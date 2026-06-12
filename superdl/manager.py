@@ -79,7 +79,8 @@ class DownloadManager:
     `connections` kapcsolattal."""
 
     # ezekben az állapotokban érdemes a sort menteni / újraindításkor folytatni
-    RESUMABLE = ("várakozik", "ütemezve", "letöltés", "leállítva", "hiba")
+    # a hibára futott letöltéseket NEM ajánljuk fel folytatásra (értelmetlen)
+    RESUMABLE = ("várakozik", "ütemezve", "letöltés", "leállítva")
 
     def __init__(self, out_dir: str, parallel: int = 3, connections: int = 8,
                  audio_only: bool = False, limit_bps: int = 0,

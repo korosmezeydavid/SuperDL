@@ -12,7 +12,8 @@ Narrátor is hibátlanul felolvassa. Minden funkció elérhető billentyűzetrő
   Ctrl+D   letöltési lista fókuszálása
   Ctrl+E   eseménynapló fókuszálása
   Ctrl+J   összefoglaló felolvasása (mennyi van hátra)
-  Delete   kijelölt letöltés leállítása (a listában)
+  Delete   futó letöltés leállítása; befejezett/hibás elem törlése
+  Shift+Del  a kijelölt elem eltávolítása a listából
   Ctrl+M   célmappa megnyitása
   Ctrl+Q   kilépés
 
@@ -101,7 +102,8 @@ KEYS_TEXT = (
     "  Ctrl+E   – az eseménynapló fókuszálása\n"
     "  Ctrl+J   – hangos összefoglaló (mennyi van hátra)\n"
     "  Ctrl+U   – frissítések keresése\n"
-    "  Delete   – a kijelölt letöltés leállítása (a listában)\n"
+    "  Delete   – futó letöltés leállítása; befejezett/hibás elem törlése\n"
+    "  Shift+Delete – a kijelölt elem eltávolítása a listából\n"
     "  Ctrl+Shift+S – minden letöltés leállítása\n"
     "  Ctrl+M   – a célmappa megnyitása\n"
     "  F1       – ez a súgó\n"
@@ -223,7 +225,12 @@ class MainFrame(wx.Frame):
                                "A letöltési lista fókuszálása")
         mi_log = m_dl.Append(wx.ID_ANY, "&Eseménynapló\tCtrl+E",
                              "Az eseménynapló fókuszálása")
-        mi_stop = m_dl.Append(wx.ID_ANY, "Kijelölt leállí&tása\tDel")
+        mi_stop = m_dl.Append(
+            wx.ID_ANY, "Kijelölt leállí&tása / törlése\tDel",
+            "Futó letöltés leállítása; befejezett vagy hibás elem törlése")
+        mi_remove = m_dl.Append(
+            wx.ID_ANY, "Eltávolítás a &listából\tShift+Del",
+            "A kijelölt elem eltávolítása a listából (és a mentett sorból)")
         mi_stopall = m_dl.Append(wx.ID_ANY, "Összes leállítá&sa\tCtrl+Shift+S")
         m_dl.AppendSeparator()
         mi_speak = m_dl.Append(wx.ID_ANY, "Összefoglaló &felolvasása\tCtrl+J",
@@ -262,6 +269,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, lambda e: self.dl_list.SetFocus(), mi_focus)
         self.Bind(wx.EVT_MENU, lambda e: self.log.SetFocus(), mi_log)
         self.Bind(wx.EVT_MENU, self._on_stop_selected, mi_stop)
+        self.Bind(wx.EVT_MENU, self._on_remove_selected, mi_remove)
         self.Bind(wx.EVT_MENU, self._on_stop_all, mi_stopall)
         self.Bind(wx.EVT_MENU, self._on_speak_summary, mi_speak)
         self.Bind(wx.EVT_MENU, self._on_subscribe, mi_subnew)
@@ -560,10 +568,30 @@ class MainFrame(wx.Frame):
 
     def _on_stop_selected(self, event=None):
         job = self._selected_job()
-        if job:
+        if not job:
+            return
+        if job.progress.status in ("letöltés", "seedelés", "várakozik",
+                                   "ütemezve"):
             self.mgr.stop(job)
             self._announce(
                 f"Leállítva: {job.progress.filename or job.url}", ok=False)
+        else:
+            # befejezett, hibás vagy már leállított elem: eltávolítjuk
+            self._remove_job(job)
+
+    def _on_remove_selected(self, event=None):
+        job = self._selected_job()
+        if job:
+            self._remove_job(job)
+
+    def _remove_job(self, job):
+        name = job.progress.filename or job.url
+        if self.mgr:
+            self.mgr.remove(job)          # leállítja, törli a sorból + mentésből
+        self._remove_row(job)
+        self._conflict_asked.discard(job.id)
+        self._reported.pop(job.id, None)
+        self._announce(f"Eltávolítva a listából: {name}")
 
     def _on_stop_all(self, event=None):
         if self.mgr:
@@ -572,7 +600,10 @@ class MainFrame(wx.Frame):
 
     def _on_list_key(self, event):
         if event.GetKeyCode() == wx.WXK_DELETE:
-            self._on_stop_selected()
+            if event.ShiftDown():
+                self._on_remove_selected()
+            else:
+                self._on_stop_selected()
         else:
             event.Skip()
 
@@ -632,6 +663,8 @@ class MainFrame(wx.Frame):
                 f"a legutóbbi munkamenetből.\n\nFolytatod őket?",
                 "SuperDL – folytatás", wx.YES_NO | wx.ICON_QUESTION,
                 self) != wx.YES:
+            store.save_queue([])      # elvetjük, hogy ne ajánlja fel újra
+            self._announce("A korábbi befejezetlen letöltések elvetve.")
             return
         mgr = self._ensure_mgr()
         restored = mgr.restore()
