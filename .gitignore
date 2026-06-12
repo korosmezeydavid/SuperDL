@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+
+# PyInstaller build kimenetek (a kész exe-k a GitHub Release-ekbe kerülnek)
+build/
+dist/
+*.spec
+
+# SuperDL futási maradékfájlok
+*.sdlstate
+*.part
