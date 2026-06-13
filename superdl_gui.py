@@ -91,6 +91,12 @@ HOWITWORKS_TEXT = (
     "bejelentkezésed sütijeit – abba a böngészőbe légy belépve. "
     "Alternatívaként egy cookies.txt fájl is betölthető. A program nem "
     "tárolja a jelszavadat; csak a böngésződ meglévő munkamenetét használja.\n\n"
+    "LEJÁTSZÁSI LISTÁK / ALBUMOK\n"
+    "   Ha a link egy lejátszási lista (pl. YouTube vagy YouTube Music album), "
+    "a „Lista mappába” beállítással a program a lista nevével ellátott "
+    "külön mappába tölti, és sorszámozza a dalokat (01 - Cím, 02 - Cím, ...) "
+    "– így egy egész lemez magától, helyes sorrendben jön le. Egyedi videó "
+    "ilyenkor is a fő mappában marad.\n\n"
     "TOVÁBBI KÉPESSÉGEK\n"
     "  • Időzítés: megadott időpontban indítja a letöltést.\n"
     "  • Folytatás: a félbeszakadt letöltéseket újraindításkor felkínálja.\n"
@@ -377,13 +383,19 @@ class MainFrame(wx.Frame):
         self.notify_chk.SetValue(True)
         self.notify_chk.SetName("Rendszerértesítés a letöltések elkészültéről")
 
+        self.playlist_chk = wx.CheckBox(sb, label="Lista &mappába")
+        self.playlist_chk.SetValue(True)
+        self.playlist_chk.SetName("Lejátszási listát külön, a lista nevével "
+                                  "ellátott mappába, sorszámozva tölt "
+                                  "(01 - Cím, 02 - Cím, ...)")
+
         # tördelődő elrendezés: szűk ablaknál több sorba rendeződik
         wrap = wx.WrapSizer(wx.HORIZONTAL)
         for w in (lbl_dir, self.dir_entry, btn_dir, lbl_conn, self.conn_spin,
                   lbl_par, self.par_spin, lbl_lim, self.limit_entry,
                   lbl_seed, self.seed_entry, self.audio_chk, lbl_fmt,
                   self.fmt_choice, lbl_cookies, self.cookies_choice,
-                  self.clip_chk, self.notify_chk):
+                  self.playlist_chk, self.clip_chk, self.notify_chk):
             wrap.Add(w, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.BOTTOM, 6)
         box.Add(wrap, 1, wx.EXPAND | wx.ALL, 4)
         vbox.Add(box, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
@@ -426,7 +438,7 @@ class MainFrame(wx.Frame):
             "connections": 8, "parallel": 3, "limit": "",
             "clipboard": False, "notify": True, "seed_ratio": "1.0",
             "tts": False, "update_last_check": "", "audio_format": "MP3",
-            "cookies": "Nincs", "cookies_file": "",
+            "cookies": "Nincs", "cookies_file": "", "playlist_folders": True,
         }
         try:
             self.settings.update(json.loads(SETTINGS_FILE.read_text()))
@@ -451,6 +463,7 @@ class MainFrame(wx.Frame):
         if self.cookies_choice.SetStringSelection(
                 str(s.get("cookies", "Nincs"))) is False:
             self.cookies_choice.SetSelection(0)
+        self.playlist_chk.SetValue(bool(s.get("playlist_folders", True)))
 
     def _save_settings(self):
         self.settings = {
@@ -466,6 +479,7 @@ class MainFrame(wx.Frame):
             "audio_format": self.fmt_choice.GetStringSelection() or "MP3",
             "cookies": self.cookies_choice.GetStringSelection() or "Nincs",
             "cookies_file": self._cookies_file or "",
+            "playlist_folders": self.playlist_chk.GetValue(),
         }
         try:
             SETTINGS_FILE.write_text(json.dumps(self.settings, indent=2))
@@ -525,7 +539,8 @@ class MainFrame(wx.Frame):
                 audio_only=self.audio_chk.GetValue(),
                 limit_bps=parse_limit(self.limit_entry.GetValue() or "0"),
                 seed_ratio=self._seed_ratio(), audio_format=fmt,
-                cookies_browser=ck_browser, cookies_file=ck_file)
+                cookies_browser=ck_browser, cookies_file=ck_file,
+                playlist_folders=self.playlist_chk.GetValue())
         else:
             self.mgr.out_dir = self.dir_entry.GetValue()
             self.mgr.connections = self.conn_spin.GetValue()
@@ -536,6 +551,7 @@ class MainFrame(wx.Frame):
             self.mgr.audio_format = fmt
             self.mgr.cookies_browser = ck_browser
             self.mgr.cookies_file = ck_file
+            self.mgr.playlist_folders = self.playlist_chk.GetValue()
         return self.mgr
 
     def _on_add(self, event=None, url: str | None = None):

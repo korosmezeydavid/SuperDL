@@ -148,6 +148,9 @@ def main() -> int:
                          "vivaldi, chromium")
     ap.add_argument("--cookies", metavar="FÁJL",
                     help="sütik betöltése cookies.txt fájlból")
+    ap.add_argument("--flat", action="store_true",
+                    help="lejátszási listát NE külön, sorszámozott mappába "
+                         "töltsön (alapból külön mappába, sorszámozva)")
     ap.add_argument("--file", action="store_true", dest="force_file",
                     help="kényszerített közvetlen fájlletöltés (yt-dlp nélkül)")
     ap.add_argument("-l", "--limit", default="0", metavar="SEBESSÉG",
@@ -260,7 +263,8 @@ def main() -> int:
                           limit_bps=limit, seed_ratio=args.seed_ratio,
                           audio_format=args.audio_format,
                           cookies_browser=args.cookies_from_browser,
-                          cookies_file=args.cookies)
+                          cookies_file=args.cookies,
+                          playlist_folders=not args.flat)
     print(f"Célmappa: {Path(args.out).resolve()}")
 
     # ---- félbeszakadtak folytatása ----------------------------------

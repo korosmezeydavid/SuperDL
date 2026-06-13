@@ -25,6 +25,10 @@ Három letöltőmotor egyben:
   munkamenet sütijeit, vagy betöltesz egy `cookies.txt` fájlt. Jelszót nem
   tárol. Parancssorban: `--cookies-from-browser firefox`, vagy
   `--cookies cookies.txt`.
+  **Lejátszási listák / albumok** (pl. YouTube és YouTube Music): a „Lista
+  mappába" beállítással a program a lista nevével ellátott külön mappába
+  tölti, sorszámozva (`01 - Cím`, `02 - Cím`…), így egy egész lemez magától,
+  helyes sorrendben jön le. Parancssorban a `--flat` kapcsolja ki.
 - **Torrentek** (magnet-link és .torrent fájl): a beépített **aria2** motor
   kezeli, DHT-vel, letöltés után a beállított megosztási arányig seedel.
 

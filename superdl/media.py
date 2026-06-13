@@ -35,12 +35,16 @@ class MediaDownloader:
                  progress: Progress | None = None, limit_bps: int = 0,
                  audio_format: str = "mp3", video_format: str | None = None,
                  cookies_browser: str | None = None,
-                 cookies_file: str | None = None):
+                 cookies_file: str | None = None,
+                 playlist_folders: bool = True):
         self.url = url
         self.out_dir = out_dir
         self.connections = connections
         self.audio_only = audio_only
         self.fmt = fmt
+        # lejátszási listát külön, a lista nevével ellátott mappába,
+        # sorszámozva ment (01 - Cím, 02 - Cím, ...)
+        self.playlist_folders = playlist_folders
         self.audio_format = (audio_format or "mp3").lower()
         self.video_format = (video_format or "").lower() or None
         # bejelentkezés/sütik: böngészőből vagy cookies.txt fájlból
@@ -85,9 +89,18 @@ class MediaDownloader:
         else:
             fmt = self.fmt or "bestvideo*+bestaudio/best"
 
+        base = str(self.out_dir)
+        if self.playlist_folders:
+            # lista esetén: <mappa>/<lista neve>/01 - Cím [id].kit
+            # egyedi videónál a lista-mező üres, így marad a fő mappában
+            outtmpl = (base + "/%(playlist_title|)s/"
+                       "%(playlist_index&{:02d} - |)s%(title)s [%(id)s].%(ext)s")
+        else:
+            outtmpl = base + "/%(title)s [%(id)s].%(ext)s"
+
         opts = {
             "format": fmt,
-            "outtmpl": str(self.out_dir) + "/%(title)s [%(id)s].%(ext)s",
+            "outtmpl": outtmpl,
             "concurrent_fragment_downloads": self.connections,
             "progress_hooks": [self._hook],
             "noprogress": True,
