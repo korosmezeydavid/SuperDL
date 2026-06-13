@@ -33,7 +33,9 @@ class MediaDownloader:
     def __init__(self, url: str, out_dir: str, connections: int = 8,
                  audio_only: bool = False, fmt: str | None = None,
                  progress: Progress | None = None, limit_bps: int = 0,
-                 audio_format: str = "mp3", video_format: str | None = None):
+                 audio_format: str = "mp3", video_format: str | None = None,
+                 cookies_browser: str | None = None,
+                 cookies_file: str | None = None):
         self.url = url
         self.out_dir = out_dir
         self.connections = connections
@@ -41,6 +43,9 @@ class MediaDownloader:
         self.fmt = fmt
         self.audio_format = (audio_format or "mp3").lower()
         self.video_format = (video_format or "").lower() or None
+        # bejelentkezés/sütik: böngészőből vagy cookies.txt fájlból
+        self.cookies_browser = (cookies_browser or "").lower() or None
+        self.cookies_file = cookies_file or None
         self.progress = progress or Progress()
         self.limit_bps = limit_bps
         self._stop = threading.Event()
@@ -93,6 +98,13 @@ class MediaDownloader:
         }
         if self.limit_bps:
             opts["ratelimit"] = self.limit_bps
+
+        # bejelentkezés/sütik: a fiókod mögötti (korhatáros, tagsági,
+        # régiózárt) tartalmakhoz – a böngésződ munkamenetéből vagy fájlból
+        if self.cookies_browser:
+            opts["cookiesfrombrowser"] = (self.cookies_browser,)
+        elif self.cookies_file:
+            opts["cookiefile"] = self.cookies_file
 
         # van-e szükség átkódolásra (ehhez ffmpeg kell)?
         need_ffmpeg = self.audio_only or bool(self.video_format)

@@ -142,6 +142,12 @@ def main() -> int:
                     help="a hang formátuma: mp3 (alap), m4a, opus, flac, wav, "
                          "aac (az átkódoláshoz ffmpeg kell; ha nincs, a "
                          "program letölti)")
+    ap.add_argument("--cookies-from-browser", metavar="BÖNGÉSZŐ",
+                    help="sütik a böngészőből a bejelentkezést igénylő "
+                         "videókhoz: chrome, firefox, edge, brave, opera, "
+                         "vivaldi, chromium")
+    ap.add_argument("--cookies", metavar="FÁJL",
+                    help="sütik betöltése cookies.txt fájlból")
     ap.add_argument("--file", action="store_true", dest="force_file",
                     help="kényszerített közvetlen fájlletöltés (yt-dlp nélkül)")
     ap.add_argument("-l", "--limit", default="0", metavar="SEBESSÉG",
@@ -252,7 +258,9 @@ def main() -> int:
                           connections=args.connections,
                           audio_only=args.audio,
                           limit_bps=limit, seed_ratio=args.seed_ratio,
-                          audio_format=args.audio_format)
+                          audio_format=args.audio_format,
+                          cookies_browser=args.cookies_from_browser,
+                          cookies_file=args.cookies)
     print(f"Célmappa: {Path(args.out).resolve()}")
 
     # ---- félbeszakadtak folytatása ----------------------------------

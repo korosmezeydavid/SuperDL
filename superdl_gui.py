@@ -50,7 +50,8 @@ SETTINGS_FILE = Path.home() / ".superdl.json"
 
 ABOUT_TEXT = (
     f"SuperDL {__version__} – akadálymentes, többfunkciós, többszálú letöltő\n\n"
-    "Készítette: Kőrösmezey Dávid\n\n"
+    "Készítette: Kőrösmezey Dávid\n"
+    "Elérhetőség: korosmezey.david.richard@gmail.com\n\n"
     "Egy program, amely közvetlen fájlokat, médiaoldalakat és torrenteket "
     "tölt le – kiemelt hangsúllyal a teljes, minden szintű "
     "képernyőolvasó-támogatáson. A cél, hogy a letöltés mindenki számára "
@@ -83,6 +84,13 @@ HOWITWORKS_TEXT = (
     "3. TORRENT (magnet-link vagy .torrent fájl)\n"
     "   Az aria2 motor kezeli. Letöltés után a „Seed-arány” mezőben megadott "
     "arányig oszt vissza (seedel) másoknak; 0 esetén nem seedel.\n\n"
+    "BEJELENTKEZÉS / SÜTIK\n"
+    "   Ha egy videó csak bejelentkezve tölthető (korhatáros, tagsági, "
+    "régiózárt, vagy „erősítsd meg, hogy nem vagy robot”), a „Sütik” "
+    "választóval megadhatod, melyik böngészőből vegye a program a "
+    "bejelentkezésed sütijeit – abba a böngészőbe légy belépve. "
+    "Alternatívaként egy cookies.txt fájl is betölthető. A program nem "
+    "tárolja a jelszavadat; csak a böngésződ meglévő munkamenetét használja.\n\n"
     "TOVÁBBI KÉPESSÉGEK\n"
     "  • Időzítés: megadott időpontban indítja a letöltést.\n"
     "  • Folytatás: a félbeszakadt letöltéseket újraindításkor felkínálja.\n"
@@ -350,6 +358,18 @@ class MainFrame(wx.Frame):
                                 "a többihez a program szükség esetén letölti "
                                 "az átalakítót")
 
+        lbl_cookies = wx.StaticText(sb, label="&Sütik:")
+        self.cookies_choice = wx.Choice(sb, choices=[
+            "Nincs", "Chrome", "Firefox", "Edge", "Brave", "Opera",
+            "Vivaldi", "Chromium", "cookies.txt fájl…"])
+        self.cookies_choice.SetSelection(0)
+        self.cookies_choice.SetName(
+            "Bejelentkezés sütikkel a fiókod mögötti (korhatáros, tagsági) "
+            "videókhoz: válassz böngészőt, amelybe be vagy jelentkezve, vagy "
+            "egy cookies.txt fájlt")
+        self.cookies_choice.Bind(wx.EVT_CHOICE, self._on_cookies_choice)
+        self._cookies_file = None
+
         self.clip_chk = wx.CheckBox(sb, label="&Vágólap figyelése")
         self.clip_chk.SetName("Vágólapra másolt hivatkozások automatikus "
                               "letöltése")
@@ -362,7 +382,8 @@ class MainFrame(wx.Frame):
         for w in (lbl_dir, self.dir_entry, btn_dir, lbl_conn, self.conn_spin,
                   lbl_par, self.par_spin, lbl_lim, self.limit_entry,
                   lbl_seed, self.seed_entry, self.audio_chk, lbl_fmt,
-                  self.fmt_choice, self.clip_chk, self.notify_chk):
+                  self.fmt_choice, lbl_cookies, self.cookies_choice,
+                  self.clip_chk, self.notify_chk):
             wrap.Add(w, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.BOTTOM, 6)
         box.Add(wrap, 1, wx.EXPAND | wx.ALL, 4)
         vbox.Add(box, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
@@ -405,6 +426,7 @@ class MainFrame(wx.Frame):
             "connections": 8, "parallel": 3, "limit": "",
             "clipboard": False, "notify": True, "seed_ratio": "1.0",
             "tts": False, "update_last_check": "", "audio_format": "MP3",
+            "cookies": "Nincs", "cookies_file": "",
         }
         try:
             self.settings.update(json.loads(SETTINGS_FILE.read_text()))
@@ -425,6 +447,10 @@ class MainFrame(wx.Frame):
         if self.fmt_choice.SetStringSelection(str(s.get("audio_format", "MP3"))) \
                 is False:
             self.fmt_choice.SetSelection(0)
+        self._cookies_file = s.get("cookies_file") or None
+        if self.cookies_choice.SetStringSelection(
+                str(s.get("cookies", "Nincs"))) is False:
+            self.cookies_choice.SetSelection(0)
 
     def _save_settings(self):
         self.settings = {
@@ -438,6 +464,8 @@ class MainFrame(wx.Frame):
             "tts": self.mi_tts.IsChecked(),
             "update_last_check": self.settings.get("update_last_check", ""),
             "audio_format": self.fmt_choice.GetStringSelection() or "MP3",
+            "cookies": self.cookies_choice.GetStringSelection() or "Nincs",
+            "cookies_file": self._cookies_file or "",
         }
         try:
             SETTINGS_FILE.write_text(json.dumps(self.settings, indent=2))
@@ -463,8 +491,32 @@ class MainFrame(wx.Frame):
         except ValueError:
             return 1.0
 
+    def _cookies_config(self) -> tuple[str | None, str | None]:
+        """(böngésző, cookies.txt-fájl) a sütik-választó alapján."""
+        sel = self.cookies_choice.GetStringSelection()
+        if sel == "cookies.txt fájl…":
+            return None, self._cookies_file
+        if sel and sel != "Nincs":
+            return sel.lower(), None
+        return None, None
+
+    def _on_cookies_choice(self, event):
+        if self.cookies_choice.GetStringSelection() != "cookies.txt fájl…":
+            return
+        dlg = wx.FileDialog(
+            self, "cookies.txt fájl kiválasztása",
+            wildcard="cookies.txt (*.txt)|*.txt|Minden fájl|*.*",
+            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        if dlg.ShowModal() == wx.ID_OK:
+            self._cookies_file = dlg.GetPath()
+            self._announce(f"Sütifájl beállítva: {self._cookies_file}")
+        else:
+            self.cookies_choice.SetSelection(0)   # vissza a „Nincs"-re
+        dlg.Destroy()
+
     def _ensure_mgr(self) -> DownloadManager:
         fmt = (self.fmt_choice.GetStringSelection() or "mp3").lower()
+        ck_browser, ck_file = self._cookies_config()
         if self.mgr is None:
             self.mgr = DownloadManager(
                 self.dir_entry.GetValue(),
@@ -472,7 +524,8 @@ class MainFrame(wx.Frame):
                 connections=self.conn_spin.GetValue(),
                 audio_only=self.audio_chk.GetValue(),
                 limit_bps=parse_limit(self.limit_entry.GetValue() or "0"),
-                seed_ratio=self._seed_ratio(), audio_format=fmt)
+                seed_ratio=self._seed_ratio(), audio_format=fmt,
+                cookies_browser=ck_browser, cookies_file=ck_file)
         else:
             self.mgr.out_dir = self.dir_entry.GetValue()
             self.mgr.connections = self.conn_spin.GetValue()
@@ -481,6 +534,8 @@ class MainFrame(wx.Frame):
                 self.limit_entry.GetValue() or "0")
             self.mgr.seed_ratio = self._seed_ratio()
             self.mgr.audio_format = fmt
+            self.mgr.cookies_browser = ck_browser
+            self.mgr.cookies_file = ck_file
         return self.mgr
 
     def _on_add(self, event=None, url: str | None = None):

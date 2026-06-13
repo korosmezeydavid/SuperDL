@@ -1,6 +1,6 @@
 # SuperDL – akadálymentes, többfunkciós, többszálú letöltő
 
-Készítette: **Kőrösmezey Dávid**
+Készítette: **Kőrösmezey Dávid** — korosmezey.david.richard@gmail.com
 
 > A `dist\SuperDL.exe` és `dist\SuperDL-cli.exe` **önálló, terjeszthető**
 > programok: a Python, a wxPython, a yt-dlp, a feedparser és az aria2 mind
@@ -19,6 +19,12 @@ Három letöltőmotor egyben:
   „Csak hang" módban a **Hangformátum** is választható (MP3, M4A, OPUS,
   FLAC, WAV, AAC); az átkódoláshoz szükséges **ffmpeg**-et a program első
   alkalommal automatikusan letölti a `~/.superdl/bin` mappába.
+  **Bejelentkezést igénylő videók** (korhatáros, tagsági, régiózárt) a
+  **Sütik** választóval tölthetők: megadod, melyik böngésződből (Chrome,
+  Firefox, Edge, Brave, Opera, Vivaldi, Chromium) vegye a bejelentkezett
+  munkamenet sütijeit, vagy betöltesz egy `cookies.txt` fájlt. Jelszót nem
+  tárol. Parancssorban: `--cookies-from-browser firefox`, vagy
+  `--cookies cookies.txt`.
 - **Torrentek** (magnet-link és .torrent fájl): a beépített **aria2** motor
   kezeli, DHT-vel, letöltés után a beállított megosztási arányig seedel.
 

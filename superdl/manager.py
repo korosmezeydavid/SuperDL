@@ -85,12 +85,16 @@ class DownloadManager:
     def __init__(self, out_dir: str, parallel: int = 3, connections: int = 8,
                  audio_only: bool = False, limit_bps: int = 0,
                  seed_ratio: float = 1.0, persist: bool = True,
-                 audio_format: str = "mp3", video_format: str | None = None):
+                 audio_format: str = "mp3", video_format: str | None = None,
+                 cookies_browser: str | None = None,
+                 cookies_file: str | None = None):
         self.out_dir = out_dir
         self.connections = connections
         self.audio_only = audio_only
         self.audio_format = audio_format
         self.video_format = video_format
+        self.cookies_browser = cookies_browser
+        self.cookies_file = cookies_file
         self.seed_ratio = seed_ratio
         self.persist = persist
         # közös korlát: az összes letöltés együtt sem lépi túl
@@ -158,7 +162,9 @@ class DownloadManager:
                     audio_only=audio, progress=job.progress,
                     limit_bps=self.limiter.bps,
                     audio_format=self.audio_format,
-                    video_format=self.video_format)
+                    video_format=self.video_format,
+                    cookies_browser=self.cookies_browser,
+                    cookies_file=self.cookies_file)
             else:
                 job.downloader = SegmentDownloader(
                     job.url, out_dir, connections=self.connections,
