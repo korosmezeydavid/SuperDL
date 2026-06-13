@@ -76,7 +76,10 @@ HOWITWORKS_TEXT = (
     "letöltött darabokat megőrzi, és onnan folytatja.\n\n"
     "2. MÉDIAOLDAL (YouTube, Vimeo, SoundCloud és sok ezer más)\n"
     "   A yt-dlp motor intézi; a videó-darabokat szintén több szálon szedi. "
-    "A „Csak hang” beállítással csak a hangsávot töltöd le.\n\n"
+    "A „Csak hang” beállítással csak a hangsávot töltöd le, a "
+    "„Hangformátum” választóval pedig a formátumát (MP3, M4A, OPUS, FLAC, "
+    "WAV, AAC). Az átkódoláshoz ffmpeg kell; ha nincs a gépen, a program "
+    "az első ilyen letöltéskor egyszer automatikusan letölti.\n\n"
     "3. TORRENT (magnet-link vagy .torrent fájl)\n"
     "   Az aria2 motor kezeli. Letöltés után a „Seed-arány” mezőben megadott "
     "arányig oszt vissza (seedel) másoknak; 0 esetén nem seedel.\n\n"
@@ -307,7 +310,7 @@ class MainFrame(wx.Frame):
         vbox.Add(row1, 0, wx.EXPAND | wx.ALL, 8)
 
         # beállítások
-        box = wx.StaticBoxSizer(wx.HORIZONTAL, panel, "Beállítások")
+        box = wx.StaticBoxSizer(wx.VERTICAL, panel, "Beállítások")
         sb = box.GetStaticBox()
 
         lbl_dir = wx.StaticText(sb, label="&Célmappa:")
@@ -338,6 +341,15 @@ class MainFrame(wx.Frame):
 
         self.audio_chk = wx.CheckBox(sb, label="Csak &hang")
         self.audio_chk.SetName("Médiaoldalról csak a hangsáv letöltése")
+
+        lbl_fmt = wx.StaticText(sb, label="Hang&formátum:")
+        self.fmt_choice = wx.Choice(
+            sb, choices=["MP3", "M4A", "OPUS", "FLAC", "WAV", "AAC"])
+        self.fmt_choice.SetSelection(0)
+        self.fmt_choice.SetName("Hangformátum a Csak hang módhoz; MP3-hoz és "
+                                "a többihez a program szükség esetén letölti "
+                                "az átalakítót")
+
         self.clip_chk = wx.CheckBox(sb, label="&Vágólap figyelése")
         self.clip_chk.SetName("Vágólapra másolt hivatkozások automatikus "
                               "letöltése")
@@ -345,14 +357,14 @@ class MainFrame(wx.Frame):
         self.notify_chk.SetValue(True)
         self.notify_chk.SetName("Rendszerértesítés a letöltések elkészültéről")
 
-        for w, prop in ((lbl_dir, 0), (self.dir_entry, 1), (btn_dir, 0),
-                        (lbl_conn, 0), (self.conn_spin, 0),
-                        (lbl_par, 0), (self.par_spin, 0),
-                        (lbl_lim, 0), (self.limit_entry, 0),
-                        (lbl_seed, 0), (self.seed_entry, 0),
-                        (self.audio_chk, 0), (self.clip_chk, 0),
-                        (self.notify_chk, 0)):
-            box.Add(w, prop, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        # tördelődő elrendezés: szűk ablaknál több sorba rendeződik
+        wrap = wx.WrapSizer(wx.HORIZONTAL)
+        for w in (lbl_dir, self.dir_entry, btn_dir, lbl_conn, self.conn_spin,
+                  lbl_par, self.par_spin, lbl_lim, self.limit_entry,
+                  lbl_seed, self.seed_entry, self.audio_chk, lbl_fmt,
+                  self.fmt_choice, self.clip_chk, self.notify_chk):
+            wrap.Add(w, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.BOTTOM, 6)
+        box.Add(wrap, 1, wx.EXPAND | wx.ALL, 4)
         vbox.Add(box, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
 
         # letöltési lista
@@ -392,7 +404,7 @@ class MainFrame(wx.Frame):
             "out_dir": str(Path.home() / "Downloads"),
             "connections": 8, "parallel": 3, "limit": "",
             "clipboard": False, "notify": True, "seed_ratio": "1.0",
-            "tts": False, "update_last_check": "",
+            "tts": False, "update_last_check": "", "audio_format": "MP3",
         }
         try:
             self.settings.update(json.loads(SETTINGS_FILE.read_text()))
@@ -410,6 +422,9 @@ class MainFrame(wx.Frame):
         self.seed_entry.SetValue(str(s["seed_ratio"]))
         self.mi_tts.Enable(self.speaker.available)
         self.mi_tts.Check(bool(s.get("tts")) and self.speaker.available)
+        if self.fmt_choice.SetStringSelection(str(s.get("audio_format", "MP3"))) \
+                is False:
+            self.fmt_choice.SetSelection(0)
 
     def _save_settings(self):
         self.settings = {
@@ -422,6 +437,7 @@ class MainFrame(wx.Frame):
             "seed_ratio": self.seed_entry.GetValue(),
             "tts": self.mi_tts.IsChecked(),
             "update_last_check": self.settings.get("update_last_check", ""),
+            "audio_format": self.fmt_choice.GetStringSelection() or "MP3",
         }
         try:
             SETTINGS_FILE.write_text(json.dumps(self.settings, indent=2))
@@ -448,6 +464,7 @@ class MainFrame(wx.Frame):
             return 1.0
 
     def _ensure_mgr(self) -> DownloadManager:
+        fmt = (self.fmt_choice.GetStringSelection() or "mp3").lower()
         if self.mgr is None:
             self.mgr = DownloadManager(
                 self.dir_entry.GetValue(),
@@ -455,7 +472,7 @@ class MainFrame(wx.Frame):
                 connections=self.conn_spin.GetValue(),
                 audio_only=self.audio_chk.GetValue(),
                 limit_bps=parse_limit(self.limit_entry.GetValue() or "0"),
-                seed_ratio=self._seed_ratio())
+                seed_ratio=self._seed_ratio(), audio_format=fmt)
         else:
             self.mgr.out_dir = self.dir_entry.GetValue()
             self.mgr.connections = self.conn_spin.GetValue()
@@ -463,6 +480,7 @@ class MainFrame(wx.Frame):
             self.mgr.limiter.bps = parse_limit(
                 self.limit_entry.GetValue() or "0")
             self.mgr.seed_ratio = self._seed_ratio()
+            self.mgr.audio_format = fmt
         return self.mgr
 
     def _on_add(self, event=None, url: str | None = None):

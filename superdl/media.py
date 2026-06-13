@@ -23,15 +23,24 @@ def is_media_url(url: str) -> bool:
     return False
 
 
+# a yt-dlp-nek átadható hangkodek-azonosítók
+AUDIO_FORMATS = ("mp3", "m4a", "opus", "flac", "wav", "aac", "vorbis")
+# konténerek, amikbe a videót össze lehet fűzni
+VIDEO_FORMATS = ("mp4", "mkv", "webm")
+
+
 class MediaDownloader:
     def __init__(self, url: str, out_dir: str, connections: int = 8,
                  audio_only: bool = False, fmt: str | None = None,
-                 progress: Progress | None = None, limit_bps: int = 0):
+                 progress: Progress | None = None, limit_bps: int = 0,
+                 audio_format: str = "mp3", video_format: str | None = None):
         self.url = url
         self.out_dir = out_dir
         self.connections = connections
         self.audio_only = audio_only
         self.fmt = fmt
+        self.audio_format = (audio_format or "mp3").lower()
+        self.video_format = (video_format or "").lower() or None
         self.progress = progress or Progress()
         self.limit_bps = limit_bps
         self._stop = threading.Event()
@@ -54,8 +63,17 @@ class MediaDownloader:
             with p._lock:
                 p.downloaded = p.total or p.downloaded
 
+    def _ffmpeg_progress(self, done: int, total: int) -> None:
+        p = self.progress
+        p.status = "előkészítés"
+        p.filename = "Átalakító (ffmpeg) letöltése – egyszeri"
+        p.total = total
+        with p._lock:
+            p.downloaded = done
+
     def run(self) -> str:
         import yt_dlp
+        from . import ffmpeg as ffmpeg_mod
 
         if self.audio_only:
             fmt = "bestaudio/best"
@@ -75,15 +93,30 @@ class MediaDownloader:
         }
         if self.limit_bps:
             opts["ratelimit"] = self.limit_bps
+
+        # van-e szükség átkódolásra (ehhez ffmpeg kell)?
+        need_ffmpeg = self.audio_only or bool(self.video_format)
+        ff_dir = ffmpeg_mod.find_ffmpeg() and ffmpeg_mod.ffmpeg_dir()
+        if need_ffmpeg and not ff_dir:
+            # igény esetén automatikusan letöltjük az ffmpeg-et
+            ff_dir = ffmpeg_mod.ensure_ffmpeg(self._ffmpeg_progress)
+        if ff_dir:
+            opts["ffmpeg_location"] = ff_dir
+
         if self.audio_only:
-            # ffmpeg nélkül is működjön: csak akkor konvertálunk, ha van
-            import shutil
-            if shutil.which("ffmpeg"):
-                opts["postprocessors"] = [{
-                    "key": "FFmpegExtractAudio",
-                    "preferredcodec": "mp3",
-                    "preferredquality": "192",
-                }]
+            codec = self.audio_format if self.audio_format in AUDIO_FORMATS \
+                else "mp3"
+            if ff_dir:
+                pp = {"key": "FFmpegExtractAudio", "preferredcodec": codec}
+                if codec not in ("flac", "wav"):     # veszteségmentesnél nincs
+                    pp["preferredquality"] = "192"
+                opts["postprocessors"] = [pp]
+            else:
+                # ffmpeg nélkül a natív hangsáv jön le (nincs átkódolás)
+                self.progress.error = ("ffmpeg nélkül a hang az eredeti "
+                                       "formátumában (nem MP3) töltődik le")
+        elif self.video_format in VIDEO_FORMATS and ff_dir:
+            opts["merge_output_format"] = self.video_format
 
         self.progress.status = "letöltés"
         self.progress.connections = self.connections

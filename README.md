@@ -16,6 +16,9 @@ Három letöltőmotor egyben:
   Range kéréseket, automatikusan egyszálú módra vált.
 - **Médiaoldalak** (YouTube, Vimeo, SoundCloud, Twitch és több ezer más): a
   beépített **yt-dlp** intézi, a fragmenseket szintén több szálon szedi le.
+  „Csak hang" módban a **Hangformátum** is választható (MP3, M4A, OPUS,
+  FLAC, WAV, AAC); az átkódoláshoz szükséges **ffmpeg**-et a program első
+  alkalommal automatikusan letölti a `~/.superdl/bin` mappába.
 - **Torrentek** (magnet-link és .torrent fájl): a beépített **aria2** motor
   kezeli, DHT-vel, letöltés után a beállított megosztási arányig seedel.
 

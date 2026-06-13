@@ -138,6 +138,10 @@ def main() -> int:
                     help="egyszerre futó letöltések száma (alap: 3)")
     ap.add_argument("--audio", action="store_true",
                     help="médiaoldalról csak a hangot tölti le")
+    ap.add_argument("--audio-format", default="mp3", metavar="FORMÁTUM",
+                    help="a hang formátuma: mp3 (alap), m4a, opus, flac, wav, "
+                         "aac (az átkódoláshoz ffmpeg kell; ha nincs, a "
+                         "program letölti)")
     ap.add_argument("--file", action="store_true", dest="force_file",
                     help="kényszerített közvetlen fájlletöltés (yt-dlp nélkül)")
     ap.add_argument("-l", "--limit", default="0", metavar="SEBESSÉG",
@@ -247,7 +251,8 @@ def main() -> int:
     mgr = DownloadManager(args.out, parallel=args.parallel,
                           connections=args.connections,
                           audio_only=args.audio,
-                          limit_bps=limit, seed_ratio=args.seed_ratio)
+                          limit_bps=limit, seed_ratio=args.seed_ratio,
+                          audio_format=args.audio_format)
     print(f"Célmappa: {Path(args.out).resolve()}")
 
     # ---- félbeszakadtak folytatása ----------------------------------
