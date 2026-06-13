@@ -392,12 +392,23 @@ class MediaSearchFrame(wx.Frame):
         if not self.mc.Load(path):
             self._announce("A lejátszó nem tudta megnyitni a fájlt.")
             return
+        # FONTOS: a „betöltve” (EVT_MEDIA_LOADED) esemény ezzel a Windows-
+        # motorral gyakran NEM sül el, ezért nem várunk rá – rövid késleltetés
+        # után közvetlenül indítjuk a lejátszást (a fájl ekkorra már kész).
         self.player_panel.SetFocus()
+        wx.CallLater(250, self._start_play)
 
-    def _mc_loaded(self):
+    def _start_play(self):
+        if not self.mc:
+            return
         self.mc.Play()
         self._announce(f"Lejátszás: {getattr(self, '_play_title', '')}  "
                        "(bal/jobb tekerés, fel/le hangerő, Escape vissza)")
+
+    def _mc_loaded(self):
+        # ha mégis megérkezik a „betöltve” esemény, az is indítson (ártalmatlan)
+        if self.mc:
+            self.mc.Play()
 
     def _cleanup_play(self):
         try:
