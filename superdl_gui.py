@@ -40,7 +40,7 @@ from superdl.torrent import is_torrent_url
 from superdl.feeds import FeedManager
 from superdl.report import build_summary
 from superdl.speech import Speaker
-from superdl import updater, selfupdate, __version__
+from superdl import updater, selfupdate, sounds, __version__
 from superdl.searchwin import MediaSearchFrame
 
 try:
@@ -198,6 +198,7 @@ class MainFrame(wx.Frame):
         self._last_values: dict[int, tuple] = {}
         self._reported: dict[int, str] = {}
         self._conflict_asked: set = set()        # mely job-okra kérdeztünk rá
+        self._started: set = set()               # melyik kezdett már letöltődni
         self._last_clip = ""
 
         self._load_settings()
@@ -261,6 +262,10 @@ class MainFrame(wx.Frame):
         self.mi_tts = m_dl.AppendCheckItem(
             wx.ID_ANY, "Be&fejezés felolvasása",
             "Minden elkészült letöltést hangosan is bemond")
+        self.mi_sounds = m_dl.AppendCheckItem(
+            wx.ID_ANY, "Hang&hatások",
+            "Apró hangjelzés a fontos eseményeknél (indulás, kész, hiba)")
+        self.mi_sounds.Check(True)
         mb.Append(m_dl, "&Letöltések")
 
         m_sub = wx.Menu()
@@ -452,6 +457,7 @@ class MainFrame(wx.Frame):
             "clipboard": False, "notify": True, "seed_ratio": "1.0",
             "tts": False, "update_last_check": "", "audio_format": "MP3",
             "cookies": "Nincs", "cookies_file": "", "playlist_folders": True,
+            "sounds": True,
         }
         try:
             self.settings.update(json.loads(SETTINGS_FILE.read_text()))
@@ -477,6 +483,7 @@ class MainFrame(wx.Frame):
                 str(s.get("cookies", "Nincs"))) is False:
             self.cookies_choice.SetSelection(0)
         self.playlist_chk.SetValue(bool(s.get("playlist_folders", True)))
+        self.mi_sounds.Check(bool(s.get("sounds", True)))
 
     def _save_settings(self):
         self.settings = {
@@ -493,6 +500,7 @@ class MainFrame(wx.Frame):
             "cookies": self.cookies_choice.GetStringSelection() or "Nincs",
             "cookies_file": self._cookies_file or "",
             "playlist_folders": self.playlist_chk.GetValue(),
+            "sounds": self.mi_sounds.IsChecked(),
         }
         try:
             SETTINGS_FILE.write_text(json.dumps(self.settings, indent=2))
@@ -501,13 +509,23 @@ class MainFrame(wx.Frame):
 
     # ---- események ----------------------------------------------------
 
-    def _announce(self, text: str, ok: bool = True, toast: bool = False):
+    def _sfx(self, name: str):
+        if self.mi_sounds.IsChecked():
+            sounds.play(name)
+
+    def _announce(self, text: str, ok: bool = True, toast: bool = False,
+                  sound: str | None = None):
         """Állapotsor + napló + hang; fontos eseménynél rendszerértesítés,
-        amelyet a képernyőolvasók maguktól felolvasnak."""
+        amelyet a képernyőolvasók maguktól felolvasnak. `sound` esetén a
+        megfelelő hanghatás szól (ha a hanghatások be vannak kapcsolva),
+        különben a megszokott rendszer-csipogás."""
         self.SetStatusText(text)
         stamp = time.strftime("%H:%M:%S")
         self.log.AppendText(f"[{stamp}] {text}\n")
-        beep(ok)
+        if sound and self.mi_sounds.IsChecked():
+            sounds.play(sound)
+        else:
+            beep(ok)
         if toast and self.notify_chk.GetValue():
             note = wx.adv.NotificationMessage("SuperDL", text)
             note.Show(timeout=8)
@@ -908,6 +926,9 @@ class MainFrame(wx.Frame):
             row = self._row_for(j)      # visszatöltött/podcast elemekhez is
             if p.status in ("letöltés", "seedelés"):
                 active += 1
+            if p.status == "letöltés" and j.id not in self._started:
+                self._started.add(j.id)
+                self._sfx("start")
             halad = f"{p.percent:.0f}%" if p.total else human(p.downloaded)
             if p.status == "seedelés" or (j.kind == "torrent" and p.uploaded):
                 feltoltes = f"{human(p.up_speed)}/s ({p.ratio:.2f})"
@@ -928,13 +949,13 @@ class MainFrame(wx.Frame):
                 self._reported[j.id] = p.status
                 if p.status == "kész":
                     msg = f"Elkészült: {p.filename or j.url}"
-                    self._announce(msg, toast=True)
+                    self._announce(msg, toast=True, sound="done")
                 elif p.status == "seedelés":
                     msg = f"Letöltve, seedelés folyamatban: {p.filename or j.url}"
-                    self._announce(msg, toast=True)
+                    self._announce(msg, toast=True, sound="done")
                 else:
                     msg = f"Hiba: {p.filename or j.url} – {p.error}"
-                    self._announce(msg, ok=False, toast=True)
+                    self._announce(msg, ok=False, toast=True, sound="error")
                 if self.mi_tts.IsChecked() and self.speaker.available:
                     self.speaker.speak(msg)
             # torrent: a cél fájl már létezik – felkínáljuk a választást

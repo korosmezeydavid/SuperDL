@@ -212,6 +212,8 @@ class MediaSearchFrame(wx.Frame):
             self.res_list.SetItem(row, 1, S.human_duration(x.duration))
             self.res_list.SetItem(row, 2, x.uploader)
         self.SetStatusText(f"{len(res)} találat a(z) „{self.query}” szóra.")
+        if res and hasattr(self.main, "_sfx"):
+            self.main._sfx("results")
         self.btn_more.Enable(bool(res))
         if res:
             sel = 0 if focus_first else min(keep, len(res) - 1)

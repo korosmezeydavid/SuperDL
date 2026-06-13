@@ -76,6 +76,9 @@ A program kiemelt szempontja a teljes akadálymentesség:
   és gyorsbillentyűje (Alt+aláhúzott betű).
 - A letöltések elkészültéről **rendszerértesítés** és hangjelzés szól — az
   értesítéseket a képernyőolvasók maguktól felolvassák.
+- **Apró hanghatások** (Letöltések → Hanghatások) jelzik a fontos
+  eseményeket: találati lista megjelenése, letöltés indulása, befejezése és
+  hibája. A program maga állítja elő őket; ki-be kapcsolható.
 - Az **eseménynapló** (Ctrl+E) csak olvasható szövegmezőben, időbélyeggel
   őrzi a történteket, így bármikor kényelmesen visszaolvasható.
 - A parancssor **--plain** kapcsolóval (vagy átirányításnál automatikusan)
