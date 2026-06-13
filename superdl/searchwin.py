@@ -7,7 +7,10 @@ szabványos helyi menü (jobb klikk, Menü-billentyű, Shift+F10) ad
 műveleteket, és vannak közvetlen gyorsbillentyűk is.
 """
 
+import glob
+import os
 import threading
+from pathlib import Path
 
 import wx
 import wx.media
@@ -17,6 +20,7 @@ from . import store
 
 SEEK_INTERVALS = [5, 10, 15, 20, 25, 30, 40, 50, 60]
 PAGE = 25
+PLAY_DIR = Path.home() / ".superdl" / "play"   # ideiglenes lejátszó-fájlok
 
 
 def _fmt_time(ms: int) -> str:
@@ -311,37 +315,97 @@ class MediaSearchFrame(wx.Frame):
         if not x or not self.mc:
             return
         self._cur = x
-        self._announce(f"Betöltés lejátszásra: {x.title} …")
+        self._announce(f"Letöltés lejátszáshoz: {x.title} …")
         ckb, ckf = (self.main._cookies_config()
                     if hasattr(self.main, "_cookies_config") else (None, None))
         audio = self._audio_only_play
 
         def work():
             try:
-                url, title, dur = S.resolve_stream(
-                    x.url, audio_only=audio,
-                    cookies_browser=ckb, cookies_file=ckf)
+                path = self._fetch_for_play(x.url, audio, ckb, ckf)
             except Exception as ex:
-                wx.CallAfter(self._announce, f"Nem lejátszható: {ex}")
+                wx.CallAfter(self._announce, self._friendly_error(str(ex)))
                 return
-            wx.CallAfter(self._load_stream, url, x.title)
+            wx.CallAfter(self._load_local, path, x.title)
 
         threading.Thread(target=work, daemon=True).start()
 
-    def _load_stream(self, url, title):
-        if not url or not self.mc:
-            self._announce("Nem sikerült lejátszható forrást találni.")
+    @staticmethod
+    def _friendly_error(msg: str) -> str:
+        m = msg.lower()
+        if "not available" in m or "unavailable" in m or "removed" in m:
+            return ("Ez a videó nem elérhető (lehet, hogy régiózárt vagy "
+                    "törölt). Próbálj egy másikat a listából.")
+        if "sign in" in m or "age" in m or "consent" in m or "private" in m:
+            return ("Bejelentkezés szükséges. A fő ablakban állítsd be a "
+                    "Sütik-et (böngésződ), majd próbáld újra.")
+        return f"Nem lejátszható: {msg[:120]}. Próbálj egy másikat."
+
+    def _fetch_for_play(self, url, audio, ckb, ckf) -> str:
+        """A választott médiát ideiglenes fájlba tölti, és visszaadja az
+        útvonalát. A helyi fájlt a beépített lejátszó megbízhatóan megnyitja
+        (van kiterjesztése, ismert kodek)."""
+        import yt_dlp
+        PLAY_DIR.mkdir(parents=True, exist_ok=True)
+        self._cleanup_play()
+        if audio:
+            fmt = "bestaudio[ext=m4a]/bestaudio"
+        else:
+            fmt = ("best[ext=mp4][acodec!=none][vcodec!=none]/"
+                   "best[acodec!=none][vcodec!=none]/bestaudio[ext=m4a]/"
+                   "bestaudio")
+        holder: dict = {}
+
+        def hook(d):
+            if d["status"] == "downloading":
+                t = (d.get("total_bytes") or d.get("total_bytes_estimate")
+                     or 0)
+                done = d.get("downloaded_bytes") or 0
+                pct = int(done / t * 100) if t else 0
+                wx.CallAfter(self._announce, f"Letöltés lejátszáshoz: {pct}%")
+            elif d["status"] == "finished":
+                holder["path"] = d.get("filename")
+
+        opts = {"quiet": True, "no_warnings": True, "format": fmt,
+                "outtmpl": str(PLAY_DIR / "play.%(ext)s"),
+                "progress_hooks": [hook], "noprogress": True}
+        if ckb:
+            opts["cookiesfrombrowser"] = (ckb,)
+        elif ckf:
+            opts["cookiefile"] = ckf
+        with yt_dlp.YoutubeDL(opts) as y:
+            y.download([url])
+        path = holder.get("path")
+        if not path or not os.path.exists(path):
+            files = glob.glob(str(PLAY_DIR / "play.*"))
+            path = files[0] if files else None
+        if not path:
+            raise RuntimeError("nem jött létre lejátszható fájl")
+        return path
+
+    def _load_local(self, path, title):
+        if not self.mc:
             return
         self._play_title = title
-        if not self.mc.LoadURI(url):
-            self._announce("A lejátszó nem tudta megnyitni a forrást.")
+        if not self.mc.Load(path):
+            self._announce("A lejátszó nem tudta megnyitni a fájlt.")
             return
         self.player_panel.SetFocus()
 
     def _mc_loaded(self):
         self.mc.Play()
         self._announce(f"Lejátszás: {getattr(self, '_play_title', '')}  "
-                       "(nyilakkal vezérelhető, Escape: vissza)")
+                       "(bal/jobb tekerés, fel/le hangerő, Escape vissza)")
+
+    def _cleanup_play(self):
+        try:
+            for f in glob.glob(str(PLAY_DIR / "play.*")):
+                try:
+                    os.remove(f)
+                except OSError:
+                    pass
+        except Exception:
+            pass
 
     def _on_player_key(self, e):
         if not self.mc:
@@ -415,6 +479,7 @@ class MediaSearchFrame(wx.Frame):
                 self.mc.Stop()
         except Exception:
             pass
+        self._cleanup_play()
         self._save_cart()
         if getattr(self.main, "_search_win", None) is self:
             self.main._search_win = None
