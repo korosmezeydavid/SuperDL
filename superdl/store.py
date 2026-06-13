@@ -14,6 +14,7 @@ from pathlib import Path
 CONFIG_DIR = Path.home() / ".superdl"
 QUEUE_FILE = CONFIG_DIR / "queue.json"
 SUBS_FILE = CONFIG_DIR / "subscriptions.json"
+CART_FILE = CONFIG_DIR / "cart.json"
 
 _lock = threading.Lock()
 
@@ -58,3 +59,15 @@ def load_subscriptions() -> list[dict]:
 def save_subscriptions(records: list[dict]) -> None:
     with _lock:
         save_json(SUBS_FILE, records)
+
+
+def load_cart() -> list[dict]:
+    """A médiakereső kosarának tartalma (program-bezárás után is megmarad)."""
+    with _lock:
+        data = load_json(CART_FILE, [])
+    return data if isinstance(data, list) else []
+
+
+def save_cart(records: list[dict]) -> None:
+    with _lock:
+        save_json(CART_FILE, records)

@@ -39,6 +39,23 @@ Ezen felül tud **időzíteni**, a **félbeszakadt letöltéseket folytatni**
 **podcast/RSS-csatornákra feliratkozni**, hogy az új epizódokat magától
 letöltse.
 
+## Médiakereső (Ctrl+F)
+
+Beépített **médiakereső** (Eszközök → Médiakereső): beírod a keresőszót, és
+a program több legális forráson (YouTube, SoundCloud) keres, az eredményeket
+egyetlen, egybefűzött listába téve. A „Tovább" gomb a következő 25 találatot
+hozza. Minden találaton:
+
+- **Enter** – lejátszás a beépített kis médialejátszóban (a lejátszóban a
+  bal/jobb nyíl tekerés, fel/le nyíl hangerő, Ctrl+bal/jobb az ugrásköz
+  váltása 5–60 mp között, szóköz szünet, Escape vissza a listához);
+- **Ctrl+B** – virtuális **kosárba** (a kosár a bezárás után is megmarad);
+- **Ctrl+D** – közvetlen letöltés a fő beállításokkal;
+- **Ctrl+C** – az URL pontos másolása;
+- helyi menü a jobb klikkre, a Menü-billentyűre és a Shift+F10-re is.
+
+A „Kosár letöltése" gombbal a kosár teljes tartalma egyben letölthető.
+
 > ⚠️ Csak olyan tartalmat tölts le, amelyhez jogod van (saját, szabad
 > licencű, vagy az oldal felhasználási feltételei engedik)!
 

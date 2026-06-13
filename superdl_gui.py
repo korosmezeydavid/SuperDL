@@ -12,6 +12,7 @@ Narrátor is hibátlanul felolvassa. Minden funkció elérhető billentyűzetrő
   Ctrl+D   letöltési lista fókuszálása
   Ctrl+E   eseménynapló fókuszálása
   Ctrl+J   összefoglaló felolvasása (mennyi van hátra)
+  Ctrl+F   médiakereső (keresés, lejátszás, letöltés)
   Delete   futó letöltés leállítása; befejezett/hibás elem törlése
   Shift+Del  a kijelölt elem eltávolítása a listából
   Ctrl+M   célmappa megnyitása
@@ -40,6 +41,7 @@ from superdl.feeds import FeedManager
 from superdl.report import build_summary
 from superdl.speech import Speaker
 from superdl import updater, selfupdate, __version__
+from superdl.searchwin import MediaSearchFrame
 
 try:
     import winsound
@@ -98,6 +100,8 @@ HOWITWORKS_TEXT = (
     "– így egy egész lemez magától, helyes sorrendben jön le. Egyedi videó "
     "ilyenkor is a fő mappában marad.\n\n"
     "TOVÁBBI KÉPESSÉGEK\n"
+    "  • Médiakereső (Ctrl+F): keresés több forráson, beépített lejátszó, "
+    "kosár, közvetlen letöltés.\n"
     "  • Időzítés: megadott időpontban indítja a letöltést.\n"
     "  • Folytatás: a félbeszakadt letöltéseket újraindításkor felkínálja.\n"
     "  • Podcast/RSS: feliratkozol egy csatornára, az új epizódokat magától "
@@ -118,6 +122,7 @@ KEYS_TEXT = (
     "  Ctrl+D   – a letöltési lista fókuszálása\n"
     "  Ctrl+E   – az eseménynapló fókuszálása\n"
     "  Ctrl+J   – hangos összefoglaló (mennyi van hátra)\n"
+    "  Ctrl+F   – médiakereső (keresés, lejátszás, letöltés)\n"
     "  Ctrl+U   – frissítések keresése\n"
     "  Delete   – futó letöltés leállítása; befejezett/hibás elem törlése\n"
     "  Shift+Delete – a kijelölt elem eltávolítása a listából\n"
@@ -188,6 +193,7 @@ class MainFrame(wx.Frame):
         self.mgr: DownloadManager | None = None
         self.fm = FeedManager()
         self.speaker = Speaker()
+        self._search_win = None
         self._known_rows: dict[int, int] = {}   # job.id -> listasor
         self._last_values: dict[int, tuple] = {}
         self._reported: dict[int, str] = {}
@@ -266,6 +272,12 @@ class MainFrame(wx.Frame):
                                  "Minden feliratkozás ellenőrzése azonnal")
         mb.Append(m_sub, "F&eliratkozások")
 
+        m_tools = wx.Menu()
+        mi_search = m_tools.Append(
+            wx.ID_ANY, "Média&kereső\tCtrl+F",
+            "Keresés több forráson, lejátszás és letöltés egy helyen")
+        mb.Append(m_tools, "&Eszközök")
+
         m_help = wx.Menu()
         mi_keys = m_help.Append(wx.ID_ANY, "&Billentyűparancsok\tF1")
         mi_how = m_help.Append(wx.ID_ANY, "&Hogyan működik")
@@ -297,6 +309,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(2), mi_how)
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(3), mi_priv)
         self.Bind(wx.EVT_MENU, self._on_check_updates, mi_upd)
+        self.Bind(wx.EVT_MENU, self._on_search_window, mi_search)
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(0), mi_about)
 
     def _build_ui(self):
@@ -702,6 +715,14 @@ class MainFrame(wx.Frame):
     def _on_check_updates(self, event=None):
         UpdateDialog(self).ShowModal()
 
+    def _on_search_window(self, event=None):
+        if self._search_win:
+            self._search_win.Raise()
+            self._search_win.search_entry.SetFocus()
+            return
+        self._search_win = MediaSearchFrame(self)
+        self._search_win.Show()
+
     def _auto_update_check(self):
         import datetime
         today = datetime.date.today().isoformat()
@@ -959,6 +980,8 @@ class MainFrame(wx.Frame):
         from superdl.torrent import shutdown_aria2
         shutdown_aria2()
         self.speaker.stop()
+        if self._search_win:
+            self._search_win.Destroy()
         self._save_settings()
         self.timer.Stop()
         self.feed_timer.Stop()
