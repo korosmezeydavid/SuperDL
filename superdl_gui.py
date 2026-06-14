@@ -42,6 +42,9 @@ from superdl.report import build_summary
 from superdl.speech import Speaker
 from superdl import updater, selfupdate, sounds, __version__
 from superdl.searchwin import MediaSearchFrame
+from superdl.radiowin import RadioFrame
+from superdl.bookwin import BookFrame
+from superdl.radiorec import RecordManager
 
 try:
     import winsound
@@ -102,6 +105,8 @@ HOWITWORKS_TEXT = (
     "TOVÁBBI KÉPESSÉGEK\n"
     "  • Médiakereső (Ctrl+F): keresés több forráson, beépített lejátszó, "
     "kosár, közvetlen letöltés.\n"
+    "  • Internetes rádió (Ctrl+Shift+R): élő rádióállomások keresése és "
+    "hallgatása, kedvencekkel.\n"
     "  • Időzítés: megadott időpontban indítja a letöltést.\n"
     "  • Folytatás: a félbeszakadt letöltéseket újraindításkor felkínálja.\n"
     "  • Podcast/RSS: feliratkozol egy csatornára, az új epizódokat magától "
@@ -123,6 +128,7 @@ KEYS_TEXT = (
     "  Ctrl+E   – az eseménynapló fókuszálása\n"
     "  Ctrl+J   – hangos összefoglaló (mennyi van hátra)\n"
     "  Ctrl+F   – médiakereső (keresés, lejátszás, letöltés)\n"
+    "  Ctrl+Shift+R – internetes rádió\n"
     "  Ctrl+U   – frissítések keresése\n"
     "  Delete   – futó letöltés leállítása; befejezett/hibás elem törlése\n"
     "  Shift+Delete – a kijelölt elem eltávolítása a listából\n"
@@ -194,6 +200,9 @@ class MainFrame(wx.Frame):
         self.fm = FeedManager()
         self.speaker = Speaker()
         self._search_win = None
+        self._radio_win = None
+        self._book_win = None
+        self._record_mgr = None
         self._known_rows: dict[int, int] = {}   # job.id -> listasor
         self._last_values: dict[int, tuple] = {}
         self._reported: dict[int, str] = {}
@@ -205,6 +214,13 @@ class MainFrame(wx.Frame):
         self._build_menu()
         self._build_ui()
         self._apply_settings()
+
+        # rádiófelvétel-kezelő: az időzített felvételek akkor is elindulnak,
+        # ha a rádió-ablak épp zárva van (a program fusson)
+        self._record_mgr = RecordManager(
+            lambda: self.dir_entry.GetValue(),
+            on_event=lambda text, level:
+                wx.CallAfter(self._on_record_event, text, level))
 
         self.SetDropTarget(UrlDropTarget(self._on_drop_url))
         self.timer = wx.Timer(self)
@@ -281,6 +297,12 @@ class MainFrame(wx.Frame):
         mi_search = m_tools.Append(
             wx.ID_ANY, "Média&kereső\tCtrl+F",
             "Keresés több forráson, lejátszás és letöltés egy helyen")
+        mi_radio = m_tools.Append(
+            wx.ID_ANY, "Internetes &rádió\tCtrl+Shift+R",
+            "Élő rádióállomások keresése és hallgatása")
+        mi_book = m_tools.Append(
+            wx.ID_ANY, "&Hangoskönyv készítő\tCtrl+Shift+B",
+            "Könyv (TXT/DOCX/EPUB/PDF) átalakítása MP3 hangoskönyvvé")
         mb.Append(m_tools, "&Eszközök")
 
         m_help = wx.Menu()
@@ -315,6 +337,8 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(3), mi_priv)
         self.Bind(wx.EVT_MENU, self._on_check_updates, mi_upd)
         self.Bind(wx.EVT_MENU, self._on_search_window, mi_search)
+        self.Bind(wx.EVT_MENU, self._on_radio_window, mi_radio)
+        self.Bind(wx.EVT_MENU, self._on_book_window, mi_book)
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(0), mi_about)
 
     def _build_ui(self):
@@ -741,6 +765,28 @@ class MainFrame(wx.Frame):
         self._search_win = MediaSearchFrame(self)
         self._search_win.Show()
 
+    def _on_radio_window(self, event=None):
+        if self._radio_win:
+            self._radio_win.Raise()
+            self._radio_win.search_entry.SetFocus()
+            return
+        self._radio_win = RadioFrame(self)
+        self._radio_win.Show()
+
+    def _on_record_event(self, text, level):
+        """A rádiófelvétel-kezelő üzenete (felvétel indult/kész/hiba)."""
+        sound = {"start": "start", "done": "done",
+                 "error": "error"}.get(level)
+        self._announce(text, ok=(level != "error"),
+                       toast=(level in ("done", "error")), sound=sound)
+
+    def _on_book_window(self, event=None):
+        if self._book_win:
+            self._book_win.Raise()
+            return
+        self._book_win = BookFrame(self)
+        self._book_win.Show()
+
     def _auto_update_check(self):
         import datetime
         today = datetime.date.today().isoformat()
@@ -995,14 +1041,30 @@ class MainFrame(wx.Frame):
                              self) != wx.YES:
                 event.Veto()
                 return
+        rec_active = self._record_mgr and self._record_mgr.snapshot_active()
+        if rec_active:
+            if wx.MessageBox(
+                    f"{len(rec_active)} rádiófelvétel van folyamatban. "
+                    "Biztosan kilépsz?\n\n(A kilépés leállítja és elmenti az "
+                    "eddig felvett részt. Az időzített felvételek csak akkor "
+                    "indulnak el, ha a program nyitva van.)",
+                    "SuperDL", wx.YES_NO | wx.ICON_QUESTION, self) != wx.YES:
+                event.Veto()
+                return
         if self.mgr:
             self.mgr.stop_all()
             self.mgr.close()       # elmenti a sort a folytatáshoz
         from superdl.torrent import shutdown_aria2
         shutdown_aria2()
+        if self._record_mgr:
+            self._record_mgr.shutdown()
         self.speaker.stop()
         if self._search_win:
             self._search_win.Destroy()
+        if self._radio_win:
+            self._radio_win.Destroy()
+        if self._book_win:
+            self._book_win.Destroy()
         self._save_settings()
         self.timer.Stop()
         self.feed_timer.Stop()

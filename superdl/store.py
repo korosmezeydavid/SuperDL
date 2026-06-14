@@ -15,6 +15,7 @@ CONFIG_DIR = Path.home() / ".superdl"
 QUEUE_FILE = CONFIG_DIR / "queue.json"
 SUBS_FILE = CONFIG_DIR / "subscriptions.json"
 CART_FILE = CONFIG_DIR / "cart.json"
+RADIO_FAV_FILE = CONFIG_DIR / "radio_favorites.json"
 
 _lock = threading.Lock()
 
@@ -71,3 +72,43 @@ def load_cart() -> list[dict]:
 def save_cart(records: list[dict]) -> None:
     with _lock:
         save_json(CART_FILE, records)
+
+
+def load_radio_favorites() -> list[dict]:
+    with _lock:
+        data = load_json(RADIO_FAV_FILE, [])
+    return data if isinstance(data, list) else []
+
+
+def save_radio_favorites(records: list[dict]) -> None:
+    with _lock:
+        save_json(RADIO_FAV_FILE, records)
+
+
+RADIO_SCHED_FILE = CONFIG_DIR / "radio_schedule.json"
+
+
+def load_radio_schedule() -> list[dict]:
+    """Az időzített rádiófelvételek (program-újraindítás után is megmaradnak)."""
+    with _lock:
+        data = load_json(RADIO_SCHED_FILE, [])
+    return data if isinstance(data, list) else []
+
+
+def save_radio_schedule(records: list[dict]) -> None:
+    with _lock:
+        save_json(RADIO_SCHED_FILE, records)
+
+
+TTS_KEYS_FILE = CONFIG_DIR / "tts_keys.json"
+
+
+def load_tts_keys() -> dict:
+    with _lock:
+        data = load_json(TTS_KEYS_FILE, {})
+    return data if isinstance(data, dict) else {}
+
+
+def save_tts_keys(keys: dict) -> None:
+    with _lock:
+        save_json(TTS_KEYS_FILE, keys)

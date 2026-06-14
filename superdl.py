@@ -182,9 +182,44 @@ def main() -> int:
                     help="a záró összefoglalót a beszédmotor is felolvassa")
     ap.add_argument("--engines", action="store_true",
                     help="a letöltőmotorok (yt-dlp, aria2) verziójának kiírása")
+    ap.add_argument("--selftest-audio", action="store_true",
+                    help="a hangkimenet (rádió-lejátszás) ellenőrzése")
+    ap.add_argument("--selftest-tts", action="store_true",
+                    help="a hangoskönyv-motorok és a könyvolvasók ellenőrzése")
     ap.add_argument("--update", action="store_true",
                     help="a letöltőmotorok frissítése a legújabb verzióra")
     args = ap.parse_args()
+
+    if getattr(args, "selftest_tts", False):
+        ok = True
+        try:
+            import asyncio
+            import edge_tts
+            vs = asyncio.run(edge_tts.list_voices())
+            hu = [v["ShortName"] for v in vs if v["Locale"].startswith("hu")]
+            print(f"edge-tts OK: {len(vs)} hang, magyar: {hu}")
+        except Exception as e:
+            ok = False
+            print(f"edge-tts HIBA: {e}")
+        for mod in ("docx", "ebooklib", "pypdf", "bs4"):
+            try:
+                __import__(mod)
+                print(f"{mod} OK")
+            except Exception as e:
+                ok = False
+                print(f"{mod} HIBA: {e}")
+        return 0 if ok else 1
+
+    if getattr(args, "selftest_audio", False):
+        try:
+            import sounddevice as sd
+            dev = sd.query_devices(kind="output")
+            print(f"hangkimenet OK: {dev['name']}")
+            print(f"sounddevice {sd.__version__}, PortAudio elérhető.")
+            return 0
+        except Exception as e:
+            print(f"hangkimenet HIBA: {e}")
+            return 1
 
     if args.engines or args.update:
         from superdl import updater, selfupdate

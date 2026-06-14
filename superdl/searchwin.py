@@ -40,12 +40,16 @@ class MediaSearchFrame(wx.Frame):
         self._interval_idx = 2           # 15 mp
         self._audio_only_play = True
         self._cur = None                 # épp játszott találat
+        self._player_mode = False        # lejátszó-vezérlés be van-e kapcsolva
 
         self._build()
         self._refresh_cart()
         self.CreateStatusBar()
         self.SetStatusText("Írd be a keresőszót, és nyomj Entert. "
                            "Lejátszás: Enter a találaton. Súgó: F1.")
+        # ablakszintű billentyű-elkapó: lejátszó módban a nyilak a lejátszót
+        # vezérlik (a panel nem tartja a fókuszt, ezért kell a CHAR_HOOK)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_char_hook)
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self.search_entry.SetFocus()
 
@@ -130,7 +134,6 @@ class MediaSearchFrame(wx.Frame):
         self.pos_label.SetName("Lejátszó állapota")
         pv.Add(self.pos_label, 0, wx.ALL, 4)
         self.player_panel.SetSizer(pv)
-        self.player_panel.Bind(wx.EVT_KEY_DOWN, self._on_player_key)
         v.Add(self.player_panel, 2, wx.EXPAND | wx.ALL, 8)
 
         self.audio_chk = wx.CheckBox(p, label="Lejátszásnál csak &hang")
@@ -181,6 +184,7 @@ class MediaSearchFrame(wx.Frame):
         q = self.search_entry.GetValue().strip()
         if not q:
             return
+        self._player_mode = False        # új keresés: vissza lista-módba
         self.query, self.count = q, PAGE
         self._run_search(focus_first=True)
 
@@ -395,15 +399,18 @@ class MediaSearchFrame(wx.Frame):
         # FONTOS: a „betöltve” (EVT_MEDIA_LOADED) esemény ezzel a Windows-
         # motorral gyakran NEM sül el, ezért nem várunk rá – rövid késleltetés
         # után közvetlenül indítjuk a lejátszást (a fájl ekkorra már kész).
-        self.player_panel.SetFocus()
+        # A fókusz a találati listán marad; a lejátszó-vezérlést a CHAR_HOOK
+        # és a _player_mode jelző intézi.
         wx.CallLater(250, self._start_play)
 
     def _start_play(self):
         if not self.mc:
             return
         self.mc.Play()
+        self._player_mode = True         # innentől a nyilak a lejátszót vezérlik
         self._announce(f"Lejátszás: {getattr(self, '_play_title', '')}  "
-                       "(bal/jobb tekerés, fel/le hangerő, Escape vissza)")
+                       "– lejátszó vezérlés bekapcsolva: bal/jobb tekerés, "
+                       "fel/le hangerő, szóköz szünet, Escape vissza a listához.")
 
     def _mc_loaded(self):
         # ha mégis megérkezik a „betöltve” esemény, az is indítson (ártalmatlan)
@@ -420,14 +427,27 @@ class MediaSearchFrame(wx.Frame):
         except Exception:
             pass
 
-    def _on_player_key(self, e):
+    def _on_char_hook(self, e):
+        """Ablakszintű billentyű-elkapó. Lejátszó módban (Enter után) a
+        nyilak/szóköz a lejátszót vezérlik – kivéve, ha épp szövegmezőben
+        gépelsz (akkor a kurzor mozogjon normálisan)."""
+        focus = wx.Window.FindFocus()
+        if (self._player_mode and self.mc
+                and not isinstance(focus, wx.TextCtrl)):
+            if self._player_key(e):
+                return                   # kezeltük, nem adjuk tovább
+        e.Skip()
+
+    def _player_key(self, e) -> bool:
+        """A lejátszó-vezérlő billentyűk kezelése. True, ha lekezeltük."""
         if not self.mc:
-            e.Skip()
-            return
+            return False
         code, ctrl = e.GetKeyCode(), e.ControlDown()
         step = SEEK_INTERVALS[self._interval_idx] * 1000
         if code == wx.WXK_ESCAPE:
+            self._player_mode = False
             self.res_list.SetFocus()
+            self._announce("Vissza a találati listához (nyilakkal mozoghatsz).")
         elif code == wx.WXK_SPACE:
             if self.mc.GetState() == wx.media.MEDIASTATE_PLAYING:
                 self.mc.Pause()
@@ -459,7 +479,8 @@ class MediaSearchFrame(wx.Frame):
             self._announce(f"Hangerő: {round(self.mc.GetVolume() * 100)} "
                            "százalék.")
         else:
-            e.Skip()
+            return False
+        return True
 
     def _announce_pos(self):
         if self.mc:

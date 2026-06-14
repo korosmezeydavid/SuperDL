@@ -47,11 +47,12 @@ Start-Sleep -Milliseconds 600
 foreach ($f in "dist\SuperDL.exe", "dist\SuperDL-cli.exe") {
     if (Test-Path $f) { Remove-Item $f -Force -ErrorAction SilentlyContinue }
 }
-$common = @("--collect-submodules", "yt_dlp", "--collect-submodules", "feedparser",
-    "--hidden-import", "win32com.client", "--hidden-import", "pythoncom",
-    "--hidden-import", "pywintypes", "--add-binary", "bin\aria2c.exe;.")
-python -m PyInstaller --noconfirm --onefile --windowed --name SuperDL @common superdl_gui.py
-python -m PyInstaller --noconfirm --onefile --console --name SuperDL-cli @common superdl.py
+# A két .spec fájl tartalmazza az ÖSSZES függőséget (aria2c, win32com,
+# yt-dlp, feedparser, valamint a hangoskönyv/rádió motorjai: sounddevice,
+# edge-tts, python-docx, ebooklib, pypdf). Mindig a spec-ekből építünk, hogy
+# egyetlen funkció se maradjon ki a kiadott exékből.
+python -m PyInstaller --noconfirm SuperDL.spec
+python -m PyInstaller --noconfirm SuperDL-cli.spec
 if (-not (Test-Path "dist\SuperDL.exe") -or -not (Test-Path "dist\SuperDL-cli.exe")) {
     Stop-OnError "Az exe-k építése nem sikerült. Nézd át a fenti üzeneteket."
 }

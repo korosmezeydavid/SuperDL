@@ -11,6 +11,23 @@ import threading
 from .segment import Progress
 
 
+def friendly_error(msg: str) -> str:
+    """Ismert, gyakori hibák érthető, lépésenkénti magyar üzenete."""
+    m = msg.lower()
+    if "could not copy" in m and "cookie" in m:
+        return ("A böngésző (Chrome/Edge) épp FUT, ezért a program nem tudja "
+                "kiolvasni a sütijeit. Megoldás: zárd be a böngészőt, VAGY a "
+                "Sütik beállításnál válaszd a Firefoxot, VAGY használj "
+                "cookies.txt fájlt.")
+    if ("dpapi" in m or "failed to decrypt" in m
+            or "could not decrypt" in m):
+        return ("Az újabb Chrome/Edge titkosítja a sütiket, amit egyetlen "
+                "letöltő sem tud kiolvasni. Megoldás: a Sütik beállításnál "
+                "válaszd a FIREFOXOT (ezt nem érinti), VAGY exportálj egy "
+                "cookies.txt fájlt egy böngésző-kiegészítővel, és azt add meg.")
+    return msg
+
+
 def is_media_url(url: str) -> bool:
     """Igaz, ha a yt-dlp-nek van dedikált kinyerője az URL-hez."""
     import yt_dlp.extractor
@@ -156,5 +173,5 @@ class MediaDownloader:
             return ""
         except Exception as e:
             self.progress.status = "hiba"
-            self.progress.error = str(e)
+            self.progress.error = friendly_error(str(e))
             raise

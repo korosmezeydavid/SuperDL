@@ -56,6 +56,37 @@ hozza. Minden találaton:
 
 A „Kosár letöltése" gombbal a kosár teljes tartalma egyben letölthető.
 
+## Internetes rádió (Ctrl+Shift+R)
+
+Beépített **rádió** (Eszközök → Internetes rádió): a nyílt, ingyenes
+radio-browser.info adatbázisában kereshetsz **név, címke (műfaj) vagy ország**
+szerint, vagy megnézheted a **népszerű állomásokat**. Az élő adást a program
+egy saját, megbízható streaming hangmotorral játssza (ffmpeg + sounddevice).
+
+- **Enter** vagy F5 – a kijelölt állomás lejátszása;
+- **Ctrl+fel / Ctrl+le** – hangerő; **Ctrl+szóköz** – szünet/folytatás;
+  **Escape** – leállítás;
+- **Ctrl+B** – kedvencekhez (a kedvencek a bezárás után is megmaradnak);
+- **Ctrl+C** – az állomás URL-jének másolása; helyi menü is van.
+
+## Hangoskönyv készítő (Ctrl+Shift+B)
+
+Beépített **hangoskönyv-készítő** (Eszközök → Hangoskönyv készítő): egy
+könyvet (**TXT, DOCX, EPUB, PDF**) MP3 hangoskönyvvé alakít a választott
+felolvasó-motorral:
+
+- **SAPI** (offline, a gépre telepített hangok),
+- **Edge neural** (online, **ingyenes, kulcs nélkül**, kiváló magyar hangok),
+- **Google Gemini** és **Google Cloud TTS** (mindenki a **saját** API-kulcsával).
+
+Motoronként kiírja a karakterkorlátot (a hosszú szöveget automatikusan
+darabolja), listázza a választható hangokat, és **hangteszttel**
+előhallgathatod a kiválasztott hangot. Ahol a motor engedi, a **magasság**
+és a **sebesség** is állítható. A kimenet **egyetlen MP3** vagy a megadott
+**percenként darabolt** fájlok. A program minden hangoskönyv elejére fix
+bevezetőt, a végére pedig egy jogi nyilatkozatot tesz (kizárólag egyéni célú
+hallgatás; terjesztés a szerző engedélye nélkül tilos).
+
 > ⚠️ Csak olyan tartalmat tölts le, amelyhez jogod van (saját, szabad
 > licencű, vagy az oldal felhasználási feltételei engedik)!
 
