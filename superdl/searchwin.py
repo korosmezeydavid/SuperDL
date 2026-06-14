@@ -13,10 +13,10 @@ import threading
 from pathlib import Path
 
 import wx
-import wx.media
 
 from . import search as S
 from . import store
+from .audioengine import Player
 
 SEEK_INTERVALS = [5, 10, 15, 20, 25, 30, 40, 50, 60]
 PAGE = 25
@@ -37,10 +37,13 @@ class MediaSearchFrame(wx.Frame):
                                      for r in store.load_cart()]
         self.query = ""
         self.count = PAGE
-        self._interval_idx = 2           # 15 mp
         self._audio_only_play = True
         self._cur = None                 # épp játszott találat
         self._player_mode = False        # lejátszó-vezérlés be van-e kapcsolva
+        # megbízható streaming hangmotor (ffmpeg → sounddevice), ugyanaz, mint
+        # a rádiónál; a kényes wx.media helyett
+        self.player = Player()
+        self.player.on_state = lambda s: wx.CallAfter(self._on_player_state, s)
 
         self._build()
         self._refresh_cart()
@@ -111,30 +114,19 @@ class MediaSearchFrame(wx.Frame):
         crow.Add(b_rm, 0)
         v.Add(crow, 0, wx.LEFT | wx.BOTTOM, 8)
 
-        # lejátszó
+        # lejátszó (streaming hangmotor – nincs külön videofelület)
         v.Add(wx.StaticText(p, label="Lejátszó:"), 0, wx.LEFT, 8)
-        self.player_panel = wx.Panel(p, style=wx.WANTS_CHARS | wx.BORDER_SUNKEN)
-        self.player_panel.SetName("Lejátszó – nyilakkal vezérelhető")
+        self.player_panel = wx.Panel(p)
         pv = wx.BoxSizer(wx.VERTICAL)
-        try:
-            self.mc = wx.media.MediaCtrl(self.player_panel, size=(-1, 180))
-        except Exception:
-            self.mc = None
-        if self.mc:
-            self.mc.SetVolume(0.8)
-            pv.Add(self.mc, 1, wx.EXPAND | wx.ALL, 2)
-            self.mc.Bind(wx.media.EVT_MEDIA_LOADED, lambda e: self._mc_loaded())
-            self.mc.Bind(wx.media.EVT_MEDIA_FINISHED,
-                         lambda e: self._announce("A lejátszás véget ért."))
         self.pos_label = wx.StaticText(
             self.player_panel,
             label="Nincs lejátszás. Enter egy találaton: lejátszás. "
-                  "Bal/jobb: tekerés, fel/le: hangerő, Ctrl+bal/jobb: "
-                  "ugrásköz, szóköz: szünet, Escape: vissza a listához.")
+                  "Fel/le: hangerő, szóköz: szünet/folytatás, Escape: "
+                  "leállítás.")
         self.pos_label.SetName("Lejátszó állapota")
         pv.Add(self.pos_label, 0, wx.ALL, 4)
         self.player_panel.SetSizer(pv)
-        v.Add(self.player_panel, 2, wx.EXPAND | wx.ALL, 8)
+        v.Add(self.player_panel, 0, wx.EXPAND | wx.ALL, 8)
 
         self.audio_chk = wx.CheckBox(p, label="Lejátszásnál csak &hang")
         self.audio_chk.SetValue(True)
@@ -248,12 +240,21 @@ class MediaSearchFrame(wx.Frame):
         mi_cart = m.Append(wx.ID_ANY, "&Kosárba\tCtrl+B")
         mi_dl = m.Append(wx.ID_ANY, "Közvetlen le&töltés\tCtrl+D")
         mi_url = m.Append(wx.ID_ANY, "&URL pontos másolása\tCtrl+C")
+        m.AppendSeparator()
+        mi_ai = m.Append(wx.ID_ANY, "AI: Videó &elemzése")
         self.Bind(wx.EVT_MENU, lambda e: self._play_selected(), mi_play)
         self.Bind(wx.EVT_MENU, lambda e: self._add_to_cart(), mi_cart)
         self.Bind(wx.EVT_MENU, lambda e: self._download_selected(), mi_dl)
         self.Bind(wx.EVT_MENU, lambda e: self._copy_url(), mi_url)
+        self.Bind(wx.EVT_MENU, lambda e: self._ai_analyze(), mi_ai)
         self.res_list.PopupMenu(m)
         m.Destroy()
+
+    def _ai_analyze(self):
+        x = self._selected_result()
+        if x:
+            self._announce(f"Videó elemzése AI-jal: {x.title}")
+            self.main._analyze_video_auto(x.url)
 
     def _add_to_cart(self):
         x = self._selected_result()
@@ -318,21 +319,35 @@ class MediaSearchFrame(wx.Frame):
 
     def _play_selected(self):
         x = self._selected_result()
-        if not x or not self.mc:
+        if not x:
             return
         self._cur = x
-        self._announce(f"Letöltés lejátszáshoz: {x.title} …")
+        self._announce(f"Csatlakozás: {x.title} …")
         ckb, ckf = (self.main._cookies_config()
                     if hasattr(self.main, "_cookies_config") else (None, None))
         audio = self._audio_only_play
 
+        # próbáljuk sütikkel; ha az elbukik (pl. fut a böngésző, zárolt
+        # sütik-adatbázis), újrapróbáljuk sütik NÉLKÜL – a legtöbb keresőtalálat
+        # nyilvános, nem kell hozzá bejelentkezés
+        attempts = [(ckb, ckf)]
+        if ckb or ckf:
+            attempts.append((None, None))
+
         def work():
-            try:
-                path = self._fetch_for_play(x.url, audio, ckb, ckf)
-            except Exception as ex:
-                wx.CallAfter(self._announce, self._friendly_error(str(ex)))
-                return
-            wx.CallAfter(self._load_local, path, x.title)
+            last = None
+            for b, f in attempts:
+                try:
+                    stream_url, _, _ = S.resolve_stream(
+                        x.url, audio_only=audio, cookies_browser=b,
+                        cookies_file=f)
+                    if stream_url:
+                        wx.CallAfter(self.player.play, stream_url, x.title)
+                        return
+                    last = "üres találat"
+                except Exception as ex:
+                    last = ex
+            wx.CallAfter(self._announce, self._friendly_error(str(last)))
 
         threading.Thread(target=work, daemon=True).start()
 
@@ -347,145 +362,60 @@ class MediaSearchFrame(wx.Frame):
                     "Sütik-et (böngésződ), majd próbáld újra.")
         return f"Nem lejátszható: {msg[:120]}. Próbálj egy másikat."
 
-    def _fetch_for_play(self, url, audio, ckb, ckf) -> str:
-        """A választott médiát ideiglenes fájlba tölti, és visszaadja az
-        útvonalát. A helyi fájlt a beépített lejátszó megbízhatóan megnyitja
-        (van kiterjesztése, ismert kodek)."""
-        import yt_dlp
-        PLAY_DIR.mkdir(parents=True, exist_ok=True)
-        self._cleanup_play()
-        if audio:
-            fmt = "bestaudio[ext=m4a]/bestaudio"
-        else:
-            fmt = ("best[ext=mp4][acodec!=none][vcodec!=none]/"
-                   "best[acodec!=none][vcodec!=none]/bestaudio[ext=m4a]/"
-                   "bestaudio")
-        holder: dict = {}
-
-        def hook(d):
-            if d["status"] == "downloading":
-                t = (d.get("total_bytes") or d.get("total_bytes_estimate")
-                     or 0)
-                done = d.get("downloaded_bytes") or 0
-                pct = int(done / t * 100) if t else 0
-                wx.CallAfter(self._announce, f"Letöltés lejátszáshoz: {pct}%")
-            elif d["status"] == "finished":
-                holder["path"] = d.get("filename")
-
-        opts = {"quiet": True, "no_warnings": True, "format": fmt,
-                "outtmpl": str(PLAY_DIR / "play.%(ext)s"),
-                "progress_hooks": [hook], "noprogress": True}
-        if ckb:
-            opts["cookiesfrombrowser"] = (ckb,)
-        elif ckf:
-            opts["cookiefile"] = ckf
-        with yt_dlp.YoutubeDL(opts) as y:
-            y.download([url])
-        path = holder.get("path")
-        if not path or not os.path.exists(path):
-            files = glob.glob(str(PLAY_DIR / "play.*"))
-            path = files[0] if files else None
-        if not path:
-            raise RuntimeError("nem jött létre lejátszható fájl")
-        return path
-
-    def _load_local(self, path, title):
-        if not self.mc:
-            return
-        self._play_title = title
-        if not self.mc.Load(path):
-            self._announce("A lejátszó nem tudta megnyitni a fájlt.")
-            return
-        # FONTOS: a „betöltve” (EVT_MEDIA_LOADED) esemény ezzel a Windows-
-        # motorral gyakran NEM sül el, ezért nem várunk rá – rövid késleltetés
-        # után közvetlenül indítjuk a lejátszást (a fájl ekkorra már kész).
-        # A fókusz a találati listán marad; a lejátszó-vezérlést a CHAR_HOOK
-        # és a _player_mode jelző intézi.
-        wx.CallLater(250, self._start_play)
-
-    def _start_play(self):
-        if not self.mc:
-            return
-        self.mc.Play()
-        self._player_mode = True         # innentől a nyilak a lejátszót vezérlik
-        self._announce(f"Lejátszás: {getattr(self, '_play_title', '')}  "
-                       "– lejátszó vezérlés bekapcsolva: bal/jobb tekerés, "
-                       "fel/le hangerő, szóköz szünet, Escape vissza a listához.")
-
-    def _mc_loaded(self):
-        # ha mégis megérkezik a „betöltve” esemény, az is indítson (ártalmatlan)
-        if self.mc:
-            self.mc.Play()
-
-    def _cleanup_play(self):
-        try:
-            for f in glob.glob(str(PLAY_DIR / "play.*")):
-                try:
-                    os.remove(f)
-                except OSError:
-                    pass
-        except Exception:
-            pass
+    def _on_player_state(self, text):
+        if text == "lejátszás":
+            self._player_mode = True
+            t = self._cur.title if self._cur else ""
+            self._announce(f"Lejátszás: {t}  (hangerő "
+                           f"{round(self.player.volume * 100)}%). Szóköz: "
+                           "szünet, fel/le: hangerő, Escape: leállítás.")
+        elif text.startswith("hiba"):
+            self._player_mode = False
+            self._announce(f"Nem lejátszható – {text}. Próbálj másikat.")
+        elif text == "vége":
+            self._player_mode = False
+            self._announce("A lejátszás véget ért. Enter egy találaton: új "
+                           "lejátszás.")
 
     def _on_char_hook(self, e):
         """Ablakszintű billentyű-elkapó. Lejátszó módban (Enter után) a
         nyilak/szóköz a lejátszót vezérlik – kivéve, ha épp szövegmezőben
         gépelsz (akkor a kurzor mozogjon normálisan)."""
         focus = wx.Window.FindFocus()
-        if (self._player_mode and self.mc
+        if (self._player_mode and self.player.is_active()
                 and not isinstance(focus, wx.TextCtrl)):
             if self._player_key(e):
                 return                   # kezeltük, nem adjuk tovább
+        # lista módban: Enter a találati listán MINDIG indítsa a lejátszást
+        # (megbízhatóbb, mint a lista saját Enter-eseményére várni)
+        if (not self._player_mode and focus is self.res_list
+                and e.GetKeyCode() in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER)):
+            self._play_selected()
+            return
         e.Skip()
 
     def _player_key(self, e) -> bool:
         """A lejátszó-vezérlő billentyűk kezelése. True, ha lekezeltük."""
-        if not self.mc:
-            return False
-        code, ctrl = e.GetKeyCode(), e.ControlDown()
-        step = SEEK_INTERVALS[self._interval_idx] * 1000
+        code = e.GetKeyCode()
         if code == wx.WXK_ESCAPE:
+            self.player.stop()
             self._player_mode = False
             self.res_list.SetFocus()
-            self._announce("Vissza a találati listához (nyilakkal mozoghatsz).")
+            self._announce("Leállítva. Vissza a találati listához.")
         elif code == wx.WXK_SPACE:
-            if self.mc.GetState() == wx.media.MEDIASTATE_PLAYING:
-                self.mc.Pause()
-                self._announce("Szünet.")
-            else:
-                self.mc.Play()
-                self._announce("Lejátszás.")
-        elif ctrl and code == wx.WXK_LEFT:
-            self._interval_idx = max(0, self._interval_idx - 1)
-            self._announce(f"Ugrásköz: {SEEK_INTERVALS[self._interval_idx]} "
-                           "másodperc.")
-        elif ctrl and code == wx.WXK_RIGHT:
-            self._interval_idx = min(len(SEEK_INTERVALS) - 1,
-                                     self._interval_idx + 1)
-            self._announce(f"Ugrásköz: {SEEK_INTERVALS[self._interval_idx]} "
-                           "másodperc.")
-        elif code == wx.WXK_LEFT:
-            self.mc.Seek(max(0, self.mc.Tell() - step))
-            self._announce_pos()
-        elif code == wx.WXK_RIGHT:
-            self.mc.Seek(min(self.mc.Length(), self.mc.Tell() + step))
-            self._announce_pos()
+            paused = self.player.toggle_pause()
+            self._announce("Szünet." if paused else "Folytatás.")
         elif code == wx.WXK_UP:
-            self.mc.SetVolume(min(1.0, self.mc.GetVolume() + 0.05))
-            self._announce(f"Hangerő: {round(self.mc.GetVolume() * 100)} "
+            self.player.set_volume(self.player.volume + 0.05)
+            self._announce(f"Hangerő: {round(self.player.volume * 100)} "
                            "százalék.")
         elif code == wx.WXK_DOWN:
-            self.mc.SetVolume(max(0.0, self.mc.GetVolume() - 0.05))
-            self._announce(f"Hangerő: {round(self.mc.GetVolume() * 100)} "
+            self.player.set_volume(self.player.volume - 0.05)
+            self._announce(f"Hangerő: {round(self.player.volume * 100)} "
                            "százalék.")
         else:
             return False
         return True
-
-    def _announce_pos(self):
-        if self.mc:
-            self._announce(f"{_fmt_time(self.mc.Tell())} / "
-                           f"{_fmt_time(self.mc.Length())}")
 
     # ---- súgó / zárás -------------------------------------------------
 
@@ -501,19 +431,16 @@ class MediaSearchFrame(wx.Frame):
             "  Menü-billentyű / jobb klikk – helyi menü\n"
             "  Tovább gomb – következő 25 találat\n\n"
             "Kosár (Ctrl+K): Delete – eltávolítás; „Kosár letöltése” gomb.\n\n"
-            "Lejátszó (Enter után ide kerül a fókusz):\n"
-            "  bal/jobb nyíl – tekerés, fel/le – hangerő\n"
-            "  Ctrl+bal/jobb – ugrásköz (5–60 mp)\n"
-            "  szóköz – szünet/folytatás, Escape – vissza a listához",
+            "Lejátszás közben (a fókusz a listán marad):\n"
+            "  fel/le nyíl – hangerő\n"
+            "  szóköz – szünet/folytatás, Escape – leállítás",
             "Médiakereső súgó", wx.OK | wx.ICON_INFORMATION, self)
 
     def _on_close(self, e):
         try:
-            if self.mc:
-                self.mc.Stop()
+            self.player.stop()
         except Exception:
             pass
-        self._cleanup_play()
         self._save_cart()
         if getattr(self.main, "_search_win", None) is self:
             self.main._search_win = None

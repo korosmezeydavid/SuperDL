@@ -39,12 +39,22 @@ from superdl.segment import parse_limit
 from superdl.torrent import is_torrent_url
 from superdl.feeds import FeedManager
 from superdl.report import build_summary
-from superdl.speech import Speaker
+from superdl.speech import VoiceSpeaker
 from superdl import updater, selfupdate, sounds, __version__
 from superdl.searchwin import MediaSearchFrame
 from superdl.radiowin import RadioFrame
 from superdl.bookwin import BookFrame
 from superdl.radiorec import RecordManager
+from superdl import dayinfo, weather, search, store, aiclient, mediaai
+from superdl.settingsdialog import SettingsDialog
+from superdl.aiwin import run_ai, run_ai_progress
+from superdl.dayinfowin import DayInfoDialog
+from superdl.ytchannel import ChannelManager
+from superdl.freshvideoswin import FreshVideosDialog, ChannelsDialog
+from superdl.news import NewsManager
+from superdl.newswin import NewsFrame
+from superdl.library import Library
+from superdl.readerwin import ReaderFrame
 
 try:
     import winsound
@@ -54,12 +64,16 @@ except ImportError:
 SETTINGS_FILE = Path.home() / ".superdl.json"
 
 ABOUT_TEXT = (
-    f"SuperDL {__version__} – akadálymentes, többfunkciós, többszálú letöltő\n\n"
+    f"SuperDL {__version__} – Super Digital Lounge\n"
+    "Akadálymentes médiaközpont: letöltés, média, rádió, hangoskönyv, "
+    "könyvolvasó, hírek és napi infó\n\n"
     "Készítette: Kőrösmezey Dávid\n"
     "Elérhetőség: korosmezey.david.richard@gmail.com\n\n"
-    "Egy program, amely közvetlen fájlokat, médiaoldalakat és torrenteket "
-    "tölt le – kiemelt hangsúllyal a teljes, minden szintű "
-    "képernyőolvasó-támogatáson. A cél, hogy a letöltés mindenki számára "
+    "A „DL” mostantól nem csak letöltés: Digital Lounge – egy akadálymentes "
+    "digitális médiaszalon. Közvetlen fájlokat, médiaoldalakat és torrenteket "
+    "tölt le, élő rádiót és médiát játszik, hangoskönyvet készít és olvas, "
+    "híreket gyűjt és olvas fel – kiemelt hangsúllyal a teljes, minden szintű "
+    "képernyőolvasó-támogatáson. A cél, hogy mindez mindenki számára "
     "egyszerű és átlátható legyen.\n\n"
     "Felhasznált, nyílt forráskódú összetevők és licenceik:\n"
     "  • yt-dlp – médialetöltő motor (Unlicense)\n"
@@ -194,14 +208,20 @@ class UrlDropTarget(wx.TextDropTarget):
 
 class MainFrame(wx.Frame):
     def __init__(self):
-        super().__init__(None, title="SuperDL – akadálymentes többszálú letöltő",
+        super().__init__(None, title="SuperDL – akadálymentes médiaközpont",
                          size=(980, 640))
         self.mgr: DownloadManager | None = None
         self.fm = FeedManager()
-        self.speaker = Speaker()
+        self.cm = ChannelManager()
+        self.news_mgr = NewsManager()
+        self.library = Library()
+        self.ai_config = store.load_ai_config()
+        self.speaker = VoiceSpeaker()
         self._search_win = None
         self._radio_win = None
         self._book_win = None
+        self._news_win = None
+        self._reader_win = None
         self._record_mgr = None
         self._known_rows: dict[int, int] = {}   # job.id -> listasor
         self._last_values: dict[int, tuple] = {}
@@ -228,8 +248,7 @@ class MainFrame(wx.Frame):
         self.timer.Start(700)
         # a feliratkozások időnkénti, automatikus ellenőrzése (15 perc)
         self.feed_timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, lambda e: self._check_feeds(quiet=True),
-                  self.feed_timer)
+        self.Bind(wx.EVT_TIMER, self._on_feed_timer, self.feed_timer)
         self.feed_timer.Start(15 * 60 * 1000)
         self.Bind(wx.EVT_CLOSE, self._on_close)
 
@@ -237,8 +256,12 @@ class MainFrame(wx.Frame):
         wx.CallLater(400, self._offer_resume)
         if self.fm.subs:
             wx.CallLater(3000, lambda: self._check_feeds(quiet=True))
+        if self.cm.channels:
+            wx.CallLater(4500, lambda: self._check_channels(quiet=True))
         # naponta egyszer, csendben frissítést keresünk (a háttérben)
         wx.CallLater(6000, self._auto_update_check)
+        # induló, automatikus hangos üdvözlés (dátum, névnap, időjárás)
+        wx.CallLater(1200, self._startup_greeting)
 
         self.url_entry.SetFocus()
 
@@ -256,6 +279,10 @@ class MainFrame(wx.Frame):
                                 "Szövegfájl megnyitása, soronként egy URL-lel")
         mi_open = m_file.Append(wx.ID_ANY, "Cél&mappa megnyitása\tCtrl+M",
                                 "A letöltési mappa megnyitása a Fájlkezelőben")
+        m_file.AppendSeparator()
+        mi_settings = m_file.Append(
+            wx.ID_ANY, "&Beállítások…\tCtrl+,",
+            "Az összes beállítás lapfülekre rendezve")
         m_file.AppendSeparator()
         mi_quit = m_file.Append(wx.ID_EXIT, "&Kilépés\tCtrl+Q")
         mb.Append(m_file, "&Fájl")
@@ -291,6 +318,19 @@ class MainFrame(wx.Frame):
                                  "Feliratkozások listája és törlése")
         mi_subchk = m_sub.Append(wx.ID_ANY, "Új epizódok le&töltése most",
                                  "Minden feliratkozás ellenőrzése azonnal")
+        m_sub.AppendSeparator()
+        mi_chan_new = m_sub.Append(
+            wx.ID_ANY, "YouTube-&csatorna feliratkozás...",
+            "Feliratkozás egy YouTube-csatornára (új videók figyelése)")
+        mi_chan_fresh = m_sub.Append(
+            wx.ID_ANY, "Friss &videók...\tCtrl+Shift+Y",
+            "A figyelt csatornák új videói: online lejátszás vagy letöltés")
+        mi_chan_mng = m_sub.Append(
+            wx.ID_ANY, "Csatornák ke&zelése...",
+            "Feliratkozott csatornák listája, figyelés ki/be, törlés")
+        mi_chan_chk = m_sub.Append(
+            wx.ID_ANY, "Csatornák ellen&őrzése most",
+            "Minden figyelt csatorna ellenőrzése új videókért")
         mb.Append(m_sub, "F&eliratkozások")
 
         m_tools = wx.Menu()
@@ -303,16 +343,65 @@ class MainFrame(wx.Frame):
         mi_book = m_tools.Append(
             wx.ID_ANY, "&Hangoskönyv készítő\tCtrl+Shift+B",
             "Könyv (TXT/DOCX/EPUB/PDF) átalakítása MP3 hangoskönyvvé")
+        mi_reader = m_tools.Append(
+            wx.ID_ANY, "Könyv&olvasó (élő felolvasás)\tCtrl+Shift+O",
+            "Könyv felolvasása a programban, könyvjelzővel (folytatható)")
+        m_tools.AppendSeparator()
+        mi_news = m_tools.Append(
+            wx.ID_ANY, "&Hírolvasó\tCtrl+Shift+H",
+            "Reklámmentes RSS hírgyűjtő és letisztított cikkolvasó")
+        mi_dayinfo = m_tools.Append(
+            wx.ID_ANY, "Napi in&fó (időjárás, névnap)\tCtrl+Shift+W",
+            "Mai dátum, névnap és időjárás a megadott városra")
         mb.Append(m_tools, "&Eszközök")
+
+        m_ai = wx.Menu()
+        mi_ai_img = m_ai.Append(
+            wx.ID_ANY, "&Kép leírása fájlból…\tCtrl+Shift+I",
+            "Mi van a képen? – részletes leírás, felolvasással")
+        mi_ai_clip = m_ai.Append(
+            wx.ID_ANY, "Kép leírása a &vágólapról",
+            "A vágólapra másolt kép leírása")
+        mi_ai_ocr = m_ai.Append(
+            wx.ID_ANY, "&Szöveg kiolvasása képből (OCR)…",
+            "A képen lévő szöveg kiolvasása")
+        m_ai.AppendSeparator()
+        mi_ai_doc = m_ai.Append(
+            wx.ID_ANY, "&Dokumentum összefoglalása…",
+            "PDF/EPUB/DOCX/TXT tömör összefoglalása")
+        mi_ai_qa = m_ai.Append(
+            wx.ID_ANY, "Kérdezz egy do&kumentumról…",
+            "Kérdés egy dokumentum tartalmáról")
+        m_ai.AppendSeparator()
+        mi_ai_tr = m_ai.Append(
+            wx.ID_ANY, "Á&tirat készítése (hang/videó)…",
+            "Beszéd → szöveg helyi hang- vagy videófájlból")
+        mi_ai_srt = m_ai.Append(
+            wx.ID_ANY, "Felira&t (.srt) készítése…",
+            "Időbélyeges felirat egy rövidebb hang/videófájlból")
+        mi_ai_vid = m_ai.Append(
+            wx.ID_ANY, "&Videó elemzése (URL vagy fájl)…",
+            "A videó KÉPI tartalmának elemzése a Geminivel")
+        m_ai.AppendSeparator()
+        mi_ai_set = m_ai.Append(
+            wx.ID_ANY, "AI-&beállítások (kulcsok)…",
+            "API-kulcsok és modell megadása")
+        mb.Append(m_ai, "&AI")
 
         m_help = wx.Menu()
         mi_keys = m_help.Append(wx.ID_ANY, "&Billentyűparancsok\tF1")
         mi_how = m_help.Append(wx.ID_ANY, "&Hogyan működik")
         mi_priv = m_help.Append(wx.ID_ANY, "&Adatkezelés és adatvédelem")
+        mi_aikeys = m_help.Append(
+            wx.ID_ANY, "AI-&kulcsok beszerzése…",
+            "Hol és hogyan szerezhetsz API-kulcsot a 4 szolgáltatóhoz")
         m_help.AppendSeparator()
         mi_upd = m_help.Append(wx.ID_ANY, "&Frissítések keresése\tCtrl+U",
                                "A letöltőmotorok új verzióinak keresése")
         m_help.AppendSeparator()
+        mi_support = m_help.Append(
+            wx.ID_ANY, "Köszönet és &támogatás…",
+            "A program ingyenes; önkéntes támogatás (sosem kötelező)")
         mi_about = m_help.Append(wx.ID_ABOUT, "&Névjegy")
         mb.Append(m_help, "&Súgó")
 
@@ -322,6 +411,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_open_list, mi_list)
         self.Bind(wx.EVT_MENU, self._on_open_folder, mi_open)
         self.Bind(wx.EVT_MENU, lambda e: self.Close(), mi_quit)
+        self.Bind(wx.EVT_MENU, self._on_settings, mi_settings)
         self.Bind(wx.EVT_MENU, lambda e: self.dl_list.SetFocus(), mi_focus)
         self.Bind(wx.EVT_MENU, lambda e: self.log.SetFocus(), mi_log)
         self.Bind(wx.EVT_MENU, self._on_stop_selected, mi_stop)
@@ -330,15 +420,36 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_speak_summary, mi_speak)
         self.Bind(wx.EVT_MENU, self._on_subscribe, mi_subnew)
         self.Bind(wx.EVT_MENU, self._on_manage_subs, mi_submng)
+        self.Bind(wx.EVT_MENU, self._on_channel_subscribe, mi_chan_new)
+        self.Bind(wx.EVT_MENU, self._on_fresh_videos, mi_chan_fresh)
+        self.Bind(wx.EVT_MENU, self._on_channels_window, mi_chan_mng)
+        self.Bind(wx.EVT_MENU, lambda e: self._check_channels(quiet=False),
+                  mi_chan_chk)
         self.Bind(wx.EVT_MENU, lambda e: self._check_feeds(quiet=False),
                   mi_subchk)
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(1), mi_keys)
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(2), mi_how)
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(3), mi_priv)
+        self.Bind(wx.EVT_MENU, self._on_ai_keys_help, mi_aikeys)
         self.Bind(wx.EVT_MENU, self._on_check_updates, mi_upd)
         self.Bind(wx.EVT_MENU, self._on_search_window, mi_search)
         self.Bind(wx.EVT_MENU, self._on_radio_window, mi_radio)
         self.Bind(wx.EVT_MENU, self._on_book_window, mi_book)
+        self.Bind(wx.EVT_MENU, self._on_reader_window, mi_reader)
+        self.Bind(wx.EVT_MENU, self._on_news_window, mi_news)
+        self.Bind(wx.EVT_MENU, self._on_dayinfo_window, mi_dayinfo)
+        self.Bind(wx.EVT_MENU, self._on_ai_image, mi_ai_img)
+        self.Bind(wx.EVT_MENU, self._on_ai_clip, mi_ai_clip)
+        self.Bind(wx.EVT_MENU, self._on_ai_ocr, mi_ai_ocr)
+        self.Bind(wx.EVT_MENU, self._on_ai_doc_summary, mi_ai_doc)
+        self.Bind(wx.EVT_MENU, self._on_ai_doc_qa, mi_ai_qa)
+        self.Bind(wx.EVT_MENU, lambda e: self._on_ai_transcribe(srt=False),
+                  mi_ai_tr)
+        self.Bind(wx.EVT_MENU, lambda e: self._on_ai_transcribe(srt=True),
+                  mi_ai_srt)
+        self.Bind(wx.EVT_MENU, self._on_ai_video, mi_ai_vid)
+        self.Bind(wx.EVT_MENU, lambda e: self._on_settings(page=3), mi_ai_set)
+        self.Bind(wx.EVT_MENU, self._on_support, mi_support)
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(0), mi_about)
 
     def _build_ui(self):
@@ -366,80 +477,23 @@ class MainFrame(wx.Frame):
         vbox.Add(row1, 0, wx.EXPAND | wx.ALL, 8)
 
         # beállítások
-        box = wx.StaticBoxSizer(wx.VERTICAL, panel, "Beállítások")
+        # Gyors beállítások a fő ablakon: célmappa + csak hang + a többi
+        # a „Beállítások…” ablakban (lapfülekre rendezve), hogy ne legyen zsúfolt.
+        box = wx.StaticBoxSizer(wx.HORIZONTAL, panel, "Beállítások")
         sb = box.GetStaticBox()
-
         lbl_dir = wx.StaticText(sb, label="&Célmappa:")
-        self.dir_entry = wx.TextCtrl(sb, size=(260, -1))
+        self.dir_entry = wx.TextCtrl(sb, size=(320, -1))
         self.dir_entry.SetName("Célmappa")
         btn_dir = wx.Button(sb, label="Tall&ózás...")
-
-        lbl_conn = wx.StaticText(sb, label="S&zálak:")
-        self.conn_spin = wx.SpinCtrl(sb, min=1, max=32, initial=8,
-                                     size=(60, -1))
-        self.conn_spin.SetName("Szálak száma letöltésenként")
-
-        lbl_par = wx.StaticText(sb, label="&Párhuzamos letöltés:")
-        self.par_spin = wx.SpinCtrl(sb, min=1, max=10, initial=3,
-                                    size=(60, -1))
-        self.par_spin.SetName("Egyszerre futó letöltések száma")
-
-        lbl_lim = wx.StaticText(sb, label="Sebesség&korlát:")
-        self.limit_entry = wx.TextCtrl(sb, size=(70, -1))
-        self.limit_entry.SetName("Sebességkorlát, például 2M vagy 500K, "
-                                 "üresen hagyva nincs korlát")
-        self.limit_entry.SetHint("pl. 2M")
-
-        lbl_seed = wx.StaticText(sb, label="Seed-&arány:")
-        self.seed_entry = wx.TextCtrl(sb, size=(50, -1), value="1.0")
-        self.seed_entry.SetName("Torrent megosztási arány, eddig seedel a "
-                                "letöltés után; nulla esetén nem seedel")
-
         self.audio_chk = wx.CheckBox(sb, label="Csak &hang")
         self.audio_chk.SetName("Médiaoldalról csak a hangsáv letöltése")
-
-        lbl_fmt = wx.StaticText(sb, label="Hang&formátum:")
-        self.fmt_choice = wx.Choice(
-            sb, choices=["MP3", "M4A", "OPUS", "FLAC", "WAV", "AAC"])
-        self.fmt_choice.SetSelection(0)
-        self.fmt_choice.SetName("Hangformátum a Csak hang módhoz; MP3-hoz és "
-                                "a többihez a program szükség esetén letölti "
-                                "az átalakítót")
-
-        lbl_cookies = wx.StaticText(sb, label="&Sütik:")
-        self.cookies_choice = wx.Choice(sb, choices=[
-            "Nincs", "Chrome", "Firefox", "Edge", "Brave", "Opera",
-            "Vivaldi", "Chromium", "cookies.txt fájl…"])
-        self.cookies_choice.SetSelection(0)
-        self.cookies_choice.SetName(
-            "Bejelentkezés sütikkel a fiókod mögötti (korhatáros, tagsági) "
-            "videókhoz: válassz böngészőt, amelybe be vagy jelentkezve, vagy "
-            "egy cookies.txt fájlt")
-        self.cookies_choice.Bind(wx.EVT_CHOICE, self._on_cookies_choice)
-        self._cookies_file = None
-
-        self.clip_chk = wx.CheckBox(sb, label="&Vágólap figyelése")
-        self.clip_chk.SetName("Vágólapra másolt hivatkozások automatikus "
-                              "letöltése")
-        self.notify_chk = wx.CheckBox(sb, label="É&rtesítések")
-        self.notify_chk.SetValue(True)
-        self.notify_chk.SetName("Rendszerértesítés a letöltések elkészültéről")
-
-        self.playlist_chk = wx.CheckBox(sb, label="Lista &mappába")
-        self.playlist_chk.SetValue(True)
-        self.playlist_chk.SetName("Lejátszási listát külön, a lista nevével "
-                                  "ellátott mappába, sorszámozva tölt "
-                                  "(01 - Cím, 02 - Cím, ...)")
-
-        # tördelődő elrendezés: szűk ablaknál több sorba rendeződik
-        wrap = wx.WrapSizer(wx.HORIZONTAL)
-        for w in (lbl_dir, self.dir_entry, btn_dir, lbl_conn, self.conn_spin,
-                  lbl_par, self.par_spin, lbl_lim, self.limit_entry,
-                  lbl_seed, self.seed_entry, self.audio_chk, lbl_fmt,
-                  self.fmt_choice, lbl_cookies, self.cookies_choice,
-                  self.playlist_chk, self.clip_chk, self.notify_chk):
-            wrap.Add(w, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.BOTTOM, 6)
-        box.Add(wrap, 1, wx.EXPAND | wx.ALL, 4)
+        btn_settings = wx.Button(sb, label="&Beállítások…")
+        btn_settings.Bind(wx.EVT_BUTTON, self._on_settings)
+        box.Add(lbl_dir, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        box.Add(self.dir_entry, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        box.Add(btn_dir, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 12)
+        box.Add(self.audio_chk, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 12)
+        box.Add(btn_settings, 0, wx.ALIGN_CENTER_VERTICAL)
         vbox.Add(box, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
 
         # letöltési lista
@@ -481,7 +535,7 @@ class MainFrame(wx.Frame):
             "clipboard": False, "notify": True, "seed_ratio": "1.0",
             "tts": False, "update_last_check": "", "audio_format": "MP3",
             "cookies": "Nincs", "cookies_file": "", "playlist_folders": True,
-            "sounds": True,
+            "sounds": True, "city": "Budapest", "voice_mode": "auto",
         }
         try:
             self.settings.update(json.loads(SETTINGS_FILE.read_text()))
@@ -489,43 +543,21 @@ class MainFrame(wx.Frame):
             pass
 
     def _apply_settings(self):
+        # a fő ablakon csak a célmappa él; a többi beállítás a self.settings
+        # szótárban van, amit a „Beállítások…” ablak szerkeszt
         s = self.settings
         self.dir_entry.SetValue(s["out_dir"])
-        self.conn_spin.SetValue(s["connections"])
-        self.par_spin.SetValue(s["parallel"])
-        self.limit_entry.SetValue(s["limit"])
-        self.clip_chk.SetValue(s["clipboard"])
-        self.notify_chk.SetValue(s["notify"])
-        self.seed_entry.SetValue(str(s["seed_ratio"]))
         self.mi_tts.Enable(self.speaker.available)
         self.mi_tts.Check(bool(s.get("tts")) and self.speaker.available)
-        if self.fmt_choice.SetStringSelection(str(s.get("audio_format", "MP3"))) \
-                is False:
-            self.fmt_choice.SetSelection(0)
-        self._cookies_file = s.get("cookies_file") or None
-        if self.cookies_choice.SetStringSelection(
-                str(s.get("cookies", "Nincs"))) is False:
-            self.cookies_choice.SetSelection(0)
-        self.playlist_chk.SetValue(bool(s.get("playlist_folders", True)))
         self.mi_sounds.Check(bool(s.get("sounds", True)))
+        self.speaker.set_mode(str(s.get("voice_mode", "auto")))
 
     def _save_settings(self):
-        self.settings = {
-            "out_dir": self.dir_entry.GetValue(),
-            "connections": self.conn_spin.GetValue(),
-            "parallel": self.par_spin.GetValue(),
-            "limit": self.limit_entry.GetValue(),
-            "clipboard": self.clip_chk.GetValue(),
-            "notify": self.notify_chk.GetValue(),
-            "seed_ratio": self.seed_entry.GetValue(),
-            "tts": self.mi_tts.IsChecked(),
-            "update_last_check": self.settings.get("update_last_check", ""),
-            "audio_format": self.fmt_choice.GetStringSelection() or "MP3",
-            "cookies": self.cookies_choice.GetStringSelection() or "Nincs",
-            "cookies_file": self._cookies_file or "",
-            "playlist_folders": self.playlist_chk.GetValue(),
-            "sounds": self.mi_sounds.IsChecked(),
-        }
+        # a fő ablak által birtokolt értékek; a többit a Beállítások-ablak
+        # már beleírta a self.settings-be
+        self.settings["out_dir"] = self.dir_entry.GetValue()
+        self.settings["tts"] = self.mi_tts.IsChecked()
+        self.settings["sounds"] = self.mi_sounds.IsChecked()
         try:
             SETTINGS_FILE.write_text(json.dumps(self.settings, indent=2))
         except OSError:
@@ -550,63 +582,79 @@ class MainFrame(wx.Frame):
             sounds.play(sound)
         else:
             beep(ok)
-        if toast and self.notify_chk.GetValue():
+        if toast and self.settings.get("notify", True):
             note = wx.adv.NotificationMessage("SuperDL", text)
             note.Show(timeout=8)
 
     def _seed_ratio(self) -> float:
         try:
-            return max(0.0, float(self.seed_entry.GetValue().replace(",", ".")))
+            return max(0.0, float(str(self.settings.get("seed_ratio", "1.0"))
+                                  .replace(",", ".")))
         except ValueError:
             return 1.0
 
     def _cookies_config(self) -> tuple[str | None, str | None]:
-        """(böngésző, cookies.txt-fájl) a sütik-választó alapján."""
-        sel = self.cookies_choice.GetStringSelection()
+        """(böngésző, cookies.txt-fájl) a sütik-beállítás alapján."""
+        sel = self.settings.get("cookies", "Nincs")
         if sel == "cookies.txt fájl…":
-            return None, self._cookies_file
+            return None, (self.settings.get("cookies_file") or None)
         if sel and sel != "Nincs":
             return sel.lower(), None
         return None, None
 
-    def _on_cookies_choice(self, event):
-        if self.cookies_choice.GetStringSelection() != "cookies.txt fájl…":
-            return
-        dlg = wx.FileDialog(
-            self, "cookies.txt fájl kiválasztása",
-            wildcard="cookies.txt (*.txt)|*.txt|Minden fájl|*.*",
-            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-        if dlg.ShowModal() == wx.ID_OK:
-            self._cookies_file = dlg.GetPath()
-            self._announce(f"Sütifájl beállítva: {self._cookies_file}")
-        else:
-            self.cookies_choice.SetSelection(0)   # vissza a „Nincs"-re
+    def _on_settings(self, event=None, page=0):
+        dlg = SettingsDialog(self, self.settings, self.ai_config)
+        if page:
+            dlg.nb.SetSelection(page)
+        if dlg.ShowModal() == wx.ID_OK and dlg.result_settings is not None:
+            self.settings.update(dlg.result_settings)
+            self.ai_config = dlg.result_ai
+            store.save_ai_config(self.ai_config)
+            self._save_settings()
+            self._apply_runtime_settings()
+            self._announce("A beállítások elmentve.")
         dlg.Destroy()
 
+    def _apply_runtime_settings(self):
+        """A megváltozott beállítások érvényesítése a futó részekre."""
+        self.speaker.set_mode(str(self.settings.get("voice_mode", "auto")))
+        if self.mgr:
+            self.mgr.connections = self.settings.get("connections", 8)
+            self.mgr.limiter.bps = parse_limit(
+                self.settings.get("limit", "") or "0")
+            self.mgr.playlist_folders = bool(
+                self.settings.get("playlist_folders", True))
+            self.mgr.seed_ratio = self._seed_ratio()
+            self.mgr.audio_format = (
+                self.settings.get("audio_format", "MP3") or "MP3").lower()
+            ck_browser, ck_file = self._cookies_config()
+            self.mgr.cookies_browser = ck_browser
+            self.mgr.cookies_file = ck_file
+
     def _ensure_mgr(self) -> DownloadManager:
-        fmt = (self.fmt_choice.GetStringSelection() or "mp3").lower()
+        s = self.settings
+        fmt = (s.get("audio_format", "MP3") or "mp3").lower()
         ck_browser, ck_file = self._cookies_config()
         if self.mgr is None:
             self.mgr = DownloadManager(
                 self.dir_entry.GetValue(),
-                parallel=self.par_spin.GetValue(),
-                connections=self.conn_spin.GetValue(),
+                parallel=s.get("parallel", 3),
+                connections=s.get("connections", 8),
                 audio_only=self.audio_chk.GetValue(),
-                limit_bps=parse_limit(self.limit_entry.GetValue() or "0"),
+                limit_bps=parse_limit(s.get("limit", "") or "0"),
                 seed_ratio=self._seed_ratio(), audio_format=fmt,
                 cookies_browser=ck_browser, cookies_file=ck_file,
-                playlist_folders=self.playlist_chk.GetValue())
+                playlist_folders=bool(s.get("playlist_folders", True)))
         else:
             self.mgr.out_dir = self.dir_entry.GetValue()
-            self.mgr.connections = self.conn_spin.GetValue()
+            self.mgr.connections = s.get("connections", 8)
             self.mgr.audio_only = self.audio_chk.GetValue()
-            self.mgr.limiter.bps = parse_limit(
-                self.limit_entry.GetValue() or "0")
+            self.mgr.limiter.bps = parse_limit(s.get("limit", "") or "0")
             self.mgr.seed_ratio = self._seed_ratio()
             self.mgr.audio_format = fmt
             self.mgr.cookies_browser = ck_browser
             self.mgr.cookies_file = ck_file
-            self.mgr.playlist_folders = self.playlist_chk.GetValue()
+            self.mgr.playlist_folders = bool(s.get("playlist_folders", True))
         return self.mgr
 
     def _on_add(self, event=None, url: str | None = None):
@@ -787,6 +835,21 @@ class MainFrame(wx.Frame):
         self._book_win = BookFrame(self)
         self._book_win.Show()
 
+    def _on_news_window(self, event=None):
+        if self._news_win:
+            self._news_win.Raise()
+            return
+        self._news_win = NewsFrame(self)
+        self._news_win.Show()
+
+    def _on_reader_window(self, event=None, open_path="", text="", title=""):
+        if self._reader_win:
+            self._reader_win.Raise()
+            return
+        self._reader_win = ReaderFrame(self, open_path=open_path,
+                                       text=text, title=title)
+        self._reader_win.Show()
+
     def _auto_update_check(self):
         import datetime
         today = datetime.date.today().isoformat()
@@ -881,6 +944,11 @@ class MainFrame(wx.Frame):
         dlg.ShowModal()
         dlg.Destroy()
 
+    def _on_feed_timer(self, event):
+        # 15 percenként: podcast/RSS feliratkozások ÉS YouTube-csatornák
+        self._check_feeds(quiet=True)
+        self._check_channels(quiet=True)
+
     def _check_feeds(self, quiet: bool = True):
         if not self.fm.subs:
             if not quiet:
@@ -910,6 +978,87 @@ class MainFrame(wx.Frame):
             self.fm.mark_seen(sub, ep)
         self._announce(f"{len(found)} új epizód letöltése elindult.",
                        toast=True)
+
+    # ---- YouTube-csatornák: figyelés, friss videók --------------------
+
+    def _on_channel_subscribe(self, event=None):
+        dlg = wx.TextEntryDialog(
+            self, "A YouTube-csatorna címe (URL), pl. "
+            "https://www.youtube.com/@csatornanev:",
+            "YouTube-csatorna feliratkozás")
+        if dlg.ShowModal() == wx.ID_OK:
+            url = dlg.GetValue().strip()
+            if url:
+                self._do_channel_subscribe(url)
+        dlg.Destroy()
+
+    def _do_channel_subscribe(self, url, on_done=None):
+        self._announce(f"Csatorna vizsgálata: {url}")
+
+        def work():
+            try:
+                ch = self.cm.subscribe(url)
+                wx.CallAfter(
+                    self._announce,
+                    f"Feliratkozva a csatornára: {ch.title}. A meglévő "
+                    "videók kihagyva, csak az ezutániakat jelzem.")
+            except Exception as e:
+                wx.CallAfter(self._announce,
+                             f"Nem sikerült a csatorna-feliratkozás: {e}",
+                             False)
+            if on_done:
+                wx.CallAfter(on_done)
+        threading.Thread(target=work, daemon=True).start()
+
+    def _on_channels_window(self, event=None):
+        dlg = ChannelsDialog(self, self.cm, self._do_channel_subscribe,
+                             lambda: self._check_channels(quiet=False))
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def _on_fresh_videos(self, event=None):
+        dlg = FreshVideosDialog(self, self.cm, self._resolve_video,
+                                self._download_video)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def _resolve_video(self, url):
+        ck_browser, ck_file = self._cookies_config()
+        return search.resolve_stream(url, audio_only=True,
+                                     cookies_browser=ck_browser,
+                                     cookies_file=ck_file)
+
+    def _download_video(self, video):
+        mgr = self._ensure_mgr()
+        job = mgr.add(video.url, out_dir=self.dir_entry.GetValue(),
+                      audio_only=self.audio_chk.GetValue())
+        job.progress.filename = video.title
+        self._row_for(job)
+
+    def _check_channels(self, quiet: bool = True):
+        if not self.cm.channels:
+            if not quiet:
+                self._announce("Nincs YouTube-csatorna feliratkozás. Adj "
+                               "hozzá egyet a Feliratkozások menüből.")
+            return
+        if not quiet:
+            self._announce("YouTube-csatornák ellenőrzése...")
+
+        def work():
+            found = self.cm.check_all()
+            wx.CallAfter(self._channels_found, found, quiet)
+        threading.Thread(target=work, daemon=True).start()
+
+    def _channels_found(self, found, quiet):
+        if not found:
+            if not quiet:
+                self._announce("Nincs új videó a figyelt csatornákon.")
+            return
+        first = found[0][1].title
+        self._announce(
+            f"{len(found)} új videó a figyelt csatornákon. Legfrissebb: "
+            f"{first}. Megnyitás: Feliratkozások menü, Friss videók, vagy "
+            "Ctrl+Shift+Y.", toast=True, sound="results")
 
     # ---- torrent: a fájl már létezik ----------------------------------
 
@@ -950,19 +1099,279 @@ class MainFrame(wx.Frame):
     # ---- hangos összefoglaló ------------------------------------------
 
     def _on_speak_summary(self, event=None):
-        text = build_summary(self.mgr.jobs if self.mgr else [])
-        # a képernyőolvasó az értesítésből/állapotsorból olvassa fel,
-        # a beszédmotor pedig hangosan is kimondja (ha elérhető)
-        self._announce(text, toast=True)
-        if self.speaker.available:
-            self.speaker.speak(text)
-        elif not self.notify_chk.GetValue():
-            self.SetStatusText(text)
+        # a Ctrl+J összefoglaló a teljes napi infót adja: dátum, névnap,
+        # időjárás és a letöltések állapota – az időjárást háttérben kérjük le
+        self._speak_dayinfo(toast=True, beep=True)
+
+    # ---- napi infó: dátum, névnap, időjárás --------------------------
+
+    def _download_status_phrase(self) -> str:
+        s = build_summary(self.mgr.jobs if self.mgr else [])
+        # személyesebb megfogalmazás, ha épp nincs aktív letöltés
+        return ("Jelenleg nincs aktív letöltésed." if s == "Nincs aktív "
+                "letöltés." else s)
+
+    def _compose_dayinfo(self, w=None) -> str:
+        return dayinfo.build_greeting(
+            weather=w, download_status=self._download_status_phrase())
+
+    def _fetch_weather_async(self, on_done):
+        """A beállított város időjárását háttérszálon kéri le, majd
+        on_done(weather_vagy_None) a fő szálon. A város üres/hibás → None."""
+        city = (self.settings.get("city") or "").strip()
+
+        def work():
+            w = None
+            if city:
+                try:
+                    w = weather.current(city)
+                except Exception:
+                    w = None
+            wx.CallAfter(on_done, w)
+        threading.Thread(target=work, daemon=True).start()
+
+    def _speak_dayinfo(self, toast=False, beep=True):
+        def done(w):
+            text = self._compose_dayinfo(w)
+            if beep:
+                self._announce(text, toast=toast)
+            else:
+                self.SetStatusText(text)
+                self.log.AppendText(
+                    f"[{time.strftime('%H:%M:%S')}] {text}\n")
+            if self.speaker.available:
+                self.speaker.speak(text)
+        self._fetch_weather_async(done)
+
+    def _startup_greeting(self):
+        # indításkor automatikus, hangos üdvözlés (beep nélkül, hogy ne
+        # ütközzön a beszéddel)
+        self._speak_dayinfo(toast=False, beep=False)
+
+    def _on_dayinfo_window(self, event=None):
+        dlg = DayInfoDialog(self, self._compose_dayinfo,
+                            self._fetch_weather_async, self.speaker)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    # ---- AI: kép leírása / OCR ----------------------------------------
+
+    AI_DESCRIBE = ("Írd le részletesen, magyarul, mi látható ezen a képen. "
+                   "Ha fontos szöveg van rajta, idézd is. Légy konkrét és "
+                   "segítőkész egy látássérült felhasználónak.")
+    AI_OCR = ("Olvasd ki és add vissza pontosan a képen szereplő összes "
+              "szöveget, az eredeti nyelven. Csak a szöveget add vissza, "
+              "magyarázat nélkül.")
+
+    def _ai_image_file(self, prompt, title):
+        dlg = wx.FileDialog(
+            self, "Kép kiválasztása",
+            wildcard="Képek|*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.webp|"
+                     "Minden fájl|*.*",
+            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        if dlg.ShowModal() != wx.ID_OK:
+            dlg.Destroy()
+            return
+        path = dlg.GetPath()
+        dlg.Destroy()
+        import mimetypes
+        mime = mimetypes.guess_type(path)[0] or "image/png"
+
+        def worker():
+            with open(path, "rb") as f:
+                data = f.read()
+            return aiclient.vision(prompt, data, mime=mime)
+        run_ai(self, title, worker, busy="A kép elemzése folyamatban…")
+
+    def _on_ai_image(self, event=None):
+        self._ai_image_file(self.AI_DESCRIBE, "Kép leírása")
+
+    def _on_ai_ocr(self, event=None):
+        self._ai_image_file(self.AI_OCR, "Szöveg a képből")
+
+    def _on_ai_clip(self, event=None):
+        data = self._clipboard_png()
+        if not data:
+            self._announce("A vágólapon nincs kép. Másolj egy képet "
+                           "(pl. képernyőképet), majd próbáld újra.")
+            return
+
+        def worker():
+            return aiclient.vision(self.AI_DESCRIBE, data, mime="image/png")
+        run_ai(self, "Kép leírása (vágólap)", worker,
+               busy="A vágólap képének elemzése…")
+
+    def _clipboard_png(self):
+        bmp = None
+        if wx.TheClipboard.Open():
+            if wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_BITMAP)):
+                obj = wx.BitmapDataObject()
+                if wx.TheClipboard.GetData(obj):
+                    bmp = obj.GetBitmap()
+            wx.TheClipboard.Close()
+        if not bmp or not bmp.IsOk():
+            return None
+        import os
+        import tempfile
+        fd, tmp = tempfile.mkstemp(suffix=".png")
+        os.close(fd)
+        try:
+            bmp.ConvertToImage().SaveFile(tmp, wx.BITMAP_TYPE_PNG)
+            with open(tmp, "rb") as f:
+                return f.read()
+        finally:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+
+    def _on_ai_keys_help(self, event=None):
+        from superdl.aikeyshelp import AIKeysHelpDialog
+        dlg = AIKeysHelpDialog(self)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def _on_support(self, event=None):
+        from superdl.supportwin import SupportDialog
+        dlg = SupportDialog(self)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    # ---- AI: dokumentum összefoglaló / kérdezz ------------------------
+
+    MAX_DOC_CHARS = 100000
+
+    def _ai_pick_doc(self):
+        dlg = wx.FileDialog(
+            self, "Dokumentum kiválasztása",
+            wildcard="Dokumentumok|*.txt;*.pdf;*.epub;*.docx|Minden fájl|*.*",
+            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        path = dlg.GetPath() if dlg.ShowModal() == wx.ID_OK else None
+        dlg.Destroy()
+        return path
+
+    def _ai_extract_doc(self, path):
+        import os
+        from superdl import booktext
+        book = booktext.extract(path)
+        text = book.text or ""
+        title = book.title or os.path.basename(path)
+        return text[:self.MAX_DOC_CHARS], len(text) > self.MAX_DOC_CHARS, title
+
+    def _on_ai_doc_summary(self, event=None):
+        path = self._ai_pick_doc()
+        if not path:
+            return
+
+        def worker():
+            text, trunc, title = self._ai_extract_doc(path)
+            if not text.strip():
+                raise RuntimeError("a dokumentumból nem sikerült szöveget "
+                                   "kinyerni")
+            note = " (a dokumentum eleje alapján)" if trunc else ""
+            prompt = ("Foglald össze a következő dokumentumot magyarul, jól "
+                      "tagolva: 4–8 fő pont, majd egy rövid záró bekezdés a "
+                      f"lényegről.{note}\n\nCÍM: {title}\n\nSZÖVEG:\n{text}")
+            return aiclient.chat(prompt, max_tokens=2000)
+        run_ai(self, "Dokumentum összefoglaló", worker,
+               busy="A dokumentum elemzése folyamatban…")
+
+    VIDEO_PROMPT = (
+        "Elemezd ezt a videót magyarul, egy látássérült nézőnek. Írd le, mi "
+        "történik benne KÉPILEG: a főbb jelenetek időrendben, a szereplők, a "
+        "cselekvések, a helyszín, és a képen megjelenő szövegek. A végén "
+        "foglald össze röviden, miről szól a videó.")
+
+    def _run_video_analysis(self, *, youtube_url=None, url=None,
+                            local_path=None):
+        """A médiakeresőből és az AI menüből is hívható videóelemzés."""
+        def worker(report):
+            if youtube_url:
+                return aiclient.analyze_video(
+                    self.VIDEO_PROMPT, youtube_url=youtube_url, progress=report)
+            path = local_path or mediaai.download_video_temp(url,
+                                                             progress=report)
+            return aiclient.analyze_video(self.VIDEO_PROMPT, local_path=path,
+                                          progress=report)
+        run_ai_progress(self, "Videó elemzése", worker,
+                        busy="Videó előkészítése…")
+
+    def _analyze_video_auto(self, url):
+        """A médiakeresőből: YouTube-linket közvetlenül, mást letöltve elemez."""
+        if mediaai.is_youtube(url):
+            self._run_video_analysis(youtube_url=url)
+        else:
+            self._run_video_analysis(url=url)
+
+    def _on_ai_video(self, event=None):
+        dlg = wx.TextEntryDialog(
+            self, "Add meg a videó URL-jét (pl. YouTube).\nHa helyi fájlt "
+            "elemeznél, hagyd üresen, és kattints az OK-ra.",
+            "Videó elemzése")
+        if dlg.ShowModal() != wx.ID_OK:
+            dlg.Destroy()
+            return
+        val = dlg.GetValue().strip()
+        dlg.Destroy()
+        if val:
+            if mediaai.is_youtube(val):
+                self._run_video_analysis(youtube_url=val)
+            else:
+                self._run_video_analysis(url=val)
+            return
+        fdlg = wx.FileDialog(
+            self, "Videófájl kiválasztása",
+            wildcard="Videó|*.mp4;*.mkv;*.webm;*.mov;*.avi;*.m4v|"
+                     "Minden fájl|*.*",
+            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        if fdlg.ShowModal() == wx.ID_OK:
+            self._run_video_analysis(local_path=fdlg.GetPath())
+        fdlg.Destroy()
+
+    def _on_ai_transcribe(self, srt=False):
+        dlg = wx.FileDialog(
+            self, "Hang- vagy videófájl kiválasztása",
+            wildcard="Hang és videó|*.mp3;*.m4a;*.wav;*.opus;*.flac;*.aac;"
+                     "*.ogg;*.mp4;*.mkv;*.webm;*.mov;*.avi|Minden fájl|*.*",
+            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        if dlg.ShowModal() != wx.ID_OK:
+            dlg.Destroy()
+            return
+        path = dlg.GetPath()
+        dlg.Destroy()
+
+        def worker(report):
+            return mediaai.transcribe_media(path, srt=srt, progress=report)
+        title = "Felirat (.srt)" if srt else "Hang/videó átirat"
+        run_ai_progress(self, title, worker,
+                        busy="Előkészítés (ffmpeg)…")
+
+    def _on_ai_doc_qa(self, event=None):
+        path = self._ai_pick_doc()
+        if not path:
+            return
+        q = wx.GetTextFromUser("Mit szeretnél kérdezni a dokumentumról?",
+                               "Kérdés a dokumentumról")
+        if not q.strip():
+            return
+
+        def worker():
+            text, trunc, title = self._ai_extract_doc(path)
+            if not text.strip():
+                raise RuntimeError("a dokumentumból nem sikerült szöveget "
+                                   "kinyerni")
+            prompt = ("Az alábbi dokumentum alapján válaszolj magyarul a "
+                      "kérdésre. Ha a válasz nincs benne a szövegben, mondd "
+                      f"meg őszintén.\n\nKÉRDÉS: {q}\n\nCÍM: {title}\n\n"
+                      f"DOKUMENTUM:\n{text}")
+            return aiclient.chat(prompt, max_tokens=2000)
+        run_ai(self, "Kérdés a dokumentumról", worker,
+               busy="Válasz keresése a dokumentumban…")
 
     # ---- időzített frissítés ------------------------------------------
 
     def _on_tick(self, event):
-        if self.clip_chk.GetValue():
+        if self.settings.get("clipboard"):
             self._check_clipboard()
         if not self.mgr:
             return
@@ -1008,7 +1417,7 @@ class MainFrame(wx.Frame):
             if p.conflict and j.id not in self._conflict_asked:
                 self._conflict_asked.add(j.id)
                 wx.CallAfter(self._ask_conflict, j)
-        title = "SuperDL – akadálymentes többszálú letöltő"
+        title = "SuperDL – akadálymentes médiaközpont"
         if active:
             title = f"SuperDL – {active} letöltés fut"
         if self.GetTitle() != title:
@@ -1065,6 +1474,10 @@ class MainFrame(wx.Frame):
             self._radio_win.Destroy()
         if self._book_win:
             self._book_win.Destroy()
+        if self._news_win:
+            self._news_win.Destroy()
+        if self._reader_win:
+            self._reader_win.Destroy()
         self._save_settings()
         self.timer.Stop()
         self.feed_timer.Stop()

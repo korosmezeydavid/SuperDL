@@ -124,9 +124,9 @@ def run_plain(mgr) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser(
         prog="superdl",
-        description="Többfunkciós, többszálú letöltő (közvetlen fájlok + "
-                    "médiaoldalak a yt-dlp révén). Csak legálisan letölthető "
-                    "tartalomhoz használd!")
+        description="SuperDL – Super Digital Lounge: akadálymentes "
+                    "médiaközpont (közvetlen fájlok + médiaoldalak a yt-dlp "
+                    "révén). Csak legálisan letölthető tartalomhoz használd!")
     ap.add_argument("urls", nargs="*", help="letöltendő URL-ek")
     ap.add_argument("--list", metavar="FÁJL",
                     help="URL-lista fájlból (soronként egy)")

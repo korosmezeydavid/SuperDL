@@ -100,6 +100,79 @@ def save_radio_schedule(records: list[dict]) -> None:
         save_json(RADIO_SCHED_FILE, records)
 
 
+CHANNELS_FILE = CONFIG_DIR / "channels.json"
+FRESH_VIDEOS_FILE = CONFIG_DIR / "fresh_videos.json"
+
+
+def load_channels() -> list[dict]:
+    """YouTube-csatorna feliratkozások."""
+    with _lock:
+        data = load_json(CHANNELS_FILE, [])
+    return data if isinstance(data, list) else []
+
+
+def save_channels(records: list[dict]) -> None:
+    with _lock:
+        save_json(CHANNELS_FILE, records)
+
+
+def load_fresh_videos() -> list[dict]:
+    """A figyelt csatornák friss, még meg nem nyitott videói."""
+    with _lock:
+        data = load_json(FRESH_VIDEOS_FILE, [])
+    return data if isinstance(data, list) else []
+
+
+def save_fresh_videos(records: list[dict]) -> None:
+    with _lock:
+        save_json(FRESH_VIDEOS_FILE, records)
+
+
+NEWS_FEEDS_FILE = CONFIG_DIR / "news_feeds.json"
+
+
+def load_news_feeds() -> list[dict]:
+    """A hírolvasó RSS-forrásai."""
+    with _lock:
+        data = load_json(NEWS_FEEDS_FILE, [])
+    return data if isinstance(data, list) else []
+
+
+def save_news_feeds(records: list[dict]) -> None:
+    with _lock:
+        save_json(NEWS_FEEDS_FILE, records)
+
+
+LIBRARY_FILE = CONFIG_DIR / "library.json"
+
+
+def load_library() -> list[dict]:
+    """Könyvtár + könyvjelzők (élő könyvolvasó)."""
+    with _lock:
+        data = load_json(LIBRARY_FILE, [])
+    return data if isinstance(data, list) else []
+
+
+def save_library(records: list[dict]) -> None:
+    with _lock:
+        save_json(LIBRARY_FILE, records)
+
+
+AI_CONFIG_FILE = CONFIG_DIR / "ai.json"
+
+
+def load_ai_config() -> dict:
+    """AI-szolgáltatók API-kulcsai és modellbeállítása (helyben tárolva)."""
+    with _lock:
+        data = load_json(AI_CONFIG_FILE, {})
+    return data if isinstance(data, dict) else {}
+
+
+def save_ai_config(config: dict) -> None:
+    with _lock:
+        save_json(AI_CONFIG_FILE, config)
+
+
 TTS_KEYS_FILE = CONFIG_DIR / "tts_keys.json"
 
 
