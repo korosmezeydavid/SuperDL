@@ -1190,27 +1190,67 @@ class MainFrame(wx.Frame):
         self._ai_image_file(self.AI_OCR, "Szöveg a képből")
 
     def _on_ai_clip(self, event=None):
-        data = self._clipboard_png()
-        if not data:
+        got = self._clipboard_image()
+        if not got:
             self._announce("A vágólapon nincs kép. Másolj egy képet "
-                           "(pl. képernyőképet), majd próbáld újra.")
+                           "(képernyőképet PrintScreennel, vagy egy "
+                           "képfájlt a Fájlkezelőből), majd próbáld újra.")
             return
+        data, mime = got
 
         def worker():
-            return aiclient.vision(self.AI_DESCRIBE, data, mime="image/png")
+            return aiclient.vision(self.AI_DESCRIBE, data, mime=mime)
         run_ai(self, "Kép leírása (vágólap)", worker,
                busy="A vágólap képének elemzése…")
 
-    def _clipboard_png(self):
-        bmp = None
-        if wx.TheClipboard.Open():
-            if wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_BITMAP)):
-                obj = wx.BitmapDataObject()
-                if wx.TheClipboard.GetData(obj):
-                    bmp = obj.GetBitmap()
-            wx.TheClipboard.Close()
-        if not bmp or not bmp.IsOk():
+    IMAGE_EXTS = (".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp",
+                  ".tif", ".tiff")
+
+    def _clipboard_image(self):
+        """Kép a vágólapról: (bájtok, mime) vagy None. Kezeli a BITKÉPET
+        (PrintScreen, böngésző „kép másolása"), a FÁJLBÓL másolt képet
+        (Fájlkezelő → Másolás), és az egyedi PNG-formátumot is."""
+        import mimetypes
+        import os
+
+        cb = wx.TheClipboard
+        if not cb.Open():
             return None
+        try:
+            # 1) bitkép (DIB) – PrintScreen, böngésző „kép másolása"
+            if cb.IsSupported(wx.DataFormat(wx.DF_BITMAP)):
+                obj = wx.BitmapDataObject()
+                if cb.GetData(obj):
+                    bmp = obj.GetBitmap()
+                    if bmp and bmp.IsOk():
+                        data = self._bmp_to_png(bmp)
+                        if data:
+                            return data, "image/png"
+            # 2) fájl(ok) a vágólapon (Fájlkezelő → Másolás, CF_HDROP)
+            if cb.IsSupported(wx.DataFormat(wx.DF_FILENAME)):
+                fobj = wx.FileDataObject()
+                if cb.GetData(fobj):
+                    for path in fobj.GetFilenames():
+                        if os.path.splitext(path)[1].lower() in self.IMAGE_EXTS:
+                            try:
+                                with open(path, "rb") as f:
+                                    return (f.read(),
+                                            mimetypes.guess_type(path)[0]
+                                            or "image/png")
+                            except OSError:
+                                continue
+            # 3) egyedi PNG-formátum (egyes alkalmazások így másolnak)
+            png_fmt = wx.DataFormat("PNG")
+            if cb.IsSupported(png_fmt):
+                cobj = wx.CustomDataObject(png_fmt)
+                if cb.GetData(cobj) and cobj.GetDataSize() > 0:
+                    return cobj.GetData(), "image/png"
+        finally:
+            cb.Close()
+        return None
+
+    @staticmethod
+    def _bmp_to_png(bmp):
         import os
         import tempfile
         fd, tmp = tempfile.mkstemp(suffix=".png")
@@ -1219,6 +1259,8 @@ class MainFrame(wx.Frame):
             bmp.ConvertToImage().SaveFile(tmp, wx.BITMAP_TYPE_PNG)
             with open(tmp, "rb") as f:
                 return f.read()
+        except Exception:
+            return None
         finally:
             try:
                 os.remove(tmp)
@@ -1719,6 +1761,7 @@ def url_is_new(mgr, url: str) -> bool:
 
 def main():
     app = wx.App()
+    wx.InitAllImageHandlers()     # minden képformátum (PNG/JPEG/…) kezelése
     selfupdate.cleanup_old()      # korábbi önfrissítés maradékának törlése
     # induláskor a vágólap tartalmát nem töltjük le automatikusan
     frame = MainFrame()

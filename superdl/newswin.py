@@ -43,7 +43,12 @@ class NewsFrame(wx.Frame):
                 wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         self.feed_ch = wx.Choice(p, choices=[])
         self.feed_ch.SetName("Hírforrás választása")
-        self.feed_ch.Bind(wx.EVT_CHOICE, lambda e: self._load_headlines())
+        self.feed_ch.Bind(wx.EVT_CHOICE, lambda e: self._on_feed_change())
+        # rövid késleltetés a betöltés elé: ha nyilakkal pörgeted a forrásokat,
+        # csak a megállás után tölt be (és a fókusz a forrásokon marad)
+        self._load_timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, lambda e: self._load_headlines(),
+                  self._load_timer)
         row.Add(self.feed_ch, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         for label, fn in (("Fri&ssítés", lambda e: self._load_headlines()),
                           ("Ú&j forrás…", lambda e: self._add_feed()),
@@ -98,10 +103,16 @@ class NewsFrame(wx.Frame):
     # ---- forrás / szalagcímek -----------------------------------------
 
     def _reload_feeds(self):
-        self.feed_ch.Set([f.title or f.url for f in self.nm.feeds])
+        self.feed_ch.Set([f.label() for f in self.nm.feeds])
         if self.nm.feeds:
             self.feed_ch.SetSelection(0)
             self._load_headlines()
+
+    def _on_feed_change(self):
+        # nem töltünk be azonnal: kis késleltetéssel (a fókusz a választón
+        # marad, és a gyors nyíl-léptetés nem indít fölösleges letöltést)
+        self._load_timer.Stop()
+        self._load_timer.StartOnce(450)
 
     def _current_feed(self):
         i = self.feed_ch.GetSelection()
@@ -130,18 +141,22 @@ class NewsFrame(wx.Frame):
         self.head_list.DeleteAllItems()
         for a in arts:
             self.head_list.InsertItem(self.head_list.GetItemCount(), a.title)
-        # ha a forrás címe most derült ki, frissítsük a választóban
-        if title and feed.title != title:
+        # ha a forrásnak még nincs neve, töltsük ki – de a legördülő elemét
+        # HELYBEN frissítjük (nem építjük újra), hogy ne ugorjon el a kurzor
+        if title and not feed.title:
             feed.title = title
             self.nm.save()
-            sel = self.feed_ch.GetSelection()
-            self.feed_ch.Set([f.title or f.url for f in self.nm.feeds])
-            self.feed_ch.SetSelection(sel)
-        self.SetStatusText(f"{len(arts)} szalagcím – {title}.")
+            try:
+                self.feed_ch.SetString(self.nm.feeds.index(feed), feed.label())
+            except Exception:
+                pass
+        self.SetStatusText(f"{len(arts)} szalagcím – {title}. "
+                           "(Tabbal a szalagcímekhez.)")
         if arts:
             self.head_list.Select(0)
             self.head_list.Focus(0)
-            self.head_list.SetFocus()
+            # a fókusz SZÁNDÉKOSAN a forrás-választón marad: így nyugodtan
+            # végiglépkedhetsz a forrásokon; Tabbal mész a szalagcímekhez
 
     # ---- cikk ---------------------------------------------------------
 
@@ -258,6 +273,7 @@ class NewsFrame(wx.Frame):
             self._reload_feeds()
 
     def _on_close(self, e):
+        self._load_timer.Stop()
         self._stop_speech()
         if getattr(self.main, "_news_win", None) is self:
             self.main._news_win = None

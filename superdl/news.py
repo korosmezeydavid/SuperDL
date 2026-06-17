@@ -16,12 +16,26 @@ from . import store
 
 UA = {"User-Agent": "Mozilla/5.0 (SuperDL hírolvasó)"}
 
-# pár alapértelmezett magyar hírforrás, hogy ne üres listával induljon
+# Beépített magyar hírforrások kategóriánként (kategória, név, RSS-cím).
+# Mind ellenőrzött, élő feed (2026-06).
 DEFAULT_FEEDS = [
-    ("hírek (Telex)", "https://telex.hu/rss"),
-    ("hírek (444)", "https://444.hu/feed"),
-    ("közélet (HVG)", "https://hvg.hu/rss"),
-    ("MVGYOSZ (vakok szövetsége)", "https://www.mvgyosz.hu/feed/"),
+    ("Hírek", "Telex", "https://telex.hu/rss"),
+    ("Hírek", "444", "https://444.hu/feed"),
+    ("Hírek", "HVG", "https://hvg.hu/rss"),
+    ("Hírek", "Index", "https://index.hu/24ora/rss/"),
+    ("Hírek", "24.hu", "https://24.hu/feed/"),
+    ("Hírek", "Origo", "https://www.origo.hu/contentpartner/rss/origoall/"
+                       "origo.xml"),
+    ("Hírek", "Népszava", "https://nepszava.hu/feed"),
+    ("IT", "HWSW", "https://www.hwsw.hu/xml/latest_news_rss.xml"),
+    ("IT", "Bitport", "https://bitport.hu/rss"),
+    ("Játék", "GameStar", "https://www.gamestar.hu/site/rss/rss.xml"),
+    ("Játék", "IGN Hungary", "https://hu.ign.com/feed.xml"),
+    ("Játék", "Player", "https://player.hu/feed/"),
+    ("Tudomány", "Qubit", "https://qubit.hu/feed"),
+    ("Gazdaság", "Portfolio", "https://www.portfolio.hu/rss/all.xml"),
+    ("Életmód", "NLC", "https://nlc.hu/feed/"),
+    ("Akadálymentesség", "MVGYOSZ", "https://www.mvgyosz.hu/feed/"),
 ]
 
 
@@ -37,13 +51,21 @@ class Article:
 class NewsFeed:
     url: str
     title: str = ""
+    category: str = ""
+
+    def label(self) -> str:
+        """A legördülőben megjelenő név, kategória-címkével, pl. „[IT] HWSW"."""
+        name = self.title or self.url
+        return f"[{self.category}] {name}" if self.category else name
 
     def to_record(self) -> dict:
-        return {"url": self.url, "title": self.title}
+        return {"url": self.url, "title": self.title,
+                "category": self.category}
 
     @classmethod
     def from_record(cls, r: dict) -> "NewsFeed":
-        return cls(url=r["url"], title=r.get("title", ""))
+        return cls(url=r["url"], title=r.get("title", ""),
+                   category=r.get("category", ""))
 
 
 def _strip_html(html: str) -> str:
@@ -128,12 +150,28 @@ class NewsManager:
     """A hírforrások (RSS-feedek) listáját kezeli és tárolja."""
 
     def __init__(self):
-        records = store.load_news_feeds()
-        if records:
-            self.feeds = [NewsFeed.from_record(r) for r in records]
-        else:
-            self.feeds = [NewsFeed(url=u, title=t) for t, u in DEFAULT_FEEDS]
+        self.feeds = [NewsFeed.from_record(r)
+                      for r in store.load_news_feeds()]
+        # a bővített, kategorizált beépített forrásokat EGYSZER hozzáadjuk a
+        # meglévőkhöz is (frissítéskor); a felhasználó saját forrásai és
+        # törlései megmaradnak (marker fájl jelzi, hogy már megtörtént)
+        marker = store.CONFIG_DIR / "news_defaults_v2.done"
+        if not marker.exists():
+            by_url = {f.url: f for f in self.feeds}
+            for cat, title, url in DEFAULT_FEEDS:
+                if url in by_url:
+                    f = by_url[url]
+                    if not f.category:          # régi, kategória nélküli elem
+                        f.category, f.title = cat, title
+                else:
+                    self.feeds.append(NewsFeed(url=url, title=title,
+                                               category=cat))
             self.save()
+            try:
+                store.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+                marker.write_text("ok", encoding="utf-8")
+            except OSError:
+                pass
 
     def save(self) -> None:
         store.save_news_feeds([f.to_record() for f in self.feeds])
