@@ -1,6 +1,6 @@
 """SuperDL - többfunkciós, több szálú letöltő."""
 
-__version__ = "3.1.0"
+__version__ = "3.1.1"
 
 # --- frissített yt-dlp betöltése -------------------------------------
 # Ha a felhasználó frissítette a yt-dlp-t (~/.superdl/bin/ytdlp), onnan

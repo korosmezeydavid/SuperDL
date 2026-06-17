@@ -24,8 +24,9 @@ from pathlib import Path
 
 from . import __version__
 
-# Állítsd be a saját GitHub-tárhelyedre, pl. "korosmezeyd/SuperDL".
-DEFAULT_REPO = ""
+# A SuperDL hivatalos GitHub-tárhelye – beégetve, hogy az önfrissítés
+# repo.txt nélkül is működjön (akkor is, ha valaki csak az exét tölti le).
+DEFAULT_REPO = "korosmezeydavid/SuperDL"
 UA = {"User-Agent": "SuperDL-selfupdate"}
 
 
