@@ -32,7 +32,8 @@ class MediaSearchFrame(wx.Frame):
         super().__init__(main, title="SuperDL – Médiakereső",
                          size=(960, 700))
         self.main = main                 # a fő ablak (letöltés, beállítások)
-        self.results: list[S.Result] = []
+        self.results: list[S.Result] = []   # az összes lekért találat
+        self._shown: list[S.Result] = []    # a hossz-szűrő után megjelenítettek
         self.cart: list[S.Result] = [self._from_rec(r)
                                      for r in store.load_cart()]
         self.query = ""
@@ -69,11 +70,42 @@ class MediaSearchFrame(wx.Frame):
         self.search_entry = wx.TextCtrl(p, style=wx.TE_PROCESS_ENTER)
         self.search_entry.SetName("Keresőszó")
         self.search_entry.Bind(wx.EVT_TEXT_ENTER, lambda e: self._on_search())
+        row.Add(wx.StaticText(p, label="&Típus:"), 0,
+                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
+        self.kind_choice = wx.Choice(
+            p, choices=["Videó", "Lejátszási lista", "Csatorna"])
+        self.kind_choice.SetSelection(0)
+        self.kind_choice.SetName("Keresés típusa")
+        # típusváltáskor – ha van már keresőszó – újrakeresünk
+        self.kind_choice.Bind(
+            wx.EVT_CHOICE,
+            lambda e: self._on_search() if self.search_entry.GetValue().strip()
+            else None)
         btn_search = wx.Button(p, label="Ke&resés")
         btn_search.Bind(wx.EVT_BUTTON, lambda e: self._on_search())
         row.Add(self.search_entry, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        row.Add(self.kind_choice, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         row.Add(btn_search, 0)
         v.Add(row, 0, wx.EXPAND | wx.ALL, 8)
+
+        # hossz-szűrő: a már lekért találatokat a hosszuk alapján szűri
+        # (letöltés/újrakeresés nélkül, azonnal)
+        frow = wx.BoxSizer(wx.HORIZONTAL)
+        frow.Add(wx.StaticText(p, label="&Hossz:"), 0,
+                 wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.dur_choice = wx.Choice(
+            p, choices=["Bármilyen", "rövidebb, mint", "hosszabb, mint"])
+        self.dur_choice.SetSelection(0)
+        self.dur_choice.SetName("Hossz szerinti szűrés")
+        self.dur_choice.Bind(wx.EVT_CHOICE, lambda e: self._display())
+        self.dur_spin = wx.SpinCtrl(p, min=1, max=600, initial=10,
+                                    size=(70, -1))
+        self.dur_spin.SetName("Perc")
+        self.dur_spin.Bind(wx.EVT_SPINCTRL, lambda e: self._display())
+        frow.Add(self.dur_choice, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        frow.Add(self.dur_spin, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
+        frow.Add(wx.StaticText(p, label="perc"), 0, wx.ALIGN_CENTER_VERTICAL)
+        v.Add(frow, 0, wx.LEFT | wx.BOTTOM, 8)
 
         # találatok
         v.Add(wx.StaticText(p, label="&Találatok (Enter: lejátszás, "
@@ -87,7 +119,7 @@ class MediaSearchFrame(wx.Frame):
         self.res_list.Bind(wx.EVT_KEY_DOWN, self._on_res_key)
         self.res_list.Bind(wx.EVT_CONTEXT_MENU, self._on_res_menu)
         self.res_list.Bind(wx.EVT_LIST_ITEM_ACTIVATED,
-                           lambda e: self._play_selected())
+                           lambda e: self._primary_action())
         v.Add(self.res_list, 3, wx.EXPAND | wx.ALL, 8)
 
         self.btn_more = wx.Button(p, label="To&vább (következő 25 találat)")
@@ -168,7 +200,7 @@ class MediaSearchFrame(wx.Frame):
 
     def _selected_result(self) -> S.Result | None:
         i = self.res_list.GetFirstSelected()
-        return self.results[i] if 0 <= i < len(self.results) else None
+        return self._shown[i] if 0 <= i < len(self._shown) else None
 
     # ---- keresés ------------------------------------------------------
 
@@ -188,10 +220,11 @@ class MediaSearchFrame(wx.Frame):
         self.SetStatusText(f"Keresés: {self.query} …")
         self.btn_more.Disable()
         q, count = self.query, self.count
+        kind = ("video", "playlist", "channel")[self.kind_choice.GetSelection()]
 
         def work():
             try:
-                res = S.search(q, count=count)
+                res = S.search(q, count=count, kind=kind)
             except Exception as e:
                 wx.CallAfter(self.SetStatusText, f"Keresési hiba: {e}")
                 return
@@ -199,30 +232,106 @@ class MediaSearchFrame(wx.Frame):
 
         threading.Thread(target=work, daemon=True).start()
 
+    @staticmethod
+    def _dedup(items):
+        """Találatok duplikátum-szűrése id/url alapján, sorrend megtartásával."""
+        seen, out = set(), []
+        for x in items:
+            key = x.id or x.url
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append(x)
+        return out
+
+    def _add_row(self, x):
+        """Egy találat hozzáfűzése a ListCtrl végéhez (egységes oszlopokkal)."""
+        row = self.res_list.InsertItem(self.res_list.GetItemCount(), x.title)
+        self.res_list.SetItem(row, 1, S.human_duration(x.duration))
+        self.res_list.SetItem(row, 2, x.uploader)
+        return row
+
     def _show_results(self, res, focus_first, keep):
-        self.results = res
-        self.res_list.DeleteAllItems()
-        for x in res:
-            row = self.res_list.InsertItem(self.res_list.GetItemCount(),
-                                           x.title)
-            self.res_list.SetItem(row, 1, S.human_duration(x.duration))
-            self.res_list.SetItem(row, 2, x.uploader)
-        self.SetStatusText(f"{len(res)} találat a(z) „{self.query}” szóra.")
         if res and hasattr(self.main, "_sfx"):
             self.main._sfx("results")
-        self.btn_more.Enable(bool(res))
-        if res:
-            sel = 0 if focus_first else min(keep, len(res) - 1)
+        if focus_first:
+            # új keresés: teljes csere + dedup, majd teljes újraépítés
+            self.results = self._dedup(res)
+            self.btn_more.Enable(bool(self.results))
+            self._display(focus_first=True)
+        else:
+            # „Tovább": CSAK a még nem látott találatokat fűzzük hozzá (nincs
+            # duplikátum, és nem építjük újra a listát → a képernyőolvasó nem
+            # veszti el a helyét). A fókusz az ELSŐ ÚJ találatra kerül.
+            seen = {(r.id or r.url) for r in self.results}
+            added = [r for r in res if (r.id or r.url) not in seen]
+            self.results.extend(added)
+            self.btn_more.Enable(True)
+            self._append_new(added)
+
+    def _pass_duration(self, x) -> bool:
+        """Átmegy-e a hossz-szűrőn? (0 = bármilyen, 1 = rövidebb, 2 = hosszabb)"""
+        # lejátszási listáknak / csatornáknak nincs értelmezhető hosszuk
+        if (getattr(x, "kind", "video") or "video") != "video":
+            return True
+        mode = self.dur_choice.GetSelection()
+        if mode == 0:
+            return True
+        secs = self.dur_spin.GetValue() * 60
+        d = x.duration or 0
+        if d <= 0:                       # ismeretlen hossz – szűrésnél kihagyjuk
+            return False
+        return d <= secs if mode == 1 else d >= secs
+
+    def _display(self, focus_first: bool = True, keep: int = 0):
+        """A találatok TELJES újraépítése a hossz-szűrő alkalmazásával
+        (új keresésnél és a szűrő változásakor)."""
+        self._shown = [x for x in self.results if self._pass_duration(x)]
+        self.res_list.DeleteAllItems()
+        for x in self._shown:
+            self._add_row(x)
+        self._update_status()
+        if self._shown:
+            sel = 0 if focus_first else min(keep, len(self._shown) - 1)
             self.res_list.Select(sel)
             self.res_list.Focus(sel)
             self.res_list.SetFocus()
+
+    def _append_new(self, added):
+        """A „Tovább" után CSAK az új találatok hozzáfűzése a lista végéhez,
+        a meglévő sorok és a kijelölés bolygatása nélkül. A fókusz az első új
+        találatra ugrik, hogy a képernyőolvasó onnan folytassa az olvasást."""
+        new_shown = [x for x in added if self._pass_duration(x)]
+        first_row = None
+        for x in new_shown:
+            row = self._add_row(x)
+            if first_row is None:
+                first_row = row
+        self._shown.extend(new_shown)
+        self._update_status()
+        if first_row is not None:
+            self.res_list.Select(first_row)
+            self.res_list.Focus(first_row)
+            self.res_list.SetFocus()
+        else:
+            # nem jött új találat (vagy mind kiszűrtük) – jelezzük
+            self._announce("Nincs több új találat.")
+
+    def _update_status(self):
+        if self.dur_choice.GetSelection() == 0:
+            self.SetStatusText(f"{len(self._shown)} találat a(z) "
+                               f"„{self.query}” szóra.")
+        else:
+            self.SetStatusText(f"{len(self._shown)} találat a szűrés után "
+                               f"({len(self.results)} összesen) – "
+                               f"„{self.query}”.")
 
     # ---- találat-műveletek -------------------------------------------
 
     def _on_res_key(self, e):
         code, ctrl = e.GetKeyCode(), e.ControlDown()
         if code in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER):
-            self._play_selected()
+            self._primary_action()
         elif ctrl and code == ord('B'):
             self._add_to_cart()
         elif ctrl and code == ord('D'):
@@ -233,22 +342,67 @@ class MediaSearchFrame(wx.Frame):
             e.Skip()
 
     def _on_res_menu(self, e):
-        if not self._selected_result():
+        x = self._selected_result()
+        if not x:
             return
         m = wx.Menu()
-        mi_play = m.Append(wx.ID_ANY, "&Lejátszás\tEnter")
-        mi_cart = m.Append(wx.ID_ANY, "&Kosárba\tCtrl+B")
-        mi_dl = m.Append(wx.ID_ANY, "Közvetlen le&töltés\tCtrl+D")
-        mi_url = m.Append(wx.ID_ANY, "&URL pontos másolása\tCtrl+C")
-        m.AppendSeparator()
-        mi_ai = m.Append(wx.ID_ANY, "AI: Videó &elemzése")
-        self.Bind(wx.EVT_MENU, lambda e: self._play_selected(), mi_play)
-        self.Bind(wx.EVT_MENU, lambda e: self._add_to_cart(), mi_cart)
-        self.Bind(wx.EVT_MENU, lambda e: self._download_selected(), mi_dl)
-        self.Bind(wx.EVT_MENU, lambda e: self._copy_url(), mi_url)
-        self.Bind(wx.EVT_MENU, lambda e: self._ai_analyze(), mi_ai)
+        if x.kind == "channel":
+            # csatorna: a fő művelet a feliratkozás
+            mi_sub = m.Append(wx.ID_ANY, "&Feliratkozás a csatornára\tEnter")
+            mi_open = m.Append(wx.ID_ANY, "Meg&nyitás a böngészőben")
+            mi_url = m.Append(wx.ID_ANY, "&URL pontos másolása\tCtrl+C")
+            self.Bind(wx.EVT_MENU, lambda e: self._subscribe_channel(), mi_sub)
+            self.Bind(wx.EVT_MENU, lambda e: self._open_in_browser(), mi_open)
+            self.Bind(wx.EVT_MENU, lambda e: self._copy_url(), mi_url)
+        elif x.kind == "playlist":
+            # lejátszási lista: a fő művelet a teljes lista letöltése
+            mi_dl = m.Append(wx.ID_ANY, "A teljes lista le&töltése\tEnter")
+            mi_cart = m.Append(wx.ID_ANY, "&Kosárba\tCtrl+B")
+            mi_open = m.Append(wx.ID_ANY, "Meg&nyitás a böngészőben")
+            mi_url = m.Append(wx.ID_ANY, "&URL pontos másolása\tCtrl+C")
+            self.Bind(wx.EVT_MENU, lambda e: self._download_selected(), mi_dl)
+            self.Bind(wx.EVT_MENU, lambda e: self._add_to_cart(), mi_cart)
+            self.Bind(wx.EVT_MENU, lambda e: self._open_in_browser(), mi_open)
+            self.Bind(wx.EVT_MENU, lambda e: self._copy_url(), mi_url)
+        else:
+            mi_play = m.Append(wx.ID_ANY, "&Lejátszás\tEnter")
+            mi_cart = m.Append(wx.ID_ANY, "&Kosárba\tCtrl+B")
+            mi_dl = m.Append(wx.ID_ANY, "Közvetlen le&töltés\tCtrl+D")
+            mi_url = m.Append(wx.ID_ANY, "&URL pontos másolása\tCtrl+C")
+            m.AppendSeparator()
+            mi_ai = m.Append(wx.ID_ANY, "AI: Videó &elemzése")
+            self.Bind(wx.EVT_MENU, lambda e: self._play_selected(), mi_play)
+            self.Bind(wx.EVT_MENU, lambda e: self._add_to_cart(), mi_cart)
+            self.Bind(wx.EVT_MENU, lambda e: self._download_selected(), mi_dl)
+            self.Bind(wx.EVT_MENU, lambda e: self._copy_url(), mi_url)
+            self.Bind(wx.EVT_MENU, lambda e: self._ai_analyze(), mi_ai)
         self.res_list.PopupMenu(m)
         m.Destroy()
+
+    def _primary_action(self):
+        """A kiválasztott találat típusától függő fő művelet (Enter)."""
+        x = self._selected_result()
+        if not x:
+            return
+        if x.kind == "channel":
+            self._subscribe_channel()
+        elif x.kind == "playlist":
+            self._download_selected()
+        else:
+            self._play_selected()
+
+    def _subscribe_channel(self):
+        x = self._selected_result()
+        if x:
+            self._announce(f"Feliratkozás a csatornára: {x.title}")
+            self.main._do_channel_subscribe(x.url)
+
+    def _open_in_browser(self):
+        x = self._selected_result()
+        if x:
+            import webbrowser
+            webbrowser.open(x.url)
+            self._announce(f"Megnyitva a böngészőben: {x.title}")
 
     def _ai_analyze(self):
         x = self._selected_result()
@@ -386,11 +540,12 @@ class MediaSearchFrame(wx.Frame):
                 and not isinstance(focus, wx.TextCtrl)):
             if self._player_key(e):
                 return                   # kezeltük, nem adjuk tovább
-        # lista módban: Enter a találati listán MINDIG indítsa a lejátszást
-        # (megbízhatóbb, mint a lista saját Enter-eseményére várni)
+        # lista módban: Enter a találati listán MINDIG a típus szerinti fő
+        # műveletet indítsa (videó: lejátszás, lista: letöltés, csatorna:
+        # feliratkozás) – megbízhatóbb, mint a lista saját Enter-eseménye
         if (not self._player_mode and focus is self.res_list
                 and e.GetKeyCode() in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER)):
-            self._play_selected()
+            self._primary_action()
             return
         e.Skip()
 

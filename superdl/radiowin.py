@@ -29,9 +29,13 @@ class RadioFrame(wx.Frame):
         self.favorites: list[R.Station] = [
             self._from_rec(r) for r in store.load_radio_favorites()]
         self._cur: R.Station | None = None
+        self.countries: list[R.Country] = []
+        self._country_limit = 50         # ország-top találatszám (Tovább növeli)
+        self._cur_country: R.Country | None = None
 
         self._build()
         self._refresh_fav()
+        self._load_countries()
         self.CreateStatusBar()
         self.SetStatusText("Keress állomást, vagy nézd a népszerűeket. "
                            "Lejátszás: Enter. Hangerő: Ctrl+fel/le. Súgó: F1.")
@@ -50,7 +54,7 @@ class RadioFrame(wx.Frame):
         self.search_entry = wx.TextCtrl(p, style=wx.TE_PROCESS_ENTER)
         self.search_entry.SetName("Keresőszó")
         self.search_entry.Bind(wx.EVT_TEXT_ENTER, lambda e: self._on_search())
-        self.by_choice = wx.Choice(p, choices=["Név", "Címke (műfaj)", "Ország"])
+        self.by_choice = wx.Choice(p, choices=["Név", "Címke (műfaj)"])
         self.by_choice.SetSelection(0)
         self.by_choice.SetName("Mi szerint keressen")
         b_search = wx.Button(p, label="Ke&resés")
@@ -62,6 +66,24 @@ class RadioFrame(wx.Frame):
         row.Add(b_search, 0, wx.RIGHT, 6)
         row.Add(b_top, 0)
         v.Add(row, 0, wx.EXPAND | wx.ALL, 8)
+
+        # ország szerinti böngészés (a régi, hibás név-szerinti keresés helyett:
+        # legördülő ország + az adott ország legnépszerűbb állomásai)
+        crow = wx.BoxSizer(wx.HORIZONTAL)
+        crow.Add(wx.StaticText(p, label="&Ország:"), 0,
+                 wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.country_choice = wx.Choice(p, choices=["(betöltés…)"])
+        self.country_choice.SetName("Ország választása")
+        self.country_choice.Disable()
+        b_country = wx.Button(p, label="Az ország á&llomásai")
+        b_country.Bind(wx.EVT_BUTTON, lambda e: self._on_country_top())
+        self.b_country_more = wx.Button(p, label="To&vább (több ország-állomás)")
+        self.b_country_more.Bind(wx.EVT_BUTTON, lambda e: self._on_country_more())
+        self.b_country_more.Disable()
+        crow.Add(self.country_choice, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        crow.Add(b_country, 0, wx.RIGHT, 6)
+        crow.Add(self.b_country_more, 0)
+        v.Add(crow, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
 
         v.Add(wx.StaticText(p, label="&Állomások (Enter: lejátszás, "
               "Ctrl+B: kedvencekhez, Ctrl+C: URL):"), 0, wx.LEFT, 8)
@@ -179,13 +201,70 @@ class RadioFrame(wx.Frame):
         q = self.search_entry.GetValue().strip()
         if not q:
             return
-        by = {0: "name", 1: "tag", 2: "country"}[self.by_choice.GetSelection()]
+        by = {0: "name", 1: "tag"}[self.by_choice.GetSelection()]
         self._fetch(lambda: R.search(q, by=by), f"„{q}”")
 
     def _on_top(self):
         self._fetch(R.top, "népszerű állomások")
 
-    def _fetch(self, fn, label):
+    # ---- ország szerinti böngészés ------------------------------------
+
+    def _saved_country_code(self) -> str:
+        s = getattr(self.main, "settings", None)
+        return (s.get("radio_country") if isinstance(s, dict) else "") or "HU"
+
+    def _load_countries(self):
+        """Az országlista betöltése a háttérben, az utolsó (vagy magyar)
+        ország kiválasztásával."""
+        def work():
+            try:
+                cs = R.countries()
+            except Exception:
+                cs = []
+            wx.CallAfter(self._countries_ready, cs)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _countries_ready(self, cs):
+        self.countries = cs
+        if not cs:
+            self.country_choice.Set(["(nem sikerült betölteni)"])
+            return
+        self.country_choice.Set([f"{c.name} ({c.count})" for c in cs])
+        want = self._saved_country_code()
+        idx = next((i for i, c in enumerate(cs) if c.code == want), 0)
+        self.country_choice.SetSelection(idx)
+        self.country_choice.Enable()
+
+    def _on_country_top(self):
+        if not self.countries:
+            self._announce("Az országlista még töltődik, próbáld kicsit "
+                           "később.")
+            return
+        i = self.country_choice.GetSelection()
+        if not (0 <= i < len(self.countries)):
+            return
+        self._cur_country = self.countries[i]
+        self._country_limit = 50
+        s = getattr(self.main, "settings", None)        # utolsó ország mentése
+        if isinstance(s, dict):
+            s["radio_country"] = self._cur_country.code
+        self._fetch_country()
+
+    def _on_country_more(self):
+        if self._cur_country:
+            self._country_limit += 50
+            self._fetch_country()
+
+    def _fetch_country(self):
+        c = self._cur_country
+        self.b_country_more.Disable()
+        self._fetch(lambda: R.by_country_code(c.code, self._country_limit),
+                    f"{c.name} – legnépszerűbb állomások",
+                    on_done=lambda res: self.b_country_more.Enable(
+                        len(res) >= self._country_limit))
+
+    def _fetch(self, fn, label, on_done=None):
         self.SetStatusText(f"Keresés: {label} …")
 
         def work():
@@ -195,6 +274,8 @@ class RadioFrame(wx.Frame):
                 wx.CallAfter(self.SetStatusText, f"Hiba: {e}")
                 return
             wx.CallAfter(self._show, res, label)
+            if on_done:
+                wx.CallAfter(on_done, res)
 
         threading.Thread(target=work, daemon=True).start()
 
@@ -251,26 +332,30 @@ class RadioFrame(wx.Frame):
     # ---- felvétel -----------------------------------------------------
 
     def _record_now(self):
+        """A KIJELÖLT állomás felvételének indítása/leállítása. Egyszerre több
+        állomás is felvehető (mindegyiket külön F9-cel indítod/állítod le),
+        miközben akár egy másikat hallgatsz."""
         if not self.rec:
             self._announce("A felvétel-kezelő nem érhető el.")
-            return
-        if self._manual_rec and self._manual_rec.is_active():
-            path = self._manual_rec.path
-            self._manual_rec.stop()
-            self._manual_rec = None
-            self.rec_btn.SetLabel("&Felvétel most (F9)")
-            self._announce(f"Felvétel leállítva és elmentve ide: {path}")
             return
         st = self._selected() or self._cur
         if not st:
             self._announce("Előbb válassz ki egy állomást a felvételhez.")
             return
+        # erre az állomásra (URL szerint) fut-e már felvétel? → akkor leállítjuk
+        running = [r for r in self.rec.snapshot_active() if r.url == st.url]
+        if running:
+            for r in running:
+                r.stop()
+            self._announce(f"Felvétel leállítva és elmentve: {st.name}.")
+            return
         r = self.rec.start_manual(st.name, st.url)
         if r:
-            self._manual_rec = r
-            self.rec_btn.SetLabel("Felvétel &leállítása (F9)")
-            self._announce(f"Felvétel folyamatban: {st.name}. "
-                           f"Leállítás: F9. Mentés ide: {r.path}")
+            n = len(self.rec.snapshot_active())
+            extra = (f" Most {n} felvétel fut egyszerre." if n > 1 else "")
+            self._announce(
+                f"Felvétel folyamatban: {st.name}.{extra} Leállítás: F9 ezen "
+                "az állomáson, vagy a Felvételek kezelése (Ctrl+Shift+F).")
         else:
             self._announce("A felvétel nem indult el – próbáld újra, vagy "
                            "ellenőrizd, hogy az állomás szól-e.")
@@ -279,11 +364,23 @@ class RadioFrame(wx.Frame):
         if not self.rec:
             self._announce("A felvétel-kezelő nem érhető el.")
             return
-        st = self._selected() or self._cur
-        if not st:
-            self._announce("Előbb válassz ki egy állomást az időzítéshez.")
-            return
-        dlg = ScheduleDialog(self, st.name, st.url, self.rec)
+        # az időzítéshez a KEDVENCEK közül választhatsz (legördülő); így átfedő,
+        # párhuzamos időzítések is megadhatók, akár több állomásra
+        stations = [(f.name, f.url) for f in self.favorites]
+        if not stations:
+            st = self._selected() or self._cur
+            if not st:
+                self._announce("Az időzítéshez előbb tegyél állomásokat a "
+                               "kedvencek közé (Ctrl+B), vagy válassz ki egyet "
+                               "a listából.")
+                return
+            stations = [(st.name, st.url)]
+        sel = self._selected() or self._cur
+        preselect = 0
+        if sel:
+            preselect = next((i for i, (_n, u) in enumerate(stations)
+                              if u == sel.url), 0)
+        dlg = ScheduleDialog(self, stations, self.rec, preselect=preselect)
         if dlg.ShowModal() == wx.ID_OK and getattr(dlg, "result", None):
             self.rec.add_schedule(dlg.result)
             self._announce(f"Időzített felvétel mentve: {dlg.result.describe()}")
@@ -369,8 +466,11 @@ class RadioFrame(wx.Frame):
     def _help(self):
         wx.MessageBox(
             "Internetes rádió – billentyűk\n\n"
-            "Keresőmező: írd be, válaszd ki, mi szerint (Név / Címke / "
-            "Ország), Enter = keresés. „Népszerű állomások” gomb is van.\n\n"
+            "Keresőmező: írd be, válaszd ki, mi szerint (Név / Címke), "
+            "Enter = keresés. „Népszerű állomások” gomb is van.\n\n"
+            "Ország szerint: válassz a legördülő országlistából, majd „Az "
+            "ország állomásai” – a legnépszerűbbeket hozza (Tovább: több). "
+            "A program megjegyzi az utolsó országot.\n\n"
             "Állomáslista (fel/le nyíl a mozgás):\n"
             "  Enter vagy F5 – lejátszás\n"
             "  Ctrl+B – kedvencekhez\n"
@@ -381,9 +481,13 @@ class RadioFrame(wx.Frame):
             "  Ctrl+szóköz – szünet / folytatás\n"
             "  Escape – leállítás\n\n"
             "Felvétel:\n"
-            "  F9 – a kijelölt állomás felvétele most (újra F9: leállítás)\n"
-            "  Ctrl+R – időzített felvétel beállítása (mettől meddig, "
-            "egyszeri / minden nap / a hét adott napjain)\n"
+            "  F9 – a kijelölt állomás felvétele most (újra F9 ugyanazon az "
+            "állomáson: leállítás). EGYSZERRE TÖBB állomás is felvehető – "
+            "jelölj ki egy másikat és F9 –, miközben akár egy továbbit "
+            "hallgatsz.\n"
+            "  Ctrl+R – időzített felvétel beállítása: az állomást a "
+            "KEDVENCEK közül választod, mettől meddig, egyszeri / minden nap "
+            "/ a hét adott napjain. Átfedő időzítések is megadhatók.\n"
             "  Ctrl+Shift+F – a folyó felvételek és időzítések kezelése\n"
             "  A felvételek a célmappa „Rádiófelvételek” dátumozott "
             "almappájába kerülnek, MP3-ként. Az időzített felvételhez a "

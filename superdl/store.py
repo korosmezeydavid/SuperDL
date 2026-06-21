@@ -16,6 +16,10 @@ QUEUE_FILE = CONFIG_DIR / "queue.json"
 SUBS_FILE = CONFIG_DIR / "subscriptions.json"
 CART_FILE = CONFIG_DIR / "cart.json"
 RADIO_FAV_FILE = CONFIG_DIR / "radio_favorites.json"
+ORG_EVENTS_FILE = CONFIG_DIR / "organizer_events.json"
+ORG_TASKS_FILE = CONFIG_DIR / "organizer_tasks.json"
+ORG_NOTES_FILE = CONFIG_DIR / "organizer_notes.json"
+ICS_SUBS_FILE = CONFIG_DIR / "ics_subscriptions.json"
 
 _lock = threading.Lock()
 
@@ -185,3 +189,45 @@ def load_tts_keys() -> dict:
 def save_tts_keys(keys: dict) -> None:
     with _lock:
         save_json(TTS_KEYS_FILE, keys)
+
+
+def _load_list(path: Path) -> list[dict]:
+    with _lock:
+        data = load_json(path, [])
+    return data if isinstance(data, list) else []
+
+
+def load_organizer_events() -> list[dict]:
+    return _load_list(ORG_EVENTS_FILE)
+
+
+def save_organizer_events(records: list[dict]) -> None:
+    with _lock:
+        save_json(ORG_EVENTS_FILE, records)
+
+
+def load_organizer_tasks() -> list[dict]:
+    return _load_list(ORG_TASKS_FILE)
+
+
+def save_organizer_tasks(records: list[dict]) -> None:
+    with _lock:
+        save_json(ORG_TASKS_FILE, records)
+
+
+def load_organizer_notes() -> list[dict]:
+    return _load_list(ORG_NOTES_FILE)
+
+
+def save_organizer_notes(records: list[dict]) -> None:
+    with _lock:
+        save_json(ORG_NOTES_FILE, records)
+
+
+def load_ics_subs() -> list[dict]:
+    return _load_list(ICS_SUBS_FILE)
+
+
+def save_ics_subs(records: list[dict]) -> None:
+    with _lock:
+        save_json(ICS_SUBS_FILE, records)

@@ -22,6 +22,7 @@ class Bookmark:
     pos_char: int = 0
     total_chars: int = 0
     updated: float = field(default_factory=time.time)
+    sleep_points: list = field(default_factory=list)   # elalvási pontok (char)
 
     def percent(self) -> int:
         if self.total_chars <= 0:
@@ -33,7 +34,7 @@ class Bookmark:
                 "engine_key": self.engine_key, "voice_id": self.voice_id,
                 "rate": self.rate, "pitch": self.pitch,
                 "pos_char": self.pos_char, "total_chars": self.total_chars,
-                "updated": self.updated}
+                "updated": self.updated, "sleep_points": self.sleep_points}
 
     @classmethod
     def from_record(cls, r: dict) -> "Bookmark":
@@ -43,7 +44,8 @@ class Bookmark:
                    rate=int(r.get("rate", 0)), pitch=int(r.get("pitch", 0)),
                    pos_char=int(r.get("pos_char", 0)),
                    total_chars=int(r.get("total_chars", 0)),
-                   updated=r.get("updated", 0.0))
+                   updated=r.get("updated", 0.0),
+                   sleep_points=list(r.get("sleep_points", []) or []))
 
 
 class Library:

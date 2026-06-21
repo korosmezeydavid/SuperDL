@@ -40,12 +40,25 @@ from superdl.torrent import is_torrent_url
 from superdl.feeds import FeedManager
 from superdl.report import build_summary
 from superdl.speech import VoiceSpeaker
+from superdl.selfvoice import SelfVoice
 from superdl import updater, selfupdate, sounds, __version__
 from superdl.searchwin import MediaSearchFrame
 from superdl.radiowin import RadioFrame
+from superdl.videowin import VideoComposeFrame
+from superdl.convertwin import BatchConvertFrame
+from superdl.ringtonewin import RingtoneFrame
+from superdl.podcastwin import PodcastFrame
+from superdl.organizer import OrganizerManager
+from superdl.organizerwin import OrganizerFrame
+from superdl.p2pwin import P2PFrame
+from superdl.videoeditwin import VideoEditFrame
+from superdl.videodescribewin import VideoDescribeFrame
+from superdl.assistantwin import AssistantFrame
+from superdl.supermwin import SuperMFrame
 from superdl.bookwin import BookFrame
 from superdl.radiorec import RecordManager
 from superdl import dayinfo, weather, search, store, aiclient, mediaai
+from superdl import assistant
 from superdl.settingsdialog import SettingsDialog
 from superdl.aiwin import run_ai, run_ai_progress
 from superdl.dayinfowin import DayInfoDialog
@@ -217,17 +230,30 @@ class MainFrame(wx.Frame):
         self.library = Library()
         self.ai_config = store.load_ai_config()
         self.speaker = VoiceSpeaker()
+        self.selfvoice = SelfVoice()        # művelet-bejelentő réteg (M12)
         self._search_win = None
         self._radio_win = None
         self._book_win = None
         self._news_win = None
         self._reader_win = None
+        self._video_win = None
+        self._convert_win = None
+        self._ringtone_win = None
+        self._podcast_win = None
+        self._organizer_win = None
+        self._p2p_win = None
+        self._videoedit_win = None
+        self._videodescribe_win = None
+        self._assistant_win = None
+        self._superm_win = None
         self._record_mgr = None
         self._known_rows: dict[int, int] = {}   # job.id -> listasor
         self._last_values: dict[int, tuple] = {}
         self._reported: dict[int, str] = {}
         self._conflict_asked: set = set()        # mely job-okra kérdeztünk rá
         self._started: set = set()               # melyik kezdett már letöltődni
+        self._beeper = sounds.ProgressBeeper()    # százalék-pittyegés (M12)
+        self._beep_job = None                     # melyik letöltést pittyegjük
         self._last_clip = ""
 
         self._load_settings()
@@ -241,6 +267,12 @@ class MainFrame(wx.Frame):
             lambda: self.dir_entry.GetValue(),
             on_event=lambda text, level:
                 wx.CallAfter(self._on_record_event, text, level))
+
+        # naptár/szervező: az emlékeztetők és az időzített akciók akkor is
+        # elsülnek, ha a szervező-ablak épp zárva van (a program fusson)
+        self._organizer = OrganizerManager(
+            on_remind=lambda ev, kind:
+                wx.CallAfter(self._on_organizer_remind, ev, kind))
 
         self.SetDropTarget(UrlDropTarget(self._on_drop_url))
         self.timer = wx.Timer(self)
@@ -264,6 +296,84 @@ class MainFrame(wx.Frame):
         wx.CallLater(1200, self._startup_greeting)
 
         self.url_entry.SetFocus()
+        wx.CallAfter(self._init_mode)
+
+    # ---- AI / UI mód --------------------------------------------------
+
+    def _init_mode(self):
+        """Első indításkor megkérdezi a kívánt módot (UI vagy AI), utána
+        emlékszik rá. Aztán alkalmazza a beállított módot."""
+        if not self.settings.get("ui_mode_chosen"):
+            dlg = wx.MessageDialog(
+                self,
+                "Hogyan szeretnéd használni a SuperDL-t?\n\n"
+                "• IGEN → AI mód: mondd vagy írd be, mit szeretnél, és az "
+                "asszisztens elintézi.\n"
+                "• NEM → Klasszikus (UI) mód: a megszokott menük és gombok.\n\n"
+                "Bármikor válthatsz a főablak „módra váltás” gombjával.",
+                "Üdvözöl a SuperDL – válassz módot",
+                wx.YES_NO | wx.ICON_QUESTION)
+            dlg.SetYesNoLabels("AI mód", "Klasszikus (UI) mód")
+            self.settings["ui_mode"] = ("ai" if dlg.ShowModal() == wx.ID_YES
+                                        else "ui")
+            self.settings["ui_mode_chosen"] = True
+            dlg.Destroy()
+            self._save_settings()
+        self._apply_mode()
+
+    def _toggle_mode(self):
+        self.settings["ui_mode"] = ("ui" if self.settings.get("ui_mode") == "ai"
+                                    else "ai")
+        self.settings["ui_mode_chosen"] = True
+        self._apply_mode()
+        self._save_settings()
+
+    def _apply_mode(self):
+        ai = self.settings.get("ui_mode") == "ai"
+        self.assist_panel.Show(ai)
+        self.mode_btn.SetLabel("Klasszikus (UI) módra váltás" if ai
+                               else "AI módra váltás")
+        self._main_panel.Layout()
+        if ai:
+            self.assist_cmd.SetFocus()
+            self._announce("AI mód bekapcsolva. Mondd vagy írd be, mit "
+                           "szeretnél.", toast=False)
+        else:
+            self.url_entry.SetFocus()
+            self._announce("Klasszikus mód. Illessz be egy URL-t, vagy "
+                           "használd a menüket.")
+
+    def _assist_run(self):
+        text = self.assist_cmd.GetValue().strip()
+        if not text:
+            return
+        self.assist_cmd.SetValue("")
+        self.log.AppendText(f"» {text}\n")
+        self._announce("Értelmezem…")
+
+        def work():
+            result = assistant.parse_command(text)
+            wx.CallAfter(self._assist_done, result)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _assist_done(self, result):
+        say = result.get("say", "")
+        if say:
+            self._assist_say(say)
+        try:
+            assistant.execute(self, result.get("action", "none"),
+                              result.get("params", {}), self._assist_say)
+        except Exception as e:
+            self._assist_say(f"Nem sikerült végrehajtani: {e}")
+
+    def _assist_say(self, text):
+        self._announce(text)
+        self.log.AppendText(text + "\n")
+        try:
+            self.selfvoice.speak(text, force=True)
+        except Exception:
+            pass
 
     # ---- felépítés ----------------------------------------------------
 
@@ -318,6 +428,9 @@ class MainFrame(wx.Frame):
                                  "Feliratkozások listája és törlése")
         mi_subchk = m_sub.Append(wx.ID_ANY, "Új epizódok le&töltése most",
                                  "Minden feliratkozás ellenőrzése azonnal")
+        mi_subdisc = m_sub.Append(
+            wx.ID_ANY, "&Podcastok felfedezése...\tCtrl+Shift+P",
+            "Podcast-keresés és ország-toplista, feliratkozással")
         m_sub.AppendSeparator()
         mi_chan_new = m_sub.Append(
             wx.ID_ANY, "YouTube-&csatorna feliratkozás...",
@@ -334,18 +447,41 @@ class MainFrame(wx.Frame):
         mb.Append(m_sub, "F&eliratkozások")
 
         m_tools = wx.Menu()
+        mi_assist = m_tools.Append(
+            wx.ID_ANY, "&Asszisztens (hang/írás)\tCtrl+Shift+A",
+            "Mondd vagy írd be, mit szeretnél – az AI a megfelelő eszközhöz "
+            "irányít")
+        m_tools.AppendSeparator()
         mi_search = m_tools.Append(
             wx.ID_ANY, "Média&kereső\tCtrl+F",
             "Keresés több forráson, lejátszás és letöltés egy helyen")
         mi_radio = m_tools.Append(
             wx.ID_ANY, "Internetes &rádió\tCtrl+Shift+R",
             "Élő rádióállomások keresése és hallgatása")
+        mi_superm = m_tools.Append(
+            wx.ID_ANY, "Super &M – műsorszóró stúdió\tCtrl+Shift+M",
+            "Rádió-műsorszórás: lejátszás, keverés, mikrofon, jingle-pad, "
+            "Shoutcast/Icecast (BASS motor)")
         mi_book = m_tools.Append(
             wx.ID_ANY, "&Hangoskönyv készítő\tCtrl+Shift+B",
             "Könyv (TXT/DOCX/EPUB/PDF) átalakítása MP3 hangoskönyvvé")
         mi_reader = m_tools.Append(
             wx.ID_ANY, "Könyv&olvasó (élő felolvasás)\tCtrl+Shift+O",
             "Könyv felolvasása a programban, könyvjelzővel (folytatható)")
+        mi_video = m_tools.Append(
+            wx.ID_ANY, "&Videókészítő (kép + zene)\tCtrl+Shift+V",
+            "Videó készítése háttérképből és zenéből, idővonalas szöveg- és "
+            "kép-beszúrással")
+        mi_convert = m_tools.Append(
+            wx.ID_ANY, "Médiakon&vertáló (kötegelt)\tCtrl+Shift+K",
+            "Hang/videó fájlok átalakítása más formátumba, egyszerre többet is")
+        mi_vedit = m_tools.Append(
+            wx.ID_ANY, "Videóvá&gó és összefűző\tCtrl+Shift+E",
+            "Videó vágása füllel (markerek), magyarázó szöveg ráégetése, "
+            "videók összefűzése")
+        mi_ring = m_tools.Append(
+            wx.ID_ANY, "iPhone &csengőhang-készítő\tCtrl+Shift+G",
+            "Csengőhang (.m4r) vagy MP3 készítése egy zene részletéből")
         m_tools.AppendSeparator()
         mi_news = m_tools.Append(
             wx.ID_ANY, "&Hírolvasó\tCtrl+Shift+H",
@@ -353,6 +489,14 @@ class MainFrame(wx.Frame):
         mi_dayinfo = m_tools.Append(
             wx.ID_ANY, "Napi in&fó (időjárás, névnap)\tCtrl+Shift+W",
             "Mai dátum, névnap és időjárás a megadott városra")
+        mi_org = m_tools.Append(
+            wx.ID_ANY, "Naptár, teen&dők, jegyzetek\tCtrl+Shift+N",
+            "Események emlékeztetővel, teendők, jegyzetek és külső "
+            "naptár-szinkron (ICS-link)")
+        mi_p2p = m_tools.Append(
+            wx.ID_ANY, "Fájlküldés gépről gé&pre (P2P)\tCtrl+Shift+T",
+            "Nagy fájl küldése egy másik gépre felhő nélkül, bemondható "
+            "kóddal, titkosítva")
         mb.Append(m_tools, "&Eszközök")
 
         m_ai = wx.Menu()
@@ -382,6 +526,10 @@ class MainFrame(wx.Frame):
         mi_ai_vid = m_ai.Append(
             wx.ID_ANY, "&Videó elemzése (URL vagy fájl)…",
             "A videó KÉPI tartalmának elemzése a Geminivel")
+        mi_ai_ad = m_ai.Append(
+            wx.ID_ANY, "AI &hangalámondás videóhoz…",
+            "A videó képi tartalmát az AI leírja és hanggal beleszövi "
+            "(vakon nézhető videó)")
         m_ai.AppendSeparator()
         mi_ai_set = m_ai.Append(
             wx.ID_ANY, "AI-&beállítások (kulcsok)…",
@@ -420,6 +568,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_speak_summary, mi_speak)
         self.Bind(wx.EVT_MENU, self._on_subscribe, mi_subnew)
         self.Bind(wx.EVT_MENU, self._on_manage_subs, mi_submng)
+        self.Bind(wx.EVT_MENU, self._on_podcast_window, mi_subdisc)
         self.Bind(wx.EVT_MENU, self._on_channel_subscribe, mi_chan_new)
         self.Bind(wx.EVT_MENU, self._on_fresh_videos, mi_chan_fresh)
         self.Bind(wx.EVT_MENU, self._on_channels_window, mi_chan_mng)
@@ -434,10 +583,18 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_check_updates, mi_upd)
         self.Bind(wx.EVT_MENU, self._on_search_window, mi_search)
         self.Bind(wx.EVT_MENU, self._on_radio_window, mi_radio)
+        self.Bind(wx.EVT_MENU, self._on_superm_window, mi_superm)
         self.Bind(wx.EVT_MENU, self._on_book_window, mi_book)
         self.Bind(wx.EVT_MENU, self._on_reader_window, mi_reader)
+        self.Bind(wx.EVT_MENU, self._on_video_window, mi_video)
+        self.Bind(wx.EVT_MENU, self._on_convert_window, mi_convert)
+        self.Bind(wx.EVT_MENU, self._on_videoedit_window, mi_vedit)
+        self.Bind(wx.EVT_MENU, self._on_assistant_window, mi_assist)
+        self.Bind(wx.EVT_MENU, self._on_ringtone_window, mi_ring)
         self.Bind(wx.EVT_MENU, self._on_news_window, mi_news)
         self.Bind(wx.EVT_MENU, self._on_dayinfo_window, mi_dayinfo)
+        self.Bind(wx.EVT_MENU, self._on_organizer_window, mi_org)
+        self.Bind(wx.EVT_MENU, self._on_p2p_window, mi_p2p)
         self.Bind(wx.EVT_MENU, self._on_ai_image, mi_ai_img)
         self.Bind(wx.EVT_MENU, self._on_ai_clip, mi_ai_clip)
         self.Bind(wx.EVT_MENU, self._on_ai_ocr, mi_ai_ocr)
@@ -448,13 +605,35 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, lambda e: self._on_ai_transcribe(srt=True),
                   mi_ai_srt)
         self.Bind(wx.EVT_MENU, self._on_ai_video, mi_ai_vid)
+        self.Bind(wx.EVT_MENU, self._on_videodescribe_window, mi_ai_ad)
         self.Bind(wx.EVT_MENU, lambda e: self._on_settings(page=3), mi_ai_set)
         self.Bind(wx.EVT_MENU, self._on_support, mi_support)
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(0), mi_about)
 
     def _build_ui(self):
         panel = wx.Panel(self)
+        self._main_panel = panel
         vbox = wx.BoxSizer(wx.VERTICAL)
+
+        # AI-asszisztens sáv (csak AI módban látszik) – a főablak tetején
+        self.assist_panel = wx.Panel(panel)
+        ar = wx.BoxSizer(wx.HORIZONTAL)
+        ar.Add(wx.StaticText(self.assist_panel, label="&Asszisztens:"), 0,
+               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.assist_cmd = wx.TextCtrl(self.assist_panel, style=wx.TE_PROCESS_ENTER)
+        self.assist_cmd.SetName("Asszisztens parancs")
+        self.assist_cmd.SetHint("Mondd vagy írd be, mit szeretnél…")
+        self.assist_cmd.Bind(wx.EVT_TEXT_ENTER, lambda e: self._assist_run())
+        ab_run = wx.Button(self.assist_panel, label="&Futtatás")
+        ab_run.Bind(wx.EVT_BUTTON, lambda e: self._assist_run())
+        ab_voice = wx.Button(self.assist_panel, label="&Beszéd…")
+        ab_voice.Bind(wx.EVT_BUTTON, lambda e: self._on_assistant_window())
+        ar.Add(self.assist_cmd, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        ar.Add(ab_run, 0, wx.RIGHT, 6)
+        ar.Add(ab_voice, 0)
+        self.assist_panel.SetSizer(ar)
+        self.assist_panel.Hide()        # csak AI módban jelenik meg
+        vbox.Add(self.assist_panel, 0, wx.EXPAND | wx.ALL, 8)
 
         # URL-sor
         row1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -489,11 +668,14 @@ class MainFrame(wx.Frame):
         self.audio_chk.SetName("Médiaoldalról csak a hangsáv letöltése")
         btn_settings = wx.Button(sb, label="&Beállítások…")
         btn_settings.Bind(wx.EVT_BUTTON, self._on_settings)
+        self.mode_btn = wx.Button(sb, label="AI módra váltás")
+        self.mode_btn.Bind(wx.EVT_BUTTON, lambda e: self._toggle_mode())
         box.Add(lbl_dir, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         box.Add(self.dir_entry, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         box.Add(btn_dir, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 12)
         box.Add(self.audio_chk, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 12)
-        box.Add(btn_settings, 0, wx.ALIGN_CENTER_VERTICAL)
+        box.Add(btn_settings, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 12)
+        box.Add(self.mode_btn, 0, wx.ALIGN_CENTER_VERTICAL)
         vbox.Add(box, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
 
         # letöltési lista
@@ -536,6 +718,12 @@ class MainFrame(wx.Frame):
             "tts": False, "update_last_check": "", "audio_format": "MP3",
             "cookies": "Nincs", "cookies_file": "", "playlist_folders": True,
             "sounds": True, "city": "Budapest", "voice_mode": "auto",
+            "video_format": "MP4", "audio_bitrate": "192",
+            "audio_samplerate": "",
+            "beep_enabled": True, "beep_volume": 30,
+            "selfvoice_enabled": False, "selfvoice_voice": "",
+            "selfvoice_rate": 0, "selfvoice_pitch": 0, "selfvoice_volume": 100,
+            "ui_mode": "ui", "ui_mode_chosen": False,
         }
         try:
             self.settings.update(json.loads(SETTINGS_FILE.read_text()))
@@ -551,6 +739,15 @@ class MainFrame(wx.Frame):
         self.mi_tts.Check(bool(s.get("tts")) and self.speaker.available)
         self.mi_sounds.Check(bool(s.get("sounds", True)))
         self.speaker.set_mode(str(s.get("voice_mode", "auto")))
+        # M12: pittyegés + self-voice művelet-bejelentő konfigurálása
+        sounds.set_progress(enabled=bool(s.get("beep_enabled", True)),
+                            amp=int(s.get("beep_volume", 30)) / 100.0)
+        self.selfvoice.configure(
+            enabled=bool(s.get("selfvoice_enabled", False)),
+            voice_desc=str(s.get("selfvoice_voice", "") or ""),
+            rate=int(s.get("selfvoice_rate", 0)),
+            pitch=int(s.get("selfvoice_pitch", 0)),
+            volume=int(s.get("selfvoice_volume", 100)))
 
     def _save_settings(self):
         # a fő ablak által birtokolt értékek; a többit a Beállítások-ablak
@@ -634,6 +831,9 @@ class MainFrame(wx.Frame):
     def _ensure_mgr(self) -> DownloadManager:
         s = self.settings
         fmt = (s.get("audio_format", "MP3") or "mp3").lower()
+        vfmt = (s.get("video_format", "MP4") or "").lower() or None
+        abr = str(s.get("audio_bitrate", "192"))
+        asr = str(s.get("audio_samplerate", ""))
         ck_browser, ck_file = self._cookies_config()
         if self.mgr is None:
             self.mgr = DownloadManager(
@@ -643,6 +843,7 @@ class MainFrame(wx.Frame):
                 audio_only=self.audio_chk.GetValue(),
                 limit_bps=parse_limit(s.get("limit", "") or "0"),
                 seed_ratio=self._seed_ratio(), audio_format=fmt,
+                video_format=vfmt, audio_bitrate=abr, audio_samplerate=asr,
                 cookies_browser=ck_browser, cookies_file=ck_file,
                 playlist_folders=bool(s.get("playlist_folders", True)))
         else:
@@ -652,6 +853,9 @@ class MainFrame(wx.Frame):
             self.mgr.limiter.bps = parse_limit(s.get("limit", "") or "0")
             self.mgr.seed_ratio = self._seed_ratio()
             self.mgr.audio_format = fmt
+            self.mgr.video_format = vfmt
+            self.mgr.audio_bitrate = abr
+            self.mgr.audio_samplerate = asr
             self.mgr.cookies_browser = ck_browser
             self.mgr.cookies_file = ck_file
             self.mgr.playlist_folders = bool(s.get("playlist_folders", True))
@@ -827,6 +1031,50 @@ class MainFrame(wx.Frame):
                  "error": "error"}.get(level)
         self._announce(text, ok=(level != "error"),
                        toast=(level in ("done", "error")), sound=sound)
+        sv_state = {"start": "start", "done": "done", "error": "error"}.get(level)
+        if sv_state:
+            self.selfvoice.announce("record", sv_state)
+
+    def _on_organizer_remind(self, ev, kind):
+        """A naptár/szervező emlékeztetője vagy időzített akciója sült el.
+        Emlékeztető: értesítés + felolvasás. Akció (CSAK saját eseménynél):
+        hivatkozás/app/levél megnyitása, vagy egy szöveg felolvasása."""
+        import os
+        import webbrowser
+        if kind == "remind":
+            msg = f"Emlékeztető: {ev.title}, {ev.time}."
+            if ev.note:
+                msg += " " + ev.note[:140]
+            self._announce(msg, toast=True, sound="results")
+            try:
+                self.speaker.speak(msg)
+            except Exception:
+                pass
+            return
+        # kind == "action" – biztonság: csak a SAJÁT eseményeknél
+        if ev.source != "local":
+            return
+        if ev.action_type == "speak":
+            text = ev.action_data or ev.title
+            self._announce(f"Időzített üzenet: {text}", toast=True,
+                           sound="results")
+            try:
+                self.speaker.speak(text)
+            except Exception:
+                pass
+        elif ev.action_type == "open":
+            target = (ev.action_data or "").strip()
+            if not target:
+                return
+            try:
+                if target.startswith(("http://", "https://", "mailto:")):
+                    webbrowser.open(target)
+                else:
+                    os.startfile(target)
+                self._announce(f"Időzítve megnyitva: {target}", toast=True)
+            except Exception as e:
+                self._announce(f"Az időzített megnyitás nem sikerült: {e}",
+                               ok=False)
 
     def _on_book_window(self, event=None):
         if self._book_win:
@@ -841,6 +1089,81 @@ class MainFrame(wx.Frame):
             return
         self._news_win = NewsFrame(self)
         self._news_win.Show()
+
+    def _on_video_window(self, event=None):
+        if self._video_win:
+            self._video_win.Raise()
+            return
+        self._video_win = VideoComposeFrame(self)
+        self._video_win.Show()
+
+    def _on_convert_window(self, event=None):
+        if self._convert_win:
+            self._convert_win.Raise()
+            return
+        self._convert_win = BatchConvertFrame(self)
+        self._convert_win.Show()
+
+    def _on_videoedit_window(self, event=None):
+        if self._videoedit_win:
+            self._videoedit_win.Raise()
+            return
+        self._videoedit_win = VideoEditFrame(self)
+        self._videoedit_win.Show()
+
+    def _on_videodescribe_window(self, event=None):
+        if self._videodescribe_win:
+            self._videodescribe_win.Raise()
+            return
+        self._videodescribe_win = VideoDescribeFrame(self)
+        self._videodescribe_win.Show()
+
+    def _on_assistant_window(self, event=None):
+        if self._assistant_win:
+            self._assistant_win.Raise()
+            return
+        self._assistant_win = AssistantFrame(self)
+        self._assistant_win.Show()
+
+    def _on_superm_window(self, event=None):
+        if self._superm_win:
+            self._superm_win.Raise()
+            return
+        try:
+            self._superm_win = SuperMFrame(self)
+        except Exception as e:
+            wx.MessageBox(f"A Super M stúdió nem indult el: {e}", "Super M",
+                          wx.OK | wx.ICON_ERROR, self)
+            return
+        self._superm_win.Show()
+
+    def _on_ringtone_window(self, event=None):
+        if self._ringtone_win:
+            self._ringtone_win.Raise()
+            return
+        self._ringtone_win = RingtoneFrame(self)
+        self._ringtone_win.Show()
+
+    def _on_podcast_window(self, event=None):
+        if self._podcast_win:
+            self._podcast_win.Raise()
+            return
+        self._podcast_win = PodcastFrame(self)
+        self._podcast_win.Show()
+
+    def _on_organizer_window(self, event=None):
+        if self._organizer_win:
+            self._organizer_win.Raise()
+            return
+        self._organizer_win = OrganizerFrame(self, self._organizer)
+        self._organizer_win.Show()
+
+    def _on_p2p_window(self, event=None):
+        if self._p2p_win:
+            self._p2p_win.Raise()
+            return
+        self._p2p_win = P2PFrame(self)
+        self._p2p_win.Show()
 
     def _on_reader_window(self, event=None, open_path="", text="", title=""):
         if self._reader_win:
@@ -1418,14 +1741,18 @@ class MainFrame(wx.Frame):
         if not self.mgr:
             return
         active = 0
+        beep_target = None              # az első aktív, ismert hosszú letöltés
         for j in self.mgr.jobs:
             p = j.progress
             row = self._row_for(j)      # visszatöltött/podcast elemekhez is
             if p.status in ("letöltés", "seedelés"):
                 active += 1
+            if p.status == "letöltés" and p.total and beep_target is None:
+                beep_target = j
             if p.status == "letöltés" and j.id not in self._started:
                 self._started.add(j.id)
                 self._sfx("start")
+                self.selfvoice.announce("download", "start")
             halad = f"{p.percent:.0f}%" if p.total else human(p.downloaded)
             if p.status == "seedelés" or (j.kind == "torrent" and p.uploaded):
                 feltoltes = f"{human(p.up_speed)}/s ({p.ratio:.2f})"
@@ -1447,18 +1774,29 @@ class MainFrame(wx.Frame):
                 if p.status == "kész":
                     msg = f"Elkészült: {p.filename or j.url}"
                     self._announce(msg, toast=True, sound="done")
+                    self.selfvoice.announce("download", "done")
                 elif p.status == "seedelés":
                     msg = f"Letöltve, seedelés folyamatban: {p.filename or j.url}"
                     self._announce(msg, toast=True, sound="done")
+                    self.selfvoice.announce("download", "done")
                 else:
                     msg = f"Hiba: {p.filename or j.url} – {p.error}"
                     self._announce(msg, ok=False, toast=True, sound="error")
+                    self.selfvoice.announce("download", "error")
                 if self.mi_tts.IsChecked() and self.speaker.available:
                     self.speaker.speak(msg)
             # torrent: a cél fájl már létezik – felkínáljuk a választást
             if p.conflict and j.id not in self._conflict_asked:
                 self._conflict_asked.add(j.id)
                 wx.CallAfter(self._ask_conflict, j)
+        # százalék-pittyegés: az első aktív, ismert hosszú letöltést követjük
+        if beep_target is not None:
+            if self._beep_job != beep_target.id:
+                self._beep_job = beep_target.id
+                self._beeper.reset()
+            self._beeper.update(beep_target.progress.percent)
+        else:
+            self._beep_job = None
         title = "SuperDL – akadálymentes médiaközpont"
         if active:
             title = f"SuperDL – {active} letöltés fut"
@@ -1520,6 +1858,28 @@ class MainFrame(wx.Frame):
             self._news_win.Destroy()
         if self._reader_win:
             self._reader_win.Destroy()
+        if self._video_win:
+            self._video_win.Destroy()
+        if self._convert_win:
+            self._convert_win.Destroy()
+        if self._ringtone_win:
+            self._ringtone_win.Destroy()
+        if self._podcast_win:
+            self._podcast_win.Destroy()
+        if self._organizer_win:
+            self._organizer_win.Destroy()
+        if self._p2p_win:
+            self._p2p_win.Destroy()
+        if self._videoedit_win:
+            self._videoedit_win.Destroy()
+        if self._videodescribe_win:
+            self._videodescribe_win.Destroy()
+        if self._assistant_win:
+            self._assistant_win.Destroy()
+        if self._superm_win:
+            self._superm_win.Destroy()
+        if self._organizer:
+            self._organizer.shutdown()
         self._save_settings()
         self.timer.Stop()
         self.feed_timer.Stop()
@@ -1720,7 +2080,7 @@ class UpdateDialog(wx.Dialog):
             app_done = False
             if app_upd:
                 try:
-                    selfupdate.apply(app_assets, prog, restart=False)
+                    selfupdate.apply(app_assets, prog, restart=True)
                     results.append(f"SuperDL: letöltve a(z) {self.app['latest']} "
                                    "verzió.")
                     app_done = True
@@ -1737,18 +2097,21 @@ class UpdateDialog(wx.Dialog):
         tail = ("\n\nKész. A motorfrissítések a következő indításkor lépnek "
                 "életbe.")
         if app_done:
-            tail = ("\n\nKész. A SuperDL új verziójához újra kell indítani a "
-                    "programot.")
+            tail = ("\n\nKész. Az új verzió életbe lépéséhez a program most "
+                    "bezárul, és pár másodperc múlva AUTOMATIKUSAN újraindul az "
+                    "új verzióval. Ha nem indulna el magától, indítsd el kézzel "
+                    "a SuperDL-t.")
         self.info.SetValue("\n".join(results) + tail)
         parent = self.GetParent()
         if hasattr(parent, "_announce"):
             parent._announce("Frissítés kész.", toast=True)
+        # a cserét egy leválasztott swapper végzi, MIUTÁN a program kilépett –
+        # ezért itt csak BE KELL ZÁRNI a programot (a swapper indítja újra)
         if app_done and wx.MessageBox(
-                "A SuperDL új verziója letöltődött.\n\nÚjraindítod most?",
+                "A SuperDL új verziója letöltődött.\n\nA cseréhez a program "
+                "most bezárul és automatikusan újraindul. Folytatod?",
                 "SuperDL frissítés", wx.YES_NO | wx.ICON_QUESTION,
                 self) == wx.YES:
-            import subprocess
-            subprocess.Popen([sys.executable], close_fds=True)
             self.EndModal(wx.ID_CLOSE)
             wx.CallAfter(parent.Close)
 
@@ -1759,7 +2122,19 @@ def url_is_new(mgr, url: str) -> bool:
     return all(j.url != url for j in mgr.jobs)
 
 
+def _maybe_wormhole():
+    """Ha a programot a `--wh` kapcsolóval indítják, NEM a grafikus felület
+    indul, hanem a beágyazott magic-wormhole parancssori eszköz fut le (a
+    P2P fájlküldéshez a program saját magát hívja alfolyamatként)."""
+    if len(sys.argv) >= 2 and sys.argv[1] == "--wh":
+        from wormhole.cli.cli import wormhole
+        sys.argv = ["wormhole"] + sys.argv[2:]
+        wormhole()                 # lefut, majd a folyamat kilép
+        sys.exit(0)
+
+
 def main():
+    _maybe_wormhole()
     app = wx.App()
     wx.InitAllImageHandlers()     # minden képformátum (PNG/JPEG/…) kezelése
     selfupdate.cleanup_old()      # korábbi önfrissítés maradékának törlése

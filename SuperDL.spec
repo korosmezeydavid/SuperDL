@@ -4,7 +4,17 @@ from PyInstaller.utils.hooks import collect_submodules
 from PyInstaller.utils.hooks import collect_all
 
 datas = []
-binaries = [('bin\\aria2c.exe', '.')]
+binaries = [('bin\\aria2c.exe', '.'),
+            ('bin\\ffmpeg.exe', '.'),
+            ('bin\\ffprobe.exe', '.'),
+            ('bin\\espeak-ng.exe', '.'),
+            ('bin\\libespeak-ng.dll', '.'),
+            ('bin\\bass.dll', '.'),
+            ('bin\\bassmix.dll', '.'),
+            ('bin\\bassenc.dll', '.'),
+            ('bin\\bassenc_mp3.dll', '.')]
+# eSpeak-NG hangadatok (magyar hang a self-voice-hoz) – a teljes mappa
+datas += [('bin\\espeak-ng-data', 'espeak-ng-data')]
 hiddenimports = ['win32com.client', 'pythoncom', 'pywintypes']
 datas += collect_data_files('docx')
 hiddenimports += collect_submodules('yt_dlp')
@@ -15,6 +25,16 @@ tmp_ret = collect_all('sounddevice')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('edge_tts')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+# magic-wormhole (P2P fájlküldés) – Twisted-alapú, sok rejtett importtal
+for _pkg in ('wormhole', 'twisted', 'autobahn', 'automat', 'incremental',
+             'constantly', 'hyperlink', 'txaio', 'zope', 'nacl', 'spake2',
+             'hkdf', 'cbor2', 'click', 'humanize', 'iterable_io',
+             'zipstream', 'attr', 'attrs'):
+    try:
+        tmp_ret = collect_all(_pkg)
+        datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+    except Exception:
+        pass
 
 
 a = Analysis(

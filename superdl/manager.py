@@ -86,6 +86,7 @@ class DownloadManager:
                  audio_only: bool = False, limit_bps: int = 0,
                  seed_ratio: float = 1.0, persist: bool = True,
                  audio_format: str = "mp3", video_format: str | None = None,
+                 audio_bitrate: str = "192", audio_samplerate: str = "",
                  cookies_browser: str | None = None,
                  cookies_file: str | None = None,
                  playlist_folders: bool = True):
@@ -94,6 +95,8 @@ class DownloadManager:
         self.audio_only = audio_only
         self.audio_format = audio_format
         self.video_format = video_format
+        self.audio_bitrate = audio_bitrate
+        self.audio_samplerate = audio_samplerate
         self.cookies_browser = cookies_browser
         self.cookies_file = cookies_file
         self.playlist_folders = playlist_folders
@@ -165,6 +168,8 @@ class DownloadManager:
                     limit_bps=self.limiter.bps,
                     audio_format=self.audio_format,
                     video_format=self.video_format,
+                    audio_bitrate=self.audio_bitrate,
+                    audio_samplerate=self.audio_samplerate,
                     cookies_browser=self.cookies_browser,
                     cookies_file=self.cookies_file,
                     playlist_folders=self.playlist_folders)

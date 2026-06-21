@@ -43,6 +43,9 @@ class Player:
         self._lock = threading.Lock()
         self.on_state = None
         self.title = ""
+        self._played = 0           # eddig megszólaltatott PCM-bájtok száma
+        self._url = ""             # az aktuális forrás (a seek-hez)
+        self._start_offset = 0.0   # a lejátszás kezdő-időpontja (seek után)
 
     # ---- állapot ------------------------------------------------------
 
@@ -58,6 +61,12 @@ class Player:
 
     def is_paused(self) -> bool:
         return self._paused.is_set()
+
+    def position(self) -> float:
+        """A pillanatnyi lejátszási pozíció másodpercben (a ténylegesen
+        megszólaltatott hangminták + a seek-kezdőpont alapján; szünetben
+        nem nő)."""
+        return self._start_offset + self._played / (RATE * CHANNELS * 2)
 
     # ---- vezérlés -----------------------------------------------------
 
@@ -75,6 +84,15 @@ class Player:
             self._paused.set()
         return self._paused.is_set()
 
+    def seek(self, pos: float) -> None:
+        """Ugrás a megadott időpontra (a forrást a `-ss`-szel újraindítja)."""
+        if self._url:
+            self.play(self._url, self.title, start=max(0.0, pos))
+
+    def relative_seek(self, delta: float) -> None:
+        """Léptetés az aktuális pozícióhoz képest (finomhangoláshoz)."""
+        self.seek(max(0.0, self.position() + delta))
+
     def stop(self) -> None:
         self._stop.set()
         self._paused.clear()
@@ -86,19 +104,27 @@ class Player:
             except Exception:
                 pass
 
-    def play(self, url: str, title: str = "", progress=None) -> None:
-        """A megadott forrás lejátszása az elejétől (az előzőt leállítja)."""
+    def play(self, url: str, title: str = "", progress=None,
+             start: float = 0.0) -> None:
+        """A megadott forrás lejátszása (az előzőt leállítja). `start`>0 esetén
+        onnan kezd (seek, az ffmpeg `-ss`-ével)."""
         self.stop()
         self.title = title or url
+        self._url = url
         ff = _ffmpeg_exe(progress)
         if not ff:
             self._emit("hiba: az ffmpeg nem érhető el")
             return
         self._stop = threading.Event()
         self._paused.clear()
+        self._played = 0
+        self._start_offset = max(0.0, float(start))
         flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
-        cmd = [ff, "-nostdin", "-i", url, "-f", "s16le", "-ar", str(RATE),
-               "-ac", str(CHANNELS), "-loglevel", "quiet", "-"]
+        cmd = [ff, "-nostdin"]
+        if self._start_offset > 0:
+            cmd += ["-ss", f"{self._start_offset:.3f}"]
+        cmd += ["-i", url, "-f", "s16le", "-ar", str(RATE),
+                "-ac", str(CHANNELS), "-loglevel", "quiet", "-"]
         try:
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                     creationflags=flags)
@@ -141,6 +167,7 @@ class Player:
                 if not raw:
                     break
                 started = True
+                self._played += len(raw)
                 v = self._volume
                 if v >= 0.999:
                     stream.write(raw)

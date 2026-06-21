@@ -2,11 +2,18 @@
 
 A program a megadott GitHub-tárhely legújabb kiadását (Release) figyeli.
 Ha a kiadás verziója újabb a futónál, letölti a hozzá tartozó exe-t, és
-kicseréli magát. Windows alatt a futó exe nem írható felül, de átnevezhető,
-ezért:
-  1. a régi SuperDL.exe -> SuperDL.old.exe (átnevezés futás közben is megy)
-  2. az új exe a helyére kerül
-  3. a program újraindul; induláskor törli a .old.exe maradékot.
+kicseréli magát. Windows alatt a FUTÓ exe nem írható felül és nem mozgatható
+megbízhatóan (memóriába mappelve van, az AV is beleszólhat), ezért a cserét
+egy LEVÁLASZTOTT kötegfájl (.bat) végzi, MIUTÁN a program kilépett:
+  1. az új exe a helyére `SuperDL.exe.new` néven töltődik le,
+  2. a program elindít egy swapper-kötegfájlt és KILÉP,
+  3. a swapper megvárja a folyamat kilépését, `move /Y`-nal a helyére teszi
+     az új exét (zárolás esetén újrapróbálva), naplóz a ~/.superdl/update.log
+     fájlba, majd – ha kérted – újraindítja a programot, végül törli magát.
+
+Korábban a csere a futó folyamatból, helyben történt (átnevezés + azonnali
+újraindítás), ami sok gépen csendben elbukott (AV-karantén, írásvédett mappa,
+verseny a régi folyamattal) – ezért „letöltötte, de a régi verzió maradt".
 
 A tárhely megadása (bármelyik, ebben a sorrendben):
   - SUPERDL_REPO környezeti változó,
@@ -121,53 +128,145 @@ def _download(url: str, progress=None) -> bytes:
 
 
 def cleanup_old() -> None:
-    """A korábbi frissítés .old.exe maradékának törlése (induláskor)."""
+    """A korábbi frissítés maradékainak törlése (induláskor): a régi
+    .old.exe-k, a félbemaradt .new fájlok és az elárvult swapper-kötegfájlok."""
     try:
         folder = Path(sys.executable).parent
-        for p in folder.glob("*.old.exe"):
-            try:
-                p.unlink()
-            except OSError:
-                pass
+        for pat in ("*.old.exe", "*.exe.new", "superdl_update_*.bat"):
+            for p in folder.glob(pat):
+                try:
+                    p.unlink()
+                except OSError:
+                    pass
     except Exception:
         pass
 
 
+def update_log() -> Path:
+    """A frissítés naplófájlja (~/.superdl/update.log) – ide ír a swapper is."""
+    d = Path.home() / ".superdl"
+    try:
+        d.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        pass
+    return d / "update.log"
+
+
+def _folder_writable(folder: Path) -> bool:
+    """A program mappája írható-e? (Program Files / OneDrive / írásvédett hely
+    esetén nem – ott a csere eleve nem sikerülhet.)"""
+    try:
+        t = folder / ".superdl_write_test"
+        t.write_text("x", encoding="ascii")
+        t.unlink()
+        return True
+    except OSError:
+        return False
+
+
+def _swapper_script(folder: Path, pairs: list[tuple[Path, Path]],
+                    relaunch_name: str | None, pid: int, log: Path) -> str:
+    """A swapper-kötegfájl tartalmának előállítása (külön a tesztelhetőségért).
+
+    A külső segédprogramokat (tasklist/find/ping) ABSZOLÚT System32-útvonallal
+    hívjuk, nehogy egy PATH-on lévő idegen eszköz (pl. a git Unix-os `find`-ja)
+    elrontsa a várakozó ciklust. A késleltetés `ping`-gel megy (nem `timeout`-tal),
+    mert a swapper KONZOL NÉLKÜL (leválasztva) fut, ahol a `timeout` stdin híján
+    azonnal hibára futna – a `ping -n 2` viszont konzol nélkül is ~1 mp-et vár."""
+    sys32 = r'%SystemRoot%\System32'
+    wait1 = f'"{sys32}\\ping.exe" -n 2 127.0.0.1 >NUL'   # ~1 mp késleltetés
+    L = ['@echo off', 'setlocal enableextensions',
+         f'set "LOG={log}"',
+         f'echo [SWAP] %DATE% %TIME% indul, varakozas a PID {pid}-re >> "%LOG%" 2>&1',
+         'set /a n=0',
+         ':wait',
+         f'"{sys32}\\tasklist.exe" /FI "PID eq {pid}" 2>NUL | '
+         f'"{sys32}\\find.exe" "{pid}" >NUL',
+         'if errorlevel 1 goto swap',
+         'set /a n+=1',
+         'if %n% GEQ 90 goto swap',         # max ~90 mp várakozás
+         wait1,
+         'goto wait',
+         ':swap']
+    for i, (newf, target) in enumerate(pairs):
+        L += [f'set /a m{i}=0',
+              f':mv{i}',
+              f'move /Y "{newf}" "{target}" >> "%LOG%" 2>&1',
+              f'if not errorlevel 1 goto ok{i}',
+              f'set /a m{i}+=1',
+              f'if %m{i}% GEQ 30 goto ok{i}',   # max ~30 mp a zárolás oldására
+              wait1,
+              f'goto mv{i}',
+              f':ok{i}']
+    if relaunch_name:
+        L.append(f'echo [SWAP] ujraindites: {relaunch_name} >> "%LOG%" 2>&1')
+        L.append(f'start "" "{folder / relaunch_name}"')
+    L += ['echo [SWAP] kesz >> "%LOG%" 2>&1', 'del "%~f0"']
+    return "\r\n".join(L) + "\r\n"
+
+
+def _spawn_swapper(folder: Path, pairs: list[tuple[Path, Path]],
+                   relaunch_name: str | None) -> None:
+    """Leválasztott kötegfájl, ami a folyamat kilépése UTÁN cseréli a fájlokat.
+    `pairs`: (új_fájl, cél_fájl) párok; `relaunch_name`: melyik exét indítsa
+    újra a csere után (None = ne indítson semmit)."""
+    pid = os.getpid()
+    log = update_log()
+    script = _swapper_script(folder, pairs, relaunch_name, pid, log)
+
+    bat = folder / f"superdl_update_{pid}.bat"
+    try:
+        bat.write_text(script, encoding="ascii")
+    except OSError:
+        import tempfile
+        bat = Path(tempfile.gettempdir()) / f"superdl_update_{pid}.bat"
+        bat.write_text(script, encoding="ascii")
+
+    # CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP – a swappernek SAJÁT, rejtett
+    # konzolja legyen (így a `tasklist | find` cső és a segédprogramok valós
+    # std-leírókkal működnek; a DETACHED_PROCESS itt épp ezért NEM jó, mert
+    # leírók nélkül a cső nem jön létre), és a szülő kilépése után is fusson.
+    flags = 0x08000000 | 0x00000200
+    subprocess.Popen(["cmd", "/c", str(bat)], creationflags=flags,
+                     close_fds=True, cwd=str(folder))
+
+
 def apply(assets: dict, progress=None, restart: bool = True) -> list[str]:
-    """A futó exe (és a SuperDL-cli.exe, ha van rá kiadás) cseréje."""
+    """A futó exe (és a SuperDL-cli.exe, ha van rá kiadás) cseréje egy
+    kilépés utáni swapper-kötegfájllal. `restart=True` esetén a csere után
+    újraindítja a programot. A hívónak a visszatérés után MIHAMARABB ki kell
+    lépnie, hogy a swapper a (már nem zárolt) exét lecserélhesse."""
     if not is_frozen():
         raise RuntimeError(
             "Automatikusan csak a kész exe frissíthető. Forrásból a "
             "megfelelő a 'git pull' a tárhelyről.")
     exe = Path(sys.executable)
     folder = exe.parent
+    if not _folder_writable(folder):
+        raise RuntimeError(
+            f"A program mappája nem írható: {folder}. Valószínűleg Program "
+            "Files vagy OneDrive/írásvédett hely. Helyezd át a SuperDL.exe-t "
+            "egy saját, írható mappába (pl. az Asztal vagy a Letöltések egy "
+            "almappájába), vagy töltsd le kézzel a frissítést a kiadási "
+            "oldalról.")
+
     targets = [exe.name]
-    if "SuperDL-cli.exe" not in targets and \
+    if "SuperDL-cli.exe" != exe.name and "SuperDL-cli.exe" not in targets and \
             ("SuperDL-cli.exe" in assets or (folder / "SuperDL-cli.exe").exists()):
         targets.append("SuperDL-cli.exe")
 
-    swapped = []
+    pairs: list[tuple[Path, Path]] = []
     for name in targets:
         url = assets.get(name)
         if not url:
             continue
         data = _download(url, progress)
         newf = folder / (name + ".new")
-        newf.write_bytes(data)
-        target = folder / name
-        oldf = folder / (Path(name).stem + ".old.exe")
-        if target.exists():
-            try:
-                if oldf.exists():
-                    oldf.unlink()
-            except OSError:
-                pass
-            os.replace(target, oldf)        # futó exe átnevezése – Windows: OK
-        os.replace(newf, target)
-        swapped.append(name)
+        newf.write_bytes(data)               # SuperDL.exe.new a mappába
+        pairs.append((newf, folder / name))
 
-    if not swapped:
+    if not pairs:
         raise RuntimeError("A kiadásban nincs letölthető SuperDL.exe.")
-    if restart:
-        subprocess.Popen([str(folder / exe.name)], close_fds=True)
-    return swapped
+
+    _spawn_swapper(folder, pairs, exe.name if restart else None)
+    return [t.name for _, t in pairs]

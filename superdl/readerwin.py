@@ -30,6 +30,8 @@ class ReaderFrame(wx.Frame):
         self._path = ""
         self._title = ""
         self._voices: list[tts.Voice] = []
+        self.sleep = None                       # az aktív SleepTimer
+        self._sleep_points: list[int] = []      # elalvási pontok (char-pozíciók)
 
         self._build()
         self._reload_library()
@@ -107,6 +109,26 @@ class ReaderFrame(wx.Frame):
         self.now_lbl = wx.StaticText(p, label="")
         self.now_lbl.SetName("Most felolvasott mondat")
         v.Add(self.now_lbl, 0, wx.LEFT | wx.BOTTOM, 8)
+
+        # alvás-időzítő: ennyi idő után lassan elhalkul és leáll; közben négy
+        # „elalvási pontot" ment, amelyek közt reggel ugrálni lehet
+        sl = wx.BoxSizer(wx.HORIZONTAL)
+        sl.Add(wx.StaticText(p, label="&Alvás-időzítő:"), 0,
+               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
+        self.sleep_ch = wx.Choice(p, choices=[
+            "Kikapcsolva", "15 perc", "30 perc", "45 perc", "60 perc",
+            "90 perc"])
+        self.sleep_ch.SetSelection(0)
+        self.sleep_ch.SetName("Alvás-időzítő perc")
+        self.sleep_ch.Bind(wx.EVT_CHOICE, lambda e: self._on_sleep_choice())
+        sl.Add(self.sleep_ch, 0, wx.RIGHT, 10)
+        b_sp_prev = wx.Button(p, label="Előző elalvási &pont")
+        b_sp_prev.Bind(wx.EVT_BUTTON, lambda e: self._jump_sleep_point(-1))
+        b_sp_next = wx.Button(p, label="Következő elalvási p&ont")
+        b_sp_next.Bind(wx.EVT_BUTTON, lambda e: self._jump_sleep_point(1))
+        sl.Add(b_sp_prev, 0, wx.RIGHT, 5)
+        sl.Add(b_sp_next, 0)
+        v.Add(sl, 0, wx.LEFT | wx.BOTTOM, 8)
 
         v.Add(wx.StaticText(p, label="Könyv s&zövege (csak olvasható):"),
               0, wx.LEFT, 8)
@@ -206,6 +228,10 @@ class ReaderFrame(wx.Frame):
 
     def _set_book(self, path, text, title):
         self.engine.stop()
+        if self.sleep and self.sleep.active():   # új könyv → futó időzítő lemond
+            self.sleep.cancel()
+            self.sleep = None
+            self.sleep_ch.SetSelection(0)
         self._path, self._title = path, title
         self.engine.load(text)
         self.title_lbl.SetLabel(f"Könyv: {title}  "
@@ -213,9 +239,12 @@ class ReaderFrame(wx.Frame):
         self.text.SetValue(text)
         self.text.SetInsertionPoint(0)
         bm = self.lib.get(path)
+        self._sleep_points = list(bm.sleep_points) if bm else []
         if bm and bm.pos_char > 0:
+            sp = (f" {len(self._sleep_points)} elalvási pont mentve."
+                  if self._sleep_points else "")
             self.SetStatusText(f"„{title}” megnyitva. Korábban itt tartottál: "
-                               f"kb. {bm.percent()}%. Folytatás: F5.")
+                               f"kb. {bm.percent()}%. Folytatás: F5.{sp}")
             # a korábbi motor/hang/beállítás visszaállítása
             if bm.engine_key in READ_ENGINE_KEYS:
                 self.engine_ch.SetSelection(READ_ENGINE_KEYS.index(bm.engine_key))
@@ -252,6 +281,73 @@ class ReaderFrame(wx.Frame):
 
     def _play_from(self, from_char):
         self._start_at(from_char)
+
+    # ---- alvás-időzítő ------------------------------------------------
+
+    SLEEP_MIN = [0, 15, 30, 45, 60, 90]
+
+    def _on_sleep_choice(self):
+        if self.sleep and self.sleep.active():
+            self.sleep.cancel()
+            self.sleep = None
+        mins = self.SLEEP_MIN[self.sleep_ch.GetSelection()]
+        if mins <= 0:
+            self.SetStatusText("Alvás-időzítő kikapcsolva.")
+            return
+        from .sleeptimer import SleepTimer
+        self._base_vol = self.engine.player.volume or 0.7
+        self.sleep = SleepTimer(
+            mins * 60,
+            on_mark=lambda q: wx.CallAfter(self._sleep_mark, q),
+            on_fade=lambda lv: self.engine.player.set_volume(self._base_vol * lv),
+            on_finish=lambda: wx.CallAfter(self._sleep_finish),
+            fade_s=25.0)
+        self.sleep.start()
+        self.SetStatusText(
+            f"Alvás-időzítő bekapcsolva: {mins} perc. A vége előtt lassan "
+            "elhalkul, és négy elalvási pontot ment, amelyek közt reggel "
+            "ugrálhatsz.")
+
+    def _sleep_mark(self, q):
+        pos = self.engine.position_char()
+        if pos not in self._sleep_points:
+            self._sleep_points.append(pos)
+        self._save_bookmark()                  # létrehozza/frissíti a könyvjelzőt
+        bm = self.lib.get(self._path) if self._path else None
+        if bm:
+            bm.sleep_points = sorted(set(self._sleep_points))
+            self.lib.save()
+        pct = round(pos / max(1, self.engine.total_chars) * 100)
+        self.SetStatusText(f"Elalvási pont {q} a négyből elmentve "
+                           f"(kb. {pct}%).")
+
+    def _sleep_finish(self):
+        self._save_bookmark()
+        self.engine.stop()
+        self.engine.player.set_volume(self._base_vol)   # vissza normál hangerőre
+        self.sleep = None
+        self.sleep_ch.SetSelection(0)
+        self.SetStatusText(
+            "Az alvás-időzítő letelt, a felolvasás leállt. Reggel ugyanezt a "
+            "könyvet megnyitva az „Előző/Következő elalvási pont” gombbal "
+            "ugrálhatsz a mentett pontok között.")
+
+    def _jump_sleep_point(self, direction):
+        pts = sorted(set(self._sleep_points))
+        if not pts:
+            self.SetStatusText("Ehhez a könyvhöz még nincsenek elalvási "
+                               "pontok (az alvás-időzítő menti őket).")
+            return
+        cur = self.engine.position_char()
+        if direction > 0:
+            target = next((p for p in pts if p > cur + 5), pts[-1])
+        else:
+            target = next((p for p in reversed(pts) if p < cur - 5), pts[0])
+        self._play_from(target)
+        idx = pts.index(target) + 1
+        pct = round(target / max(1, self.engine.total_chars) * 100)
+        self.SetStatusText(f"Ugrás a(z) {idx}. elalvási pontra a "
+                           f"{len(pts)}-ből (kb. {pct}%).")
 
     def _toggle(self):
         if not self.engine.is_active():
@@ -331,6 +427,8 @@ class ReaderFrame(wx.Frame):
 
     def _on_close(self, e):
         self.save_timer.Stop()
+        if self.sleep and self.sleep.active():
+            self.sleep.cancel()
         self._save_bookmark()
         try:
             self.engine.stop()

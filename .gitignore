@@ -10,3 +10,11 @@ dist/
 # SuperDL futási maradékfájlok
 *.sdlstate
 *.part
+
+# Csomagolt segédbinárisok (nagyok – a fejlesztő a bin/ mappába teszi őket,
+# a kész exe a GitHub Release-be kerül; ffmpeg az auto-letöltőből is pótolható)
+bin/ffmpeg.exe
+bin/ffprobe.exe
+bin/espeak-ng.exe
+bin/libespeak-ng.dll
+bin/espeak-ng-data/

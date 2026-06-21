@@ -28,6 +28,15 @@ def friendly_error(msg: str) -> str:
     return msg
 
 
+def _is_cookie_error(msg: str) -> bool:
+    """Igaz, ha a hiba a böngésző-sütik kiolvasásából ered (pl. fut a böngésző,
+    zárolt vagy titkosított süti-adatbázis)."""
+    m = msg.lower()
+    return (("could not copy" in m and "cookie" in m)
+            or "dpapi" in m or "failed to decrypt" in m
+            or "could not decrypt" in m)
+
+
 def is_media_url(url: str) -> bool:
     """Igaz, ha a yt-dlp-nek van dedikált kinyerője az URL-hez."""
     import yt_dlp.extractor
@@ -51,6 +60,7 @@ class MediaDownloader:
                  audio_only: bool = False, fmt: str | None = None,
                  progress: Progress | None = None, limit_bps: int = 0,
                  audio_format: str = "mp3", video_format: str | None = None,
+                 audio_bitrate: str = "192", audio_samplerate: str = "",
                  cookies_browser: str | None = None,
                  cookies_file: str | None = None,
                  playlist_folders: bool = True):
@@ -64,6 +74,8 @@ class MediaDownloader:
         self.playlist_folders = playlist_folders
         self.audio_format = (audio_format or "mp3").lower()
         self.video_format = (video_format or "").lower() or None
+        self.audio_bitrate = str(audio_bitrate or "192").strip()
+        self.audio_samplerate = str(audio_samplerate or "").strip()
         # bejelentkezés/sütik: böngészőből vagy cookies.txt fájlból
         self.cookies_browser = (cookies_browser or "").lower() or None
         self.cookies_file = cookies_file or None
@@ -103,17 +115,24 @@ class MediaDownloader:
 
         if self.audio_only:
             fmt = "bestaudio/best"
+        elif self.video_format == "mp4" and not self.fmt:
+            # MP4 előnyben: a legjobb MP4-barát sávok (H.264/m4a), hogy a
+            # legtöbb esetben átkódolás nélkül, sima MP4-et kapjunk
+            fmt = ("bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/"
+                   "bestvideo*+bestaudio/best")
         else:
             fmt = self.fmt or "bestvideo*+bestaudio/best"
 
         base = str(self.out_dir)
+        # tiszta fájlnév: NINCS [videó-azonosító] a végén (a felhasználók
+        # zavarónak találták). Listánál a sorszám marad (a sorrendhez hasznos).
         if self.playlist_folders:
-            # lista esetén: <mappa>/<lista neve>/01 - Cím [id].kit
+            # lista esetén: <mappa>/<lista neve>/01 - Cím.kit
             # egyedi videónál a lista-mező üres, így marad a fő mappában
             outtmpl = (base + "/%(playlist_title|)s/"
-                       "%(playlist_index&{:02d} - |)s%(title)s [%(id)s].%(ext)s")
+                       "%(playlist_index&{:02d} - |)s%(title)s.%(ext)s")
         else:
-            outtmpl = base + "/%(title)s [%(id)s].%(ext)s"
+            outtmpl = base + "/%(title)s.%(ext)s"
 
         opts = {
             "format": fmt,
@@ -134,13 +153,25 @@ class MediaDownloader:
         if self.cookies_browser:
             opts["cookiesfrombrowser"] = (self.cookies_browser,)
         elif self.cookies_file:
-            opts["cookiefile"] = self.cookies_file
+            # a kiegészítővel exportált cookies.txt gyakran hibás (hiányzó
+            # Netscape-fejléc, BOM, JSON-export) → normalizáljuk; ha tényleg
+            # nem használható, ÉRTHETŐ hibát adunk (ne a yt-dlp homályos
+            # „does not look like a Netscape format" üzenetét)
+            from .cookies import prepare_cookiefile, CookieFileError
+            try:
+                opts["cookiefile"] = prepare_cookiefile(self.cookies_file)
+            except CookieFileError as e:
+                self.progress.status = "hiba"
+                self.progress.error = str(e)
+                raise
 
-        # van-e szükség átkódolásra (ehhez ffmpeg kell)?
-        need_ffmpeg = self.audio_only or bool(self.video_format)
+        # ffmpeg szinte minden médialetöltéshez kell: hangkivonás,
+        # formátum-átkódolás, ÉS a videó+hang sávok ÖSSZEFŰZÉSE (a YouTube
+        # külön sávban adja a képet és a hangot). Ezért MINDIG biztosítjuk –
+        # ha nincs a gépen, egyszer automatikusan letöltődik. (Korábban tiszta
+        # videónál nem töltöttük le → „ffmpeg is not installed" merge-hiba.)
         ff_dir = ffmpeg_mod.find_ffmpeg() and ffmpeg_mod.ffmpeg_dir()
-        if need_ffmpeg and not ff_dir:
-            # igény esetén automatikusan letöltjük az ffmpeg-et
+        if not ff_dir:
             ff_dir = ffmpeg_mod.ensure_ffmpeg(self._ffmpeg_progress)
         if ff_dir:
             opts["ffmpeg_location"] = ff_dir
@@ -151,8 +182,11 @@ class MediaDownloader:
             if ff_dir:
                 pp = {"key": "FFmpegExtractAudio", "preferredcodec": codec}
                 if codec not in ("flac", "wav"):     # veszteségmentesnél nincs
-                    pp["preferredquality"] = "192"
+                    pp["preferredquality"] = self.audio_bitrate
                 opts["postprocessors"] = [pp]
+                if self.audio_samplerate:            # pl. 44100 / 48000 Hz
+                    opts["postprocessor_args"] = {
+                        "extractaudio": ["-ar", self.audio_samplerate]}
             else:
                 # ffmpeg nélkül a natív hangsáv jön le (nincs átkódolás)
                 self.progress.error = ("ffmpeg nélkül a hang az eredeti "
@@ -162,9 +196,28 @@ class MediaDownloader:
 
         self.progress.status = "letöltés"
         self.progress.connections = self.connections
+
+        def _download(o):
+            with yt_dlp.YoutubeDL(o) as ydl:
+                return ydl.extract_info(self.url, download=True)
+
+        had_cookies = bool(opts.get("cookiesfrombrowser")
+                           or opts.get("cookiefile"))
         try:
-            with yt_dlp.YoutubeDL(opts) as ydl:
-                info = ydl.extract_info(self.url, download=True)
+            try:
+                info = _download(opts)
+            except KeyboardInterrupt:
+                self.progress.status = "leállítva"
+                return ""
+            except Exception as e:
+                # ha a böngésző-sütik nem olvashatók (pl. fut a böngésző),
+                # próbáljuk újra SÜTIK NÉLKÜL – a legtöbb tartalom nyilvános
+                if had_cookies and _is_cookie_error(str(e)):
+                    opts.pop("cookiesfrombrowser", None)
+                    opts.pop("cookiefile", None)
+                    info = _download(opts)
+                else:
+                    raise
             self.progress.status = "kész"
             self.progress.filename = info.get("title", self.url)
             return info.get("title", "")

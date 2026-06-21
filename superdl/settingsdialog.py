@@ -8,6 +8,9 @@ hogy ne legyen zsúfolt és könnyű legyen képernyőolvasóval bejárni.
 import wx
 
 AUDIO_FORMATS = ["MP3", "M4A", "OPUS", "FLAC", "WAV", "AAC"]
+VIDEO_FORMATS = ["MP4", "MKV", "WEBM"]
+AUDIO_BITRATES = ["128", "192", "256", "320"]
+SAMPLERATES = [("Eredeti", ""), ("44100 Hz", "44100"), ("48000 Hz", "48000")]
 COOKIE_CHOICES = ["Nincs", "Chrome", "Firefox", "Edge", "Brave", "Opera",
                   "Vivaldi", "Chromium", "cookies.txt fájl…"]
 VOICE_LABELS = [
@@ -31,6 +34,7 @@ class SettingsDialog(wx.Dialog):
         self.nb.AddPage(self._page_download(), "Letöltés")
         self.nb.AddPage(self._page_cookies(), "Fiók / Sütik")
         self.nb.AddPage(self._page_general(), "Általános")
+        self.nb.AddPage(self._page_sound(), "Hangjelzések / Beszéd")
         self.nb.AddPage(self._page_ai(), "AI")
         outer.Add(self.nb, 1, wx.EXPAND | wx.ALL, 8)
 
@@ -73,11 +77,27 @@ class SettingsDialog(wx.Dialog):
         self.c_limit = wx.TextCtrl(p, value=str(self.s.get("limit", "")))
         self.c_limit.SetHint("pl. 2M vagy 500K – üresen nincs korlát")
         self._row(p, v, "Sebesség&korlát:", self.c_limit)
+        self.c_vfmt = wx.Choice(p, choices=VIDEO_FORMATS)
+        if self.c_vfmt.SetStringSelection(
+                str(self.s.get("video_format", "MP4")).upper()) is False:
+            self.c_vfmt.SetSelection(0)
+        self._row(p, v, "&Videóformátum (letöltött videóhoz):", self.c_vfmt)
         self.c_fmt = wx.Choice(p, choices=AUDIO_FORMATS)
         if self.c_fmt.SetStringSelection(
                 str(self.s.get("audio_format", "MP3"))) is False:
             self.c_fmt.SetSelection(0)
         self._row(p, v, "Hang&formátum (Csak hang módhoz):", self.c_fmt)
+        self.c_abr = wx.Choice(p, choices=AUDIO_BITRATES)
+        if self.c_abr.SetStringSelection(
+                str(self.s.get("audio_bitrate", "192"))) is False:
+            self.c_abr.SetStringSelection("192")
+        self._row(p, v, "Hang-&bitráta (kbps):", self.c_abr)
+        self.c_asr = wx.Choice(p, choices=[t for t, _ in SAMPLERATES])
+        cur_sr = str(self.s.get("audio_samplerate", ""))
+        self.c_asr.SetSelection(
+            next((i for i, (_, val) in enumerate(SAMPLERATES) if val == cur_sr),
+                 0))
+        self._row(p, v, "&Mintavétel (kHz):", self.c_asr)
         self.c_seed = wx.TextCtrl(p, value=str(self.s.get("seed_ratio", "1.0")))
         self._row(p, v, "Seed-&arány (torrent):", self.c_seed,
                   name="Torrent megosztási arány")
@@ -120,9 +140,26 @@ class SettingsDialog(wx.Dialog):
             wildcard="cookies.txt (*.txt)|*.txt|Minden fájl|*.*",
             style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if dlg.ShowModal() == wx.ID_OK:
-            self.cookies_file = dlg.GetPath()
+            path = dlg.GetPath()
+            # azonnali visszajelzés: használható-e a fájl? (a tényleges
+            # letöltés is így ellenőrzi majd)
+            from .cookies import prepare_cookiefile, CookieFileError
+            try:
+                prepare_cookiefile(path)
+            except CookieFileError as e:
+                wx.MessageBox(
+                    f"{e}\n\nVálassz másik, helyes cookies.txt fájlt.",
+                    "A süti-fájl nem használható",
+                    wx.OK | wx.ICON_WARNING, self)
+                dlg.Destroy()
+                return
+            self.cookies_file = path
             self.c_cookfile.SetValue(self.cookies_file)
             self.c_cookies.SetStringSelection("cookies.txt fájl…")
+            wx.MessageBox(
+                "A cookies.txt fájl rendben, elmentve. A Sütik forrása "
+                "automatikusan „cookies.txt fájl…”-ra állt.",
+                "Süti-fájl elfogadva", wx.OK | wx.ICON_INFORMATION, self)
         dlg.Destroy()
 
     # ---- Általános fül ------------------------------------------------
@@ -148,6 +185,79 @@ class SettingsDialog(wx.Dialog):
         self._row(p, v, "Beszéd&hang (üdvözlés, felolvasás):", self.c_voice)
         p.SetSizer(v)
         return p
+
+    # ---- Hangjelzések / Beszéd fül ------------------------------------
+
+    def _page_sound(self):
+        from .selfvoice import SelfVoice, ESPEAK_VOICES, espeak_available
+        p = wx.Panel(self.nb)
+        v = wx.BoxSizer(wx.VERTICAL)
+
+        v.Add(wx.StaticText(p, label="SZÁZALÉK-PITTYEGÉS – hosszú "
+              "műveleteknél (letöltés, konvertálás, renderelés…)"), 0,
+              wx.LEFT | wx.TOP, 10)
+        self.c_beep = wx.CheckBox(
+            p, label="&Pittyegés bekapcsolva (minden 2%-nál egyre magasabb hang)")
+        self.c_beep.SetValue(bool(self.s.get("beep_enabled", True)))
+        v.Add(self.c_beep, 0, wx.ALL, 8)
+        self.c_beepvol = wx.SpinCtrl(p, min=0, max=100,
+                                     initial=int(self.s.get("beep_volume", 30)))
+        self.c_beepvol.SetName("Pittyegés hangereje")
+        self._row(p, v, "Pittyegés &hangereje (0–100):", self.c_beepvol)
+
+        v.Add(wx.StaticLine(p), 0, wx.EXPAND | wx.ALL, 8)
+        v.Add(wx.StaticText(p, label="MŰVELET-BEJELENTÉSEK saját hanggal – "
+              "kiegészíti a képernyőolvasót (nem helyettesíti). A program "
+              "bemondja a műveletek kezdetét/végét."), 0, wx.LEFT, 10)
+        self.c_sv = wx.CheckBox(
+            p, label="Művelet-be&jelentések bekapcsolva")
+        self.c_sv.SetValue(bool(self.s.get("selfvoice_enabled", False)))
+        v.Add(self.c_sv, 0, wx.ALL, 8)
+
+        pairs = [("(alapértelmezett rendszerhang)", "")]
+        try:
+            for d in SelfVoice().list_voices():
+                pairs.append((d, d))
+        except Exception:
+            pass
+        if espeak_available():
+            pairs += ESPEAK_VOICES        # beépített magyar eSpeak-hangok
+        self._sv_voice_pairs = pairs
+        self.c_svvoice = wx.Choice(p, choices=[lab for lab, _ in pairs])
+        cur = self.s.get("selfvoice_voice", "") or ""
+        self.c_svvoice.SetSelection(
+            next((i for i, (_l, v) in enumerate(pairs) if v == cur), 0))
+        self.c_svvoice.SetName("Bejelentő hang")
+        self._row(p, v, "Bejelentő ha&ng:", self.c_svvoice)
+        self.c_svrate = wx.SpinCtrl(p, min=-10, max=10,
+                                    initial=int(self.s.get("selfvoice_rate", 0)))
+        self.c_svrate.SetName("Beszédtempó")
+        self._row(p, v, "&Tempó (-10–10):", self.c_svrate)
+        self.c_svpitch = wx.SpinCtrl(
+            p, min=-10, max=10, initial=int(self.s.get("selfvoice_pitch", 0)))
+        self.c_svpitch.SetName("Hangmagasság")
+        self._row(p, v, "Hang&magasság (-10–10):", self.c_svpitch)
+        self.c_svvol = wx.SpinCtrl(
+            p, min=0, max=100, initial=int(self.s.get("selfvoice_volume", 100)))
+        self.c_svvol.SetName("Beszéd hangereje")
+        self._row(p, v, "Beszéd hangere&je (0–100):", self.c_svvol)
+
+        b_test = wx.Button(p, label="Hang ki&próbálása")
+        b_test.Bind(wx.EVT_BUTTON, lambda e: self._test_voice())
+        v.Add(b_test, 0, wx.ALL, 8)
+        p.SetSizer(v)
+        return p
+
+    def _test_voice(self):
+        from .selfvoice import SelfVoice
+        sv = SelfVoice()
+        i = self.c_svvoice.GetSelection()
+        voice = self._sv_voice_pairs[i][1] if 0 <= i < len(self._sv_voice_pairs) else ""
+        sv.configure(enabled=True, voice_desc=voice,
+                     rate=self.c_svrate.GetValue(),
+                     pitch=self.c_svpitch.GetValue(),
+                     volume=self.c_svvol.GetValue())
+        sv.speak("Letöltés befejezve. Konvertálás megkezdődött.", force=True)
 
     # ---- AI fül -------------------------------------------------------
 
@@ -193,6 +303,9 @@ class SettingsDialog(wx.Dialog):
             "parallel": self.c_par.GetValue(),
             "limit": self.c_limit.GetValue().strip(),
             "audio_format": self.c_fmt.GetStringSelection() or "MP3",
+            "video_format": self.c_vfmt.GetStringSelection() or "MP4",
+            "audio_bitrate": self.c_abr.GetStringSelection() or "192",
+            "audio_samplerate": SAMPLERATES[self.c_asr.GetSelection()][1],
             "seed_ratio": self.c_seed.GetValue().strip() or "1.0",
             "playlist_folders": self.c_playlist.GetValue(),
             "cookies": self.c_cookies.GetStringSelection() or "Nincs",
@@ -201,6 +314,14 @@ class SettingsDialog(wx.Dialog):
             "notify": self.c_notify.GetValue(),
             "city": self.c_city.GetValue().strip(),
             "voice_mode": VOICE_LABELS[self.c_voice.GetSelection()][1],
+            "beep_enabled": self.c_beep.GetValue(),
+            "beep_volume": self.c_beepvol.GetValue(),
+            "selfvoice_enabled": self.c_sv.GetValue(),
+            "selfvoice_voice":
+                self._sv_voice_pairs[self.c_svvoice.GetSelection()][1],
+            "selfvoice_rate": self.c_svrate.GetValue(),
+            "selfvoice_pitch": self.c_svpitch.GetValue(),
+            "selfvoice_volume": self.c_svvol.GetValue(),
         }
         self.result_ai = {
             "openai_key": self.ai_openai.GetValue().strip(),

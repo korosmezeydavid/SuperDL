@@ -13,20 +13,29 @@ from .radiorec import Schedule, WEEKDAY_NAMES
 
 
 class ScheduleDialog(wx.Dialog):
-    """Egy időzített felvétel beállítása a kiválasztott állomáshoz."""
+    """Egy időzített felvétel beállítása. Az állomást a KEDVENCEK közül egy
+    legördülőből választod (átfedő/párhuzamos időzítések is megadhatók)."""
 
-    def __init__(self, parent, station_name, url, manager):
+    def __init__(self, parent, stations, manager, preselect=0):
         super().__init__(parent, title="Időzített rádiófelvétel",
-                         size=(560, 540))
-        self.station_name = station_name
-        self.url = url
+                         size=(560, 560))
+        # stations: [(név, url), …] – jellemzően a kedvencek
+        self.stations = list(stations)
         self.manager = manager
 
         p = wx.Panel(self)
         v = wx.BoxSizer(wx.VERTICAL)
 
-        v.Add(wx.StaticText(p, label=f"Állomás: {station_name}"), 0,
-              wx.ALL, 10)
+        v.Add(wx.StaticText(p, label="&Állomás (a kedvencek közül):"), 0,
+              wx.LEFT | wx.TOP, 10)
+        self.station_choice = wx.Choice(
+            p, choices=[n for n, _u in self.stations])
+        self.station_choice.SetName("Felveendő állomás")
+        if 0 <= preselect < len(self.stations):
+            self.station_choice.SetSelection(preselect)
+        elif self.stations:
+            self.station_choice.SetSelection(0)
+        v.Add(self.station_choice, 0, wx.ALL | wx.EXPAND, 8)
 
         now = datetime.now()
         # --- kezdés ---
@@ -93,7 +102,7 @@ class ScheduleDialog(wx.Dialog):
 
         p.SetSizer(v)
         self.Bind(wx.EVT_BUTTON, self._on_ok, id=wx.ID_OK)
-        self.sh.SetFocus()
+        self.station_choice.SetFocus()
 
     def _on_rep(self, _evt):
         weekly = self.rep.GetSelection() == 2
@@ -113,6 +122,12 @@ class ScheduleDialog(wx.Dialog):
             wx.MessageBox("Heti ismétlésnél jelölj ki legalább egy napot.",
                           "Időzítés", wx.OK | wx.ICON_WARNING, self)
             return
+        si = self.station_choice.GetSelection()
+        if not (0 <= si < len(self.stations)):
+            wx.MessageBox("Válassz ki egy állomást a legördülőből.",
+                          "Időzítés", wx.OK | wx.ICON_WARNING, self)
+            return
+        station_name, url = self.stations[si]
         date = ""
         if rep == "once":
             now = datetime.now()
@@ -121,8 +136,8 @@ class ScheduleDialog(wx.Dialog):
                 start += timedelta(days=1)      # ma már elmúlt → holnap
             date = start.strftime("%Y-%m-%d")
         self.result = Schedule(
-            id=self.manager.new_id(), station_name=self.station_name,
-            url=self.url, start_h=sh, start_m=sm, end_h=eh, end_m=em,
+            id=self.manager.new_id(), station_name=station_name,
+            url=url, start_h=sh, start_m=sm, end_h=eh, end_m=em,
             repeat=rep, weekdays=weekdays, date=date)
         evt.Skip()        # bezárja a párbeszédet ID_OK-kal
 

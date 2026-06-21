@@ -75,3 +75,33 @@ def search(query: str, by: str = "name", limit: int = 50) -> list[Station]:
 
 def top(limit: int = 50) -> list[Station]:
     return _to_stations(_api(f"/json/stations/topclick/{limit}"))
+
+
+@dataclass
+class Country:
+    name: str
+    code: str                          # ISO 3166-1 (pl. „HU")
+    count: int = 0                     # állomások száma
+
+
+def countries(min_count: int = 3) -> list[Country]:
+    """Az országok listája (a radio-browser /json/countries-ből), névsorban.
+    Csak azokat hozza, ahol van érdemi számú állomás."""
+    out: list[Country] = []
+    for c in _api("/json/countries"):
+        name = (c.get("name") or "").strip()
+        code = (c.get("iso_3166_1") or "").strip().upper()
+        cnt = int(c.get("stationcount") or 0)
+        if name and code and cnt >= min_count:
+            out.append(Country(name=name, code=code, count=cnt))
+    out.sort(key=lambda x: x.name.lower())
+    return out
+
+
+def by_country_code(code: str, limit: int = 50) -> list[Station]:
+    """Egy ország legnépszerűbb állomásai az ISO-kód PONTOS egyezésével.
+    (A korábbi név szerinti `country=` keresés azért nem talált, mert pontos
+    angol országnevet várt; az ISO-kód megbízható.)"""
+    path = (f"/json/stations/bycountrycodeexact/{quote(code.strip().upper())}"
+            f"?hidebroken=true&order=clickcount&reverse=true&limit={limit}")
+    return _to_stations(_api(path))
