@@ -99,10 +99,15 @@ def silence_gaps(ff: str, src: str, noise_db: int = -30,
 
 
 def has_audio(ff: str, src: str) -> bool:
-    """Van-e hangsávja a videónak (a néma videók muxját másképp kell kezelni)."""
+    """Van-e hangsávja a videónak (a néma videók muxját másképp kell kezelni)?
+
+    BIZONYTALANSÁGNÁL a biztonságosabb „nincs hang" (False) az alapértelmezés:
+    ha tévesen feltételeznénk hangot egy néma videónál, a [0:a]-ra hivatkozó mux
+    az EGÉSZ feldolgozást megbuktatná; fordítva legföljebb a narráció lesz a
+    hangsáv. (A muxoló ráadásul fallbackként némaként is újrapróbálja.)"""
     pb = Path(ff).with_name("ffprobe.exe")
     if not pb.is_file():
-        return True             # ha nem tudjuk, feltételezzük, hogy van
+        return False            # nem tudjuk megállapítani → biztonságos default
     try:
         r = subprocess.run([str(pb), "-v", "error", "-select_streams", "a",
                             "-show_entries", "stream=index", "-of",
@@ -110,7 +115,7 @@ def has_audio(ff: str, src: str) -> bool:
                            timeout=30)
         return bool(r.stdout.strip())
     except (OSError, subprocess.SubprocessError):
-        return True
+        return False            # bizonytalan → inkább némaként kezeljük
 
 
 def media_duration(ff: str, src: str) -> float:
@@ -301,11 +306,8 @@ class VideoDescriber:
                 return min(s if s >= at else at, max(0.0, (total or at) - dur))
         return max(0.0, at)
 
-    def _mux(self, ff, scenes, work) -> bool:
-        """A videó hangsávjának újraépítése: a narráció-klipeket a helyükre
-        késleltetjük, összemixeljük, és (ducking esetén) az eredeti hangot a
-        narráció alatt halkítjuk. A videósávot érintetlenül hagyjuk (-c:v copy)."""
-        orig_audio = has_audio(ff, self.src)
+    def _build_mux_cmd(self, ff, scenes, orig_audio):
+        """A mux-parancs összeállítása a megadott „van-e eredeti hang" feltétellel."""
         cmd = [ff, "-y", "-i", self.src]
         for sc in scenes:
             cmd += ["-i", sc.clip]
@@ -336,7 +338,21 @@ class VideoDescriber:
         graph = ";".join(parts)
         cmd += ["-filter_complex", graph, "-map", "0:v", "-map", "[aout]",
                 "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", self.out]
-        rc, err = _run(cmd, cwd=str(work))
+        return cmd
+
+    def _mux(self, ff, scenes, work) -> bool:
+        """A videó hangsávjának újraépítése: a narráció-klipeket a helyükre
+        késleltetjük, összemixeljük, és (ducking esetén) az eredeti hangot a
+        narráció alatt halkítjuk. A videósávot érintetlenül hagyjuk (-c:v copy)."""
+        orig_audio = has_audio(ff, self.src)
+        rc, err = _run(self._build_mux_cmd(ff, scenes, orig_audio),
+                       cwd=str(work))
+        # FALLBACK: ha hangos muxot próbáltunk és elbukott (pl. a videónak
+        # mégsincs használható hangsávja), próbáljuk újra némaként – egy
+        # narráció-csak hangsáv jobb, mint a teljes kudarc
+        if rc != 0 and orig_audio:
+            rc, err = _run(self._build_mux_cmd(ff, scenes, False),
+                           cwd=str(work))
         if rc != 0:
             self.error = (err.strip().splitlines()[-1]
                           if err.strip() else "a mux nem sikerült")

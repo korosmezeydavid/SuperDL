@@ -9,6 +9,7 @@ Minden a felhasználó saját mappájában, a ~/.superdl könyvtárban tárolód
 
 import json
 import threading
+import time
 from pathlib import Path
 
 CONFIG_DIR = Path.home() / ".superdl"
@@ -29,9 +30,28 @@ def _ensure_dir() -> None:
 
 
 def load_json(path: Path, default):
+    """Beolvasás. Hiányzó fájlnál csendben az alapértelmezett (normál első
+    indulás). SÉRÜLT (de létező) fájlnál NEM nyeljük el némán: előbb a legutóbbi
+    jó .bak biztonsági másolatból próbálunk, és ha az sincs, a sérült fájlt
+    félretesszük .corrupt-<dátum> néven, hogy a következő mentés NE írja felül a
+    még esetleg menthető adatot."""
     try:
         return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+    except FileNotFoundError:
+        return default
+    except OSError:
+        return default
+    except json.JSONDecodeError:
+        bak = path.with_suffix(path.suffix + ".bak")
+        try:
+            return json.loads(bak.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            pass
+        try:
+            stamp = time.strftime("%Y%m%d-%H%M%S")
+            path.replace(path.with_suffix(path.suffix + f".corrupt-{stamp}"))
+        except OSError:
+            pass
         return default
 
 
@@ -40,6 +60,13 @@ def save_json(path: Path, data) -> None:
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False),
                    encoding="utf-8")
+    # a jelenlegi (még jó) fájlt megőrizzük .bak néven, mielőtt felülírnánk –
+    # így egy fél mentés vagy későbbi sérülés után van mihez visszanyúlni
+    if path.exists():
+        try:
+            path.replace(path.with_suffix(path.suffix + ".bak"))
+        except OSError:
+            pass
     tmp.replace(path)
 
 

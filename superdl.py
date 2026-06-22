@@ -308,15 +308,17 @@ def main() -> int:
         print(f"Folytatás: {len(restored)} korábbi letöltés visszatöltve.")
 
     # ---- új podcast-epizódok letöltése ------------------------------
+    feed_jobs = []          # (FeedManager, Subscription, Episode, Job)
     if args.check_feeds:
         from superdl.feeds import FeedManager
         fm = FeedManager()
         new = fm.check_all()
         print(f"Feliratkozások: {len(new)} új epizód.")
         for sub, ep in new:
-            mgr.add(ep.url, out_dir=sub.out_dir or args.out,
-                    audio_only=sub.audio_only)
-            fm.mark_seen(sub, ep)
+            job = mgr.add(ep.url, out_dir=sub.out_dir or args.out,
+                          audio_only=sub.audio_only)
+            # a „látott"-ra jelölést a SIKERES letöltés UTÁNRA halasztjuk
+            feed_jobs.append((fm, sub, ep, job))
             print(f"  letöltésre jelölve: {ep.title}")
 
     urls = list(args.urls)
@@ -355,6 +357,13 @@ def main() -> int:
     mgr.close()
     from superdl.torrent import shutdown_aria2
     shutdown_aria2()
+
+    # az epizódokat CSAK a tényleg sikeres letöltés után jelöljük „látott"-nak,
+    # hogy egy hálózati/lemez-hiba miatt elbukott letöltést legközelebb újra
+    # megpróbáljon (a hibás eddig is látottá vált, és kimaradt)
+    for fm, sub, ep, job in feed_jobs:
+        if job.progress.status == "kész":
+            fm.mark_seen(sub, ep)
 
     if not plain:
         for line in render(mgr.jobs):

@@ -71,7 +71,8 @@ class Job:
         return {"url": self.url, "kind": self.kind, "out_dir": self.out_dir,
                 "audio_only": self.audio_only, "start_at": self.start_at,
                 "status": self.progress.status,
-                "filename": self.progress.filename}
+                "filename": self.progress.filename,
+                "overwrite": self.overwrite, "verify": self.verify}
 
 
 class DownloadManager:
@@ -121,7 +122,10 @@ class DownloadManager:
     def add(self, url: str, kind: str | None = None,
             out_dir: str | None = None, audio_only: bool | None = None,
             start_at: float | None = None, overwrite: bool = False,
-            verify: bool = False) -> Job:
+            verify: bool = False, autostart: bool = True) -> Job:
+        """Új letöltés a sorba. `autostart=False` esetén csak felveszi
+        „leállítva" állapotban, és NEM indítja el magától (ezt használja a
+        restore() a korábban leállított elemekhez)."""
         if kind is None:
             if is_torrent_url(url):
                 kind = "torrent"
@@ -132,10 +136,12 @@ class DownloadManager:
         job.progress.filename = url
         if start_at and start_at > time.time():
             job.progress.status = "ütemezve"
+        elif not autostart:
+            job.progress.status = "leállítva"   # folytatható, de magától nem indul
         with self._lock:
             self.jobs.append(job)
         self._allow_autosave = True
-        if job.progress.status != "ütemezve":
+        if job.progress.status not in ("ütemezve", "leállítva"):
             self._launch(job)
         self._save()
         return job
@@ -199,12 +205,18 @@ class DownloadManager:
                 self._save()
             time.sleep(1)
 
+    def _persistable(self, job: Job) -> bool:
+        """Elmentendő-e a sorba? A folytatható állapotok igen; a torrentnél a
+        seedelés is. A KÉSZ és HIBA elemeket (a torrenteket is) NEM mentjük,
+        hogy újraindításkor ne kerüljenek vissza és ne induljanak el feleslegesen."""
+        if job.progress.status in self.RESUMABLE:
+            return True
+        return job.kind == "torrent" and job.progress.status == "seedelés"
+
     def _save(self) -> None:
         if not self.persist or not self._allow_autosave:
             return
-        records = [j.to_record() for j in self.jobs
-                   if j.progress.status in self.RESUMABLE
-                   or j.kind == "torrent"]
+        records = [j.to_record() for j in self.jobs if self._persistable(j)]
         try:
             store.save_queue(records)
         except Exception:
@@ -221,11 +233,21 @@ class DownloadManager:
             url = r.get("url")
             if not url:
                 continue
-            # a már leállított elemeket nem indítjuk újra magától: várakozóra
+            status = r.get("status", "")
+            # a már befejezett vagy hibára futott elemeket egyáltalán nem
+            # töltjük vissza az aktív sorba
+            if status in ("kész", "hiba"):
+                continue
+            # a leállított elemeket NEM indítjuk újra magától (autostart=False);
+            # a többi (letöltés/várakozik) folytatható, az ütemezett az idejére vár
+            autostart = status != "leállítva"
             job = self.add(
                 url, kind=r.get("kind"), out_dir=r.get("out_dir"),
                 audio_only=r.get("audio_only"),
-                start_at=r.get("start_at"))
+                start_at=r.get("start_at"),
+                overwrite=bool(r.get("overwrite", False)),
+                verify=bool(r.get("verify", False)),
+                autostart=autostart)
             if r.get("filename"):
                 job.progress.filename = r["filename"]
             restored.append(job)

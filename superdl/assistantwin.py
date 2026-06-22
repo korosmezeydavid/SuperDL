@@ -97,6 +97,16 @@ class AssistantFrame(wx.Frame):
         say = result.get("say", "")
         if say:
             self._say(say)
+        # kockázatos (letöltést indító) akcióknál MEGERŐSÍTÉST kérünk – egy
+        # félrehallott parancs ne indíthasson el magától hálózati letöltést
+        if A.is_risky(action):
+            dlg = wx.MessageDialog(self, A.confirm_text(action, params),
+                                   "Megerősítés", wx.YES_NO | wx.ICON_QUESTION)
+            confirmed = dlg.ShowModal() == wx.ID_YES
+            dlg.Destroy()
+            if not confirmed:
+                self._say("Rendben, mégsem hajtottam végre.")
+                return
         try:
             A.execute(self.main, action, params, self._say)
         except Exception as e:

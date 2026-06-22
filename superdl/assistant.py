@@ -12,12 +12,15 @@ import json
 import re
 
 # akció-kulcs -> (emberi leírás, kockázatos-e [megerősítés kell])
+# A kifelé menő / hálózati letöltést indító akciók KOCKÁZATOSAK: ezeket egy
+# félrehallott vagy pontatlanul visszaadott parancs ne indíthassa el magától,
+# ezért a GUI megerősítést kér rájuk (lásd assistantwin._execute + confirm_text).
 ACTIONS = {
-    "download":      ("egy URL letöltése (params.url)", False),
+    "download":      ("egy URL letöltése (params.url)", True),
     "search":        ("médiakeresés (params.query)", False),
     "radio":         ("internetes rádió megnyitása/keresése (params.query)", False),
     "agenda":        ("a mai/közelgő naptár-események felolvasása", False),
-    "subscriptions": ("új epizódok ellenőrzése a feliratkozásokban", False),
+    "subscriptions": ("új epizódok ellenőrzése + letöltése", True),
     "datetime":      ("a pontos dátum és idő bemondása", False),
     "open_tool":     ("egy eszköz megnyitása (params.tool)", False),
     "none":          ("nem érthető kérés", False),
@@ -75,12 +78,19 @@ def _extract_json(raw: str) -> dict:
     except json.JSONDecodeError:
         return {"action": "none", "params": {},
                 "say": "Nem értettem a kérést."}
+    if not isinstance(data, dict):
+        return {"action": "none", "params": {},
+                "say": "Nem értettem a kérést."}
     action = data.get("action", "none")
     if action not in ACTIONS:
         action = "none"
+    # a params SZIGORÚAN objektum legyen; ha a modell szöveget/listát ad, a
+    # későbbi params.get() elszállna – ezért üres dict-re cseréljük
+    p = data.get("params")
+    say = data.get("say")
     return {"action": action,
-            "params": data.get("params") or {},
-            "say": data.get("say") or ""}
+            "params": p if isinstance(p, dict) else {},
+            "say": say if isinstance(say, str) else ""}
 
 
 def parse_command(text: str) -> dict:
@@ -97,6 +107,19 @@ def parse_command(text: str) -> dict:
 
 def is_risky(action: str) -> bool:
     return ACTIONS.get(action, ("", False))[1]
+
+
+def confirm_text(action: str, params: dict) -> str:
+    """Felolvasható megerősítő kérdés egy kockázatos akcióhoz (a GUI ezt mutatja
+    meg / mondja be, mielőtt végrehajtaná)."""
+    params = params or {}
+    if action == "download":
+        url = (params.get("url") or "").strip() or "(nincs megadva cím)"
+        return f"Letöltés indul a következő címről:\n{url}\n\nElindítsam?"
+    if action == "subscriptions":
+        return ("Ellenőrzöm a feliratkozásokat, és letöltöm az összes új "
+                "epizódot.\n\nFolytassam?")
+    return "Biztosan végrehajtsam ezt a műveletet?"
 
 
 # open_tool kulcs -> a fő ablak megnyitó metódusa
