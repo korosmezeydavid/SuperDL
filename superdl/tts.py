@@ -14,7 +14,6 @@ darabolja a `char_limit` szerint.
 
 import base64
 import json
-import struct
 import urllib.request
 from dataclasses import dataclass
 

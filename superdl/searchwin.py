@@ -7,8 +7,6 @@ szabványos helyi menü (jobb klikk, Menü-billentyű, Shift+F10) ad
 műveleteket, és vannak közvetlen gyorsbillentyűk is.
 """
 
-import glob
-import os
 import threading
 from pathlib import Path
 

@@ -53,12 +53,14 @@ class VideoDescribeFrame(wx.Frame):
         g = wx.FlexGridSizer(0, 2, 8, 8)
         g.Add(wx.StaticText(p, label="Bejelentő &hang:"), 0,
               wx.ALIGN_CENTER_VERTICAL)
-        self.voice_ch = wx.Choice(p, choices=[n for n, _ in VOICES])
+        self.voice_ch = wx.Choice(p, choices=[n for n, _ in VOICES],
+                                  name="Bejelentő hang")
         self.voice_ch.SetSelection(0)
         g.Add(self.voice_ch, 0, wx.EXPAND)
         g.Add(wx.StaticText(p, label="&Részletesség:"), 0,
               wx.ALIGN_CENTER_VERTICAL)
-        self.detail_ch = wx.Choice(p, choices=[n for n, _ in DETAILS])
+        self.detail_ch = wx.Choice(p, choices=[n for n, _ in DETAILS],
+                                   name="Részletesség")
         self.detail_ch.SetSelection(0)
         g.Add(self.detail_ch, 0, wx.EXPAND)
         g.Add(wx.StaticText(p, label="&Beszédtempó (-10 lassú … +10 gyors):"),

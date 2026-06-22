@@ -80,7 +80,8 @@ class VideoEditFrame(wx.Frame):
         lv.Add(wx.StaticText(p, label="Mar&kerek (Delete: törlés). A „Szakasz "
                "mentése” a kijelölt és a következő marker közt ment:"),
                0, wx.LEFT | wx.TOP, 6)
-        self.mk_list = wx.ListCtrl(p, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
+        self.mk_list = wx.ListCtrl(p, style=wx.LC_REPORT | wx.LC_SINGLE_SEL,
+                                   name="Markerek")
         self.mk_list.InsertColumn(0, "Marker időpont", width=180)
         self.mk_list.Bind(wx.EVT_KEY_DOWN, self._on_mk_key)
         lv.Add(self.mk_list, 1, wx.EXPAND | wx.ALL, 4)
@@ -89,7 +90,8 @@ class VideoEditFrame(wx.Frame):
         nv = wx.BoxSizer(wx.VERTICAL)
         nv.Add(wx.StaticText(p, label="Magyarázó szöve&gek (Delete: törlés):"),
                0, wx.LEFT | wx.TOP, 6)
-        self.nt_list = wx.ListCtrl(p, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
+        self.nt_list = wx.ListCtrl(p, style=wx.LC_REPORT | wx.LC_SINGLE_SEL,
+                                   name="Magyarázó szövegek")
         self.nt_list.InsertColumn(0, "Időpont", width=90)
         self.nt_list.InsertColumn(1, "Szöveg", width=300)
         self.nt_list.Bind(wx.EVT_KEY_DOWN, self._on_nt_key)

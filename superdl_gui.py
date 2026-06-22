@@ -55,6 +55,7 @@ from superdl.videoeditwin import VideoEditFrame
 from superdl.videodescribewin import VideoDescribeFrame
 from superdl.assistantwin import AssistantFrame
 from superdl.supermwin import SuperMFrame
+from superdl.mediaanalyzewin import MediaAnalyzeFrame
 from superdl.bookwin import BookFrame
 from superdl.radiorec import RecordManager
 from superdl import dayinfo, weather, search, store, aiclient, mediaai
@@ -246,6 +247,7 @@ class MainFrame(wx.Frame):
         self._videodescribe_win = None
         self._assistant_win = None
         self._superm_win = None
+        self._mediaanalyze_win = None
         self._record_mgr = None
         self._known_rows: dict[int, int] = {}   # job.id -> listasor
         self._last_values: dict[int, tuple] = {}
@@ -482,6 +484,10 @@ class MainFrame(wx.Frame):
         mi_ring = m_tools.Append(
             wx.ID_ANY, "iPhone &csengőhang-készítő\tCtrl+Shift+G",
             "Csengőhang (.m4r) vagy MP3 készítése egy zene részletéből")
+        mi_analyze = m_tools.Append(
+            wx.ID_ANY, "Beszélő média&elemző\tCtrl+Shift+Q",
+            "Médiafájl ellenőrzése és hangtechnikai elemzése (LUFS, csúcs, "
+            "torzítás), valamint EBU R128 hangerő-normalizálás profilonként")
         m_tools.AppendSeparator()
         mi_news = m_tools.Append(
             wx.ID_ANY, "&Hírolvasó\tCtrl+Shift+H",
@@ -588,6 +594,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_reader_window, mi_reader)
         self.Bind(wx.EVT_MENU, self._on_video_window, mi_video)
         self.Bind(wx.EVT_MENU, self._on_convert_window, mi_convert)
+        self.Bind(wx.EVT_MENU, self._on_mediaanalyze_window, mi_analyze)
         self.Bind(wx.EVT_MENU, self._on_videoedit_window, mi_vedit)
         self.Bind(wx.EVT_MENU, self._on_assistant_window, mi_assist)
         self.Bind(wx.EVT_MENU, self._on_ringtone_window, mi_ring)
@@ -1117,6 +1124,13 @@ class MainFrame(wx.Frame):
             return
         self._videodescribe_win = VideoDescribeFrame(self)
         self._videodescribe_win.Show()
+
+    def _on_mediaanalyze_window(self, event=None):
+        if self._mediaanalyze_win:
+            self._mediaanalyze_win.Raise()
+            return
+        self._mediaanalyze_win = MediaAnalyzeFrame(self)
+        self._mediaanalyze_win.Show()
 
     def _on_assistant_window(self, event=None):
         if self._assistant_win:
@@ -1878,6 +1892,8 @@ class MainFrame(wx.Frame):
             self._assistant_win.Destroy()
         if self._superm_win:
             self._superm_win.Destroy()
+        if self._mediaanalyze_win:
+            self._mediaanalyze_win.Destroy()
         if self._organizer:
             self._organizer.shutdown()
         self._save_settings()

@@ -124,7 +124,8 @@ class VideoComposeFrame(wx.Frame):
         v.Add(wx.StaticText(self.edit_panel,
               label="Beszúrt elemek (időpont szerint):"), 0, wx.LEFT | wx.TOP, 8)
         self.list = wx.ListCtrl(self.edit_panel,
-                                style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
+                                style=wx.LC_REPORT | wx.LC_SINGLE_SEL,
+                                name="Jelenetek")
         self.list.InsertColumn(0, "Időpont", width=90)
         self.list.InsertColumn(1, "Típus", width=80)
         self.list.InsertColumn(2, "Tartalom", width=460)

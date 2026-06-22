@@ -67,7 +67,8 @@ class BatchConvertFrame(wx.Frame):
         v.Add(b1, 0, wx.ALL, 6)
 
         # fájllista
-        self.list = wx.ListCtrl(p, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
+        self.list = wx.ListCtrl(p, style=wx.LC_REPORT | wx.LC_SINGLE_SEL,
+                                name="Átalakítandó fájlok")
         self.list.InsertColumn(0, "Fájl", width=520)
         self.list.InsertColumn(1, "Állapot", width=160)
         self.list.Bind(wx.EVT_KEY_DOWN, self._on_list_key)
@@ -78,21 +79,23 @@ class BatchConvertFrame(wx.Frame):
         g = wx.BoxSizer(wx.HORIZONTAL)
         g.Add(wx.StaticText(p, label="&Irány:"), 0,
               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
-        self.mode_ch = wx.Choice(p, choices=[m[0] for m in MODE_LABELS])
+        self.mode_ch = wx.Choice(p, choices=[m[0] for m in MODE_LABELS],
+                                 name="Irány")
         self.mode_ch.SetSelection(0)
         self.mode_ch.Bind(wx.EVT_CHOICE, lambda e: self._sync_format_choices())
         g.Add(self.mode_ch, 0, wx.RIGHT, 12)
 
         g.Add(wx.StaticText(p, label="F&ormátum:"), 0,
               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
-        self.fmt_ch = wx.Choice(p, choices=[])
+        self.fmt_ch = wx.Choice(p, choices=[], name="Formátum")
         self.fmt_ch.Bind(wx.EVT_CHOICE, lambda e: self._sync_bitrate())
         g.Add(self.fmt_ch, 0, wx.RIGHT, 12)
 
         g.Add(wx.StaticText(p, label="&Bitráta:"), 0,
               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
         self.br_ch = wx.Choice(p, choices=[f"{b} kbps"
-                                           for b in C.AUDIO_BITRATES])
+                                           for b in C.AUDIO_BITRATES],
+                               name="Bitráta")
         self.br_ch.SetSelection(1)
         g.Add(self.br_ch, 0)
         v.Add(g, 0, wx.ALL, 8)

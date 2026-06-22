@@ -376,6 +376,7 @@ class EventDialog(wx.Dialog):
 
         v.Add(wx.StaticText(p, label="&Cím:"), 0, wx.LEFT | wx.TOP, 8)
         self.title = wx.TextCtrl(p, value=ev.title if ev else "")
+        self.title.SetName("Cím")
         v.Add(self.title, 0, wx.EXPAND | wx.ALL, 8)
 
         dr = wx.BoxSizer(wx.HORIZONTAL)
@@ -384,6 +385,7 @@ class EventDialog(wx.Dialog):
         self.date = wx.TextCtrl(
             p, value=(ev.date if ev else date.today().isoformat()),
             size=(120, -1))
+        self.date.SetName("Dátum (év-hónap-nap)")
         dr.Add(self.date, 0, wx.RIGHT, 12)
         dr.Add(wx.StaticText(p, label="&Óra:"), 0,
                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
@@ -403,17 +405,20 @@ class EventDialog(wx.Dialog):
               wx.LEFT, 8)
         self.note = wx.TextCtrl(p, value=ev.note if ev else "",
                                 style=wx.TE_MULTILINE, size=(-1, 60))
+        self.note.SetName("Jegyzet")
         v.Add(self.note, 0, wx.EXPAND | wx.ALL, 8)
 
         rr = wx.BoxSizer(wx.HORIZONTAL)
         rr.Add(wx.StaticText(p, label="E&mlékeztető:"), 0,
                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         self.remind = wx.Choice(p, choices=[n for n, _ in REMINDERS])
+        self.remind.SetName("Emlékeztető")
         self.remind.SetSelection(self._remind_index())
         rr.Add(self.remind, 0, wx.RIGHT, 12)
         rr.Add(wx.StaticText(p, label="&Ismétlés:"), 0,
                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         self.repeat = wx.Choice(p, choices=[n for n, _ in REPEATS])
+        self.repeat.SetName("Ismétlés")
         self.repeat.SetSelection(self._repeat_index())
         self.repeat.Bind(wx.EVT_CHOICE, self._on_repeat)
         rr.Add(self.repeat, 0)
@@ -436,12 +441,14 @@ class EventDialog(wx.Dialog):
         ar.Add(wx.StaticText(p, label="&Akció a megadott időben:"), 0,
                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         self.action = wx.Choice(p, choices=[n for n, _ in ACTIONS])
+        self.action.SetName("Akció a megadott időben")
         self.action.SetSelection(self._action_index())
         ar.Add(self.action, 1)
         v.Add(ar, 0, wx.EXPAND | wx.ALL, 8)
         v.Add(wx.StaticText(p, label="Akció adata (URL / fájl / mailto:cím, "
               "vagy a felolvasandó szöveg):"), 0, wx.LEFT, 8)
         self.action_data = wx.TextCtrl(p, value=ev.action_data if ev else "")
+        self.action_data.SetName("Akció adata (URL, fájl, mailto-cím vagy szöveg)")
         v.Add(self.action_data, 0, wx.EXPAND | wx.ALL, 8)
 
         btns = wx.StdDialogButtonSizer()
@@ -516,13 +523,16 @@ class TaskDialog(wx.Dialog):
         v = wx.BoxSizer(wx.VERTICAL)
         v.Add(wx.StaticText(p, label="&Teendő:"), 0, wx.LEFT | wx.TOP, 8)
         self.title = wx.TextCtrl(p, value=task.title if task else "")
+        self.title.SetName("Teendő")
         v.Add(self.title, 0, wx.EXPAND | wx.ALL, 8)
         v.Add(wx.StaticText(p, label="&Határidő (ÉÉÉÉ-HH-NN, nem kötelező):"),
               0, wx.LEFT, 8)
         self.due = wx.TextCtrl(p, value=task.due if task else "")
+        self.due.SetName("Határidő (év-hónap-nap)")
         v.Add(self.due, 0, wx.EXPAND | wx.ALL, 8)
         v.Add(wx.StaticText(p, label="&Jegyzet:"), 0, wx.LEFT, 8)
         self.note = wx.TextCtrl(p, value=task.note if task else "",
+                                name="Jegyzet",
                                 style=wx.TE_MULTILINE, size=(-1, 60))
         v.Add(self.note, 0, wx.EXPAND | wx.ALL, 8)
         btns = wx.StdDialogButtonSizer()
@@ -565,9 +575,11 @@ class NoteDialog(wx.Dialog):
         v = wx.BoxSizer(wx.VERTICAL)
         v.Add(wx.StaticText(p, label="&Cím:"), 0, wx.LEFT | wx.TOP, 8)
         self.title = wx.TextCtrl(p, value=note.title if note else "")
+        self.title.SetName("Cím")
         v.Add(self.title, 0, wx.EXPAND | wx.ALL, 8)
         v.Add(wx.StaticText(p, label="&Szöveg:"), 0, wx.LEFT, 8)
         self.body = wx.TextCtrl(p, value=note.body if note else "",
+                                name="Szöveg",
                                 style=wx.TE_MULTILINE, size=(-1, 240))
         v.Add(self.body, 1, wx.EXPAND | wx.ALL, 8)
         btns = wx.StdDialogButtonSizer()
@@ -608,11 +620,11 @@ class IcsDialog(wx.Dialog):
         v = wx.BoxSizer(wx.VERTICAL)
         v.Add(wx.StaticText(p, label="&Név (szabadon választható):"), 0,
               wx.LEFT | wx.TOP, 8)
-        self.name_txt = wx.TextCtrl(p)
+        self.name_txt = wx.TextCtrl(p, name="Naptár neve")
         v.Add(self.name_txt, 0, wx.EXPAND | wx.ALL, 8)
         v.Add(wx.StaticText(p, label="ICS- (iCal-) &link (titkos cím):"), 0,
               wx.LEFT, 8)
-        self.url_txt = wx.TextCtrl(p)
+        self.url_txt = wx.TextCtrl(p, name="ICS-link (iCal cím)")
         v.Add(self.url_txt, 0, wx.EXPAND | wx.ALL, 8)
         help_btn = wx.Button(p, label="&Honnan szerzem ezt a linket?")
         help_btn.Bind(wx.EVT_BUTTON, lambda e: IcsHelpDialog(self).ShowModal())
