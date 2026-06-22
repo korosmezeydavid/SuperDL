@@ -23,15 +23,17 @@ MAX_RETRIES = 5
 
 
 def parse_limit(text: str) -> int:
-    """Sebességkorlát szövegből bájt/mp-be: '2M', '500K', '1.5m'."""
-    text = text.strip().lower().rstrip("b").rstrip("/s").strip()
-    if not text or text == "0":
+    """Sebességkorlát szövegből bájt/mp-be. Elfogadott alakok: '2M', '500K',
+    '500 KB', '500 KB/s', '2 MB/s', '1,5 MB/s', '1.5m'. (Reguláris kifejezéssel,
+    hogy a 'B' és a '/s' utótag, a szóköz és a tizedesvessző ne okozzon hibát.)"""
+    if not text:
         return 0
-    mult = 1
-    if text[-1] in "kmg":
-        mult = {"k": 1024, "m": 1024 ** 2, "g": 1024 ** 3}[text[-1]]
-        text = text[:-1]
-    return int(float(text) * mult)
+    t = text.strip().lower().replace(",", ".")
+    m = re.match(r"^\s*([0-9]*\.?[0-9]+)\s*([kmg])?", t)
+    if not m:
+        return 0
+    mult = {"k": 1024, "m": 1024 ** 2, "g": 1024 ** 3}.get(m.group(2), 1)
+    return int(float(m.group(1)) * mult)
 
 
 class RateLimiter:
@@ -49,9 +51,12 @@ class RateLimiter:
         while True:
             with self._lock:
                 now = time.monotonic()
+                # a vödör teteje legalább akkora legyen, mint a kért blokk (n),
+                # különben egy a limitnél nagyobb blokk SOHA nem férne bele, és a
+                # letöltés örökre megállna (pl. 64 KB/s limit + 256 KB-os blokk)
+                cap = max(float(self.bps), float(n))
                 self._allowance = min(
-                    float(self.bps),
-                    self._allowance + (now - self._last) * self.bps)
+                    cap, self._allowance + (now - self._last) * self.bps)
                 self._last = now
                 if self._allowance >= n:
                     self._allowance -= n
@@ -209,6 +214,14 @@ class SegmentDownloader:
             if self._stop.is_set():
                 p.status = "leállítva"
                 return target
+            # végső méret-ellenőrzés: ismert teljes méretnél a kész fájl pontosan
+            # akkora legyen (az egyszálú útnál ez fogja el a csonka letöltést)
+            if size > 0:
+                actual = part.stat().st_size if part.exists() else 0
+                if actual != size:
+                    raise RuntimeError(
+                        f"a letöltött fájl mérete nem teljes: {actual} / {size} "
+                        "bájt – a letöltés nem fejeződött be rendesen")
             part.rename(target)
             self._state_path(target).unlink(missing_ok=True)
             p.status = "kész"
@@ -277,6 +290,13 @@ class SegmentDownloader:
                     with self.session.get(self.url, stream=True, timeout=30,
                                           headers=headers) as resp:
                         resp.raise_for_status()
+                        # ha a szerver NEM 206-tal felel, figyelmen kívül hagyta
+                        # a Range-et és a teljes fájlt küldené minden szálban →
+                        # ez összekeverné a kimenetet, ezért hibának vesszük
+                        if resp.status_code != 206:
+                            errors.append("a szerver nem támogatta a Range "
+                                          "kérést (nem 206-os válasz)")
+                            return
                         with open(part, "r+b") as f:
                             f.seek(seg[0])
                             for chunk in resp.iter_content(CHUNK_SIZE):
@@ -307,6 +327,14 @@ class SegmentDownloader:
             return
         if errors:
             raise RuntimeError("; ".join(errors[:3]))
+        # MINDEN szegmensnek teljesen le kell töltődnie (seg[0] túljutott a
+        # végén). Ha egy stream kivétel nélkül, idő előtt zárult, a hiányzó rész
+        # nulla maradna az előre lefoglalt fájlban – ezt itt elkapjuk, hogy SOHA
+        # ne nevezzünk át sérült fájlt késznek.
+        incomplete = sum(1 for s in segments if s[0] <= s[1])
+        if incomplete:
+            raise RuntimeError(f"hiányos letöltés: {incomplete} szegmens nem "
+                               "töltődött le teljesen")
 
     def _speed_meter(self) -> None:
         last_bytes, last_time = self.progress.downloaded, time.monotonic()
