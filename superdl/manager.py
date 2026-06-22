@@ -1,6 +1,7 @@
 """Letöltési sor: több feladat párhuzamos futtatása, időzítéssel,
 és a sor megőrzésével program-újraindítás után is."""
 
+import logging
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -13,6 +14,7 @@ from .segment import Progress, RateLimiter, SegmentDownloader
 from .torrent import TorrentDownloader, is_torrent_url
 
 _ids = count(1)
+_log = logging.getLogger("superdl.manager")
 
 
 def parse_when(text: str) -> float | None:
@@ -184,8 +186,15 @@ class DownloadManager:
                     job.url, out_dir, connections=self.connections,
                     progress=job.progress, limiter=self.limiter)
             job.downloader.run()
-        except Exception:
-            pass  # a hiba a job.progress.error mezőben már megvan
+        except Exception as exc:
+            # a letöltők többsége már beállítja a job.progress.error mezőt, de
+            # ha NEM (pl. már a letöltő-objektum létrehozása elszállt), itt
+            # gondoskodunk róla, hogy a hiba látszódjon és NAPLÓZÓDJON
+            if job.progress.status not in ("hiba", "leállítva"):
+                job.progress.status = "hiba"
+                if not job.progress.error:
+                    job.progress.error = str(exc)
+            _log.exception("Letöltési feladat hibája: %s", job.url)
         finally:
             self._save()
 

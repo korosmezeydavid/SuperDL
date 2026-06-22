@@ -299,12 +299,24 @@ class VideoDescriber:
             shutil.rmtree(work, ignore_errors=True)
 
     def _place_in_gap(self, at, dur, gaps, total):
-        """A narrációt a jelenethez legközelebbi (azt tartalmazó vagy utána
-        következő) csendbe igazítja, hogy ne beszéljen bele a párbeszédbe."""
+        """A narrációt a jelenethez legközelebbi, ELÉG HOSSZÚ csendbe igazítja,
+        úgy hogy a narráció VÉGE is a csenden belül maradjon – ne lógjon bele a
+        következő párbeszédbe. Ha nincs elég hosszú csend, a jelenetidőre teszi
+        (legjobb közelítés)."""
+        margin = 0.3
+        need = dur + margin
+        cap = max(0.0, (total or at) - dur)      # ne lógjon túl a videó végén
         for s, e in gaps:
-            if s <= at <= e or (s >= at and s - at < 6):
-                return min(s if s >= at else at, max(0.0, (total or at) - dur))
-        return max(0.0, at)
+            if (e - s) < need:
+                continue                          # ez a csend túl rövid ehhez
+            if s <= at <= e:
+                # a jelenetnél tartó csend: kezdjük itt, de húzzuk vissza, hogy a
+                # narráció vége is beleférjen a csend végéig
+                return max(0.0, min(min(at, e - need), cap))
+            if s >= at and s - at < 6:
+                # hamarosan jövő, elég hosszú csend → annak az elejére
+                return max(0.0, min(s, cap))
+        return max(0.0, min(at, cap))
 
     def _build_mux_cmd(self, ff, scenes, orig_audio):
         """A mux-parancs összeállítása a megadott „van-e eredeti hang" feltétellel."""

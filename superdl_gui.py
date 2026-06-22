@@ -2062,6 +2062,7 @@ class UpdateDialog(wx.Dialog):
         engines = [c for c in self.comps if c["update"]]
         app_upd = bool(self.app and self.app.get("update"))
         app_assets = self.app.get("assets", {}) if self.app else {}
+        app_digests = self.app.get("digests", {}) if self.app else {}
         self.info.SetValue("Frissítések letöltése és telepítése...")
 
         def prog(f):
@@ -2080,7 +2081,8 @@ class UpdateDialog(wx.Dialog):
             app_done = False
             if app_upd:
                 try:
-                    selfupdate.apply(app_assets, prog, restart=True)
+                    selfupdate.apply(app_assets, prog, restart=True,
+                                     digests=app_digests)
                     results.append(f"SuperDL: letöltve a(z) {self.app['latest']} "
                                    "verzió.")
                     app_done = True

@@ -15,7 +15,7 @@ binaries = [('bin\\aria2c.exe', '.'),
             ('bin\\bassenc_mp3.dll', '.')]
 # eSpeak-NG hangadatok (magyar hang a self-voice-hoz) – a teljes mappa
 datas += [('bin\\espeak-ng-data', 'espeak-ng-data')]
-hiddenimports = ['win32com.client', 'pythoncom', 'pywintypes']
+hiddenimports = ['win32com.client', 'pythoncom', 'pywintypes', 'win32crypt']
 datas += collect_data_files('docx')
 hiddenimports += collect_submodules('yt_dlp')
 hiddenimports += collect_submodules('feedparser')

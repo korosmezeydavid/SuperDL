@@ -7,7 +7,7 @@ datas = []
 binaries = [('bin\\aria2c.exe', '.'),
             ('bin\\ffmpeg.exe', '.'),
             ('bin\\ffprobe.exe', '.')]
-hiddenimports = ['win32com.client', 'pythoncom', 'pywintypes']
+hiddenimports = ['win32com.client', 'pythoncom', 'pywintypes', 'win32crypt']
 datas += collect_data_files('docx')
 hiddenimports += collect_submodules('yt_dlp')
 hiddenimports += collect_submodules('feedparser')

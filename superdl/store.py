@@ -70,6 +70,76 @@ def save_json(path: Path, data) -> None:
     tmp.replace(path)
 
 
+# ---- titkosított tárolás (API-kulcsok) – Windows DPAPI ----------------
+# Az AI/TTS kulcsokat NEM nyílt szövegként tároljuk, hanem a felhasználó
+# fiókjához kötött DPAPI-val titkosítva. Ha a DPAPI nem érhető el (nem Windows,
+# hiányzó pywin32), biztonságos visszaesésként sima JSON-t írunk – a program
+# így sosem áll meg emiatt.
+
+def _dpapi_protect(text: str):
+    try:
+        import win32crypt
+        return win32crypt.CryptProtectData(
+            text.encode("utf-8"), "SuperDL", None, None, None, 0)
+    except Exception:
+        return None
+
+
+def _dpapi_unprotect(blob: bytes):
+    try:
+        import win32crypt
+        _, data = win32crypt.CryptUnprotectData(blob, None, None, None, 0)
+        return data.decode("utf-8")
+    except Exception:
+        return None
+
+
+def save_secret_json(path: Path, data) -> None:
+    """Mint a save_json, de a tartalmat DPAPI-val titkosítja."""
+    import base64
+    _ensure_dir()
+    blob = _dpapi_protect(json.dumps(data, ensure_ascii=False))
+    if blob is not None:
+        payload = {"__dpapi__": base64.b64encode(bytes(blob)).decode("ascii")}
+    else:
+        payload = data                       # visszaesés: sima JSON
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False),
+                   encoding="utf-8")
+    tmp.replace(path)
+    # FONTOS: titoknál NEM hagyunk .bak-ot, és egy meglévőt is törlünk – egy
+    # korábbi (akár sima szövegű) .bak különben nyíltan őrizné a kulcsokat
+    bak = path.with_suffix(path.suffix + ".bak")
+    try:
+        if bak.exists():
+            bak.unlink()
+    except OSError:
+        pass
+
+
+def _load_secret_config(path: Path) -> dict:
+    """DPAPI-titkosított VAGY régi sima JSON beolvasása. A régi (sima) fájlt
+    átolvasás után MIGRÁLJA: titkosítva visszaírja, hogy a kulcsok ne maradjanak
+    nyílt szövegben."""
+    import base64
+    with _lock:
+        raw = load_json(path, None)
+    if not isinstance(raw, dict):
+        return {}
+    if "__dpapi__" in raw:
+        try:
+            text = _dpapi_unprotect(base64.b64decode(raw["__dpapi__"]))
+            data = json.loads(text) if text is not None else {}
+        except Exception:
+            data = {}
+        return data if isinstance(data, dict) else {}
+    # régi, SIMA szövegként tárolt kulcsok → titkosítva visszaírjuk (migráció)
+    if raw:
+        with _lock:
+            save_secret_json(path, raw)
+    return raw
+
+
 def load_queue() -> list[dict]:
     """A mentett letöltési sor (lista a job-leírókból)."""
     with _lock:
@@ -193,29 +263,25 @@ AI_CONFIG_FILE = CONFIG_DIR / "ai.json"
 
 
 def load_ai_config() -> dict:
-    """AI-szolgáltatók API-kulcsai és modellbeállítása (helyben tárolva)."""
-    with _lock:
-        data = load_json(AI_CONFIG_FILE, {})
-    return data if isinstance(data, dict) else {}
+    """AI-szolgáltatók API-kulcsai és modellbeállítása (DPAPI-val titkosítva)."""
+    return _load_secret_config(AI_CONFIG_FILE)
 
 
 def save_ai_config(config: dict) -> None:
     with _lock:
-        save_json(AI_CONFIG_FILE, config)
+        save_secret_json(AI_CONFIG_FILE, config)
 
 
 TTS_KEYS_FILE = CONFIG_DIR / "tts_keys.json"
 
 
 def load_tts_keys() -> dict:
-    with _lock:
-        data = load_json(TTS_KEYS_FILE, {})
-    return data if isinstance(data, dict) else {}
+    return _load_secret_config(TTS_KEYS_FILE)
 
 
 def save_tts_keys(keys: dict) -> None:
     with _lock:
-        save_json(TTS_KEYS_FILE, keys)
+        save_secret_json(TTS_KEYS_FILE, keys)
 
 
 def _load_list(path: Path) -> list[dict]:

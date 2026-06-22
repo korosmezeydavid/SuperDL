@@ -81,50 +81,64 @@ def current_version() -> str:
     return __version__
 
 
-def latest_release(repo: str) -> tuple[str, dict]:
+def latest_release(repo: str) -> tuple[str, dict, dict]:
+    """(tag, {assetnév: url}, {assetnév: sha256-hex}). A GitHub minden assethez
+    megadja a `digest` (sha256:…) mezőt – ezt használjuk a letöltés ELLENŐRZÉSÉRE."""
     url = f"https://api.github.com/repos/{repo}/releases/latest"
     req = urllib.request.Request(url, headers=UA)
     with urllib.request.urlopen(req, timeout=30) as r:
         d = json.load(r)
     tag = d.get("tag_name", "")
-    assets = {a["name"]: a["browser_download_url"]
-              for a in d.get("assets", [])}
-    return tag, assets
+    assets, digests = {}, {}
+    for a in d.get("assets", []):
+        assets[a["name"]] = a["browser_download_url"]
+        dg = (a.get("digest") or "")
+        if dg.startswith("sha256:"):
+            digests[a["name"]] = dg.split(":", 1)[1].strip().lower()
+    return tag, assets, digests
 
 
 def check() -> dict:
-    """Visszaadja: {update, current, latest, assets, error}."""
+    """Visszaadja: {update, current, latest, assets, digests, error}."""
     repo = get_repo()
     res = {"update": False, "current": __version__, "latest": None,
-           "assets": {}, "error": None, "repo": repo}
+           "assets": {}, "digests": {}, "error": None, "repo": repo}
     if not repo:
         res["error"] = "nincs beállítva a frissítési tárhely"
         return res
     try:
-        tag, assets = latest_release(repo)
+        tag, assets, digests = latest_release(repo)
     except Exception as e:
         res["error"] = str(e)
         return res
     latest = tag.lstrip("vV")
     res["latest"] = latest
     res["assets"] = assets
+    res["digests"] = digests
     res["update"] = _ver(latest) > _ver(__version__)
     return res
 
 
-def _download(url: str, progress=None) -> bytes:
+def _download_to_file(url: str, dest: Path, progress=None) -> str:
+    """A fájlt KÖZVETLENÜL a lemezre streameli (nem gyűjti a teljes ~165 MB-ot a
+    memóriába), és közben kiszámolja a SHA-256-ot. Visszaadja a hex-lenyomatot,
+    hogy az apply() összevethesse a GitHub által megadott hivatalos digesttel."""
+    import hashlib
+    h = hashlib.sha256()
     req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=60) as r:
+    with urllib.request.urlopen(req, timeout=60) as r, open(dest, "wb") as f:
         total = int(r.headers.get("Content-Length", 0) or 0)
-        buf = bytearray()
+        done = 0
         while True:
             chunk = r.read(65536)
             if not chunk:
                 break
-            buf += chunk
+            f.write(chunk)
+            h.update(chunk)
+            done += len(chunk)
             if progress and total:
-                progress(len(buf) / total)
-    return bytes(buf)
+                progress(done / total)
+    return h.hexdigest().lower()
 
 
 def cleanup_old() -> None:
@@ -194,11 +208,24 @@ def _swapper_script(folder: Path, pairs: list[tuple[Path, Path]],
               f'move /Y "{newf}" "{target}" >> "%LOG%" 2>&1',
               f'if not errorlevel 1 goto ok{i}',
               f'set /a m{i}+=1',
-              f'if %m{i}% GEQ 30 goto ok{i}',   # max ~30 mp a zárolás oldására
+              f'if %m{i}% GEQ 30 goto fail{i}',   # max ~30 mp a zárolás oldására
               wait1,
               f'goto mv{i}',
+              # a kimerült próbálkozást ŐSZINTÉN naplózzuk (nem tesszük úgy,
+              # mintha sikerült volna); a cél exe ilyenkor a régi, ép marad
+              f':fail{i}',
+              f'echo [SWAP] HIBA: a csere nem sikerult (zarolva maradt): '
+              f'{target} >> "%LOG%" 2>&1',
               f':ok{i}']
     if relaunch_name:
+        # FONTOS: a frissen lecserélt (nagy, ~165 MB-os) exét NEM indítjuk
+        # azonnal újra. A víruskereső a friss írás után átvizsgálja a fájlt, és
+        # közben fogja – ha rögtön indítanánk, a onefile-kicsomagolás leszakadna
+        # („Failed to load Python DLL python314.dll”). Várunk ~8 mp-et, hogy az
+        # AV végezzen, csak utána indítunk.
+        L.append('echo [SWAP] varakozas az ujraindites elott (AV atvizsgalas) '
+                 '>> "%LOG%" 2>&1')
+        L.append(f'"{sys32}\\ping.exe" -n 9 127.0.0.1 >NUL')   # ~8 mp
         L.append(f'echo [SWAP] ujraindites: {relaunch_name} >> "%LOG%" 2>&1')
         L.append(f'start "" "{folder / relaunch_name}"')
     L += ['echo [SWAP] kesz >> "%LOG%" 2>&1', 'del "%~f0"']
@@ -231,11 +258,16 @@ def _spawn_swapper(folder: Path, pairs: list[tuple[Path, Path]],
                      close_fds=True, cwd=str(folder))
 
 
-def apply(assets: dict, progress=None, restart: bool = True) -> list[str]:
+def apply(assets: dict, progress=None, restart: bool = True,
+          digests: dict | None = None) -> list[str]:
     """A futó exe (és a SuperDL-cli.exe, ha van rá kiadás) cseréje egy
     kilépés utáni swapper-kötegfájllal. `restart=True` esetén a csere után
     újraindítja a programot. A hívónak a visszatérés után MIHAMARABB ki kell
-    lépnie, hogy a swapper a (már nem zárolt) exét lecserélhesse."""
+    lépnie, hogy a swapper a (már nem zárolt) exét lecserélhesse.
+
+    A letöltött exét a GitHub hivatalos SHA-256 digestjével ELLENŐRIZZÜK: ha
+    nem egyezik (sérült vagy manipulált letöltés), megszakítjuk, és a régi,
+    működő exe érintetlen marad."""
     if not is_frozen():
         raise RuntimeError(
             "Automatikusan csak a kész exe frissíthető. Forrásból a "
@@ -250,6 +282,22 @@ def apply(assets: dict, progress=None, restart: bool = True) -> list[str]:
             "almappájába), vagy töltsd le kézzel a frissítést a kiadási "
             "oldalról.")
 
+    # a hivatalos ellenőrző összegek (és ha a tárhely nem a hivatalos, azt
+    # naplózzuk – egy elállított repo.txt/SUPERDL_REPO így legalább látható)
+    repo = get_repo()
+    if digests is None:
+        try:
+            _, _, digests = latest_release(repo)
+        except Exception:
+            digests = {}
+    if repo != DEFAULT_REPO:
+        try:
+            with open(update_log(), "a", encoding="utf-8") as lf:
+                lf.write(f"[UPDATE] FIGYELEM: nem a hivatalos tarhelyrol "
+                         f"frissitunk: {repo}\n")
+        except OSError:
+            pass
+
     targets = [exe.name]
     if "SuperDL-cli.exe" != exe.name and "SuperDL-cli.exe" not in targets and \
             ("SuperDL-cli.exe" in assets or (folder / "SuperDL-cli.exe").exists()):
@@ -260,9 +308,15 @@ def apply(assets: dict, progress=None, restart: bool = True) -> list[str]:
         url = assets.get(name)
         if not url:
             continue
-        data = _download(url, progress)
         newf = folder / (name + ".new")
-        newf.write_bytes(data)               # SuperDL.exe.new a mappába
+        got = _download_to_file(url, newf, progress)   # lemezre + sha256
+        want = (digests or {}).get(name)
+        if want and got != want:
+            newf.unlink(missing_ok=True)
+            raise RuntimeError(
+                f"A letöltött {name} ellenőrző összege nem egyezik a "
+                "hivatalossal – sérült vagy manipulált letöltés. A frissítést "
+                "megszakítottam, a jelenlegi verzió érintetlen.")
         pairs.append((newf, folder / name))
 
     if not pairs:

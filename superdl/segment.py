@@ -90,6 +90,28 @@ class Progress:
         return self.downloaded / self.total * 100 if self.total else 0.0
 
 
+_RESERVED_NAMES = ({"con", "prn", "aux", "nul"}
+                   | {f"com{i}" for i in range(1, 10)}
+                   | {f"lpt{i}" for i in range(1, 10)})
+
+
+def safe_filename(name: str) -> str:
+    """Windows-biztos fájlnév: tiltott írásjelek és vezérlőkarakterek cseréje,
+    a fenntartott eszköznevek (CON, PRN, NUL, COM1…, LPT1…) elkerülése, a
+    ponttal/szóközzel végződő és az üres név kezelése, és hosszkorlát."""
+    name = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", name)
+    name = name.strip().rstrip(". ")          # nem végződhet ponttal/szóközzel
+    if not name:
+        return "letoltes.bin"
+    if name.split(".")[0].lower() in _RESERVED_NAMES:
+        name = "_" + name
+    if len(name) > 200:                        # hosszkorlát a kiterjesztéssel
+        root, dot, ext = name.rpartition(".")
+        name = (root[:199 - len(ext)] + dot + ext) if dot and len(ext) < 20 \
+            else name[:200]
+    return name
+
+
 def filename_from_response(url: str, resp: requests.Response) -> str:
     cd = resp.headers.get("content-disposition", "")
     m = re.search(r"filename\*=(?:UTF-8'')?([^;]+)", cd, re.I)
@@ -99,7 +121,7 @@ def filename_from_response(url: str, resp: requests.Response) -> str:
         name = unquote(m.group(1).strip().strip('"'))
     else:
         name = unquote(os.path.basename(urlparse(url).path)) or "letoltes.bin"
-    return re.sub(r'[<>:"/\\|?*]', "_", name)
+    return safe_filename(name)
 
 
 def unique_path(directory: Path, name: str) -> Path:
@@ -123,6 +145,8 @@ class SegmentDownloader:
         self.progress = progress or Progress()
         self.limiter = limiter or RateLimiter(0)
         self._stop = threading.Event()
+        self._etag = ""              # a szerver tartalomazonosítói a folytatáshoz
+        self._lastmod = ""
         self.session = requests.Session()
         self.session.headers["User-Agent"] = USER_AGENT
 
@@ -131,22 +155,25 @@ class SegmentDownloader:
 
     # ---- előkészítés -------------------------------------------------
 
-    def _probe(self) -> tuple[int, bool, str, str]:
-        """Visszaadja: (méret, range-támogatás, fájlnév, tartalomtípus)."""
+    def _probe(self) -> tuple[int, bool, str, str, str, str]:
+        """Visszaadja: (méret, range-támogatás, fájlnév, tartalomtípus, ETag,
+        Last-Modified)."""
         resp = self.session.get(self.url, stream=True, timeout=30,
                                 headers={"Range": "bytes=0-0"})
         resp.raise_for_status()
         name = filename_from_response(self.url, resp)
         ctype = (resp.headers.get("content-type", "") or "").split(";")[0].strip()
+        etag = (resp.headers.get("etag", "") or "").strip()
+        lastmod = (resp.headers.get("last-modified", "") or "").strip()
         if resp.status_code == 206:
             cr = resp.headers.get("content-range", "")
             m = re.search(r"/(\d+)", cr)
             size = int(m.group(1)) if m else 0
             resp.close()
-            return size, True, name, ctype
+            return size, True, name, ctype, etag, lastmod
         size = int(resp.headers.get("content-length", 0) or 0)
         resp.close()
-        return size, False, name, ctype
+        return size, False, name, ctype, etag, lastmod
 
     # ---- folytatás állapota ------------------------------------------
 
@@ -161,6 +188,15 @@ class SegmentDownloader:
         try:
             state = json.loads(sp.read_text())
             if state.get("url") == self.url and state.get("size") == size:
+                # ha a szerver tartalomazonosítója megváltozott (a fájl tartalma
+                # más lett, bár az URL és a méret azonos), NE folytassuk a régi
+                # részekkel – az összekeverné a régi és új tartalmat
+                if self._etag and state.get("etag") \
+                        and state["etag"] != self._etag:
+                    return None
+                if self._lastmod and state.get("lastmod") \
+                        and state["lastmod"] != self._lastmod:
+                    return None
                 return state["segments"]
         except (json.JSONDecodeError, KeyError):
             pass
@@ -169,7 +205,8 @@ class SegmentDownloader:
     def _save_state(self, target: Path, size: int,
                     segments: list[list[int]]) -> None:
         self._state_path(target).write_text(json.dumps(
-            {"url": self.url, "size": size, "segments": segments}))
+            {"url": self.url, "size": size, "segments": segments,
+             "etag": self._etag, "lastmod": self._lastmod}))
 
     # ---- letöltés -----------------------------------------------------
 
@@ -178,10 +215,11 @@ class SegmentDownloader:
         p = self.progress
         p.status = "letöltés"
         try:
-            size, ranges_ok, name, ctype = self._probe()
+            size, ranges_ok, name, ctype, etag, lastmod = self._probe()
         except requests.RequestException as e:
             p.status, p.error = "hiba", f"Nem érhető el: {e}"
             raise
+        self._etag, self._lastmod = etag, lastmod   # a folytatás azonosítói
         # ha weboldal jön vissza fájl helyett, ne mentsünk HTML-t kacatként:
         # ez jellemzően fájlmegosztó tárhely nyitólapja (közvetett link)
         if ctype in ("text/html", "application/xhtml+xml"):
