@@ -38,7 +38,8 @@ def _run(cmd, timeout=1800):
     """(returncode, stdout, stderr) – az ffprobe a stdout-ra ír JSON-t, az
     ffmpeg-szűrők a stderr-re a mérési adatokat."""
     try:
-        r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        r = subprocess.run(cmd, stdin=subprocess.DEVNULL,
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                            text=True, encoding="utf-8", errors="replace",
                            creationflags=_NOWIN, timeout=timeout)
         return r.returncode, r.stdout or "", r.stderr or ""

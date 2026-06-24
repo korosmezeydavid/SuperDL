@@ -1,6 +1,21 @@
 """SuperDL - többfunkciós, több szálú letöltő."""
 
-__version__ = "3.25.0"
+__version__ = "3.25.1"
+
+# --- HTTPS-tanúsítvány: megbízható CA-csomag mindenhol ----------------
+# Egyes Windows-gépeken a rendszer CA-tára hiányos/elavult, és a urllib SSL-
+# ellenőrzése elbukik („unable to get local issuer certificate"), ezért a
+# self-update és a motor-frissítés nem működik. A beágyazott certifi CA-
+# csomagra állítjuk az alapértelmezett HTTPS-kontextust, hogy az összes
+# urllib-alapú hálózati hívás (frissítő, IPTV, Pandoc-letöltés) mindenhol,
+# a Windows-tártól függetlenül megbízhatóan ellenőrizzen.
+try:                                       # noqa: E402
+    import ssl as _ssl
+    import certifi as _certifi
+    _ssl._create_default_https_context = (
+        lambda *a, **k: _ssl.create_default_context(cafile=_certifi.where()))
+except Exception:
+    pass
 
 # --- frissített yt-dlp betöltése -------------------------------------
 # Ha a felhasználó frissítette a yt-dlp-t (~/.superdl/bin/ytdlp), onnan

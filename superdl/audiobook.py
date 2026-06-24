@@ -96,7 +96,8 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
             subprocess.run(
                 [ff, "-y", "-i", raw, "-ar", "44100", "-ac", "2",
                  "-c:a", "libmp3lame", "-qscale:a", "4", str(norm),
-                 "-loglevel", "quiet"], creationflags=flags, check=True)
+                 "-loglevel", "quiet"], stdin=subprocess.DEVNULL,
+                creationflags=flags, check=True)
             norm_files.append(norm)
             try:
                 os.remove(raw)
@@ -118,7 +119,7 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
                 [ff, "-y", "-f", "concat", "-safe", "0", "-i", str(listfile),
                  "-f", "segment", "-segment_time", str(int(split_minutes * 60)),
                  "-c", "copy", pattern, "-loglevel", "quiet"],
-                creationflags=flags, check=True)
+                stdin=subprocess.DEVNULL, creationflags=flags, check=True)
             import glob
             results = sorted(glob.glob(
                 str(out.with_name(out.stem + "_*" + out.suffix))))
@@ -126,7 +127,7 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
             subprocess.run(
                 [ff, "-y", "-f", "concat", "-safe", "0", "-i", str(listfile),
                  "-c", "copy", str(out), "-loglevel", "quiet"],
-                creationflags=flags, check=True)
+                stdin=subprocess.DEVNULL, creationflags=flags, check=True)
             results = [str(out)]
         if progress:
             progress(total, total, "kész")

@@ -46,8 +46,8 @@ def make_ringtone(src: str, out: str, start: float, length: float,
            "-t", f"{length:.3f}", "-vn", *codec, out]
     flags = 0x08000000 if os.name == "nt" else 0   # CREATE_NO_WINDOW
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True,
-                           creationflags=flags, timeout=180)
+        r = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True,
+                           text=True, creationflags=flags, timeout=180)
     except (OSError, subprocess.SubprocessError) as e:
         return f"renderelési hiba: {e}"
     if r.returncode != 0 or not os.path.isfile(out):

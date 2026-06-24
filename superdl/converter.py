@@ -237,13 +237,16 @@ class Converter:
         job.out = out
         cmd = build_command(ff, src, out, self.mode, self.fmt,
                             self.bitrate, vcodec, acodec)
-        cmd = cmd[:1] + ["-progress", "pipe:1", "-nostats"] + cmd[1:]
+        # -nostdin: az ablakos (konzol nélküli) exében az örökölt stdin
+        # érvénytelen; e nélkül az ffmpeg beragadhat indításkor (se kimenet, se
+        # haladás). A stdin=DEVNULL ráadás biztosíték.
+        cmd = cmd[:1] + ["-nostdin", "-progress", "pipe:1", "-nostats"] + cmd[1:]
 
         flags = 0x08000000 if os.name == "nt" else 0   # CREATE_NO_WINDOW
         try:
             self._proc = subprocess.Popen(
-                cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                text=True, creationflags=flags)
+                cmd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT, text=True, creationflags=flags)
         except OSError as e:
             job.status = "hiba"
             job.error = str(e)

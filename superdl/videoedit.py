@@ -168,7 +168,8 @@ class VideoEditor:
         flags = 0x08000000 if os.name == "nt" else 0
         try:
             self._proc = subprocess.Popen(
-                cmd, cwd=cwd, stdout=subprocess.DEVNULL,
+                cmd, cwd=cwd, stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
                 stderr=subprocess.PIPE, text=True, creationflags=flags)
             _out, err = self._proc.communicate()
             if self._proc.returncode != 0:
@@ -292,7 +293,7 @@ class VideoEditor:
         flags = 0x08000000 if os.name == "nt" else 0
         try:
             self._proc = subprocess.Popen(
-                cmd, cwd=cwd, stdout=subprocess.PIPE,
+                cmd, cwd=cwd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT, text=True, creationflags=flags)
         except OSError as e:
             self.error = str(e)

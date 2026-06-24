@@ -34,7 +34,8 @@ def _ff():
 def _run(cmd, cwd=None):
     """Lefuttat egy ffmpeg-parancsot, visszaadja a (returncode, stderr)-t."""
     try:
-        r = subprocess.run(cmd, cwd=cwd, stdout=subprocess.DEVNULL,
+        r = subprocess.run(cmd, cwd=cwd, stdin=subprocess.DEVNULL,
+                           stdout=subprocess.DEVNULL,
                            stderr=subprocess.PIPE, text=True,
                            encoding="utf-8", errors="replace",
                            creationflags=_NOWIN, timeout=900)
