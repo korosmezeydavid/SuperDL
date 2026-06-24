@@ -10,7 +10,9 @@ import webbrowser
 
 import wx
 
+from . import feeds
 from . import podcast as P
+from .medialistwin import MediaListDialog
 
 
 class PodcastFrame(wx.Frame):
@@ -143,6 +145,8 @@ class PodcastFrame(wx.Frame):
             self._subscribe()
         elif ctrl and code == ord('C'):
             self._copy_url()
+        elif ctrl and code == ord('E'):
+            self._browse_episodes()
         else:
             e.Skip()
 
@@ -151,9 +155,11 @@ class PodcastFrame(wx.Frame):
             return
         m = wx.Menu()
         ms = m.Append(wx.ID_ANY, "&Feliratkozás\tEnter")
+        me = m.Append(wx.ID_ANY, "&Epizódok böngészése (régebbiek is)\tCtrl+E")
         mo = m.Append(wx.ID_ANY, "Meg&nyitás a böngészőben")
         mu = m.Append(wx.ID_ANY, "&URL (RSS) másolása\tCtrl+C")
         self.Bind(wx.EVT_MENU, lambda e: self._subscribe(), ms)
+        self.Bind(wx.EVT_MENU, lambda e: self._browse_episodes(), me)
         self.Bind(wx.EVT_MENU, lambda e: self._open_browser(), mo)
         self.Bind(wx.EVT_MENU, lambda e: self._copy_url(), mu)
         self.list.PopupMenu(m)
@@ -169,6 +175,40 @@ class PodcastFrame(wx.Frame):
                                "epizódokat tölti majd le.")
         else:
             self.SetStatusText("A feliratkozás-kezelő nem érhető el.")
+
+    def _browse_episodes(self):
+        """A kijelölt podcast ÖSSZES epizódja (a régebbiek is) – böngészhető és
+        letölthető listában. A feed-et háttérszálon kérjük le."""
+        pod = self._selected()
+        if not pod or not getattr(pod, "feed_url", ""):
+            self.SetStatusText("Ehhez a podcasthoz nincs RSS-cím.")
+            return
+        feed_url, name = pod.feed_url, pod.name
+        self.SetStatusText(f"Epizódok lekérése: {name} …")
+
+        def work():
+            try:
+                _title, episodes = feeds.parse_feed(feed_url)
+            except Exception as ex:
+                wx.CallAfter(self.SetStatusText, f"Hiba a lekéréskor: {ex}")
+                return
+            wx.CallAfter(self._show_episodes, name, episodes)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _show_episodes(self, name, episodes):
+        if not episodes:
+            self.SetStatusText(f"Nem találtam epizódot: {name}.")
+            return
+        items = [(ep.title, ep.published, ep.url) for ep in episodes]
+        self.SetStatusText(f"{len(items)} epizód – {name}.")
+        dlg = MediaListDialog(
+            self, f"Epizódok – {name}", items,
+            resolve_fn=lambda url: (url, "", 0),     # közvetlen média
+            download_fn=lambda url, title: self.main._on_add(url=url),
+            subtitle_header="Megjelent")
+        dlg.ShowModal()
+        dlg.Destroy()
 
     def _open_browser(self):
         pod = self._selected()

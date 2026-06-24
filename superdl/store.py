@@ -284,6 +284,35 @@ def save_tts_keys(keys: dict) -> None:
         save_secret_json(TTS_KEYS_FILE, keys)
 
 
+IPTV_FAV_FILE = CONFIG_DIR / "iptv_favorites.json"
+IPTV_CONF_FILE = CONFIG_DIR / "iptv.json"
+
+
+def load_iptv_favorites() -> list[dict]:
+    """Kedvenc TV-csatornák (program-újraindítás után is megmaradnak)."""
+    with _lock:
+        data = load_json(IPTV_FAV_FILE, [])
+    return data if isinstance(data, list) else []
+
+
+def save_iptv_favorites(records: list[dict]) -> None:
+    with _lock:
+        save_json(IPTV_FAV_FILE, records)
+
+
+def load_iptv_conf() -> dict:
+    """IPTV-beállítások: utolsó m3u/EPG URL, Xtream-kiszolgáló és -felhasználó
+    (a JELSZÓT biztonságból NEM tároljuk)."""
+    with _lock:
+        data = load_json(IPTV_CONF_FILE, {})
+    return data if isinstance(data, dict) else {}
+
+
+def save_iptv_conf(conf: dict) -> None:
+    with _lock:
+        save_json(IPTV_CONF_FILE, conf)
+
+
 def _load_list(path: Path) -> list[dict]:
     with _lock:
         data = load_json(path, [])

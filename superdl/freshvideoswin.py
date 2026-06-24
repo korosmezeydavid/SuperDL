@@ -11,6 +11,8 @@ import threading
 import wx
 
 from .audioengine import Player
+from .medialistwin import MediaListDialog
+from .ytchannel import fetch_videos
 
 
 class FreshVideosDialog(wx.Dialog):
@@ -187,18 +189,21 @@ class FreshVideosDialog(wx.Dialog):
 class ChannelsDialog(wx.Dialog):
     """YouTube-csatorna feliratkozások kezelése."""
 
-    def __init__(self, parent, manager, subscribe_fn, check_fn):
+    def __init__(self, parent, manager, subscribe_fn, check_fn,
+                 resolve_fn=None, download_fn=None):
         super().__init__(parent, title="YouTube-csatornák kezelése",
                          size=(640, 460))
         self.manager = manager
         self._subscribe = subscribe_fn      # subscribe_fn(url) háttérben
         self._check = check_fn              # check_fn() ellenőrzés most
+        self._resolve = resolve_fn          # resolve(url) -> stream a böngészéshez
+        self._download = download_fn        # download(url, cím)
 
         p = wx.Panel(self)
         v = wx.BoxSizer(wx.VERTICAL)
         v.Add(wx.StaticText(p, label="Feliratkozott &csatornák "
-              "(szóköz: automatikus figyelés be/ki, Delete: törlés):"), 0,
-              wx.ALL, 8)
+              "(Enter: régebbi videók böngészése, szóköz: figyelés be/ki, "
+              "Delete: törlés):"), 0, wx.ALL, 8)
         self.lst = wx.ListCtrl(p, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.lst.SetName("Csatornák listája")
         self.lst.InsertColumn(0, "Csatorna", width=440)
@@ -209,13 +214,15 @@ class ChannelsDialog(wx.Dialog):
         row = wx.BoxSizer(wx.HORIZONTAL)
         b_add = wx.Button(p, label="Ú&j csatorna…")
         b_add.Bind(wx.EVT_BUTTON, lambda e: self._add())
+        b_browse = wx.Button(p, label="Régebbi &videók…")
+        b_browse.Bind(wx.EVT_BUTTON, lambda e: self._browse())
         b_tog = wx.Button(p, label="Figyelés be/&ki")
         b_tog.Bind(wx.EVT_BUTTON, lambda e: self._toggle())
         b_del = wx.Button(p, label="&Törlés")
         b_del.Bind(wx.EVT_BUTTON, lambda e: self._delete())
         b_chk = wx.Button(p, label="&Ellenőrzés most")
         b_chk.Bind(wx.EVT_BUTTON, lambda e: self._check())
-        for b in (b_add, b_tog, b_del, b_chk):
+        for b in (b_add, b_browse, b_tog, b_del, b_chk):
             row.Add(b, 0, wx.RIGHT, 6)
         v.Add(row, 0, wx.LEFT | wx.BOTTOM, 8)
         v.Add(wx.Button(p, wx.ID_CANCEL, "&Bezárás"), 0,
@@ -265,11 +272,48 @@ class ChannelsDialog(wx.Dialog):
             self.manager.unsubscribe(c.url)
             self._refresh()
 
+    def _browse(self):
+        """A kijelölt csatorna RÉGEBBI videóinak böngészése (streamelés/letöltés).
+        A videókat háttérszálon, „flat" módban kérjük le (max. 200)."""
+        c = self._sel()
+        if not c:
+            return
+        if not (self._resolve and self._download):
+            return
+        url, name = c.url, (c.title or c.url)
+        self.SetTitle(f"YouTube-csatornák kezelése – {name} videóinak lekérése…")
+
+        def work():
+            try:
+                _t, videos = fetch_videos(url, limit=200)
+            except Exception as ex:
+                wx.CallAfter(wx.MessageBox, f"Nem sikerült lekérni: {ex}",
+                             "Hiba", wx.OK | wx.ICON_ERROR)
+                return
+            wx.CallAfter(self._show_videos, name, videos)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _show_videos(self, name, videos):
+        self.SetTitle("YouTube-csatornák kezelése")
+        if not videos:
+            wx.MessageBox(f"Nem találtam videót: {name}.", "Régebbi videók",
+                          wx.OK | wx.ICON_INFORMATION)
+            return
+        items = [(v.title, v.channel_title or name, v.url) for v in videos]
+        dlg = MediaListDialog(self, f"Régebbi videók – {name}", items,
+                              self._resolve, self._download,
+                              subtitle_header="Csatorna")
+        dlg.ShowModal()
+        dlg.Destroy()
+
     def _on_key(self, e):
         code = e.GetKeyCode()
         if code == wx.WXK_DELETE:
             self._delete()
         elif code == wx.WXK_SPACE:
             self._toggle()
+        elif code in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER):
+            self._browse()
         else:
             e.Skip()

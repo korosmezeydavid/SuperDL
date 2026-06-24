@@ -105,9 +105,10 @@ class Player:
                 pass
 
     def play(self, url: str, title: str = "", progress=None,
-             start: float = 0.0) -> None:
+             start: float = 0.0, audio_track: int | None = None) -> None:
         """A megadott forrás lejátszása (az előzőt leállítja). `start`>0 esetén
-        onnan kezd (seek, az ffmpeg `-ss`-ével)."""
+        onnan kezd (seek, az ffmpeg `-ss`-ével). `audio_track` megadva a több
+        hangsávos adásból azt a sávot játssza (pl. hangalámondás)."""
         self.stop()
         self.title = title or url
         self._url = url
@@ -123,7 +124,10 @@ class Player:
         cmd = [ff, "-nostdin"]
         if self._start_offset > 0:
             cmd += ["-ss", f"{self._start_offset:.3f}"]
-        cmd += ["-i", url, "-f", "s16le", "-ar", str(RATE),
+        cmd += ["-i", url]
+        if audio_track is not None:
+            cmd += ["-map", f"0:a:{int(audio_track)}"]
+        cmd += ["-f", "s16le", "-ar", str(RATE),
                 "-ac", str(CHANNELS), "-loglevel", "quiet", "-"]
         try:
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,

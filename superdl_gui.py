@@ -56,6 +56,8 @@ from superdl.videodescribewin import VideoDescribeFrame
 from superdl.assistantwin import AssistantFrame
 from superdl.supermwin import SuperMFrame
 from superdl.mediaanalyzewin import MediaAnalyzeFrame
+from superdl.docconvertwin import DocConvertFrame
+from superdl.iptvwin import IPTVFrame
 from superdl.bookwin import BookFrame
 from superdl.radiorec import RecordManager
 from superdl import dayinfo, weather, search, store, aiclient, mediaai
@@ -248,6 +250,8 @@ class MainFrame(wx.Frame):
         self._assistant_win = None
         self._superm_win = None
         self._mediaanalyze_win = None
+        self._docconvert_win = None
+        self._iptv_win = None
         self._record_mgr = None
         self._known_rows: dict[int, int] = {}   # job.id -> listasor
         self._last_values: dict[int, tuple] = {}
@@ -408,7 +412,7 @@ class MainFrame(wx.Frame):
             wx.ID_ANY, "Kijelölt leállí&tása / törlése\tDel",
             "Futó letöltés leállítása; befejezett vagy hibás elem törlése")
         mi_remove = m_dl.Append(
-            wx.ID_ANY, "Eltávolítás a &listából\tShift+Del",
+            wx.ID_ANY, "Eltá&volítás a listából\tShift+Del",
             "A kijelölt elem eltávolítása a listából (és a mentett sorból)")
         mi_stopall = m_dl.Append(wx.ID_ANY, "Összes leállítá&sa\tCtrl+Shift+S")
         m_dl.AppendSeparator()
@@ -446,7 +450,21 @@ class MainFrame(wx.Frame):
         mi_chan_chk = m_sub.Append(
             wx.ID_ANY, "Csatornák ellen&őrzése most",
             "Minden figyelt csatorna ellenőrzése új videókért")
-        mb.Append(m_sub, "F&eliratkozások")
+        mb.Append(m_sub, "Fel&iratkozások")
+
+        m_books = wx.Menu()
+        mi_reader = m_books.Append(
+            wx.ID_ANY, "Könyv&olvasó (élő felolvasás)\tCtrl+Shift+O",
+            "Könyv felolvasása a programban, könyvjelzővel (folytatható)")
+        mi_book = m_books.Append(
+            wx.ID_ANY, "&Hangoskönyv készítő\tCtrl+Shift+B",
+            "Könyv (TXT/DOCX/EPUB/PDF) átalakítása MP3 hangoskönyvvé")
+        m_books.AppendSeparator()
+        mi_docconv = m_books.Append(
+            wx.ID_ANY, "&Dokumentum-konverter\tCtrl+Shift+D",
+            "Azonnali konverzió könyv- és szövegformátumok közt (TXT, DOCX, "
+            "EPUB, PDF, HTML) és kódolás-átalakítás (UTF-8 és társai)")
+        mb.Append(m_books, "&Könyvek")
 
         m_tools = wx.Menu()
         mi_assist = m_tools.Append(
@@ -460,22 +478,20 @@ class MainFrame(wx.Frame):
         mi_radio = m_tools.Append(
             wx.ID_ANY, "Internetes &rádió\tCtrl+Shift+R",
             "Élő rádióállomások keresése és hallgatása")
+        mi_iptv = m_tools.Append(
+            wx.ID_ANY, "Internetes &TV (legális IPTV)\tCtrl+Shift+I",
+            "Saját, legális m3u/Xtream forrás csatornái akadálymentesen, "
+            "felolvasott műsorújsággal (EPG)")
         mi_superm = m_tools.Append(
             wx.ID_ANY, "Super &M – műsorszóró stúdió\tCtrl+Shift+M",
             "Rádió-műsorszórás: lejátszás, keverés, mikrofon, jingle-pad, "
             "Shoutcast/Icecast (BASS motor)")
-        mi_book = m_tools.Append(
-            wx.ID_ANY, "&Hangoskönyv készítő\tCtrl+Shift+B",
-            "Könyv (TXT/DOCX/EPUB/PDF) átalakítása MP3 hangoskönyvvé")
-        mi_reader = m_tools.Append(
-            wx.ID_ANY, "Könyv&olvasó (élő felolvasás)\tCtrl+Shift+O",
-            "Könyv felolvasása a programban, könyvjelzővel (folytatható)")
         mi_video = m_tools.Append(
             wx.ID_ANY, "&Videókészítő (kép + zene)\tCtrl+Shift+V",
             "Videó készítése háttérképből és zenéből, idővonalas szöveg- és "
             "kép-beszúrással")
         mi_convert = m_tools.Append(
-            wx.ID_ANY, "Médiakon&vertáló (kötegelt)\tCtrl+Shift+K",
+            wx.ID_ANY, "Médiakonvertá&ló (kötegelt)\tCtrl+Shift+K",
             "Hang/videó fájlok átalakítása más formátumba, egyszerre többet is")
         mi_vedit = m_tools.Append(
             wx.ID_ANY, "Videóvá&gó és összefűző\tCtrl+Shift+E",
@@ -520,17 +536,17 @@ class MainFrame(wx.Frame):
             wx.ID_ANY, "&Dokumentum összefoglalása…",
             "PDF/EPUB/DOCX/TXT tömör összefoglalása")
         mi_ai_qa = m_ai.Append(
-            wx.ID_ANY, "Kérdezz egy do&kumentumról…",
+            wx.ID_ANY, "Kérde&zz egy dokumentumról…",
             "Kérdés egy dokumentum tartalmáról")
         m_ai.AppendSeparator()
         mi_ai_tr = m_ai.Append(
             wx.ID_ANY, "Á&tirat készítése (hang/videó)…",
             "Beszéd → szöveg helyi hang- vagy videófájlból")
         mi_ai_srt = m_ai.Append(
-            wx.ID_ANY, "Felira&t (.srt) készítése…",
+            wx.ID_ANY, "Feli&rat (.srt) készítése…",
             "Időbélyeges felirat egy rövidebb hang/videófájlból")
         mi_ai_vid = m_ai.Append(
-            wx.ID_ANY, "&Videó elemzése (URL vagy fájl)…",
+            wx.ID_ANY, "Videó &elemzése (URL vagy fájl)…",
             "A videó KÉPI tartalmának elemzése a Geminivel")
         mi_ai_ad = m_ai.Append(
             wx.ID_ANY, "AI &hangalámondás videóhoz…",
@@ -590,8 +606,10 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_search_window, mi_search)
         self.Bind(wx.EVT_MENU, self._on_radio_window, mi_radio)
         self.Bind(wx.EVT_MENU, self._on_superm_window, mi_superm)
+        self.Bind(wx.EVT_MENU, self._on_iptv_window, mi_iptv)
         self.Bind(wx.EVT_MENU, self._on_book_window, mi_book)
         self.Bind(wx.EVT_MENU, self._on_reader_window, mi_reader)
+        self.Bind(wx.EVT_MENU, self._on_docconvert_window, mi_docconv)
         self.Bind(wx.EVT_MENU, self._on_video_window, mi_video)
         self.Bind(wx.EVT_MENU, self._on_convert_window, mi_convert)
         self.Bind(wx.EVT_MENU, self._on_mediaanalyze_window, mi_analyze)
@@ -1132,6 +1150,20 @@ class MainFrame(wx.Frame):
         self._mediaanalyze_win = MediaAnalyzeFrame(self)
         self._mediaanalyze_win.Show()
 
+    def _on_docconvert_window(self, event=None):
+        if self._docconvert_win:
+            self._docconvert_win.Raise()
+            return
+        self._docconvert_win = DocConvertFrame(self)
+        self._docconvert_win.Show()
+
+    def _on_iptv_window(self, event=None):
+        if self._iptv_win:
+            self._iptv_win.Raise()
+            return
+        self._iptv_win = IPTVFrame(self)
+        self._iptv_win.Show()
+
     def _on_assistant_window(self, event=None):
         if self._assistant_win:
             self._assistant_win.Raise()
@@ -1349,7 +1381,9 @@ class MainFrame(wx.Frame):
 
     def _on_channels_window(self, event=None):
         dlg = ChannelsDialog(self, self.cm, self._do_channel_subscribe,
-                             lambda: self._check_channels(quiet=False))
+                             lambda: self._check_channels(quiet=False),
+                             resolve_fn=self._resolve_video,
+                             download_fn=self._download_url)
         dlg.ShowModal()
         dlg.Destroy()
 
@@ -1365,12 +1399,18 @@ class MainFrame(wx.Frame):
                                      cookies_browser=ck_browser,
                                      cookies_file=ck_file)
 
-    def _download_video(self, video):
+    def _download_url(self, url, title=""):
+        """Egy URL letöltése a sorba (a podcast-epizód / csatorna-videó
+        böngészőkből hívva)."""
         mgr = self._ensure_mgr()
-        job = mgr.add(video.url, out_dir=self.dir_entry.GetValue(),
+        job = mgr.add(url, out_dir=self.dir_entry.GetValue(),
                       audio_only=self.audio_chk.GetValue())
-        job.progress.filename = video.title
+        if title:
+            job.progress.filename = title
         self._row_for(job)
+
+    def _download_video(self, video):
+        self._download_url(video.url, video.title)
 
     def _check_channels(self, quiet: bool = True):
         if not self.cm.channels:
@@ -1894,6 +1934,10 @@ class MainFrame(wx.Frame):
             self._superm_win.Destroy()
         if self._mediaanalyze_win:
             self._mediaanalyze_win.Destroy()
+        if self._docconvert_win:
+            self._docconvert_win.Destroy()
+        if self._iptv_win:
+            self._iptv_win.Destroy()
         if self._organizer:
             self._organizer.shutdown()
         self._save_settings()
