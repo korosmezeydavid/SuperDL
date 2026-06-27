@@ -165,8 +165,8 @@ def _extract_zip_to(data: bytes, dest: Path) -> None:
         if not rel:
             continue
         target = (dest / rel).resolve()
-        if not str(target).startswith(str(base)):
-            continue                       # zip-slip védelem
+        if not target.is_relative_to(base):   # zip-slip (pontos befoglalás)
+            continue
         target.parent.mkdir(parents=True, exist_ok=True)
         with z.open(n) as s, open(target, "wb") as d:
             shutil.copyfileobj(s, d)

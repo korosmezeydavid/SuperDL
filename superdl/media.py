@@ -26,22 +26,29 @@ def friendly_error(msg: str) -> str:
                 "kiolvasni a sütijeit. Megoldás: zárd be a böngészőt, VAGY a "
                 "Sütik beállításnál válaszd a Firefoxot, VAGY használj "
                 "cookies.txt fájlt.")
-    if ("dpapi" in m or "failed to decrypt" in m
-            or "could not decrypt" in m):
-        return ("Az újabb Chrome/Edge titkosítja a sütiket, amit egyetlen "
-                "letöltő sem tud kiolvasni. Megoldás: a Sütik beállításnál "
-                "válaszd a FIREFOXOT (ezt nem érinti), VAGY exportálj egy "
-                "cookies.txt fájlt egy böngésző-kiegészítővel, és azt add meg.")
+    if ("dpapi" in m or "failed to decrypt" in m or "could not decrypt" in m
+            or "failed to load cookies" in m or "unable to load cookies" in m
+            or "could not load cookies" in m):
+        return ("A böngésződ sütijeit nem sikerült beolvasni (az újabb "
+                "Chrome/Edge „App-Bound” titkosítása miatt egyetlen letöltő sem "
+                "tudja kiolvasni). Megoldás: jelentkezz be a YouTube-ra "
+                "FIREFOXBAN, és a Sütik beállításnál válaszd a Firefoxot; VAGY "
+                "exportálj egy cookies.txt fájlt egy böngésző-kiegészítővel. "
+                "Frissítsd a programot is, hogy a legújabb letöltőmotor "
+                "(yt-dlp) legyen benne.")
     return msg
 
 
 def _is_cookie_error(msg: str) -> bool:
-    """Igaz, ha a hiba a böngésző-sütik kiolvasásából ered (pl. fut a böngésző,
-    zárolt vagy titkosított süti-adatbázis)."""
+    """Igaz, ha a hiba a böngésző-sütik kiolvasásából/betöltéséből ered (fut a
+    böngésző, zárolt VAGY App-Bound-titkosított süti-adatbázis)."""
     m = msg.lower()
     return (("could not copy" in m and "cookie" in m)
             or "dpapi" in m or "failed to decrypt" in m
-            or "could not decrypt" in m)
+            or "could not decrypt" in m
+            or "failed to load cookies" in m
+            or "unable to load cookies" in m
+            or "could not load cookies" in m)
 
 
 def _is_bot_check(msg: str) -> bool:
@@ -293,12 +300,16 @@ class MediaDownloader:
                 return ""
             except Exception as e:
                 msg = str(e)
-                # ha a böngésző-sütik nem olvashatók (pl. fut a böngésző),
-                # próbáljuk újra SÜTIK NÉLKÜL – a legtöbb tartalom nyilvános
+                # a beállított böngésző sütijét nem sikerült beolvasni (fut a
+                # böngésző / App-Bound titkosítás) → előbb próbáljunk MÁS
+                # telepített böngészőt, és csak utána sütik nélkül (a nyilvános
+                # tartalomhoz). Így nem áll meg azonnal a „failed to load cookies"-nál.
                 if had_cookies and _is_cookie_error(msg):
-                    opts.pop("cookiesfrombrowser", None)
-                    opts.pop("cookiefile", None)
-                    info = _download(opts)
+                    info = self._retry_with_browser_cookies(opts, _download)
+                    if info is None:
+                        opts.pop("cookiesfrombrowser", None)
+                        opts.pop("cookiefile", None)
+                        info = _download(opts)
                 # PLUSZ: a YouTube bot-ellenőrzését – ha a felhasználó nem
                 # állított be sütit – AUTOMATIKUSAN a saját, bejelentkezett
                 # böngészője sütijeivel kerüljük meg (semmit nem kell beállítania)

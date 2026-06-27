@@ -58,15 +58,25 @@ def download_bytes(url: str, progress=None, timeout: int = 300) -> bytes:
 
 
 def install_entry(loader, entry, progress=None, root=None):
-    """Egy bolt-beli ModuleEntry telepítése/frissítése: letöltés → SHA-256
-    ellenőrzéssel telepítés (install_module_zip) → (frissítésnél a régi
-    leszerelése) → betöltés. Visszaadja a Manifestet; hibánál kivételt dob."""
+    """Egy bolt-beli ModuleEntry TRANZAKCIÓS telepítése/frissítése:
+    letöltés → SHA-256-os telepítés a régi .bak-ban tartásával → IMPORT+REGISTER
+    PRÓBA → siker esetén commit (.bak eldobása), HIBA esetén ROLLBACK a régire
+    (és a régi visszatöltése). Így egy hibás új modul SOSEM teszi tönkre a
+    meglévő, működő verziót. Visszaadja a Manifestet; hibánál kivételt dob."""
     root = Path(root) if root is not None else modkit.modules_root()
     data = download_bytes(entry.url, progress)
-    man = modkit.install_module_zip(data, entry.sha256 or None, root)
-    if man.id in loader.loaded:
-        loader.unload(man.id)              # frissítésnél előbb a régit leszereljük
-    loader.load_dir(root / man.id)
+    if entry.id in loader.loaded:
+        loader.unload(entry.id)            # a régi leszerelése a fájlcsere előtt
+    man = modkit.install_module_zip(data, entry.sha256 or None, root,
+                                    keep_backup=True)
+    lm = loader.load_dir(root / man.id)    # IMPORT + REGISTER próba
+    if lm is None:                         # hibás új modul → VISSZAGÖRGETÉS
+        err = loader.errors.get(man.id, "ismeretlen hiba")
+        if modkit.rollback_install(man.id, root):
+            loader.load_dir(root / man.id)   # a RÉGI, működő verzió visszatöltése
+        raise RuntimeError(
+            f"Az új modul betöltése sikertelen, visszaálltunk a korábbira: {err}")
+    modkit.commit_install(man.id, root)    # siker → a .bak eldobható
     return man
 
 

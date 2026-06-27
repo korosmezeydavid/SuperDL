@@ -94,15 +94,24 @@ def _dpapi_unprotect(blob: bytes):
         return None
 
 
+class SecretStoreError(Exception):
+    """A bizalmas adatot NEM sikerült TITKOSÍTVA menteni (és nyíltan nem mentjük)."""
+
+
 def save_secret_json(path: Path, data) -> None:
-    """Mint a save_json, de a tartalmat DPAPI-val titkosítja."""
+    """Mint a save_json, de a tartalmat DPAPI-val titkosítja. Ha a titkosítás
+    NEM érhető el, NEM ír sima szöveget – inkább SecretStoreError-t dob, hogy a
+    felhasználó ne higgye titkosítottnak a valójában nyílt kulcsot (a korábbi
+    csendes visszaesés sima JSON-ra biztonsági hiba volt)."""
     import base64
     _ensure_dir()
     blob = _dpapi_protect(json.dumps(data, ensure_ascii=False))
-    if blob is not None:
-        payload = {"__dpapi__": base64.b64encode(bytes(blob)).decode("ascii")}
-    else:
-        payload = data                       # visszaesés: sima JSON
+    if blob is None:
+        raise SecretStoreError(
+            "A titkosítás (Windows DPAPI) nem érhető el, ezért a bizalmas "
+            "adatokat (pl. AI-kulcsok) NEM mentem nyílt szövegként. Ellenőrizd a "
+            "telepítést, vagy használd a kulcsot csak ebben a munkamenetben.")
+    payload = {"__dpapi__": base64.b64encode(bytes(blob)).decode("ascii")}
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False),
                    encoding="utf-8")
@@ -135,8 +144,11 @@ def _load_secret_config(path: Path) -> dict:
         return data if isinstance(data, dict) else {}
     # régi, SIMA szövegként tárolt kulcsok → titkosítva visszaírjuk (migráció)
     if raw:
-        with _lock:
-            save_secret_json(path, raw)
+        try:
+            with _lock:
+                save_secret_json(path, raw)
+        except SecretStoreError:
+            pass        # DPAPI nincs → a migráció elmarad, a régi adat marad
     return raw
 
 

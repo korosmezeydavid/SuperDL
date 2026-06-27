@@ -197,7 +197,11 @@ class BookFrame(wx.Frame):
         eng = tts.ENGINES[self._engine_key()]
         if eng.needs_key:
             self.keys[self._engine_key()] = self.key_txt.GetValue().strip()
-            store.save_tts_keys(self.keys)
+            try:
+                store.save_tts_keys(self.keys)
+            except store.SecretStoreError as e:
+                wx.MessageBox(str(e), "Titkosítás nem érhető el",
+                              wx.OK | wx.ICON_WARNING, self)
 
     def _load_voices(self):
         eng = tts.ENGINES[self._engine_key()]

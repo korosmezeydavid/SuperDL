@@ -30,7 +30,11 @@ def compute_rows(entries, installed: dict, core_api: str = modkit.CORE_API):
         compat = e.compatible(core_api)
         inst = installed.get(e.id)
         if inst is not None:
-            updatable = compat and e.version and e.version != inst
+            # SZEMANTIKUS összevetés: csak akkor „Frissíthető", ha az online
+            # verzió SZIGORÚAN ÚJABB (a puszta != egy RÉGEBBI online verziót is
+            # frissítésnek vett volna)
+            updatable = bool(compat and e.version
+                             and modkit.version_gt(e.version, inst))
             status = "Frissíthető" if updatable else "Telepítve"
             rows.append(dict(id=e.id, name=e.name, category=e.category,
                              status=status, version=e.version or inst,
@@ -207,7 +211,8 @@ class ModuleManagerFrame(wx.Frame):
             try:
                 man = coremod.install_entry(self.loader, r["entry"], prog, self.root)
                 wx.CallAfter(self._install_done, True,
-                             f"Telepítve: {man.name} ({man.version}).")
+                             f"Telepítve: {man.name} ({man.version}). A teljes "
+                             "érvényesüléshez indítsd újra a SuperDL-t.")
             except Exception as ex:
                 wx.CallAfter(self._install_done, False,
                              f"A telepítés nem sikerült: {ex}")

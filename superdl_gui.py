@@ -172,24 +172,41 @@ KEYS_TEXT = (
 
 PRIVACY_TEXT = (
     "Adatkezelés és adatvédelem – pontosan mihez fér hozzá a program\n\n"
-    "A SuperDL NEM gyűjt és NEM küld semmilyen adatot magáról rólad. "
-    "Nincs benne nyomkövetés, nincs fiók, nincs reklám. Minden a te "
-    "gépeden marad.\n\n"
-    "HÁLÓZAT – a program csak ezekhez kapcsolódik:\n"
-    "  • azokhoz a címekhez, amelyeket te adsz meg letöltésre;\n"
-    "  • azokhoz az RSS/podcast-csatornákhoz, amelyekre feliratkozol;\n"
-    "  • médiaoldal letöltésekor az adott oldalhoz (a yt-dlp révén);\n"
-    "  • torrentnél a trackerekhez és a többi felhasználóhoz (peer);\n"
-    "  • frissítéskereséskor a github.com és a pypi.org címekhez "
-    "(csak verziók lekérdezése és a motorok letöltése).\n\n"
-    "FÁJLOK – a program ezeket írja vagy olvassa a gépeden:\n"
-    "  • a letöltött fájlok a kiválasztott célmappába kerülnek;\n"
-    "  • beállítások: a felhasználói mappádban a .superdl.json fájl;\n"
-    "  • letöltési sor, feliratkozások és motorfrissítések: a .superdl mappa;\n"
-    "  • a megnyitott .torrent fájlokat beolvassa.\n\n"
+    "A SuperDL NEM gyűjt rólad telemetriai vagy elemzési adatot: nincs benne "
+    "nyomkövetés, fiók vagy reklám, és magától SEMMIT nem küld magáról. Egyes "
+    "funkciók azonban – KIZÁRÓLAG a TE indításodra – külső szolgáltatásokhoz "
+    "továbbítanak adatot. A program minden ilyen művelet előtt jelzi.\n\n"
+    "HÁLÓZAT – ezekhez kapcsolódhat, a TE műveleted hatására:\n"
+    "  • a letöltésre megadott címekhez; a feliratkozott RSS/podcastokhoz;\n"
+    "  • médiaoldal letöltésekor az adott oldalhoz (yt-dlp); torrentnél a "
+    "trackerekhez és a peerekhez;\n"
+    "  • AI-funkcióknál (kép-/szövegleírás, OCR, átirat, hangalámondás, "
+    "asszisztens) a VÁLASZTOTT szolgáltatóhoz (OpenAI, Google Gemini, "
+    "Anthropic, xAI Grok) – a SAJÁT kulcsoddal –, ahová a feldolgozandó szöveg, "
+    "kép, hang vagy videó kerül;\n"
+    "  • az Edge online beszédhang a felolvasandó szöveget a Microsofthoz küldi "
+    "(az offline eSpeak-NG nem küld semmit);\n"
+    "  • fájlküldésnél (P2P) a kiválasztott fájl a magic-wormhole hálózatán át, "
+    "végpontok közötti titkosítással jut a CÍMZETTHEZ;\n"
+    "  • Internetes TV-nél az általad megadott m3u/stream- és EPG-forrásokhoz; "
+    "élő közvetítésnél (Super Stream) a beállított platformokhoz (YouTube, "
+    "Facebook, TikTok) a saját stream-kulcsoddal;\n"
+    "  • a hír- és időjárás-funkciók a megfelelő szolgáltatásoktól kérnek le "
+    "adatot; a Modulkezelő a hivatalos modul-forrásból tölt;\n"
+    "  • frissítéskor a github.com / pypi.org címekhez (verziók + motorok).\n\n"
+    "BÖNGÉSZŐ-SÜTIK – ha bekapcsolod, a letöltő a böngésződ bejelentkezett "
+    "sütijeit használja (pl. a YouTube bot-ellenőrzéséhez); ezeket csak a "
+    "letöltéshez olvassa, máshová nem küldi.\n\n"
+    "TITKOK – az AI-/TTS-kulcsok és más bizalmas adatok a gépeden, Windows "
+    "DPAPI-val TITKOSÍTVA tárolódnak; ha a titkosítás nem érhető el, a program "
+    "inkább nem menti el, mint hogy nyíltan tárolja.\n\n"
+    "FÁJLOK – a letöltött fájlok a célmappádba kerülnek; a beállítások és a "
+    "letöltési sor a felhasználói .superdl mappádban; a megnyitott .torrent "
+    "fájlokat beolvassa.\n\n"
     "VÁGÓLAP – a vágólapot CSAK akkor figyeli, ha a „Vágólap figyelése” "
     "beállítást bekapcsolod; egyébként soha nem nézi.\n\n"
-    "Semmi mást nem ér el, és semmilyen adatot nem továbbít sehová."
+    "Összefoglalva: a SuperDL nem figyel téged a háttérből; amit külső "
+    "szolgáltatáshoz küld, azt mindig egy általad indított funkció teszi."
 )
 
 
@@ -545,7 +562,7 @@ class MainFrame(wx.Frame):
 
         m_ai = wx.Menu()
         mi_ai_img = m_ai.Append(
-            wx.ID_ANY, "&Kép leírása fájlból…\tCtrl+Shift+I",
+            wx.ID_ANY, "&Kép leírása fájlból…\tCtrl+Shift+L",
             "Mi van a képen? – részletes leírás, felolvasással")
         mi_ai_clip = m_ai.Append(
             wx.ID_ANY, "Kép leírása a &vágólapról",
@@ -855,7 +872,11 @@ class MainFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK and dlg.result_settings is not None:
             self.settings.update(dlg.result_settings)
             self.ai_config = dlg.result_ai
-            store.save_ai_config(self.ai_config)
+            try:
+                store.save_ai_config(self.ai_config)
+            except store.SecretStoreError as e:
+                wx.MessageBox(str(e), "Titkosítás nem érhető el",
+                              wx.OK | wx.ICON_WARNING, self)
             self._save_settings()
             self._apply_runtime_settings()
             self._announce("A beállítások elmentve.")

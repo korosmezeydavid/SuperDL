@@ -189,7 +189,9 @@ def _gemini_upload(key, path, progress=None):
     if not up_url:
         raise AIError("A Gemini fájlfeltöltés nem indult el.")
     with open(path, "rb") as f:
-        up = requests.post(up_url, data=f.read(), timeout=TIMEOUT_LONG,
+        # STREAMELT feltöltés: a fájlobjektumot adjuk át (a requests darabokban
+        # küldi), NEM olvassuk az egész – akár több GB-os – fájlt a memóriába
+        up = requests.post(up_url, data=f, timeout=TIMEOUT_LONG,
                            headers={"X-Goog-Upload-Offset": "0",
                                     "X-Goog-Upload-Command": "upload, finalize"})
     _check(up)
@@ -283,8 +285,23 @@ def _whisper(key, path, srt, language):
     return r.text.strip()
 
 
+def _ensure_size(path, max_mb, what="fájl"):
+    """Méret-ŐR: nagy fájl TELJES memóriába olvasása (base64/inline) előtt
+    érthető hibát ad a MemoryError/összeomlás helyett."""
+    try:
+        sz = os.path.getsize(path)
+    except OSError:
+        return
+    if sz > max_mb * 1024 * 1024:
+        raise AIError(
+            f"A(z) {what} túl nagy ({sz // (1024 * 1024)} MB) a közvetlen "
+            f"feldolgozáshoz (max kb. {max_mb} MB). Darabold fel, vagy "
+            "használj rövidebb/kisebb fájlt.")
+
+
 def _gemini_audio(key, model, path, srt):
     mime = mimetypes.guess_type(path)[0] or "audio/mpeg"
+    _ensure_size(path, 20, "hangfelvétel")    # inline base64 → memória-korlát
     with open(path, "rb") as f:
         b64 = base64.b64encode(f.read()).decode()
     if srt:

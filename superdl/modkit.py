@@ -110,6 +110,13 @@ def is_compatible(m: Manifest, core_api: str = CORE_API) -> bool:
     return _api_tuple(m.min_core_api) <= _api_tuple(core_api)
 
 
+def version_gt(a: str, b: str) -> bool:
+    """`a` verzió SZIGORÚAN újabb-e `b`-nél (szemantikus, számjegy-csoportos
+    összevetés). Így a Modulkezelő NEM jelez frissítést egy RÉGEBBI online
+    verzióra (a puszta `!=` ezt hibásan tette)."""
+    return _api_tuple(a) > _api_tuple(b)
+
+
 # ======================================================================
 #  EventBus – laza csatolás
 # ======================================================================
@@ -273,8 +280,10 @@ class InstallError(Exception):
     """A modul telepítése nem biztonságos vagy sikertelen."""
 
 
-# kicsomagolt méret-korlát (zip-bomba ellen); egy tiszta-Python modul bőven elfér
+# kicsomagolt méret- és fájlszám-korlát (zip-bomba ellen); egy tiszta-Python
+# modul bőven elfér
 _MAX_UNCOMPRESSED = 200 * 1024 * 1024
+_MAX_FILES = 5000
 
 
 def _safe_extract_zip(data: bytes, dest: Path) -> None:
@@ -282,29 +291,60 @@ def _safe_extract_zip(data: bytes, dest: Path) -> None:
     ZIP-BOMBA ellen védve. A manifest.json a ZIP GYÖKERÉBEN van (nem hántolunk
     felső mappát, ellentétben a runtime-bináris csomagokkal)."""
     z = zipfile.ZipFile(io.BytesIO(data))
-    if sum(max(0, i.file_size) for i in z.infolist()) > _MAX_UNCOMPRESSED:
+    infos = [i for i in z.infolist() if not i.is_dir()]
+    if len(infos) > _MAX_FILES:
+        raise InstallError("A modulcsomag túl sok fájlt tartalmaz (zip-bomba védelem).")
+    if sum(max(0, i.file_size) for i in infos) > _MAX_UNCOMPRESSED:
         raise InstallError("A modulcsomag kicsomagolva túl nagy (zip-bomba védelem).")
     dest.mkdir(parents=True, exist_ok=True)
     base = dest.resolve()
-    for info in z.infolist():
-        if info.is_dir():
-            continue
+    for info in infos:
         target = (dest / info.filename).resolve()
-        if not str(target).startswith(str(base)):
+        # ÚTVONALBEJÁRÁS (zip-slip): PONTOS befoglalás-ellenőrzés. A korábbi
+        # str.startswith becsapható volt (base „…_123" vs „…_123_evil"); az
+        # is_relative_to a tényleges szülő-gyermek viszonyt nézi.
+        if not target.is_relative_to(base):
             raise InstallError("Útvonalbejárás a csomagban (zip-slip) – elutasítva.")
         target.parent.mkdir(parents=True, exist_ok=True)
         with z.open(info) as s, open(target, "wb") as d:
             shutil.copyfileobj(s, d)
 
 
+def commit_install(module_id: str, root=None) -> None:
+    """A sikeres telepítés VÉGLEGESÍTÉSE: a .bak biztonsági másolat eldobása."""
+    root = Path(root) if root is not None else modules_root()
+    backup = root / (module_id + ".bak")
+    if backup.exists():
+        shutil.rmtree(backup, ignore_errors=True)
+
+
+def rollback_install(module_id: str, root=None) -> bool:
+    """VISSZAGÖRGETÉS a .bak-ból: a hibás ÚJ modul törlése + a régi
+    visszaállítása. True, ha volt mit visszaállítani."""
+    root = Path(root) if root is not None else modules_root()
+    target = root / module_id
+    backup = root / (module_id + ".bak")
+    if not backup.exists():
+        return False
+    if target.exists():
+        shutil.rmtree(target, ignore_errors=True)
+    backup.rename(target)
+    return True
+
+
 def install_module_zip(data: bytes, expected_sha256: str | None = None,
-                       root=None, core_api: str = CORE_API) -> Manifest:
+                       root=None, core_api: str = CORE_API,
+                       keep_backup: bool = False) -> Manifest:
     """Egy modul-ZIP biztonságos telepítése a modules/<id>/ alá.
 
     Lépések (MODULE_ARCHITECTURE §7): SHA-256 ellenőrzés → kicsomagolás temp-be
     (zip-slip/bomba védve) → manifest érvényesítés + kompat → ATOMI áthelyezés
     (a régi verzió .bak-ba, hibánál visszagörgetés). Visszaadja a Manifestet.
-    Bármi hibánál InstallError, és a meglévő telepítés ÉRINTETLEN marad."""
+    Bármi hibánál InstallError, és a meglévő telepítés ÉRINTETLEN marad.
+
+    `keep_backup=True` esetén a .bak NEM törlődik a végén – így a hívó előbb
+    BETÖLTÉSI/REGISTER-PRÓBÁT futtathat, és csak siker esetén hív `commit_install`-t,
+    hibánál `rollback_install`-t (teljes tranzakciós frissítés)."""
     if expected_sha256:
         got = hashlib.sha256(data).hexdigest().lower()
         if got != expected_sha256.strip().lower():
@@ -347,7 +387,7 @@ def install_module_zip(data: bytes, expected_sha256: str | None = None,
             if backup.exists() and not target.exists():
                 backup.rename(target)        # VISSZAGÖRGETÉS a régire
             raise InstallError(f"A modul áthelyezése sikertelen: {e}")
-        if backup.exists():
+        if backup.exists() and not keep_backup:
             shutil.rmtree(backup, ignore_errors=True)
         return man
     finally:
@@ -407,6 +447,15 @@ class ModuleLoader:
         try:
             if str(module_dir) not in sys.path:
                 sys.path.insert(0, str(module_dir))
+            # sys.modules FRISSÍTÉS: a korábban betöltött (gyorsítótárazott)
+            # modult kivesszük, hogy FRISSÍTÉSKOR a friss kód importálódjon, ne a
+            # memóriában maradt régi (a Python különben a sys.modules-beli régit
+            # adná vissza). MEGJEGYZÉS: a TELJESEN megbízható frissítéshez a
+            # Modulkezelő app-újraindítást ajánl (a régi referenciák miatt).
+            for _name in [n for n in sys.modules
+                          if n == man.entry or n.startswith(man.entry + ".")]:
+                del sys.modules[_name]
+            importlib.invalidate_caches()
             mod = importlib.import_module(man.entry)
             core = self._make_core(man)
             if hasattr(mod, "register"):

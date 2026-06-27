@@ -43,6 +43,12 @@ def available_engines() -> dict:
 
 def ai_ocr(path: str) -> str:
     from . import aiclient
+    try:
+        if os.path.getsize(path) > 30 * 1024 * 1024:   # méret-őr (memória)
+            raise RuntimeError("A kép túl nagy (több mint 30 MB) az AI-OCR-hez. "
+                               "Csökkentsd a felbontást, vagy használj kisebb képet.")
+    except OSError:
+        pass
     with open(path, "rb") as f:
         data = f.read()
     mime = _MIME.get(Path(path).suffix.lower(), "image/png")
