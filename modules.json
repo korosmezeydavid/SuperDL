@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "core_api": "1.0",
+  "modules": [
+    {
+      "id": "docconvert",
+      "name": "Dokumentum-konverter",
+      "category": "Könyvek",
+      "description": "Dokumentumok átalakítása formátumok közt (TXT, DOCX, EPUB, PDF, HTML, RTF, ODT, Markdown…), beépített PDF-fel és OCR-rel. Az első, modulként szállított SuperDL-funkció.",
+      "latest": {
+        "version": "1.0.0",
+        "min_core_api": "1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-docconvert-1.0.0/docconvert-1.0.0.zip",
+        "sha256": "b5c6730065ab0d3c7094d9b398cc09905263c8f95970be74d48b2980e9f5fb62",
+        "size": 1407
+      }
+    }
+  ]
+}

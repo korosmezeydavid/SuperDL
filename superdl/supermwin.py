@@ -295,6 +295,22 @@ class SuperMFrame(wx.Frame):
         self._load_cfg()
         p.SetSizer(v)
 
+    def _open_fx(self):
+        """A valós idejű effekt-rack megnyitása a most szóló deckre (MK-A)."""
+        if getattr(self, "_fx_dlg", None):
+            try:
+                self._fx_dlg.Raise()
+                return
+            except Exception:
+                self._fx_dlg = None
+        from .supermfxwin import EffectRackDialog
+        self._fx_dlg = EffectRackDialog(
+            self, lambda: self.player.handle, lambda t: self._announce(t))
+        self._fx_dlg.Bind(
+            wx.EVT_CLOSE,
+            lambda e: (setattr(self, "_fx_dlg", None), e.Skip()))
+        self._fx_dlg.Show()
+
     def _build_menu(self):
         """Akadálymentes menüsor: minden vezérlés MEGBÍZHATÓ gyorsbillentyűvel
         (a menü-gyorsbillentyűk keret-szinten mindig működnek, függetlenül a
@@ -316,6 +332,7 @@ class SuperMFrame(wx.Frame):
         self.mi_mic = add("&Mikrofon be/ki (Ctrl+Numpad 1)", self._toggle_mic)
         add("Mű&sorvezető bemondás (idő + most szól)\tCtrl+J",
             lambda: self._dj_announce("both"))
+        add("Effekt-&rack…\tCtrl+E", self._open_fx)
         m.AppendSeparator()
         add("&Lejátszás / szünet\tCtrl+P", self._toggle)
         add("Le&állítás\tCtrl+S", self._stop)

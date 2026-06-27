@@ -14,6 +14,13 @@ from .segment import Progress
 def friendly_error(msg: str) -> str:
     """Ismert, gyakori hibák érthető, lépésenkénti magyar üzenete."""
     m = msg.lower()
+    if _is_bot_check(msg):
+        return ("A YouTube megerősítést kér, hogy nem robot vagy (bot-"
+                "ellenőrzés). A SuperDL automatikusan megpróbálta a böngésződ "
+                "sütijeit is. Ha így sem megy: a Beállítások → Fiók/Sütik lapon "
+                "válaszd ki azt a böngészőt, amelyikben be vagy jelentkezve a "
+                "YouTube-ra. Sok elem egyszerre is kiválthatja – tölts le "
+                "kevesebbet egyszerre.")
     if "could not copy" in m and "cookie" in m:
         return ("A böngésző (Chrome/Edge) épp FUT, ezért a program nem tudja "
                 "kiolvasni a sütijeit. Megoldás: zárd be a böngészőt, VAGY a "
@@ -35,6 +42,48 @@ def _is_cookie_error(msg: str) -> bool:
     return (("could not copy" in m and "cookie" in m)
             or "dpapi" in m or "failed to decrypt" in m
             or "could not decrypt" in m)
+
+
+def _is_bot_check(msg: str) -> bool:
+    """Igaz, ha a YouTube BOT-ELLENŐRZÉSE blokkol (»Sign in to confirm you're
+    not a bot«) – ilyenkor a böngésző bejelentkezett sütijei segítenek."""
+    m = msg.lower()
+    return ("not a bot" in m or "sign in to confirm" in m
+            or "confirm you’re not a bot" in m)
+
+
+class _CollectingLogger:
+    """yt-dlp-naplózó, ami az ignoreerrors módban ELNYELT hibákat összegyűjti
+    (különben a kihagyott elemek hibája némán elveszne, és nem tudnánk
+    süti-/bot-újrapróbát indítani vagy érthető üzenetet adni)."""
+
+    def __init__(self):
+        self.errors: list[str] = []
+
+    def debug(self, m):
+        pass
+
+    def info(self, m):
+        pass
+
+    def warning(self, m):
+        pass
+
+    def error(self, m):
+        if m:
+            self.errors.append(str(m))
+
+
+def _count_entries(info) -> tuple[int, int]:
+    """(sikeres, hibás) elemszám egy yt-dlp eredményből. Egyedi videónál
+    (1, 0) sikernél, (0, 1) bukásnál; lejátszási listánál az elemek szerint."""
+    if not info:
+        return (0, 1)
+    if isinstance(info, dict) and "entries" in info:
+        entries = list(info.get("entries") or [])
+        ok = sum(1 for e in entries if e)
+        return (ok, len(entries) - ok)
+    return (1, 0)
 
 
 def is_media_url(url: str) -> bool:
@@ -85,6 +134,25 @@ class MediaDownloader:
 
     def stop(self) -> None:
         self._stop.set()
+
+    def _retry_with_browser_cookies(self, opts: dict, _download):
+        """A YouTube bot-ellenőrzésekor sorra próbáljuk a gépen MEGTALÁLT
+        böngészők bejelentkezett sütijeit, és az első működővel térünk vissza
+        (None, ha egyik sem segít). Jogtiszta: a SAJÁT böngésződ munkamenete a
+        SAJÁT letöltéseidhez."""
+        from .cookies import available_browsers
+        for br in available_browsers():
+            o2 = dict(opts)
+            o2["cookiesfrombrowser"] = (br,)
+            o2.pop("cookiefile", None)
+            try:
+                info = _download(o2)
+            except Exception:
+                continue                       # ez a böngésző nem jó → következő
+            if info:
+                self.cookies_browser = br      # bookkeeping a futó letöltéshez
+                return info
+        return None
 
     def _hook(self, d: dict) -> None:
         if self._stop.is_set():
@@ -144,6 +212,9 @@ class MediaDownloader:
             "no_warnings": True,
             "retries": 5,
             "fragment_retries": 5,
+            # egy hibás/elérhetetlen elem NE állítsa meg a lejátszási lista
+            # többi elemét – a kihagyott elemek hibáit a _CollectingLogger fogja
+            "ignoreerrors": True,
         }
         if self.limit_bps:
             opts["ratelimit"] = self.limit_bps
@@ -194,12 +265,23 @@ class MediaDownloader:
         elif self.video_format in VIDEO_FORMATS and ff_dir:
             opts["merge_output_format"] = self.video_format
 
+        errlog = _CollectingLogger()
+        opts["logger"] = errlog
+
         self.progress.status = "letöltés"
         self.progress.connections = self.connections
 
         def _download(o):
+            errlog.errors.clear()
             with yt_dlp.YoutubeDL(o) as ydl:
-                return ydl.extract_info(self.url, download=True)
+                info = ydl.extract_info(self.url, download=True)
+            # ignoreerrors módban a TELJES bukás nem dob kivételt (None vagy
+            # csupa-None elem) → mi alakítjuk kivétellé, hogy a süti-/bot-
+            # újrapróba és az érthető hibaüzenet a megszokott ágon menjen
+            if _count_entries(info)[0] == 0:
+                raise RuntimeError("; ".join(errlog.errors)
+                                   or "a letöltés nem sikerült")
+            return info
 
         had_cookies = bool(opts.get("cookiesfrombrowser")
                            or opts.get("cookiefile"))
@@ -210,17 +292,35 @@ class MediaDownloader:
                 self.progress.status = "leállítva"
                 return ""
             except Exception as e:
+                msg = str(e)
                 # ha a böngésző-sütik nem olvashatók (pl. fut a böngésző),
                 # próbáljuk újra SÜTIK NÉLKÜL – a legtöbb tartalom nyilvános
-                if had_cookies and _is_cookie_error(str(e)):
+                if had_cookies and _is_cookie_error(msg):
                     opts.pop("cookiesfrombrowser", None)
                     opts.pop("cookiefile", None)
                     info = _download(opts)
+                # PLUSZ: a YouTube bot-ellenőrzését – ha a felhasználó nem
+                # állított be sütit – AUTOMATIKUSAN a saját, bejelentkezett
+                # böngészője sütijeivel kerüljük meg (semmit nem kell beállítania)
+                elif (not had_cookies) and _is_bot_check(msg):
+                    info = self._retry_with_browser_cookies(opts, _download)
+                    if info is None:
+                        raise
                 else:
                     raise
+            ok, failed = _count_entries(info)
             self.progress.status = "kész"
-            self.progress.filename = info.get("title", self.url)
-            return info.get("title", "")
+            if isinstance(info, dict) and "entries" in info:
+                # lejátszási lista: hallható összegzés (hány jött le, mennyi maradt)
+                summary = f"Lejátszási lista: {ok} elem letöltve"
+                if failed:
+                    summary += f", {failed} kihagyva (hibás vagy elérhetetlen)"
+                self.progress.filename = summary
+                return summary
+            title = (info.get("title") if isinstance(info, dict) else "") \
+                or self.url
+            self.progress.filename = title
+            return title
         except KeyboardInterrupt:
             self.progress.status = "leállítva"
             return ""

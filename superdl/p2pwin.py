@@ -5,6 +5,7 @@ bemondható szó-kód. A tényleges átvitelt a p2p modul (magic-wormhole) végz
 from pathlib import Path
 
 import wx
+import wx.adv
 
 from . import p2p
 
@@ -16,6 +17,7 @@ class P2PFrame(wx.Frame):
         self.main = main
         self.send_session = None
         self.recv_session = None
+        self._send_name = ""             # a küldött fájl neve a visszaigazoláshoz
 
         self._build()
         self.CreateStatusBar()
@@ -101,6 +103,7 @@ class P2PFrame(wx.Frame):
             return
         path = dlg.GetPath()
         dlg.Destroy()
+        self._send_name = Path(path).name
         self.code_out.SetValue("")
         self.send_btn.Disable()
         self.send_cancel.Enable()
@@ -143,15 +146,40 @@ class P2PFrame(wx.Frame):
         if sv:
             sv.announce(key, state)
 
+    def _notify(self, title: str, text: str):
+        """Aktív, figyelemfelkeltő értesítés a küldőnek – akkor is megjelenik
+        (és a képernyőolvasó felolvassa), ha épp más ablakban vársz, plusz
+        kimondjuk az önhanggal. Ez Farkas István kérése: »a fájl megérkezésekor
+        nálam is jelezzen«."""
+        try:
+            if getattr(self.main, "settings", {}).get("notify", True):
+                wx.adv.NotificationMessage(title, text).Show(timeout=10)
+        except Exception:
+            pass
+        sv = getattr(self.main, "selfvoice", None)
+        if sv:
+            try:
+                sv.speak(text, force=True)
+            except Exception:
+                pass
+
     def _send_done(self, ok, msg):
         self.send_session = None
         self.send_btn.Enable()
         self.send_cancel.Disable()
         self.copy_btn.Disable()
         self._sv("send", "done" if ok else "error")
-        self.SetStatusText(msg)
         if ok:
             self.code_out.SetValue("")
+            name = self._send_name or "A fájl"
+            # FONTOS (magyar idézőjel-csapda): a nyitó „ után ZÁRÓ ” kell, nem
+            # ASCII " – az előre lezárná az f-stringet
+            confirm = f"Kézbesítve: „{name}” megérkezett a másik géphez."
+            self.SetStatusText(confirm)
+            self._notify("SuperDL – fájl kézbesítve", confirm)
+        else:
+            self.SetStatusText(msg)
+            self._notify("SuperDL – a küldés nem fejeződött be", msg)
 
     def _cancel_send(self):
         if self.send_session:

@@ -8,8 +8,39 @@ módosítja), és érthető, magyar üzenetű hibát ad, ha a tartalom tényleg 
 használható.
 """
 
+import os
 import tempfile
 from pathlib import Path
+
+
+def available_browsers() -> list[str]:
+    """A gépen MEGTALÁLHATÓ böngészők yt-dlp-neve, ésszerű sorrendben.
+
+    A YouTube bot-ellenőrzésénél ezekből próbálunk SÜTIT kiolvasni – a
+    felhasználó SAJÁT, bejelentkezett munkamenete a SAJÁT letöltéseihez
+    (jogtiszta). A Chromium-alapúak elöl (oda szokás bejelentkezni a
+    YouTube-ra); ha egy nem dekódolható (App-Bound titkosítás), a hívó a
+    következőre lép."""
+    local = os.environ.get("LOCALAPPDATA", "")
+    roaming = os.environ.get("APPDATA", "")
+    candidates = [
+        ("chrome",   Path(local) / "Google" / "Chrome" / "User Data"),
+        ("edge",     Path(local) / "Microsoft" / "Edge" / "User Data"),
+        ("brave",    Path(local) / "BraveSoftware" / "Brave-Browser" / "User Data"),
+        ("vivaldi",  Path(local) / "Vivaldi" / "User Data"),
+        ("chromium", Path(local) / "Chromium" / "User Data"),
+        ("opera",    Path(roaming) / "Opera Software" / "Opera Stable"),
+        ("firefox",  Path(roaming) / "Mozilla" / "Firefox" / "Profiles"),
+    ]
+    out: list[str] = []
+    for name, path in candidates:
+        try:
+            if path.exists():
+                out.append(name)
+        except OSError:
+            pass
+    return out
+
 
 NETSCAPE_HEADER = "# Netscape HTTP Cookie File"
 _BOM = b"\xef\xbb\xbf"

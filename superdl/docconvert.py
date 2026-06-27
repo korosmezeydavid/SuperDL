@@ -176,6 +176,49 @@ def _write_epub(book, dst):
     epub.write_epub(str(dst), b)
 
 
+def _unicode_font() -> str | None:
+    """Egy Unicode TrueType betű a magyar ékezetekhez (a beépített PDF-hez). A
+    Windowson mindig elérhető Arialt részesítjük előnyben, tartalékként a
+    csomagolt DejaVuSans (ha mellécsomagoltuk)."""
+    import sys as _sys
+    win = Path(os.environ.get("WINDIR", r"C:\Windows")) / "Fonts"
+    for name in ("arial.ttf", "segoeui.ttf", "tahoma.ttf", "verdana.ttf",
+                 "calibri.ttf"):
+        c = win / name
+        if c.is_file():
+            return str(c)
+    mei = getattr(_sys, "_MEIPASS", None)
+    if mei:
+        d = Path(mei) / "DejaVuSans.ttf"
+        if d.is_file():
+            return str(d)
+    return None
+
+
+def _write_pdf(book, dst):
+    """Tiszta-Python PDF a kinyert szövegből (fpdf2) – KÜLSŐ PROGRAM NÉLKÜL.
+    A magyar ékezetekhez beágyazott Unicode TrueType betűt használ. Így a
+    szöveg/DOCX/EPUB/HTML → PDF konverzióhoz NEM kell Calibre/LibreOffice."""
+    from fpdf import FPDF
+    font = _unicode_font()
+    pdf = FPDF(format="A4")
+    pdf.set_auto_page_break(True, margin=15)
+    pdf.add_page()
+    fam = "Helvetica"
+    if font:
+        pdf.add_font("doc", "", font)
+        fam = "doc"
+    pdf.set_font(fam, size=16)
+    # új sor a bal margóra (különben a kurzor a jobb szélen marad → „nincs hely")
+    pdf.multi_cell(0, 9, book.title or "", new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(3)
+    pdf.set_font(fam, size=12)
+    for line in _lines(book):
+        pdf.multi_cell(0, 7, line if line else " ",
+                       new_x="LMARGIN", new_y="NEXT")
+    pdf.output(str(dst))
+
+
 def _write_simple(book, dst: Path, out_format, out_encoding):
     if out_format == "txt":
         _write_txt(book, dst, out_encoding)
@@ -299,6 +342,19 @@ def convert(src, dst, out_format, in_encoding=None, out_encoding="utf-8",
         if office and (out_format == "pdf" or in_ext == ".doc"):
             _office(office, src, dst, out_format)
             return f"Kész (LibreOffice) → {Path(dst).name}."
+        # PDF KÜLSŐ PROGRAM NÉLKÜL is: a kinyert szövegből beépített (fpdf2)
+        # PDF-et készítünk → a szöveg/DOCX/EPUB/HTML/PDF→PDF sosem zsákutca
+        # (egy felhasználó jelezte, hogy nincs Calibre/LibreOffice-a, mégis
+        # PDF-et szeretne)
+        if out_format == "pdf" and in_ext not in CALIBRE_IN:
+            try:
+                book = read_document(src, in_encoding)
+            except ValueError:
+                book = None
+            if book is not None:
+                _write_pdf(book, dst)
+                return (f"Kész (beépített PDF) → {Path(dst).name}. "
+                        f"{book.chars} karakter – külső program nem kellett.")
         raise RuntimeError(_need_msg(out_format, in_ext))
 
     # 3) RTF/ODT/MD/FB2 érintett → Pandoc DIREKT (legjobb formázás-megőrzés)

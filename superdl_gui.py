@@ -252,6 +252,8 @@ class MainFrame(wx.Frame):
         self._mediaanalyze_win = None
         self._docconvert_win = None
         self._iptv_win = None
+        self._modmgr_win = None
+        self._superstream_win = None
         self._record_mgr = None
         self._known_rows: dict[int, int] = {}   # job.id -> listasor
         self._last_values: dict[int, tuple] = {}
@@ -303,6 +305,18 @@ class MainFrame(wx.Frame):
 
         self.url_entry.SetFocus()
         wx.CallAfter(self._init_mode)
+        wx.CallAfter(self._init_modules)
+
+    def _init_modules(self):
+        """A telepített, OPCIONÁLIS modulok hibatűrő betöltése (moduláris
+        rendszer, It.1). A betöltő naplózza a kihagyott/hibás modulokat; hiba
+        SOHA ne akassza meg az indulást. Most még üres a modules mappa → no-op."""
+        try:
+            from superdl import coremod
+            coremod.init_modules(self)
+        except Exception:
+            import logging
+            logging.getLogger("superdl").exception("modulbetöltés hiba")
 
     # ---- AI / UI mód --------------------------------------------------
 
@@ -519,6 +533,14 @@ class MainFrame(wx.Frame):
             wx.ID_ANY, "Fájlküldés gépről gé&pre (P2P)\tCtrl+Shift+T",
             "Nagy fájl küldése egy másik gépre felhő nélkül, bemondható "
             "kóddal, titkosítva")
+        mi_superstream = m_tools.Append(
+            wx.ID_ANY, "Super &Stream – élő multistream…",
+            "Élő adás egyszerre több platformra (YouTube, Facebook, TikTok) a "
+            "saját stream-kulcsoddal")
+        m_tools.AppendSeparator()
+        mi_modmgr = m_tools.Append(
+            wx.ID_ANY, "&Modulkezelő…",
+            "Opcionális SuperDL-modulok telepítése, frissítése és eltávolítása")
         mb.Append(m_tools, "&Eszközök")
 
         m_ai = wx.Menu()
@@ -607,6 +629,8 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_radio_window, mi_radio)
         self.Bind(wx.EVT_MENU, self._on_superm_window, mi_superm)
         self.Bind(wx.EVT_MENU, self._on_iptv_window, mi_iptv)
+        self.Bind(wx.EVT_MENU, self._on_modmgr_window, mi_modmgr)
+        self.Bind(wx.EVT_MENU, self._on_superstream_window, mi_superstream)
         self.Bind(wx.EVT_MENU, self._on_book_window, mi_book)
         self.Bind(wx.EVT_MENU, self._on_reader_window, mi_reader)
         self.Bind(wx.EVT_MENU, self._on_docconvert_window, mi_docconv)
@@ -1163,6 +1187,22 @@ class MainFrame(wx.Frame):
             return
         self._iptv_win = IPTVFrame(self)
         self._iptv_win.Show()
+
+    def _on_modmgr_window(self, event=None):
+        if self._modmgr_win:
+            self._modmgr_win.Raise()
+            return
+        from superdl.modmanagerwin import ModuleManagerFrame
+        self._modmgr_win = ModuleManagerFrame(self)
+        self._modmgr_win.Show()
+
+    def _on_superstream_window(self, event=None):
+        if self._superstream_win:
+            self._superstream_win.Raise()
+            return
+        from superdl.superstreamwin import SuperStreamFrame
+        self._superstream_win = SuperStreamFrame(self)
+        self._superstream_win.Show()
 
     def _on_assistant_window(self, event=None):
         if self._assistant_win:
@@ -2156,17 +2196,30 @@ class UpdateDialog(wx.Dialog):
     def _installed(self, results, app_done):
         self.gauge.SetValue(0)
         self.btn_check.Enable()
-        tail = ("\n\nKész. A motorfrissítések a következő indításkor lépnek "
-                "életbe.")
+        failed = any("hiba" in r.lower() for r in results)
         if app_done:
             tail = ("\n\nKész. Az új verzió életbe lépéséhez a program most "
                     "bezárul, és pár másodperc múlva AUTOMATIKUSAN újraindul az "
                     "új verzióval. Ha nem indulna el magától, indítsd el kézzel "
                     "a SuperDL-t.")
+        elif failed:
+            tail = ("\n\nA frissítés hibába ütközött (lásd fent). A jelenlegi "
+                    "verzió érintetlen maradt – kézzel is letöltheted a kiadási "
+                    "oldalról.")
+        else:
+            tail = ("\n\nKész. A motorfrissítések a következő indításkor lépnek "
+                    "életbe.")
         self.info.SetValue("\n".join(results) + tail)
         parent = self.GetParent()
         if hasattr(parent, "_announce"):
-            parent._announce("Frissítés kész.", toast=True)
+            # FONTOS: hibánál NE „kész"-t mondjunk – a képernyőolvasó a toastot
+            # olvassa fel, ezért a tényleges eredményt jelezzük (BUG: eddig
+            # hibánál is „Frissítés kész." hangzott el, a hiba meg néma maradt).
+            if failed:
+                parent._announce("A frissítés hibába ütközött: "
+                                 + "; ".join(results), ok=False, toast=True)
+            else:
+                parent._announce("Frissítés kész.", toast=True)
         # a cserét egy leválasztott swapper végzi, MIUTÁN a program kilépett –
         # ezért itt csak BE KELL ZÁRNI a programot (a swapper indítja újra)
         if app_done and wx.MessageBox(
@@ -2195,8 +2248,22 @@ def _maybe_wormhole():
         sys.exit(0)
 
 
+def _single_instance_mutex():
+    """Névvel ellátott mutex, hogy a (onedir) telepítő FELISMERJE és bezárhassa
+    a futó SuperDL-t önfrissítéskor (Inno Setup AppMutex). A handle-t nyitva
+    hagyjuk – a mutex a folyamat élettartamáig él."""
+    if os.name == "nt":
+        try:
+            import ctypes
+            ctypes.windll.kernel32.CreateMutexW(
+                None, False, "SuperDL_SingleInstance_Mutex")
+        except Exception:
+            pass
+
+
 def main():
     _maybe_wormhole()
+    _single_instance_mutex()
     app = wx.App()
     wx.InitAllImageHandlers()     # minden képformátum (PNG/JPEG/…) kezelése
     selfupdate.cleanup_old()      # korábbi önfrissítés maradékának törlése

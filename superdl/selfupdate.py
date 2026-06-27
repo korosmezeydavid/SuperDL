@@ -232,6 +232,52 @@ def _swapper_script(folder: Path, pairs: list[tuple[Path, Path]],
     return "\r\n".join(L) + "\r\n"
 
 
+def _oem_encoding() -> str | None:
+    """A cmd.exe a kötegfájlt az OEM-kódlapon olvassa (pl. magyar Windowson
+    cp852). Ezt a Python-kódlapnevet adjuk vissza, hogy a swapper-.bat-ot
+    PONTOSAN azon írhassuk – így az ÉKEZETES útvonalak (pl. ékezetes Windows-
+    felhasználónév) nem romlanak el. None, ha nem állapítható meg."""
+    try:
+        import ctypes
+        cp = int(ctypes.windll.kernel32.GetOEMCP())   # type: ignore[attr-defined]
+    except (OSError, AttributeError, ValueError):
+        return None
+    enc = "utf-8" if cp == 65001 else f"cp{cp}"
+    try:
+        "x".encode(enc)                                # van-e ilyen codec?
+    except LookupError:
+        return None
+    return enc
+
+
+def _write_bat(bat: Path, script: str) -> None:
+    """A swapper-.bat kiírása úgy, hogy a cmd.exe az ÉKEZETES útvonalakat is
+    helyesen értelmezze.
+
+    KORÁBBI HIBA: a fájlt `encoding="ascii"`-vel írtuk, ezért ha a beágyazott
+    útvonalban (pl. a ~/.superdl naplófájl vagy a program mappája egy ékezetes
+    felhasználónév alatt) ékezetes betű volt, a kiírás elszállt:
+    „'ascii' codec can't encode character '\\xda' …" → a frissítés MINDIG
+    bukott az ilyen gépeken.
+
+    MEGOLDÁS: elsőként az OEM-kódlapon írunk (a cmd ezt várja, nincs kódlap-
+    váltás); ha egy karakter abba nem fér bele, UTF-8-ra váltunk és a .bat
+    élére `chcp 65001`-et teszünk, hogy a cmd UTF-8-ként olvassa. Mindkét úton
+    `write_bytes`, hogy a `\\r\\n` sorvégek ne duplázódjanak."""
+    enc = _oem_encoding()
+    if enc and enc != "utf-8":
+        try:
+            bat.write_bytes(script.encode(enc))        # strict: belefér-e OEM-be
+            return
+        except UnicodeEncodeError:
+            pass                                       # nem fért bele → UTF-8 út
+    lines = script.split("\r\n")
+    if enc != "utf-8":          # nem-UTF-8 (vagy ismeretlen) konzolról váltunk
+        at = 1 if (lines and lines[0].startswith("@echo off")) else 0
+        lines.insert(at, "chcp 65001 >NUL")
+    bat.write_bytes("\r\n".join(lines).encode("utf-8"))
+
+
 def _spawn_swapper(folder: Path, pairs: list[tuple[Path, Path]],
                    relaunch_name: str | None) -> None:
     """Leválasztott kötegfájl, ami a folyamat kilépése UTÁN cseréli a fájlokat.
@@ -243,11 +289,11 @@ def _spawn_swapper(folder: Path, pairs: list[tuple[Path, Path]],
 
     bat = folder / f"superdl_update_{pid}.bat"
     try:
-        bat.write_text(script, encoding="ascii")
+        _write_bat(bat, script)
     except OSError:
         import tempfile
         bat = Path(tempfile.gettempdir()) / f"superdl_update_{pid}.bat"
-        bat.write_text(script, encoding="ascii")
+        _write_bat(bat, script)
 
     # CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP – a swappernek SAJÁT, rejtett
     # konzolja legyen (így a `tasklist | find` cső és a segédprogramok valós
@@ -256,6 +302,48 @@ def _spawn_swapper(folder: Path, pairs: list[tuple[Path, Path]],
     flags = 0x08000000 | 0x00000200
     subprocess.Popen(["cmd", "/c", str(bat)], creationflags=flags,
                      close_fds=True, cwd=str(folder))
+
+
+def is_onedir() -> bool:
+    """Onedir (telepítős) build? A futó exe mellett ott van a _internal mappa."""
+    try:
+        return (Path(sys.executable).parent / "_internal").is_dir()
+    except Exception:
+        return False
+
+
+def _find_installer_asset(assets: dict) -> str | None:
+    """A kiadás telepítő-assetje (SuperDL-Setup-<verzió>.exe), ha van."""
+    for name in assets:
+        n = name.lower()
+        if n.startswith("superdl-setup-") and n.endswith(".exe"):
+            return name
+    return None
+
+
+def apply_installer(assets: dict, name: str, progress=None,
+                    digests: dict | None = None) -> list[str]:
+    """ONEDIR önfrissítés: a Setup.exe letöltése (SHA-256 ellenőrzéssel) és
+    CSENDES futtatása. A telepítő (AppMutex + Restart Manager) bezárja a futó
+    SuperDL-t, kicseréli az ÖSSZES fájlt (a _internal mappát is), és újraindítja.
+    A hívónak a visszatérés után MIHAMARABB ki kell lépnie."""
+    import tempfile
+    url = assets.get(name)
+    if not url:
+        raise RuntimeError(f"A kiadásban nincs telepítő ({name}).")
+    dest = Path(tempfile.gettempdir()) / name
+    got = _download_to_file(url, dest, progress)
+    want = (digests or {}).get(name)
+    if want and got != want:
+        dest.unlink(missing_ok=True)
+        raise RuntimeError(
+            "A letöltött telepítő ellenőrző összege nem egyezik a hivatalossal "
+            "– sérült vagy manipulált, a frissítést megszakítottam.")
+    # csendes telepítés; a futó appot a telepítő zárja be és indítja újra
+    subprocess.Popen(
+        [str(dest), "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART",
+         "/FORCECLOSEAPPLICATIONS", "/RESTARTAPPLICATIONS"], close_fds=True)
+    return [name]
 
 
 def apply(assets: dict, progress=None, restart: bool = True,
@@ -272,6 +360,11 @@ def apply(assets: dict, progress=None, restart: bool = True,
         raise RuntimeError(
             "Automatikusan csak a kész exe frissíthető. Forrásból a "
             "megfelelő a 'git pull' a tárhelyről.")
+    # ONEDIR/telepítős build: a teljes mappát (a _internal-t is) a TELEPÍTŐ
+    # cseréli – nem a single-exe swapper. Letöltjük és csendben futtatjuk.
+    inst = _find_installer_asset(assets)
+    if inst and is_onedir():
+        return apply_installer(assets, inst, progress, digests)
     exe = Path(sys.executable)
     folder = exe.parent
     if not _folder_writable(folder):

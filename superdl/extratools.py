@@ -10,6 +10,7 @@ A nagy külső eszközöket NEM sütjük az exébe (lean marad), hanem:
   • Tesseract – offline OCR; észlelés (PATH vagy ~/.superdl/bin).
 """
 
+import hashlib
 import io
 import json
 import shutil
@@ -22,6 +23,12 @@ from pathlib import Path
 BIN = Path.home() / ".superdl" / "bin"
 UA = {"User-Agent": "SuperDL-tools"}
 _lock = threading.Lock()
+
+# A Tesseract-csomag (motor + magyar/angol nyelvi adat) a SAJÁT SuperDL-
+# kiadásból tölthető le. A SHA-256-ot a csomag elkészültekor töltjük ki; amíg
+# ÜRES, NEM töltünk le ellenőrizetlen binárist (integritás-elv).
+_TESSERACT_ASSET = "tesseract-portable-hu-en.zip"
+_TESSERACT_SHA256 = ""
 
 
 def _meipass(name: str) -> str | None:
@@ -114,3 +121,79 @@ def ensure_pandoc(progress=None) -> str | None:
         except Exception:
             return None
     return None
+
+
+def _superdl_repo() -> str:
+    try:
+        from . import selfupdate
+        return selfupdate.get_repo()
+    except Exception:
+        return "korosmezeydavid/SuperDL"
+
+
+def _tesseract_asset_url() -> str | None:
+    """A Tesseract-csomag letöltési URL-je a SAJÁT SuperDL-kiadásokból (az
+    asset nevére keresve). None, ha még nincs feltöltve."""
+    repo = _superdl_repo()
+    req = urllib.request.Request(
+        f"https://api.github.com/repos/{repo}/releases?per_page=30", headers=UA)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            releases = json.load(r)
+    except Exception:
+        return None
+    for rel in releases:
+        for a in rel.get("assets", []):
+            if a.get("name") == _TESSERACT_ASSET:
+                return a.get("browser_download_url")
+    return None
+
+
+def _extract_zip_to(data: bytes, dest: Path) -> None:
+    """A ZIP kicsomagolása a `dest` mappába, egyetlen közös felső mappát
+    lehántva (ha minden bejegyzés azonos mappa alatt van). Útvonal-bejárás
+    (zip-slip) ellen védve."""
+    z = zipfile.ZipFile(io.BytesIO(data))
+    names = [n for n in z.namelist() if not n.endswith("/")]
+    tops = {n.split("/", 1)[0] for n in names if "/" in n}
+    strip = next(iter(tops)) + "/" if (len(tops) == 1
+                                       and all("/" in n for n in names)) else ""
+    dest.mkdir(parents=True, exist_ok=True)
+    base = dest.resolve()
+    for n in names:
+        rel = n[len(strip):] if strip and n.startswith(strip) else n
+        if not rel:
+            continue
+        target = (dest / rel).resolve()
+        if not str(target).startswith(str(base)):
+            continue                       # zip-slip védelem
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with z.open(n) as s, open(target, "wb") as d:
+            shutil.copyfileobj(s, d)
+
+
+def ensure_tesseract(progress=None) -> str | None:
+    """A tesseract.exe elérési útja; ha nincs, LETÖLTI a saját SuperDL-kiadás
+    Tesseract-csomagjából (motor + magyar/angol nyelvi adat) a
+    ~/.superdl/bin/tesseract mappába, SHA-256-tal ellenőrizve. Hiba, hiányzó
+    csomag, vagy (még) ki nem töltött hivatalos SHA-256 esetén None."""
+    p = find_tesseract()
+    if p:
+        return p
+    if not _TESSERACT_SHA256:
+        return None            # nincs hitelesített csomag → nem töltünk le
+    with _lock:
+        p = find_tesseract()
+        if p:
+            return p
+        url = _tesseract_asset_url()
+        if not url:
+            return None
+        try:
+            data = _download(url, progress)
+            if hashlib.sha256(data).hexdigest().lower() != _TESSERACT_SHA256.lower():
+                return None    # sérült/manipulált csomag → nem telepítjük
+            _extract_zip_to(data, BIN / "tesseract")
+        except Exception:
+            return None
+        return find_tesseract()

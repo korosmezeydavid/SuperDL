@@ -20,7 +20,7 @@ IMAGE_EXTS = (".tif", ".tiff", ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".webp")
 # motor-kulcs -> (megjelenített név, kell-e telepítés/kulcs)
 ENGINES = {
     "ai": "AI-vízió (felhő, AI-kulcs kell)",
-    "tesseract": "Tesseract (offline, külön telepítendő)",
+    "tesseract": "Tesseract (offline, első használatkor letölthető)",
 }
 
 _MIME = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
@@ -50,9 +50,13 @@ def ai_ocr(path: str) -> str:
 
 
 def tesseract_ocr(path: str, lang: str = "hun+eng") -> str:
-    exe = extratools.find_tesseract()
+    # ha nincs telepítve, megpróbáljuk IGÉNY SZERINT letölteni (saját kiadásból)
+    exe = extratools.find_tesseract() or extratools.ensure_tesseract()
     if not exe:
-        raise RuntimeError("A Tesseract OCR nincs telepítve.")
+        raise RuntimeError(
+            "A Tesseract OCR nem érhető el (a letölthető csomag még nem "
+            "elérhető, vagy a letöltés nem sikerült). Addig válaszd az "
+            "„AI-vízió” OCR-motort, vagy telepítsd a Tesseractot.")
     try:
         r = subprocess.run([exe, str(path), "stdout", "-l", lang],
                            capture_output=True, text=True, encoding="utf-8",

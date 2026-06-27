@@ -1,4 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
+# ONEDIR build a moduláris rendszerhez + Inno Setup telepítőhöz.
+# (A onefile SuperDL.spec érintetlen marad; ez a kettő egymás mellett él, amíg
+#  a moduláris/onedir átállás véglegesedik.)
 from PyInstaller.utils.hooks import collect_data_files
 from PyInstaller.utils.hooks import collect_submodules
 from PyInstaller.utils.hooks import collect_all
@@ -53,23 +56,35 @@ a = Analysis(
 )
 pyz = PYZ(a.pure)
 
+# ONEDIR: az EXE NEM tartalmazza a binárisokat/adatokat (exclude_binaries),
+# azokat a COLLECT gyűjti a dist/SuperDL/ mappába – nincs minden indításkori
+# temp-kicsomagolás (ez szüntette meg az SSL/ffmpeg double-click hibák melegágyát
+# és teszi azonnal indíthatóvá az appot).
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
     [],
+    exclude_binaries=True,
     name='SuperDL',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     upx_exclude=[],
-    runtime_tmpdir=None,
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='SuperDL',
 )

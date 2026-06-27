@@ -367,6 +367,12 @@ class Player:
                 self.set_volume(self._vol)
         return bool(self._h)
 
+    @property
+    def handle(self) -> int:
+        """A lejátszott csatorna BASS-handle-je (0, ha nincs betöltve) – az
+        effekt-rack (superm_fx) ehhez csatolja a valós idejű effekteket."""
+        return self._h
+
     def unload(self):
         if self._h:
             _lib().BASS_StreamFree(self._h)     # a mixerből is kiveszi
