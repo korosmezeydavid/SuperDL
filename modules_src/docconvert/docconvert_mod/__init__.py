@@ -1,31 +1,27 @@
-"""SuperDL PILOT modul – Dokumentum-konverter.
+"""SuperDL modul – Dokumentum-konverter (az ELSŐ, VALÓDIBAN kiemelt funkció).
 
-Ez az ELSŐ, modulként szállított SuperDL-funkció: bemutatja a teljes moduláris
-betöltést. A `register(core)` a Core↔Modul SZERZŐDÉSEN (CoreContext) át ad egy
-menüt és egy menüpontot, ami a dokumentum-konvertert nyitja (EGYABLAKOSAN, a
-core.register_window-on át). A tényleges konverziós kód (booktext, extratools,
-ocr, fpdf, python-docx, ebooklib) a Core FUTTATÓKÖRNYEZETÉBEN van – a modul ezt
-a Core csomagjain át éri el, nem importál más MODULT.
+A converter TELJES kódja (docconvert.py + docconvertwin.py) ITT, a MODULBAN van;
+a Core csak a MEGOSZTOTT segédeket (booktext, extratools, ocr, fpdf, python-docx,
+ebooklib) adja a `superdl` csomagon át. Így a konverter ÖNÁLLÓAN frissíthető, a
+Core (a nagy exe) újraépítése nélkül – ez a moduláris katalógus lényege.
 
-A modul SEMMIT nem hagy maga után: az `unregister(core)` leszereli a menüt (a
-frissítéshez/eltávolításhoz)."""
+A `register(core)` hozzáadja a „Dokumentumok" menüt a konverterrel (egyablakosan,
+a core.register_window-on át); az `unregister(core)` mindent leszerel."""
 
-# modul-szintű állapot (a leszereléshez); a modul SOHA nem nyúl a Core belső
-# szerkezetéhez, csak a `core`-on és a Core futtatókörnyezetén át
 _state = {}
 
 
 def register(core):
-    # a beépített konverter-ablak a Core futtatókörnyezetéből (a Core bundle-ölte)
-    from superdl.docconvertwin import DocConvertFrame
+    from .docconvertwin import DocConvertFrame    # a converter-ablak a MODULBAN
 
     opener = core.register_window("docconvert_module", DocConvertFrame)
-    menu = core.add_menu("Modu&l: Dokumentumok")
+    menu = core.add_menu("&Dokumentumok")
     item = core.add_menu_item(
-        menu, "Dokumentum-&konverter (modul)\tCtrl+Alt+D", opener,
-        help="Dokumentum átalakítása más formátumba (modulként)")
+        menu, "Dokumentum-&konverter\tCtrl+Shift+D", opener,
+        help="Dokumentum átalakítása más formátumba (TXT, DOCX, EPUB, PDF, "
+             "HTML, RTF, ODT, Markdown…), beépített PDF-fel és OCR-rel")
     _state["item"] = item
-    core.log.info("docconvert modul betöltve: menüpont hozzáadva")
+    core.log.info("docconvert modul betöltve")
 
 
 def unregister(core):

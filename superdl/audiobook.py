@@ -25,6 +25,54 @@ OUTRO = ("A hangoskönyv vége. Ezt a felvételt a SuperDL program olvasta fel, 
 
 DEFAULT_CHUNK = 6000
 
+# Önálló oldalszám-sor (csak számjegy, körülötte legföljebb pont/kötőjel/szóköz),
+# pl. „42", „- 42 -", „. 42 .". A betűt tartalmazó sorokat NEM érinti.
+_PAGE_NUM = re.compile(r"^[\s.\-—–]*\d{1,4}[\s.\-—–]*$")
+
+
+def clean_for_speech(text: str) -> str:
+    """A könyvszöveget FELOLVASÁSRA/hangoskönyvre tisztítja: a „felesleges"
+    sorokat és sortöréseket távolítja el, a tartalmat megtartva.
+
+    Mit csinál (saját, konzervatív logika – SZÁNDÉKOSAN nem szűr betűket, az
+    nyelvfüggő és kockázatos; csak a SOR-SZERKEZETET rendezi):
+      1) a sorvégi elválasztójellel kettévágott szót összevonja
+         („elválasz-\\ntás" → „elválasztás"; a lágy kötőjelet, U+00AD, is);
+      2) bekezdésekre bont (üres sor = bekezdéshatár, ezt MEGTARTJA), és a
+         bekezdésen BELÜLI kemény sortöréseket szóközzé alakítja – a TTS az
+         írásjelekből szünetel, nem a sortörésekből, így a felolvasás folyamatos;
+      3) kidobja a TARTALOM NÉLKÜLI sorokat: üres sorok és önálló oldalszámok.
+    Üres bemenetre üreset ad."""
+    if not text:
+        return text
+    t = text.replace("\r\n", "\n").replace("\r", "\n")
+    # 1) sorvégi elválasztás összevonása (rendes és lágy kötőjel is)
+    t = re.sub(r"(\w)[-­]\n(\w)", r"\1\2", t)
+    # 2-3) bekezdésenként: oldalszám/üres sorok ki, a többit egy sorba olvasztjuk
+    out = []
+    for para in re.split(r"\n[ \t]*\n", t):
+        lines = []
+        for ln in para.split("\n"):
+            s = ln.strip()
+            if not s or _PAGE_NUM.match(s):
+                continue
+            lines.append(s)
+        joined = re.sub(r"[ \t]+", " ", " ".join(lines)).strip()
+        if joined:
+            out.append(joined)
+    return "\n\n".join(out)
+
+
+def clean_book(book):
+    """Egy `booktext.Book` minden szakaszát felolvasásra tisztítja (a Book
+    típusától függetlenül, klónozással – nincs import-kör)."""
+    import copy
+    sections = [clean_for_speech(s) for s in book.sections]
+    sections = [s for s in sections if s.strip()] or [""]
+    nb = copy.copy(book)
+    nb.sections = sections
+    return nb
+
 
 def chunk_text(text: str, limit: int) -> list[str]:
     """A szöveget legfeljebb `limit` karakteres darabokra bontja, lehetőleg

@@ -8,11 +8,115 @@
       "category": "Könyvek",
       "description": "Dokumentumok átalakítása formátumok közt (TXT, DOCX, EPUB, PDF, HTML, RTF, ODT, Markdown…), beépített PDF-fel és OCR-rel. Az első, modulként szállított SuperDL-funkció.",
       "latest": {
+        "version": "1.1.0",
+        "min_core_api": "1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-docconvert-1.1.0/docconvert-1.1.0.zip",
+        "sha256": "b583c8c9cd85a5ee96cb9746ebc8278ecaf8aae9b96a27891fb94fc6af1d2ea4",
+        "size": 9743
+      }
+    },
+    {
+      "id": "p2p",
+      "name": "Fájlküldés gépről gépre (P2P)",
+      "category": "Eszközök",
+      "description": "Nagy fájl küldése egy másik gépre felhő nélkül, bemondható kóddal, végpontok közötti titkosítással (magic-wormhole). A küldő is jelzést kap, amikor a fájl megérkezett.",
+      "latest": {
         "version": "1.0.0",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-docconvert-1.0.0/docconvert-1.0.0.zip",
-        "sha256": "b5c6730065ab0d3c7094d9b398cc09905263c8f95970be74d48b2980e9f5fb62",
-        "size": 1407
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-p2p-1.0.0/p2p-1.0.0.zip",
+        "sha256": "13bb3f26dddc475cacb27a83f033c057739cae54ab1e973fde8ef9469d41f7bb",
+        "size": 6195
+      }
+    },
+    {
+      "id": "mediatools",
+      "name": "Média-eszközök",
+      "category": "Média",
+      "description": "Médiakészítő és -elemző eszközök egy csomagban: kötegelt médiakonvertáló, beszélő médiaelemző (LUFS/EBU R128), iPhone csengőhang-készítő, videókészítő (kép+zene) és videóvágó-összefűző.",
+      "latest": {
+        "version": "1.4.0",
+        "min_core_api": "1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.0/mediatools-1.4.0.zip",
+        "sha256": "51796d9275a7d73216e419f1c77d86968ac210b4cfbb12d2348731b4f8d492d0",
+        "size": 34620
+      }
+    },
+    {
+      "id": "szervezes",
+      "name": "Szervezés",
+      "category": "Szervezés",
+      "description": "Szervezés-eszközök egy csomagban: akadálymentes Hírolvasó (RSS-gyűjtő letisztított cikkolvasóval), Podcast-felfedező (keresés, ország-toplista, feliratkozással), Naptár/teendők/jegyzetek (emlékeztetővel, ICS-szinkronnal) és Napi infó (időjárás, névnap).",
+      "latest": {
+        "version": "1.1.0",
+        "min_core_api": "1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.1.0/szervezes-1.1.0.zip",
+        "sha256": "b68882b24a9d9028f6578343a5050e759f2d88228a23fa09bba41f9ce3972f9c",
+        "size": 21346
+      }
+    },
+    {
+      "id": "konyvek",
+      "name": "Könyvek",
+      "category": "Könyvek",
+      "description": "Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3). Mindkettő tisztítja a felesleges üres sorokat és kemény sortöréseket a folyamatos felolvasásért.",
+      "latest": {
+        "version": "1.0.0",
+        "min_core_api": "1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-konyvek-1.0.0/konyvek-1.0.0.zip",
+        "sha256": "a1f6ed77a90390d03cac353d8fec3d314ecff28206776b3ce209de3f7a346d45",
+        "size": 14725
+      }
+    },
+    {
+      "id": "iptv",
+      "name": "Internetes TV",
+      "category": "Média",
+      "description": "Akadálymentes internetes TV (legális IPTV): saját m3u/Xtream forrás csatornái, felolvasott műsorújság (EPG), felvétel és emlékeztető, hangalámondás-sáv és élő felirat-felolvasás. Csak legális, saját előfizetésű forrásokhoz.",
+      "latest": {
+        "version": "1.0.0",
+        "min_core_api": "1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iptv-1.0.0/iptv-1.0.0.zip",
+        "sha256": "cd9f860280a7381dcbf4f20783c36f3edf65cce59faddecef4e62419cbf801a1",
+        "size": 12899
+      }
+    },
+    {
+      "id": "supermedia",
+      "name": "Super Media",
+      "category": "Média",
+      "description": "Hang-műsorszóró stúdió és multistream egy csomagban: Super M (akadálymentes rádió-stúdió és médialejátszó – lejátszás, keverés, mikrofon, jingle-pad, valós idejű effekt-rack, Shoutcast/Icecast élő adás, BASS-motor) és Super Stream (élő adás egyszerre több platformra a saját kulcsoddal). A BASS-runtime a Core-ból jön.",
+      "latest": {
+        "version": "1.0.0",
+        "min_core_api": "1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supermedia-1.0.0/supermedia-1.0.0.zip",
+        "sha256": "a35fb0365a8c45003170f987acefb16c4696bc9f1b7e291ea5391038b95a5320",
+        "size": 31260
+      }
+    },
+    {
+      "id": "radio",
+      "name": "Internetes rádió",
+      "category": "Média",
+      "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
+      "latest": {
+        "version": "1.0.0",
+        "min_core_api": "1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.0.0/radio-1.0.0.zip",
+        "sha256": "751f3c430c4b03cffff4fe5f19d59eef4341c4ae0a575975b6b572e923ed6f7b",
+        "size": 12263
+      }
+    },
+    {
+      "id": "hangalamondas",
+      "name": "AI hangalámondás",
+      "category": "AI",
+      "description": "AI hangalámondás (audio description) videóhoz: a videó képi tartalmát AI írja le és hanggal mondja el, az eredeti hang alatta halkítva – így a videó vakon is „nézhető”. A leírás részletessége és elhelyezése választható; a saját AI-kulcsoddal megy.",
+      "latest": {
+        "version": "1.0.0",
+        "min_core_api": "1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-hangalamondas-1.0.0/hangalamondas-1.0.0.zip",
+        "sha256": "accaa24237875f546bf2bbac31e0062c2c884c80374aadcf5ae54f7085791eb3",
+        "size": 10538
       }
     }
   ]

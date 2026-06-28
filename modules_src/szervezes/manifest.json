@@ -1,0 +1,11 @@
+{
+  "id": "szervezes",
+  "name": "Szervezés",
+  "version": "1.1.0",
+  "entry": "szervezes_mod",
+  "category": "Szervezés",
+  "description": "Szervezés-eszközök egy csomagban: akadálymentes Hírolvasó (RSS-gyűjtő letisztított cikkolvasóval), Podcast-felfedező (keresés, ország-toplista, feliratkozással), Naptár/teendők/jegyzetek (emlékeztetővel, ICS-szinkronnal) és Napi infó (időjárás, névnap).",
+  "min_core_api": "1.0",
+  "requires_tools": [],
+  "author": "Kőrösmezey Dávid"
+}

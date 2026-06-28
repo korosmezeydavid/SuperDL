@@ -1,0 +1,11 @@
+{
+  "id": "supermedia",
+  "name": "Super Media",
+  "version": "1.0.0",
+  "entry": "supermedia_mod",
+  "category": "Média",
+  "description": "Hang-műsorszóró stúdió és multistream egy csomagban: Super M (akadálymentes rádió-stúdió és médialejátszó – lejátszás, keverés, mikrofon, jingle-pad, valós idejű effekt-rack, Shoutcast/Icecast élő adás, BASS-motor) és Super Stream (élő adás egyszerre több platformra a saját kulcsoddal). A BASS-runtime a Core-ból jön.",
+  "min_core_api": "1.0",
+  "requires_tools": [],
+  "author": "Kőrösmezey Dávid"
+}

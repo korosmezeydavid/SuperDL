@@ -22,6 +22,10 @@ hiddenimports += collect_submodules('feedparser')
 hiddenimports += collect_submodules('ebooklib')
 hiddenimports += collect_submodules('pypdf')
 hiddenimports += collect_submodules('fpdf')      # beépített PDF (dok.-konverter)
+# A TELJES superdl csomag (a megosztott runtime: videocompose, audioengine,
+# booktext, ocr, extratools…) – a kiemelt MODULOK `from superdl import …`-zal
+# hívják, ezért akkor is bundle-ölni kell, ha a built-in gui már nem importálja.
+hiddenimports += collect_submodules('superdl')
 tmp_ret = collect_all('sounddevice')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('edge_tts')

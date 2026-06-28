@@ -43,34 +43,26 @@ from superdl.speech import VoiceSpeaker
 from superdl.selfvoice import SelfVoice
 from superdl import updater, selfupdate, sounds, __version__
 from superdl.searchwin import MediaSearchFrame
-from superdl.radiowin import RadioFrame
-from superdl.videowin import VideoComposeFrame
-from superdl.convertwin import BatchConvertFrame
-from superdl.ringtonewin import RingtoneFrame
-from superdl.podcastwin import PodcastFrame
+# Az Internetes rádió MOSTANTÓL külön MODUL (a felvevő-szolgáltatás a Core-ban marad).
+# A Podcast-felfedező MOSTANTÓL a „Szervezés" MODULban.
 from superdl.organizer import OrganizerManager
-from superdl.organizerwin import OrganizerFrame
-from superdl.p2pwin import P2PFrame
-from superdl.videoeditwin import VideoEditFrame
-from superdl.videodescribewin import VideoDescribeFrame
+# A Naptár-ABLAK MOSTANTÓL a „Szervezés" MODULban (a kezelő a Core-ban marad).
+# Az AI hangalámondás MOSTANTÓL külön MODUL („AI hangalámondás").
 from superdl.assistantwin import AssistantFrame
-from superdl.supermwin import SuperMFrame
-from superdl.mediaanalyzewin import MediaAnalyzeFrame
-from superdl.docconvertwin import DocConvertFrame
-from superdl.iptvwin import IPTVFrame
-from superdl.bookwin import BookFrame
+# A Super M és a Super Stream MOSTANTÓL a „Super Media" MODULban.
+# Az Internetes TV (IPTV) MOSTANTÓL külön MODUL.
+# A Hangoskönyv-készítő MOSTANTÓL a „Könyvek" MODULban.
 from superdl.radiorec import RecordManager
 from superdl import dayinfo, weather, search, store, aiclient, mediaai
 from superdl import assistant
 from superdl.settingsdialog import SettingsDialog
 from superdl.aiwin import run_ai, run_ai_progress
-from superdl.dayinfowin import DayInfoDialog
+# A Napi infó ABLAK MOSTANTÓL a „Szervezés" MODULban (az üdvözlés-backend a Core-ban).
 from superdl.ytchannel import ChannelManager
 from superdl.freshvideoswin import FreshVideosDialog, ChannelsDialog
-from superdl.news import NewsManager
-from superdl.newswin import NewsFrame
+# A Hírolvasó MOSTANTÓL a „Szervezés" MODULban.
 from superdl.library import Library
-from superdl.readerwin import ReaderFrame
+# A Könyvolvasó MOSTANTÓL a „Könyvek" MODULban.
 
 try:
     import winsound
@@ -246,31 +238,13 @@ class MainFrame(wx.Frame):
         self.mgr: DownloadManager | None = None
         self.fm = FeedManager()
         self.cm = ChannelManager()
-        self.news_mgr = NewsManager()
         self.library = Library()
         self.ai_config = store.load_ai_config()
         self.speaker = VoiceSpeaker()
         self.selfvoice = SelfVoice()        # művelet-bejelentő réteg (M12)
         self._search_win = None
-        self._radio_win = None
-        self._book_win = None
-        self._news_win = None
-        self._reader_win = None
-        self._video_win = None
-        self._convert_win = None
-        self._ringtone_win = None
-        self._podcast_win = None
-        self._organizer_win = None
-        self._p2p_win = None
-        self._videoedit_win = None
-        self._videodescribe_win = None
         self._assistant_win = None
-        self._superm_win = None
-        self._mediaanalyze_win = None
-        self._docconvert_win = None
-        self._iptv_win = None
         self._modmgr_win = None
-        self._superstream_win = None
         self._record_mgr = None
         self._known_rows: dict[int, int] = {}   # job.id -> listasor
         self._last_values: dict[int, tuple] = {}
@@ -465,9 +439,7 @@ class MainFrame(wx.Frame):
                                  "Feliratkozások listája és törlése")
         mi_subchk = m_sub.Append(wx.ID_ANY, "Új epizódok le&töltése most",
                                  "Minden feliratkozás ellenőrzése azonnal")
-        mi_subdisc = m_sub.Append(
-            wx.ID_ANY, "&Podcastok felfedezése...\tCtrl+Shift+P",
-            "Podcast-keresés és ország-toplista, feliratkozással")
+        # A Podcastok felfedezése MOSTANTÓL a „Szervezés" MODULban.
         m_sub.AppendSeparator()
         mi_chan_new = m_sub.Append(
             wx.ID_ANY, "YouTube-&csatorna feliratkozás...",
@@ -483,19 +455,9 @@ class MainFrame(wx.Frame):
             "Minden figyelt csatorna ellenőrzése új videókért")
         mb.Append(m_sub, "Fel&iratkozások")
 
-        m_books = wx.Menu()
-        mi_reader = m_books.Append(
-            wx.ID_ANY, "Könyv&olvasó (élő felolvasás)\tCtrl+Shift+O",
-            "Könyv felolvasása a programban, könyvjelzővel (folytatható)")
-        mi_book = m_books.Append(
-            wx.ID_ANY, "&Hangoskönyv készítő\tCtrl+Shift+B",
-            "Könyv (TXT/DOCX/EPUB/PDF) átalakítása MP3 hangoskönyvvé")
-        m_books.AppendSeparator()
-        mi_docconv = m_books.Append(
-            wx.ID_ANY, "&Dokumentum-konverter\tCtrl+Shift+D",
-            "Azonnali konverzió könyv- és szövegformátumok közt (TXT, DOCX, "
-            "EPUB, PDF, HTML) és kódolás-átalakítás (UTF-8 és társai)")
-        mb.Append(m_books, "&Könyvek")
+        # A „Könyvek" MENÜ MOSTANTÓL MODUL: a Könyvolvasó és a Hangoskönyv-készítő
+        # a „konyvek", a dokumentum-konverter a „docconvert" modulban (Modulkezelő
+        # → telepítés); a menü akkor jelenik meg, ha a modul telepítve van.
 
         m_tools = wx.Menu()
         mi_assist = m_tools.Append(
@@ -506,54 +468,20 @@ class MainFrame(wx.Frame):
         mi_search = m_tools.Append(
             wx.ID_ANY, "Média&kereső\tCtrl+F",
             "Keresés több forráson, lejátszás és letöltés egy helyen")
-        mi_radio = m_tools.Append(
-            wx.ID_ANY, "Internetes &rádió\tCtrl+Shift+R",
-            "Élő rádióállomások keresése és hallgatása")
-        mi_iptv = m_tools.Append(
-            wx.ID_ANY, "Internetes &TV (legális IPTV)\tCtrl+Shift+I",
-            "Saját, legális m3u/Xtream forrás csatornái akadálymentesen, "
-            "felolvasott műsorújsággal (EPG)")
-        mi_superm = m_tools.Append(
-            wx.ID_ANY, "Super &M – műsorszóró stúdió\tCtrl+Shift+M",
-            "Rádió-műsorszórás: lejátszás, keverés, mikrofon, jingle-pad, "
-            "Shoutcast/Icecast (BASS motor)")
-        mi_video = m_tools.Append(
-            wx.ID_ANY, "&Videókészítő (kép + zene)\tCtrl+Shift+V",
-            "Videó készítése háttérképből és zenéből, idővonalas szöveg- és "
-            "kép-beszúrással")
-        mi_convert = m_tools.Append(
-            wx.ID_ANY, "Médiakonvertá&ló (kötegelt)\tCtrl+Shift+K",
-            "Hang/videó fájlok átalakítása más formátumba, egyszerre többet is")
-        mi_vedit = m_tools.Append(
-            wx.ID_ANY, "Videóvá&gó és összefűző\tCtrl+Shift+E",
-            "Videó vágása füllel (markerek), magyarázó szöveg ráégetése, "
-            "videók összefűzése")
-        mi_ring = m_tools.Append(
-            wx.ID_ANY, "iPhone &csengőhang-készítő\tCtrl+Shift+G",
-            "Csengőhang (.m4r) vagy MP3 készítése egy zene részletéből")
-        mi_analyze = m_tools.Append(
-            wx.ID_ANY, "Beszélő média&elemző\tCtrl+Shift+Q",
-            "Médiafájl ellenőrzése és hangtechnikai elemzése (LUFS, csúcs, "
-            "torzítás), valamint EBU R128 hangerő-normalizálás profilonként")
+        # Az Internetes rádió MOSTANTÓL külön MODUL (Modulkezelő → telepítés).
+        # Az Internetes TV (IPTV) MOSTANTÓL külön MODUL (Modulkezelő → telepítés).
+        # A Super M – műsorszóró stúdió MOSTANTÓL a „Super Media" MODULban.
+        # A videókészítő MOSTANTÓL a „Média-eszközök" MODULban (Modulkezelő).
+        # A médiakonvertáló MOSTANTÓL a „Média-eszközök" MODULban.
+        # A videóvágó-összefűző MOSTANTÓL a „Média-eszközök" MODULban.
+        # A csengőhang-készítő és a médiaelemző MOSTANTÓL a „Média-eszközök"
+        # MODULban (Modulkezelő → telepítés).
+        # A Hírolvasó MOSTANTÓL a „Szervezés" MODULban.
         m_tools.AppendSeparator()
-        mi_news = m_tools.Append(
-            wx.ID_ANY, "&Hírolvasó\tCtrl+Shift+H",
-            "Reklámmentes RSS hírgyűjtő és letisztított cikkolvasó")
-        mi_dayinfo = m_tools.Append(
-            wx.ID_ANY, "Napi in&fó (időjárás, névnap)\tCtrl+Shift+W",
-            "Mai dátum, névnap és időjárás a megadott városra")
-        mi_org = m_tools.Append(
-            wx.ID_ANY, "Naptár, teen&dők, jegyzetek\tCtrl+Shift+N",
-            "Események emlékeztetővel, teendők, jegyzetek és külső "
-            "naptár-szinkron (ICS-link)")
-        mi_p2p = m_tools.Append(
-            wx.ID_ANY, "Fájlküldés gépről gé&pre (P2P)\tCtrl+Shift+T",
-            "Nagy fájl küldése egy másik gépre felhő nélkül, bemondható "
-            "kóddal, titkosítva")
-        mi_superstream = m_tools.Append(
-            wx.ID_ANY, "Super &Stream – élő multistream…",
-            "Élő adás egyszerre több platformra (YouTube, Facebook, TikTok) a "
-            "saját stream-kulcsoddal")
+        # A Napi infó és a Naptár ABLAKAI MOSTANTÓL a „Szervezés" MODULban
+        # (a backendek – üdvözlés, naptár-kezelő – a Core-ban maradnak).
+        # A P2P fájlküldés MOSTANTÓL külön MODUL (Modulkezelő → telepítés).
+        # A Super Stream – élő multistream MOSTANTÓL a „Super Media" MODULban.
         m_tools.AppendSeparator()
         mi_modmgr = m_tools.Append(
             wx.ID_ANY, "&Modulkezelő…",
@@ -587,10 +515,7 @@ class MainFrame(wx.Frame):
         mi_ai_vid = m_ai.Append(
             wx.ID_ANY, "Videó &elemzése (URL vagy fájl)…",
             "A videó KÉPI tartalmának elemzése a Geminivel")
-        mi_ai_ad = m_ai.Append(
-            wx.ID_ANY, "AI &hangalámondás videóhoz…",
-            "A videó képi tartalmát az AI leírja és hanggal beleszövi "
-            "(vakon nézhető videó)")
+        # Az AI hangalámondás MOSTANTÓL külön MODUL (Modulkezelő → telepítés).
         m_ai.AppendSeparator()
         mi_ai_set = m_ai.Append(
             wx.ID_ANY, "AI-&beállítások (kulcsok)…",
@@ -629,7 +554,6 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_speak_summary, mi_speak)
         self.Bind(wx.EVT_MENU, self._on_subscribe, mi_subnew)
         self.Bind(wx.EVT_MENU, self._on_manage_subs, mi_submng)
-        self.Bind(wx.EVT_MENU, self._on_podcast_window, mi_subdisc)
         self.Bind(wx.EVT_MENU, self._on_channel_subscribe, mi_chan_new)
         self.Bind(wx.EVT_MENU, self._on_fresh_videos, mi_chan_fresh)
         self.Bind(wx.EVT_MENU, self._on_channels_window, mi_chan_mng)
@@ -643,24 +567,8 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_ai_keys_help, mi_aikeys)
         self.Bind(wx.EVT_MENU, self._on_check_updates, mi_upd)
         self.Bind(wx.EVT_MENU, self._on_search_window, mi_search)
-        self.Bind(wx.EVT_MENU, self._on_radio_window, mi_radio)
-        self.Bind(wx.EVT_MENU, self._on_superm_window, mi_superm)
-        self.Bind(wx.EVT_MENU, self._on_iptv_window, mi_iptv)
         self.Bind(wx.EVT_MENU, self._on_modmgr_window, mi_modmgr)
-        self.Bind(wx.EVT_MENU, self._on_superstream_window, mi_superstream)
-        self.Bind(wx.EVT_MENU, self._on_book_window, mi_book)
-        self.Bind(wx.EVT_MENU, self._on_reader_window, mi_reader)
-        self.Bind(wx.EVT_MENU, self._on_docconvert_window, mi_docconv)
-        self.Bind(wx.EVT_MENU, self._on_video_window, mi_video)
-        self.Bind(wx.EVT_MENU, self._on_convert_window, mi_convert)
-        self.Bind(wx.EVT_MENU, self._on_mediaanalyze_window, mi_analyze)
-        self.Bind(wx.EVT_MENU, self._on_videoedit_window, mi_vedit)
         self.Bind(wx.EVT_MENU, self._on_assistant_window, mi_assist)
-        self.Bind(wx.EVT_MENU, self._on_ringtone_window, mi_ring)
-        self.Bind(wx.EVT_MENU, self._on_news_window, mi_news)
-        self.Bind(wx.EVT_MENU, self._on_dayinfo_window, mi_dayinfo)
-        self.Bind(wx.EVT_MENU, self._on_organizer_window, mi_org)
-        self.Bind(wx.EVT_MENU, self._on_p2p_window, mi_p2p)
         self.Bind(wx.EVT_MENU, self._on_ai_image, mi_ai_img)
         self.Bind(wx.EVT_MENU, self._on_ai_clip, mi_ai_clip)
         self.Bind(wx.EVT_MENU, self._on_ai_ocr, mi_ai_ocr)
@@ -671,7 +579,6 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, lambda e: self._on_ai_transcribe(srt=True),
                   mi_ai_srt)
         self.Bind(wx.EVT_MENU, self._on_ai_video, mi_ai_vid)
-        self.Bind(wx.EVT_MENU, self._on_videodescribe_window, mi_ai_ad)
         self.Bind(wx.EVT_MENU, lambda e: self._on_settings(page=3), mi_ai_set)
         self.Bind(wx.EVT_MENU, self._on_support, mi_support)
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(0), mi_about)
@@ -1087,14 +994,6 @@ class MainFrame(wx.Frame):
         self._search_win = MediaSearchFrame(self)
         self._search_win.Show()
 
-    def _on_radio_window(self, event=None):
-        if self._radio_win:
-            self._radio_win.Raise()
-            self._radio_win.search_entry.SetFocus()
-            return
-        self._radio_win = RadioFrame(self)
-        self._radio_win.Show()
-
     def _on_record_event(self, text, level):
         """A rádiófelvétel-kezelő üzenete (felvétel indult/kész/hiba)."""
         sound = {"start": "start", "done": "done",
@@ -1146,68 +1045,6 @@ class MainFrame(wx.Frame):
                 self._announce(f"Az időzített megnyitás nem sikerült: {e}",
                                ok=False)
 
-    def _on_book_window(self, event=None):
-        if self._book_win:
-            self._book_win.Raise()
-            return
-        self._book_win = BookFrame(self)
-        self._book_win.Show()
-
-    def _on_news_window(self, event=None):
-        if self._news_win:
-            self._news_win.Raise()
-            return
-        self._news_win = NewsFrame(self)
-        self._news_win.Show()
-
-    def _on_video_window(self, event=None):
-        if self._video_win:
-            self._video_win.Raise()
-            return
-        self._video_win = VideoComposeFrame(self)
-        self._video_win.Show()
-
-    def _on_convert_window(self, event=None):
-        if self._convert_win:
-            self._convert_win.Raise()
-            return
-        self._convert_win = BatchConvertFrame(self)
-        self._convert_win.Show()
-
-    def _on_videoedit_window(self, event=None):
-        if self._videoedit_win:
-            self._videoedit_win.Raise()
-            return
-        self._videoedit_win = VideoEditFrame(self)
-        self._videoedit_win.Show()
-
-    def _on_videodescribe_window(self, event=None):
-        if self._videodescribe_win:
-            self._videodescribe_win.Raise()
-            return
-        self._videodescribe_win = VideoDescribeFrame(self)
-        self._videodescribe_win.Show()
-
-    def _on_mediaanalyze_window(self, event=None):
-        if self._mediaanalyze_win:
-            self._mediaanalyze_win.Raise()
-            return
-        self._mediaanalyze_win = MediaAnalyzeFrame(self)
-        self._mediaanalyze_win.Show()
-
-    def _on_docconvert_window(self, event=None):
-        if self._docconvert_win:
-            self._docconvert_win.Raise()
-            return
-        self._docconvert_win = DocConvertFrame(self)
-        self._docconvert_win.Show()
-
-    def _on_iptv_window(self, event=None):
-        if self._iptv_win:
-            self._iptv_win.Raise()
-            return
-        self._iptv_win = IPTVFrame(self)
-        self._iptv_win.Show()
 
     def _on_modmgr_window(self, event=None):
         if self._modmgr_win:
@@ -1217,14 +1054,6 @@ class MainFrame(wx.Frame):
         self._modmgr_win = ModuleManagerFrame(self)
         self._modmgr_win.Show()
 
-    def _on_superstream_window(self, event=None):
-        if self._superstream_win:
-            self._superstream_win.Raise()
-            return
-        from superdl.superstreamwin import SuperStreamFrame
-        self._superstream_win = SuperStreamFrame(self)
-        self._superstream_win.Show()
-
     def _on_assistant_window(self, event=None):
         if self._assistant_win:
             self._assistant_win.Raise()
@@ -1232,53 +1061,7 @@ class MainFrame(wx.Frame):
         self._assistant_win = AssistantFrame(self)
         self._assistant_win.Show()
 
-    def _on_superm_window(self, event=None):
-        if self._superm_win:
-            self._superm_win.Raise()
-            return
-        try:
-            self._superm_win = SuperMFrame(self)
-        except Exception as e:
-            wx.MessageBox(f"A Super M stúdió nem indult el: {e}", "Super M",
-                          wx.OK | wx.ICON_ERROR, self)
-            return
-        self._superm_win.Show()
 
-    def _on_ringtone_window(self, event=None):
-        if self._ringtone_win:
-            self._ringtone_win.Raise()
-            return
-        self._ringtone_win = RingtoneFrame(self)
-        self._ringtone_win.Show()
-
-    def _on_podcast_window(self, event=None):
-        if self._podcast_win:
-            self._podcast_win.Raise()
-            return
-        self._podcast_win = PodcastFrame(self)
-        self._podcast_win.Show()
-
-    def _on_organizer_window(self, event=None):
-        if self._organizer_win:
-            self._organizer_win.Raise()
-            return
-        self._organizer_win = OrganizerFrame(self, self._organizer)
-        self._organizer_win.Show()
-
-    def _on_p2p_window(self, event=None):
-        if self._p2p_win:
-            self._p2p_win.Raise()
-            return
-        self._p2p_win = P2PFrame(self)
-        self._p2p_win.Show()
-
-    def _on_reader_window(self, event=None, open_path="", text="", title=""):
-        if self._reader_win:
-            self._reader_win.Raise()
-            return
-        self._reader_win = ReaderFrame(self, open_path=open_path,
-                                       text=text, title=title)
-        self._reader_win.Show()
 
     def _auto_update_check(self):
         import datetime
@@ -1585,12 +1368,6 @@ class MainFrame(wx.Frame):
         # indításkor automatikus, hangos üdvözlés (beep nélkül, hogy ne
         # ütközzön a beszéddel)
         self._speak_dayinfo(toast=False, beep=False)
-
-    def _on_dayinfo_window(self, event=None):
-        dlg = DayInfoDialog(self, self._compose_dayinfo,
-                            self._fetch_weather_async, self.speaker)
-        dlg.ShowModal()
-        dlg.Destroy()
 
     # ---- AI: kép leírása / OCR ----------------------------------------
 
@@ -1965,40 +1742,8 @@ class MainFrame(wx.Frame):
         self.speaker.stop()
         if self._search_win:
             self._search_win.Destroy()
-        if self._radio_win:
-            self._radio_win.Destroy()
-        if self._book_win:
-            self._book_win.Destroy()
-        if self._news_win:
-            self._news_win.Destroy()
-        if self._reader_win:
-            self._reader_win.Destroy()
-        if self._video_win:
-            self._video_win.Destroy()
-        if self._convert_win:
-            self._convert_win.Destroy()
-        if self._ringtone_win:
-            self._ringtone_win.Destroy()
-        if self._podcast_win:
-            self._podcast_win.Destroy()
-        if self._organizer_win:
-            self._organizer_win.Destroy()
-        if self._p2p_win:
-            self._p2p_win.Destroy()
-        if self._videoedit_win:
-            self._videoedit_win.Destroy()
-        if self._videodescribe_win:
-            self._videodescribe_win.Destroy()
         if self._assistant_win:
             self._assistant_win.Destroy()
-        if self._superm_win:
-            self._superm_win.Destroy()
-        if self._mediaanalyze_win:
-            self._mediaanalyze_win.Destroy()
-        if self._docconvert_win:
-            self._docconvert_win.Destroy()
-        if self._iptv_win:
-            self._iptv_win.Destroy()
         if self._organizer:
             self._organizer.shutdown()
         self._save_settings()

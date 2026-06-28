@@ -1,0 +1,11 @@
+{
+  "id": "hangalamondas",
+  "name": "AI hangalámondás",
+  "version": "1.0.0",
+  "entry": "hangalamondas_mod",
+  "category": "AI",
+  "description": "AI hangalámondás (audio description) videóhoz: a videó képi tartalmát AI írja le és hanggal mondja el, az eredeti hang alatta halkítva – így a videó vakon is „nézhető”. A leírás részletessége és elhelyezése (párbeszéd-szünet / kiterjesztett) választható; a saját AI-kulcsoddal megy.",
+  "min_core_api": "1.0",
+  "requires_tools": [],
+  "author": "Kőrösmezey Dávid"
+}

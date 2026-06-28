@@ -1,0 +1,11 @@
+{
+  "id": "p2p",
+  "name": "Fájlküldés gépről gépre (P2P)",
+  "version": "1.0.0",
+  "entry": "p2p_mod",
+  "category": "Eszközök",
+  "description": "Nagy fájl küldése egy másik gépre felhő nélkül, bemondható kóddal, végpontok közötti titkosítással (magic-wormhole). A küldő is jelzést kap, amikor a fájl megérkezett.",
+  "min_core_api": "1.0",
+  "requires_tools": [],
+  "author": "Kőrösmezey Dávid"
+}

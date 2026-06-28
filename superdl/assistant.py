@@ -173,12 +173,16 @@ def execute(main, action: str, params: dict, say) -> None:
             win.search_entry.SetValue(q)
             win._on_search()
     elif action == "radio":
-        main._on_radio_window()
-        q = (params.get("query") or "").strip()
-        win = getattr(main, "_radio_win", None)
-        if win and q:
-            win.search_entry.SetValue(q)
-            win._on_search()
+        if not hasattr(main, "_on_radio_window"):
+            say("Az internetes rádió külön modul. Telepítsd a Modulkezelőből, "
+                "azután elérhető lesz.")
+        else:
+            main._on_radio_window()
+            q = (params.get("query") or "").strip()
+            win = getattr(main, "_radio_win", None)
+            if win and q:
+                win.search_entry.SetValue(q)
+                win._on_search()
     elif action == "agenda":
         say(agenda_text(main))
     elif action == "subscriptions":
@@ -193,6 +197,10 @@ def execute(main, action: str, params: dict, say) -> None:
         method = TOOL_METHODS.get(tool)
         if method and hasattr(main, method):
             getattr(main, method)()
+        elif method:
+            # ismert eszköz, de a metódus hiányzik → külön MODUL, nincs telepítve
+            say("Ez a funkció külön modul. Telepítsd a Modulkezelőből, "
+                "azután elérhető lesz.")
         else:
             say("Ezt az eszközt nem ismerem fel.")
     # "none": csak a say hangzott el

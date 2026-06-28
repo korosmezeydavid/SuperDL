@@ -5,6 +5,9 @@ __pycache__/
 # PyInstaller build kimenetek (a kész exe-k a GitHub Release-ekbe kerülnek)
 build/
 dist/
+dist_modules/
+installer/
+release_staging/
 *.spec
 
 # SuperDL futási maradékfájlok

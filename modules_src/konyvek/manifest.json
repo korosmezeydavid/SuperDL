@@ -1,0 +1,11 @@
+{
+  "id": "konyvek",
+  "name": "Könyvek",
+  "version": "1.0.0",
+  "entry": "konyvek_mod",
+  "category": "Könyvek",
+  "description": "Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3, választható hanggal és sebességgel).",
+  "min_core_api": "1.0",
+  "requires_tools": [],
+  "author": "Kőrösmezey Dávid"
+}
