@@ -48,13 +48,12 @@ from superdl.searchwin import MediaSearchFrame
 from superdl.organizer import OrganizerManager
 # A Naptár-ABLAK MOSTANTÓL a „Szervezés" MODULban (a kezelő a Core-ban marad).
 # Az AI hangalámondás MOSTANTÓL külön MODUL („AI hangalámondás").
-from superdl.assistantwin import AssistantFrame
+# Az AI-asszisztens és az AI/UI mód-váltó ELTÁVOLÍTVA (klasszikus UI).
 # A Super M és a Super Stream MOSTANTÓL a „Super Media" MODULban.
 # Az Internetes TV (IPTV) MOSTANTÓL külön MODUL.
 # A Hangoskönyv-készítő MOSTANTÓL a „Könyvek" MODULban.
 from superdl.radiorec import RecordManager
 from superdl import dayinfo, weather, search, store, aiclient, mediaai
-from superdl import assistant
 from superdl.settingsdialog import SettingsDialog
 from superdl.aiwin import run_ai, run_ai_progress
 # A Napi infó ABLAK MOSTANTÓL a „Szervezés" MODULban (az üdvözlés-backend a Core-ban).
@@ -172,8 +171,8 @@ PRIVACY_TEXT = (
     "  • a letöltésre megadott címekhez; a feliratkozott RSS/podcastokhoz;\n"
     "  • médiaoldal letöltésekor az adott oldalhoz (yt-dlp); torrentnél a "
     "trackerekhez és a peerekhez;\n"
-    "  • AI-funkcióknál (kép-/szövegleírás, OCR, átirat, hangalámondás, "
-    "asszisztens) a VÁLASZTOTT szolgáltatóhoz (OpenAI, Google Gemini, "
+    "  • AI-funkcióknál (kép-/szövegleírás, OCR, átirat, hangalámondás) "
+    "a VÁLASZTOTT szolgáltatóhoz (OpenAI, Google Gemini, "
     "Anthropic, xAI Grok) – a SAJÁT kulcsoddal –, ahová a feldolgozandó szöveg, "
     "kép, hang vagy videó kerül;\n"
     "  • az Edge online beszédhang a felolvasandó szöveget a Microsofthoz küldi "
@@ -243,7 +242,6 @@ class MainFrame(wx.Frame):
         self.speaker = VoiceSpeaker()
         self.selfvoice = SelfVoice()        # művelet-bejelentő réteg (M12)
         self._search_win = None
-        self._assistant_win = None
         self._modmgr_win = None
         self._record_mgr = None
         self._known_rows: dict[int, int] = {}   # job.id -> listasor
@@ -295,7 +293,6 @@ class MainFrame(wx.Frame):
         wx.CallLater(1200, self._startup_greeting)
 
         self.url_entry.SetFocus()
-        wx.CallAfter(self._init_mode)
         wx.CallAfter(self._init_modules)
 
     def _init_modules(self):
@@ -308,83 +305,6 @@ class MainFrame(wx.Frame):
         except Exception:
             import logging
             logging.getLogger("superdl").exception("modulbetöltés hiba")
-
-    # ---- AI / UI mód --------------------------------------------------
-
-    def _init_mode(self):
-        """Első indításkor megkérdezi a kívánt módot (UI vagy AI), utána
-        emlékszik rá. Aztán alkalmazza a beállított módot."""
-        if not self.settings.get("ui_mode_chosen"):
-            dlg = wx.MessageDialog(
-                self,
-                "Hogyan szeretnéd használni a SuperDL-t?\n\n"
-                "• IGEN → AI mód: mondd vagy írd be, mit szeretnél, és az "
-                "asszisztens elintézi.\n"
-                "• NEM → Klasszikus (UI) mód: a megszokott menük és gombok.\n\n"
-                "Bármikor válthatsz a főablak „módra váltás” gombjával.",
-                "Üdvözöl a SuperDL – válassz módot",
-                wx.YES_NO | wx.ICON_QUESTION)
-            dlg.SetYesNoLabels("AI mód", "Klasszikus (UI) mód")
-            self.settings["ui_mode"] = ("ai" if dlg.ShowModal() == wx.ID_YES
-                                        else "ui")
-            self.settings["ui_mode_chosen"] = True
-            dlg.Destroy()
-            self._save_settings()
-        self._apply_mode()
-
-    def _toggle_mode(self):
-        self.settings["ui_mode"] = ("ui" if self.settings.get("ui_mode") == "ai"
-                                    else "ai")
-        self.settings["ui_mode_chosen"] = True
-        self._apply_mode()
-        self._save_settings()
-
-    def _apply_mode(self):
-        ai = self.settings.get("ui_mode") == "ai"
-        self.assist_panel.Show(ai)
-        self.mode_btn.SetLabel("Klasszikus (UI) módra váltás" if ai
-                               else "AI módra váltás")
-        self._main_panel.Layout()
-        if ai:
-            self.assist_cmd.SetFocus()
-            self._announce("AI mód bekapcsolva. Mondd vagy írd be, mit "
-                           "szeretnél.", toast=False)
-        else:
-            self.url_entry.SetFocus()
-            self._announce("Klasszikus mód. Illessz be egy URL-t, vagy "
-                           "használd a menüket.")
-
-    def _assist_run(self):
-        text = self.assist_cmd.GetValue().strip()
-        if not text:
-            return
-        self.assist_cmd.SetValue("")
-        self.log.AppendText(f"» {text}\n")
-        self._announce("Értelmezem…")
-
-        def work():
-            result = assistant.parse_command(text)
-            wx.CallAfter(self._assist_done, result)
-
-        threading.Thread(target=work, daemon=True).start()
-
-    def _assist_done(self, result):
-        say = result.get("say", "")
-        if say:
-            self._assist_say(say)
-        try:
-            assistant.execute(self, result.get("action", "none"),
-                              result.get("params", {}), self._assist_say)
-        except Exception as e:
-            self._assist_say(f"Nem sikerült végrehajtani: {e}")
-
-    def _assist_say(self, text):
-        self._announce(text)
-        self.log.AppendText(text + "\n")
-        try:
-            self.selfvoice.speak(text, force=True)
-        except Exception:
-            pass
 
     # ---- felépítés ----------------------------------------------------
 
@@ -460,11 +380,7 @@ class MainFrame(wx.Frame):
         # → telepítés); a menü akkor jelenik meg, ha a modul telepítve van.
 
         m_tools = wx.Menu()
-        mi_assist = m_tools.Append(
-            wx.ID_ANY, "&Asszisztens (hang/írás)\tCtrl+Shift+A",
-            "Mondd vagy írd be, mit szeretnél – az AI a megfelelő eszközhöz "
-            "irányít")
-        m_tools.AppendSeparator()
+        # Az AI-asszisztens ELTÁVOLÍTVA (az AI-eszközök az AI menüben maradnak).
         mi_search = m_tools.Append(
             wx.ID_ANY, "Média&kereső\tCtrl+F",
             "Keresés több forráson, lejátszás és letöltés egy helyen")
@@ -568,7 +484,6 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_check_updates, mi_upd)
         self.Bind(wx.EVT_MENU, self._on_search_window, mi_search)
         self.Bind(wx.EVT_MENU, self._on_modmgr_window, mi_modmgr)
-        self.Bind(wx.EVT_MENU, self._on_assistant_window, mi_assist)
         self.Bind(wx.EVT_MENU, self._on_ai_image, mi_ai_img)
         self.Bind(wx.EVT_MENU, self._on_ai_clip, mi_ai_clip)
         self.Bind(wx.EVT_MENU, self._on_ai_ocr, mi_ai_ocr)
@@ -587,26 +502,6 @@ class MainFrame(wx.Frame):
         panel = wx.Panel(self)
         self._main_panel = panel
         vbox = wx.BoxSizer(wx.VERTICAL)
-
-        # AI-asszisztens sáv (csak AI módban látszik) – a főablak tetején
-        self.assist_panel = wx.Panel(panel)
-        ar = wx.BoxSizer(wx.HORIZONTAL)
-        ar.Add(wx.StaticText(self.assist_panel, label="&Asszisztens:"), 0,
-               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
-        self.assist_cmd = wx.TextCtrl(self.assist_panel, style=wx.TE_PROCESS_ENTER)
-        self.assist_cmd.SetName("Asszisztens parancs")
-        self.assist_cmd.SetHint("Mondd vagy írd be, mit szeretnél…")
-        self.assist_cmd.Bind(wx.EVT_TEXT_ENTER, lambda e: self._assist_run())
-        ab_run = wx.Button(self.assist_panel, label="&Futtatás")
-        ab_run.Bind(wx.EVT_BUTTON, lambda e: self._assist_run())
-        ab_voice = wx.Button(self.assist_panel, label="&Beszéd…")
-        ab_voice.Bind(wx.EVT_BUTTON, lambda e: self._on_assistant_window())
-        ar.Add(self.assist_cmd, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
-        ar.Add(ab_run, 0, wx.RIGHT, 6)
-        ar.Add(ab_voice, 0)
-        self.assist_panel.SetSizer(ar)
-        self.assist_panel.Hide()        # csak AI módban jelenik meg
-        vbox.Add(self.assist_panel, 0, wx.EXPAND | wx.ALL, 8)
 
         # URL-sor
         row1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -641,14 +536,11 @@ class MainFrame(wx.Frame):
         self.audio_chk.SetName("Médiaoldalról csak a hangsáv letöltése")
         btn_settings = wx.Button(sb, label="&Beállítások…")
         btn_settings.Bind(wx.EVT_BUTTON, self._on_settings)
-        self.mode_btn = wx.Button(sb, label="AI módra váltás")
-        self.mode_btn.Bind(wx.EVT_BUTTON, lambda e: self._toggle_mode())
         box.Add(lbl_dir, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         box.Add(self.dir_entry, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         box.Add(btn_dir, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 12)
         box.Add(self.audio_chk, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 12)
-        box.Add(btn_settings, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 12)
-        box.Add(self.mode_btn, 0, wx.ALIGN_CENTER_VERTICAL)
+        box.Add(btn_settings, 0, wx.ALIGN_CENTER_VERTICAL)
         vbox.Add(box, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
 
         # letöltési lista
@@ -696,7 +588,6 @@ class MainFrame(wx.Frame):
             "beep_enabled": True, "beep_volume": 30,
             "selfvoice_enabled": False, "selfvoice_voice": "",
             "selfvoice_rate": 0, "selfvoice_pitch": 0, "selfvoice_volume": 100,
-            "ui_mode": "ui", "ui_mode_chosen": False,
         }
         try:
             self.settings.update(json.loads(SETTINGS_FILE.read_text()))
@@ -1053,13 +944,6 @@ class MainFrame(wx.Frame):
         from superdl.modmanagerwin import ModuleManagerFrame
         self._modmgr_win = ModuleManagerFrame(self)
         self._modmgr_win.Show()
-
-    def _on_assistant_window(self, event=None):
-        if self._assistant_win:
-            self._assistant_win.Raise()
-            return
-        self._assistant_win = AssistantFrame(self)
-        self._assistant_win.Show()
 
 
 
@@ -1742,8 +1626,6 @@ class MainFrame(wx.Frame):
         self.speaker.stop()
         if self._search_win:
             self._search_win.Destroy()
-        if self._assistant_win:
-            self._assistant_win.Destroy()
         if self._organizer:
             self._organizer.shutdown()
         self._save_settings()
