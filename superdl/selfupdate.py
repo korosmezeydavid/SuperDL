@@ -37,6 +37,24 @@ DEFAULT_REPO = "korosmezeydavid/SuperDL"
 UA = {"User-Agent": "SuperDL-selfupdate"}
 
 
+def _clean_child_env() -> dict:
+    """A PyInstaller-bootloader BELSŐ környezeti változóit kiszedi a gyerek-
+    folyamat környezetéből.
+
+    A frozen app indításakor a bootloader beállítja a `_PYI_APPLICATION_HOME_DIR`
+    (és társai: `_PYI_ARCHIVE_FILE`, `_PYI_PARENT_PROCESS_LEVEL`, `_MEIPASS2`…)
+    változókat. Ha az önfrissítő ezek ÖRÖKLÉSÉVEL indítja a telepítőt/swappert,
+    azok TOVÁBBADJÁK az ÚJRAINDÍTOTT SuperDL-nek, és annak a bootloadere a régi
+    SZÜLŐ értékét/üres értékét látja → „_PYI_APPLICATION_HOME_DIR is not defined".
+    Ezért minden olyan gyereknek, ami (közvetve) ÚJ frozen appot indít, TISZTA
+    környezetet adunk."""
+    env = os.environ.copy()
+    for k in list(env):
+        if k.startswith("_PYI") or k == "_MEIPASS2":
+            env.pop(k, None)
+    return env
+
+
 def _repo_file_candidates() -> list[Path]:
     cands: list[Path] = []
     if getattr(sys, "frozen", False):              # az exe melletti repo.txt
@@ -300,8 +318,10 @@ def _spawn_swapper(folder: Path, pairs: list[tuple[Path, Path]],
     # std-leírókkal működnek; a DETACHED_PROCESS itt épp ezért NEM jó, mert
     # leírók nélkül a cső nem jön létre), és a szülő kilépése után is fusson.
     flags = 0x08000000 | 0x00000200
+    # TISZTA környezet: különben a swapper által ÚJRAINDÍTOTT SuperDL örökölné a
+    # szülő _PYI_APPLICATION_HOME_DIR-jét → bootloader-hiba indításkor.
     subprocess.Popen(["cmd", "/c", str(bat)], creationflags=flags,
-                     close_fds=True, cwd=str(folder))
+                     close_fds=True, cwd=str(folder), env=_clean_child_env())
 
 
 def is_onedir() -> bool:
@@ -339,10 +359,14 @@ def apply_installer(assets: dict, name: str, progress=None,
         raise RuntimeError(
             "A letöltött telepítő ellenőrző összege nem egyezik a hivatalossal "
             "– sérült vagy manipulált, a frissítést megszakítottam.")
-    # csendes telepítés; a futó appot a telepítő zárja be és indítja újra
+    # csendes telepítés; a futó appot a telepítő zárja be és indítja újra.
+    # TISZTA környezet: a telepítő (és az általa ÚJRAINDÍTOTT SuperDL) NE örökölje
+    # a szülő _PYI_* változóit → különben az újraindított app bootloadere elszáll
+    # („_PYI_APPLICATION_HOME_DIR is not defined").
     subprocess.Popen(
         [str(dest), "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART",
-         "/FORCECLOSEAPPLICATIONS", "/RESTARTAPPLICATIONS"], close_fds=True)
+         "/FORCECLOSEAPPLICATIONS", "/RESTARTAPPLICATIONS"],
+        close_fds=True, env=_clean_child_env())
     return [name]
 
 
