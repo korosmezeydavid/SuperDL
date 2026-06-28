@@ -21,7 +21,7 @@ def register(core):
     from .supermwin import SuperMFrame
     from .superstreamwin import SuperStreamFrame
 
-    menu = core.add_menu("Super &Media")
+    menu = core.add_menu("Su&per Media")
     _add(core, menu, "superm_module", SuperMFrame,
          "Super &M – műsorszóró stúdió\tCtrl+Shift+M",
          "Rádió-műsorszórás: lejátszás, keverés, mikrofon, jingle-pad, "

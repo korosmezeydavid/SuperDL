@@ -14,7 +14,7 @@ def register(core):
     from .p2pwin import P2PFrame
 
     opener = core.register_window("p2p_module", P2PFrame)
-    menu = core.add_menu("&Fájlküldés")
+    menu = core.add_menu("Fá&jlküldés")
     item = core.add_menu_item(
         menu, "Fájlküldés gépről gé&pre (P2P)\tCtrl+Shift+T", opener,
         help="Nagy fájl küldése egy másik gépre felhő nélkül, bemondható "

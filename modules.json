@@ -21,11 +21,11 @@
       "category": "Eszközök",
       "description": "Nagy fájl küldése egy másik gépre felhő nélkül, bemondható kóddal, végpontok közötti titkosítással (magic-wormhole). A küldő is jelzést kap, amikor a fájl megérkezett.",
       "latest": {
-        "version": "1.0.0",
+        "version": "1.0.1",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-p2p-1.0.0/p2p-1.0.0.zip",
-        "sha256": "13bb3f26dddc475cacb27a83f033c057739cae54ab1e973fde8ef9469d41f7bb",
-        "size": 6195
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-p2p-1.0.1/p2p-1.0.1.zip",
+        "sha256": "5f0735aa29442c42816008fdad7c34ce29ad31ccdccffc012a1e4a657386e1fd",
+        "size": 6197
       }
     },
     {
@@ -47,11 +47,11 @@
       "category": "Szervezés",
       "description": "Szervezés-eszközök egy csomagban: akadálymentes Hírolvasó (RSS-gyűjtő letisztított cikkolvasóval), Podcast-felfedező (keresés, ország-toplista, feliratkozással), Naptár/teendők/jegyzetek (emlékeztetővel, ICS-szinkronnal) és Napi infó (időjárás, névnap).",
       "latest": {
-        "version": "1.1.0",
+        "version": "1.1.1",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.1.0/szervezes-1.1.0.zip",
-        "sha256": "b68882b24a9d9028f6578343a5050e759f2d88228a23fa09bba41f9ce3972f9c",
-        "size": 21346
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.1.1/szervezes-1.1.1.zip",
+        "sha256": "f36a6ee9faa5ac95244ae66f0d46a44dfc950cbadbc5204012b94442433e12b6",
+        "size": 21348
       }
     },
     {
@@ -86,11 +86,11 @@
       "category": "Média",
       "description": "Hang-műsorszóró stúdió és multistream egy csomagban: Super M (akadálymentes rádió-stúdió és médialejátszó – lejátszás, keverés, mikrofon, jingle-pad, valós idejű effekt-rack, Shoutcast/Icecast élő adás, BASS-motor) és Super Stream (élő adás egyszerre több platformra a saját kulcsoddal). A BASS-runtime a Core-ból jön.",
       "latest": {
-        "version": "1.0.0",
+        "version": "1.0.1",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supermedia-1.0.0/supermedia-1.0.0.zip",
-        "sha256": "a35fb0365a8c45003170f987acefb16c4696bc9f1b7e291ea5391038b95a5320",
-        "size": 31260
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supermedia-1.0.1/supermedia-1.0.1.zip",
+        "sha256": "b7a8cad552c812adf79a5a793213d44b97d81a592fb5ce98686c01725d636e25",
+        "size": 31263
       }
     },
     {
@@ -112,11 +112,11 @@
       "category": "AI",
       "description": "AI hangalámondás (audio description) videóhoz: a videó képi tartalmát AI írja le és hanggal mondja el, az eredeti hang alatta halkítva – így a videó vakon is „nézhető”. A leírás részletessége és elhelyezése választható; a saját AI-kulcsoddal megy.",
       "latest": {
-        "version": "1.0.0",
+        "version": "1.0.1",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-hangalamondas-1.0.0/hangalamondas-1.0.0.zip",
-        "sha256": "accaa24237875f546bf2bbac31e0062c2c884c80374aadcf5ae54f7085791eb3",
-        "size": 10538
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-hangalamondas-1.0.1/hangalamondas-1.0.1.zip",
+        "sha256": "a9e662c072d857a4bf684c295147ad6f3c4cb53cc54565530902601f1e9eb583",
+        "size": 10543
       }
     }
   ]
