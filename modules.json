@@ -45,13 +45,13 @@
       "id": "szervezes",
       "name": "Szervezés",
       "category": "Szervezés",
-      "description": "Szervezés-eszközök egy csomagban: akadálymentes Hírolvasó (RSS-gyűjtő letisztított cikkolvasóval), Podcast-felfedező (keresés, ország-toplista, feliratkozással), Naptár/teendők/jegyzetek (emlékeztetővel, ICS-szinkronnal) és Napi infó (időjárás, névnap).",
+      "description": "Szervezés-eszközök egy csomagban: akadálymentes Hírolvasó (RSS), Podcast-felfedező, Naptár/teendők/jegyzetek (emlékeztetővel, ICS-szinkronnal) ÚJ rezsi/költség-kalkulátor füllel (havi/éves összesítés, naptári emlékeztetők, opcionális PIN-lakat), és Napi infó (időjárás, névnap).",
       "latest": {
-        "version": "1.1.1",
+        "version": "1.2.0",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.1.1/szervezes-1.1.1.zip",
-        "sha256": "f36a6ee9faa5ac95244ae66f0d46a44dfc950cbadbc5204012b94442433e12b6",
-        "size": 21348
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.2.0/szervezes-1.2.0.zip",
+        "sha256": "3db0b87d635cb6fd14aa5fbdac491b6f8d8d76ebde49b71a7c9680609c7e499c",
+        "size": 25517
       }
     },
     {

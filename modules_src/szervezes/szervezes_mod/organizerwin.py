@@ -10,6 +10,7 @@ from datetime import date, datetime
 import wx
 
 from superdl import organizer as O   # a naptár-backend a Core-ban marad (agenda + indítás)
+from . import rezsi as R              # rezsi/költség-kalkulátor (a fülhöz)
 
 REMINDERS = [("Nincs", -1), ("Pontban", 0), ("5 perccel előtte", 5),
              ("10 perccel előtte", 10), ("15 perccel előtte", 15),
@@ -34,6 +35,7 @@ class OrganizerFrame(wx.Frame):
         self._build_agenda()
         self._build_tasks()
         self._build_notes()
+        self._build_rezsi()
         self._build_ics()
         self.CreateStatusBar()
         self._announce(f"Ma {date.today().isoformat()} van. Lapozz a fülek "
@@ -275,6 +277,194 @@ class OrganizerFrame(wx.Frame):
             self.mgr.remove_note(n.id)
             self._refresh_notes()
             self._announce(f"Jegyzet törölve: {n.title}")
+
+    # ---- REZSI / KÖLTSÉG-KALKULÁTOR fül ------------------------------
+
+    def _build_rezsi(self):
+        self.rz = R.RezsiData.load()
+        self._rz_unlocked = not self.rz.has_pin()
+        p = wx.Panel(self.nb)
+        v = wx.BoxSizer(wx.VERTICAL)
+
+        # zár-réteg (PIN): csak akkor látszik, ha lakat van és még nincs feloldva
+        self.rz_lock = wx.Panel(p)
+        lv = wx.BoxSizer(wx.VERTICAL)
+        lv.Add(wx.StaticText(self.rz_lock,
+               label="Ez a fül zárolva. Add meg a PIN-kódot a feloldáshoz:"),
+               0, wx.ALL, 8)
+        lr = wx.BoxSizer(wx.HORIZONTAL)
+        self.rz_pin = wx.TextCtrl(self.rz_lock, style=wx.TE_PASSWORD | wx.TE_PROCESS_ENTER,
+                                  size=(120, -1))
+        self.rz_pin.SetName("PIN-kód a rezsi-fül feloldásához")
+        self.rz_pin.Bind(wx.EVT_TEXT_ENTER, lambda e: self._rz_unlock())
+        b_unlock = wx.Button(self.rz_lock, label="&Feloldás")
+        b_unlock.Bind(wx.EVT_BUTTON, lambda e: self._rz_unlock())
+        lr.Add(self.rz_pin, 0, wx.RIGHT, 6)
+        lr.Add(b_unlock, 0)
+        lv.Add(lr, 0, wx.LEFT | wx.BOTTOM, 8)
+        self.rz_lock.SetSizer(lv)
+        v.Add(self.rz_lock, 0, wx.EXPAND)
+
+        # tartalom-réteg: a lista + vezérlők + összesítés
+        self.rz_body = wx.Panel(p)
+        bv = wx.BoxSizer(wx.VERTICAL)
+        bv.Add(wx.StaticText(self.rz_body,
+               label="&Rendszeres és egyszeri költségek:"), 0, wx.LEFT | wx.TOP, 4)
+        self.rz_list = wx.ListCtrl(self.rz_body,
+                                   style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
+        self.rz_list.SetName("Költségtételek listája")
+        for i, (c, w) in enumerate((("Név", 160), ("Összeg (Ft)", 100),
+                                    ("Gyakoriság", 110), ("Esed. nap", 80),
+                                    ("Megjegyzés", 200))):
+            self.rz_list.InsertColumn(i, c, width=w)
+        self.rz_list.Bind(wx.EVT_LIST_ITEM_ACTIVATED, lambda e: self._rz_edit())
+        bv.Add(self.rz_list, 1, wx.EXPAND | wx.ALL, 4)
+
+        br = wx.BoxSizer(wx.HORIZONTAL)
+        for label, fn in (("Ú&j tétel", self._rz_add),
+                          ("S&zerkesztés", self._rz_edit),
+                          ("&Törlés", self._rz_del),
+                          ("&Naptárba (emlékeztetők)", self._rz_to_calendar),
+                          ("&Lakat (PIN)", self._rz_set_pin)):
+            b = wx.Button(self.rz_body, label=label)
+            b.Bind(wx.EVT_BUTTON, lambda e, f=fn: f())
+            br.Add(b, 0, wx.RIGHT, 5)
+        bv.Add(br, 0, wx.LEFT | wx.BOTTOM, 4)
+
+        self.rz_sum = wx.StaticText(self.rz_body, label="")
+        self.rz_sum.SetName("Költség-összesítés")
+        bv.Add(self.rz_sum, 0, wx.LEFT | wx.BOTTOM, 6)
+        self.rz_body.SetSizer(bv)
+        v.Add(self.rz_body, 1, wx.EXPAND)
+
+        p.SetSizer(v)
+        self.nb.AddPage(p, "Rezsi")
+        self._rz_apply_lock()
+
+    def _rz_apply_lock(self):
+        """A zár/tartalom réteg láthatóságának frissítése."""
+        locked = self.rz.has_pin() and not self._rz_unlocked
+        self.rz_lock.Show(locked)
+        self.rz_body.Show(not locked)
+        self.rz_lock.GetParent().Layout()
+        if not locked:
+            self._refresh_rezsi()
+
+    def _rz_unlock(self):
+        if self.rz.check_pin(self.rz_pin.GetValue()):
+            self._rz_unlocked = True
+            self.rz_pin.SetValue("")
+            self._rz_apply_lock()
+            self._announce("Rezsi-fül feloldva.")
+        else:
+            self.rz_pin.SetValue("")
+            self._announce("Hibás PIN-kód.")
+
+    def _refresh_rezsi(self):
+        self.rz_list.DeleteAllItems()
+        for i, it in enumerate(self.rz.items):
+            self.rz_list.InsertItem(i, it.name)
+            self.rz_list.SetItem(i, 1, f"{it.amount:,.0f}".replace(",", " "))
+            self.rz_list.SetItem(i, 2, it.period)
+            self.rz_list.SetItem(i, 3, "—" if it.period == "egyszeri" else str(it.day))
+            self.rz_list.SetItem(i, 4, it.note)
+        m = self.rz.monthly_total()
+        y = self.rz.yearly_total()
+        o = self.rz.onetime_total()
+        txt = (f"Havi összesen (ismétlődő): {m:,.0f} Ft   ·   "
+               f"Éves összesen: {y:,.0f} Ft").replace(",", " ")
+        if o:
+            txt += f"   ·   Egyszeri tételek: {o:,.0f} Ft".replace(",", " ")
+        self.rz_sum.SetLabel(txt)
+
+    def _rz_selected(self):
+        i = self.rz_list.GetFirstSelected()
+        return i if 0 <= i < len(self.rz.items) else -1
+
+    def _rz_add(self):
+        dlg = RezsiItemDialog(self, None)
+        if dlg.ShowModal() == wx.ID_OK and dlg.result:
+            self.rz.items.append(dlg.result)
+            self.rz.save()
+            self._refresh_rezsi()
+            self._announce(f"Tétel hozzáadva: {dlg.result.name}.")
+        dlg.Destroy()
+
+    def _rz_edit(self):
+        i = self._rz_selected()
+        if i < 0:
+            self._announce("Előbb válassz egy tételt.")
+            return
+        dlg = RezsiItemDialog(self, self.rz.items[i])
+        if dlg.ShowModal() == wx.ID_OK and dlg.result:
+            self.rz.items[i] = dlg.result
+            self.rz.save()
+            self._refresh_rezsi()
+            self._announce("Tétel módosítva.")
+        dlg.Destroy()
+
+    def _rz_del(self):
+        i = self._rz_selected()
+        if i < 0:
+            return
+        name = self.rz.items[i].name
+        if wx.MessageBox(f"Törlöd ezt a tételt?\n\n{name}", "Rezsi",
+                         wx.YES_NO | wx.ICON_QUESTION, self) == wx.YES:
+            self.rz.items.pop(i)
+            self.rz.save()
+            self._refresh_rezsi()
+            self._announce(f"Tétel törölve: {name}.")
+
+    def _rz_to_calendar(self):
+        """Minden ISMÉTLŐDŐ tételhez emlékeztetőt tesz a naptárba a KÖVETKEZŐ
+        esedékességre (a naptár-backend nincs havi ismétlés, ezért egyszeri
+        emlékeztető a következő dátumra)."""
+        from calendar import monthrange
+        today = date.today()
+        added = 0
+        for it in self.rz.items:
+            if it.period == "egyszeri":
+                continue
+            day = max(1, min(it.day, 28))
+            y, mo = today.year, today.month
+            if day < today.day:                    # ehavi nap elmúlt → jövő hónap
+                mo += 1
+                if mo > 12:
+                    mo, y = 1, y + 1
+            day = min(day, monthrange(y, mo)[1])
+            due = date(y, mo, day)
+            ev = O.Event(id=O.new_id(),
+                         title=f"Rezsi: {it.name} – {it.amount:,.0f} Ft".replace(",", " "),
+                         date=due.isoformat(), time="08:00",
+                         note=it.note or "Esedékes költség (rezsi-kalkulátor).",
+                         reminder_min=O.REMINDER_DEFAULT if hasattr(O, "REMINDER_DEFAULT") else 10)
+            self.mgr.add_event(ev)
+            added += 1
+        self.refresh_all()
+        self._announce(f"{added} emlékeztető a naptárba a következő "
+                       "esedékességekre." if added else
+                       "Nincs ismétlődő tétel a naptárba tételhez.")
+
+    def _rz_set_pin(self):
+        if self.rz.has_pin():
+            msg = ("A fül jelenleg PIN-lakattal védett.\n\nÚj PIN beírása "
+                   "megváltoztatja; ÜRESEN hagyva a lakatot TÖRLÖD.\n\nÚj PIN "
+                   "(max 6 számjegy):")
+        else:
+            msg = ("Állíts be PIN-kódot (max 6 számjegy), hogy a rezsi-fülbe "
+                   "csak az nézhessen bele, aki ismeri.\n\n(Üresen hagyva nincs "
+                   "lakat.) PIN:")
+        dlg = wx.TextEntryDialog(self, msg, "Rezsi – PIN-lakat")
+        if dlg.ShowModal() == wx.ID_OK:
+            pin = "".join(c for c in dlg.GetValue() if c.isdigit())[:6]
+            self.rz.set_pin(pin)
+            if pin:
+                self._announce("PIN-lakat beállítva. Legközelebb a fül "
+                               "megnyitásakor kéri.")
+            else:
+                self._rz_unlocked = True
+                self._announce("PIN-lakat törölve.")
+        dlg.Destroy()
 
     # ---- KÜLSŐ NAPTÁR (ICS) fül --------------------------------------
 
@@ -563,6 +753,68 @@ class TaskDialog(wx.Dialog):
         t = self.task or O.Task(id=O.new_id(), title="")
         t.title, t.due, t.note = title, due, self.note.GetValue().strip()
         self.result = t
+        e.Skip()
+
+
+class RezsiItemDialog(wx.Dialog):
+    """Egy rezsi/költség-tétel hozzáadása vagy szerkesztése."""
+
+    def __init__(self, parent, item):
+        super().__init__(parent, title="Költségtétel", size=(460, 380))
+        self.result = None
+        p = wx.Panel(self)
+        v = wx.BoxSizer(wx.VERTICAL)
+        v.Add(wx.StaticText(p, label="&Megnevezés (pl. Áram, Internet):"),
+              0, wx.LEFT | wx.TOP, 8)
+        self.name = wx.TextCtrl(p, value=item.name if item else "")
+        self.name.SetName("A költség megnevezése")
+        v.Add(self.name, 0, wx.EXPAND | wx.ALL, 8)
+        v.Add(wx.StaticText(p, label="Ö&sszeg (Ft):"), 0, wx.LEFT, 8)
+        self.amount = wx.TextCtrl(p, value=(f"{item.amount:g}" if item else ""))
+        self.amount.SetName("Összeg forintban")
+        v.Add(self.amount, 0, wx.EXPAND | wx.ALL, 8)
+        v.Add(wx.StaticText(p, label="&Gyakoriság:"), 0, wx.LEFT, 8)
+        self.period = wx.Choice(p, choices=R.PERIODS)
+        self.period.SetName("Milyen gyakran fizetendő")
+        self.period.SetSelection(R.PERIODS.index(item.period)
+                                 if item and item.period in R.PERIODS else 0)
+        v.Add(self.period, 0, wx.ALL, 8)
+        v.Add(wx.StaticText(p, label="&Esedékesség (a hónap napja, 1–31):"),
+              0, wx.LEFT, 8)
+        self.day = wx.SpinCtrl(p, min=1, max=31, initial=item.day if item else 1)
+        self.day.SetName("A hónap melyik napján esedékes")
+        v.Add(self.day, 0, wx.ALL, 8)
+        v.Add(wx.StaticText(p, label="Meg&jegyzés (nem kötelező):"), 0, wx.LEFT, 8)
+        self.note = wx.TextCtrl(p, value=item.note if item else "",
+                                name="Megjegyzés")
+        v.Add(self.note, 0, wx.EXPAND | wx.ALL, 8)
+        btns = wx.StdDialogButtonSizer()
+        ok = wx.Button(p, wx.ID_OK, "&Mentés")
+        ok.SetDefault()
+        btns.AddButton(ok)
+        btns.AddButton(wx.Button(p, wx.ID_CANCEL, "Mé&gse"))
+        btns.Realize()
+        v.Add(btns, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
+        p.SetSizer(v)
+        self.Bind(wx.EVT_BUTTON, self._on_ok, id=wx.ID_OK)
+        self.name.SetFocus()
+
+    def _on_ok(self, e):
+        name = self.name.GetValue().strip()
+        if not name:
+            wx.MessageBox("Adj megnevezést a tételnek.", "Költségtétel",
+                          wx.OK | wx.ICON_WARNING, self)
+            return
+        try:
+            amount = float(self.amount.GetValue().replace(" ", "").replace(",", "."))
+        except ValueError:
+            wx.MessageBox("Az összeg egy szám legyen (Ft).", "Költségtétel",
+                          wx.OK | wx.ICON_WARNING, self)
+            return
+        self.result = R.Item(name=name, amount=amount,
+                             period=R.PERIODS[self.period.GetSelection()],
+                             day=self.day.GetValue(),
+                             note=self.note.GetValue().strip())
         e.Skip()
 
 
