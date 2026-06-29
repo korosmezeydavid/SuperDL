@@ -246,6 +246,7 @@ class WxHost:
             win = self._windows.get(key)
             if win:
                 try:
+                    win.Show()           # ha rejtve/kis méretben volt
                     win.Raise()
                     return win
                 except Exception:
@@ -257,6 +258,8 @@ class WxHost:
                                                   e.Skip()))
             except Exception:
                 pass
+            win.Show()                   # KRITIKUS: az ablakot LÁTHATÓVÁ kell tenni
+            win.Raise()
             return win
         return opener
 
