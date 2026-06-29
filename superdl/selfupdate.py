@@ -341,12 +341,47 @@ def _find_installer_asset(assets: dict) -> str | None:
     return None
 
 
+def _installer_script(setup: Path, pid: int, log: Path) -> str:
+    """A telepítő-INDÍTÓ kötegfájl tartalma. KRITIKUS: NEM azonnal futtatja a
+    Setup.exe-t, hanem előbb MEGVÁRJA, míg a futó SuperDL (PID) KILÉP – csak
+    AZUTÁN indítja a telepítőt. Így a telepítő már zárolatlan fájlokat talál és
+    nem ütközik a kilépő/modális appal (ez volt a „letölt, de nem cserél" oka).
+    A swapperrel azonos, konzol nélkül is működő mintát (abszolút System32-utak,
+    ping-késleltetés, PID-figyelés) használja."""
+    sys32 = r'%SystemRoot%\System32'
+    wait1 = f'"{sys32}\\ping.exe" -n 2 127.0.0.1 >NUL'      # ~1 mp
+    L = ['@echo off', 'setlocal enableextensions',
+         f'set "LOG={log}"',
+         f'echo [INST] %DATE% %TIME% indul, varakozas a PID {pid} kilepesere '
+         f'>> "%LOG%" 2>&1',
+         'set /a n=0',
+         ':wait',
+         f'"{sys32}\\tasklist.exe" /FI "PID eq {pid}" 2>NUL | '
+         f'"{sys32}\\find.exe" "{pid}" >NUL',
+         'if errorlevel 1 goto run',
+         'set /a n+=1',
+         'if %n% GEQ 90 goto run',          # max ~90 mp, aztán mindenképp futtat
+         wait1,
+         'goto wait',
+         ':run',
+         # rövid ráadás-várakozás, hogy a Restart Manager biztosan elengedje a
+         # fájlokat, mielőtt a telepítő nekiállna
+         f'"{sys32}\\ping.exe" -n 3 127.0.0.1 >NUL',
+         f'echo [INST] telepito inditasa: {setup} >> "%LOG%" 2>&1',
+         f'"{setup}" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART '
+         f'/FORCECLOSEAPPLICATIONS /RESTARTAPPLICATIONS >> "%LOG%" 2>&1',
+         'echo [INST] telepito vegzett (kod %ERRORLEVEL%) >> "%LOG%" 2>&1',
+         'del "%~f0"']
+    return "\r\n".join(L) + "\r\n"
+
+
 def apply_installer(assets: dict, name: str, progress=None,
                     digests: dict | None = None) -> list[str]:
-    """ONEDIR önfrissítés: a Setup.exe letöltése (SHA-256 ellenőrzéssel) és
-    CSENDES futtatása. A telepítő (AppMutex + Restart Manager) bezárja a futó
-    SuperDL-t, kicseréli az ÖSSZES fájlt (a _internal mappát is), és újraindítja.
-    A hívónak a visszatérés után MIHAMARABB ki kell lépnie."""
+    """ONEDIR önfrissítés: a Setup.exe letöltése (SHA-256 ellenőrzéssel), majd egy
+    INDÍTÓ kötegfájl, ami MEGVÁRJA a SuperDL kilépését, és CSAK AZUTÁN futtatja a
+    telepítőt csendben. A telepítő (AppMutex + Restart Manager) kicseréli az
+    ÖSSZES fájlt (a _internal mappát is), és újraindítja. A hívónak a visszatérés
+    után MIHAMARABB ki kell lépnie."""
     import tempfile
     url = assets.get(name)
     if not url:
@@ -359,14 +394,19 @@ def apply_installer(assets: dict, name: str, progress=None,
         raise RuntimeError(
             "A letöltött telepítő ellenőrző összege nem egyezik a hivatalossal "
             "– sérült vagy manipulált, a frissítést megszakítottam.")
-    # csendes telepítés; a futó appot a telepítő zárja be és indítja újra.
-    # TISZTA környezet: a telepítő (és az általa ÚJRAINDÍTOTT SuperDL) NE örökölje
-    # a szülő _PYI_* változóit → különben az újraindított app bootloadere elszáll
-    # („_PYI_APPLICATION_HOME_DIR is not defined").
-    subprocess.Popen(
-        [str(dest), "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART",
-         "/FORCECLOSEAPPLICATIONS", "/RESTARTAPPLICATIONS"],
-        close_fds=True, env=_clean_child_env())
+    # INDÍTÓ kötegfájl: megvárja a SuperDL kilépését, AZUTÁN futtatja a telepítőt
+    # (így nem ütközik a kilépő/modális appal – ez volt a „letölt, de nem cserél").
+    pid = os.getpid()
+    script = _installer_script(dest, pid, update_log())
+    import tempfile as _tf
+    bat = Path(_tf.gettempdir()) / f"superdl_install_{pid}.bat"
+    _write_bat(bat, script)
+    # CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP, leválasztva, TISZTA környezettel
+    # (a telepítő és az általa ÚJRAINDÍTOTT SuperDL NE örökölje a szülő _PYI_*
+    # változóit → különben az újraindított app bootloadere elszáll).
+    flags = 0x08000000 | 0x00000200
+    subprocess.Popen(["cmd", "/c", str(bat)], creationflags=flags,
+                     close_fds=True, env=_clean_child_env())
     return [name]
 
 
