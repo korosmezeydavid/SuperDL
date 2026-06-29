@@ -26,6 +26,9 @@ hiddenimports += collect_submodules('fpdf')      # beépített PDF (dok.-konvert
 # booktext, ocr, extratools…) – a kiemelt MODULOK `from superdl import …`-zal
 # hívják, ezért akkor is bundle-ölni kell, ha a built-in gui már nem importálja.
 hiddenimports += collect_submodules('superdl')
+# A Super Media modul „Super Recorder" vokóder/harmonizer-e numpy-t használ
+# (a modul a Core runtime-jára épül) – biztosan bundle-öljük.
+hiddenimports += collect_submodules('numpy')
 tmp_ret = collect_all('sounddevice')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('edge_tts')

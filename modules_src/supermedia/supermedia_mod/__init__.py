@@ -20,12 +20,22 @@ def _add(core, menu, key, factory, label, help):
 def register(core):
     from .supermwin import SuperMFrame
     from .superstreamwin import SuperStreamFrame
+    from .superrecwin import SuperRecorderFrame
+    from .supereditwin import SuperEditorFrame
 
     menu = core.add_menu("Su&per Media")
     _add(core, menu, "superm_module", SuperMFrame,
          "Super &M – műsorszóró stúdió\tCtrl+Shift+M",
          "Rádió-műsorszórás: lejátszás, keverés, mikrofon, jingle-pad, "
          "effekt-rack, Shoutcast/Icecast (BASS motor)")
+    _add(core, menu, "superrec_module", SuperRecorderFrame,
+         "Super &Recorder – felvevő…",
+         "Akadálymentes hangfelvevő: felvétel mikrofonból, kimondott "
+         "szintmérővel, mentés WAV/MP3-ba normalizálással")
+    _add(core, menu, "superedit_module", SuperEditorFrame,
+         "Super Recorder – fülre-sz&erkesztő…",
+         "Akadálymentes hangszerkesztő: markeres navigáció, szakasz "
+         "törlése/némítása/trim, csend-beszúrás, undo/redo – mind kimondva")
     _add(core, menu, "superstream_module", SuperStreamFrame,
          "Super &Stream – élő multistream…",
          "Élő adás egyszerre több platformra (YouTube, Facebook, TikTok) a "
