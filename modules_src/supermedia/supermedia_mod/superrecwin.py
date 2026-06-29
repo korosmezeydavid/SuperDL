@@ -47,7 +47,7 @@ class SuperRecorderFrame(wx.Frame):
         self.btn_pause = wx.Button(p, label="&Szünet")
         self.btn_pause.Bind(wx.EVT_BUTTON, lambda e: self._on_pause())
         self.btn_pause.Disable()
-        self.btn_stop = wx.Button(p, label="&Leállítás (Esc)")
+        self.btn_stop = wx.Button(p, label="&Leállítás (F7)")
         self.btn_stop.Bind(wx.EVT_BUTTON, lambda e: self._on_stop())
         self.btn_stop.Disable()
         self.btn_new = wx.Button(p, label="Ú&j felvétel")
@@ -67,7 +67,7 @@ class SuperRecorderFrame(wx.Frame):
         self.gauge = wx.Gauge(p, range=100)
         self.gauge.SetName("Szintmérő")
         v.Add(self.gauge, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
-        b_lvl = wx.Button(p, label="Szint ki&mondása (L)")
+        b_lvl = wx.Button(p, label="Szint ki&mondása (F8)")
         b_lvl.Bind(wx.EVT_BUTTON, lambda e: self._say_level())
         v.Add(b_lvl, 0, wx.LEFT | wx.TOP | wx.BOTTOM, 8)
 
@@ -107,26 +107,37 @@ class SuperRecorderFrame(wx.Frame):
         self.CreateStatusBar()
         self.SetStatusText("Készen állok a felvételre.")
 
-        # gyorsbillentyűk: F5 felvétel, Esc leállítás, L szint
-        self._mk_accelerators()
+        self._build_menubar()
+        self.dev_ch.SetFocus()        # kezdő fókusz (a JAWS innen indul)
 
         # élő frissítő időzítő (szint + idő)
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._on_tick, self.timer)
         self.Bind(wx.EVT_CLOSE, self._on_close)
 
-    # ---- gyorsbillentyűk ---------------------------------------------
+    # ---- menüsor (akadálymentes; biztonságos F-/Ctrl-gyorsbillentyűk) ------
 
-    def _mk_accelerators(self):
-        idr, ids, idl = wx.NewIdRef(), wx.NewIdRef(), wx.NewIdRef()
-        self.Bind(wx.EVT_MENU, lambda e: self._on_record(), id=idr)
-        self.Bind(wx.EVT_MENU, lambda e: self._on_stop(), id=ids)
-        self.Bind(wx.EVT_MENU, lambda e: self._say_level(), id=idl)
-        self.SetAcceleratorTable(wx.AcceleratorTable([
-            (wx.ACCEL_NORMAL, wx.WXK_F5, idr),
-            (wx.ACCEL_NORMAL, wx.WXK_ESCAPE, ids),
-            (wx.ACCEL_NORMAL, ord("L"), idl),
-        ]))
+    def _build_menubar(self):
+        mb = wx.MenuBar()
+
+        def mi(menu, label, fn):
+            item = menu.Append(wx.ID_ANY, label)
+            self.Bind(wx.EVT_MENU, lambda e: fn(), item)
+
+        m_rec = wx.Menu()
+        mi(m_rec, "&Felvétel\tF5", self._on_record)
+        mi(m_rec, "&Szünet / folytatás\tF6", self._on_pause)
+        mi(m_rec, "Le&állítás\tF7", self._on_stop)
+        mi(m_rec, "Ú&j felvétel", self._on_new)
+        mi(m_rec, "Szint &kimondása\tF8", self._say_level)
+        mb.Append(m_rec, "&Felvétel")
+
+        m_file = wx.Menu()
+        mi(m_file, "Men&tés…\tCtrl+S", self._on_save)
+        mi(m_file, "Tovább a sz&erkesztőbe…\tCtrl+E", self._on_edit)
+        mb.Append(m_file, "&Fájl")
+
+        self.SetMenuBar(mb)
 
     # ---- felvétel-vezérlés -------------------------------------------
 

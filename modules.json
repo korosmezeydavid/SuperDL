@@ -86,11 +86,11 @@
       "category": "Média",
       "description": "Hang-műsorszóró stúdió, FELVEVŐ, szerkesztő és multistream egy csomagban: Super M (akadálymentes rádió-stúdió és médialejátszó, BASS-motor), Super Recorder (akadálymentes felvevő kimondott szintmérővel + fülre-szerkesztő: markeres vágás/trim/némítás, 12 effekt, vokóder/harmonizer/ének-eltávolítás/2-sávos keverés, undo/redo) és Super Stream (élő multistream). A BASS- és numpy-runtime a Core-ból jön.",
       "latest": {
-        "version": "1.1.0",
+        "version": "1.1.1",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supermedia-1.1.0/supermedia-1.1.0.zip",
-        "sha256": "3eebdb3bb47e0b5b90bb5b7299b5d652784df94f299560dd8631fca1054c615f",
-        "size": 51552
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supermedia-1.1.1/supermedia-1.1.1.zip",
+        "sha256": "817eb887eaf063b3d6c3e25b2a837fc95de8639acfa379156d4faf87769ba56f",
+        "size": 51981
       }
     },
     {

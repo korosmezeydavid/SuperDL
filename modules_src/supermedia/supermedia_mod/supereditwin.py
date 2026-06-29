@@ -41,7 +41,7 @@ class SuperEditorFrame(wx.Frame):
 
         # megnyitás + állapot
         top = wx.BoxSizer(wx.HORIZONTAL)
-        b_open = wx.Button(p, label="Hang meg&nyitása…")
+        b_open = self._b_open = wx.Button(p, label="Hang meg&nyitása…")
         b_open.Bind(wx.EVT_BUTTON, lambda e: self._on_open())
         self.title_lbl = wx.StaticText(p, label="Nincs betöltött hang.")
         top.Add(b_open, 0, wx.RIGHT, 8)
@@ -51,10 +51,10 @@ class SuperEditorFrame(wx.Frame):
         # lejátszás-vezérlés
         c = wx.BoxSizer(wx.HORIZONTAL)
         for label, fn in (
-                ("&Lejátszás/szünet (szóköz)", lambda e: self._toggle_play()),
+                ("&Lejátszás/szünet (F5)", lambda e: self._toggle_play()),
                 ("&Elölről", lambda e: self._play_from(0.0)),
                 ("Leállí&tás", lambda e: self._stop()),
-                ("Ma&rker itt (M)", lambda e: self._add_marker()),
+                ("Ma&rker itt (F9)", lambda e: self._add_marker()),
                 ("M&ind töröl (marker)", lambda e: self._clear_markers())):
             b = wx.Button(p, label=label)
             b.Bind(wx.EVT_BUTTON, fn)
@@ -159,34 +159,62 @@ class SuperEditorFrame(wx.Frame):
         self.CreateStatusBar()
         self.SetStatusText("Nyiss meg egy hangfájlt a szerkesztéshez.")
 
-        self._mk_accel()
+        self._build_menubar()
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._on_tick, self.timer)
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self._update_buttons()
         self._fx_param_update()
+        self._b_open.SetFocus()        # kezdő fókusz (a JAWS innen indul)
 
-    # ---- gyorsbillentyűk ---------------------------------------------
+    # ---- menüsor (akadálymentes: a JAWS olvassa; biztonságos gyorsbillentyűk,
+    #      semmi sima Szóköz/nyíl/betű, ami a vezérlőktől lopná a billentyűt) ----
 
-    def _mk_accel(self):
-        ids = {k: wx.NewIdRef() for k in
-               ("play", "stop", "mark", "undo", "redo", "left", "right")}
-        self.Bind(wx.EVT_MENU, lambda e: self._toggle_play(), id=ids["play"])
-        self.Bind(wx.EVT_MENU, lambda e: self._stop(), id=ids["stop"])
-        self.Bind(wx.EVT_MENU, lambda e: self._add_marker(), id=ids["mark"])
-        self.Bind(wx.EVT_MENU, lambda e: self._undo(), id=ids["undo"])
-        self.Bind(wx.EVT_MENU, lambda e: self._redo(), id=ids["redo"])
-        self.Bind(wx.EVT_MENU, lambda e: self._nudge(-2.0), id=ids["left"])
-        self.Bind(wx.EVT_MENU, lambda e: self._nudge(2.0), id=ids["right"])
-        self.SetAcceleratorTable(wx.AcceleratorTable([
-            (wx.ACCEL_NORMAL, wx.WXK_SPACE, ids["play"]),
-            (wx.ACCEL_NORMAL, wx.WXK_ESCAPE, ids["stop"]),
-            (wx.ACCEL_NORMAL, ord("M"), ids["mark"]),
-            (wx.ACCEL_CTRL, ord("Z"), ids["undo"]),
-            (wx.ACCEL_CTRL, ord("Y"), ids["redo"]),
-            (wx.ACCEL_NORMAL, wx.WXK_LEFT, ids["left"]),
-            (wx.ACCEL_NORMAL, wx.WXK_RIGHT, ids["right"]),
-        ]))
+    def _build_menubar(self):
+        mb = wx.MenuBar()
+
+        def mi(menu, label, fn):
+            item = menu.Append(wx.ID_ANY, label)
+            self.Bind(wx.EVT_MENU, lambda e: fn(), item)
+
+        m_file = wx.Menu()
+        mi(m_file, "Hang meg&nyitása…\tCtrl+O", self._on_open)
+        mi(m_file, "Men&tés…\tCtrl+S", self._on_save)
+        mb.Append(m_file, "&Fájl")
+
+        m_play = wx.Menu()
+        mi(m_play, "&Lejátszás / szünet\tF5", self._toggle_play)
+        mi(m_play, "&Elölről", lambda: self._play_from(0.0))
+        mi(m_play, "Le&állítás\tF6", self._stop)
+        mi(m_play, "&Vissza 2 mp\tF7", lambda: self._nudge(-2.0))
+        mi(m_play, "E&lőre 2 mp\tF8", lambda: self._nudge(2.0))
+        mb.Append(m_play, "&Lejátszás")
+
+        m_edit = wx.Menu()
+        mi(m_edit, "&Marker itt\tF9", self._add_marker)
+        mi(m_edit, "Minden marker &törlése", self._clear_markers)
+        m_edit.AppendSeparator()
+        mi(m_edit, "Szakasz tör&lése", self._del_section)
+        mi(m_edit, "Csak a szakasz (t&rim)", self._trim_section)
+        mi(m_edit, "Szakasz né&mítása", self._mute_section)
+        mi(m_edit, "Szakasz má&solása", self._copy_section)
+        mi(m_edit, "&Beillesztés itt", self._paste_here)
+        mi(m_edit, "&Csend beszúrása itt", self._insert_silence)
+        m_edit.AppendSeparator()
+        mi(m_edit, "&Visszavonás\tCtrl+Z", self._undo)
+        mi(m_edit, "Új&ra\tCtrl+Y", self._redo)
+        mb.Append(m_edit, "&Szerkesztés")
+
+        m_voc = wx.Menu()
+        mi(m_voc, "&Vokóder", self._vocoder)
+        mi(m_voc, "&Harmonizer (terc+kvint)", self._harmonizer)
+        mi(m_voc, "Ének &eltávolítása (karaoke)", self._remove_vocals)
+        m_voc.AppendSeparator()
+        mi(m_voc, "Alap &betöltése…", self._load_backing)
+        mi(m_voc, "&Keverés", self._mix_backing)
+        mb.Append(m_voc, "&Vokál")
+
+        self.SetMenuBar(mb)
 
     # ---- segéd -------------------------------------------------------
 

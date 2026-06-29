@@ -1,7 +1,7 @@
 {
   "id": "supermedia",
   "name": "Super Media",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "entry": "supermedia_mod",
   "category": "Média",
   "description": "Hang-műsorszóró stúdió, felvevő és multistream egy csomagban: Super M (akadálymentes rádió-stúdió és médialejátszó – lejátszás, keverés, mikrofon, jingle-pad, valós idejű effekt-rack, Shoutcast/Icecast élő adás, BASS-motor), Super Recorder (akadálymentes hangfelvevő kimondott szintmérővel, mentés WAV/MP3-ba normalizálással/csend-vágással) és Super Stream (élő adás egyszerre több platformra a saját kulcsoddal). A BASS-runtime a Core-ból jön.",
