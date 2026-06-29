@@ -71,6 +71,7 @@ STATES = {"start": 0, "done": 1, "error": 2}
 class SelfVoice:
     def __init__(self):
         self.enabled = False
+        self.muted = False          # TELJES némítás: a force=True-t is felülírja
         self.voice_desc = ""        # a kívánt hang leírásának részlete
         self.rate = 0               # -10..10 (tempó)
         self.pitch = 0              # -10..10 (hangmagasság)
@@ -107,10 +108,12 @@ class SelfVoice:
             pass
         return out
 
-    def configure(self, *, enabled=None, voice_desc=None, rate=None,
+    def configure(self, *, enabled=None, muted=None, voice_desc=None, rate=None,
                   pitch=None, volume=None):
         if enabled is not None:
             self.enabled = bool(enabled)
+        if muted is not None:
+            self.muted = bool(muted)
         if voice_desc is not None:
             self.voice_desc = voice_desc
         if rate is not None:
@@ -138,6 +141,8 @@ class SelfVoice:
         """Aszinkron bemondás. `force=False` esetén csak ha be van kapcsolva.
         eSpeak-hang esetén a beépített eSpeak-NG-vel, különben a rendszer
         SAPI-hangjával szól."""
+        if self.muted:                       # TELJES némítás: a force-ot is felülírja
+            return
         if not self.enabled and not force:
             return
         if self._use_espeak:
@@ -195,7 +200,7 @@ class SelfVoice:
     def announce(self, key: str, state: str):
         """Egy művelet-esemény bemondása (key: download/convert/…; state:
         start/done/error)."""
-        if not self.enabled:
+        if self.muted or not self.enabled:
             return
         texts = EVENTS.get(key)
         if not texts:

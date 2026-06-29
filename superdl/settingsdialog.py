@@ -214,6 +214,14 @@ class SettingsDialog(wx.Dialog):
         self.c_sv.SetValue(bool(self.s.get("selfvoice_enabled", False)))
         v.Add(self.c_sv, 0, wx.ALL, 8)
 
+        self.c_sv_off = wx.CheckBox(
+            p, label="&Teljes némítás: a program semmit ne mondjon ki "
+                     "(a bejelentkező üdvözlést se)")
+        self.c_sv_off.SetName("Teljes némítás – a program egyetlen szöveget se "
+                              "mondjon ki, az induló üdvözlést sem")
+        self.c_sv_off.SetValue(bool(self.s.get("selfvoice_off", False)))
+        v.Add(self.c_sv_off, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+
         pairs = [("(alapértelmezett rendszerhang)", "")]
         try:
             for d in SelfVoice().list_voices():
@@ -317,6 +325,7 @@ class SettingsDialog(wx.Dialog):
             "beep_enabled": self.c_beep.GetValue(),
             "beep_volume": self.c_beepvol.GetValue(),
             "selfvoice_enabled": self.c_sv.GetValue(),
+            "selfvoice_off": self.c_sv_off.GetValue(),
             "selfvoice_voice":
                 self._sv_voice_pairs[self.c_svvoice.GetSelection()][1],
             "selfvoice_rate": self.c_svrate.GetValue(),

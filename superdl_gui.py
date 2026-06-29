@@ -586,7 +586,8 @@ class MainFrame(wx.Frame):
             "video_format": "MP4", "audio_bitrate": "192",
             "audio_samplerate": "",
             "beep_enabled": True, "beep_volume": 30,
-            "selfvoice_enabled": False, "selfvoice_voice": "",
+            "selfvoice_enabled": False, "selfvoice_off": False,
+            "selfvoice_voice": "",
             "selfvoice_rate": 0, "selfvoice_pitch": 0, "selfvoice_volume": 100,
         }
         try:
@@ -608,6 +609,7 @@ class MainFrame(wx.Frame):
                             amp=int(s.get("beep_volume", 30)) / 100.0)
         self.selfvoice.configure(
             enabled=bool(s.get("selfvoice_enabled", False)),
+            muted=bool(s.get("selfvoice_off", False)),
             voice_desc=str(s.get("selfvoice_voice", "") or ""),
             rate=int(s.get("selfvoice_rate", 0)),
             pitch=int(s.get("selfvoice_pitch", 0)),
@@ -1249,6 +1251,10 @@ class MainFrame(wx.Frame):
         self._fetch_weather_async(done)
 
     def _startup_greeting(self):
+        # TELJES némítás esetén induláskor SEMMIT nem mondunk (a bejelentkező
+        # üdvözlést se) – a felhasználó a saját képernyőolvasóját használja.
+        if self.settings.get("selfvoice_off"):
+            return
         # indításkor automatikus, hangos üdvözlés (beep nélkül, hogy ne
         # ütközzön a beszéddel)
         self._speak_dayinfo(toast=False, beep=False)
