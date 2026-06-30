@@ -12,7 +12,8 @@ binaries = [('bin\\aria2c.exe', '.'),
             ('bin\\bass.dll', '.'),
             ('bin\\bassmix.dll', '.'),
             ('bin\\bassenc.dll', '.'),
-            ('bin\\bassenc_mp3.dll', '.')]
+            ('bin\\bassenc_mp3.dll', '.'),
+            ('bin\\bass_fx.dll', '.')]
 # eSpeak-NG hangadatok (magyar hang a self-voice-hoz) – a teljes mappa
 datas += [('bin\\espeak-ng-data', 'espeak-ng-data')]
 hiddenimports = ['win32com.client', 'pythoncom', 'pywintypes', 'win32crypt']

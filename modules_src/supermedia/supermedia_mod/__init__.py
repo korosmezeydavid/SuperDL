@@ -22,6 +22,7 @@ def register(core):
     from .superstreamwin import SuperStreamFrame
     from .superrecwin import SuperRecorderFrame
     from .supereditwin import SuperEditorFrame
+    from .supervoicewin import VoiceChangerFrame
 
     menu = core.add_menu("Su&per Media")
     _add(core, menu, "superm_module", SuperMFrame,
@@ -36,6 +37,10 @@ def register(core):
          "Super Recorder – fülre-sz&erkesztő…",
          "Akadálymentes hangszerkesztő: markeres navigáció, szakasz "
          "törlése/némítása/trim, csend-beszúrás, undo/redo – mind kimondva")
+    _add(core, menu, "voicechanger_module", VoiceChangerFrame,
+         "Valós idejű &voice changer…",
+         "Élő mikrofon-átalakítás: hangmagasság-váltás és effektek valós időben, "
+         "fejhallgatóba monitorozva")
     _add(core, menu, "superstream_module", SuperStreamFrame,
          "Super &Stream – élő multistream…",
          "Élő adás egyszerre több platformra (YouTube, Facebook, TikTok) a "

@@ -64,6 +64,27 @@ EFFECTS = [
      lambda p, d, f: _fade(p, d)),
     ("reverse", "Visszafelé", None, 0,
      lambda p, d, f: "areverse"),
+    # --- bővített effekt-arzenál ---
+    ("echo", "Visszhang (terem)", None, 0,
+     lambda p, d, f: "aecho=0.8:0.88:60:0.4"),
+    ("echo_big", "Visszhang (nagy terem)", None, 0,
+     lambda p, d, f: "aecho=0.8:0.9:1000:0.3"),
+    ("chorus", "Kórus", None, 0,
+     lambda p, d, f: "chorus=0.5:0.9:50|60|40:0.4|0.32|0.3:0.25|0.4|0.3:2|2.3|1.3"),
+    ("flanger", "Flanger", None, 0,
+     lambda p, d, f: "flanger"),
+    ("tremolo", "Tremoló (remegő hangerő)", "frekv. Hz", 5,
+     lambda p, d, f: f"tremolo=f={max(0.1, p):g}:d=0.7"),
+    ("vibrato", "Vibrato (remegő hangmagasság)", "frekv. Hz", 6,
+     lambda p, d, f: f"vibrato=f={max(0.1, p):g}:d=0.5"),
+    ("phone", "Telefonhang", None, 0,
+     lambda p, d, f: "highpass=f=300,lowpass=f=3400"),
+    ("radio", "Régi rádió", None, 0,
+     lambda p, d, f: "highpass=f=200,lowpass=f=5000,acrusher=bits=8:mode=log"),
+    ("lofi", "Lo-fi / torzítás", "bitmélység (2–12)", 4,
+     lambda p, d, f: f"acrusher=bits={max(1, min(16, int(p)))}:samples=2:mode=log"),
+    ("muffle", "Tompa (aluláteresztő)", "vágás Hz", 3000,
+     lambda p, d, f: f"lowpass=f={max(200, int(p))}"),
 ]
 
 
