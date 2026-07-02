@@ -291,14 +291,19 @@ class WxHost:
         """Egyablakos megnyitót ad vissza: ha már nyitva van, előtérbe hozza,
         különben a `factory(parent)`-tel létrehozza (záráskor elfelejti)."""
         def _bring_to_front(w):
-            # Az ablakot LÁTHATÓVÁ tesszük, kibontjuk (ha ikonizált), előtérbe
-            # hozzuk ÉS fókuszt adunk neki – hogy tényleg ELŐJÖJJÖN, ne csak
-            # „villanjon" és visszadobjon a főablakra.
+            # Az ablakot LÁTHATÓVÁ tesszük, kibontjuk (ha ikonizált) és előtérbe
+            # hozzuk – hogy tényleg ELŐJÖJJÖN, ne csak „villanjon".
+            # FONTOS (akadálymentesség): NEM hívunk a KERETRE `SetFocus()`-t! Az
+            # ellopná a fókuszt attól a vezérlőtől, amire az ablak a saját
+            # __init__-jében ráállította (pl. keresőmező) → a képernyőolvasó a
+            # csupasz keretet kapná = a felhasználónak „üres ablak". A `Raise`
+            # aktiválja az ablakot, a wx pedig visszaállítja az utolsó vezérlő-
+            # fókuszt – így a screen reader a helyes vezérlőt olvassa fel.
             try:
                 w.Show()
             except Exception:
                 pass
-            for meth in ("Iconize", "Raise", "SetFocus"):
+            for meth in ("Iconize", "Raise"):
                 try:
                     fn = getattr(w, meth, None)
                     if fn is None:
