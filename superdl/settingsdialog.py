@@ -222,6 +222,15 @@ class SettingsDialog(wx.Dialog):
         self.c_sv_off.SetValue(bool(self.s.get("selfvoice_off", False)))
         v.Add(self.c_sv_off, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
 
+        self.c_hide_url = wx.CheckBox(
+            p, label="Induláskor ne mutassa a letöltési &URL-mezőt "
+                     "(a Fájl → Új letöltés vagy Ctrl+N előhozza)")
+        self.c_hide_url.SetName("Induláskor a letöltési URL-mező elrejtése; a "
+                                "Fájl menü Új letöltés pontja vagy a Ctrl+N "
+                                "bármikor előhozza")
+        self.c_hide_url.SetValue(bool(self.s.get("hide_url_row", False)))
+        v.Add(self.c_hide_url, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+
         pairs = [("(alapértelmezett rendszerhang)", "")]
         try:
             for d in SelfVoice().list_voices():
@@ -326,6 +335,7 @@ class SettingsDialog(wx.Dialog):
             "beep_volume": self.c_beepvol.GetValue(),
             "selfvoice_enabled": self.c_sv.GetValue(),
             "selfvoice_off": self.c_sv_off.GetValue(),
+            "hide_url_row": self.c_hide_url.GetValue(),
             "selfvoice_voice":
                 self._sv_voice_pairs[self.c_svvoice.GetSelection()][1],
             "selfvoice_rate": self.c_svrate.GetValue(),

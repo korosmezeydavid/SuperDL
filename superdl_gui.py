@@ -247,7 +247,9 @@ class MainFrame(wx.Frame):
         self._known_rows: dict[int, int] = {}   # job.id -> listasor
         self._last_values: dict[int, tuple] = {}
         self._reported: dict[int, str] = {}
-        self._conflict_asked: set = set()        # mely job-okra kérdeztünk rá
+        self._conflict_asked: set = set()        # mely job-okra döntöttünk
+        self._conflict_showing: set = set()      # épp megjelenő ütközés-párbeszéd
+        self._feed_pending: dict[int, tuple] = {}  # job.id -> (sub, ep) podcast
         self._started: set = set()               # melyik kezdett már letöltődni
         self._beeper = sounds.ProgressBeeper()    # százalék-pittyegés (M12)
         self._beep_job = None                     # melyik letöltést pittyegjük
@@ -258,6 +260,7 @@ class MainFrame(wx.Frame):
         self._build_menu()
         self._build_ui()
         self._apply_settings()
+        self._apply_startup_view()      # „indító nézet": URL-sor elrejtése, ha kérték
 
         # rádiófelvétel-kezelő: az időzített felvételek akkor is elindulnak,
         # ha a rádió-ablak épp zárva van (a program fusson)
@@ -293,7 +296,11 @@ class MainFrame(wx.Frame):
         # induló, automatikus hangos üdvözlés (dátum, névnap, időjárás)
         wx.CallLater(1200, self._startup_greeting)
 
-        self.url_entry.SetFocus()
+        # induló fókusz: ha az URL-sor rejtve van, a letöltési listára álljunk
+        if self.settings.get("hide_url_row"):
+            self.dl_list.SetFocus()
+        else:
+            self.url_entry.SetFocus()
         wx.CallAfter(self._init_modules)
 
     def _init_modules(self):
@@ -457,7 +464,7 @@ class MainFrame(wx.Frame):
         mb.Append(m_help, "&Súgó")
 
         self.SetMenuBar(mb)
-        self.Bind(wx.EVT_MENU, lambda e: self.url_entry.SetFocus(), mi_url)
+        self.Bind(wx.EVT_MENU, lambda e: self._reveal_url_row(), mi_url)
         self.Bind(wx.EVT_MENU, self._on_open_torrent, mi_torrent)
         self.Bind(wx.EVT_MENU, self._on_open_list, mi_list)
         self.Bind(wx.EVT_MENU, self._on_open_folder, mi_open)
@@ -523,6 +530,8 @@ class MainFrame(wx.Frame):
         row1.Add(self.sched_entry, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         row1.Add(btn_dl, 0)
         vbox.Add(row1, 0, wx.EXPAND | wx.ALL, 8)
+        self._url_row = row1        # „indító nézet": elrejthető letöltési URL-sor
+        self._url_vbox = vbox
 
         # beállítások
         # Gyors beállítások a fő ablakon: célmappa + csak hang + a többi
@@ -588,6 +597,7 @@ class MainFrame(wx.Frame):
             "audio_samplerate": "",
             "beep_enabled": True, "beep_volume": 30,
             "selfvoice_enabled": False, "selfvoice_off": False,
+            "hide_url_row": False,
             "selfvoice_voice": "",
             "selfvoice_rate": 0, "selfvoice_pitch": 0, "selfvoice_volume": 100,
         }
@@ -680,6 +690,7 @@ class MainFrame(wx.Frame):
                               wx.OK | wx.ICON_WARNING, self)
             self._save_settings()
             self._apply_runtime_settings()
+            self._apply_startup_view()      # az URL-sor el/megjelenítése azonnal
             self._announce("A beállítások elmentve.")
         dlg.Destroy()
 
@@ -759,7 +770,13 @@ class MainFrame(wx.Frame):
 
     def _add_job(self, url: str, kind: str):
         mgr = self._ensure_mgr()
-        start_at = parse_when(self.sched_entry.GetValue())
+        sched_text = self.sched_entry.GetValue().strip()
+        start_at = parse_when(sched_text) if sched_text else None
+        if sched_text and start_at is None:
+            self._announce(
+                "Érvénytelen időzítés. Használd pl. a +2h, +30m vagy 14:30 "
+                "formátumot.", ok=False)
+            return
         job = mgr.add(url, kind=kind, start_at=start_at)
         self._row_for(job)
         kind_hu = {"media": "médialetöltés", "torrent": "torrent"}.get(
@@ -992,7 +1009,8 @@ class MainFrame(wx.Frame):
     def _offer_resume(self):
         from superdl import store
         saved = store.load_queue()
-        pending = [r for r in saved if r.get("status") != "kész"]
+        pending = [r for r in saved
+                   if r.get("url") and r.get("status") not in ("kész", "hiba")]
         if not pending:
             return
         if wx.MessageBox(
@@ -1075,7 +1093,7 @@ class MainFrame(wx.Frame):
                           audio_only=sub.audio_only)
             job.progress.filename = ep.title
             self._row_for(job)
-            self.fm.mark_seen(sub, ep)
+            self._feed_pending[job.id] = (sub, ep)
         self._announce(f"{len(found)} új epizód letöltése elindult.",
                        toast=True)
 
@@ -1171,6 +1189,7 @@ class MainFrame(wx.Frame):
     # ---- torrent: a fájl már létezik ----------------------------------
 
     def _ask_conflict(self, job):
+        self._conflict_showing.discard(job.id)
         name = job.progress.filename or job.url
         choices = ["Kihagyom – nem töltöm le újra",
                    "Felülírom – újra letöltöm az elejéről",
@@ -1180,6 +1199,7 @@ class MainFrame(wx.Frame):
             "Mit tegyek?", "A fájl már létezik", choices)
         dlg.SetSelection(2)
         if dlg.ShowModal() == wx.ID_OK:
+            self._conflict_asked.add(job.id)
             i = dlg.GetSelection()
             if i == 0:
                 self.mgr.remove(job)
@@ -1192,6 +1212,10 @@ class MainFrame(wx.Frame):
                 self.mgr.resolve_conflict(job, "verify")
                 self._announce("Ellenőrzés és megosztás: a meglévő fájlt "
                                "ellenőrzöm, majd seedelem.")
+        else:
+            self._announce(
+                "A torrent várakozik: döntsd el, mit tegyek a meglévő fájllal. "
+                "A kérdés hamarosan újra felajánlódik.", ok=False)
         dlg.Destroy()
 
     def _remove_row(self, job):
@@ -1251,6 +1275,20 @@ class MainFrame(wx.Frame):
                 self.speaker.speak(text)
         self._fetch_weather_async(done)
 
+    def _apply_startup_view(self):
+        """„Indító nézet": a beállítás szerint el/megjeleníti a letöltési
+        URL-sort (a Beállítások-mentés után azonnal érvényesül). A Fájl → Új
+        letöltés (Ctrl+N) elrejtve is bármikor előhozza."""
+        show = not bool(self.settings.get("hide_url_row"))
+        self._url_vbox.Show(self._url_row, show, recursive=True)
+        self._main_panel.Layout()
+
+    def _reveal_url_row(self):
+        """A letöltési URL-sor megjelenítése és fókuszálása (Ctrl+N / Fájl-menü)."""
+        self._url_vbox.Show(self._url_row, True, recursive=True)
+        self._main_panel.Layout()
+        self.url_entry.SetFocus()
+
     def _startup_greeting(self):
         # TELJES némítás esetén induláskor SEMMIT nem mondunk (a bejelentkező
         # üdvözlést se) – a felhasználó a saját képernyőolvasóját használja.
@@ -1259,6 +1297,16 @@ class MainFrame(wx.Frame):
         # indításkor automatikus, hangos üdvözlés (beep nélkül, hogy ne
         # ütközzön a beszéddel)
         self._speak_dayinfo(toast=False, beep=False)
+        # …majd az aktív letöltések állapota is (amit Zsolt kért)
+        active = 0
+        if self.mgr:
+            active = sum(1 for j in self.mgr.jobs
+                         if j.progress.status in ("letöltés", "seedelés",
+                                                  "várakozik", "ütemezve"))
+        msg = (f"{active} aktív vagy várakozó letöltés van."
+               if active else "Jelenleg nincs aktív letöltés.")
+        wx.CallLater(2600, lambda: self.speaker.speak(msg)
+                     if self.speaker and self.speaker.available else None)
 
     # ---- AI: kép leírása / OCR ----------------------------------------
 
@@ -1558,6 +1606,10 @@ class MainFrame(wx.Frame):
                     msg = f"Elkészült: {p.filename or j.url}"
                     self._announce(msg, toast=True, sound="done")
                     self.selfvoice.announce("download", "done")
+                    feed = self._feed_pending.pop(j.id, None)
+                    if feed:
+                        self.fm.mark_seen(feed[0], feed[1])
+                    self.cm.on_video_downloaded(j.url)
                 elif p.status == "seedelés":
                     msg = f"Letöltve, seedelés folyamatban: {p.filename or j.url}"
                     self._announce(msg, toast=True, sound="done")
@@ -1566,11 +1618,13 @@ class MainFrame(wx.Frame):
                     msg = f"Hiba: {p.filename or j.url} – {p.error}"
                     self._announce(msg, ok=False, toast=True, sound="error")
                     self.selfvoice.announce("download", "error")
+                    self._feed_pending.pop(j.id, None)
                 if self.mi_tts.IsChecked() and self.speaker.available:
                     self.speaker.speak(msg)
             # torrent: a cél fájl már létezik – felkínáljuk a választást
-            if p.conflict and j.id not in self._conflict_asked:
-                self._conflict_asked.add(j.id)
+            if (p.conflict and j.id not in self._conflict_asked
+                    and j.id not in self._conflict_showing):
+                self._conflict_showing.add(j.id)
                 wx.CallAfter(self._ask_conflict, j)
         # százalék-pittyegés: az első aktív, ismert hosszú letöltést követjük
         if beep_target is not None:

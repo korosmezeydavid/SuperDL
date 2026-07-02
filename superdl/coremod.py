@@ -261,8 +261,14 @@ class WxHost:
     def add_submenu(self, top_title: str, sub_title: str):
         """A megadott felső menü (cím szerinti find-or-create) ALÁ fűz egy
         almenüt, és AZT adja vissza – a modul abba teszi az elemeit. Így a
-        média/könyv/eszköz modulok egy-egy közös felső menü alatt csoportosulnak."""
+        média/könyv/eszköz modulok egy-egy közös felső menü alatt csoportosulnak.
+        FIND-OR-CREATE az almenüre is: modul-újratöltéskor nem duplikálja."""
         top = self.add_menu(top_title)
+        plain = sub_title.replace("&", "")
+        for it in top.GetMenuItems():
+            sm = it.GetSubMenu()
+            if sm is not None and it.GetItemLabelText() == plain:
+                return sm
         sub = wx.Menu()
         top.AppendSubMenu(sub, sub_title)
         return sub
@@ -305,10 +311,11 @@ class WxHost:
             win = self._windows.get(key)
             if win:
                 try:
+                    win.IsShown()        # holt (törölt) wrappernél RuntimeError-t dob
                     _bring_to_front(win)
                     return win
                 except Exception:
-                    self._windows.pop(key, None)
+                    self._windows.pop(key, None)   # elavult ablak – újranyitjuk
             try:
                 win = factory(self.frame)
             except Exception as exc:

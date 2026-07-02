@@ -151,9 +151,8 @@ class FreshVideosDialog(wx.Dialog):
         if not vd:
             return
         self._download(vd)
-        self.manager.remove_fresh(vd)
-        self._refresh()
-        self._announce(f"Letöltés elindítva: {vd.title}")
+        self._announce(f"Letöltés elindítva: {vd.title}. A listából a sikeres "
+                       "befejezés után kerül ki.")
 
     def _remove(self):
         vd = self._selected()

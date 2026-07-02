@@ -35,7 +35,13 @@ def parse_when(text: str) -> float | None:
         if body and body[-1] in "hmd":
             mult = {"m": 60, "h": 3600, "d": 86400}[body[-1]]
             body = body[:-1]
-        return (now + _dt.timedelta(seconds=float(body) * mult)).timestamp()
+        try:
+            secs = float(body)
+        except (ValueError, TypeError):
+            return None
+        if secs < 0:
+            return None
+        return (now + _dt.timedelta(seconds=secs * mult)).timestamp()
     for fmt in ("%Y-%m-%d %H:%M", "%Y.%m.%d %H:%M", "%m-%d %H:%M"):
         try:
             dt = _dt.datetime.strptime(text, fmt)

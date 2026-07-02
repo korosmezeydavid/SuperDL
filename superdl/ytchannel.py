@@ -152,9 +152,24 @@ class ChannelManager:
         if not any(v.id == video.id for v in self.fresh):
             self.fresh.insert(0, video)      # legújabb elöl
 
-    def remove_fresh(self, video: Video) -> None:
+    def remove_fresh(self, video: Video, *, mark_seen: bool = True) -> None:
         self.fresh = [v for v in self.fresh if v.id != video.id]
+        if mark_seen:
+            self._mark_video_seen(video)
         self.save()
+
+    def _mark_video_seen(self, video: Video) -> None:
+        for ch in self.channels:
+            if ch.title == video.channel_title:
+                ch.seen.add(video.id)
+                return
+
+    def on_video_downloaded(self, url: str) -> None:
+        """Sikeres letöltés után: eltávolítja a friss listából és látottnak jelöli."""
+        for v in list(self.fresh):
+            if v.url == url:
+                self.remove_fresh(v)
+                return
 
     def clear_fresh(self) -> None:
         self.fresh = []
@@ -162,8 +177,10 @@ class ChannelManager:
 
     def check_all(self) -> list[tuple[Channel, Video]]:
         """Minden automatikus csatorna új videói. A talált videókat a friss
-        listához adja és 'látottnak' jelöli (nem jelzi kétszer)."""
+        listához adja. Látottnak csak letöltés vagy kézi eltávolítás után
+        jelöli (így egy sikertelen letöltés legközelebb újra felajánlódik)."""
         found: list[tuple[Channel, Video]] = []
+        fresh_ids = {v.id for v in self.fresh}
         for ch in list(self.channels):
             if not ch.auto:
                 continue
@@ -174,9 +191,10 @@ class ChannelManager:
             ch.last_check = time.time()
             # a régiektől az újak felé, hogy a sorrend természetes legyen
             for v in reversed(videos):
-                if v.id not in ch.seen:
-                    ch.seen.add(v.id)
-                    self._add_fresh(v)
-                    found.append((ch, v))
+                if v.id in ch.seen or v.id in fresh_ids:
+                    continue
+                self._add_fresh(v)
+                fresh_ids.add(v.id)
+                found.append((ch, v))
         self.save()
         return found

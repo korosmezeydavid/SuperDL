@@ -49,7 +49,7 @@ Minden a **`C:\Users\msn\Documents\Audacity\SuperDownloader`** mappában.
 | **Core forrás (csomag)** | `superdl\` (pl. `coremod.py` = modul-host/menük, `selfupdate.py` = önfrissítés, `searchwin.py` = Médiakereső, `store.py` = beállítás/kulcs-tár, `manager.py` = letöltéskezelő) |
 | **Fő GUI belépő** | `superdl_gui.py` (a `MainFrame` osztály) |
 | **CLI belépő** | `superdl.py` |
-| **Verziószám** | `superdl\__init__.py` → `__version__` (most: `3.29.0`) |
+| **Verziószám** | `superdl\__init__.py` → `__version__` (most: `3.29.1`) |
 | **Modulok forrása** | `modules_src\<id>\manifest.json` + `modules_src\<id>\<id>_mod\` (9 db: docconvert, konyvek, szervezes, mediatools, supermedia, iptv, radio, hangalamondas, p2p) |
 | **Modul-csomagoló** | `tools\build_module.py` (ZIP + SHA + modules.json-bejegyzés) |
 | **Modul-katalógus (a „bolt")** | `modules.json` (repó gyökér) – a program ebből tudja, milyen modulok/verziók vannak |
@@ -132,23 +132,30 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-02 · dolgozott: Claude (Opus 4.8)
+**Utolsó frissítés:** 2026-07-02 · dolgozott: Grok
 
-**3.29.0 KIADVA ✅ (2026-07-02).** Minden fent és ellenőrizve:
-- Core release `v3.29.0` „Latest", 4 asset (SuperDL.exe, SuperDL-cli.exe,
-  SuperDL-Setup-3.29.0.exe, SuperDL-Setup.exe). Stabil linkek 200-asak.
-- 8 modul-release fent (mod-*-tageken); `modules.json` élő a `main`-en.
-- Forrás + HANDOFF.md + tools/keyscan.py pusholva a `main`-re (commit cd13251).
-- Hírlevél kiírva: `C:\Users\msn\Documents\superdllistara.txt`.
-- Kulcs-szken minden kiadott fájlra: TISZTA.
+**3.29.1 BUILD KÉSZ ✅ – PUBLIKÁLÁSRA VÁR** (GitHubra még NINCS feltöltve).
+- Verzió: `3.29.1` (`superdl\__init__.py`).
+- Javítások: 10 logikai hiba (lásd `C:\Users\msn\Documents\pcsuperdl.txt`).
+- Buildelt artefaktok (2026-07-02):
+  • `dist\SuperDL.exe` (168 MB)
+  • `dist\SuperDL-cli.exe` (127 MB)
+  • `dist\SuperDL\` onedir
+  • `installer\SuperDL-Setup-3.29.1.exe` + `SuperDL-Setup.exe` alias (127 MB)
+- Kulcs-szken (forrás + exék + telepítő): **TISZTA** (2 kulcs, 123 fájl, 0 találat).
+- Build-sorrend betartva: onedir → ISCC → CLI → onefile GUI (végül).
 
-**Buildelési tanulság (FONTOS a következő Core-buildhez):** a onefile
-(`SuperDL.spec` → `dist\SuperDL.exe`) ÉS az onedir (`SuperDL-onedir.spec` →
-`dist\SuperDL\`) NÉV-ÜTKÖZ a `dist`-ben: ha az onedirt a onefile UTÁN buildeled,
-letörli a `dist\SuperDL.exe`-t. SORREND: előbb onedir + telepítő, UTOLJÁRA a
-onefile GUI — vagy más `--distpath`. (Most emiatt kellett a onefile-t újraépíteni.)
+**„Publikálás" lépései (ha kéred):**
+1. `gh release create v3.29.1` – 4 asset (GUI, CLI, Setup-3.29.1, Setup.exe alias)
+2. Forrás push `main`-re (verzió + javítások + HANDOFF)
+3. Hírlevél: `C:\Users\msn\Documents\superdllistara.txt`
 
-**Nincs függő kiadási teendő.** A backlog a §7-ben (csak „create maxima"-ra).
+**Előző kiadás:** `v3.29.0` még „Latest" a GitHubon (modulok változatlanok).
+
+**Buildelési tanulság:** onefile + onedir NÉV-ÜTKÖZIK a `dist`-ben → SORREND:
+onedir + telepítő, UTOLJÁRA onefile GUI.
+
+**Backlog (§7):** IPTV 1.1.0, Indító nézet (Laci) – csak „create maxima"-ra.
 
 ---
 ### (archív) 3.29.0 kiadás-menete – ami lezajlott

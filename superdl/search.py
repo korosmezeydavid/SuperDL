@@ -153,5 +153,9 @@ def resolve_stream(url: str, audio_only: bool = True,
     with yt_dlp.YoutubeDL(opts) as y:
         info = y.extract_info(url, download=False)
     if info.get("entries"):
-        info = info["entries"][0]
+        entries = [e for e in info["entries"] if e]
+        if not entries:
+            raise RuntimeError(
+                "A lejátszási lista üres, vagy minden elem elérhetetlen.")
+        info = entries[0]
     return info.get("url"), info.get("title", ""), info.get("duration") or 0

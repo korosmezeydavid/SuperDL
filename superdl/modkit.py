@@ -206,6 +206,9 @@ class CoreContext:
     def add_menu(self, title: str):
         return self._host.add_menu(title)
 
+    def add_submenu(self, top_title: str, sub_title: str):
+        return self._host.add_submenu(top_title, sub_title)
+
     def add_menu_item(self, menu, label, callback, shortcut=None, help=""):
         return self._host.add_menu_item(menu, label, callback, shortcut, help)
 

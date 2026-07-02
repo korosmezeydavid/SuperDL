@@ -314,14 +314,14 @@ class RecordManager:
                     self._fire(s, duration, today)
 
     def _fire(self, s: Schedule, duration: int, today: str):
-        s.last_run_date = today
-        if s.repeat == "once":
-            s.enabled = False
-        self.save()
         rec = ActiveRecording(s.station_name, s.url, self.base_dir(),
                               duration_s=duration, scheduled=True,
                               on_done=self._on_done)
         if rec.start():
+            s.last_run_date = today
+            if s.repeat == "once":
+                s.enabled = False
+            self.save()
             with self._lock:
                 self.active.append(rec)
             self._emit(f"Időzített felvétel elindult: {s.station_name} "

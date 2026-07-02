@@ -180,6 +180,20 @@ class SegmentDownloader:
     def _state_path(self, target: Path) -> Path:
         return target.with_suffix(target.suffix + ".sdlstate")
 
+    def _find_resumable_target(self, name: str, size: int) -> Path | None:
+        """Megkeresi a már megkezdett letöltés célfájlját (.sdlstate + .part)."""
+        stem = Path(name).stem
+        suffix = Path(name).suffix
+        candidates = [self.out_dir / name]
+        if stem and suffix:
+            for p in sorted(self.out_dir.glob(f"{stem}*{suffix}")):
+                if p.is_file() and p not in candidates:
+                    candidates.append(p)
+        for cand in candidates:
+            if self._load_state(cand, size) is not None:
+                return cand
+        return None
+
     def _load_state(self, target: Path, size: int) -> list[list[int]] | None:
         sp = self._state_path(target)
         part = target.with_suffix(target.suffix + ".part")
@@ -234,9 +248,10 @@ class SegmentDownloader:
         p.total = size
 
         target = unique_path(self.out_dir, name)
-        # folytatható letöltésnél a már megkezdett fájlt használjuk
-        resumable = self.out_dir / name
-        if self._load_state(resumable, size) is not None:
+        # folytatható letöltésnél a már megkezdett fájlt használjuk (akár
+        # egyedi „(1)" névvel is, ha az eredeti már foglalt volt)
+        resumable = self._find_resumable_target(name, size)
+        if resumable is not None:
             target = resumable
         part = target.with_suffix(target.suffix + ".part")
 

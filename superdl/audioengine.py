@@ -162,6 +162,8 @@ class Player:
             return
         self._emit("lejátszás")
         started = False
+        failed = False
+        err_msg = ""
         try:
             while not self._stop.is_set():
                 if self._paused.is_set():
@@ -178,8 +180,9 @@ class Player:
                 else:
                     a = np.frombuffer(raw, dtype=np.int16).astype(np.float32)
                     stream.write((a * v).astype(np.int16).tobytes())
-        except Exception:
-            pass
+        except Exception as exc:
+            failed = True
+            err_msg = str(exc)
         finally:
             try:
                 stream.stop()
@@ -187,5 +190,10 @@ class Player:
             except Exception:
                 pass
         if not self._stop.is_set():
-            self._emit("vége" if started else
-                       "hiba: a forrás nem játszható le")
+            if failed and started:
+                self._emit(f"hiba: lejátszás megszakadt – {err_msg}")
+            elif failed:
+                self._emit("hiba: a forrás nem játszható le")
+            else:
+                self._emit("vége" if started else
+                           "hiba: a forrás nem játszható le")
