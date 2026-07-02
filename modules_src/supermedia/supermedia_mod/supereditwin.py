@@ -107,9 +107,16 @@ class SuperEditorFrame(wx.Frame):
         fx.Add(self.fx_ch, 0, wx.RIGHT, 8)
         self.fx_param_lbl = wx.StaticText(fb, label="")
         fx.Add(self.fx_param_lbl, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
-        self.fx_param = wx.TextCtrl(fb, size=(70, -1))
-        self.fx_param.SetName("Effekt paramétere")
-        fx.Add(self.fx_param, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
+        # CSÚSZKA a paraméterhez (nyílbillentyűkkel állítható, a képernyőolvasó
+        # bemondja az értéket); mellette élő érték-címke a látóknak.
+        self.fx_slider = wx.Slider(fb, minValue=0, maxValue=100, value=0,
+                                   size=(150, -1))
+        self.fx_slider.SetName("Effekt paramétere")
+        self.fx_slider.Bind(wx.EVT_SLIDER, lambda e: self._fx_slider_moved())
+        fx.Add(self.fx_slider, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
+        self.fx_val = wx.StaticText(fb, label="", size=(64, -1))
+        fx.Add(self.fx_val, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
+        self._fx_scale = 1
         b_fxsec = wx.Button(fb, label="Alkalmaz a sza&kaszra")
         b_fxsec.Bind(wx.EVT_BUTTON, lambda e: self._apply_effect(False))
         b_fxall = wx.Button(fb, label="Alkalmaz az e&gészre")
@@ -431,33 +438,47 @@ class SuperEditorFrame(wx.Frame):
 
     # ---- effekt-rack (It.3) ------------------------------------------
 
+    def _fx_value(self) -> float:
+        """A csúszka valós paraméterértéke (egész csúszka / skála)."""
+        return self.fx_slider.GetValue() / self._fx_scale
+
+    def _fx_slider_moved(self):
+        """A csúszka mozgatásakor frissíti az érték-címkét (a képernyőolvasó
+        magát az értéket a nyílbillentyűkkel amúgy is bemondja)."""
+        v = self._fx_value()
+        self.fx_val.SetLabel(f"{v:g}")
+
     def _fx_param_update(self):
-        """A kiválasztott effekthez tartozó paraméter-mező címkéje/alapja."""
+        """A kiválasztott effekthez tartozó csúszka tartománya/alapja/címkéje."""
         idx = self.fx_ch.GetSelection()
         if not (0 <= idx < len(supereffects.EFFECTS)):
             return
-        _k, _n, lbl, dflt, _f = supereffects.EFFECTS[idx]
-        if lbl:
+        key, name, lbl, dflt, _f = supereffects.EFFECTS[idx]
+        rng = supereffects.param_range(key)
+        if lbl and rng:
+            lo, hi, scale = rng
+            self._fx_scale = scale
             self.fx_param_lbl.SetLabel(lbl + ":")
-            self.fx_param.Enable(True)
-            self.fx_param.SetValue(f"{dflt:g}")
+            self.fx_slider.Enable(True)
+            self.fx_slider.SetMin(int(round(lo * scale)))
+            self.fx_slider.SetMax(int(round(hi * scale)))
+            self.fx_slider.SetPageSize(max(1, int((hi - lo) * scale / 20)))
+            self.fx_slider.SetValue(int(round(dflt * scale)))
+            self.fx_slider.SetName(f"{name} paramétere: {lbl}")
+            self._fx_slider_moved()
         else:
+            self._fx_scale = 1
             self.fx_param_lbl.SetLabel("(nincs paraméter)")
-            self.fx_param.SetValue("")
-            self.fx_param.Enable(False)
+            self.fx_slider.Enable(False)
+            self.fx_slider.SetName("Effekt paramétere (ehhez nincs)")
+            self.fx_val.SetLabel("")
 
     def _apply_effect(self, whole: bool):
         if self._busy or not self.clip.has_audio():
             return
         idx = self.fx_ch.GetSelection()
         key, name, lbl, _dflt, _f = supereffects.EFFECTS[idx]
-        param = 0.0
-        if lbl:
-            try:
-                param = float(self.fx_param.GetValue().replace(",", "."))
-            except ValueError:
-                self._announce("Hibás paraméter – adj meg egy számot.")
-                return
+        param = self._fx_value() if (lbl and supereffects.param_range(key)) else 0.0
         if whole:
             a, b = 0.0, self.clip.duration()
         else:

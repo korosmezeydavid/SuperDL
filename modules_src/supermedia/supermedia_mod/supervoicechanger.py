@@ -139,6 +139,11 @@ class VoiceChanger:
     def set_effect(self, dx8_type: int, on: bool) -> bool:
         return bool(self.rack and self.rack.set(dx8_type, on))
 
+    def set_effect_intensity(self, dx8_type: int, amount: float) -> bool:
+        """A DX8 effekt erőssége 0–100%-ban (akkor is megjegyzi, ha az effekt
+        épp nincs bekapcsolva – bekapcsoláskor érvényesül)."""
+        return bool(self.rack and self.rack.set_intensity(dx8_type, amount))
+
     def is_effect_on(self, dx8_type: int) -> bool:
         return bool(self.rack and self.rack.is_on(dx8_type))
 

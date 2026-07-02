@@ -54,27 +54,41 @@ class VoiceChangerFrame(wx.Frame):
         self.btn.Bind(wx.EVT_BUTTON, lambda e: self._toggle())
         v.Add(self.btn, 0, wx.LEFT | wx.BOTTOM, 10)
 
-        # hangmagasság
+        # hangmagasság – CSÚSZKA (nyílbillentyűkkel, a képernyőolvasó bemondja)
         ph = wx.BoxSizer(wx.HORIZONTAL)
         ph.Add(wx.StaticText(p, label="&Hangmagasság (félhang, −12…+12):"), 0,
                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
-        self.pitch = wx.SpinCtrl(p, min=-12, max=12, initial=0)
+        self.pitch = wx.Slider(p, minValue=-12, maxValue=12, value=0,
+                               size=(200, -1))
         self.pitch.SetName("Hangmagasság félhangban, mínusz tizenkettőtől plusz "
                            "tizenkettőig")
-        self.pitch.Bind(wx.EVT_SPINCTRL, lambda e: self._on_pitch())
-        ph.Add(self.pitch, 0)
+        self.pitch.Bind(wx.EVT_SLIDER, lambda e: self._on_pitch())
+        ph.Add(self.pitch, 0, wx.RIGHT, 6)
+        self.pitch_val = wx.StaticText(p, label="0 félhang", size=(90, -1))
+        ph.Add(self.pitch_val, 0, wx.ALIGN_CENTER_VERTICAL)
         v.Add(ph, 0, wx.LEFT | wx.BOTTOM, 10)
 
-        # effektek (DX8) – pipák
-        box = wx.StaticBoxSizer(wx.VERTICAL, p, "Élő effektek")
+        # effektek (DX8) – pipa + intenzitás-csúszka soronként
+        box = wx.StaticBoxSizer(wx.VERTICAL, p, "Élő effektek (pipa + erősség)")
         sb = box.GetStaticBox()
         self.fx_chk = {}
+        self.fx_slider = {}
+        grid = wx.FlexGridSizer(len(VC.EFFECTS), 3, 4, 8)
         for name, dx8 in VC.EFFECTS:
             c = wx.CheckBox(sb, label=name)
             c.SetName(f"{name} effekt be/ki")
             c.Bind(wx.EVT_CHECKBOX, lambda e, t=dx8: self._on_fx(t))
-            box.Add(c, 0, wx.ALL, 4)
             self.fx_chk[dx8] = c
+            sl = wx.Slider(sb, minValue=0, maxValue=100, value=50, size=(160, -1))
+            sl.SetName(f"{name} erőssége százalékban")
+            sl.Bind(wx.EVT_SLIDER, lambda e, t=dx8: self._on_fx_intensity(t))
+            self.fx_slider[dx8] = sl
+            grid.Add(c, 0, wx.ALIGN_CENTER_VERTICAL)
+            grid.Add(sl, 0, wx.ALIGN_CENTER_VERTICAL)
+            grid.Add(wx.StaticText(sb, label="erősség %"), 0,
+                     wx.ALIGN_CENTER_VERTICAL)
+        grid.AddGrowableCol(1, 1)
+        box.Add(grid, 0, wx.EXPAND | wx.ALL, 4)
         v.Add(box, 0, wx.EXPAND | wx.ALL, 10)
 
         p.SetSizer(v)
@@ -123,6 +137,20 @@ class VoiceChangerFrame(wx.Frame):
         self.pitch.Enable(on)
         for c in self.fx_chk.values():
             c.Enable(on)
+        for s in self.fx_slider.values():
+            s.Enable(on)
+
+    def _fx_name(self, dx8):
+        for name, t in VC.EFFECTS:
+            if t == dx8:
+                return name
+        return "Effekt"
+
+    def _on_fx_intensity(self, dx8):
+        val = self.fx_slider[dx8].GetValue()
+        if self.vc and self.vc.running:
+            self.vc.set_effect_intensity(dx8, val)
+        self._announce(f"{self._fx_name(dx8)} erőssége: {val} százalék.")
 
     # ---- vezérlés ----------------------------------------------------
 
@@ -149,16 +177,20 @@ class VoiceChangerFrame(wx.Frame):
         self.in_ch.Enable(False)
         self.out_ch.Enable(False)
         self._enable_fx(True)
-        # az aktuális effekt-pipák alkalmazása
+        # a csúszkák aktuális intenzitása → majd a bekapcsolt effekt-pipák
+        for dx8, sl in self.fx_slider.items():
+            self.vc.set_effect_intensity(dx8, sl.GetValue())
         for dx8, c in self.fx_chk.items():
             if c.GetValue():
                 self.vc.set_effect(dx8, True)
         self._announce("Voice changer elindult. Beszélj a mikrofonba.")
 
     def _on_pitch(self):
+        val = self.pitch.GetValue()
+        self.pitch_val.SetLabel(f"{val:+d} félhang")
         if self.vc and self.vc.running:
-            self.vc.set_pitch(self.pitch.GetValue())
-        self._announce(f"Hangmagasság: {self.pitch.GetValue():+d} félhang.")
+            self.vc.set_pitch(val)
+        self._announce(f"Hangmagasság: {val:+d} félhang.")
 
     def _on_fx(self, dx8):
         if not (self.vc and self.vc.running):

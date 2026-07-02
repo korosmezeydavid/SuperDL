@@ -15,7 +15,8 @@ def register(core):
     from .radiowin import RadioFrame
 
     opener = core.register_window("radio_module", RadioFrame)
-    menu = core.add_menu("Internetes &rádió")
+    _sub = getattr(core, "add_submenu", None)
+    menu = _sub("&Média", "Internetes &rádió") if _sub else core.add_menu("Internetes &rádió")
     item = core.add_menu_item(
         menu, "Internetes &rádió\tCtrl+Shift+R", opener,
         help="Élő rádióállomások keresése és hallgatása, felvétellel")

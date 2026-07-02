@@ -282,6 +282,107 @@ class VideoEditor:
         finally:
             shutil.rmtree(work, ignore_errors=True)
 
+    def export_cut(self, cut_start: float, cut_end: float, out: str,
+                   progress=None) -> bool:
+        """A globális idővonalból KIVÁGJA a [cut_start, cut_end] szakaszt, és a
+        megmaradt elejét [0, cut_start) és végét [cut_end, vége) ÖSSZEFŰZVE menti
+        `out`-ba – a videó ennyivel rövidebb lesz. A megmaradó magyarázó szövegek
+        a kivágás hosszával előrébb csúsznak; a kivágott részbe esők kimaradnak.
+        Egyetlen ffmpeg-menetben, a trim+concat szűrővel. True = siker."""
+        self._stop.clear()
+        self.error = ""
+        ff = self._ff()
+        if not ff:
+            self.error = "az ffmpeg nem érhető el"
+            return False
+        if not self.clips:
+            self.error = "nincs betöltött videó"
+            return False
+        total = self.total_duration()
+        cut_start = max(0.0, cut_start)
+        cut_end = min(cut_end if cut_end > 0 else total, total)
+        if cut_end - cut_start < 0.1:
+            self.error = "a kivágandó szakasz túl rövid"
+            return False
+        head = cut_start > 0.05                    # marad-e eleje
+        tail = cut_end < total - 0.05              # marad-e vége
+        if not head and not tail:
+            self.error = "a kivágás az egész videót érintené"
+            return False
+
+        gap = cut_end - cut_start
+        out_dur = total - gap
+        work = Path(tempfile.mkdtemp(prefix="superdl_cut_"))
+        try:
+            base = self._ensure_base(ff)
+            if not base:
+                self.error = self.error or "az összefűzés nem sikerült"
+                return False
+
+            vparts, aparts = [], []
+            n = 0
+            if head:
+                vparts.append(f"[0:v]trim=start=0:end={cut_start:.3f},"
+                              f"setpts=PTS-STARTPTS[v{n}]")
+                aparts.append(f"[0:a]atrim=start=0:end={cut_start:.3f},"
+                              f"asetpts=PTS-STARTPTS[a{n}]")
+                n += 1
+            if tail:
+                vparts.append(f"[0:v]trim=start={cut_end:.3f},"
+                              f"setpts=PTS-STARTPTS[v{n}]")
+                aparts.append(f"[0:a]atrim=start={cut_end:.3f},"
+                              f"asetpts=PTS-STARTPTS[a{n}]")
+                n += 1
+            graph = ";".join(vparts + aparts)
+            if n == 1:
+                graph += ";[v0]null[vc];[a0]anull[a]"
+            else:
+                vl = "".join(f"[v{i}]" for i in range(n))
+                al = "".join(f"[a{i}]" for i in range(n))
+                graph += (f";{vl}concat=n={n}:v=1:a=0[vc]"
+                          f";{al}concat=n={n}:v=0:a=1[a]")
+
+            # a megmaradó szövegek ráégetése a [vc]-re, csúsztatott időzítéssel
+            font = _find_font()
+            if len(self.clips) == 1:
+                ow = self.clips[0].width or 1280
+                oh = self.clips[0].height or 720
+            else:
+                ow, oh = self.target_res()
+            fs = max(18, int(oh / 22))
+            margin = max(12, int(oh / 18))
+            draws = []
+            idx = 0
+            for note in self.notes:
+                t = note.at
+                if cut_start <= t < cut_end or not font:
+                    continue                       # kivágott részbe esik / nincs font
+                rel = t if t < cut_start else t - gap
+                shutil.copyfile(font, work / "font.ttf")
+                (work / f"note{idx}.txt").write_text(
+                    wrap_caption(note.text, ow, fs), encoding="utf-8")
+                draws.append(
+                    f"drawtext=textfile=note{idx}.txt:fontfile=font.ttf:"
+                    f"fontsize={fs}:fontcolor=white:borderw=4:bordercolor=black:"
+                    f"line_spacing=8:x=(w-text_w)/2:y=h-text_h-{margin}:"
+                    f"expansion=none:"
+                    f"enable='between(t,{rel:.3f},{rel + note.dur:.3f})'")
+                idx += 1
+            if draws:
+                graph += f";[vc]{','.join(draws)}[v]"
+                vmap = "[v]"
+            else:
+                vmap = "[vc]"
+
+            cmd = [ff, "-y", "-i", base, "-filter_complex", graph,
+                   "-map", vmap, "-map", "[a]",
+                   "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+                   "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k",
+                   "-progress", "pipe:1", "-nostats", out]
+            return self._run_progress(cmd, str(work), out_dur, progress)
+        finally:
+            shutil.rmtree(work, ignore_errors=True)
+
     def cleanup(self):
         """Az alap-videó ideiglenes mappájának törlése (ablak bezárásakor)."""
         if self._base_dir:

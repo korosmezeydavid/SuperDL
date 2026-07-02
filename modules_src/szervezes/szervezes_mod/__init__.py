@@ -26,7 +26,9 @@ def register(core):
     from .organizerwin import OrganizerFrame
     from .dayinfowin import DayInfoDialog
 
-    menu = core.add_menu("Szer&vezés")
+    # Szervezés = nem média, nem könyv → az Eszközök menü alá (almenüként).
+    _sub = getattr(core, "add_submenu", None)
+    menu = _sub("&Eszközök", "Szer&vezés") if _sub else core.add_menu("Szer&vezés")
     _add(core, menu, "news_module", NewsFrame,
          "&Hírolvasó\tCtrl+Shift+H",
          "Reklámmentes RSS hírgyűjtő és letisztított cikkolvasó")

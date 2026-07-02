@@ -1,7 +1,7 @@
 {
   "id": "radio",
   "name": "Internetes rádió",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "entry": "radio_mod",
   "category": "Média",
   "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",

@@ -463,9 +463,39 @@ class MediaSearchFrame(wx.Frame):
         if not self.cart:
             self._announce("A kosár üres.")
             return
-        for x in self.cart:
-            self.main._on_add(url=x.url)
-        self._announce(f"{len(self.cart)} elem letöltésre küldve a kosárból.")
+        urls = [x.url for x in self.cart]
+        for u in urls:
+            self.main._on_add(url=u)
+        n = len(urls)
+        # CHECKOUT: a kosár NEM ürül azonnal – a főablak figyeli a beküldött
+        # letöltéseket, és amikor MIND befejeződött, kiüríti a kosarat (akkor is,
+        # ha közben bezárod ezt az ablakot). Így megszakadás esetén sem vesznek el.
+        reg = getattr(self.main, "register_cart_checkout", None)
+        if reg:
+            reg(urls, on_cleared=self._on_cart_downloaded)
+            self._announce(f"{n} elem letöltésre küldve – a kosár a letöltések "
+                           f"befejeztével automatikusan kiürül.")
+        else:
+            # régi főablak (nincs figyelő): checkout = azonnali ürítés
+            self.cart.clear()
+            self._save_cart()
+            self._refresh_cart()
+            self._announce(f"{n} elem letöltésre küldve; a kosár kiürült.")
+
+    def _on_cart_downloaded(self, done, failed):
+        """A főablak hívja (fő szálon), amikor a kosárból beküldött ÖSSZES
+        letöltés befejeződött – a kosár teljes tartalmát kiürítjük."""
+        try:
+            self.cart.clear()
+            self._refresh_cart()   # a lemezes kosarat már a főablak kiürítette
+            if failed:
+                self._announce(
+                    f"Kosár letöltése kész – a kosár kiürült ({done} kész, "
+                    f"{failed} hiba; a hibásak a listából újraindíthatók).")
+            else:
+                self._announce("Kosár letöltése kész – a kosár kiürült.")
+        except RuntimeError:
+            pass                   # az ablakot közben bezárták (törölt wrapper)
 
     # ---- lejátszó -----------------------------------------------------
 

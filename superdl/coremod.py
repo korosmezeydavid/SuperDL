@@ -216,14 +216,56 @@ class WxHost:
     def main_frame(self):
         return self.frame
 
-    def add_menu(self, title: str):
+    # A felső menük kívánt sorrendje (rang szerint). Az ismeretlen címek 5-ös
+    # rangot kapnak (a tartalom-menük és az Eszközök közé kerülnek), a Súgó és
+    # az AI rangja a legmagasabb, így azok mindig hátul maradnak.
+    _TOP_RANK = {
+        "Fájl": 0, "Letöltések": 1, "Feliratkozások": 2,
+        "Média": 3, "Könyvek": 4, "Eszközök": 6, "AI": 7, "Súgó": 8,
+    }
+
+    def _menubar(self):
         mb = self.frame.GetMenuBar()
         if mb is None:
             mb = wx.MenuBar()
             self.frame.SetMenuBar(mb)
+        return mb
+
+    def _find_top_menu(self, mb, plain_title):
+        for i in range(mb.GetMenuCount()):
+            if mb.GetMenuLabelText(i) == plain_title:
+                return mb.GetMenu(i)
+        return None
+
+    def _top_insert_pos(self, mb, plain_title):
+        rank = self._TOP_RANK.get(plain_title, 5)
+        for i in range(mb.GetMenuCount()):
+            if self._TOP_RANK.get(mb.GetMenuLabelText(i), 5) > rank:
+                return i
+        return mb.GetMenuCount()
+
+    def add_menu(self, title: str):
+        """Felső menüt ad vissza CÍM szerint. Ha már van ilyen című felső menü,
+        AZT adja vissza (nem hoz létre duplikátumot) – így több modul is
+        ugyanabba a kategória-menübe (pl. Média, Könyvek, Eszközök) tölthet.
+        Új menüt a kívánt sorrendi helyre szúr be (a Súgó mindig utolsó)."""
+        mb = self._menubar()
+        plain = title.replace("&", "")
+        existing = self._find_top_menu(mb, plain)
+        if existing is not None:
+            return existing
         menu = wx.Menu()
-        mb.Append(menu, title)
+        mb.Insert(self._top_insert_pos(mb, plain), menu, title)
         return menu
+
+    def add_submenu(self, top_title: str, sub_title: str):
+        """A megadott felső menü (cím szerinti find-or-create) ALÁ fűz egy
+        almenüt, és AZT adja vissza – a modul abba teszi az elemeit. Így a
+        média/könyv/eszköz modulok egy-egy közös felső menü alatt csoportosulnak."""
+        top = self.add_menu(top_title)
+        sub = wx.Menu()
+        top.AppendSubMenu(sub, sub_title)
+        return sub
 
     def add_menu_item(self, menu, label, callback, shortcut=None, help=""):
         text = f"{label}\t{shortcut}" if shortcut else label
@@ -242,24 +284,53 @@ class WxHost:
     def register_window(self, key, factory):
         """Egyablakos megnyitót ad vissza: ha már nyitva van, előtérbe hozza,
         különben a `factory(parent)`-tel létrehozza (záráskor elfelejti)."""
+        def _bring_to_front(w):
+            # Az ablakot LÁTHATÓVÁ tesszük, kibontjuk (ha ikonizált), előtérbe
+            # hozzuk ÉS fókuszt adunk neki – hogy tényleg ELŐJÖJJÖN, ne csak
+            # „villanjon" és visszadobjon a főablakra.
+            try:
+                w.Show()
+            except Exception:
+                pass
+            for meth in ("Iconize", "Raise", "SetFocus"):
+                try:
+                    fn = getattr(w, meth, None)
+                    if fn is None:
+                        continue
+                    fn(False) if meth == "Iconize" else fn()
+                except Exception:
+                    pass
+
         def opener():
             win = self._windows.get(key)
             if win:
                 try:
-                    win.Show()           # ha rejtve/kis méretben volt
-                    win.Raise()
+                    _bring_to_front(win)
                     return win
                 except Exception:
                     self._windows.pop(key, None)
-            win = factory(self.frame)
+            try:
+                win = factory(self.frame)
+            except Exception as exc:
+                _log.exception("A(z) %r ablak megnyitása nem sikerült", key)
+                try:
+                    wx.MessageBox(
+                        "Az ablakot sajnos nem sikerült megnyitni.\n\n"
+                        "Hiba: %s\n\nPróbáld újraindítani a programot; ha így is "
+                        "marad, írd meg ezt a hibaüzenetet." % exc,
+                        "Megnyitási hiba", wx.OK | wx.ICON_ERROR)
+                except Exception:
+                    pass
+                return None
+            if win is None:
+                return None
             self._windows[key] = win
             try:
                 win.Bind(wx.EVT_CLOSE, lambda e: (self._windows.pop(key, None),
                                                   e.Skip()))
             except Exception:
                 pass
-            win.Show()                   # KRITIKUS: az ablakot LÁTHATÓVÁ kell tenni
-            win.Raise()
+            _bring_to_front(win)         # KRITIKUS: tényleg jöjjön elő és kapjon fókuszt
             return win
         return opener
 

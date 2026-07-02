@@ -192,12 +192,28 @@ class IPTVFrame(wx.Frame):
         av.Add(self.subread_btn, 0)
         v.Add(av, 0, wx.LEFT | wx.BOTTOM, 6)
 
-        v.Add(wx.StaticText(p, label="Műso&rújság / információ:"), 0, wx.LEFT, 6)
+        self._report_lbl = wx.StaticText(p, label="Műso&rújság / információ:")
+        v.Add(self._report_lbl, 0, wx.LEFT, 6)
         self.report = wx.TextCtrl(
             p, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_BESTWRAP,
             size=(-1, 110), name="Műsorújság")
         v.Add(self.report, 0, wx.EXPAND | wx.ALL, 6)
         p.SetSizer(v)
+
+        # ÁLLAPOTGÉP: a „tartalmi" vezérlők (EPG, szűrő, lista, lejátszás, felvétel,
+        # hangsáv, riport) csak AKKOR látszanak, ha már van betöltött forrás –
+        # így belépés előtt tiszta, egyszerű a képernyő; utána minden előjön.
+        self._panel = p
+        self._vsizer = v
+        self._content = [er, fr, self.list, self.now_lbl, b1, b2, rec, av,
+                         self._report_lbl, self.report]
+        self._set_logged_in(False)
+
+    def _set_logged_in(self, on: bool):
+        """A tartalmi vezérlők megjelenítése/elrejtése (belépés utáni/előtti nézet)."""
+        for item in self._content:
+            self._vsizer.Show(item, on, recursive=True)
+        self._panel.Layout()
 
     # ---- visszajelzés -------------------------------------------------
 
@@ -269,17 +285,47 @@ class IPTVFrame(wx.Frame):
         self.epg_url.SetValue(iptv.xtream_epg_url(host, user, pwd))
         self._save_conf()
         self._bg("Bejelentkezés és csatornák lekérése…",
-                 lambda: iptv.xtream_channels(host, user, pwd),
-                 self._channels_loaded)
+                 lambda: iptv.xtream_load(host, user, pwd),
+                 self._xtream_loaded)
 
-    def _channels_loaded(self, channels):
+    def _xtream_loaded(self, result):
+        """A player_api-s bejelentkezés eredménye: (user_info, csatornák).
+        Beszélő visszajelzés (csatorna- és kategóriaszám, lejárat), fókusz a
+        csatornalistára – hogy a felhasználó TUDJA, sikerült-e, és hol folytassa."""
+        info, channels = result
+        self._channels_loaded(channels, announce=False)
+        cats = len({c.group for c in channels if c.group})
+        extra = ""
+        exp = info.get("exp_date")
+        if exp:
+            try:
+                d = _dt.datetime.fromtimestamp(int(exp))
+                extra = f" A fiók eddig érvényes: {d:%Y-%m-%d}."
+            except Exception:
+                pass
+        if channels:
+            self._announce(f"Bejelentkezve. {len(channels)} csatorna "
+                           f"{cats} kategóriában.{extra} "
+                           f"Válassz kategóriát, vagy lépj a csatornalistára.")
+            try:
+                self.list.SetFocus()
+            except Exception:
+                pass
+        else:
+            self._announce("Bejelentkezve, de a szolgáltató nem adott vissza "
+                           "csatornát.")
+
+    def _channels_loaded(self, channels, announce=True):
         self._busy = False
         self.channels = channels
         groups = iptv.groups(channels)
         self.group_ch.Set(groups)
         self.group_ch.SetSelection(0)
+        if channels:
+            self._set_logged_in(True)      # előjönnek a tartalmi vezérlők
         self._refresh_list()
-        self._announce(f"{len(channels)} csatorna betöltve.")
+        if announce:
+            self._announce(f"{len(channels)} csatorna betöltve.")
         if not channels:
             self._report("A lista üres, vagy nem értelmezhető.")
 

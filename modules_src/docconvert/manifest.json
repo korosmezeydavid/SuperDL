@@ -1,7 +1,7 @@
 {
   "id": "docconvert",
   "name": "Dokumentum-konverter",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "entry": "docconvert_mod",
   "category": "Könyvek",
   "description": "Dokumentumok átalakítása formátumok közt (TXT, DOCX, EPUB, PDF, HTML, RTF, ODT, Markdown…), beépített PDF-fel és OCR-rel. Az első, modulként szállított SuperDL-funkció.",

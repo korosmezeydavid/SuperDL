@@ -1,7 +1,7 @@
 {
   "id": "hangalamondas",
   "name": "AI hangalámondás",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "entry": "hangalamondas_mod",
   "category": "AI",
   "description": "AI hangalámondás (audio description) videóhoz: a videó képi tartalmát AI írja le és hanggal mondja el, az eredeti hang alatta halkítva – így a videó vakon is „nézhető”. A leírás részletessége és elhelyezése (párbeszéd-szünet / kiterjesztett) választható; a saját AI-kulcsoddal megy.",

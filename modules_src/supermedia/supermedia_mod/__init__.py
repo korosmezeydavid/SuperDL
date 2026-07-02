@@ -24,7 +24,8 @@ def register(core):
     from .supereditwin import SuperEditorFrame
     from .supervoicewin import VoiceChangerFrame
 
-    menu = core.add_menu("Su&per Media")
+    _sub = getattr(core, "add_submenu", None)
+    menu = _sub("&Média", "Su&per Media") if _sub else core.add_menu("Su&per Media")
     _add(core, menu, "superm_module", SuperMFrame,
          "Super &M – műsorszóró stúdió\tCtrl+Shift+M",
          "Rádió-műsorszórás: lejátszás, keverés, mikrofon, jingle-pad, "

@@ -22,7 +22,8 @@ def register(core):
     from .videowin import VideoComposeFrame
     from .videoeditwin import VideoEditFrame
 
-    menu = core.add_menu("&Média-eszközök")
+    _sub = getattr(core, "add_submenu", None)
+    menu = _sub("&Média", "&Média-eszközök") if _sub else core.add_menu("&Média-eszközök")
     _add(core, menu, "convert_module", BatchConvertFrame,
          "Médiakonvertá&ló (kötegelt)\tCtrl+Shift+K",
          "Hang/videó fájlok átalakítása más formátumba, egyszerre többet is")

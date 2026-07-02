@@ -15,7 +15,9 @@ def register(core):
     from .docconvertwin import DocConvertFrame    # a converter-ablak a MODULBAN
 
     opener = core.register_window("docconvert_module", DocConvertFrame)
-    menu = core.add_menu("&Dokumentumok")
+    # Minden, ami dokumentum/szöveg = a Könyvek menü alá.
+    _sub = getattr(core, "add_submenu", None)
+    menu = _sub("&Könyvek", "&Dokumentum-konverter") if _sub else core.add_menu("&Dokumentumok")
     item = core.add_menu_item(
         menu, "Dokumentum-&konverter\tCtrl+Shift+D", opener,
         help="Dokumentum átalakítása más formátumba (TXT, DOCX, EPUB, PDF, "

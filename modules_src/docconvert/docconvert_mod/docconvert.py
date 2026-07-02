@@ -38,19 +38,47 @@ OUT_FORMATS = [
     ("Kindle (AZW3)", "azw3", "calibre"),
     ("PDF", "pdf", "calibre/office"),
 ]
-ENCODINGS = [("UTF-8", "utf-8"),
+ENCODINGS = [("Automatikus felismerés", "auto"),
+             ("UTF-8", "utf-8"),
              ("UTF-8 BOM-mal", "utf-8-sig"),
              ("UTF-16", "utf-16"),
              ("Közép-európai (Windows-1250)", "cp1250"),
              ("Közép-európai (ISO-8859-2 / Latin-2)", "iso-8859-2"),
+             ("Magyar DOS (CP852 / Latin-2)", "cp852"),
+             ("Magyar CWI-2 (régi DOS)", "cwi2"),
+             ("Régi DOS (CP437)", "cp437"),
              ("Nyugat-európai (Windows-1252)", "cp1252")]
+
+# az AUTOMATIKUS felismerés egybájtos jelöltjei (a legvalószínűbbtől); a helyeset
+# NEM az „elsőként hibátlanul dekódol" választja (az iso-8859-2/cp852/cp437 MINDEN
+# bájtot elfogad, így kacatot is), hanem a `_decode_score` szerinti LEGJOBB.
+_TRY_ENC = ["cp1250", "cp852", "iso-8859-2", "cp437", "cp1252"]
+
+# a helyes magyar dekódolás erős jelei
+_HU_CHARS = "áéíóöőúüűÁÉÍÓÖŐÚÜŰ"
+# a magyar szövegben megszokott, nem-ASCII, de RENDBEN lévő írásjelek
+_OK_EXTRA = set("„”“‚’‘–—…«»•·§°€£")
+
+# CWI-2 (régi magyar DOS-kódlap, ≈CP3845): a CP437-re épül; a magyar kisbetűk
+# (á é í ó ö ú ü) és az É Ö Ü nagybetűk MÁR a CP437 helyükön vannak, csak a
+# ő ű Ő Ű és néhány nagybetű (Á Í Ó Ú) kerül más pozícióra. Ezért a CP437-alapot
+# vesszük, és CSAK ezt a 8 magyar pozíciót írjuk felül → teljes magyar lefedettség.
+_CWI2_OVERRIDES = {0x8D: "Í", 0x8F: "Á", 0x93: "ő", 0x95: "Ó",
+                   0x96: "ű", 0x97: "Ú", 0x98: "Ű", 0xA7: "Ő"}
+_CWI2_TABLE = list(bytes(range(256)).decode("cp437"))
+for _b, _ch in _CWI2_OVERRIDES.items():
+    _CWI2_TABLE[_b] = _ch
+_CWI2_TABLE = "".join(_CWI2_TABLE)
+
+
+def decode_cwi2(data: bytes) -> str:
+    """A régi magyar CWI-2 DOS-kódlapú bájtok Unicode-ra fejtése."""
+    return "".join(_CWI2_TABLE[b] for b in data)
 
 # bemeneti kiterjesztések (a fájlválasztóhoz)
 IN_EXTS = (".txt", ".docx", ".epub", ".pdf", ".html", ".htm", ".rtf", ".odt",
            ".md", ".markdown", ".fb2", ".doc", ".mobi", ".azw3"
            ) + ocr.IMAGE_EXTS
-
-_TRY_ENC = ["utf-8-sig", "utf-8", "cp1250", "iso-8859-2", "cp1252"]
 
 # ---- formátum-halmazok a routinghoz ----
 PHASE1_WRITE = {"txt", "html", "docx", "epub"}
@@ -73,20 +101,62 @@ def _run(cmd, timeout=600):
 
 # ---- bemeneti olvasók (phase-1, szöveg-kinyerés) ----------------------
 
+def _decode_score(text: str) -> int:
+    """A dekódolt szöveg „hihetőségének" pontszáma. A magyar ékezetes betűk
+    ERŐSEN növelik, a vezérlő-/dobozrajz-/pótló-karakterek CSÖKKENTIK – így a
+    régi DOS-kódlapok (cp852/cp437) helyesen felismerhetők a mindent elfogadó
+    iso-8859-2 helyett."""
+    good = bad = 0
+    for ch in text:
+        if ch in "\r\n\t":
+            continue
+        o = ord(ch)
+        if ch in _HU_CHARS:             # magyar ékezetes – a jó kódlap erős jele
+            good += 3
+        elif o < 0x80:                  # ASCII
+            if o < 32 or o == 0x7f:     # vezérlőkarakter
+                bad += 5
+            else:                       # normál ASCII betű/szám/írásjel
+                good += 1
+        elif ch in _OK_EXTRA:           # megszokott európai írásjel
+            good += 1
+        else:                           # bármi más nem-ASCII (nem magyar): gyanús
+            bad += 2                    # (Š, Ł, ŕ, ˘, dobozrajz, pótló-karakter…)
+    return good - bad
+
+
+def _auto_decode(data: bytes) -> str:
+    """A bájtokat a legvalószínűbb kódlappal fejti meg: előbb szigorú UTF-8,
+    aztán a `_TRY_ENC` egybájtos jelöltek közül a LEGJOBB pontszámú."""
+    for enc in ("utf-8-sig", "utf-8"):
+        try:
+            return data.decode(enc)
+        except UnicodeDecodeError:
+            pass
+    best_text, best_score = None, None
+    candidates = [(enc, None) for enc in _TRY_ENC] + [("cwi2", decode_cwi2)]
+    for enc, fn in candidates:
+        if fn is not None:
+            t = fn(data)
+        else:
+            try:
+                t = data.decode(enc)
+            except UnicodeDecodeError:
+                t = data.decode(enc, errors="replace")
+        sc = _decode_score(t)
+        if best_score is None or sc > best_score:
+            best_text, best_score = t, sc
+    return best_text if best_text is not None else data.decode("utf-8",
+                                                               errors="replace")
+
+
 def _read_txt(path: Path, in_encoding):
     data = path.read_bytes()
     if in_encoding and in_encoding != "auto":
-        text = data.decode(in_encoding, errors="replace")
+        text = decode_cwi2(data) if in_encoding == "cwi2" \
+            else data.decode(in_encoding, errors="replace")
     else:
-        text = None
-        for enc in _TRY_ENC:
-            try:
-                text = data.decode(enc)
-                break
-            except UnicodeDecodeError:
-                continue
-        if text is None:
-            text = data.decode("utf-8", errors="replace")
+        text = _auto_decode(data)
     return booktext.Book(title=path.stem, sections=[booktext._clean(text)])
 
 

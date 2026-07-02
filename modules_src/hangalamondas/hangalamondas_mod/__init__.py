@@ -14,7 +14,9 @@ def register(core):
     from .videodescribewin import VideoDescribeFrame
 
     opener = core.register_window("videodescribe_module", VideoDescribeFrame)
-    menu = core.add_menu("AI &hangalámondás")
+    # Audiodeszkripció videóhoz = MÉDIA-funkció, ezért a Média menü alá kerül.
+    _sub = getattr(core, "add_submenu", None)
+    menu = _sub("&Média", "AI &hangalámondás") if _sub else core.add_menu("AI &hangalámondás")
     item = core.add_menu_item(
         menu, "AI hangalá&mondás videóhoz…", opener,
         help="A videó képi tartalmát AI írja le és hanggal mondja el "

@@ -1,7 +1,7 @@
 {
   "id": "mediatools",
   "name": "Média-eszközök",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "entry": "mediatools_mod",
   "category": "Média",
   "description": "Médiakészítő és -elemző eszközök egy csomagban: kötegelt médiakonvertáló, beszélő médiaelemző (LUFS/EBU R128), iPhone csengőhang-készítő, videókészítő (kép+zene) és videóvágó-összefűző.",

@@ -1,7 +1,7 @@
 {
   "id": "szervezes",
   "name": "Szervezés",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "entry": "szervezes_mod",
   "category": "Szervezés",
   "description": "Szervezés-eszközök egy csomagban: akadálymentes Hírolvasó (RSS), Podcast-felfedező, Naptár/teendők/jegyzetek (emlékeztetővel, ICS-szinkronnal) ÚJ rezsi/költség-kalkulátor füllel (havi/éves összesítés, naptári emlékeztetők, opcionális PIN-lakat), és Napi infó (időjárás, névnap).",

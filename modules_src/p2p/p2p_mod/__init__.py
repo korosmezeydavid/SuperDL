@@ -14,7 +14,9 @@ def register(core):
     from .p2pwin import P2PFrame
 
     opener = core.register_window("p2p_module", P2PFrame)
-    menu = core.add_menu("Fá&jlküldés")
+    # Nem média, nem könyv → a meglévő Eszközök menübe (új Core-on egyetlen
+    # elemként); régi Core-on saját „Fájlküldés" felső menü.
+    menu = core.add_menu("&Eszközök" if hasattr(core, "add_submenu") else "Fá&jlküldés")
     item = core.add_menu_item(
         menu, "Fájlküldés gépről gé&pre (P2P)\tCtrl+Shift+T", opener,
         help="Nagy fájl küldése egy másik gépre felhő nélkül, bemondható "

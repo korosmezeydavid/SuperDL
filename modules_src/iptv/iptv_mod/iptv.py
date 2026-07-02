@@ -137,6 +137,107 @@ def xtream_channels(host: str, user: str, pwd: str) -> list[Channel]:
     return load_playlist(xtream_m3u_url(host, user, pwd))
 
 
+# ---- Xtream player_api.php: hitelesítés + kategóriák (megbízható) ------
+
+class XtreamError(Exception):
+    """Beszélő hiba a bejelentkezéshez (rossz jelszó, lejárt fiók, elérhetetlen
+    szerver, nem-Xtream cím) – hogy a felhasználó TUDJA, mi a baj, ne csak
+    csendben ne történjen semmi."""
+
+
+def _xtream_api(host: str, user: str, pwd: str, action: str = "",
+                extra: str = ""):
+    """A player_api.php JSON-válasza. Hibánál XtreamError-t dob."""
+    from urllib.parse import quote
+    url = (f"{_xtream_base(host)}/player_api.php?username={quote(user)}"
+           f"&password={quote(pwd)}")
+    if action:
+        url += f"&action={action}"
+    url += extra
+    try:
+        text = _fetch(url, timeout=45)
+    except Exception as e:
+        raise XtreamError(f"A szerver nem érhető el: {e}")
+    try:
+        return json.loads(text)
+    except Exception:
+        raise XtreamError("A szerver válasza nem értelmezhető – ellenőrizd a "
+                          "címet (lehet, hogy nem Xtream Codes kiszolgáló).")
+
+
+def xtream_authenticate(host: str, user: str, pwd: str) -> dict:
+    """Belépés-ellenőrzés a player_api.php-n. Siker: a user_info szótár.
+    Hibánál BESZÉLŐ XtreamError (rossz jelszó / lejárt / tiltott fiók)."""
+    data = _xtream_api(host, user, pwd)
+    info = data.get("user_info") if isinstance(data, dict) else None
+    if not isinstance(info, dict):
+        raise XtreamError("Váratlan szerverválasz a bejelentkezéskor.")
+    auth = info.get("auth", 0)
+    if auth in (0, "0", None, False):
+        raise XtreamError("Hibás felhasználónév vagy jelszó.")
+    status = str(info.get("status", "")).strip().lower()
+    if status and status != "active":
+        raise XtreamError(f"A fiók nem aktív (állapot: {info.get('status')}).")
+    return info
+
+
+def xtream_stream_url(host: str, user: str, pwd: str, stream_id,
+                      ext: str = "ts") -> str:
+    from urllib.parse import quote
+    return (f"{_xtream_base(host)}/live/{quote(user)}/{quote(pwd)}/"
+            f"{stream_id}.{ext}")
+
+
+def xtream_live_categories(host: str, user: str, pwd: str) -> list[tuple]:
+    """(kategória_id, név) párok az élő csatornákhoz."""
+    data = _xtream_api(host, user, pwd, "get_live_categories")
+    out = []
+    if isinstance(data, list):
+        for c in data:
+            cid = str(c.get("category_id", "") or "")
+            if cid:
+                out.append((cid, c.get("category_name", "") or "Egyéb"))
+    return out
+
+
+def xtream_live_streams(host: str, user: str, pwd: str,
+                        cat_names: dict | None = None) -> list[Channel]:
+    """Az élő csatornák a player_api-ból, KATEGÓRIANÉVVEL (nem lapos lista)."""
+    data = _xtream_api(host, user, pwd, "get_live_streams")
+    cat_names = cat_names or {}
+    out = []
+    if isinstance(data, list):
+        for s in data:
+            sid = s.get("stream_id")
+            if sid is None:
+                continue
+            out.append(Channel(
+                name=s.get("name", "") or f"Csatorna {sid}",
+                url=xtream_stream_url(host, user, pwd, sid,
+                                      s.get("container_extension") or "ts"),
+                group=cat_names.get(str(s.get("category_id", "") or ""), ""),
+                tvg_id=str(s.get("epg_channel_id", "") or ""),
+                logo=s.get("stream_icon", "") or ""))
+    return out
+
+
+def xtream_load(host: str, user: str, pwd: str) -> tuple[dict, list[Channel]]:
+    """MEGBÍZHATÓ Xtream-betöltés: hitelesítés → kategóriák → élő csatornák
+    (kategórianévvel). Ez váltja a régi, teljes-m3u letöltést, ami lapos,
+    kategória nélküli listát adott. Ha a player_api nem ad csatornát, TARTALÉKBAN
+    a teljes m3u-ra esik vissza. BESZÉLŐ XtreamError-t dob a belépési hibákról."""
+    info = xtream_authenticate(host, user, pwd)
+    try:
+        cat_names = {cid: nm for cid, nm in
+                     xtream_live_categories(host, user, pwd)}
+        chans = xtream_live_streams(host, user, pwd, cat_names)
+    except XtreamError:
+        chans = []
+    if not chans:
+        chans = xtream_channels(host, user, pwd)   # tartalék: teljes m3u
+    return info, chans
+
+
 # ---- EPG (XMLTV műsorújság) -------------------------------------------
 
 def _xmltv_time(s: str) -> _dt.datetime | None:

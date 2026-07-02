@@ -102,9 +102,12 @@ class VideoEditFrame(wx.Frame):
         s = wx.BoxSizer(wx.HORIZONTAL)
         b_sec = wx.Button(p, label="S&zakasz mentése…")
         b_sec.Bind(wx.EVT_BUTTON, lambda e: self._save_section())
+        b_cut = wx.Button(p, label="Szakasz &kivágása (a többi marad)…")
+        b_cut.Bind(wx.EVT_BUTTON, lambda e: self._cut_section())
         b_all = wx.Button(p, label="&Teljes videó mentése…")
         b_all.Bind(wx.EVT_BUTTON, lambda e: self._save_whole())
         s.Add(b_sec, 0, wx.RIGHT, 6)
+        s.Add(b_cut, 0, wx.RIGHT, 6)
         s.Add(b_all, 0)
         v.Add(s, 0, wx.ALL, 6)
         self.gauge = wx.Gauge(p, range=100)
@@ -310,6 +313,26 @@ class VideoEditFrame(wx.Frame):
                                f"Szakasz mentése {VE.human_time(start)}–"
                                f"{VE.human_time(end)}…")
 
+    def _cut_section(self):
+        """A kijelölt és a következő marker KÖZTI részt KIVÁGJA – a videó eleje
+        és vége összefűzve marad (a köztes szakasz eltűnik)."""
+        if self._rendering:
+            return
+        mk = self.editor.markers
+        i = self.mk_list.GetFirstSelected()
+        if len(mk) < 2 or i < 0 or i + 1 >= len(mk):
+            self._announce("A kivágáshoz jelölj ki egy markert, és legyen "
+                           "utána még egy (a kettő közti rész esik ki, a többi "
+                           "marad).")
+            return
+        cut_start, cut_end = mk[i].at, mk[i + 1].at
+        out = self._ask_format_and_path("kivágott")
+        if out:
+            self._start_export(
+                cut_start, cut_end, out,
+                f"A(z) {VE.human_time(cut_start)}–{VE.human_time(cut_end)} "
+                f"szakasz kivágása, a többi összefűzése…", cut=True)
+
     def _save_whole(self):
         if self._rendering or not self.editor.clips:
             if not self.editor.clips:
@@ -325,16 +348,17 @@ class VideoEditFrame(wx.Frame):
         if sv:
             sv.announce(key, state)
 
-    def _start_export(self, start, end, out, msg):
+    def _start_export(self, start, end, out, msg, cut=False):
         self._rendering = True
         self.player.stop()
         self._sv("video", "start")
         self.gauge.SetValue(0)
         self._last_pct = -10
         self._announce(msg + " Ez eltarthat egy darabig.")
+        render = self.editor.export_cut if cut else self.editor.export
 
         def work():
-            ok = self.editor.export(
+            ok = render(
                 start, end, out,
                 progress=lambda p: wx.CallAfter(self._export_progress, p))
             wx.CallAfter(self._export_done, ok, out)

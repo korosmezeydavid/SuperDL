@@ -341,11 +341,16 @@ def _find_installer_asset(assets: dict) -> str | None:
     return None
 
 
-def _installer_script(setup: Path, pid: int, log: Path) -> str:
+def _installer_script(setup: Path, pid: int, log: Path, exe: Path) -> str:
     """A telepítő-INDÍTÓ kötegfájl tartalma. KRITIKUS: NEM azonnal futtatja a
     Setup.exe-t, hanem előbb MEGVÁRJA, míg a futó SuperDL (PID) KILÉP – csak
     AZUTÁN indítja a telepítőt. Így a telepítő már zárolatlan fájlokat talál és
     nem ütközik a kilépő/modális appal (ez volt a „letölt, de nem cserél" oka).
+    A telepítés VÉGÉN a kötegfájl MAGA INDÍTJA ÚJRA a SuperDL-t (`exe`): a
+    telepítő [Run] bejegyzése `skipifsilent`, ezért csendes frissítéskor nem
+    indítaná el, a Restart Manager /RESTARTAPPLICATIONS-je pedig nem fog, mert
+    az app MAGA lépett ki (nem az RM zárta be) – ezért a `start` felhasználói
+    környezetben (NEM a telepítő emelt jogaival) újraindítja.
     A swapperrel azonos, konzol nélkül is működő mintát (abszolút System32-utak,
     ping-késleltetés, PID-figyelés) használja."""
     sys32 = r'%SystemRoot%\System32'
@@ -369,8 +374,13 @@ def _installer_script(setup: Path, pid: int, log: Path) -> str:
          f'"{sys32}\\ping.exe" -n 3 127.0.0.1 >NUL',
          f'echo [INST] telepito inditasa: {setup} >> "%LOG%" 2>&1',
          f'"{setup}" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART '
-         f'/FORCECLOSEAPPLICATIONS /RESTARTAPPLICATIONS >> "%LOG%" 2>&1',
+         f'/FORCECLOSEAPPLICATIONS >> "%LOG%" 2>&1',
          'echo [INST] telepito vegzett (kod %ERRORLEVEL%) >> "%LOG%" 2>&1',
+         # AV-nyugvás, majd a SuperDL ÚJRAINDÍTÁSA a saját mappájából (a
+         # telepítő ugyanoda telepít – azonos AppId), felhasznaloi jogokkal
+         f'"{sys32}\\ping.exe" -n 8 127.0.0.1 >NUL',
+         f'echo [INST] SuperDL ujrainditasa: {exe} >> "%LOG%" 2>&1',
+         f'start "" /D "{exe.parent}" "{exe}"',
          'del "%~f0"']
     return "\r\n".join(L) + "\r\n"
 
@@ -397,7 +407,7 @@ def apply_installer(assets: dict, name: str, progress=None,
     # INDÍTÓ kötegfájl: megvárja a SuperDL kilépését, AZUTÁN futtatja a telepítőt
     # (így nem ütközik a kilépő/modális appal – ez volt a „letölt, de nem cserél").
     pid = os.getpid()
-    script = _installer_script(dest, pid, update_log())
+    script = _installer_script(dest, pid, update_log(), Path(sys.executable))
     import tempfile as _tf
     bat = Path(_tf.gettempdir()) / f"superdl_install_{pid}.bat"
     _write_bat(bat, script)

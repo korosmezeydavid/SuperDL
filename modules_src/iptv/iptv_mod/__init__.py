@@ -14,7 +14,8 @@ def register(core):
     from .iptvwin import IPTVFrame
 
     opener = core.register_window("iptv_module", IPTVFrame)
-    menu = core.add_menu("Internetes &TV")
+    _sub = getattr(core, "add_submenu", None)
+    menu = _sub("&Média", "Internetes &TV") if _sub else core.add_menu("Internetes &TV")
     item = core.add_menu_item(
         menu, "Internetes &TV (legális IPTV)\tCtrl+Shift+I", opener,
         help="Saját, legális m3u/Xtream forrás csatornái akadálymentesen, "

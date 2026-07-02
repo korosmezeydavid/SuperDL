@@ -251,6 +251,7 @@ class MainFrame(wx.Frame):
         self._started: set = set()               # melyik kezdett már letöltődni
         self._beeper = sounds.ProgressBeeper()    # százalék-pittyegés (M12)
         self._beep_job = None                     # melyik letöltést pittyegjük
+        self._cart_checkout = None                 # Médiakereső-kosár checkout-figyelő
         self._last_clip = ""
 
         self._load_settings()
@@ -1584,6 +1585,47 @@ class MainFrame(wx.Frame):
             title = f"SuperDL – {active} letöltés fut"
         if self.GetTitle() != title:
             self.SetTitle(title)
+        self._check_cart_checkout()
+
+    # ---- Médiakereső-kosár: checkout-figyelő ----------------------------
+    def register_cart_checkout(self, urls, on_cleared=None):
+        """A Médiakereső hívja a „Kosár letöltése"-kor: megjegyezzük a beküldött
+        URL-eket, és a tick figyeli, amíg MIND befejeződik – akkor kiürül a kosár
+        (a lemezes kosár is), és meghívjuk az `on_cleared(done, failed)` visszahívást."""
+        urls = [u for u in (urls or []) if u]
+        if not urls:
+            return
+        self._cart_checkout = {"urls": set(urls), "on_cleared": on_cleared}
+
+    def _check_cart_checkout(self):
+        co = getattr(self, "_cart_checkout", None)
+        if not co or not self.mgr:
+            return
+        done = failed = pending = 0
+        for url in co["urls"]:
+            jobs = [j for j in self.mgr.jobs if j.url == url]
+            if not jobs:
+                continue                 # nincs (már) job – nem követhető, kész
+            st = jobs[-1].progress.status
+            if st == "kész":
+                done += 1
+            elif st == "hiba":
+                failed += 1
+            else:
+                pending += 1
+        if pending:
+            return
+        self._cart_checkout = None       # minden beküldött letöltés végzett
+        try:
+            store.save_cart([])          # a lemezes kosár kiürítése
+        except Exception:
+            logging.getLogger("superdl").exception("kosár-ürítés (lemez) hiba")
+        cb = co.get("on_cleared")
+        if cb:
+            try:
+                cb(done, failed)
+            except Exception:
+                logging.getLogger("superdl").exception("kosár on_cleared hiba")
 
     def _check_clipboard(self):
         text = ""
