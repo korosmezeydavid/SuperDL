@@ -132,30 +132,35 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-02 · dolgozott: Grok
+**Utolsó frissítés:** 2026-07-02 · dolgozott: Grok (10 fix) → Claude (menü-fix + kiadás)
 
-**3.29.1 BUILD KÉSZ ✅ – PUBLIKÁLÁSRA VÁR** (GitHubra még NINCS feltöltve).
-- Verzió: `3.29.1` (`superdl\__init__.py`).
-- Javítások: 10 logikai hiba (lásd `C:\Users\msn\Documents\pcsuperdl.txt`).
-- Buildelt artefaktok (2026-07-02):
-  • `dist\SuperDL.exe` (168 MB)
-  • `dist\SuperDL-cli.exe` (127 MB)
-  • `dist\SuperDL\` onedir
-  • `installer\SuperDL-Setup-3.29.1.exe` + `SuperDL-Setup.exe` alias (127 MB)
-- Kulcs-szken (forrás + exék + telepítő): **TISZTA** (2 kulcs, 123 fájl, 0 találat).
-- Build-sorrend betartva: onedir → ISCC → CLI → onefile GUI (végül).
+**3.29.1 KIADVA ✅ (2026-07-02).** Core `v3.29.1` „Latest", 4 asset feltöltve;
+forrás pusholva (`2bbeaf1`); kulcs-szken TISZTA (96 fájl). Modulok VÁLTOZATLANOK
+(nem kellett újra feltölteni – a fix a Core-ban van).
 
-**„Publikálás" lépései (ha kéred):**
-1. `gh release create v3.29.1` – 4 asset (GUI, CLI, Setup-3.29.1, Setup.exe alias)
-2. Forrás push `main`-re (verzió + javítások + HANDOFF)
-3. Hírlevél: `C:\Users\msn\Documents\superdllistara.txt`
+Mit tartalmaz a 3.29.1:
+- **KRITIKUS menü-regresszió fix (Claude):** a `CoreContext` nem proxyzta az
+  `add_submenu`-t → a 3.29.0 menü-átrendezése VALÓJÁBAN NEM lépett életbe (a
+  modulok a régi saját menüikbe estek vissza; ezért jelezte Zsolt, hogy „nem
+  működnek a modulok"). Fix: `CoreContext.add_submenu` (modkit) + `WxHost.
+  add_submenu` most FIND-OR-CREATE (nem duplikál újratöltéskor) + opener
+  holt-ablak érzékelés (`win.IsShown()` próba). TESZT-RÉS is javítva: mostantól
+  a CoreContext-en át tesztelünk (a headless menü-teszt eddig a hostot hívta).
+- **Indító nézet (Zsolt/Laci):** `hide_url_row` beállítás – induláskor elrejti a
+  letöltési URL-sort; `_reveal_url_row` (Ctrl+N / Fájl→Új letöltés) előhozza; az
+  induló üdvözlés az aktív letöltések számát is bemondja. (superdl_gui + settingsdialog)
+- **Grok 10 logikai javítása** (átnézve+jóváhagyva): audioengine, freshvideoswin,
+  manager, radiorec, search, segment, ytchannel, superdl_gui – lásd
+  `C:\Users\msn\Documents\pcsuperdl.txt`.
 
-**Előző kiadás:** `v3.29.0` még „Latest" a GitHubon (modulok változatlanok).
+**Nincs függő kiadási teendő.** Hírlevél kiírva a listának.
 
 **Buildelési tanulság:** onefile + onedir NÉV-ÜTKÖZIK a `dist`-ben → SORREND:
-onedir + telepítő, UTOLJÁRA onefile GUI.
+onedir + telepítő, UTOLJÁRA onefile GUI. (Most így ment, jó.)
 
-**Backlog (§7):** IPTV 1.1.0, Indító nézet (Laci) – csak „create maxima"-ra.
+**Backlog (§7, csak „create maxima"-ra):** IPTV 1.1.0; hordozható önfrissítés
+robusztussága (a néma csere-hiba láthatóvá tétele + hosszabb retry – Farkas István
+jelezte, hogy AV mellett a hordozható frissítés csendben nem cserél).
 
 ---
 ### (archív) 3.29.0 kiadás-menete – ami lezajlott
