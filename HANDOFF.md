@@ -132,10 +132,27 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-01 · dolgozott: Claude (Opus 4.8)
+**Utolsó frissítés:** 2026-07-02 · dolgozott: Claude (Opus 4.8)
 
-**Cél most:** a **3.29.0 kiadás** (menü-átrendezés + javítási létra #1–#6). A
-felhasználó kimondta a **„publikálás"**-t → a kiadás FOLYAMATBAN.
+**3.29.0 KIADVA ✅ (2026-07-02).** Minden fent és ellenőrizve:
+- Core release `v3.29.0` „Latest", 4 asset (SuperDL.exe, SuperDL-cli.exe,
+  SuperDL-Setup-3.29.0.exe, SuperDL-Setup.exe). Stabil linkek 200-asak.
+- 8 modul-release fent (mod-*-tageken); `modules.json` élő a `main`-en.
+- Forrás + HANDOFF.md + tools/keyscan.py pusholva a `main`-re (commit cd13251).
+- Hírlevél kiírva: `C:\Users\msn\Documents\superdllistara.txt`.
+- Kulcs-szken minden kiadott fájlra: TISZTA.
+
+**Buildelési tanulság (FONTOS a következő Core-buildhez):** a onefile
+(`SuperDL.spec` → `dist\SuperDL.exe`) ÉS az onedir (`SuperDL-onedir.spec` →
+`dist\SuperDL\`) NÉV-ÜTKÖZ a `dist`-ben: ha az onedirt a onefile UTÁN buildeled,
+letörli a `dist\SuperDL.exe`-t. SORREND: előbb onedir + telepítő, UTOLJÁRA a
+onefile GUI — vagy más `--distpath`. (Most emiatt kellett a onefile-t újraépíteni.)
+
+**Nincs függő kiadási teendő.** A backlog a §7-ben (csak „create maxima"-ra).
+
+---
+### (archív) 3.29.0 kiadás-menete – ami lezajlott
+A **3.29.0** (menü-átrendezés + javítási létra #1–#6).
 
 **Kód: KÉSZ és verifikálva.** Tartalom (mind benne a forrásban):
 - **Menü-átrendezés:** kategória-menük (Média/Könyvek/Eszközök), Súgó utolsó,
