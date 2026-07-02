@@ -132,9 +132,21 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-02 · dolgozott: Grok (10 fix) → Claude (menü-fix + kiadás)
+**Utolsó frissítés:** 2026-07-02 · dolgozott: Claude (3.29.2 akadálymentességi hotfix)
 
-**3.29.1 KIADVA ✅ (2026-07-02).** Core `v3.29.1` „Latest", 4 asset feltöltve;
+**3.29.2 KIADVA ✅ (2026-07-02).** Core `v3.29.2` „Latest", 4 asset; forrás push
+`25d7bdd`; kulcs-szken TISZTA (96 fájl). Modulok VÁLTOZATLANOK (Core-only fix).
+- **AKADÁLYMENTESSÉGI HOTFIX:** a 3.29.0-ban bevezetett opener `_bring_to_front`
+  a KERETRE hívott `SetFocus()`-t → ellopta a fókuszt a vezérlőtől, amire a
+  modul-ablak a saját __init__-jében ráállította (pl. rádió keresőmező) → a
+  képernyőolvasónak „üres ablak" (Karcsi jelezte a rádión). FIX: SetFocus KIVÉVE
+  a `_bring_to_front`-ból (marad Show + Iconize(False) + Raise; a Raise aktivál,
+  a wx visszaállítja az utolsó vezérlő-fókuszt). MINDEN modul-ablakot érintett.
+- Éles megerősítés Karcsitól: a telepítős auto-újraindítás (#2) MŰKÖDIK.
+- TANULSÁG: modul-ablak megnyitásakor SOHA ne hívj a KERETRE SetFocus()-t – a
+  vezérlő-fókuszt hagyd az ablak __init__-jére (screen reader!).
+
+**Korábbi: 3.29.1 KIADVA (2026-07-02).** Core `v3.29.1`, 4 asset feltöltve;
 forrás pusholva (`2bbeaf1`); kulcs-szken TISZTA (96 fájl). Modulok VÁLTOZATLANOK
 (nem kellett újra feltölteni – a fix a Core-ban van).
 
