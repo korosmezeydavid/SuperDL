@@ -293,6 +293,8 @@ class MainFrame(wx.Frame):
             wx.CallLater(4500, lambda: self._check_channels(quiet=True))
         # naponta egyszer, csendben frissítést keresünk (a háttérben)
         wx.CallLater(6000, self._auto_update_check)
+        # ha volt függő frissítés: jelezzük, sikerült-e (néma csere-hiba ellen)
+        wx.CallLater(900, self._check_update_result)
         # induló, automatikus hangos üdvözlés (dátum, névnap, időjárás)
         wx.CallLater(1200, self._startup_greeting)
 
@@ -1289,6 +1291,35 @@ class MainFrame(wx.Frame):
         self._main_panel.Layout()
         self.url_entry.SetFocus()
 
+    def _check_update_result(self):
+        """Induláskor: ha volt függő önfrissítés, jelezzük, sikerült-e. A NÉMA
+        csere-hibát (pl. a víruskereső fogja a friss fájlt) érthető, felolvasott
+        üzenettel + kézi letöltő linkkel hozzuk a felszínre (Farkas István jelezte)."""
+        try:
+            res = selfupdate.check_update_result()
+        except Exception:
+            return
+        if not res:
+            return
+        if res["status"] == "ok":
+            self._announce(f"A frissítés sikerült: a(z) {res['target']} verzió fut.",
+                           toast=True, sound="done")
+            return
+        link = ("https://github.com/korosmezeydavid/SuperDL/releases/latest/"
+                "download/SuperDL.exe")
+        msg = (f"Az automatikus frissítés a(z) {res['target']} verzióra nem "
+               f"sikerült – a program továbbra is a(z) {res['current']} verzió.\n\n"
+               "Ezt legtöbbször a víruskereső okozza: fogja a frissen letöltött "
+               "fájlt, ezért a csere nem tud lezajlani.\n\n"
+               "Megoldás: zárd be a programot, töltsd le kézzel az új SuperDL.exe-t "
+               "az alábbi címről, és írd felül a régit (ha az AV rákérdez, "
+               "engedélyezd egyszer):\n\n" + link)
+        if self.speaker and self.speaker.available:
+            self.speaker.speak("Az automatikus frissítés nem sikerült. A "
+                               "részletek a megjelenő ablakban, kézi letöltő "
+                               "hivatkozással.")
+        wx.MessageBox(msg, "A frissítés nem cserélt", wx.OK | wx.ICON_WARNING, self)
+
     def _startup_greeting(self):
         # TELJES némítás esetén induláskor SEMMIT nem mondunk (a bejelentkező
         # üdvözlést se) – a felhasználó a saját képernyőolvasóját használja.
@@ -1932,7 +1963,8 @@ class UpdateDialog(wx.Dialog):
             if app_upd:
                 try:
                     selfupdate.apply(app_assets, prog, restart=True,
-                                     digests=app_digests)
+                                     digests=app_digests,
+                                     target_version=self.app['latest'])
                     results.append(f"SuperDL: letöltve a(z) {self.app['latest']} "
                                    "verzió.")
                     app_done = True

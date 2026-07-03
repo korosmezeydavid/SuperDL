@@ -184,6 +184,53 @@ def update_log() -> Path:
     return d / "update.log"
 
 
+def _pending_marker() -> Path:
+    return Path.home() / ".superdl" / "update_pending.json"
+
+
+def mark_update_pending(target_version: str) -> None:
+    """Jelző: elindítottunk egy frissítést a `target_version`-re. Az újraindult
+    program induláskor a `check_update_result`-tal ellenőrzi, TÉNYLEG
+    lecserélődött-e – így a NÉMA csere-hibát (pl. a víruskereső fogja a fájlt) is
+    észrevesszük, nem marad rejtve."""
+    if not target_version:
+        return
+    try:
+        import json
+        import time
+        p = _pending_marker()
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps({"target": str(target_version),
+                                 "ts": time.time()}), encoding="utf-8")
+    except OSError:
+        pass
+
+
+def check_update_result() -> dict | None:
+    """Induláskor hívandó. Ha volt függő frissítés, megnézi, sikerült-e (a most
+    FUTÓ verzió eléri-e a célt). Visszaad: {"status":"ok"|"failed","target":…,
+    "current":…} vagy None (ha nem volt függő frissítés). A jelzőt MINDKÉT esetben
+    törli, hogy az üzenet csak egyszer jelenjen meg."""
+    p = _pending_marker()
+    if not p.is_file():
+        return None
+    target = ""
+    try:
+        import json
+        target = str(json.loads(p.read_text(encoding="utf-8")).get("target") or "")
+    except (OSError, ValueError):
+        target = ""
+    try:
+        p.unlink()
+    except OSError:
+        pass
+    if not target:
+        return None
+    ok = _ver(__version__) >= _ver(target)
+    return {"status": "ok" if ok else "failed",
+            "target": target, "current": __version__}
+
+
 def _folder_writable(folder: Path) -> bool:
     """A program mappája írható-e? (Program Files / OneDrive / írásvédett hely
     esetén nem – ott a csere eleve nem sikerülhet.)"""
@@ -226,7 +273,7 @@ def _swapper_script(folder: Path, pairs: list[tuple[Path, Path]],
               f'move /Y "{newf}" "{target}" >> "%LOG%" 2>&1',
               f'if not errorlevel 1 goto ok{i}',
               f'set /a m{i}+=1',
-              f'if %m{i}% GEQ 30 goto fail{i}',   # max ~30 mp a zárolás oldására
+              f'if %m{i}% GEQ 120 goto fail{i}',  # max ~120 mp a zárolás oldására (AV)
               wait1,
               f'goto mv{i}',
               # a kimerült próbálkozást ŐSZINTÉN naplózzuk (nem tesszük úgy,
@@ -386,7 +433,8 @@ def _installer_script(setup: Path, pid: int, log: Path, exe: Path) -> str:
 
 
 def apply_installer(assets: dict, name: str, progress=None,
-                    digests: dict | None = None) -> list[str]:
+                    digests: dict | None = None,
+                    target_version: str | None = None) -> list[str]:
     """ONEDIR önfrissítés: a Setup.exe letöltése (SHA-256 ellenőrzéssel), majd egy
     INDÍTÓ kötegfájl, ami MEGVÁRJA a SuperDL kilépését, és CSAK AZUTÁN futtatja a
     telepítőt csendben. A telepítő (AppMutex + Restart Manager) kicseréli az
@@ -411,6 +459,7 @@ def apply_installer(assets: dict, name: str, progress=None,
     import tempfile as _tf
     bat = Path(_tf.gettempdir()) / f"superdl_install_{pid}.bat"
     _write_bat(bat, script)
+    mark_update_pending(target_version)   # induláskor ellenőrizzük, sikerült-e
     # CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP, leválasztva, TISZTA környezettel
     # (a telepítő és az általa ÚJRAINDÍTOTT SuperDL NE örökölje a szülő _PYI_*
     # változóit → különben az újraindított app bootloadere elszáll).
@@ -421,7 +470,8 @@ def apply_installer(assets: dict, name: str, progress=None,
 
 
 def apply(assets: dict, progress=None, restart: bool = True,
-          digests: dict | None = None) -> list[str]:
+          digests: dict | None = None,
+          target_version: str | None = None) -> list[str]:
     """A futó exe (és a SuperDL-cli.exe, ha van rá kiadás) cseréje egy
     kilépés utáni swapper-kötegfájllal. `restart=True` esetén a csere után
     újraindítja a programot. A hívónak a visszatérés után MIHAMARABB ki kell
@@ -438,7 +488,7 @@ def apply(assets: dict, progress=None, restart: bool = True,
     # cseréli – nem a single-exe swapper. Letöltjük és csendben futtatjuk.
     inst = _find_installer_asset(assets)
     if inst and is_onedir():
-        return apply_installer(assets, inst, progress, digests)
+        return apply_installer(assets, inst, progress, digests, target_version)
     exe = Path(sys.executable)
     folder = exe.parent
     if not _folder_writable(folder):
@@ -489,5 +539,6 @@ def apply(assets: dict, progress=None, restart: bool = True,
     if not pairs:
         raise RuntimeError("A kiadásban nincs letölthető SuperDL.exe.")
 
+    mark_update_pending(target_version)   # induláskor ellenőrizzük, sikerült-e
     _spawn_swapper(folder, pairs, exe.name if restart else None)
     return [t.name for _, t in pairs]

@@ -132,9 +132,28 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-02 · dolgozott: Claude (3.29.2 akadálymentességi hotfix)
+**Utolsó frissítés:** 2026-07-02 · dolgozott: Claude (3.29.3 kódkész, kiadásra vár)
 
-**3.29.2 KIADVA ✅ (2026-07-02).** Core `v3.29.2` „Latest", 4 asset; forrás push
+**3.29.3 KÓDKÉSZ – PUBLIKÁLÁSRA VÁR (Core-only, még NINCS build/feltöltés).**
+Backlog #1 = Farkas István hordozható-önfrissítés robusztussága, MEGCSINÁLVA:
+- `selfupdate.py`: `mark_update_pending(target)` (jelzőt ír `~/.superdl/
+  update_pending.json`-ba a csere indításakor) + `check_update_result()`
+  (induláskor: a futó verzió eléri-e a célt → "ok"/"failed", a jelzőt törli).
+  Az `apply`/`apply_installer` új `target_version` paramétert kap. Swapper
+  move-retry 30→120 mp (AV zárolás). superdl_gui: `_check_update_result`
+  (CallLater 900 ms) – SIKER: toast; HIBA: felolvasott MessageBox a kézi
+  letöltő linkkel („valószínűleg a víruskereső fogta a fájlt"). Verzió 3.29.3.
+  Tesztelve: jelző-logika ok/failed helyes, MainFrame felépül, no-op jelző nélkül.
+- **Publikáláskor:** Core-build (onedir→ISCC→CLI→onefile UTOLJÁRA) + kulcs-szken +
+  v3.29.3 (4 asset) + forrás push + hírlevél. Modulok VÁLTOZATLANOK.
+
+Backlog #2 = IPTV 1.1.0: **MÁR KÉSZ a kódban** (a kiadott iptv 1.0.1-ben) – a
+player_api hitelesítés (`xtream_authenticate` beszélő hibákkal), kategóriák
+(`xtream_live_categories`+`xtream_live_streams`), m3u-tartalék (`xtream_load`) és
+a pre/post-login állapotgép mind bent van. NINCS érdemi új IPTV-munka (az „1.1.0"
+csak tervezett címke volt; opcionálisan bumpolható a modul 1.1.0-ra kozmetikából).
+
+**Korábbi: 3.29.2 KIADVA ✅ (2026-07-02).** Core `v3.29.2` „Latest", 4 asset; forrás push
 `25d7bdd`; kulcs-szken TISZTA (96 fájl). Modulok VÁLTOZATLANOK (Core-only fix).
 - **AKADÁLYMENTESSÉGI HOTFIX:** a 3.29.0-ban bevezetett opener `_bring_to_front`
   a KERETRE hívott `SetFocus()`-t → ellopta a fókuszt a vezérlőtől, amire a
