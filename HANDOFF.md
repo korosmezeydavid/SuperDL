@@ -132,10 +132,11 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-02 · dolgozott: Claude (3.29.3 kódkész, kiadásra vár)
+**Utolsó frissítés:** 2026-07-03 · dolgozott: Claude (3.29.3 KIADVA)
 
-**3.29.3 KÓDKÉSZ – PUBLIKÁLÁSRA VÁR (Core-only, még NINCS build/feltöltés).**
-Backlog #1 = Farkas István hordozható-önfrissítés robusztussága, MEGCSINÁLVA:
+**3.29.3 KIADVA ✅ (2026-07-03).** Core `v3.29.3` „Latest", 4 asset; forrás push
+`c8be77c`; kulcs-szken TISZTA (96 fájl). Modulok VÁLTOZATLANOK. Hírlevél kiírva.
+Backlog #1 = Farkas István hordozható-önfrissítés robusztussága, KIADVA:
 - `selfupdate.py`: `mark_update_pending(target)` (jelzőt ír `~/.superdl/
   update_pending.json`-ba a csere indításakor) + `check_update_result()`
   (induláskor: a futó verzió eléri-e a célt → "ok"/"failed", a jelzőt törli).
