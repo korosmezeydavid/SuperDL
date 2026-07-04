@@ -132,12 +132,14 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-03 · dolgozott: Claude (3.29.4 kódkész, kiadásra vár)
+**Utolsó frissítés:** 2026-07-05 · dolgozott: Claude (3.29.4 KIADVA)
 
-**3.29.4 KÓDKÉSZ – PUBLIKÁLÁSRA VÁR (Core 3.29.4 + MIND A 9 MODUL bumpolva).**
-Modulok (zip+modules.json KÉSZ a dist_modules-ban): docconvert 1.1.2, konyvek 1.0.1,
-szervezes 1.2.2, mediatools 1.4.2, supermedia 1.2.2, iptv 1.0.2, radio 1.0.2,
-hangalamondas 1.0.3, p2p 1.0.3. A Core-build (heavy) + FELTÖLTÉS a „publikálás"-ra vár.
+**3.29.4 KIADVA ✅ (2026-07-05).** Core `v3.29.4` „Latest” (4 asset, stabil linkek
+200); 9 modul-release fent; `modules.json` élő a `main`-en; forrás push `77f23c4`;
+kulcs-szken TISZTA (108 fájl); hírlevél kiírva. Nincs függő kiadási teendő.
+Kiadott modul-verziók: docconvert 1.1.2, konyvek 1.0.1, szervezes 1.2.2,
+mediatools 1.4.2, supermedia 1.2.2, iptv 1.0.2, radio 1.0.2, hangalamondas 1.0.3,
+p2p 1.0.3.
 TOVÁBBI (create maxima, MIND tesztelve, a fenti listán felül):
 - **(5) KÖNYVOLVASÓ mondatvég-lehagyás JAVÍTVA (Core, audiobook.py):** a `chunk_text`
   a 140+ karakteres mondatot `sent[:limit]`-tel CSONKOLTA → a felolvasó lehagyta a
