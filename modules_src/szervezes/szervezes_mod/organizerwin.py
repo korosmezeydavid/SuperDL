@@ -24,6 +24,31 @@ ACTIONS = [("Nincs", O.ACTION_NONE),
 
 # ====================== fő ablak =======================================
 
+HELP = """NAPTÁR, TEENDŐK, JEGYZETEK, REZSI
+
+MIRE VALÓ
+Események emlékeztetővel, teendők, jegyzetek, külső naptár-szinkron (ICS), és
+rezsi/költség-kalkulátor – egy ablakban, fülekre rendezve.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. A fülek közt Ctrl+Tab-bal válts: Naptár, Teendők, Jegyzetek, Rezsi, ICS.
+2. NAPTÁR: új esemény címmel, dátummal (ÉÉÉÉ-HH-NN), órával, emlékeztetővel és
+   ismétléssel. A program a megadott időben emlékeztet (ha a program nyitva van).
+3. TEENDŐK: a listában Szóköz = kész/visszavon.
+4. JEGYZETEK: a listában Enter = megnyitás/szerkesztés.
+5. REZSI: rendszeres és egyszeri költségek; havi/éves összesítés; opcionális
+   PIN-lakat (a „Feloldás” gombbal nyitod).
+6. ICS: külső naptárba/böngészőbe szinkronizálható hivatkozás.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Ctrl+Tab – fülváltás.  Tab – mozgás a fülön belül.  A listákban a
+fentebb leírt billentyűk.
+
+TIPP
+Az emlékeztetők akkor is elsülnek, ha ez az ablak zárva van – csak a program
+fusson."""
+
+
 class OrganizerFrame(wx.Frame):
     def __init__(self, main, manager: O.OrganizerManager):
         super().__init__(main, title="SuperDL – Naptár, teendők, jegyzetek",
@@ -41,10 +66,25 @@ class OrganizerFrame(wx.Frame):
         self._announce(f"Ma {date.today().isoformat()} van. Lapozz a fülek "
                        "között a Ctrl+Tab billentyűvel.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
         self.refresh_all()
 
     def _announce(self, text):
         self.SetStatusText(text)
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            self._help()
+        else:
+            e.Skip()
+
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Naptár, teendők, jegyzetek, rezsi", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Szervezés",
+                          wx.OK | wx.ICON_INFORMATION, self)
 
     def refresh_all(self):
         self._refresh_agenda()

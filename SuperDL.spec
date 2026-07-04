@@ -16,6 +16,7 @@ binaries = [('bin\\aria2c.exe', '.'),
             ('bin\\bass_fx.dll', '.')]
 # eSpeak-NG hangadatok (magyar hang a self-voice-hoz) – a teljes mappa
 datas += [('bin\\espeak-ng-data', 'espeak-ng-data')]
+datas += [('superdl\\startup.wav', 'superdl')]     # induló szignál (Farkas kérése)
 hiddenimports = ['win32com.client', 'pythoncom', 'pywintypes', 'win32crypt']
 datas += collect_data_files('docx')
 hiddenimports += collect_submodules('yt_dlp')

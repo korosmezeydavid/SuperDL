@@ -10,6 +10,30 @@ import wx
 from . import supervoicechanger as VC
 
 
+HELP = """VALÓS IDEJŰ VOICE CHANGER
+
+MIRE VALÓ
+Élő mikrofon-átalakítás valós időben: hangmagasság-váltás és DX8-effektek, a
+fejhallgatóba monitorozva.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. TEGYÉL FEL FEJHALLGATÓT (különben visszhang/gerjedés lesz).
+2. Válaszd ki a mikrofont az „Eszköz” listából (a kezdő fókusz itt van).
+3. „Indítás” – ettől kezdve a mikrofonod átalakítva szól a fejhallgatóban.
+4. „Hangmagasság” csúszka: mélyebb/magasabb hang.
+5. Az effekteknél (visszhang, echo, torzítás, kórus…) pipáld be, amit szeretnél,
+   és a mellette lévő ERŐSSÉG-csúszkával állítsd az intenzitást.
+6. „Leállítás” – kikapcsolja az átalakítást.
+
+GYORSBILLENTYŰK
+F1 – súgó.  A vezérlők (Indítás/Leállítás, csúszkák, pipák) Tab-bal elérhetők,
+a képernyőolvasó felolvassa őket.
+
+TIPP
+Ha nem hallod a saját hangod, ellenőrizd, hogy a helyes mikrofon és a helyes
+fejhallgató-kimenet van kiválasztva."""
+
+
 class VoiceChangerFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Valós idejű voice changer",
@@ -97,8 +121,20 @@ class VoiceChangerFrame(wx.Frame):
                            "Fejhallgatót használj, hogy ne legyen visszhang!")
         self._build_menubar()
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
         self.in_ch.SetFocus()
         self._enable_fx(False)
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            try:
+                from superdl.helpdialog import show_help
+                show_help(self, "Valós idejű voice changer", HELP)
+            except Exception:
+                wx.MessageBox(HELP, "Súgó – Voice changer",
+                              wx.OK | wx.ICON_INFORMATION, self)
+        else:
+            e.Skip()
 
     # ---- menüsor (akadálymentes) -------------------------------------
 

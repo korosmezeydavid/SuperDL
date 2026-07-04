@@ -15,6 +15,25 @@ from superdl.medialistwin import MediaListDialog  # megosztott médialista a Cor
 from . import podcast as P                      # a podcast-backend a modulban van
 
 
+HELP = """PODCAST-FELFEDEZŐ
+
+MIRE VALÓ
+Podcastok keresése és országonkénti toplistája, feliratkozással (az új
+epizódokat a program figyeli).
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. A „Keresés” mezőbe írd a podcast nevét vagy témáját, Enter. Vagy válassz
+   „Ország”-ot és „Top podcastok ebben az országban”.
+2. A találati listában fel/le nyíl; Enter: feliratkozás a kijelölt podcastra.
+3. A feliratkozott podcastok új epizódjai a Feliratkozások alatt jelennek meg.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Enter – feliratkozás / kiválasztás.  Tab – mozgás.
+
+TIPP
+A feliratkozásokat a fő program Feliratkozások menüjében kezelheted."""
+
+
 class PodcastFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Podcastok felfedezése",
@@ -27,7 +46,22 @@ class PodcastFrame(wx.Frame):
         self.SetStatusText("Keress podcastot, vagy nézd egy ország "
                            "legnépszerűbbjeit. Feliratkozás: Enter.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
         self.search_entry.SetFocus()
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            self._help()
+        else:
+            e.Skip()
+
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Podcast-felfedező", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Podcast-felfedező",
+                          wx.OK | wx.ICON_INFORMATION, self)
 
     # ---- felépítés ----------------------------------------------------
 

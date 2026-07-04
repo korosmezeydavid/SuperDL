@@ -74,9 +74,37 @@ def clean_book(book):
     return nb
 
 
+def _wrap_long(s: str, limit: int) -> list[str]:
+    """Egy `limit`-nél HOSSZABB szöveg feldarabolása legfeljebb `limit` hosszú
+    részekre, lehetőleg SZÓHATÁRON – SEMMIT EL NEM DOBVA. A limitnél is hosszabb
+    egyetlen szót (pl. hosszú URL) keményen vágja. Ez váltja a régi, HIBÁS
+    `sent[:limit]` csonkolást, ami a hosszú mondatok végét elhagyta (a felolvasó
+    „lehagyta a mondatvégeket")."""
+    out: list[str] = []
+    piece = ""
+    for w in s.split():
+        while len(w) > limit:                 # egyetlen, limitnél hosszabb szó
+            if piece:
+                out.append(piece)
+                piece = ""
+            out.append(w[:limit])
+            w = w[limit:]
+        if not piece:
+            piece = w
+        elif len(piece) + 1 + len(w) <= limit:
+            piece += " " + w
+        else:
+            out.append(piece)
+            piece = w
+    if piece:
+        out.append(piece)
+    return out
+
+
 def chunk_text(text: str, limit: int) -> list[str]:
     """A szöveget legfeljebb `limit` karakteres darabokra bontja, lehetőleg
-    bekezdés- és mondathatáron."""
+    bekezdés- és mondathatáron. A limitnél hosszabb mondatot TÖBB darabra bontja
+    (szóhatáron) – SOHA nem csonkolja, hogy a felolvasás teljes legyen."""
     limit = limit if limit and limit > 0 else DEFAULT_CHUNK
     chunks: list[str] = []
     cur = ""
@@ -101,9 +129,16 @@ def chunk_text(text: str, limit: int) -> list[str]:
             for sent in re.split(r"(?<=[.!?])\s+", para):
                 if len(cur) + len(sent) + 1 <= limit:
                     cur = (cur + " " + sent) if cur else sent
-                else:
+                elif len(sent) <= limit:
                     flush()
-                    cur = sent[:limit]
+                    cur = sent
+                else:
+                    # a limitnél HOSSZABB mondat: több darabra bontjuk, SEMMIT
+                    # el nem dobva (a régi sent[:limit] itt vágta le a végét)
+                    flush()
+                    pieces = _wrap_long(sent, limit)
+                    chunks.extend(pieces[:-1])
+                    cur = pieces[-1] if pieces else ""
     flush()
     return chunks
 

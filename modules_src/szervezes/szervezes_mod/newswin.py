@@ -16,6 +16,27 @@ from superdl.aiwin import run_ai     # megosztott AI-segédablak a Core-ból
 from . import news                   # a hír-backend a modulban van
 
 
+HELP = """HÍROLVASÓ (RSS)
+
+MIRE VALÓ
+Reklámmentes hírgyűjtő: RSS-források szalagcímei, letisztított cikkszöveg,
+felolvasás, AI-összefoglaló és fordítás.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. A „Forrás” listából válassz hírforrást (nyilak) – a szalagcímek betöltődnek.
+2. A szalagcímek listájában fel/le nyíl; Enter a címen: a cikk teljes, tiszta
+   szövege a „Cikk szövege” mezőbe kerül.
+3. „Felolvasás” – felolvassa a cikket; „Némítás” – elhallgattatja.
+4. „AI összefoglaló” – tömören összefoglalja; „Fordítás magyarra” – lefordítja
+   (saját AI-kulccsal). „Megnyitás a böngészőben” – az eredeti cikk.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Enter a szalagcímen – cikk.  F5 – frissítés.  Tab – mozgás.
+
+TIPP
+Új forrásokat a Feliratkozások kezelőjében adhatsz hozzá."""
+
+
 class NewsFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Hírolvasó", size=(900, 680))
@@ -30,8 +51,23 @@ class NewsFrame(wx.Frame):
                            "Felolvasás: a gomb vagy a cikknél. Frissítés: F5.")
         self._reload_feeds()
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
         if self.feed_ch.GetCount():
             self.feed_ch.SetFocus()
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            self._help()
+        else:
+            e.Skip()
+
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Hírolvasó", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Hírolvasó",
+                          wx.OK | wx.ICON_INFORMATION, self)
 
     # ---- felépítés ----------------------------------------------------
 

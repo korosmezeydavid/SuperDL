@@ -13,6 +13,28 @@ import wx
 from . import superrec
 
 
+HELP = """SUPER RECORDER – FELVEVŐ
+
+MIRE VALÓ
+Akadálymentes hangfelvevő: felvétel mikrofonból, KIMONDOTT szintmérővel, mentés
+WAV vagy MP3 formátumba, normalizálással.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. Válaszd ki a felvevő „Eszköz”-t (mikrofon). A kezdő fókusz itt van.
+2. Felvétel indítása/leállítása a menüből vagy a gyorsbillentyűvel; a program
+   KIMONDJA a szintet (hogy tudd, nem túl halk vagy torzít-e).
+3. Felvétel után a szerkesztő-részben vághatsz, majd ments.
+4. Mentés: WAV vagy MP3, normalizálással – a program bemondja, hova mentette.
+
+GYORSBILLENTYŰK
+F1 – súgó.  A felvétel/lejátszás/mentés billentyűit a MENÜSOR mutatja (a menük
+mellett ott a gyorsbillentyű). JAWS alatt is biztonságosak (menüből mennek).
+
+TIPP
+Ha a szint túl alacsony, told közelebb a mikrofont; a kimondott szintmérő
+segít beállítani."""
+
+
 class SuperRecorderFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Super Recorder (felvevő)",
@@ -114,6 +136,18 @@ class SuperRecorderFrame(wx.Frame):
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._on_tick, self.timer)
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            try:
+                from superdl.helpdialog import show_help
+                show_help(self, "Super Recorder – felvevő", HELP)
+            except Exception:
+                wx.MessageBox(HELP, "Súgó – Super Recorder",
+                              wx.OK | wx.ICON_INFORMATION, self)
+        else:
+            e.Skip()
 
     # ---- menüsor (akadálymentes; biztonságos F-/Ctrl-gyorsbillentyűk) ------
 

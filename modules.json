@@ -8,11 +8,11 @@
       "category": "Könyvek",
       "description": "Dokumentumok átalakítása formátumok közt (TXT, DOCX, EPUB, PDF, HTML, RTF, ODT, Markdown…), beépített PDF-fel és OCR-rel. Az első, modulként szállított SuperDL-funkció.",
       "latest": {
-        "version": "1.1.1",
+        "version": "1.1.2",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-docconvert-1.1.1/docconvert-1.1.1.zip",
-        "sha256": "bc8e257a3b10d4f2eb8e09e087d24b806bb95e8fbad657d5c92ef02ca8ae87cd",
-        "size": 11311
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-docconvert-1.1.2/docconvert-1.1.2.zip",
+        "sha256": "cf98a77a15e70ca5d69c9dbc328a07b88088833c9886669f19eb923d160eaa16",
+        "size": 12519
       }
     },
     {
@@ -21,11 +21,11 @@
       "category": "Eszközök",
       "description": "Nagy fájl küldése egy másik gépre felhő nélkül, bemondható kóddal, végpontok közötti titkosítással (magic-wormhole). A küldő is jelzést kap, amikor a fájl megérkezett.",
       "latest": {
-        "version": "1.0.2",
+        "version": "1.0.3",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-p2p-1.0.2/p2p-1.0.2.zip",
-        "sha256": "cf5b1822a03462df6a661c89274cc312767aeb6302dcc6421f3f1d9ad1222199",
-        "size": 6315
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-p2p-1.0.3/p2p-1.0.3.zip",
+        "sha256": "2a81c113540eae5516e591f206c3e8258f1e332339317fb90b0447243f8d780f",
+        "size": 6970
       }
     },
     {
@@ -34,11 +34,11 @@
       "category": "Média",
       "description": "Médiakészítő és -elemző eszközök egy csomagban: kötegelt médiakonvertáló, beszélő médiaelemző (LUFS/EBU R128), iPhone csengőhang-készítő, videókészítő (kép+zene) és videóvágó-összefűző.",
       "latest": {
-        "version": "1.4.1",
+        "version": "1.4.2",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.1/mediatools-1.4.1.zip",
-        "sha256": "7b36c78b639075a8cf1026e4d3056cb8f741693d121707f000fb23d4a243b873",
-        "size": 35728
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.2/mediatools-1.4.2.zip",
+        "sha256": "1736ed73f265dc3d24f5b8fdf43ebcdad48a5d8114e1eaf346305a6b93158609",
+        "size": 39229
       }
     },
     {
@@ -47,24 +47,24 @@
       "category": "Szervezés",
       "description": "Szervezés-eszközök egy csomagban: akadálymentes Hírolvasó (RSS), Podcast-felfedező, Naptár/teendők/jegyzetek (emlékeztetővel, ICS-szinkronnal) ÚJ rezsi/költség-kalkulátor füllel (havi/éves összesítés, naptári emlékeztetők, opcionális PIN-lakat), és Napi infó (időjárás, névnap).",
       "latest": {
-        "version": "1.2.1",
+        "version": "1.2.2",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.2.1/szervezes-1.2.1.zip",
-        "sha256": "8ad4f8463d95486e918593491cf3971dfc053fb8ca15cf706c5bfc92a16e2a26",
-        "size": 25607
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.2.2/szervezes-1.2.2.zip",
+        "sha256": "25f172314ad7cc62f1616e1e39747e9ac5daaf496d71832b93d4a16b8cac0673",
+        "size": 27590
       }
     },
     {
       "id": "konyvek",
       "name": "Könyvek",
       "category": "Könyvek",
-      "description": "Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3). Mindkettő tisztítja a felesleges üres sorokat és kemény sortöréseket a folyamatos felolvasásért.",
+      "description": "Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3, választható hanggal és sebességgel).",
       "latest": {
-        "version": "1.0.0",
+        "version": "1.0.1",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-konyvek-1.0.0/konyvek-1.0.0.zip",
-        "sha256": "a1f6ed77a90390d03cac353d8fec3d314ecff28206776b3ce209de3f7a346d45",
-        "size": 14725
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-konyvek-1.0.1/konyvek-1.0.1.zip",
+        "sha256": "a0746726e33cfb7d2755aeff316c012a750fa431597825b85aa81f6a368b8db1",
+        "size": 15594
       }
     },
     {
@@ -73,11 +73,11 @@
       "category": "Média",
       "description": "Akadálymentes internetes TV (legális IPTV): saját m3u/Xtream forrás csatornái, felolvasott műsorújság (EPG), felvétel és emlékeztető, hangalámondás-sáv és élő felirat-felolvasás. Csak legális, saját előfizetésű forrásokhoz.",
       "latest": {
-        "version": "1.0.1",
+        "version": "1.0.2",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iptv-1.0.1/iptv-1.0.1.zip",
-        "sha256": "5d12a139a2373565c079c589d8d36398bd4a93fb2606a2ad37a5665fa8490d5d",
-        "size": 14912
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iptv-1.0.2/iptv-1.0.2.zip",
+        "sha256": "9376ae74097b69f1f91780c8d83697aa41a5b869272a661e07a8929183f56445",
+        "size": 15625
       }
     },
     {
@@ -86,11 +86,11 @@
       "category": "Média",
       "description": "Hang-műsorszóró stúdió, felvevő, szerkesztő és multistream egy csomagban: Super M (rádió-stúdió + médialejátszó, BASS-motor), Super Recorder (akadálymentes felvevő + fülre-szerkesztő: markeres vágás, 22 effekt, vokóder/harmonizer/ének-eltávolítás/2-sáv, undo/redo), VALÓS IDEJŰ VOICE CHANGER (élő mikrofon: hangmagasság + DX8-effektek monitorozva) és Super Stream (élő multistream). A BASS/bass_fx/numpy-runtime a Core-ból jön (core 3.28.5+ ajánlott).",
       "latest": {
-        "version": "1.2.1",
+        "version": "1.2.2",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supermedia-1.2.1/supermedia-1.2.1.zip",
-        "sha256": "472e80d9e4bd8144205635aa6c0b14125710c558a740ef6d07dbf538fc9c97c2",
-        "size": 59757
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supermedia-1.2.2/supermedia-1.2.2.zip",
+        "sha256": "cf2d4e5f632fe308779cfc7397386403f14c68f77d7ff2143561fa246434da9c",
+        "size": 62671
       }
     },
     {
@@ -99,11 +99,11 @@
       "category": "Média",
       "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
       "latest": {
-        "version": "1.0.1",
+        "version": "1.0.2",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.0.1/radio-1.0.1.zip",
-        "sha256": "9d6b6177bad3595abb3b0fae8afe62357c0758c986cc0ef347b3b62ffb864c4b",
-        "size": 12308
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.0.2/radio-1.0.2.zip",
+        "sha256": "f3d5fd8698f1d35fad0ae65b3184e187f9b6b92bb031cb73cb20ba30a41d505d",
+        "size": 12329
       }
     },
     {
@@ -112,11 +112,11 @@
       "category": "AI",
       "description": "AI hangalámondás (audio description) videóhoz: a videó képi tartalmát AI írja le és hanggal mondja el, az eredeti hang alatta halkítva – így a videó vakon is „nézhető”. A leírás részletessége és elhelyezése (párbeszéd-szünet / kiterjesztett) választható; a saját AI-kulcsoddal megy.",
       "latest": {
-        "version": "1.0.2",
+        "version": "1.0.3",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-hangalamondas-1.0.2/hangalamondas-1.0.2.zip",
-        "sha256": "7eee7ba9d298de1e4158d2ecdbb30b90c7abb3d70f2b03f00e482281d0406c89",
-        "size": 10639
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-hangalamondas-1.0.3/hangalamondas-1.0.3.zip",
+        "sha256": "d6550cfbd04f95f339a868f8181d41d7651c4838e5f5599e74c4f13e663d7a3d",
+        "size": 11263
       }
     }
   ]

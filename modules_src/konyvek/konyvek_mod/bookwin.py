@@ -17,6 +17,28 @@ from superdl.audioengine import Player                 # megosztott lejátszó a
 
 ENGINE_ORDER = ["sapi", "edge", "gemini", "cloud"]
 
+HELP = """HANGOSKÖNYV-KÉSZÍTŐ
+
+MIRE VALÓ
+Könyv (TXT, DOCX, EPUB, PDF) átalakítása MP3 hangoskönyvvé, magyar hanggal.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. „Tallózás” – válaszd ki a könyvet (vagy illeszd be a szöveget a mezőbe).
+2. „Motor”: SAPI (offline), Edge (ingyenes magyar, kulcs nélkül), Gemini vagy
+   Google Cloud (saját kulccsal).
+3. „Hangok frissítése”, majd válassz „Hang”-ot; állítsd a magasságot és a
+   sebességet; a „Hangteszt” gombbal meghallgathatod.
+4. Válaszd: egyben vagy „Darabolva percenként”, és a célmappát.
+5. „Hangoskönyv készítése” – a végén fix bevezető és záró nyilatkozat is
+   rákerül; a program bemondja, hova mentette.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Tab / Shift+Tab – mozgás.  Enter vagy Szóköz – gomb.
+
+TIPP
+Hosszú könyvnél az Edge magyar hang szép és ingyenes (internet kell); offline a
+SAPI magyar hang megy."""
+
 
 class BookFrame(wx.Frame):
     def __init__(self, main):
@@ -386,18 +408,12 @@ class BookFrame(wx.Frame):
     # ---- súgó / zárás -------------------------------------------------
 
     def _help(self):
-        wx.MessageBox(
-            "Hangoskönyv készítő\n\n"
-            "1. Tallózd be a könyvet (TXT, DOCX, EPUB, PDF).\n"
-            "2. Válassz motort: SAPI (offline), Edge (ingyenes, magyar, "
-            "kulcs nélkül), Gemini vagy Google Cloud (saját API-kulccsal).\n"
-            "3. Frissítsd/válaszd ki a hangot; állítsd a magasságot és "
-            "sebességet (ahol a motor engedi); a „Hangteszt” gombbal "
-            "meghallgathatod.\n"
-            "4. Válaszd: egyben vagy percenként darabolva, és a célmappát.\n"
-            "5. „Hangoskönyv készítése”. Hosszú könyvnél türelem – a végén "
-            "egy fix bevezető és egy záró nyilatkozat is rákerül.",
-            "Súgó", wx.OK | wx.ICON_INFORMATION, self)
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Hangoskönyv-készítő", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Hangoskönyv-készítő",
+                          wx.OK | wx.ICON_INFORMATION, self)
 
     def _on_close(self, e):
         try:

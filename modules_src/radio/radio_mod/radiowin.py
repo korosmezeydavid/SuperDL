@@ -15,6 +15,31 @@ from superdl import store                       # megosztott tároló a Core-bó
 from superdl.audioengine import Player          # megosztott lejátszó a Core-ból
 from .radiorecwin import RecordingsDialog, ScheduleDialog   # a modulban
 
+HELP = """INTERNETES RÁDIÓ
+
+MIRE VALÓ
+Élő rádióállomások keresése és hallgatása, azonnali és időzített felvétellel.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. Keress: a keresőmezőbe írd be a szót, válaszd, mi szerint (Név / Címke),
+   Enter. Vagy „Népszerű állomások”, vagy ország szerint a legördülőből + „Az
+   ország állomásai”.
+2. Az állomáslistában fel/le nyíllal mozogsz; Enter vagy F5: lejátszás.
+3. Hangerő: Ctrl+fel / Ctrl+le. Szünet: Ctrl+Szóköz. Leállítás: Esc.
+4. Felvétel: F9 a kijelölt állomásra (újra F9: leállítás). Egyszerre több
+   állomás is felvehető. Időzített felvétel: Ctrl+R (az állomást a KEDVENCEK
+   közül választod, mettől meddig, egyszeri / minden nap / adott napokon).
+
+GYORSBILLENTYŰK
+F1 – súgó.  Enter vagy F5 – lejátszás.  Ctrl+B – kedvencekhez.  Ctrl+C – URL
+másolása.  Ctrl+fel / Ctrl+le – hangerő.  Ctrl+Szóköz – szünet.  Esc –
+leállítás.  F9 – felvétel most.  Ctrl+R – időzített felvétel.  Ctrl+Shift+F –
+felvételek és időzítések kezelése.  A listákban Delete – törlés.
+
+TIPP
+A felvételek a célmappa „Rádiófelvételek” dátumozott almappájába kerülnek,
+MP3-ként. Az időzített felvételhez a program legyen nyitva a megadott időben."""
+
 
 class RadioFrame(wx.Frame):
     def __init__(self, main):
@@ -464,36 +489,12 @@ class RadioFrame(wx.Frame):
     # ---- súgó / zárás -------------------------------------------------
 
     def _help(self):
-        wx.MessageBox(
-            "Internetes rádió – billentyűk\n\n"
-            "Keresőmező: írd be, válaszd ki, mi szerint (Név / Címke), "
-            "Enter = keresés. „Népszerű állomások” gomb is van.\n\n"
-            "Ország szerint: válassz a legördülő országlistából, majd „Az "
-            "ország állomásai” – a legnépszerűbbeket hozza (Tovább: több). "
-            "A program megjegyzi az utolsó országot.\n\n"
-            "Állomáslista (fel/le nyíl a mozgás):\n"
-            "  Enter vagy F5 – lejátszás\n"
-            "  Ctrl+B – kedvencekhez\n"
-            "  Ctrl+C – URL másolása\n"
-            "  Menü-billentyű / jobb klikk – helyi menü\n\n"
-            "Lejátszás közben (bárhol):\n"
-            "  Ctrl+fel / Ctrl+le – hangerő\n"
-            "  Ctrl+szóköz – szünet / folytatás\n"
-            "  Escape – leállítás\n\n"
-            "Felvétel:\n"
-            "  F9 – a kijelölt állomás felvétele most (újra F9 ugyanazon az "
-            "állomáson: leállítás). EGYSZERRE TÖBB állomás is felvehető – "
-            "jelölj ki egy másikat és F9 –, miközben akár egy továbbit "
-            "hallgatsz.\n"
-            "  Ctrl+R – időzített felvétel beállítása: az állomást a "
-            "KEDVENCEK közül választod, mettől meddig, egyszeri / minden nap "
-            "/ a hét adott napjain. Átfedő időzítések is megadhatók.\n"
-            "  Ctrl+Shift+F – a folyó felvételek és időzítések kezelése\n"
-            "  A felvételek a célmappa „Rádiófelvételek” dátumozott "
-            "almappájába kerülnek, MP3-ként. Az időzített felvételhez a "
-            "program legyen nyitva a megadott időpontban.\n\n"
-            "Kedvencek: Enter – lejátszás, Delete – törlés.",
-            "Rádió súgó", wx.OK | wx.ICON_INFORMATION, self)
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Internetes rádió", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Internetes rádió",
+                          wx.OK | wx.ICON_INFORMATION, self)
 
     def _on_close(self, e):
         try:

@@ -32,6 +32,29 @@ class _Drop(wx.FileDropTarget):
         return True
 
 
+HELP = """KÖTEGELT MÉDIAKONVERTÁLÓ
+
+MIRE VALÓ
+Hang- és videófájlok átalakítása más formátumba – egyszerre többet is.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. „Fájlok hozzáadása" gomb (vagy „Mappa hozzáadása") – gyűjtsd össze a
+   konvertálandó fájlokat. A listából „Kijelölt eltávolítása" / „Lista törlése".
+2. „Irány": hang vagy videó kimenet. „Formátum": a célformátum (pl. MP3, MP4).
+   „Bitráta": a minőség.
+3. „Kimeneti mappa" – hova kerüljön (a „Tallózás" gombbal is).
+4. „Konvertálás indítása" – sorban feldolgozza; a haladást bemondja, a végén
+   jelzi, kész. „Leállítás" gombbal megszakítható.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Tab / Shift+Tab – mozgás.  Enter vagy Szóköz – gomb.  A fájllistában
+Delete – kijelölt eltávolítása.
+
+TIPP
+Sok fájlnál a program egyenként dolgozik, és mindegyikről szól – nyugodtan
+figyelheted a haladást."""
+
+
 class BatchConvertFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Kötegelt médiakonvertáló",
@@ -44,9 +67,24 @@ class BatchConvertFrame(wx.Frame):
         self._build()
         self.CreateStatusBar()
         self._announce("Adj hozzá fájlokat, válassz formátumot, majd "
-                       "Konvertálás.")
+                       "Konvertálás. Súgó: F1.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
         self._sync_format_choices()
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            self._help()
+        else:
+            e.Skip()
+
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Kötegelt médiakonvertáló", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Médiakonvertáló",
+                          wx.OK | wx.ICON_INFORMATION, self)
 
     # ---- felépítés ----------------------------------------------------
 

@@ -20,6 +20,34 @@ from superdl import store                   # megosztott tároló a Core-ból
 from superdl.audioengine import Player      # megosztott lejátszó a Core-ból
 
 
+HELP = """INTERNETES TV (IPTV)
+
+MIRE VALÓ
+A saját, LEGÁLIS előfizetésed nézése akadálymentesen: m3u lista vagy Xtream
+belépés, csatornák kategóriákban, kedvencek, felolvasott műsorújság, felvétel.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1/a. m3u forrás: az „m3u URL" mezőbe illeszd be a listád címét, majd „Betöltés"
+     gomb. Fájlból: „m3u fájl" gomb.
+1/b. VAGY Xtream belépés: töltsd ki a Kiszolgáló, Felhasználó, Jelszó mezőket,
+     majd „Bejelentkezés". A program bemondja, hány csatorna és kategória jött,
+     és meddig érvényes a fiók. Rossz jelszónál / lejárt fióknál érthető hibát mond.
+2. Belépés után Tab-bal a „Csoport" listára állhatsz (kategória-szűrés), vagy a
+   „Keresés" mezőbe írhatsz.
+3. Tab-bal a „Csatornalista"; fel/le nyíllal válassz, Enter: lejátszás.
+4. E: mondja, mi megy most. „Teljes műsor" gomb: a nap műsora.
+5. R: felvétel indítása/leállítása. „Emlékeztető" gomb: a következő műsorra.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Enter – lejátszás.  E – mi megy most.  R – felvétel.  Ctrl+fel/le –
+hangerő.  „Szünet" gomb – megállítás.
+
+TIPPEK
+- Belépés ELŐTT a képernyő tiszta (csak a forrás/belépés látszik); belépés UTÁN
+  jön elő minden (lista, műsorújság, felvétel).
+- Csak a saját, jogtiszta előfizetésed forrását használd."""
+
+
 class IPTVFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Internetes TV (legális IPTV)",
@@ -45,8 +73,23 @@ class IPTVFrame(wx.Frame):
         self._load_conf()
         self._announce("Tölts be egy m3u listát vagy lépj be Xtream-adatokkal "
                        "(saját, legális hozzáférés). Enter: lejátszás, "
-                       "E: mi megy most.")
+                       "E: mi megy most. Súgó: F1.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            self._help()
+        else:
+            e.Skip()
+
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Internetes TV", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Internetes TV",
+                          wx.OK | wx.ICON_INFORMATION, self)
 
     # ---- felépítés ----------------------------------------------------
 

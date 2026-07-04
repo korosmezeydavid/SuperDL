@@ -55,6 +55,29 @@ def _hms(sec: float) -> str:
     return f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
 
 
+HELP = """SUPER M – MŰSORSZÓRÓ STÚDIÓ
+
+MIRE VALÓ
+Rádió-műsorszórás és médialejátszás egy helyen: lejátszó-deckek, keverés,
+mikrofon, jingle-pad, effekt-rack és élő adás (Shoutcast/Icecast), BASS-motorral.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. Tölts be zenéket a listába/deckekbe; a lejátszást a címkézett gombokkal és a
+   gyorsbillentyűkkel vezérled.
+2. Keverd a deckek és a mikrofon hangját; a mikrofont be/ki kapcsolhatod.
+3. Jingle-pad: a Numpad 1–9 gombokra tett rövid hangok azonnal indíthatók.
+4. Effekt-rack: valós idejű effektek kapcsolhatók a hangra.
+5. Élő adás: add meg a Shoutcast/Icecast szerver adatait, majd indítsd az adást.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Numpad 1–9 – jingle indítása.  A többi vezérlő billentyűjét a gombok
+címkéi mutatják (ALT+aláhúzott betű).
+
+TIPP
+Előhallgatás (PFL): a kijelölt szám külön eszközön (fejhallgató) meghallgatható,
+mielőtt adásba kerül."""
+
+
 class SuperMFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Super M műsorszóró stúdió",
@@ -956,7 +979,18 @@ class SuperMFrame(wx.Frame):
 
     # ---- billentyű + zárás --------------------------------------------
 
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Super M – műsorszóró stúdió", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Super M",
+                          wx.OK | wx.ICON_INFORMATION, self)
+
     def _on_char_hook(self, e):
+        if e.GetKeyCode() == wx.WXK_F1 and not e.HasModifiers():
+            self._help()
+            return
         # KIZÁRÓLAG a Numpad 1-9 jingle-indításhoz. Módosítóval (pl. Ctrl+Numpad 1
         # = mikrofon) vagy szövegmezőben NEM avatkozik be → a szám beírható
         # marad, és a gombokat/gyorsbillentyűket sem zavarja.

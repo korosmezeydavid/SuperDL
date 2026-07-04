@@ -19,6 +19,30 @@ WILDCARD = ("Könyvek|*.txt;*.docx;*.epub;*.pdf|Szöveg (*.txt)|*.txt|"
             "Word (*.docx)|*.docx|EPUB (*.epub)|*.epub|PDF (*.pdf)|*.pdf|"
             "Minden fájl|*.*")
 
+HELP = """KÖNYVOLVASÓ (élő felolvasás)
+
+MIRE VALÓ
+Könyv (TXT, DOCX, EPUB, PDF) FELOLVASÁSA a programban, magyar hanggal,
+könyvjelzővel (folytatható), alvás-időzítővel.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. „Könyv megnyitása” – válaszd ki a könyvet (vagy a könyvtárból Enterrel).
+2. Válassz „Felolvasó”-t és „Hang”-ot (alapból magyar hangot kínál); állítsd a
+   tempót és a magasságot.
+3. Felolvasás/folytatás: F5. Szünet: Ctrl+Szóköz. Leállítás: Esc.
+4. Mondatlépés: Ctrl+bal / Ctrl+jobb nyíl. A program megjegyzi, hol tartottál –
+   legközelebb onnan folytatja.
+5. Alvás-időzítő: a végén lassan elhalkul és elalvási pontokat ment, amik közt
+   később ugrálhatsz.
+
+GYORSBILLENTYŰK
+F1 – súgó.  F5 – felolvasás/folytatás.  Ctrl+Szóköz – szünet.  Esc – leállítás.
+Ctrl+bal / Ctrl+jobb – előző/következő mondat.
+
+TIPP
+A magyar Edge hang szép és ingyenes (internet kell); offline a SAPI magyar hang
+megy."""
+
 
 class ReaderFrame(wx.Frame):
     def __init__(self, main, open_path: str = "", text: str = "", title=""):
@@ -157,19 +181,29 @@ class ReaderFrame(wx.Frame):
         p.SetSizer(v)
 
         ids = {k: wx.NewIdRef() for k in
-               ("play", "pause", "stop", "prev", "next")}
+               ("play", "pause", "stop", "prev", "next", "help")}
         self.Bind(wx.EVT_MENU, lambda e: self._play_resume(), id=ids["play"])
         self.Bind(wx.EVT_MENU, lambda e: self._toggle(), id=ids["pause"])
         self.Bind(wx.EVT_MENU, lambda e: self._stop(), id=ids["stop"])
         self.Bind(wx.EVT_MENU, lambda e: self.engine.skip(-1), id=ids["prev"])
         self.Bind(wx.EVT_MENU, lambda e: self.engine.skip(1), id=ids["next"])
+        self.Bind(wx.EVT_MENU, lambda e: self._help(), id=ids["help"])
         self.SetAcceleratorTable(wx.AcceleratorTable([
             (wx.ACCEL_NORMAL, wx.WXK_F5, ids["play"]),
             (wx.ACCEL_CTRL, wx.WXK_SPACE, ids["pause"]),
             (wx.ACCEL_NORMAL, wx.WXK_ESCAPE, ids["stop"]),
             (wx.ACCEL_CTRL, wx.WXK_LEFT, ids["prev"]),
             (wx.ACCEL_CTRL, wx.WXK_RIGHT, ids["next"]),
+            (wx.ACCEL_NORMAL, wx.WXK_F1, ids["help"]),
         ]))
+
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Könyvolvasó", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Könyvolvasó",
+                          wx.OK | wx.ICON_INFORMATION, self)
 
     # ---- hangok -------------------------------------------------------
 

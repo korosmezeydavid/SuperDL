@@ -7,6 +7,24 @@ időjárást), Felolvasás (hangosan kimondja), Bezárás.
 
 import wx
 
+HELP = """NAPI INFÓ
+
+MIRE VALÓ
+A mai dátum, névnap és időjárás egy helyen, felolvasva.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. Az ablak megnyitásakor a szöveg (dátum, névnap, majd az időjárás is)
+   megjelenik a „Napi infó” mezőben; a képernyőolvasóval nyilakkal bejárható.
+2. „Frissítés” – újra lekéri az időjárást.
+3. „Felolvasás” – hangosan kimondja az egészet.
+4. „Bezárás” vagy Esc – kilép.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Esc – bezárás.
+
+TIPP
+A várost a fő program beállításainál adhatod meg."""
+
 
 class DayInfoDialog(wx.Dialog):
     def __init__(self, parent, compose_fn, fetch_weather_fn, speaker):
@@ -42,6 +60,18 @@ class DayInfoDialog(wx.Dialog):
         self._set_text(self._compose(None))
         self._refresh()
         self.text.SetFocus()
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            try:
+                from superdl.helpdialog import show_help
+                show_help(self, "Napi infó", HELP)
+            except Exception:
+                wx.MessageBox(HELP, "Súgó – Napi infó",
+                              wx.OK | wx.ICON_INFORMATION, self)
+        else:
+            e.Skip()
 
     def _set_text(self, txt):
         self._last = txt

@@ -26,6 +26,29 @@ SAVE_FORMATS = [("MP4 – ajánlott, mindenhol lejátszható", "mp4"),
                 ("MKV", "mkv"), ("AVI", "avi")]
 
 
+HELP = """VIDEÓKÉSZÍTŐ (kép + zene)
+
+MIRE VALÓ
+Videó készítése egy állóképből (háttér) és zenéből, az idővonalra tett magyarázó
+SZÖVEG- és KÉP-overlay-ekkel.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. „Háttérkép kiválasztása" – a videó alapképe. „Zene kiválasztása" – a hang.
+2. „Tovább a szerkesztéshez".
+3. SZÓKÖZ: a zene lejátszása/szüneteltetése; a „Pillanatnyi időpont" bemondja,
+   hol tartasz.
+4. A kívánt időpontnál: „Szöveg hozzáadása itt" (felirat ráég a videóra) vagy
+   „Kép hozzáadása itt".
+5. A „Beszúrt elemek" listában Delete törli a kijelöltet.
+6. Mentés – a program kér helyet, a végén bemondja, hova mentette.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Szóköz – lejátszás/szünet.  Delete – beszúrt elem törlése.
+
+TIPP
+A szövegek/képek arra az időpontra kerülnek, ahol a lejátszást megállítottad."""
+
+
 class VideoComposeFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main,
@@ -377,7 +400,18 @@ class VideoComposeFrame(wx.Frame):
 
     # ---- billentyű + zárás --------------------------------------------
 
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Videókészítő (kép + zene)", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Videókészítő",
+                          wx.OK | wx.ICON_INFORMATION, self)
+
     def _on_char_hook(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            self._help()
+            return
         focus = wx.Window.FindFocus()
         # Szóköz = lejátszás/szünet, kivéve szövegmezőben vagy gombon
         if (e.GetKeyCode() == wx.WXK_SPACE

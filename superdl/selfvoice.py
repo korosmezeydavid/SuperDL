@@ -92,9 +92,31 @@ class SelfVoice:
     def available(self) -> bool:
         return self._voice is not None or espeak_available()
 
+    def _effective_voice_desc(self) -> str:
+        """A ténylegesen használandó hang leírása. Ha a felhasználó NEM választott
+        hangot (üres), MAGYAR alapértelmezést adunk: magyar SAPI-hang, ha van
+        (pl. Microsoft Szabolcs); különben a BEÉPÍTETT eSpeak magyar (espeak:hu).
+        SOHA nem a rendszer angol alaphangja (pl. Zira), ami a magyar szöveget
+        angolul olvasná – ez volt a listások „angolul szólal meg" panasza."""
+        if self.voice_desc:
+            return self.voice_desc
+        if self._voice:                          # van-e telepített MAGYAR SAPI-hang?
+            try:
+                for token in self._voice.GetVoices():
+                    d = token.GetDescription()
+                    if any(k in d.lower() for k in
+                           ("hungar", "magyar", "hu-hu", "hu_hu", "szabolcs")):
+                        return d
+            except Exception:
+                pass
+        if espeak_available():                   # beépített magyar tartalék
+            return "espeak:hu"
+        return ""                                # semmi magyar – marad a rendszeré
+
     @property
     def _use_espeak(self) -> bool:
-        return self.voice_desc.startswith("espeak:") and espeak_available()
+        return (self._effective_voice_desc().startswith("espeak:")
+                and espeak_available())
 
     def list_voices(self) -> list[str]:
         """A telepített SAPI-hangok leírásai (a beállítási legördülőhöz)."""
@@ -129,9 +151,10 @@ class SelfVoice:
         try:
             self._voice.Rate = self.rate
             self._voice.Volume = self.volume
-            if self.voice_desc:
+            desc = self._effective_voice_desc()
+            if desc and not desc.startswith("espeak:"):
                 for token in self._voice.GetVoices():
-                    if self.voice_desc.lower() in token.GetDescription().lower():
+                    if desc.lower() in token.GetDescription().lower():
                         self._voice.Voice = token
                         break
         except Exception:
@@ -169,7 +192,7 @@ class SelfVoice:
         exe, data = _espeak_paths()
         if not exe:
             return
-        voice = self.voice_desc[len("espeak:"):] or "hu"
+        voice = self._effective_voice_desc()[len("espeak:"):] or "hu"
         # tempó: -10..10 -> kb. 90..260 szó/perc; hangmagasság: -10..10 -> 10..90
         wpm = max(80, min(320, 175 + self.rate * 12))
         pitch = max(0, min(99, 50 + self.pitch * 4))

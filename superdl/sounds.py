@@ -157,3 +157,36 @@ def play(name: str) -> None:
                                | winsound.SND_ASYNC | winsound.SND_NODEFAULT)
     except Exception:
         pass
+
+
+def play_startup() -> None:
+    """Az INDULÓ SZIGNÁL lejátszása (aszinkron). Sorrend: a felhasználó saját
+    fájlja (~/.superdl/sounds/startup.wav), különben a BEÉPÍTETT szignál
+    (superdl/startup.wav), végül egy kellemes szintetizált akkord. FÜGGETLEN a
+    teljes némítástól – ez HANG, nem beszéd (Farkas kérése: némítva is legyen jel)."""
+    if winsound is None:
+        return
+    try:
+        user = SOUND_DIR / "startup.wav"                 # a felhasználó felülírhatja
+        bundled = Path(__file__).resolve().parent / "startup.wav"
+        f = None
+        if user.is_file():
+            f = user
+        elif bundled.is_file():
+            f = bundled
+        else:                                            # szintetizált tartalék
+            SOUND_DIR.mkdir(parents=True, exist_ok=True)
+            f = SOUND_DIR / "startup_default.wav"
+            if not f.exists():
+                data = b"".join(_tone(fr, du) for fr, du in
+                                [(523, 0.14), (659, 0.14), (784, 0.24)])  # C–E–G
+                with wave.open(str(f), "wb") as w:
+                    w.setnchannels(1)
+                    w.setsampwidth(2)
+                    w.setframerate(RATE)
+                    w.writeframes(data)
+        if f and f.is_file():
+            winsound.PlaySound(str(f), winsound.SND_FILENAME
+                               | winsound.SND_ASYNC | winsound.SND_NODEFAULT)
+    except Exception:
+        pass

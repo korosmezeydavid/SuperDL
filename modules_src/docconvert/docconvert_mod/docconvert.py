@@ -49,6 +49,12 @@ ENCODINGS = [("Automatikus felismerés", "auto"),
              ("Régi DOS (CP437)", "cp437"),
              ("Nyugat-európai (Windows-1252)", "cp1252")]
 
+# KIMENETI kódlapok: csak amikbe KÓDOLNI is lehet. Az „auto" (felismerés) és a
+# „cwi2" (nálunk csak DEKÓDOLHATÓ) NEM való ide – korábban a kimeneti legördülő a
+# teljes ENCODINGS-ből épült, ezért az alap „auto" volt → `.encode("auto")` →
+# „unknown encoding: auto" hiba TXT-be mentéskor.
+OUT_ENCODINGS = [e for e in ENCODINGS if e[1] not in ("auto", "cwi2")]
+
 # az AUTOMATIKUS felismerés egybájtos jelöltjei (a legvalószínűbbtől); a helyeset
 # NEM az „elsőként hibátlanul dekódol" választja (az iso-8859-2/cp852/cp437 MINDEN
 # bájtot elfogad, így kacatot is), hanem a `_decode_score` szerinti LEGJOBB.
@@ -195,7 +201,12 @@ def _lines(book):
 
 
 def _write_txt(book, dst, out_encoding):
-    dst.write_bytes(book.text.encode(out_encoding or "utf-8", errors="replace"))
+    enc = out_encoding or "utf-8"
+    try:
+        data = book.text.encode(enc, errors="replace")
+    except LookupError:          # nem kódolható kódlap (auto/cwi2/ismeretlen) → UTF-8
+        data = book.text.encode("utf-8", errors="replace")
+    dst.write_bytes(data)
 
 
 def _write_html(book, dst):

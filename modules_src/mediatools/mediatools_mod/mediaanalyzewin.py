@@ -15,6 +15,27 @@ WILDCARD = ("Média (hang/videó)|*.mp3;*.wav;*.flac;*.m4a;*.aac;*.ogg;*.opus;"
             "*.mp4;*.mkv;*.avi;*.mov;*.webm;*.m4v;*.m4b|Minden fájl|*.*")
 
 
+HELP = """BESZÉLŐ MÉDIAELEMZŐ
+
+MIRE VALÓ
+Média technikai elemzése (hangerő/LUFS, csúcs, torzítás), és EBU R128 szerinti
+hangerő-normalizálás.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. „Fájl betöltése" gomb – válaszd ki a hang- vagy videófájlt.
+2. Ha alaposabb elemzést kérsz, pipáld be az „Alapos ellenőrzés"-t.
+3. „Elemzés" gomb – az eredmény a „Jelentés" szövegmezőbe kerül; a
+   képernyőolvasóval nyilakkal végigolvashatod.
+4. NORMALIZÁLÁS: válassz „Profil"-t, majd „Normalizálás új fájlba" – egyenletes
+   hangerőre igazítja, új fájlba menti.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Tab / Shift+Tab – mozgás.  Enter vagy Szóköz – gomb.
+
+TIPP
+A „Jelentés" mezőben marad az eredmény, bármikor visszaolvasható."""
+
+
 class MediaAnalyzeFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Beszélő médiaelemző",
@@ -26,8 +47,23 @@ class MediaAnalyzeFrame(wx.Frame):
         self.CreateStatusBar()
         self._announce("Tölts be egy hang- vagy videófájlt, és elemzem: "
                        "ép-e, milyen a hangereje (LUFS), van-e torzítás – majd "
-                       "ha kéred, normalizálom is.")
+                       "ha kéred, normalizálom is. Súgó: F1.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            self._help()
+        else:
+            e.Skip()
+
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Beszélő médiaelemző", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Médiaelemző",
+                          wx.OK | wx.ICON_INFORMATION, self)
 
     def _build(self):
         p = wx.Panel(self)

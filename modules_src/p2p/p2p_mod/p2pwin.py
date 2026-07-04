@@ -10,6 +10,33 @@ import wx.adv
 from . import p2p
 
 
+HELP = """FÁJLKÜLDÉS GÉPRŐL GÉPRE (P2P)
+
+MIRE VALÓ
+Nagy fájl küldése egy másik gépre FELHŐ NÉLKÜL, titkosítva. A küldő kap egy
+rövid, bemondható kódot (pl. 7-alma-traktor); a fogadó ugyanazt beírja, és a
+fájl közvetlenül, gépről gépre megy át.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+KÜLDÉS:
+1. „Fájl kiválasztása és küldése" gomb, válaszd ki a fájlt.
+2. A program ad egy KÓDOT a „küldés kódja" mezőben – a képernyőolvasó felolvassa.
+   Mondd be ezt a kódot a másik félnek (telefonon, üzenetben).
+3. Várd meg, míg a másik beírja a kódot. A program jelzi (felolvasva), amikor a
+   fájl megérkezett.
+FOGADÁS:
+1. A másiktól kapott kódot írd be a „fogadás kódja" mezőbe.
+2. „Fogadás" gomb – a program megkérdezi, hova mentse, és letölti.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Tab / Shift+Tab – mozgás a vezérlők közt.  Enter – gomb.
+
+TIPPEK
+- A kódot pontosan úgy add meg, ahogy hallottad (kötőjelekkel, kis/nagybetű nem
+  számít).
+- Mindkét gépnek internet kell; a fájl NEM megy át külső szerveren."""
+
+
 class P2PFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Fájlküldés gépről gépre",
@@ -22,8 +49,23 @@ class P2PFrame(wx.Frame):
         self._build()
         self.CreateStatusBar()
         self.SetStatusText("Küldéshez: Fájl kiválasztása. Fogadáshoz: írd be a "
-                           "küldőtől kapott kódot.")
+                           "küldőtől kapott kódot. Súgó: F1.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            self._help()
+        else:
+            e.Skip()
+
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Fájlküldés gépről gépre", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Fájlküldés",
+                          wx.OK | wx.ICON_INFORMATION, self)
 
     # ---- felépítés ----------------------------------------------------
 

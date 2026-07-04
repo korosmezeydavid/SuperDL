@@ -17,6 +17,38 @@ from superdl.audioengine import Player       # megosztott lejátszó a Core-ból
 VIDEO_WILDCARD = ("Videók (*.mp4;*.mkv;*.avi;*.mov;*.webm;*.m4v)|"
                   "*.mp4;*.mkv;*.avi;*.mov;*.webm;*.m4v|Minden fájl|*.*")
 
+HELP = """VIDEÓVÁGÓ ÉS ÖSSZEFŰZŐ
+
+MIRE VALÓ
+Videó vágása FÜLLEL (a hang alapján): két marker közti rész kivágása vagy
+mentése, több videó összefűzése, magyarázó szöveg ráégetése.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. „Videó betöltése" gomb – a program bemondja a videó hosszát.
+2. SZÓKÖZ: a videó HANGJÁT lejátssza/megállítja. A kívánt pontnál állítsd meg.
+   Finomhangolás: bal/jobb nyíl (−/+ 2 mp); a „Pillanatnyi időpont" gomb bemondja,
+   hol tartasz.
+3. Megállva: „Marker hozzáadása itt" – a program bemondja az időt és a markerek
+   számát.
+4. VÁGÁS: tegyél le KÉT markert (a rész elejére és végére). Ha pontosan 2 marker
+   van, KIJELÖLÉS SEM KELL. Aztán:
+   • „Szakasz kivágása (a többi marad)" – a két marker KÖZTI rész kiesik, az eleje
+     és vége összeáll (rövidebb videó).
+   • „Szakasz mentése" – csak a két marker KÖZTI részt menti.
+5. ÖSSZEFŰZÉS: „Videó hozzáfűzése" gombbal további videó(ka)t tehetsz a végére,
+   majd „Teljes videó mentése".
+6. Mentéskor a program kér formátumot és helyet, a végén bemondja, hova mentette.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Szóköz – lejátszás/megállás.  Bal/jobb nyíl – −/+ 2 mp.  A markerek
+listájában Delete – marker törlése.
+
+TIPPEK
+- Kettőnél több markernél a markerlistában jelöld ki a szakasz KEZDŐ markerét;
+  a vágás/mentés a kijelölt és a rákövetkező marker közt történik.
+- Minden művelet visszajelzését a program KIMONDJA; ha egy gomb „nem csinál
+  semmit", felolvasott ablakban megmondja, mi hiányzik."""
+
 
 class VideoEditFrame(wx.Frame):
     def __init__(self, main):
@@ -151,7 +183,8 @@ class VideoEditFrame(wx.Frame):
 
     def _append_video(self):
         if not self.editor.clips:
-            self._announce("Előbb tölts be egy videót.")
+            self._cannot("Előbb tölts be egy videót, utána fűzhetsz hozzá "
+                         "továbbiakat a végére.")
             return
         path = self._pick_video("Videó hozzáfűzése a végéhez")
         if not path:
@@ -168,7 +201,9 @@ class VideoEditFrame(wx.Frame):
             self._announce("Ezt a videót nem sikerült hozzáfűzni.")
             return
         self._announce(f"Hozzáfűzve: {Path(clip.path).name}. Teljes hossz most "
-                       f"{VE.human_time(self.editor.total_duration())}.")
+                       f"{VE.human_time(self.editor.total_duration())}. Az "
+                       "összefűzött videót a „Teljes videó mentése” gombbal "
+                       "mentheted el.")
 
     def _main_clip(self):
         return self.editor.clips[0].path if self.editor.clips else ""
@@ -219,11 +254,18 @@ class VideoEditFrame(wx.Frame):
 
     def _add_marker(self):
         if not self.editor.clips:
+            self._cannot("Előbb tölts be egy videót, hogy markert tehess.")
             return
         at = self._position()
         self.editor.add_marker(at)
         self._refresh_markers(select_at=at)
-        self._announce(f"Marker hozzáadva: {VE.human_time(at)}.")
+        n = len(self.editor.markers)
+        msg = f"Marker hozzáadva: {VE.human_time(at)}. Összesen {n} marker."
+        if n == 2:
+            msg += (" Két marker van: a „Szakasz kivágása” gombbal kivághatod a "
+                    "köztük lévő részt (a többi marad), vagy a „Szakasz mentése” "
+                    "gombbal csak a köztük lévő részt mentheted.")
+        self._announce(msg)
 
     def _add_note(self):
         if not self.editor.clips:
@@ -297,16 +339,36 @@ class VideoEditFrame(wx.Frame):
             out += "." + fmt
         return out or None
 
+    def _section_markers(self):
+        """A szakasz két markere (start, end). Ha pontosan KÉT marker van,
+        kijelölés NÉLKÜL is azt a kettőt adja (vakbarát); több markernél a
+        listában kijelölt + a rákövetkező. None, ha nincs érvényes pár."""
+        mk = self.editor.markers
+        if len(mk) < 2:
+            return None
+        i = self.mk_list.GetFirstSelected()
+        if i < 0:
+            if len(mk) == 2:
+                i = 0
+            else:
+                return None
+        if i + 1 >= len(mk):
+            return None
+        return mk[i].at, mk[i + 1].at
+
+    _NEED_MARKERS = ("Ehhez két marker kell. Játszd le a hangot (Szóköz), a kívánt "
+                     "pontokon állítsd meg, és tedd le a „Marker hozzáadása itt” "
+                     "gombbal. Ha kettőnél több markered van, a listában jelöld ki "
+                     "a szakasz KEZDŐ markerét.")
+
     def _save_section(self):
         if self._rendering:
             return
-        mk = self.editor.markers
-        i = self.mk_list.GetFirstSelected()
-        if len(mk) < 2 or i < 0 or i + 1 >= len(mk):
-            self._announce("A szakasz-mentéshez jelölj ki egy markert, és "
-                           "legyen utána még egy (a kettő közti rész menti).")
+        pair = self._section_markers()
+        if not pair:
+            self._cannot("A szakasz mentéséhez " + self._NEED_MARKERS)
             return
-        start, end = mk[i].at, mk[i + 1].at
+        start, end = pair
         out = self._ask_format_and_path("szakasz")
         if out:
             self._start_export(start, end, out,
@@ -318,14 +380,12 @@ class VideoEditFrame(wx.Frame):
         és vége összefűzve marad (a köztes szakasz eltűnik)."""
         if self._rendering:
             return
-        mk = self.editor.markers
-        i = self.mk_list.GetFirstSelected()
-        if len(mk) < 2 or i < 0 or i + 1 >= len(mk):
-            self._announce("A kivágáshoz jelölj ki egy markert, és legyen "
-                           "utána még egy (a kettő közti rész esik ki, a többi "
-                           "marad).")
+        pair = self._section_markers()
+        if not pair:
+            self._cannot("A kivágáshoz " + self._NEED_MARKERS
+                         + " A kettő közti rész esik ki, a többi marad.")
             return
-        cut_start, cut_end = mk[i].at, mk[i + 1].at
+        cut_start, cut_end = pair
         out = self._ask_format_and_path("kivágott")
         if out:
             self._start_export(
@@ -334,9 +394,10 @@ class VideoEditFrame(wx.Frame):
                 f"szakasz kivágása, a többi összefűzése…", cut=True)
 
     def _save_whole(self):
-        if self._rendering or not self.editor.clips:
-            if not self.editor.clips:
-                self._announce("Előbb tölts be egy videót.")
+        if self._rendering:
+            return
+        if not self.editor.clips:
+            self._cannot("Előbb tölts be egy videót a „Videó betöltése” gombbal.")
             return
         out = self._ask_format_and_path("teljes_videó")
         if out:
@@ -392,7 +453,18 @@ class VideoEditFrame(wx.Frame):
 
     # ---- billentyű + zárás --------------------------------------------
 
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Videóvágó és összefűző", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Videóvágó",
+                          wx.OK | wx.ICON_INFORMATION, self)
+
     def _on_char_hook(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:      # súgó bárhonnan (szövegmezőből is)
+            self._help()
+            return
         focus = wx.Window.FindFocus()
         if isinstance(focus, wx.TextCtrl):
             e.Skip()
@@ -409,8 +481,27 @@ class VideoEditFrame(wx.Frame):
             return
         e.Skip()
 
+    def _speak(self, text):
+        """A visszajelzés KIMONDÁSA a Core self-voice-án át – hogy a vak
+        felhasználó tényleg HALLJA (a státuszsort a képernyőolvasó nem olvassa)."""
+        sv = getattr(self.main, "selfvoice", None)
+        if sv:
+            try:
+                sv.speak(text, force=True)
+            except Exception:
+                pass
+
     def _announce(self, text):
         self.SetStatusText(text)
+        self._speak(text)                    # hallható is, ne csak a státuszsorban
+
+    def _cannot(self, text):
+        """Egy művelet MIÉRT nem indulhat – felolvasott MessageBox-szal, hogy a
+        teljes némítás mellett is (JAWS olvassa) megtudja a felhasználó, nem csak
+        némán ‚nem történik semmi'."""
+        self.SetStatusText(text)
+        self._speak(text)
+        wx.MessageBox(text, "Videóvágó", wx.OK | wx.ICON_INFORMATION, self)
 
     def _on_close(self, e):
         try:

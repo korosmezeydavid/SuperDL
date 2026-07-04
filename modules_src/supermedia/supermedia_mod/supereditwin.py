@@ -24,6 +24,32 @@ def _human(sec: float) -> str:
     return f"{m:02d}:{s:05.2f}".replace(".", ",")
 
 
+HELP = """SUPER RECORDER – FÜLRE-SZERKESZTŐ (hangszerkesztő)
+
+MIRE VALÓ
+Akadálymentes hangszerkesztő: markeres navigáció, szakasz törlése/némítása/
+levágása, csend-beszúrás, 22 effekt, vokóder/harmonizer/ének-eltávolítás/2-sáv,
+visszavonás/újra – minden lépés KIMONDVA.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. „Megnyitás” – tölts be egy hangfájlt (vagy a felvevőből jövő felvételt).
+2. Navigálj markerekkel; jelölj ki szakaszt (a menüből a kijelölés/marker
+   funkciók).
+3. Szerkeszd: szakasz törlése, levágás (trim), némítás, csend beszúrása – a
+   program mindegyiket kimondja. Elrontottad? Visszavonás.
+4. Effektek: a listából válaszd (normalizálás, zajszűrés, echo, reverb…); külön
+   a vokóder/harmonizer/ének-eltávolítás/2-sáv keverés.
+5. „Mentés” – WAV vagy MP3.
+
+GYORSBILLENTYŰK
+F1 – súgó.  A szerkesztő műveletek F- és Ctrl-billentyűit a MENÜSOR mutatja
+(JAWS-biztos: menüből mennek, nincs sima Szóköz/nyíl/betű, ami a vezérlőktől
+lopná a billentyűt).
+
+TIPP
+Kezdd kis lépésekkel, és használd a Visszavonást bátran – minden lépést hallasz."""
+
+
 class SuperEditorFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Super Recorder: fülre-szerkesztő",
@@ -170,9 +196,21 @@ class SuperEditorFrame(wx.Frame):
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._on_tick, self.timer)
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
         self._update_buttons()
         self._fx_param_update()
         self._b_open.SetFocus()        # kezdő fókusz (a JAWS innen indul)
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            try:
+                from superdl.helpdialog import show_help
+                show_help(self, "Super Recorder – fülre-szerkesztő", HELP)
+            except Exception:
+                wx.MessageBox(HELP, "Súgó – Fülre-szerkesztő",
+                              wx.OK | wx.ICON_INFORMATION, self)
+        else:
+            e.Skip()
 
     # ---- menüsor (akadálymentes: a JAWS olvassa; biztonságos gyorsbillentyűk,
     #      semmi sima Szóköz/nyíl/betű, ami a vezérlőktől lopná a billentyűt) ----

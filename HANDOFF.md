@@ -132,9 +132,56 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-03 · dolgozott: Claude (3.29.3 KIADVA)
+**Utolsó frissítés:** 2026-07-03 · dolgozott: Claude (3.29.4 kódkész, kiadásra vár)
 
-**3.29.3 KIADVA ✅ (2026-07-03).** Core `v3.29.3` „Latest", 4 asset; forrás push
+**3.29.4 KÓDKÉSZ – PUBLIKÁLÁSRA VÁR (Core 3.29.4 + MIND A 9 MODUL bumpolva).**
+Modulok (zip+modules.json KÉSZ a dist_modules-ban): docconvert 1.1.2, konyvek 1.0.1,
+szervezes 1.2.2, mediatools 1.4.2, supermedia 1.2.2, iptv 1.0.2, radio 1.0.2,
+hangalamondas 1.0.3, p2p 1.0.3. A Core-build (heavy) + FELTÖLTÉS a „publikálás"-ra vár.
+TOVÁBBI (create maxima, MIND tesztelve, a fenti listán felül):
+- **(5) KÖNYVOLVASÓ mondatvég-lehagyás JAVÍTVA (Core, audiobook.py):** a `chunk_text`
+  a 140+ karakteres mondatot `sent[:limit]`-tel CSONKOLTA → a felolvasó lehagyta a
+  mondatvégeket (Szabó László jelezte; JAWS-szal a szöveg teljes volt). FIX: új
+  `_wrap_long()` szóhatáron darabol, SEMMIT el nem dobva. Igazolva: 263-karakteres
+  mondat 2 darabban, minden szó megvan.
+- **(6) EGYÉNI, TÉTELES, VAK-FÓKUSZÚ SÚGÓ MINDEN ESZKÖZ-ABLAKBAN (F1):** új Core
+  `superdl/helpdialog.py` (görgethető, csak olvasható súgó-ablak, a fókusz a szövegen
+  → a képernyőolvasó felolvassa; F1/Esc zárja) + benne a **„Támogatás" gomb** (a
+  meglévő `supportwin.SupportDialog`-ot nyitja: Revolut+IBAN) és egy támogatás-sor a
+  szöveg végén (Farkas: „hátha más is felfedezi"). MIND A 21 eszköz-ablak F1-re a saját
+  tételes súgóját adja (Mire való / Lépésről lépésre vakon / Gyorsbillentyűk / Tipp),
+  modul-oldali MessageBox-fallbackkel (régi Core-on is megy). CSAPDA-TANULSÁG: a
+  `_help` szövegekben a záró idézőjel LEGYEN ” (U+201D), NE ASCII " – a „szó" ASCII "-e
+  lezárja a Python-stringet; a string-összefűzős _help-eket háromszoros idézőjeles
+  HELP-konstansra írtam át (ott a sima " biztonságos). NE fusson tömeges regex-csere a
+  fájlokon (elrontja a meglévő kódot – egyszer megtörtént, git checkout-tal visszaálltam).
+
+EREDETI NÉGY (create maxima), MIND tesztelve:
+- **(1) Self-voice MAGYAR alapból** (Core, selfvoice.py): üres hang esetén magyar
+  SAPI-hang (ha van), különben BEÉPÍTETT eSpeak magyar (`espeak:hu`) – SOHA a Zira
+  angol (ez volt a listások „angolul szólal meg" panasza). `_effective_voice_desc()`;
+  kézi hangválasztás tisztelve. Igazolva: üres→espeak:hu, „Zira"→SAPI.
+- **(2) INDULÓ SZIGNÁL** (Core, sounds.py + gui + spec): `sounds.play_startup()` –
+  user `~/.superdl/sounds/startup.wav` → BEÁGYAZOTT `superdl/startup.wav` (a user
+  supdl.wav-ja, datas a 2 GUI-specben) → szintetizált akkord. `startup_signal`
+  beállítás (alap BE), induláskor CallLater(250), FÜGGETLEN a teljes némítástól
+  (hang, nem beszéd). Settings-checkbox. (Farkas: némítva is legyen indulás-jel.)
+- **(3) docconvert 1.1.2** (modul): a KIMENETI kódlap-legördülő auto/cwi2 nélkül
+  (`OUT_ENCODINGS`, alap UTF-8) → nincs „unknown encoding: auto"; `_write_txt`
+  LookupError→utf-8 védőháló; a bemeneti lista duplikált „auto"-ja is javítva.
+- **(4) mediatools 1.4.2 – VIDEÓVÁGÓ akadálymentesítés** (modul): a `_announce`
+  mostantól KIMONDJA (self-voice) a visszajelzést (eddig csak státuszsor → a
+  képernyőolvasó néma volt → „nem csinál semmit"); a feltétel-hibák FELOLVASOTT
+  MessageBox-szal (`_cannot`, némítva is hallja a JAWS); `_section_markers`: pontosan
+  2 markernél kijelölés NÉLKÜL is a kettő közt vág/ment; kimondott útmutatás 2.
+  marker után és hozzáfűzés után. A MOTOR JÓ VOLT (valódi ffmpeg-teszt: cut 10→7mp,
+  concat 10+6→16mp) – a hiba tisztán akadálymentességi/UX volt.
+- **PUBLIKÁLÁSKOR:** Core-build (onedir→ISCC→CLI→onefile) + kulcs-szken + v3.29.4
+  (4 asset) + 2 modul-release (mod-docconvert-1.1.2, mod-mediatools-1.4.2) +
+  modules.json push + forrás push + hírlevél. FONTOS: a `superdl/startup.wav`
+  bekerült a repóba (bundle-höz kell).
+
+**Korábbi: 3.29.3 KIADVA ✅ (2026-07-03).** Core `v3.29.3` „Latest", 4 asset; forrás push
 `c8be77c`; kulcs-szken TISZTA (96 fájl). Modulok VÁLTOZATLANOK. Hírlevél kiírva.
 Backlog #1 = Farkas István hordozható-önfrissítés robusztussága, KIADVA:
 - `selfupdate.py`: `mark_update_pending(target)` (jelzőt ír `~/.superdl/

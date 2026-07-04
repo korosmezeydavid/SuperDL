@@ -231,6 +231,14 @@ class SettingsDialog(wx.Dialog):
         self.c_hide_url.SetValue(bool(self.s.get("hide_url_row", False)))
         v.Add(self.c_hide_url, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
 
+        self.c_startsig = wx.CheckBox(
+            p, label="&Induló szignál (hangjelzés a program indulásakor, a "
+                     "teljes némítás mellett is)")
+        self.c_startsig.SetName("Induló szignál: rövid hangjelzés a program "
+                                "indulásakor, a teljes némítás mellett is szól")
+        self.c_startsig.SetValue(bool(self.s.get("startup_signal", True)))
+        v.Add(self.c_startsig, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+
         pairs = [("(alapértelmezett rendszerhang)", "")]
         try:
             for d in SelfVoice().list_voices():
@@ -336,6 +344,7 @@ class SettingsDialog(wx.Dialog):
             "selfvoice_enabled": self.c_sv.GetValue(),
             "selfvoice_off": self.c_sv_off.GetValue(),
             "hide_url_row": self.c_hide_url.GetValue(),
+            "startup_signal": self.c_startsig.GetValue(),
             "selfvoice_voice":
                 self._sv_voice_pairs[self.c_svvoice.GetSelection()][1],
             "selfvoice_rate": self.c_svrate.GetValue(),

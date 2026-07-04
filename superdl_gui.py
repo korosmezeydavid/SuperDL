@@ -293,6 +293,10 @@ class MainFrame(wx.Frame):
             wx.CallLater(4500, lambda: self._check_channels(quiet=True))
         # naponta egyszer, csendben frissítést keresünk (a háttérben)
         wx.CallLater(6000, self._auto_update_check)
+        # induló szignál (kellemes hangjelzés) – a TELJES NÉMÍTÁStól függetlenül,
+        # mert ez hang, nem beszéd (Farkas: némítva is legyen jel az indulásról)
+        if self.settings.get("startup_signal", True):
+            wx.CallLater(250, sounds.play_startup)
         # ha volt függő frissítés: jelezzük, sikerült-e (néma csere-hiba ellen)
         wx.CallLater(900, self._check_update_result)
         # induló, automatikus hangos üdvözlés (dátum, névnap, időjárás)
@@ -599,7 +603,7 @@ class MainFrame(wx.Frame):
             "audio_samplerate": "",
             "beep_enabled": True, "beep_volume": 30,
             "selfvoice_enabled": False, "selfvoice_off": False,
-            "hide_url_row": False,
+            "hide_url_row": False, "startup_signal": True,
             "selfvoice_voice": "",
             "selfvoice_rate": 0, "selfvoice_pitch": 0, "selfvoice_volume": 100,
         }

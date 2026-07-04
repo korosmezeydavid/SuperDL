@@ -13,6 +13,27 @@ import wx
 from . import superstream as SS
 
 
+HELP = """SUPER STREAM – ÉLŐ MULTISTREAM
+
+MIRE VALÓ
+Élő adás EGYSZERRE több platformra (pl. YouTube, Facebook, TikTok) a saját
+stream-kulcsoddal.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. Adj meg egy állóképet (háttér) és egy hangforrást (mikrofon vagy hang).
+2. Adj hozzá legalább egy ADÁSCÉLT: a platform szerver-URL-je és a saját
+   stream-kulcsod. Több célt is hozzáadhatsz.
+3. „Indítás” – az adás egyszerre megy minden megadott célra.
+4. „Leállítás” – befejezi az adást.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Tab / Shift+Tab – mozgás.  Enter vagy Szóköz – gomb.
+
+TIPP
+A stream-kulcs titkos – ne oszd meg senkivel. Minden platformnál a saját
+élő-adás beállításainál találod."""
+
+
 class SuperStreamFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Super Stream (élő multistream)",
@@ -25,7 +46,19 @@ class SuperStreamFrame(wx.Frame):
         self.SetStatusText("Adj meg állóképet, hangforrást és legalább egy "
                            "adáscélt, majd Indítás.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
         wx.CallAfter(self._load_mics)
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            try:
+                from superdl.helpdialog import show_help
+                show_help(self, "Super Stream – élő multistream", HELP)
+            except Exception:
+                wx.MessageBox(HELP, "Súgó – Super Stream",
+                              wx.OK | wx.ICON_INFORMATION, self)
+        else:
+            e.Skip()
 
     # ---- felépítés ----------------------------------------------------
 

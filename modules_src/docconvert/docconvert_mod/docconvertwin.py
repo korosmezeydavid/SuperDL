@@ -14,6 +14,34 @@ from . import docconvert as DC          # a converter-logika a MODULBAN van
 from superdl import extratools          # megosztott segédek a Core csomagjából
 from superdl import ocr
 
+HELP = """DOKUMENTUM-KONVERTER
+
+MIRE VALÓ
+Dokumentumok és képek átalakítása más formátumba (TXT, DOCX, EPUB, PDF, HTML,
+RTF, ODT, Markdown, FB2…), régi kódlapok javítása, és képből szöveg kiolvasása
+(OCR). Teljesen billentyűzetről kezelhető.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. „Fájl betöltése" gomb (Tab-bal ráállsz, Enter). Válaszd ki a dokumentumot
+   vagy képet – a program bemondja, mit töltött be.
+2. Tab-bal a „Kimeneti formátum" listára, nyilakkal válaszd, mibe alakítsa
+   (pl. TXT, DOCX, EPUB, PDF).
+3. TXT-nél a „Bemeneti kódolás" és „Kimeneti kódolás" listával állítható a
+   kódlap. Régi magyar szövegnél hagyd a bemenetet „Automatikus felismerés"-en
+   (a CP852-t és a CWI-2-t is felismeri).
+4. „Konvertálás" gomb – a végén a program bemondja, hova mentette.
+Képnél: OCR-rel kiolvassa a szöveget; az OCR-motort a listából választhatod.
+
+GYORSBILLENTYŰK
+F1 – ez a súgó.  Tab / Shift+Tab – mozgás a vezérlők közt.  Szóköz vagy Enter –
+gomb megnyomása.  Fel/le nyíl – választás a listákban.
+
+TIPPEK
+- Ha egy régi magyar szöveg „kacatosan" jön át, a bemeneti kódolásnál válaszd
+  kézzel a „Magyar DOS (CP852)" vagy a „Magyar CWI-2" beállítást.
+- A gazdag formátumokhoz (RTF/ODT/MD, MOBI) a program szükség szerint letölti a
+  Pandoc/Calibre segédet – ezt egyszer engedélyezned kell."""
+
 WILDCARD = (
     "Minden támogatott|*.txt;*.docx;*.epub;*.pdf;*.html;*.htm;*.rtf;*.odt;"
     "*.md;*.markdown;*.fb2;*.doc;*.mobi;*.azw3;"
@@ -36,8 +64,23 @@ class DocConvertFrame(wx.Frame):
         self.CreateStatusBar()
         self._announce("Tölts be egy dokumentumot vagy képet, válaszd ki a "
                        "kimeneti formátumot, és konvertálom. Képnél OCR-rel "
-                       "olvasom ki a szöveget.")
+                       "olvasom ki a szöveget. Súgó: F1.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            self._help()
+        else:
+            e.Skip()
+
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "Dokumentum-konverter", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Dokumentum-konverter",
+                          wx.OK | wx.ICON_INFORMATION, self)
 
     def _build(self):
         p = wx.Panel(self)
@@ -64,15 +107,19 @@ class DocConvertFrame(wx.Frame):
 
         g.Add(wx.StaticText(p, label="Kimeneti &kódolás (TXT-nél):"), 0,
               wx.ALIGN_CENTER_VERTICAL)
-        self.enc_ch = wx.Choice(p, choices=[n for n, _ in DC.ENCODINGS],
+        self.enc_ch = wx.Choice(p, choices=[n for n, _ in DC.OUT_ENCODINGS],
                                 name="Kimeneti kódolás")
-        self.enc_ch.SetSelection(0)
+        self.enc_ch.SetSelection(0)      # UTF-8 (az OUT_ENCODINGS első eleme)
         g.Add(self.enc_ch, 0, wx.EXPAND)
 
         g.Add(wx.StaticText(p, label="Bemeneti kó&dolás (TXT-nél):"), 0,
               wx.ALIGN_CENTER_VERTICAL)
+        # a bemeneti lista: „Automatikus felismerés" + a KONKRÉT kódlapok (a cwi2
+        # is, ami DEKÓDOLHATÓ). Az ENCODINGS[0] maga az auto, ezért azt kihagyjuk,
+        # nehogy kétszer szerepeljen.
         self.in_enc_ch = wx.Choice(
-            p, choices=["Automatikus felismerés"] + [n for n, _ in DC.ENCODINGS],
+            p, choices=["Automatikus felismerés"]
+            + [n for n, _ in DC.ENCODINGS[1:]],
             name="Bemeneti kódolás")
         self.in_enc_ch.SetSelection(0)
         g.Add(self.in_enc_ch, 0, wx.EXPAND)
@@ -149,11 +196,11 @@ class DocConvertFrame(wx.Frame):
         return DC.OUT_FORMATS[self.fmt_ch.GetSelection()][1]
 
     def _out_encoding(self) -> str:
-        return DC.ENCODINGS[self.enc_ch.GetSelection()][1]
+        return DC.OUT_ENCODINGS[self.enc_ch.GetSelection()][1]
 
     def _in_encoding(self):
         i = self.in_enc_ch.GetSelection()
-        return None if i <= 0 else DC.ENCODINGS[i - 1][1]
+        return None if i <= 0 else DC.ENCODINGS[i][1]   # i=1 → ENCODINGS[1]=utf-8
 
     def _ocr_engine(self) -> str:
         i = self.ocr_ch.GetSelection()

@@ -19,6 +19,30 @@ DETAILS = [("Rövid (egy mondat / jelenet)", "short"),
            ("Részletes (egy-két mondat / jelenet)", "detailed")]
 
 
+HELP = """AI HANGALÁMONDÁS VIDEÓHOZ (audio description)
+
+MIRE VALÓ
+A videó KÉPI tartalmát AI leírja, hanggá alakítja és beleszövi a videóba – így
+vakon is „nézhető". Az eredeti hang a leírás alatt halkul. A saját AI-kulcsoddal
+megy.
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. „Videó betöltése" gomb – válaszd ki a videót. A program bemondja a hosszát.
+2. Tab-bal a „Hang" listára: beépített magyar (eSpeak, internet nélkül) vagy Edge
+   neurális magyar (szebb, internet kell).
+3. „Részletesség": rövid (1 mondat/jelenet) vagy részletes.
+4. „Jelenetek és költség megbecslése" gomb – megmondja, hány AI-hívás lesz és kb.
+   mennyibe kerül (a saját kulcsodon). Felolvasva is.
+5. „Hangalámondás készítése" gomb – elkészíti; a végén bemondja, hova mentette.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Tab / Shift+Tab – mozgás.  Enter vagy Szóköz – gomb.  Fel/le – lista.
+
+TIPPEK
+- Előbb állítsd be az AI-kulcsot a fő ablak AI menü → AI-beállítások pontjában.
+- A becslés INGYENES; a tényleges készítés használja a kulcsot (fizetős lehet)."""
+
+
 class VideoDescribeFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – AI hangalámondás videóhoz",
@@ -31,9 +55,24 @@ class VideoDescribeFrame(wx.Frame):
         self._build()
         self.CreateStatusBar()
         self._announce("Tölts be egy videót. Az AI leírja a képi tartalmát, és "
-                       "hanggal beleszövi – így vakon is nézhető lesz.")
+                       "hanggal beleszövi – így vakon is nézhető lesz. Súgó: F1.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
         self._check_ai()
+
+    def _on_help_key(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            self._help()
+        else:
+            e.Skip()
+
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "AI hangalámondás", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – AI hangalámondás",
+                          wx.OK | wx.ICON_INFORMATION, self)
 
     def _build(self):
         p = wx.Panel(self)

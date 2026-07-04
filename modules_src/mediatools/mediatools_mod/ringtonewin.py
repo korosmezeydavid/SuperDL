@@ -18,6 +18,26 @@ AUDIO_WILDCARD = ("Hang (*.mp3;*.m4a;*.wav;*.flac;*.ogg;*.opus;*.aac)|"
 SAVE_FORMATS = [("iPhone csengőhang (.m4r)", "m4r"), ("MP3", "mp3")]
 
 
+HELP = """IPHONE CSENGŐHANG-KÉSZÍTŐ
+
+MIRE VALÓ
+Csengőhang készítése egy zene részletéből (iPhone-ra .m4r, vagy MP3).
+
+LÉPÉSRŐL LÉPÉSRE (vakon is)
+1. „Zene kiválasztása" gomb – válaszd ki a zenét.
+2. SZÓKÖZ: lejátszás/megállás. Állítsd meg ott, ahol a csengőhang KEZDŐDJÖN –
+   innen indul a részlet.
+3. A hosszt a „Vég − 1 mp" / „Vég + 1 mp" gombokkal állítod.
+4. „Részlet meghallgatása" – meghallgathatod a kijelölt szakaszt.
+5. „Csengőhang mentése" – elmenti; a végén bemondja, hova.
+
+GYORSBILLENTYŰK
+F1 – súgó.  Szóköz – lejátszás/megállás.  Bal/jobb nyíl – finom léptetés.
+
+TIPP
+iPhone-ra .m4r kell – a program azt is készít."""
+
+
 class RingtoneFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – iPhone csengőhang-készítő",
@@ -263,7 +283,18 @@ class RingtoneFrame(wx.Frame):
 
     # ---- billentyű + zárás --------------------------------------------
 
+    def _help(self):
+        try:
+            from superdl.helpdialog import show_help
+            show_help(self, "iPhone csengőhang-készítő", HELP)
+        except Exception:
+            wx.MessageBox(HELP, "Súgó – Csengőhang-készítő",
+                          wx.OK | wx.ICON_INFORMATION, self)
+
     def _on_char_hook(self, e):
+        if e.GetKeyCode() == wx.WXK_F1:
+            self._help()
+            return
         focus = wx.Window.FindFocus()
         code = e.GetKeyCode()
         if isinstance(focus, wx.TextCtrl):
