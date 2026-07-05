@@ -23,6 +23,7 @@ Időzítéshez töltsd ki az Időzítés mezőt (pl. 03:00 vagy +2h).
 """
 
 import json
+import os
 import sys
 import threading
 import time
