@@ -254,18 +254,28 @@ class Converter:
             self._emit_status(i, job)
             return
 
-        for line in self._proc.stdout:
+        # SORONKÉNTI olvasás (readline) – így a haladás VALÓS IDŐBEN jön, nem
+        # ragad be a `for line in stdout` előre-pufferelésébe (emiatt nem látszott
+        # a százalék). Közben az ffmpeg NEM-progress sorait (log/figyelmeztetés/
+        # hiba) elmentjük, hogy hibánál MEGMUTATHASSUK a valódi okot (eddig néma volt).
+        import collections
+        tail = collections.deque(maxlen=25)
+        for line in iter(self._proc.stdout.readline, ""):
             if self._stop.is_set():
                 break
             line = line.strip()
-            if line.startswith("out_time_ms=") and dur > 0:
-                try:
-                    ms = int(line.split("=", 1)[1])
-                    job.progress = min(1.0, (ms / 1_000_000) / dur)
-                    if self.on_progress:
-                        self.on_progress(i, job.progress)
-                except (ValueError, ZeroDivisionError):
-                    pass
+            key = line.split("=", 1)[0]
+            if "=" in line and " " not in key and key:
+                if key == "out_time_ms" and dur > 0:      # progress kulcs=érték
+                    try:
+                        ms = int(line.split("=", 1)[1])
+                        job.progress = min(1.0, (ms / 1_000_000) / dur)
+                        if self.on_progress:
+                            self.on_progress(i, job.progress)
+                    except (ValueError, ZeroDivisionError):
+                        pass
+            elif line:                                    # ffmpeg-log/figyelmeztetés/hiba
+                tail.append(line)
         rc = self._proc.wait()
 
         if self._stop.is_set():
@@ -281,7 +291,10 @@ class Converter:
             self.done += 1
         else:
             job.status = "hiba"
-            job.error = f"ffmpeg hibakód {rc}"
+            detail = "\n".join(tail).strip()
+            job.error = (f"ffmpeg hibakód {rc}"
+                         + (f":\n{detail}" if detail else
+                            " (nincs részletes üzenet)."))
             self.failed += 1
         self._emit_status(i, job)
 

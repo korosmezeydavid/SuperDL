@@ -132,7 +132,48 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-05 · dolgozott: Claude (3.29.4 KIADVA)
+**Utolsó frissítés:** 2026-07-06 · dolgozott: Claude (3.29.5 kódkész, kiadásra vár)
+
+**3.29.5 KÓDKÉSZ – PUBLIKÁLÁSRA VÁR (Core 3.29.5 + konyvek 1.0.2 + mediatools 1.4.3 +
+docconvert 1.1.3).** Több user-jelzés javítása (create maxima, tesztelve); modul-zipek +
+modules.json KÉSZ (SHA-k egyeznek); a Core-build a „publikálás"-ra vár. FONTOS: Laci
+CWI-mintája MÉG NEM ÉRKEZETT MEG — a docconvert CWI-2 tábla finomhangolása RÁ VÁR; a user:
+„ha nem kapom meg holnap estig [2026-07-07], akkor publikálunk, de erről majd szólok" →
+PUBLIKÁLÁS CSAK a user kifejezett jelére. Az új batch tételei:
+- **KÖTEGELT KONVERTÁLÓ (Maxi):** tünet — kb. jó méretű mp3 készül, de a konverzió „nem
+  ZÁRÓDIK LE", a fájlnak nincsenek adatai (bitráta/hossz), nem játszható. A tiszta
+  tesztfájl 0,3 mp alatt HIBÁTLANUL lefut nálam → nem univerzális kód-bug, hanem Maxi
+  konkrét videói. FIX (mediatools 1.4.3 `converter.py`/`convertwin.py`): (a) VALÓS IDEJŰ
+  százalék — `for line in stdout` helyett `iter(readline, "")` (eddig a puffer benyelte a
+  progresst); (b) az ffmpeg log-sorait `deque(maxlen=25)`-be gyűjtjük, HIBÁNÁL a valódi
+  üzenet megjelenik (bejelentés első sora + `_finished` MessageBox a hibás fájlok teljes
+  ffmpeg-hibájával) — eddig NÉMA volt. Így Maxi következő tesztje MEGMUTATJA a pontos okot.
+- **„CSAK HANG" ALAPBÓL (Maxi):** a főablaki „Csak hang" pipa eddig nem maradt meg
+  indítások közt. FIX (Core): `audio_only` beállítás (default False); `_apply_settings`
+  visszaállítja a pipát, `_save_settings` menti, és a pipa `EVT_CHECKBOX`-ra AZONNAL ment
+  → a következő indításkor ugyanúgy jön vissza. (A „Csak hang" SZÁNDÉKOSAN a főablakon
+  marad, nem a Beállításokban — a settingsdialog dokumentációja is ezt írja.)
+- **AI-KULCS ELSŐ MEZŐ (Dorina):** az NVDA a Beállítások AI-fülén a LEGELSŐ kulcs-mezőnél
+  nem olvasta a címkét (a mező elé eső gomb miatt), mert a `_row` a StaticTextet a ctrl
+  UTÁN hozza létre → az akadálymentességi fában a mező MÖGÉ került. FIX (Core
+  `settingsdialog._row`): `lbl.MoveBeforeInTabOrder(ctrl)` → minden mező (az első is) a
+  SAJÁT címkéjét kapja.
+- **DOCCONVERT CWI-CÍMKÉK (docconvert 1.1.3):** tisztább legördülő-címkék —
+  „Magyar CWI / CWI-2 (régi DOS, 437-alapú)" és „Régi DOS (CP437, nem magyar)". (A CWI-2
+  dekódoló TÁBLA finomítása Laci mintájára vár — MÉG NEM.)
+- **NAPI INFÓ nem indult (Ctrl+Shift+W és menü sem):** GYÖKÉR — a szervezés
+  `open_dayinfo` a `core.frame`-et hívta, de a CoreContext-en NINCS `frame` (csak
+  `main_frame`) → AttributeError → az ablak sose nyílt meg. FIX: `CoreContext.frame`
+  ALIAS-property (a main_frame-et adja) — így a MÁR KIADOTT szervezés 1.2.2 is működik
+  (Core-only fix, nincs szervezés-rebuild). (A „startup üdvözlés sem szól" rész: ha a
+  user bekapcsolta a Teljes némítást, az SZÁNDÉKOS; egyébként külön ág — user-visszajelzésre vár.)
+- **KÖNYVOLVASÓ „szaggat" (Szabó László):** az én 3.29.4-es mondatvég-fixem
+  mellékhatása — a 140+ karakteres mondatot több darabra bontotta, a darabok közti
+  szünet a mondat KÖZEPÉRE esett. FIX: (a) konyvek `readengine.CHUNK_LIMIT` 140→400 (a
+  mondatok túlnyomó része EGY darab → folyamatos); (b) Core `audiobook._wrap_long` most
+  TAGMONDAT-HATÁRON (vessző/pontosvessző/kettőspont/gondolatjel) tör, nem akárhol → a
+  ritka >400 mondatnál is a vesszőhöz esik a szünet. Tesztelve: 239 kar.→1 darab; 639
+  kar.→2 darab vesszőnél, minden szó megvan.
 
 **3.29.4 KIADVA ✅ (2026-07-05).** Core `v3.29.4` „Latest” (4 asset, stabil linkek
 200); 9 modul-release fent; `modules.json` élő a `main`-en; forrás push `77f23c4`;

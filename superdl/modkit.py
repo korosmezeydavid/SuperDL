@@ -203,6 +203,12 @@ class CoreContext:
     def main_frame(self):
         return getattr(self._host, "main_frame", None)
 
+    # néhány modul (pl. szervezés Napi infó) `core.frame`-et hív – alias, hogy ne
+    # dobjon AttributeError-t (ez volt a „Napi infó nem indul" gyökér-oka)
+    @property
+    def frame(self):
+        return self.main_frame
+
     def add_menu(self, title: str):
         return self._host.add_menu(title)
 

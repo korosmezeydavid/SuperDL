@@ -550,6 +550,9 @@ class MainFrame(wx.Frame):
         btn_dir = wx.Button(sb, label="Tall&ózás...")
         self.audio_chk = wx.CheckBox(sb, label="Csak &hang")
         self.audio_chk.SetName("Médiaoldalról csak a hangsáv letöltése")
+        # a pipa állapotát AZONNAL megjegyezzük, így a következő indításkor
+        # ugyanígy jön vissza (nem kell újra bepipálni) – Maxi kérése
+        self.audio_chk.Bind(wx.EVT_CHECKBOX, lambda e: self._save_settings())
         btn_settings = wx.Button(sb, label="&Beállítások…")
         btn_settings.Bind(wx.EVT_BUTTON, self._on_settings)
         box.Add(lbl_dir, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
@@ -597,6 +600,7 @@ class MainFrame(wx.Frame):
             "connections": 8, "parallel": 3, "limit": "",
             "clipboard": False, "notify": True, "seed_ratio": "1.0",
             "tts": False, "update_last_check": "", "audio_format": "MP3",
+            "audio_only": False,
             "cookies": "Nincs", "cookies_file": "", "playlist_folders": True,
             "sounds": True, "city": "Budapest", "voice_mode": "auto",
             "video_format": "MP4", "audio_bitrate": "192",
@@ -617,6 +621,9 @@ class MainFrame(wx.Frame):
         # szótárban van, amit a „Beállítások…” ablak szerkeszt
         s = self.settings
         self.dir_entry.SetValue(s["out_dir"])
+        # „Csak hang" ALAPBÓL: induláskor a mentett állapotot állítjuk vissza,
+        # így nem kell minden indításkor újra bepipálni (Maxi jelezte)
+        self.audio_chk.SetValue(bool(s.get("audio_only", False)))
         self.mi_tts.Enable(self.speaker.available)
         self.mi_tts.Check(bool(s.get("tts")) and self.speaker.available)
         self.mi_sounds.Check(bool(s.get("sounds", True)))
@@ -638,6 +645,7 @@ class MainFrame(wx.Frame):
         self.settings["out_dir"] = self.dir_entry.GetValue()
         self.settings["tts"] = self.mi_tts.IsChecked()
         self.settings["sounds"] = self.mi_sounds.IsChecked()
+        self.settings["audio_only"] = self.audio_chk.GetValue()   # „csak hang" megjegyzése
         try:
             SETTINGS_FILE.write_text(json.dumps(self.settings, indent=2))
         except OSError:

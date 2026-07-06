@@ -36,8 +36,11 @@ def _co_uninit():
 
 
 READ_DIR = Path.home() / ".superdl" / "read"
-CHUNK_LIMIT = 140          # egy felolvasott darab max. hossza karakterben
-                           # (kicsi: mondatszintű ugrás és pontos könyvjelző)
+CHUNK_LIMIT = 400          # egy felolvasott darab max. hossza karakterben.
+                           # 140 volt, DE a 140+ karakteres mondat több darabra
+                           # tört → a darabok közti szünet a mondat KÖZEPÉN
+                           # „szaggatott" felolvasást adott (Szabó László). 400-nál
+                           # a mondatok túlnyomó része EGY darab → folyamatos.
 
 
 class ReadEngine:

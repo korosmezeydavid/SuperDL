@@ -301,7 +301,12 @@ class BatchConvertFrame(wx.Frame):
             self.list.SetItem(i, 1, job.status)
         if job.status in ("kész", "hiba"):
             n = self._converter.done + self._converter.failed
-            tag = "kész" if job.status == "kész" else f"HIBA: {job.error}"
+            # a bejelentésbe csak a hiba ELSŐ sora (a teljes ffmpeg-üzenet a
+            # végi részletező ablakba kerül – ne mondja fel a képernyőolvasó
+            # az egész naplót)
+            short = (job.error or "").splitlines()[0] if job.status == "hiba" \
+                else ""
+            tag = "kész" if job.status == "kész" else f"HIBA: {short}"
             self._announce(f"{n}/{total} – {Path(job.src).name}: {tag}")
             self.gauge.SetValue(int(n / total * 100))
 
@@ -329,8 +334,19 @@ class BatchConvertFrame(wx.Frame):
         msg = f"Kész: {done} sikeres, {failed} hibás."
         self._sv("convert", "error" if failed and not done else "done")
         self._announce(msg)
-        wx.MessageBox(msg, "Konvertálás befejezve",
-                      wx.OK | wx.ICON_INFORMATION, self)
+        if failed and self._converter:
+            # a hibás fájlok RÉSZLETES ffmpeg-üzenete – olvasható ablakban, hogy
+            # a felhasználó (és mi) lássuk a valódi okot (eddig néma volt)
+            errs = [f"• {Path(j.src).name}:\n{j.error}"
+                    for j in self._converter.jobs if j.status == "hiba"]
+            detail = "\n\n".join(errs[:4])
+            if len(errs) > 4:
+                detail += f"\n\n… és további {len(errs) - 4} hibás fájl."
+            wx.MessageBox(msg + "\n\nA hibák részletei:\n\n" + detail,
+                          "Konvertálás – hibák", wx.OK | wx.ICON_WARNING, self)
+        else:
+            wx.MessageBox(msg, "Konvertálás befejezve",
+                          wx.OK | wx.ICON_INFORMATION, self)
 
     # ---- egyéb --------------------------------------------------------
 

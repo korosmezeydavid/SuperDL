@@ -45,8 +45,8 @@ ENCODINGS = [("Automatikus felismerés", "auto"),
              ("Közép-európai (Windows-1250)", "cp1250"),
              ("Közép-európai (ISO-8859-2 / Latin-2)", "iso-8859-2"),
              ("Magyar DOS (CP852 / Latin-2)", "cp852"),
-             ("Magyar CWI-2 (régi DOS)", "cwi2"),
-             ("Régi DOS (CP437)", "cp437"),
+             ("Magyar CWI / CWI-2 (régi DOS, 437-alapú)", "cwi2"),
+             ("Régi DOS (CP437, nem magyar)", "cp437"),
              ("Nyugat-európai (Windows-1252)", "cp1252")]
 
 # KIMENETI kódlapok: csak amikbe KÓDOLNI is lehet. Az „auto" (felismerés) és a

@@ -57,6 +57,14 @@ class SettingsDialog(wx.Dialog):
             ctrl.SetName(name)
         elif label:
             ctrl.SetName(label.replace("&", "").rstrip(":"))
+        # A címke a vezérlő UTÁN jön létre (a ctrl-t kívülről kapjuk), ezért az
+        # akadálymentességi fában a mező MÖGÉ kerülne → az NVDA a LEGELSŐ mezőnél
+        # (ami előtt gomb áll) nem talál címkét (Dorina jelezte). Ezt előre hozzuk,
+        # így minden mező – az első is – a SAJÁT címkéjét kapja.
+        try:
+            lbl.MoveBeforeInTabOrder(ctrl)
+        except Exception:
+            pass
         r = wx.BoxSizer(wx.HORIZONTAL)
         r.Add(lbl, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
         r.Add(ctrl, 1, wx.ALIGN_CENTER_VERTICAL)

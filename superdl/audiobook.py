@@ -74,30 +74,33 @@ def clean_book(book):
     return nb
 
 
+_CLAUSE_SEPS = (", ", "; ", ": ", " – ", " — ", ") ")
+
+
 def _wrap_long(s: str, limit: int) -> list[str]:
     """Egy `limit`-nél HOSSZABB szöveg feldarabolása legfeljebb `limit` hosszú
-    részekre, lehetőleg SZÓHATÁRON – SEMMIT EL NEM DOBVA. A limitnél is hosszabb
-    egyetlen szót (pl. hosszú URL) keményen vágja. Ez váltja a régi, HIBÁS
-    `sent[:limit]` csonkolást, ami a hosszú mondatok végét elhagyta (a felolvasó
-    „lehagyta a mondatvégeket")."""
+    részekre, LEHETŐLEG TAGMONDAT-HATÁRON (vessző, pontosvessző, kettőspont,
+    gondolatjel), különben szóhatáron – SEMMIT EL NEM DOBVA. Így a darabok közti
+    (elkerülhetetlen) rövid szünet természetes helyre, a vesszőhöz esik, nem a
+    mondat közepére. A limitnél is hosszabb egyetlen szót (pl. URL) keményen vágja.
+    Ez váltja a régi, HIBÁS `sent[:limit]` csonkolást (ami a mondatvégeket
+    elhagyta), a szaggatottság elkerülésével."""
     out: list[str] = []
-    piece = ""
-    for w in s.split():
-        while len(w) > limit:                 # egyetlen, limitnél hosszabb szó
-            if piece:
-                out.append(piece)
-                piece = ""
-            out.append(w[:limit])
-            w = w[limit:]
-        if not piece:
-            piece = w
-        elif len(piece) + 1 + len(w) <= limit:
-            piece += " " + w
-        else:
-            out.append(piece)
-            piece = w
-    if piece:
-        out.append(piece)
+    s = s.strip()
+    while len(s) > limit:
+        window = s[:limit]
+        cut = -1
+        for sep in _CLAUSE_SEPS:                 # utolsó tagmondat-határ a limiten belül
+            p = window.rfind(sep)
+            if p >= 0:
+                cut = max(cut, p + len(sep.rstrip()))   # a vessző/jel UTÁN vágunk
+        if cut < limit // 2:                     # nincs jó tagmondat-határ a 2. felében
+            sp = window.rfind(" ")
+            cut = sp if sp > 0 else limit        # szóhatár, végső esetben kemény vágás
+        out.append(s[:cut].strip())
+        s = s[cut:].strip()
+    if s:
+        out.append(s)
     return out
 
 
