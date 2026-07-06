@@ -132,9 +132,21 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-06 · dolgozott: Claude (3.29.5 kódkész, kiadásra vár)
+**Utolsó frissítés:** 2026-07-06 · dolgozott: Claude (3.29.5 KIADVA ✅)
 
-**3.29.5 KÓDKÉSZ – PUBLIKÁLÁSRA VÁR (Core 3.29.5 + konyvek 1.0.2 + mediatools 1.4.3 +
+**3.29.5 KIADVA ✅ (2026-07-06).** Core `v3.29.5` „Latest" (4 asset: SuperDL.exe,
+SuperDL-cli.exe, SuperDL-Setup-3.29.5.exe, version-nélküli SuperDL-Setup.exe) + 3 modul-tag
+(mod-konyvek-1.0.2, mod-mediatools-1.4.3, mod-docconvert-1.1.3) + modules.json a main-en +
+forrás push (HEAD 2796f5b). Kulcs-szken TISZTA (forrás+zipek+binárisok, 2 kulcs, egy sem
+található). yt-dlp 2026.7.4. Build-sorrend: onedir→ISCC(3.29.5)→CLI→onefile GUI (utolsó).
+FONTOS a következő váltónak: a modul-release-eket a Core UTÁN létrehozva a GitHub az egyik
+modult jelölte „Latest"-nek → a `releases/latest/download/…` 404 lett; JAVÍTVA
+`gh release edit v3.29.5 --latest` + a modulok `--latest=false`. TANULSÁG: a Core-release-t
+utoljára hozd létre, VAGY a végén tedd vissza kifejezetten latest-re. Laci CWI-mintája MÉG
+NEM érkezett → a docconvert CWI-2 dekódoló TÁBLA finomítása továbbra is RÁ VÁR (a 1.1.3 csak
+a címkéket tisztította). Tartalom (create maxima batch, tesztelve):
+
+**(archív, korábbi állapot) 3.29.5 KÓDKÉSZ (Core 3.29.5 + konyvek 1.0.2 + mediatools 1.4.3 +
 docconvert 1.1.3).** Több user-jelzés javítása (create maxima, tesztelve); modul-zipek +
 modules.json KÉSZ (SHA-k egyeznek); a Core-build a „publikálás"-ra vár. FONTOS: Laci
 CWI-mintája MÉG NEM ÉRKEZETT MEG — a docconvert CWI-2 tábla finomhangolása RÁ VÁR; a user:
