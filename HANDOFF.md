@@ -132,9 +132,34 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-06 · dolgozott: Claude (3.29.5 KIADVA ✅)
+**Utolsó frissítés:** 2026-07-06 · dolgozott: Claude (3.29.6 KIADVA ✅)
 
-**3.29.5 KIADVA ✅ (2026-07-06).** Core `v3.29.5` „Latest" (4 asset: SuperDL.exe,
+**3.29.6 KIADVA ✅ (2026-07-06).** Core `v3.29.6` „Latest" (4 asset) + `mod-docconvert-1.1.4`
++ modules.json a main-en + forrás push (HEAD 0e714d1). Kulcs-szken TISZTA (forrás+zip+binárisok).
+yt-dlp 2026.7.4. KIADÁS-SORREND TANULSÁG ALKALMAZVA: a MODUL-release-t ELŐBB hoztam létre,
+a Core-t UTOLJÁRA `--latest`-tel → nem volt latest-csapda, minden stabil link RÖGTÖN 200
+(nem kellett utólag `gh release edit`). Két javítás:
+- **BEÁLLÍTÁS-FÜLEK CÍMKE-ELCSÚSZÁSA (Dávid jelezte, akadálymentesség):** a képernyőolvasó a
+  mezők neveit EGGYEL elcsúsztatva mondta (első mező névtelen, a többi az ELŐZŐ címkéjét — pl.
+  a formátum-listára „sebességkorlát"). GYÖKÉR: a StaticText a vezérlő UTÁN jön létre, a natív
+  MSAA a Z-sorrendben előtte állót veszi névnek; a 3.29.5-ös `MoveBeforeInTabOrder` a wx 4.2.5-ben
+  NEM rendezi át a natív MSAA-sorrendet, csak a wx-belső listát → nem oldotta meg. FIX
+  (`settingsdialog.py`): új `_NamedAccessible(wx.Accessible)` + minden vezérlőn `ctrl.SetAccessible(...)`
+  a HELYES névvel (csak a nevet írja felül, szerep/érték/állapot marad natív; GC-védelem:
+  `self._accessibles`). A `_row` mostantól példány-metódus; `MoveBeforeInTabOrder` tartaléknak marad.
+  VERIFIKÁLVA: fejnélküli példányosítás → mind a 8 vizsgált mező a SAJÁT címkéjét adja. VASSZABÁLY:
+  natív wx-vezérlő nevét NE csak SetName/MoveBeforeInTabOrder-rel add meg (nem hat az MSAA-ra) →
+  wx.Accessible.SetAccessible a megbízható. (Ugyanez a minta kell máshol is, ha „csúszik a címke".)
+- **docconvert 1.1.4 — CWI KETTŐS KÓDOLÁS (Turai László mintája: „Ráadó és Anyicska"):** a fájl
+  ÉRVÉNYES UTF-8, de valójában CWI→CP1250→UTF-8 mojibake (Á→Ź, Ó→•, É→U+0090) → auto rögtön
+  visszaadta a kacatot, kézi CWI a táblát UTF-8 többájtokra futtatta. FIX: `_has_c1_controls`
+  (C1-vezérlő = biztos mojibake-jel, nulla hamis pozitív) → `_undouble_cwi` (CP1250-vissza →
+  CWI-2 tábla) + `read_cwi`; `_auto_decode` csak TISZTA UTF-8-nál short-circuitel. A CWI-2 tábla
+  VÉGIG helyes volt — a gond a kettős kódolás. Verifikálva: mojibake auto+kézi = „RÁADÓ ÉS
+  ANYICSKA", nyers egybájtos CWI nem regresszált, tiszta UTF-8 magyar/angol érintetlen. Az 1.1.3
+  új CWI-címkéje oldotta a „nem tudtam kiválasztani" panaszt.
+
+**Korábbi: 3.29.5 KIADVA ✅ (2026-07-06).** Core `v3.29.5` „Latest" (4 asset: SuperDL.exe,
 SuperDL-cli.exe, SuperDL-Setup-3.29.5.exe, version-nélküli SuperDL-Setup.exe) + 3 modul-tag
 (mod-konyvek-1.0.2, mod-mediatools-1.4.3, mod-docconvert-1.1.3) + modules.json a main-en +
 forrás push (HEAD 2796f5b). Kulcs-szken TISZTA (forrás+zipek+binárisok, 2 kulcs, egy sem
