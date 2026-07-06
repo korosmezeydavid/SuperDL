@@ -81,6 +81,46 @@ def decode_cwi2(data: bytes) -> str:
     """A régi magyar CWI-2 DOS-kódlapú bájtok Unicode-ra fejtése."""
     return "".join(_CWI2_TABLE[b] for b in data)
 
+
+# --- KETTŐS KÓDOLÁS (CWI→CP1250→UTF-8 „mojibake") visszafejtése ----------
+# Sok magyar Windows-eszköz (jegyzettömb, levelező) a régi CWI/DOS fájlt tévesen
+# CP1250-ként OLVASSA, majd UTF-8-ként MENTI/KÜLDI. Az eredmény ÉRVÉNYES UTF-8,
+# de a tartalma kacat (Á→Ź, Ó→•, É→U+0090…). Mivel a torzítás egy-az-egyben
+# VISSZAFORDÍTHATÓ, helyre tudjuk állítani (Turai László mintája, 2026-07-06).
+_CP1250_REV: dict[str, int] = {}
+for _rb in range(256):
+    try:
+        _CP1250_REV[bytes([_rb]).decode("cp1250")] = _rb
+    except UnicodeDecodeError:
+        pass
+for _rb in range(0x80, 0xA0):            # az 5 undefined C1-slot önmagára képezve
+    _CP1250_REV.setdefault(chr(_rb), _rb)
+
+
+def _has_c1_controls(text: str) -> bool:
+    """A C1 vezérlők (U+0080..U+009F) valós szövegben SOHA nem fordulnak elő; a
+    jelenlétük a kettős kódolás (mojibake) erős, hamis-pozitívtól mentes jele."""
+    return any(0x80 <= ord(c) <= 0x9F for c in text)
+
+
+def _undouble_cwi(uni: str) -> str:
+    """A CWI→CP1250→UTF-8 mojibake visszafejtése: a CP1250-értelmezést
+    visszabájtozzuk, majd a HELYES CWI-2 táblával dekódoljuk."""
+    raw = bytes(_CP1250_REV.get(ch, ord(ch) & 0xFF) for ch in uni)
+    return decode_cwi2(raw)
+
+
+def read_cwi(data: bytes) -> str:
+    """CWI-szöveg beolvasása AKÁR nyers egybájtos CWI, AKÁR CWI→CP1250→UTF-8
+    kettős kódolás formában érkezik (a kézi „CWI" választás is ezt hívja)."""
+    try:
+        uni = data.decode("utf-8")
+        if _has_c1_controls(uni):       # valójában kettősen kódolt CWI
+            return _undouble_cwi(uni)
+    except UnicodeDecodeError:
+        pass
+    return decode_cwi2(data)             # valódi egybájtos CWI
+
 # bemeneti kiterjesztések (a fájlválasztóhoz)
 IN_EXTS = (".txt", ".docx", ".epub", ".pdf", ".html", ".htm", ".rtf", ".odt",
            ".md", ".markdown", ".fb2", ".doc", ".mobi", ".azw3"
@@ -132,23 +172,29 @@ def _decode_score(text: str) -> int:
 
 
 def _auto_decode(data: bytes) -> str:
-    """A bájtokat a legvalószínűbb kódlappal fejti meg: előbb szigorú UTF-8,
-    aztán a `_TRY_ENC` egybájtos jelöltek közül a LEGJOBB pontszámú."""
+    """A bájtokat a legvalószínűbb kódlappal fejti meg: előbb szigorú UTF-8
+    (ha tiszta), aztán a jelöltek közül a `_decode_score` szerinti LEGJOBB.
+    Kezeli a CWI→CP1250→UTF-8 kettős kódolást is (érvényes UTF-8, de kacat)."""
+    utf = None
     for enc in ("utf-8-sig", "utf-8"):
         try:
-            return data.decode(enc)
+            utf = data.decode(enc)
+            break
         except UnicodeDecodeError:
             pass
+    # tiszta UTF-8 (nincs gyanús C1-vezérlő) → kész, semmi regresszió a jó fájlokon
+    if utf is not None and not _has_c1_controls(utf):
+        return utf
+    if utf is not None:
+        # érvényes UTF-8, de C1-vezérlőkkel → valószínű kettős kódolás:
+        # az „ahogy van" UTF-8 vs. a visszafejtett CWI közül a jobb pontszámú nyer
+        candidates = [utf, _undouble_cwi(utf)]
+    else:
+        # nem UTF-8 → egybájtos jelöltek + a nyers CWI-2 tábla
+        candidates = [data.decode(e, errors="replace") for e in _TRY_ENC]
+        candidates.append(decode_cwi2(data))
     best_text, best_score = None, None
-    candidates = [(enc, None) for enc in _TRY_ENC] + [("cwi2", decode_cwi2)]
-    for enc, fn in candidates:
-        if fn is not None:
-            t = fn(data)
-        else:
-            try:
-                t = data.decode(enc)
-            except UnicodeDecodeError:
-                t = data.decode(enc, errors="replace")
+    for t in candidates:
         sc = _decode_score(t)
         if best_score is None or sc > best_score:
             best_text, best_score = t, sc
@@ -159,7 +205,7 @@ def _auto_decode(data: bytes) -> str:
 def _read_txt(path: Path, in_encoding):
     data = path.read_bytes()
     if in_encoding and in_encoding != "auto":
-        text = decode_cwi2(data) if in_encoding == "cwi2" \
+        text = read_cwi(data) if in_encoding == "cwi2" \
             else data.decode(in_encoding, errors="replace")
     else:
         text = _auto_decode(data)

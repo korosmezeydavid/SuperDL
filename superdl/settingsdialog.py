@@ -21,6 +21,22 @@ AI_PROVIDERS = [("OpenAI (GPT)", "openai"), ("Google Gemini", "gemini"),
                 ("Anthropic (Claude)", "anthropic"), ("xAI (Grok)", "xai")]
 
 
+class _NamedAccessible(wx.Accessible):
+    """A vezérlő akadálymentességi NEVÉT KÖZVETLENÜL adja meg (a képernyőolvasó
+    ezt olvassa) – függetlenül a natív „előtte álló StaticText a név" heurisztikától
+    és a Z-sorrendtől. Csak a nevet írja felül; a szerep/érték/állapot a natív
+    vezérlőé marad (a többi metódus alapból ACC_NOT_IMPLEMENTED-et ad vissza).
+    Ez javítja a fülek eggyel-elcsúszott címkéit (az első mező névtelen volt, a
+    többi az ELŐZŐ mező címkéjét mondta be)."""
+
+    def __init__(self, name: str):
+        super().__init__()
+        self._name = name
+
+    def GetName(self, childId):
+        return (wx.ACC_OK, self._name)
+
+
 class SettingsDialog(wx.Dialog):
     def __init__(self, parent, settings: dict, ai_config: dict):
         super().__init__(parent, title="SuperDL – Beállítások", size=(620, 560))
@@ -28,6 +44,8 @@ class SettingsDialog(wx.Dialog):
         self.ai = dict(ai_config)
         self.result_settings = None
         self.result_ai = None
+        self._accessibles = []      # GC-védelem: a C++ oldal használja a nevet adó
+                                    # wx.Accessible objektumokat, tartsuk életben
 
         outer = wx.BoxSizer(wx.VERTICAL)
         self.nb = wx.Notebook(self)
@@ -50,21 +68,28 @@ class SettingsDialog(wx.Dialog):
 
     # ---- segéd: címke + vezérlő egy sorban ----------------------------
 
-    @staticmethod
-    def _row(panel, sizer, label, ctrl, name=""):
+    def _row(self, panel, sizer, label, ctrl, name=""):
         lbl = wx.StaticText(panel, label=label)
-        if name:
-            ctrl.SetName(name)
-        elif label:
-            ctrl.SetName(label.replace("&", "").rstrip(":"))
-        # A címke a vezérlő UTÁN jön létre (a ctrl-t kívülről kapjuk), ezért az
-        # akadálymentességi fában a mező MÖGÉ kerülne → az NVDA a LEGELSŐ mezőnél
-        # (ami előtt gomb áll) nem talál címkét (Dorina jelezte). Ezt előre hozzuk,
-        # így minden mező – az első is – a SAJÁT címkéjét kapja.
-        try:
-            lbl.MoveBeforeInTabOrder(ctrl)
-        except Exception:
-            pass
+        # a vezérlő címkéje (& és záró kettőspont nélkül)
+        acc_name = name or (label.replace("&", "").rstrip(":") if label else "")
+        if acc_name:
+            ctrl.SetName(acc_name)
+            # A GOND: a címke a vezérlő UTÁN jön létre, ezért a natív „a Z-sorrendben
+            # előtte álló StaticText a név" heurisztika EGGYEL ELCSÚSZIK – az első
+            # mező névtelen, a többi az ELŐZŐ mező címkéjét mondja (Dorina + a fülek
+            # elcsúszott címkéi). MEGOLDÁS: a nevet közvetlenül, wx.Accessible-lel
+            # adjuk meg – ez Z-sorrendtől függetlenül a HELYES nevet olvastatja fel.
+            try:
+                acc = _NamedAccessible(acc_name)
+                ctrl.SetAccessible(acc)
+                self._accessibles.append(acc)      # ne GC-zze el a Python
+            except Exception:
+                pass
+            # tartaléknak a tab-/Z-sorrendet is a címke elé rendezzük
+            try:
+                lbl.MoveBeforeInTabOrder(ctrl)
+            except Exception:
+                pass
         r = wx.BoxSizer(wx.HORIZONTAL)
         r.Add(lbl, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
         r.Add(ctrl, 1, wx.ALIGN_CENTER_VERTICAL)
