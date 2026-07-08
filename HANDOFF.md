@@ -134,6 +134,14 @@ nyers bájtként keresi a fájlokban.)
 
 **Utolsó frissítés:** 2026-07-06 · dolgozott: Claude (3.29.6 KIADVA ✅)
 
+**MAIN-EN, MÉG KI NEM ADVA (a köv. kiadás vigye):** `superdl_gui.py` top-szintű `import os`
+(commit ff9da50). A `_single_instance_mutex()` az `os.name`-et használta, de az `os` csak
+lokálisan, más függvényekben volt importálva → forrásból (`python superdl_gui.py`) NameError
+induláskor; a frozen exe futott (PyInstaller a `__main__`-be teszi az `os`-t), ezért a kiadott
+3.29.5/3.29.6 NEM érintett. Horváth Dorina Éva jelezte (PR #1, forkról, draft) — a main
+érintetlen volt, a PR-t NEM mergeltem, hanem az egy sort beírtam és a PR-t köszönettel lezártam.
+
+
 **3.29.6 KIADVA ✅ (2026-07-06).** Core `v3.29.6` „Latest" (4 asset) + `mod-docconvert-1.1.4`
 + modules.json a main-en + forrás push (HEAD 0e714d1). Kulcs-szken TISZTA (forrás+zip+binárisok).
 yt-dlp 2026.7.4. KIADÁS-SORREND TANULSÁG ALKALMAZVA: a MODUL-release-t ELŐBB hoztam létre,
