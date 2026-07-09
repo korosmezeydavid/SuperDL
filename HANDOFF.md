@@ -134,7 +134,11 @@ nyers bájtként keresi a fájlokban.)
 
 **Utolsó frissítés:** 2026-07-06 · dolgozott: Claude (3.29.6 KIADVA ✅)
 
-**MAIN-EN, MÉG KI NEM ADVA (a köv. kiadás vigye):** `superdl_gui.py` top-szintű `import os`
+**MAIN-EN, MÉG KI NEM ADVA (a köv. kiadás vigye):**
+(a) `superdl_gui.py` — új **Közreműködők (Credits)** menüpont a Súgó menüben (commit 383979c):
+akadálymentes felolvasható ablak (helpdialog) fejlesztő + Herman Tibor (audit) + Horváth Dorina
+Éva (hibajelentés+javítás) + tesztelő közösség. `MainFrame.CREDITS_TEXT` + `_on_credits`.
+(b) `superdl_gui.py` top-szintű `import os`
 (commit ff9da50). A `_single_instance_mutex()` az `os.name`-et használta, de az `os` csak
 lokálisan, más függvényekben volt importálva → forrásból (`python superdl_gui.py`) NameError
 induláskor; a frozen exe futott (PyInstaller a `__main__`-be teszi az `os`-t), ezért a kiadott
