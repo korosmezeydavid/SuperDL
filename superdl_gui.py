@@ -467,6 +467,9 @@ class MainFrame(wx.Frame):
         mi_support = m_help.Append(
             wx.ID_ANY, "Köszönet és &támogatás…",
             "A program ingyenes; önkéntes támogatás (sosem kötelező)")
+        mi_credits = m_help.Append(
+            wx.ID_ANY, "&Közreműködők (Credits)…",
+            "A programhoz hozzájárulók és köszönet a segítségért")
         mi_about = m_help.Append(wx.ID_ABOUT, "&Névjegy")
         mb.Append(m_help, "&Súgó")
 
@@ -511,6 +514,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_ai_video, mi_ai_vid)
         self.Bind(wx.EVT_MENU, lambda e: self._on_settings(page=3), mi_ai_set)
         self.Bind(wx.EVT_MENU, self._on_support, mi_support)
+        self.Bind(wx.EVT_MENU, self._on_credits, mi_credits)
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(0), mi_about)
 
     def _build_ui(self):
@@ -1476,6 +1480,41 @@ class MainFrame(wx.Frame):
         dlg = SupportDialog(self)
         dlg.ShowModal()
         dlg.Destroy()
+
+    CREDITS_TEXT = (
+        "SuperDL – Közreműködők és köszönet\n"
+        "==================================\n"
+        "\n"
+        "A SuperDL akadálymentes, vak-first szemlélettel készül. Ez a lista azoknak "
+        "állít emléket, akik a fejlesztést és a minőségét segítik.\n"
+        "\n"
+        "FEJLESZTŐ\n"
+        "  Kőrösmezey Dávid – ötlet, fejlesztés, kiadás.\n"
+        "\n"
+        "SZAKMAI ÁTVIZSGÁLÁS ÉS KÓD-AUDIT\n"
+        "  Herman Tibor – több körben részletes, kódszintű hibajelentés és teljes "
+        "körű, modulonkénti szakmai audit (architektúra, biztonság, "
+        "akadálymentesség, minőségbiztosítás). A visszajelzései sok konkrét "
+        "javítás alapját adták.\n"
+        "\n"
+        "HIBAJELENTÉS ÉS KÓDJAVÍTÁS\n"
+        "  Horváth Dorina Éva – akadálymentességi visszajelzés (beállításmezők "
+        "címkéi) és konkrét kódjavítás (a forrásból futtatás hibájának megoldása).\n"
+        "\n"
+        "KÖSZÖNET A TESZTELŐ KÖZÖSSÉGNEK\n"
+        "  A SuperDL levelezőlista tagjainak, akik türelmesen jeleznek, mintát "
+        "küldenek és kipróbálják az új változatokat – nélkületek nem lenne ilyen jó "
+        "a program. Külön köszönet mindenkinek, aki egy-egy hibát pontosan, "
+        "képernyőolvasóval leírva jelzett.\n"
+        "\n"
+        "Ha te is szívesen segítenél (hibajelentés, ötlet, tesztelés), írj a "
+        "levelezőlistára – minden visszajelzés számít.\n"
+    )
+
+    def _on_credits(self, event=None):
+        from superdl import helpdialog
+        helpdialog.show_help(self, "Közreműködők (Credits) – SuperDL",
+                             self.CREDITS_TEXT)
 
     # ---- AI: dokumentum összefoglaló / kérdezz ------------------------
 
