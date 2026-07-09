@@ -132,7 +132,32 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-06 · dolgozott: Claude (3.29.6 KIADVA ✅)
+**Utolsó frissítés:** 2026-07-09 · dolgozott: Claude (3.29.6 KIADVA ✅ + Credits menü main-en)
+
+**➡️ KÖVETKEZŐ MUNKAMENET — 2026-07-11 (SZOMBAT): HERMAN TIBOR AUDIT „GYORS GYŐZELMEK".**
+A felhasználó kérése: „most más a dolgunk, majd szombaton — ezt tedd be, hogy következőnek
+ezeket oldjuk meg." Herman Tibor teljes körű szakmai auditot küldött a 3.29.6-ról (statikus,
+publikus forrásból; a fájl: `C:\Users\msn\Downloads\SuperDL 3.29.6 teljeskörű szakmai audit.txt`).
+Az átnézés megvolt; a KIVÁLASZTOTT, gyors haszonnal járó tételek, prioritás szerint (create maxima
+kell hozzájuk, a felhasználó szombaton indítja):
+  1. **Diagnosztikai csomag / „Hibajelentés vágólapra" menüpont** — verzió, modulok, Windows,
+     telepítés típusa, utolsó log-sorok; TITKOK/KULCSOK MASZKOLVA. Vak usernek + hibakeresésnek
+     arany. (Tibi 3.7 és 11.5, kétszer kiemeli.) ELSŐ.
+  2. **`min_core_version` mező a modules.json-ban** (a `min_core_api=1.0` mellé) + a modulkezelő
+     ellenőrizze, régi Core-on érthető üzenettel. Olcsó, valós. (Tibi 4.8 / P1.)
+  3. **Atomikus beállítás-/sor-mentés** (temp fájl → fsync → rename) — véd a fél-mentéstől. (4.2/4.6.)
+  4. **AI-kulcs mező maszkolása** a Beállításokban (jelszó-mód + „megmutat" gomb). A TÁROLÁS MÁR
+     DPAPI-titkosított (`store.py`, `win32crypt`), csak a képernyőn látszik nyíltan. (4.6.3/5.2.)
+  5. **yt-dlp hibák emberi nyelvre** (bejelentkezés kell / régiózár / korhatár / privát / nincs
+     ffmpeg). Akadálymentességi nyereség. (4.4.)
+  6. **CLI: exit-kódok + `--no-speak` + `--json`** — olcsó, teszteléshez is jó. (4.20.)
+STRATÉGIAI (nagyobb, NEM erre a menetre): aláírt release/modules.json manifest beégetett kulccsal;
+minimál CI (ruff+pytest+build smoke) + pytest-alapkészlet; IPTV üres-állapot + első indítási
+varázsló; MainFrame→controllerek + formális CoreContext-SDK. ELLENPONT/TISZTÁZÁS: a titkok NEM sima
+JSON-ban vannak (DPAPI, kész); a Black/isort tömeges formázás CSAK óvatosan, külön commitban,
+fájlonként (VASSZABÁLY: tömeges automata átírás tilos — egyszer elrontott kódot). Tibinek köszönő
+válasz még NEM ment (a user egyelőre nem kérte). Opció: az auditot `docs/AUDIT-2026-07.md`-be tenni
+és a P0/P1-et GitHub Issue-kká bontani (Tibi §9 kész issue-vázakat adott).
 
 **MAIN-EN, MÉG KI NEM ADVA (a köv. kiadás vigye):**
 (a) `superdl_gui.py` — új **Közreműködők (Credits)** menüpont a Súgó menüben (commit 383979c):
