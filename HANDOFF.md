@@ -132,7 +132,7 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-09 · dolgozott: Claude (3.29.6 KIADVA ✅ + Credits menü main-en)
+**Utolsó frissítés:** 2026-07-11 · dolgozott: Claude (3.29.7 KIADVA ✅)
 
 **➡️ KÖVETKEZŐ MUNKAMENET — 2026-07-11 (SZOMBAT): HERMAN TIBOR AUDIT „GYORS GYŐZELMEK".**
 A felhasználó kérése: „most más a dolgunk, majd szombaton — ezt tedd be, hogy következőnek
@@ -159,22 +159,25 @@ fájlonként (VASSZABÁLY: tömeges automata átírás tilos — egyszer elronto
 válasz még NEM ment (a user egyelőre nem kérte). Opció: az auditot `docs/AUDIT-2026-07.md`-be tenni
 és a P0/P1-et GitHub Issue-kká bontani (Tibi §9 kész issue-vázakat adott).
 
-**MAIN-EN, MÉG KI NEM ADVA (a köv. kiadás vigye):**
-(a) `superdl_gui.py` — új **Közreműködők (Credits)** menüpont a Súgó menüben (commit 383979c):
+**3.29.7 KIADVA ✅ (2026-07-11).** Core `v3.29.7` „Latest" (4 asset) + forrás push (HEAD 6b75231).
+Kulcs-szken TISZTA (forrás+binárisok). yt-dlp 2026.7.4. Core-only (nincs modul-változás → nincs
+latest-csapda, sima `--latest`). Stabil linkek RÖGTÖN 200. Három javítás:
+(a) `superdl/media.py` — **konkrét videó-URL-nél NE töltse a rádió/mix/lejátszási listát** (a fő,
+felhasználó által jelzett bug; commit 2ef7b4b). GYÖKÉR: a yt-dlp alapból a teljes `list=…`-t
+lehúzza; a YouTube Rádió/Mix (`list=RD…`, `start_radio=1`) végtelen → egy szóló videóra kattintva
+„mindent lekapkodott" egy mappába (link: `watch?v=HCfH6DAA3hM&list=RDHCfH6DAA3hM&start_radio=1`).
+FIX: `_prefers_single_video(url)` → ha az URL konkrét videóra mutat (`v=…`/`youtu.be/<id>`),
+`opts["noplaylist"]=True` → csak azt a videót tölti; tiszta lista-URL (`playlist?list=…`, nincs
+`v=`) marad teljes lista. Élesben IGAZOLVA (noplaylist=True → 1 videó; alap → a mix). 8 URL-eset
+unit-teszt zöld.
+(b) `superdl_gui.py` — új **Közreműködők (Credits)** menüpont a Súgó menüben (commit 383979c):
 akadálymentes felolvasható ablak (helpdialog) fejlesztő + Herman Tibor (audit) + Horváth Dorina
-Éva (hibajelentés+javítás) + tesztelő közösség. `MainFrame.CREDITS_TEXT` + `_on_credits`.
-(b) `superdl_gui.py` top-szintű `import os`
-(commit ff9da50).
-(c) `superdl/media.py` — **konkrét videó-URL-nél ne töltse le a rádió/mix/lejátszási listát**
-(commit 2ef7b4b). GYÖKÉR: a yt-dlp alapból a teljes `list=…`-t lehúzza; a YouTube Rádió/Mix
-(`list=RD…`, `start_radio=1`) végtelen → egy szóló videóra kattintva „mindent lekapkodott" egy
-mappába (user jelezte, link: `watch?v=HCfH6DAA3hM&list=RDHCfH6DAA3hM&start_radio=1`). FIX:
-`_prefers_single_video(url)` → ha az URL konkrét videóra mutat (`v=…`/`youtu.be/<id>`),
-`opts["noplaylist"]=True`; tiszta lista-URL (nincs `v=`) marad teljes lista. Élesben igazolva. A `_single_instance_mutex()` az `os.name`-et használta, de az `os` csak
-lokálisan, más függvényekben volt importálva → forrásból (`python superdl_gui.py`) NameError
-induláskor; a frozen exe futott (PyInstaller a `__main__`-be teszi az `os`-t), ezért a kiadott
-3.29.5/3.29.6 NEM érintett. Horváth Dorina Éva jelezte (PR #1, forkról, draft) — a main
-érintetlen volt, a PR-t NEM mergeltem, hanem az egy sort beírtam és a PR-t köszönettel lezártam.
+Éva + tesztelő közösség. `MainFrame.CREDITS_TEXT` + `_on_credits`.
+(c) `superdl_gui.py` top-szintű `import os` (commit ff9da50): a `_single_instance_mutex()` az
+`os.name`-et használta, de az `os` csak lokálisan volt importálva → forrásból NameError; a frozen
+exe futott (PyInstaller a `__main__`-be teszi az `os`-t), ezért a kiadott 3.29.5/3.29.6 NEM volt
+érintett. Horváth Dorina Éva jelezte (PR #1, forkról, draft) — a main érintetlen volt, a PR-t NEM
+mergeltem, az egy sort beírtam és a PR-t köszönettel lezártam.
 
 
 **3.29.6 KIADVA ✅ (2026-07-06).** Core `v3.29.6` „Latest" (4 asset) + `mod-docconvert-1.1.4`
