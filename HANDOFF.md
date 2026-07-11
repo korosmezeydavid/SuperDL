@@ -164,7 +164,13 @@ válasz még NEM ment (a user egyelőre nem kérte). Opció: az auditot `docs/AU
 akadálymentes felolvasható ablak (helpdialog) fejlesztő + Herman Tibor (audit) + Horváth Dorina
 Éva (hibajelentés+javítás) + tesztelő közösség. `MainFrame.CREDITS_TEXT` + `_on_credits`.
 (b) `superdl_gui.py` top-szintű `import os`
-(commit ff9da50). A `_single_instance_mutex()` az `os.name`-et használta, de az `os` csak
+(commit ff9da50).
+(c) `superdl/media.py` — **konkrét videó-URL-nél ne töltse le a rádió/mix/lejátszási listát**
+(commit 2ef7b4b). GYÖKÉR: a yt-dlp alapból a teljes `list=…`-t lehúzza; a YouTube Rádió/Mix
+(`list=RD…`, `start_radio=1`) végtelen → egy szóló videóra kattintva „mindent lekapkodott" egy
+mappába (user jelezte, link: `watch?v=HCfH6DAA3hM&list=RDHCfH6DAA3hM&start_radio=1`). FIX:
+`_prefers_single_video(url)` → ha az URL konkrét videóra mutat (`v=…`/`youtu.be/<id>`),
+`opts["noplaylist"]=True`; tiszta lista-URL (nincs `v=`) marad teljes lista. Élesben igazolva. A `_single_instance_mutex()` az `os.name`-et használta, de az `os` csak
 lokálisan, más függvényekben volt importálva → forrásból (`python superdl_gui.py`) NameError
 induláskor; a frozen exe futott (PyInstaller a `__main__`-be teszi az `os`-t), ezért a kiadott
 3.29.5/3.29.6 NEM érintett. Horváth Dorina Éva jelezte (PR #1, forkról, draft) — a main
