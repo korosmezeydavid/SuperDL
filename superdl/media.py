@@ -7,8 +7,31 @@ jogod van!
 """
 
 import threading
+from urllib.parse import parse_qs, urlparse
 
 from .segment import Progress
+
+
+def _prefers_single_video(url: str) -> bool:
+    """Igaz, ha az URL EGY KONKRÉT videóra mutat (van `v=` azonosító, vagy
+    youtu.be/<id> alak). Ilyenkor CSAK azt a videót töltjük le akkor is, ha a
+    linken egy `list=` lóg – ez lehet YouTube Rádió/Mix (`list=RD…`,
+    `start_radio=1`, gyakorlatilag VÉGTELEN) vagy sima lejátszási lista. Enélkül
+    a yt-dlp a teljes listát elkezdené lehúzni (ezt jelezték: „egy szóló videóra
+    kattintok, mégis mindent lekapkod egy mappába”).
+
+    Tiszta lista-URL (pl. `playlist?list=…`, NINCS videó-azonosító) → False, azt
+    SZÁNDÉKOSAN egész listaként töltjük (mappa + sorszám)."""
+    try:
+        u = urlparse(url)
+    except (ValueError, TypeError):
+        return False
+    host = (u.hostname or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    if host in ("youtu.be", "y2u.be"):     # youtu.be/<VIDEOID> – az út a videó
+        return len(u.path.strip("/")) > 0
+    return bool(parse_qs(u.query).get("v"))  # …/watch?v=<VIDEOID>
 
 
 def friendly_error(msg: str) -> str:
@@ -212,6 +235,12 @@ class MediaDownloader:
         opts = {
             "format": fmt,
             "outtmpl": outtmpl,
+            # EGY konkrét videóra mutató linknél (v=… vagy youtu.be/<id>) CSAK azt
+            # a videót töltjük, akkor is, ha egy Rádió/Mix vagy lejátszási lista
+            # (list=…) lóg rajta – különben a yt-dlp az egész (mixnél végtelen)
+            # listát lehúzná egy mappába. Tiszta lista-URL-nél (nincs v=) marad a
+            # szándékos teljes lista.
+            "noplaylist": _prefers_single_video(self.url),
             "concurrent_fragment_downloads": self.connections,
             "progress_hooks": [self._hook],
             "noprogress": True,
