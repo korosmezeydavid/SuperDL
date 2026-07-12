@@ -132,32 +132,38 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-11 · dolgozott: Claude (3.29.7 KIADVA ✅)
+**Utolsó frissítés:** 2026-07-11 · dolgozott: Claude (audit gyors győzelmek KÓDKÉSZ)
 
-**➡️ KÖVETKEZŐ MUNKAMENET — 2026-07-11 (SZOMBAT): HERMAN TIBOR AUDIT „GYORS GYŐZELMEK".**
-A felhasználó kérése: „most más a dolgunk, majd szombaton — ezt tedd be, hogy következőnek
-ezeket oldjuk meg." Herman Tibor teljes körű szakmai auditot küldött a 3.29.6-ról (statikus,
-publikus forrásból; a fájl: `C:\Users\msn\Downloads\SuperDL 3.29.6 teljeskörű szakmai audit.txt`).
-Az átnézés megvolt; a KIVÁLASZTOTT, gyors haszonnal járó tételek, prioritás szerint (create maxima
-kell hozzájuk, a felhasználó szombaton indítja):
-  1. **Diagnosztikai csomag / „Hibajelentés vágólapra" menüpont** — verzió, modulok, Windows,
-     telepítés típusa, utolsó log-sorok; TITKOK/KULCSOK MASZKOLVA. Vak usernek + hibakeresésnek
-     arany. (Tibi 3.7 és 11.5, kétszer kiemeli.) ELSŐ.
-  2. **`min_core_version` mező a modules.json-ban** (a `min_core_api=1.0` mellé) + a modulkezelő
-     ellenőrizze, régi Core-on érthető üzenettel. Olcsó, valós. (Tibi 4.8 / P1.)
-  3. **Atomikus beállítás-/sor-mentés** (temp fájl → fsync → rename) — véd a fél-mentéstől. (4.2/4.6.)
-  4. **AI-kulcs mező maszkolása** a Beállításokban (jelszó-mód + „megmutat" gomb). A TÁROLÁS MÁR
-     DPAPI-titkosított (`store.py`, `win32crypt`), csak a képernyőn látszik nyíltan. (4.6.3/5.2.)
-  5. **yt-dlp hibák emberi nyelvre** (bejelentkezés kell / régiózár / korhatár / privát / nincs
-     ffmpeg). Akadálymentességi nyereség. (4.4.)
-  6. **CLI: exit-kódok + `--no-speak` + `--json`** — olcsó, teszteléshez is jó. (4.20.)
-STRATÉGIAI (nagyobb, NEM erre a menetre): aláírt release/modules.json manifest beégetett kulccsal;
+**➡️ AUDIT „GYORS GYŐZELMEK" KÓDKÉSZ (2026-07-11) — PUBLIKÁLÁSRA VÁR (Core-only, köv. kiadás
+3.29.8).** Herman Tibor 3.29.6-auditjából a 6 kiválasztott tétel MIND KÉSZ és verifikálva
+(commit c88e530; unit + fejnélküli GUI + élő maszk-ellenőrzés; kulcs-szken tiszta). Nincs
+modul-változás (a mediatools/docconvert/konyvek érintetlen) → sima Core-kiadás `--latest`-tel.
+  1. **Diagnosztikai csomag** — ÚJ `superdl/diagnostics.py` (`build_report`): verziók,
+     telepítés-típus (forrás/onefile/onedir/telepített: unins000.exe-próba), modul-lista,
+     beállítás-FEHÉRLISTA (city/cookies_file értéke SOHA, csak „megadva"), napló-vég; a tárolt
+     kulcsok MINDEN előfordulása maszkolva (•••KULCS-MASZKOLVA•••), home→~. GUI: Súgó →
+     „Hibajelentés vágólapra (diagnosztika)" (MessageBox-megerősítés, felolvasható). CLI:
+     `--diagnose`. ÉLŐ ellenőrzés: a valódi tárolt kulcsok nem szerepelnek a jelentésben.
+  2. **min_core_version** — Manifest+ModuleEntry+parse_index+`core_version_ok()`
+     (modkit); telepítő ELUTASÍT érthető üzenettel; betöltő kihagy érthető hibával; Modulkezelő
+     státusz: „Újabb SuperDL kell (legalább X)"; build_module.py átviszi a manifestből. Üres mező
+     = nincs megkötés (minden régi modul változatlanul jó).
+  3. **Atomikus mentés** — `store._write_fsync` (írás→flush→fsync→rename) a save_json ÉS
+     save_secret_json útján.
+  4. **AI-kulcs maszkolás** — a 4 kulcs-mező TE_PASSWORD + „Kulcsok megjelenítése" pipa;
+     futásidőben a stílus nem váltható → `_swap_secret_style` mező-CSERE (érték+SetName+
+     wx.Accessible+MoveAfterInTabOrder+fókusz megőrzve); `_on_ok` a cserélt attribútumból olvas.
+  5. **yt-dlp hibák emberi nyelven** — `friendly_error` +14 kategória (korhatár/privát/tagság/
+     régiózár/törölt/premier/formátum/ffmpeg/403/429/hálózat/tele lemez/nem írható/nem támogatott);
+     CSAPDA-FIX: a korhatár-ág a bot-ellenőrzés ELÉ került („Sign in to confirm your age" a
+     bot-mintára is illik). 17 mintaüzenet-teszt zöld.
+  6. **CLI** — dokumentált exit-kódok (0 siker/1 általános/2 hálózati/3 fájl/4 nem támogatott/
+     5 részleges; `_classify_error`+`_exit_code`, a --help epilógusában is) + `--no-speak`
+     (a --speak-et is felülírja) + `--json` (utolsó sor gépi összegzés) + `--diagnose`.
+STRATÉGIAI (Tibi-audit, KÉSŐBBRE): aláírt release/modules.json manifest beégetett kulccsal;
 minimál CI (ruff+pytest+build smoke) + pytest-alapkészlet; IPTV üres-állapot + első indítási
-varázsló; MainFrame→controllerek + formális CoreContext-SDK. ELLENPONT/TISZTÁZÁS: a titkok NEM sima
-JSON-ban vannak (DPAPI, kész); a Black/isort tömeges formázás CSAK óvatosan, külön commitban,
-fájlonként (VASSZABÁLY: tömeges automata átírás tilos — egyszer elrontott kódot). Tibinek köszönő
-válasz még NEM ment (a user egyelőre nem kérte). Opció: az auditot `docs/AUDIT-2026-07.md`-be tenni
-és a P0/P1-et GitHub Issue-kká bontani (Tibi §9 kész issue-vázakat adott).
+varázsló; MainFrame→controllerek + formális CoreContext-SDK. Tibinek köszönő válasz még NEM ment.
+Az audit-fájl: `C:\Users\msn\Downloads\SuperDL 3.29.6 teljeskörű szakmai audit.txt`.
 
 **3.29.7 KIADVA ✅ (2026-07-11).** Core `v3.29.7` „Latest" (4 asset) + forrás push (HEAD 6b75231).
 Kulcs-szken TISZTA (forrás+binárisok). yt-dlp 2026.7.4. Core-only (nincs modul-változás → nincs
