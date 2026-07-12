@@ -1,0 +1,32 @@
+# SuperDL CI (Tibi-audit 7.1): minden push/PR-nél szintaxis-ellenőrzés +
+# a headless tesztkészlet Windows-on. A GUI-t nem indítja; a wx-függő
+# viselkedést a helyi (fejlesztői) fejnélküli tesztek fedik.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Függőségek telepítése
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pywin32
+
+      - name: Szintaxis-ellenőrzés (teljes forrás)
+        run: python -m compileall -q superdl modules_src tools superdl_gui.py superdl.py
+
+      - name: Tesztek
+        run: pytest tests/ -v

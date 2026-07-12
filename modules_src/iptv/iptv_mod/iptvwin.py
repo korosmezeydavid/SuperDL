@@ -74,6 +74,10 @@ class IPTVFrame(wx.Frame):
         self._announce("Tölts be egy m3u listát vagy lépj be Xtream-adatokkal "
                        "(saját, legális hozzáférés). Enter: lejátszás, "
                        "E: mi megy most. Súgó: F1.")
+        # első megnyitáskor a fókusz az útmutatón: az olvasó rögtön felolvassa,
+        # mi a teendő (a vezérlő-fókuszt az ablak adja, nem a megnyitó!)
+        if not self.channels:
+            self.intro.SetFocus()
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
 
@@ -96,6 +100,32 @@ class IPTVFrame(wx.Frame):
     def _build(self):
         p = wx.Panel(self)
         v = wx.BoxSizer(wx.VERTICAL)
+
+        # ÜRES ÁLLAPOT (első indítás): látható, FELOLVASHATÓ útmutató. A
+        # státuszsor-üzenet elillan; ez viszont fókuszba kerül megnyitáskor,
+        # így a képernyőolvasó rögtön végigmondja, mi a teendő (Tibi-audit
+        # 4.12: forrás nélkül ne tegyen úgy az ablak, mintha lenne adat).
+        self.intro = wx.TextCtrl(
+            p, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_BESTWRAP,
+            size=(-1, 96), name="Első lépések",
+            value=("Üdvözöl az Internetes TV! Még nincs beállított forrás.\n"
+                   "Három lehetőség: 1. az „m3u fájl…” gombbal lista a "
+                   "gépedről; 2. írd be az m3u lista címét, majd „Betöltés”; "
+                   "3. lépj be a saját Xtream-fiókoddal.\n"
+                   "KIZÁRÓLAG saját, legális hozzáférésű forrást használj! "
+                   "Tételes, vakos súgó: F1."))
+        v.Add(self.intro, 0, wx.EXPAND | wx.ALL, 6)
+        qr = wx.BoxSizer(wx.HORIZONTAL)
+        self.last_btn = wx.Button(p, label="&Legutóbbi m3u lista betöltése")
+        self.last_btn.SetName("Legutóbbi m3u lista betöltése; csak akkor "
+                              "érhető el, ha korábban már adtál meg listát")
+        self.last_btn.Bind(wx.EVT_BUTTON, lambda e: self._load_m3u_url())
+        qr.Add(self.last_btn, 0, wx.RIGHT, 6)
+        b_intro_help = wx.Button(p, label="Sú&gó (F1)")
+        b_intro_help.Bind(wx.EVT_BUTTON, lambda e: self._help())
+        qr.Add(b_intro_help, 0)
+        v.Add(qr, 0, wx.LEFT | wx.BOTTOM, 6)
+        self._intro_row = qr
 
         # m3u forrás
         r1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -253,9 +283,12 @@ class IPTVFrame(wx.Frame):
         self._set_logged_in(False)
 
     def _set_logged_in(self, on: bool):
-        """A tartalmi vezérlők megjelenítése/elrejtése (belépés utáni/előtti nézet)."""
+        """A tartalmi vezérlők megjelenítése/elrejtése (belépés utáni/előtti nézet).
+        Az üres-állapot útmutatója pont fordítva: belépés UTÁN tűnik el."""
         for item in self._content:
             self._vsizer.Show(item, on, recursive=True)
+        for item in (self.intro, self._intro_row):
+            self._vsizer.Show(item, not on, recursive=True)
         self._panel.Layout()
 
     # ---- visszajelzés -------------------------------------------------
@@ -367,6 +400,8 @@ class IPTVFrame(wx.Frame):
         if channels:
             self._set_logged_in(True)      # előjönnek a tartalmi vezérlők
         self._refresh_list()
+        if channels:
+            self.list.SetFocus()           # a fókusz a CSATORNALISTÁRA kerül
         if announce:
             self._announce(f"{len(channels)} csatorna betöltve.")
         if not channels:
@@ -703,6 +738,8 @@ class IPTVFrame(wx.Frame):
         self.epg_url.SetValue(c.get("epg_url", ""))
         self.xt_host.SetValue(c.get("xt_host", ""))
         self.xt_user.SetValue(c.get("xt_user", ""))
+        # a „Legutóbbi m3u betöltése" gyorsgomb csak akkor él, ha van mit
+        self.last_btn.Enable(bool(c.get("m3u_url", "").strip()))
         if self.favorites:
             self._refresh_list()
 

@@ -1,0 +1,6 @@
+# SuperDL projekt-konfiguráció (Tibi-audit: legyen pyproject + tesztek).
+# A csomagolást a PyInstaller-spec-ek végzik; itt a teszt-futtató beállítása él.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --tb=short"
