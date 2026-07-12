@@ -132,7 +132,25 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-12 · dolgozott: Claude (3.29.8 KIADVA ✅)
+**Utolsó frissítés:** 2026-07-12 · dolgozott: Claude (3.29.8 KIADVA ✅ + Tibi-audit 2. kör kódkész)
+
+**➡️ TIBI-AUDIT 2. KÖR KÓDKÉSZ (2026-07-12, commit a5b3622) — PUBLIKÁLÁSRA VÁR.**
+(A) MINŐSÉGBIZTOSÍTÁS (repo-szintű, kiadást nem igényel, MÁR ÉL): `tests/` 61 headless
+pytest-teszt (media URL+hibák, modkit min_core_version/SHA/zip-slip, store fsync/bak/corrupt,
+CLI exit-kódok, audiobook-darabolás, docconvert CWI+kettős-kódolás, diagnostics titok-maszkolás);
+`.github/workflows/ci.yml` (windows-latest, Py3.12: requirements + compileall + pytest minden
+pushnál); `requirements-build-lock.txt` (a build-env pip freeze pillanatképe, kiadáskor
+frissítendő); `pyproject.toml` (pytest-konfig). FIGYELEM: az ELSŐ CI-futás eredményét ellenőrizd
+(gh run list)!
+(B) IPTV 1.0.3 KÓDKÉSZ — ÜRES ÁLLAPOT + ELSŐ INDÍTÁS (Tibi 4.12): megnyitáskor felolvasható
+„Első lépések" útmutató kap fókuszt (3 forrás-lehetőség + legális-figyelmeztetés + F1); „Legutóbbi
+m3u betöltése" gyorsgomb (csak ha van mentett cím) + Súgó gomb; betöltés után fókusz a
+CSATORNALISTÁRA. Fejnélküli teszttel verifikálva. A zip KÉSZ (dist_modules/iptv-1.0.3.zip,
+SHA 7ead47571d0973759bcaa0e99ec171f7a5e8b8bae0f2bfc8a165180f6f8992bc), de a **modules.json
+SZÁNDÉKOSAN érintetlen** — a bejegyzést CSAK publikáláskor írd be (különben a bolt 404-es URL-re
+mutatna)! Publikáláskor: `gh release create mod-iptv-1.0.3` a zippel + modules.json frissítés
+(build_module.py kiírta a bejegyzést) + push. Core-változás NINCS ebben a körben → ha csak az
+iptv megy ki, Core-build sem kell.
 
 **3.29.8 KIADVA ✅ (2026-07-12).** Core `v3.29.8` „Latest" (4 asset; API-latest + stabil linkek
 200); forrás push HEAD c0e976e; kulcs-szken TISZTA (forrás + mindhárom bináris); yt-dlp 2026.7.4;
