@@ -132,7 +132,18 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-12 · dolgozott: Claude (3.29.8 KIADVA ✅ + Tibi-audit 2. kör kódkész)
+**Utolsó frissítés:** 2026-07-12 · dolgozott: Claude (3.29.9 KIADVA ✅)
+
+**3.29.9 KIADVA ✅ (2026-07-12).** Core `v3.29.9` „Latest" (4 asset) + `mod-iptv-1.0.3` +
+modules.json a main-en; forrás 51296ca; kulcs-szken TISZTA (forrás+iptv-zip+binárisok);
+yt-dlp 2026.7.4; 67 teszt zöld kiadás előtt; MODUL ELŐBB→Core UTOLJÁRA `--latest` (nem volt
+latest-csapda, minden link rögtön 200). TARTALOM: (1) bot-check teljes tanácssor + tv_embedded
+utolsó-esélyes mentőöv (Maxi); (2) hivatalos frissítési forrás rögzítése + Fejlesztői mód
+(Tibi 3.5); (3) iptv 1.0.3 üres-állapot/első lépések (Tibi 4.12); (4) repón élő 67 teszt+CI+
+lockfile. KIADÁSI TANULSÁGOK: (a) az ISCC ma 8+ percig futott → a 10 perces tool-timeout
+ELVÁGTA írás közben = CSONKA telepítő (90 MB a ~135 helyett); ha időtúllépés van, ELLENŐRIZD a
+méretet, töröld és építsd újra háttérben. (b) gh release --notes-ben magyar „idézőjeles" szöveg
+szétszedi a bash-parancsot → MINDIG --notes-file-t használj. Hírlevél a listának MÉG NEM ment.
 
 **➡️ TIBI-AUDIT 2. KÖR KÓDKÉSZ (2026-07-12, commit a5b3622) — PUBLIKÁLÁSRA VÁR.**
 (A) MINŐSÉGBIZTOSÍTÁS (repo-szintű, kiadást nem igényel, MÁR ÉL): `tests/` 61 headless
