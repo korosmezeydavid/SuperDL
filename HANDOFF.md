@@ -132,10 +132,15 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-11 · dolgozott: Claude (audit gyors győzelmek KÓDKÉSZ)
+**Utolsó frissítés:** 2026-07-12 · dolgozott: Claude (3.29.8 KIADVA ✅)
 
-**➡️ AUDIT „GYORS GYŐZELMEK" KÓDKÉSZ (2026-07-11) — PUBLIKÁLÁSRA VÁR (Core-only, köv. kiadás
-3.29.8).** Herman Tibor 3.29.6-auditjából a 6 kiválasztott tétel MIND KÉSZ és verifikálva
+**3.29.8 KIADVA ✅ (2026-07-12).** Core `v3.29.8` „Latest" (4 asset; API-latest + stabil linkek
+200); forrás push HEAD c0e976e; kulcs-szken TISZTA (forrás + mindhárom bináris); yt-dlp 2026.7.4;
+Core-only (nincs modul-változás) → sima `--latest`, nem volt latest-csapda. Build-sorrend:
+onedir→ISCC(3.29.8)→CLI→onefile GUI (utolsó). Tartalma az alábbi audit-csomag:
+
+**AUDIT „GYORS GYŐZELMEK" (2026-07-11 kódkész → 2026-07-12 KIADVA).** Herman Tibor
+3.29.6-auditjából a 6 kiválasztott tétel MIND KÉSZ és verifikálva
 (commit c88e530; unit + fejnélküli GUI + élő maszk-ellenőrzés; kulcs-szken tiszta). Nincs
 modul-változás (a mediatools/docconvert/konyvek érintetlen) → sima Core-kiadás `--latest`-tel.
   1. **Diagnosztikai csomag** — ÚJ `superdl/diagnostics.py` (`build_report`): verziók,
