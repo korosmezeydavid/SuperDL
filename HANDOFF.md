@@ -142,6 +142,15 @@ CLI exit-kódok, audiobook-darabolás, docconvert CWI+kettős-kódolás, diagnos
 pushnál); `requirements-build-lock.txt` (a build-env pip freeze pillanatképe, kiadáskor
 frissítendő); `pyproject.toml` (pytest-konfig). FIGYELEM: az ELSŐ CI-futás eredményét ellenőrizd
 (gh run list)!
+(D) MÉG KÓDOLANDÓ A KÖV. KIADÁS ELŐTT (create maximára; MEGÍGÉRVE Maxinak a
+maxinak.txt levélben, 2026-07-12): a `media.py` `friendly_error` bot-ellenőrzéses üzenetének
+bővítése — a diagnózis szerint a bot-check oka gyakran IP-JELÖLÉS, nem süti-gond (Maxi esete:
+„Nincs" sütivel is ugyanaz + minden yt-dlp-app érintett + nálunk süti nélkül működik, yt-dlp
+legfrissebb). Az üzenetbe: hotspot-gyorsteszt, router-újraindítás/VPN-ki, várakozás, és a PRIVÁT
+ABLAKOS cookies.txt-recept (privát ablak→belépés→export→ablak BEZÁR→a fájl a Beállításokban;
+közben ne YouTube-ozzon a fiókkal). Opcionális kutatás: bot-checknél automatikus újrapróba másik
+player_clienttel („tv") — előbb élesben tesztelni. OAuth2 SZÁNDÉKOSAN NEM lesz (Google letiltotta
+a device-flow-t, a kerülőutak fiók-felfüggesztést kockáztatnak — Maxinak megírva).
 (C) HIVATALOS FORRÁS RÖGZÍTÉSE + FEJLESZTŐI MÓD (Tibi 3.5 P0 pragmatikus magja; commit 7a871aa,
 Core-változás → a köv. Core-kiadás viszi): a frissítés+modul-bolt alapból CSAK a hivatalos
 repóról; SUPERDL_REPO/repo.txt átállítás KIZÁRÓLAG a Beállítások→Általános→„Fejlesztői mód"
