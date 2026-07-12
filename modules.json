@@ -73,11 +73,11 @@
       "category": "Média",
       "description": "Akadálymentes internetes TV (legális IPTV): saját m3u/Xtream forrás csatornái, felolvasott műsorújság (EPG), felvétel és emlékeztető, hangalámondás-sáv és élő felirat-felolvasás. Csak legális, saját előfizetésű forrásokhoz.",
       "latest": {
-        "version": "1.0.2",
+        "version": "1.0.3",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iptv-1.0.2/iptv-1.0.2.zip",
-        "sha256": "9376ae74097b69f1f91780c8d83697aa41a5b869272a661e07a8929183f56445",
-        "size": 15625
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iptv-1.0.3/iptv-1.0.3.zip",
+        "sha256": "7ead47571d0973759bcaa0e99ec171f7a5e8b8bae0f2bfc8a165180f6f8992bc",
+        "size": 16323
       }
     },
     {

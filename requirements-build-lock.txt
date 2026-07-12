@@ -2,7 +2,7 @@
 # Ebből épül a kiadott SuperDL.exe/CLI/telepítő — reprodukálhatósághoz
 # és regresszió-kereséshez (Tibi-audit 3.4). Frissítése kiadáskor:
 #   python -m pip freeze > (ez a fájl, a fejléc megtartásával)
-# Generálva: 2026-07-12 · Python 3.14.5
+# Generálva: 2026-07-12 · Python 3.14.5 · SuperDL 3.29.9
 absl-py==2.4.0
 aiohappyeyeballs==2.6.2
 aiohttp==3.14.1
