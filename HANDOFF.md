@@ -142,6 +142,15 @@ CLI exit-kódok, audiobook-darabolás, docconvert CWI+kettős-kódolás, diagnos
 pushnál); `requirements-build-lock.txt` (a build-env pip freeze pillanatképe, kiadáskor
 frissítendő); `pyproject.toml` (pytest-konfig). FIGYELEM: az ELSŐ CI-futás eredményét ellenőrizd
 (gh run list)!
+(C) HIVATALOS FORRÁS RÖGZÍTÉSE + FEJLESZTŐI MÓD (Tibi 3.5 P0 pragmatikus magja; commit 7a871aa,
+Core-változás → a köv. Core-kiadás viszi): a frissítés+modul-bolt alapból CSAK a hivatalos
+repóról; SUPERDL_REPO/repo.txt átállítás KIZÁRÓLAG a Beállítások→Általános→„Fejlesztői mód"
+kapcsolóval érvényesül (alapból KI). Induláskor: figyelmen kívül hagyott átállítás → bejelentés;
+élő nem-hivatalos forrás → HANGOS figyelmeztető ablak; frissítés/modul-telepítés előtt kifejezett
+megerősítés. CLI-ben figyelmeztető sorok. selfupdate: `custom_repo_requested`/`repo_is_official`/
+`ignored_override`/`_dev_custom_repo_enabled`. 5 új teszt (66 összesen, mind zöld). A TELJES
+Ed25519-aláírás TUDATOSAN ELHALASZTVA (kulcskezelési teher: kulcsvesztés=beragadt userek; a
+usernek elmagyarázva, tibinek.txt-ben is dokumentálva).
 (B) IPTV 1.0.3 KÓDKÉSZ — ÜRES ÁLLAPOT + ELSŐ INDÍTÁS (Tibi 4.12): megnyitáskor felolvasható
 „Első lépések" útmutató kap fókuszt (3 forrás-lehetőség + legális-figyelmeztetés + F1); „Legutóbbi
 m3u betöltése" gyorsgomb (csak ha van mentett cím) + Súgó gomb; betöltés után fókusz a
