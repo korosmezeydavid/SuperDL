@@ -61,3 +61,13 @@ def test_korhatar_a_bot_ellenorzes_elott():
     out = media.friendly_error("ERROR: Sign in to confirm your age.")
     assert "KORHATÁROS" in out
     assert "robot" not in out
+
+
+def test_bot_check_uzenet_teljes_tanacssor():
+    """A bot-ellenőrzés üzenete a Maxinak megígért teljes tanácssort adja:
+    IP-magyarázat, hotspot-gyorsteszt, router/VPN, várakozás, privát ablakos
+    cookies.txt-recept (3.29.9)."""
+    out = media.friendly_error("Sign in to confirm you're not a bot")
+    for kulcsszo in ("IP-címet", "hotspot", "routert", "VPN",
+                     "PRIVÁT", "cookies.txt", "ZÁRD BE"):
+        assert kulcsszo in out, f"hiányzik a tanácsból: {kulcsszo}"

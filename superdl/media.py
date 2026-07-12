@@ -47,10 +47,23 @@ def friendly_error(msg: str) -> str:
     if _is_bot_check(msg):
         return ("A YouTube megerősítést kér, hogy nem robot vagy (bot-"
                 "ellenőrzés). A SuperDL automatikusan megpróbálta a böngésződ "
-                "sütijeit is. Ha így sem megy: a Beállítások → Fiók/Sütik lapon "
-                "válaszd ki azt a böngészőt, amelyikben be vagy jelentkezve a "
-                "YouTube-ra. Sok elem egyszerre is kiválthatja – tölts le "
-                "kevesebbet egyszerre.")
+                "sütijeit és egy tartalék lejátszó-klienst is – ha ezt az "
+                "üzenetet látod, ezek sem segítettek. FONTOS: ez a legtöbbször "
+                "NEM a sütiken múlik – a YouTube magát az internetkapcsolatot "
+                "(IP-címet) jelöli meg, például sok letöltés, VPN/proxy vagy "
+                "megosztott cím miatt. Mit tegyél, sorrendben: "
+                "1. GYORSTESZT: próbáld meg telefonos mobilnetről (hotspot) – "
+                "ha úgy megy, a vonalad van megjelölve, nem a géped. "
+                "2. Indítsd újra a routert (sok helyen új címet kapsz), és "
+                "kapcsold ki a VPN-t/proxyt. "
+                "3. Várj néhány órát, és tölts le kevesebbet egyszerre – a "
+                "jelölés magától lejár. "
+                "4. Ha makacs: PRIVÁT böngészőablakban jelentkezz be a "
+                "YouTube-ra, egy cookies.txt-kiegészítővel mentsd ki a "
+                "sütiket, ZÁRD BE a privát ablakot (így a sütik érvényben "
+                "maradnak), majd a Beállítások → Fiók/Sütik lapon add meg a "
+                "cookies.txt fájlt – és letöltés közben ne használd a "
+                "YouTube-ot ugyanazzal a fiókkal.")
     if "could not copy" in m and "cookie" in m:
         return ("A böngésző (Chrome/Edge) épp FUT, ezért a program nem tudja "
                 "kiolvasni a sütijeit. Megoldás: zárd be a böngészőt, VAGY a "
@@ -253,6 +266,24 @@ class MediaDownloader:
                 return info
         return None
 
+    def _retry_with_tv_client(self, opts: dict, _download):
+        """UTOLSÓ ESÉLY bot-ellenőrzésnél: a yt-dlp „tv_embedded" lejátszó-
+        kliensével próbálkozunk (a beágyazott TV-s felület ellenőrzése enyhébb;
+        NINCS az alapértelmezett kliens-listában). Kizárólag akkor fut, amikor
+        minden más már elbukott, és hibánál None-t ad vissza – így SOSEM adhat
+        rosszabb hibaüzenetet az eredetinél (a sima „tv" kliens pl. egyes
+        videóknál DRM-es streamet kap, ezért azt nem használjuk)."""
+        o2 = dict(opts)
+        ea = dict(o2.get("extractor_args") or {})
+        yt = dict(ea.get("youtube") or {})
+        yt["player_client"] = ["tv_embedded"]
+        ea["youtube"] = yt
+        o2["extractor_args"] = ea
+        try:
+            return _download(o2) or None
+        except Exception:
+            return None
+
     def _hook(self, d: dict) -> None:
         if self._stop.is_set():
             raise KeyboardInterrupt
@@ -408,11 +439,19 @@ class MediaDownloader:
                         opts.pop("cookiesfrombrowser", None)
                         opts.pop("cookiefile", None)
                         info = _download(opts)
-                # PLUSZ: a YouTube bot-ellenőrzését – ha a felhasználó nem
-                # állított be sütit – AUTOMATIKUSAN a saját, bejelentkezett
-                # böngészője sütijeivel kerüljük meg (semmit nem kell beállítania)
-                elif (not had_cookies) and _is_bot_check(msg):
-                    info = self._retry_with_browser_cookies(opts, _download)
+                # PLUSZ: a YouTube bot-ellenőrzésénél két automatikus mentőöv,
+                # mielőtt feladnánk: (1) ha nem volt beállítva süti, a gépen
+                # talált bejelentkezett böngészők sütijei; (2) UTOLSÓ ESÉLYKÉNT
+                # a yt-dlp „tv_embedded" lejátszó-kliense (a beágyazott TV-s
+                # felület ellenőrzése enyhébb; élesben igazoltan ad formátumot).
+                # Ha a mentőöv is elbukik, az EREDETI bot-check hibát adjuk
+                # tovább (a friendly_error arra ad pontos tanácsot).
+                elif _is_bot_check(msg):
+                    info = None
+                    if not had_cookies:
+                        info = self._retry_with_browser_cookies(opts, _download)
+                    if info is None:
+                        info = self._retry_with_tv_client(opts, _download)
                     if info is None:
                         raise
                 else:
