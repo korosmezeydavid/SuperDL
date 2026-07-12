@@ -245,6 +245,18 @@ def main() -> int:
 
     if args.engines or args.update:
         from superdl import updater, selfupdate
+        # BIZTONSÁG: nem hivatalos forrásnál hangos, jól látható figyelmeztetés
+        ign = selfupdate.ignored_override()
+        if ign:
+            print(f"MEGJEGYZÉS: frissítésiforrás-átállítást találtam ({ign}), "
+                  "de a Fejlesztői mód nincs bekapcsolva – a HIVATALOS forrást "
+                  "használom.")
+        elif not selfupdate.repo_is_official():
+            print("=" * 64)
+            print(f"FIGYELEM: NEM hivatalos frissítési forrás: "
+                  f"{selfupdate.get_repo()}")
+            print("Csak akkor folytasd, ha ezt TE állítottad be (Fejlesztői mód).")
+            print("=" * 64)
         selfupdate.cleanup_old()
         app = selfupdate.check()
         if args.update and app.get("update"):

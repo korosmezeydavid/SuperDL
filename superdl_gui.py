@@ -302,6 +302,8 @@ class MainFrame(wx.Frame):
         wx.CallLater(900, self._check_update_result)
         # induló, automatikus hangos üdvözlés (dátum, névnap, időjárás)
         wx.CallLater(1200, self._startup_greeting)
+        # BIZTONSÁG: nem hivatalos frissítési forrás → hangos figyelmeztetés
+        wx.CallLater(1600, self._repo_security_notice)
 
         # induló fókusz: ha az URL-sor rejtve van, a letöltési listára álljunk
         if self.settings.get("hide_url_row"):
@@ -611,6 +613,7 @@ class MainFrame(wx.Frame):
             "clipboard": False, "notify": True, "seed_ratio": "1.0",
             "tts": False, "update_last_check": "", "audio_format": "MP3",
             "audio_only": False,
+            "dev_custom_repo": False,
             "cookies": "Nincs", "cookies_file": "", "playlist_folders": True,
             "sounds": True, "city": "Budapest", "voice_mode": "auto",
             "video_format": "MP4", "audio_bitrate": "192",
@@ -1312,6 +1315,35 @@ class MainFrame(wx.Frame):
         self._url_vbox.Show(self._url_row, True, recursive=True)
         self._main_panel.Layout()
         self.url_entry.SetFocus()
+
+    def _repo_security_notice(self):
+        """BIZTONSÁG (Tibi-audit 3.5): induláskor jelezzük, ha a frissítési
+        forrás nem a hivatalos. Két eset: (1) valaki átállítaná (repo.txt/env),
+        de a Fejlesztői mód nincs bekapcsolva → az átállítást FIGYELMEN KÍVÜL
+        hagytuk, ezt naplózzuk+mondjuk; (2) Fejlesztői módban tényleg más
+        forrás él → HANGOS, felolvasott figyelmeztető ablak."""
+        try:
+            ign = selfupdate.ignored_override()
+            if ign:
+                self._announce(
+                    f"Figyelem: talált frissítésiforrás-átállítást ({ign}), de "
+                    "a Fejlesztői mód nincs bekapcsolva, ezért a HIVATALOS "
+                    "forrást használom. Ha nem te állítottad be, töröld a "
+                    "repo.txt fájlt.", ok=False, toast=True)
+                return
+            if not selfupdate.repo_is_official():
+                wx.MessageBox(
+                    "FIGYELEM! A program frissítései és a modul-bolt most NEM "
+                    "a hivatalos helyről, hanem innen jönnek:\n\n"
+                    f"    {selfupdate.get_repo()}\n\n"
+                    "Ez csak akkor biztonságos, ha TE állítottad be "
+                    "(Fejlesztői mód). Ha nem te voltál, kapcsold ki a "
+                    "Beállítások → Általános → Fejlesztői mód kapcsolót, és "
+                    "töröld a repo.txt fájlt!",
+                    "Nem hivatalos frissítési forrás",
+                    wx.OK | wx.ICON_WARNING, self)
+        except Exception:
+            pass
 
     def _check_update_result(self):
         """Induláskor: ha volt függő önfrissítés, jelezzük, sikerült-e. A NÉMA
@@ -2022,6 +2054,18 @@ class UpdateDialog(wx.Dialog):
         self.info.SetValue(msg)
 
     def _install(self):
+        # BIZTONSÁG: nem hivatalos forrásból telepíteni csak KIFEJEZETT
+        # megerősítéssel lehet (a kérdést a képernyőolvasó felolvassa)
+        if not selfupdate.repo_is_official():
+            r = wx.MessageBox(
+                "A frissítés NEM a hivatalos forrásból jönne, hanem innen:\n\n"
+                f"    {selfupdate.get_repo()}\n\n"
+                "Csak akkor folytasd, ha ezt TE állítottad be (Fejlesztői "
+                "mód). Biztosan telepíted?",
+                "Nem hivatalos frissítési forrás",
+                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING, self)
+            if r != wx.YES:
+                return
         self.btn_check.Disable()
         self.btn_inst.Disable()
         engines = [c for c in self.comps if c["update"]]

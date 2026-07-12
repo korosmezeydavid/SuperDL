@@ -204,6 +204,19 @@ class ModuleManagerFrame(wx.Frame):
         r = self._selected_row()
         if self._busy or not r or not r["installable"] or not r["entry"]:
             return
+        # BIZTONSÁG: nem hivatalos modul-forrásból telepíteni csak kifejezett
+        # megerősítéssel lehet (Tibi-audit 3.5; a kérdést az olvasó felolvassa)
+        from superdl import selfupdate
+        if not selfupdate.repo_is_official():
+            a = wx.MessageBox(
+                "A modul NEM a hivatalos boltból jönne, hanem innen:\n\n"
+                f"    {selfupdate.get_repo()}\n\n"
+                "Csak akkor folytasd, ha ezt TE állítottad be (Fejlesztői "
+                "mód). Biztosan telepíted?",
+                "Nem hivatalos modul-forrás",
+                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING, self)
+            if a != wx.YES:
+                return
         self._busy = True
         self.install_btn.Disable()
         self.remove_btn.Disable()

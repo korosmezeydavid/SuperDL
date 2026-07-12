@@ -216,6 +216,19 @@ class SettingsDialog(wx.Dialog):
         self.c_voice.SetSelection(
             next((i for i, (_, m) in enumerate(VOICE_LABELS) if m == mode), 0))
         self._row(p, v, "Beszéd&hang (üdvözlés, felolvasás):", self.c_voice)
+        # FEJLESZTŐI kapcsoló (alapból KI): csak bekapcsolva érvényesül a
+        # frissítési forrás átállítása (repo.txt / SUPERDL_REPO). Kikapcsolva a
+        # program KIZÁRÓLAG a hivatalos helyről frissül – egy odacsempészett
+        # repo.txt így nem térítheti el (biztonsági audit-javaslat).
+        self.c_devrepo = wx.CheckBox(
+            p, label="Fe&jlesztői mód: egyéni frissítési forrás engedélyezése "
+                     "(repo.txt) – csak ha tudod, mit csinálsz!")
+        self.c_devrepo.SetName(
+            "Fejlesztői mód: egyéni frissítési forrás engedélyezése. "
+            "Kikapcsolva a program kizárólag a hivatalos helyről frissül. "
+            "Csak akkor kapcsold be, ha tudod, mit csinálsz.")
+        self.c_devrepo.SetValue(bool(self.s.get("dev_custom_repo", False)))
+        v.Add(self.c_devrepo, 0, wx.ALL, 10)
         p.SetSizer(v)
         return p
 
@@ -418,6 +431,7 @@ class SettingsDialog(wx.Dialog):
             "cookies_file": self.cookies_file or "",
             "clipboard": self.c_clip.GetValue(),
             "notify": self.c_notify.GetValue(),
+            "dev_custom_repo": self.c_devrepo.GetValue(),
             "city": self.c_city.GetValue().strip(),
             "voice_mode": VOICE_LABELS[self.c_voice.GetSelection()][1],
             "beep_enabled": self.c_beep.GetValue(),

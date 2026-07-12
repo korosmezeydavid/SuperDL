@@ -65,9 +65,22 @@ def _repo_file_candidates() -> list[Path]:
     return cands
 
 
-def get_repo() -> str:
+def _dev_custom_repo_enabled() -> bool:
+    """A Beállítások „Fejlesztői mód" kapcsolója (~/.superdl.json:
+    dev_custom_repo). CSAK bekapcsolva érvényesül a tárhely-átállítás."""
+    try:
+        cfg = json.loads((Path.home() / ".superdl.json")
+                         .read_text(encoding="utf-8"))
+        return bool(cfg.get("dev_custom_repo", False))
+    except (OSError, ValueError):
+        return False
+
+
+def custom_repo_requested() -> str | None:
+    """A KÉRT átállítás nyers értéke (SUPERDL_REPO env vagy repo.txt),
+    fejlesztői módtól függetlenül – a figyelmeztetésekhez."""
     r = os.environ.get("SUPERDL_REPO")
-    if r:
+    if r and r.strip():
         return r.strip()
     for f in _repo_file_candidates():
         if f.exists():
@@ -77,7 +90,35 @@ def get_repo() -> str:
                     return t
             except OSError:
                 pass
+    return None
+
+
+def get_repo() -> str:
+    """BIZTONSÁG (Tibi-audit 3.5, „hivatalos forrás rögzítése"): a frissítések
+    és a modul-bolt alapból KIZÁRÓLAG a hivatalos tárhelyről jönnek. Az
+    átállítás (SUPERDL_REPO / repo.txt) csak akkor érvényesül, ha a felhasználó
+    a Beállításokban KIFEJEZETTEN bekapcsolta a fejlesztői módot — így egy
+    odacsempészett repo.txt („tedd ezt az exe mellé…") nem téríti el a
+    frissítést. A hangos figyelmeztetés a hívók dolga (repo_is_official /
+    ignored_override)."""
+    req = custom_repo_requested()
+    if req and req != DEFAULT_REPO and _dev_custom_repo_enabled():
+        return req
     return DEFAULT_REPO
+
+
+def repo_is_official() -> bool:
+    """Igaz, ha a ténylegesen HASZNÁLT forrás a hivatalos."""
+    return get_repo() == DEFAULT_REPO
+
+
+def ignored_override() -> str | None:
+    """Ha VAN kért átállítás, de fejlesztői mód híján NEM érvényesül, a kért
+    érték (az induló értesítéshez); különben None."""
+    req = custom_repo_requested()
+    if req and req != DEFAULT_REPO and not _dev_custom_repo_enabled():
+        return req
+    return None
 
 
 def set_repo(repo: str) -> None:
