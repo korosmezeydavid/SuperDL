@@ -328,14 +328,29 @@ class SettingsDialog(wx.Dialog):
         b_help = wx.Button(p, label="&Hogyan szerzem be a kulcsokat?")
         b_help.Bind(wx.EVT_BUTTON, lambda e: self._keys_help())
         v.Add(b_help, 0, wx.LEFT | wx.BOTTOM, 8)
-        self.ai_openai = wx.TextCtrl(p, value=self.ai.get("openai_key", ""))
+        # A kulcs-mezők MASZKOLVA jelennek meg (jelszó-mód): a képernyőn ne
+        # látsszon a kulcs (Tibi-audit 5.2) – a felolvasó „védett" mezőt mond.
+        # Az alábbi pipa kérésre felfedi (pl. ellenőrzéshez, gépeléshez).
+        self.ai_show = wx.CheckBox(p, label="Kulcsok meg&jelenítése (látható "
+                                            "szövegként)")
+        self.ai_show.SetName("Kulcsok megjelenítése látható szövegként; "
+                             "kikapcsolva a kulcsok maszkolva, pontokként "
+                             "jelennek meg")
+        self.ai_show.Bind(wx.EVT_CHECKBOX, self._on_show_keys)
+        v.Add(self.ai_show, 0, wx.LEFT | wx.BOTTOM, 8)
+        self.ai_openai = wx.TextCtrl(p, value=self.ai.get("openai_key", ""),
+                                     style=wx.TE_PASSWORD)
         self._row(p, v, "&OpenAI (GPT) kulcs:", self.ai_openai)
-        self.ai_gemini = wx.TextCtrl(p, value=self.ai.get("gemini_key", ""))
+        self.ai_gemini = wx.TextCtrl(p, value=self.ai.get("gemini_key", ""),
+                                     style=wx.TE_PASSWORD)
         self._row(p, v, "Google &Gemini kulcs:", self.ai_gemini)
-        self.ai_anthropic = wx.TextCtrl(p, value=self.ai.get("anthropic_key", ""))
+        self.ai_anthropic = wx.TextCtrl(p, value=self.ai.get("anthropic_key", ""),
+                                        style=wx.TE_PASSWORD)
         self._row(p, v, "&Anthropic (Claude) kulcs:", self.ai_anthropic)
-        self.ai_xai = wx.TextCtrl(p, value=self.ai.get("xai_key", ""))
+        self.ai_xai = wx.TextCtrl(p, value=self.ai.get("xai_key", ""),
+                                  style=wx.TE_PASSWORD)
         self._row(p, v, "&xAI (Grok) kulcs:", self.ai_xai)
+        self._ai_panel = p
         self.ai_provider = wx.Choice(p, choices=[t for t, _ in AI_PROVIDERS])
         prov = self.ai.get("provider", "openai")
         self.ai_provider.SetSelection(
@@ -352,6 +367,39 @@ class SettingsDialog(wx.Dialog):
         dlg = AIKeysHelpDialog(self)
         dlg.ShowModal()
         dlg.Destroy()
+
+    _AI_KEY_ATTRS = ("ai_openai", "ai_gemini", "ai_anthropic", "ai_xai")
+
+    def _on_show_keys(self, evt=None):
+        """A kulcs-mezők maszkolásának váltása. A TE_PASSWORD stílus futás
+        közben nem váltható, ezért a mezőt AZONOS értékkel/névvel/fókusszal
+        újraépítjük, és a helyére tesszük (tab-sorrend megőrizve)."""
+        show = self.ai_show.GetValue()
+        for attr in self._AI_KEY_ATTRS:
+            self._swap_secret_style(attr, show)
+        self._ai_panel.Layout()
+
+    def _swap_secret_style(self, attr: str, show: bool):
+        old = getattr(self, attr)
+        parent = old.GetParent()
+        new = wx.TextCtrl(parent, value=old.GetValue(),
+                          style=0 if show else wx.TE_PASSWORD)
+        new.SetName(old.GetName())
+        try:
+            acc = _NamedAccessible(old.GetName())
+            new.SetAccessible(acc)
+            self._accessibles.append(acc)
+        except Exception:
+            pass
+        new.MoveAfterInTabOrder(old)       # a tab-sorrendbeli helyét örökli
+        sizer = old.GetContainingSizer()
+        if sizer:
+            sizer.Replace(old, new)
+        had_focus = wx.Window.FindFocus() is old
+        old.Destroy()
+        setattr(self, attr, new)
+        if had_focus:
+            new.SetFocus()
 
     # ---- mentés -------------------------------------------------------
 

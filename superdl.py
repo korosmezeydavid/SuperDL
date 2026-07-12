@@ -126,7 +126,15 @@ def main() -> int:
         prog="superdl",
         description="SuperDL – Super Digital Lounge: akadálymentes "
                     "médiaközpont (közvetlen fájlok + médiaoldalak a yt-dlp "
-                    "révén). Csak legálisan letölthető tartalomhoz használd!")
+                    "révén). Csak legálisan letölthető tartalomhoz használd!",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="Kilépési kódok (szkriptekhez/tesztekhez):\n"
+               "  0  minden letöltés sikeres\n"
+               "  1  általános hiba (vagy vegyes okú teljes bukás)\n"
+               "  2  hálózati hiba (minden letöltés ezen bukott)\n"
+               "  3  fájl-/jogosultsági hiba (nem írható célmappa, tele lemez)\n"
+               "  4  nem támogatott URL\n"
+               "  5  részleges siker (volt sikeres ÉS volt hibás letöltés)")
     ap.add_argument("urls", nargs="*", help="letöltendő URL-ek")
     ap.add_argument("--list", metavar="FÁJL",
                     help="URL-lista fájlból (soronként egy)")
@@ -178,6 +186,15 @@ def main() -> int:
                     help="feliratkozások listázása")
     ap.add_argument("--check-feeds", action="store_true",
                     help="feliratkozások ellenőrzése, új epizódok letöltése")
+    ap.add_argument("--no-speak", action="store_true", dest="no_speak",
+                    help="biztosan NE szólaljon meg beszéd (a --speak-et is "
+                         "felülírja; szkriptekhez, tesztekhez)")
+    ap.add_argument("--json", action="store_true", dest="json_out",
+                    help="a futás végén egy sornyi GÉPI (JSON) összegzés az "
+                         "stdout utolsó soraként")
+    ap.add_argument("--diagnose", action="store_true",
+                    help="titok-mentes diagnosztikai jelentés kiírása, majd "
+                         "kilépés (hibajelentéshez)")
     ap.add_argument("--speak", action="store_true",
                     help="a záró összefoglalót a beszédmotor is felolvassa")
     ap.add_argument("--engines", action="store_true",
@@ -189,6 +206,11 @@ def main() -> int:
     ap.add_argument("--update", action="store_true",
                     help="a letöltőmotorok frissítése a legújabb verzióra")
     args = ap.parse_args()
+
+    if getattr(args, "diagnose", False):
+        from superdl import diagnostics
+        print(diagnostics.build_report())
+        return 0
 
     if getattr(args, "selftest_tts", False):
         ok = True
@@ -372,13 +394,60 @@ def main() -> int:
     summary = build_summary(mgr.jobs)
     print(f"\n{summary}")
     print(f"Kész: {ok}/{len(mgr.jobs)} letöltés sikeres.")
-    if args.speak:
+    code = _exit_code(mgr.jobs)
+    if args.json_out:
+        import json as _json
+        from superdl import __version__
+        payload = {"version": __version__, "exit_code": code,
+                   "ok": ok, "total": len(mgr.jobs),
+                   "jobs": [{"url": j.url, "status": j.progress.status,
+                             "filename": j.progress.filename or "",
+                             "error": j.progress.error or ""}
+                            for j in mgr.jobs]}
+        print(_json.dumps(payload, ensure_ascii=False))
+    if args.speak and not args.no_speak:
         from superdl.speech import Speaker
         sp = Speaker()
         if sp.available:
             sp.speak(summary)
             time.sleep(min(2 + len(summary) / 12, 12))   # várjuk a felolvasást
-    return 0 if ok == len(mgr.jobs) else 2
+    return code
+
+
+def _classify_error(msg: str) -> int:
+    """Egy hibaszöveg → kilépési kód (2 hálózati / 3 fájl-írás / 4 nem
+    támogatott URL / 1 egyéb). Magyar (friendly_error utáni) és nyers angol
+    yt-dlp/OS üzenetekre is illik."""
+    m = (msg or "").lower()
+    if "unsupported url" in m or "no suitable extractor" in m \
+            or "nem támogatja" in m:
+        return 4
+    if ("errno 13" in m or "permission denied" in m or "access is denied" in m
+            or "errno 28" in m or "no space left" in m or "disk full" in m
+            or "nem lehet írni" in m or "elfogyott a hely" in m
+            or "nem hozható létre" in m):
+        return 3
+    if ("getaddrinfo" in m or "timed out" in m or "timeout" in m
+            or "connection" in m or "network" in m or "hálózati" in m
+            or "429" in m or "http error 5" in m or "nem érhető el" in m):
+        return 2
+    return 1
+
+
+def _exit_code(jobs) -> int:
+    """A futás kilépési kódja a dokumentált séma szerint: 0 minden kész;
+    5 részleges; teljes bukásnál a KÖZÖS ok kódja (2/3/4), vegyesnél 1."""
+    total = len(jobs)
+    done = sum(1 for j in jobs if j.progress.status == "kész")
+    if done == total:
+        return 0
+    if done:
+        return 5
+    codes = {_classify_error(getattr(j.progress, "error", "") or "")
+             for j in jobs if j.progress.status != "kész"}
+    if len(codes) == 1:
+        return codes.pop()
+    return 1
 
 
 if __name__ == "__main__":

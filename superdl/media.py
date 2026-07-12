@@ -37,6 +37,13 @@ def _prefers_single_video(url: str) -> bool:
 def friendly_error(msg: str) -> str:
     """Ismert, gyakori hibák érthető, lépésenkénti magyar üzenete."""
     m = msg.lower()
+    # a korhatár ELŐBB, mint a bot-ellenőrzés: a „Sign in to confirm your age”
+    # a bot-mintára is illik („sign in to confirm”), de a helyes üzenet a korhatáros
+    if "confirm your age" in m or "age-restricted" in m or "age restricted" in m:
+        return ("Ez a videó KORHATÁROS, ezért csak bejelentkezve tölthető le. "
+                "Megoldás: a Beállítások → Fiók/Sütik lapon válaszd ki azt a "
+                "böngészőt, amelyikben be vagy jelentkezve az oldalra – a "
+                "program a sütikkel igazolja az életkort.")
     if _is_bot_check(msg):
         return ("A YouTube megerősítést kér, hogy nem robot vagy (bot-"
                 "ellenőrzés). A SuperDL automatikusan megpróbálta a böngésződ "
@@ -59,6 +66,68 @@ def friendly_error(msg: str) -> str:
                 "exportálj egy cookies.txt fájlt egy böngésző-kiegészítővel. "
                 "Frissítsd a programot is, hogy a legújabb letöltőmotor "
                 "(yt-dlp) legyen benne.")
+    # ---- további gyakori yt-dlp hibák, emberi nyelven (Tibi-audit 4.4) ----
+    if "private video" in m or "this video is private" in m:
+        return ("Ez a videó PRIVÁT – csak az láthatja (és töltheti le), akivel "
+                "a feltöltő megosztotta. Ha jogosult vagy rá, jelentkezz be a "
+                "böngészőben, és a Beállítások → Fiók/Sütik lapon válaszd ki "
+                "azt a böngészőt.")
+    if ("members-only" in m or "members only" in m or "join this channel" in m
+            or "premium members" in m or "music premium" in m):
+        return ("Ez a tartalom TAGSÁGHOZ/ELŐFIZETÉSHEZ kötött (csatornatagság "
+                "vagy Premium). Csak akkor tölthető le, ha a fiókod jogosult "
+                "rá: jelentkezz be a böngészőben, és a Beállítások → Fiók/Sütik "
+                "lapon válaszd ki azt a böngészőt.")
+    if ("available in your country" in m or "geo restricted" in m
+            or "geo-restricted" in m or "blocked it in your country" in m
+            or "blocked in your country" in m):
+        return ("Ez a tartalom a TE ORSZÁGODBÓL nem érhető el (régiózár). Ezen "
+                "a program nem tud segíteni – a szolgáltató zárolja.")
+    if ("video unavailable" in m or "this video has been removed" in m
+            or "account associated with this video has been terminated" in m
+            or "no longer available" in m):
+        return ("A videó MÁR NEM ÉRHETŐ EL (törölték, elérhetetlenné tették, "
+                "vagy megszűnt a feltöltő fiókja). Ellenőrizd a linket a "
+                "böngészőben.")
+    if "premieres in" in m or "live event will begin" in m or "premiere" in m:
+        return ("Ez a videó MÉG NEM ELÉRHETŐ – premier vagy élő adás, ami "
+                "később kezdődik. Próbáld újra az adás/premier UTÁN.")
+    if "requested format is not available" in m:
+        return ("A kért formátum/minőség ehhez a videóhoz nem érhető el. "
+                "Próbáld más formátum- vagy minőség-beállítással (Beállítások "
+                "→ Letöltés).")
+    if "ffmpeg is not installed" in m or "ffmpeg not found" in m:
+        return ("Az ffmpeg (a hang/videó-feldolgozó motor) nem érhető el, "
+                "pedig az összefűzéshez/átkódoláshoz kell. A program általában "
+                "magától letölti – indítsd újra a letöltést; ha nem segít, a "
+                "Súgó → Frissítések keresése frissíti a motorokat.")
+    if "http error 403" in m or "forbidden" in m:
+        return ("Az oldal MEGTAGADTA a hozzáférést (403). Gyakori ok: lejárt "
+                "vagy hiányzó bejelentkezés, vagy az oldal átmenetileg blokkol. "
+                "Próbáld újra pár perc múlva, vagy a Beállítások → Fiók/Sütik "
+                "lapon add meg a bejelentkezett böngésződet.")
+    if "429" in m or "too many requests" in m:
+        return ("Az oldal átmenetileg KORLÁTOZ (túl sok kérés – 429). Várj "
+                "egy kicsit, és tölts le kevesebbet egyszerre.")
+    if ("getaddrinfo failed" in m or "timed out" in m or "timeout" in m
+            or "connection reset" in m or "connection refused" in m
+            or "unable to download webpage" in m or "network is unreachable" in m
+            or "temporary failure in name resolution" in m):
+        return ("HÁLÓZATI HIBA: az oldal nem érhető el. Ellenőrizd az "
+                "internetkapcsolatot, majd próbáld újra – a program a "
+                "félbeszakadt letöltést folytatni tudja.")
+    if ("no space left" in m or "errno 28" in m or "disk full" in m
+            or "not enough space" in m):
+        return ("ELFOGYOTT A HELY a lemezen – a letöltés nem fér el. "
+                "Szabadíts fel helyet, vagy válassz másik célmappát.")
+    if "permission denied" in m or "errno 13" in m or "access is denied" in m:
+        return ("A célmappába NEM LEHET ÍRNI (hozzáférés megtagadva). Válassz "
+                "másik célmappát a Beállításokban – például a Dokumentumok "
+                "vagy Letöltések mappát.")
+    if "unsupported url" in m or "no suitable extractor" in m:
+        return ("Ezt az oldalt/linket a letöltőmotor NEM TÁMOGATJA. Ellenőrizd "
+                "a linket; ha új oldalról van szó, a Súgó → Frissítések "
+                "keresése frissítheti a motort, ami már ismerheti.")
     return msg
 
 

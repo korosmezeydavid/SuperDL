@@ -66,6 +66,7 @@ class Manifest:
     version: str
     entry: str                      # a belépési PYTHON-csomag neve (register/unregister)
     min_core_api: str = "1.0"
+    min_core_version: str = ""      # tényleges programverzió-minimum (pl. "3.29.4")
     category: str = "Egyéb"
     description: str = ""
     requires_tools: list = field(default_factory=list)     # pl. ["ffmpeg","pandoc"]
@@ -96,6 +97,7 @@ def parse_manifest(data: dict) -> Manifest:
         version=str(data["version"]).strip(),
         entry=entry,
         min_core_api=str(data.get("min_core_api", "1.0")).strip() or "1.0",
+        min_core_version=str(data.get("min_core_version", "")).strip(),
         category=str(data.get("category", "Egyéb")).strip() or "Egyéb",
         description=str(data.get("description", "")).strip(),
         requires_tools=list(data.get("requires_tools", []) or []),
@@ -115,6 +117,27 @@ def version_gt(a: str, b: str) -> bool:
     összevetés). Így a Modulkezelő NEM jelez frissítést egy RÉGEBBI online
     verzióra (a puszta `!=` ezt hibásan tette)."""
     return _api_tuple(a) > _api_tuple(b)
+
+
+def current_core_version() -> str:
+    """A futó SuperDL programverziója (a min_core_version ellenőrzéséhez)."""
+    try:
+        from superdl import __version__
+        return __version__
+    except Exception:
+        return "0"
+
+
+def core_version_ok(required: str, current: str | None = None) -> bool:
+    """Elég új-e a futó SuperDL a modul által kért minimumhoz? Üres/hiányzó
+    követelmény = nincs megkötés. A `min_core_api` az API-kompatibilitást fedi;
+    ez a TÉNYLEGES programverzió-minimum (Tibi-audit: egy modul támaszkodhat
+    újabb Core-VISELKEDÉSRE azonos API mellett is)."""
+    req = (required or "").strip()
+    if not req:
+        return True
+    cur = current if current is not None else current_core_version()
+    return _api_tuple(cur) >= _api_tuple(req)
 
 
 # ======================================================================
@@ -240,9 +263,11 @@ class ModuleEntry:
     url: str
     sha256: str
     size: int
+    min_core_version: str = ""      # tényleges programverzió-minimum
 
     def compatible(self, core_api: str = CORE_API) -> bool:
-        return _api_tuple(self.min_core_api) <= _api_tuple(core_api)
+        return (_api_tuple(self.min_core_api) <= _api_tuple(core_api)
+                and core_version_ok(self.min_core_version))
 
 
 def parse_index(data: dict) -> list[ModuleEntry]:
@@ -261,6 +286,7 @@ def parse_index(data: dict) -> list[ModuleEntry]:
                 description=str(m.get("description", "")).strip(),
                 version=str(latest.get("version", "")).strip(),
                 min_core_api=str(latest.get("min_core_api", "1.0")).strip() or "1.0",
+                min_core_version=str(latest.get("min_core_version", "")).strip(),
                 url=str(latest.get("url", "")).strip(),
                 sha256=str(latest.get("sha256", "")).strip().lower(),
                 size=int(latest.get("size", 0) or 0),
@@ -377,6 +403,12 @@ def install_module_zip(data: bytes, expected_sha256: str | None = None,
             raise InstallError(
                 f"Ehhez a modulhoz újabb SuperDL kell (min_core_api "
                 f"{man.min_core_api} > {core_api}).")
+        if not core_version_ok(man.min_core_version):
+            raise InstallError(
+                f"Ehhez a modulhoz újabb SuperDL kell: legalább a(z) "
+                f"{man.min_core_version} verzió, ez a program pedig "
+                f"{current_core_version()}. Előbb frissítsd a programot "
+                "(Súgó → Frissítések keresése), utána telepítsd a modult.")
         if not (staging / man.entry).is_dir() \
                 and not (staging / (man.entry + ".py")).is_file():
             raise InstallError(
@@ -447,6 +479,15 @@ class ModuleLoader:
             self.errors[man.id] = (
                 f"újabb SuperDL kell (min_core_api {man.min_core_api} > "
                 f"{self._core_api})")
+            self._log.warning("Modul kihagyva (%s): %s", man.id, self.errors[man.id])
+            return None
+
+        if not core_version_ok(man.min_core_version):
+            self.errors[man.id] = (
+                f"újabb SuperDL kell: a modul legalább a(z) "
+                f"{man.min_core_version} verziót kéri, ez a program "
+                f"{current_core_version()} – frissítsd a programot "
+                "(Súgó → Frissítések keresése)")
             self._log.warning("Modul kihagyva (%s): %s", man.id, self.errors[man.id])
             return None
 

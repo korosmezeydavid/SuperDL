@@ -8,6 +8,7 @@ Minden a felhasználó saját mappájában, a ~/.superdl könyvtárban tárolód
 """
 
 import json
+import os
 import threading
 import time
 from pathlib import Path
@@ -55,11 +56,21 @@ def load_json(path: Path, default):
         return default
 
 
+def _write_fsync(path: Path, text: str) -> None:
+    """Szöveg kiírása ÚGY, hogy áramszünet/összeomlás után se maradjon üres
+    vagy fél fájl: írás → flush → os.fsync (lemezre kényszerítés), és csak
+    ezután cseréljük a helyére. E nélkül a rename atomikus ugyan, de a TARTALOM
+    még a lemez-gyorsítótárban lehet → 0 bájtos „mentett" fájl lehet a vége."""
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(text)
+        f.flush()
+        os.fsync(f.fileno())
+
+
 def save_json(path: Path, data) -> None:
     _ensure_dir()
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False),
-                   encoding="utf-8")
+    _write_fsync(tmp, json.dumps(data, indent=2, ensure_ascii=False))
     # a jelenlegi (még jó) fájlt megőrizzük .bak néven, mielőtt felülírnánk –
     # így egy fél mentés vagy későbbi sérülés után van mihez visszanyúlni
     if path.exists():
@@ -113,8 +124,7 @@ def save_secret_json(path: Path, data) -> None:
             "telepítést, vagy használd a kulcsot csak ebben a munkamenetben.")
     payload = {"__dpapi__": base64.b64encode(bytes(blob)).decode("ascii")}
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False),
-                   encoding="utf-8")
+    _write_fsync(tmp, json.dumps(payload, indent=2, ensure_ascii=False))
     tmp.replace(path)
     # FONTOS: titoknál NEM hagyunk .bak-ot, és egy meglévőt is törlünk – egy
     # korábbi (akár sima szövegű) .bak különben nyíltan őrizné a kulcsokat

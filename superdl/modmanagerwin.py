@@ -44,8 +44,13 @@ def compute_rows(entries, installed: dict, core_api: str = modkit.CORE_API):
                              status="Elérhető", version=e.version,
                              entry=e, installable=True, removable=False))
         else:
+            # ha a TÉNYLEGES programverzió a kevés, mondjuk meg, mennyi kell
+            need = getattr(e, "min_core_version", "")
+            status = ("Újabb SuperDL kell (legalább " + need + ")"
+                      if need and not modkit.core_version_ok(need)
+                      else "Újabb SuperDL kell")
             rows.append(dict(id=e.id, name=e.name, category=e.category,
-                             status="Újabb SuperDL kell", version=e.version,
+                             status=status, version=e.version,
                              entry=e, installable=False, removable=False))
     # telepítve, de a boltban nincs (helyi/levett modul)
     for mid, ver in installed.items():

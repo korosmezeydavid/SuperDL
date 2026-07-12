@@ -70,6 +70,8 @@ def build(src_dir: str, dist_dir: str = "dist_modules",
         "latest": {
             "version": ver,
             "min_core_api": man.get("min_core_api", "1.0"),
+            **({"min_core_version": str(man["min_core_version"]).strip()}
+               if str(man.get("min_core_version", "")).strip() else {}),
             "url": f"https://github.com/{repo}/releases/download/{tag}/{out.name}",
             "sha256": sha,
             "size": len(data),

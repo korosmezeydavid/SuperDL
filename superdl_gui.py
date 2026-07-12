@@ -463,6 +463,10 @@ class MainFrame(wx.Frame):
         m_help.AppendSeparator()
         mi_upd = m_help.Append(wx.ID_ANY, "&Frissítések keresése\tCtrl+U",
                                "A letöltőmotorok új verzióinak keresése")
+        mi_diag = m_help.Append(
+            wx.ID_ANY, "Hibajelentés &vágólapra (diagnosztika)",
+            "Titok-mentes diagnosztikai jelentés a vágólapra – illeszd a "
+            "hibajelentő levélbe")
         m_help.AppendSeparator()
         mi_support = m_help.Append(
             wx.ID_ANY, "Köszönet és &támogatás…",
@@ -500,6 +504,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(3), mi_priv)
         self.Bind(wx.EVT_MENU, self._on_ai_keys_help, mi_aikeys)
         self.Bind(wx.EVT_MENU, self._on_check_updates, mi_upd)
+        self.Bind(wx.EVT_MENU, self._on_diagnostics, mi_diag)
         self.Bind(wx.EVT_MENU, self._on_search_window, mi_search)
         self.Bind(wx.EVT_MENU, self._on_modmgr_window, mi_modmgr)
         self.Bind(wx.EVT_MENU, self._on_ai_image, mi_ai_img)
@@ -1480,6 +1485,33 @@ class MainFrame(wx.Frame):
         dlg = SupportDialog(self)
         dlg.ShowModal()
         dlg.Destroy()
+
+    def _on_diagnostics(self, event=None):
+        """Titok-mentes diagnosztikai jelentés a VÁGÓLAPRA (hibajelentéshez).
+        A vak felhasználónak így nem kell adatokat vadásznia: Ctrl+V a levélbe."""
+        from superdl import diagnostics
+        try:
+            tail = self.log.GetValue().splitlines()[-25:]
+        except Exception:
+            tail = []
+        report = diagnostics.build_report(settings=self.settings,
+                                          log_lines=tail)
+        ok = False
+        if wx.TheClipboard.Open():
+            try:
+                ok = wx.TheClipboard.SetData(wx.TextDataObject(report))
+            finally:
+                wx.TheClipboard.Close()
+        if ok:
+            wx.MessageBox(
+                "A diagnosztikai jelentés a VÁGÓLAPRA került (titkok nélkül, "
+                "kulcsok maszkolva).\n\nIlleszd be a hibajelentő levélbe: "
+                "Ctrl+V.", "Hibajelentés vágólapra", wx.OK | wx.ICON_INFORMATION,
+                self)
+        else:
+            wx.MessageBox("A vágólap most nem érhető el – próbáld újra.",
+                          "Hibajelentés vágólapra", wx.OK | wx.ICON_WARNING,
+                          self)
 
     CREDITS_TEXT = (
         "SuperDL – Közreműködők és köszönet\n"
