@@ -132,9 +132,16 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-12 · dolgozott: Claude (3.29.9 KIADVA ✅ + 2 új modul-funkció kódkész)
+**Utolsó frissítés:** 2026-07-12 · dolgozott: Claude (docconvert 1.2.0 + radio 1.1.0 KIADVA ✅)
 
-**➡️ ÚJ FUNKCIÓK KÓDKÉSZ — PUBLIKÁLÁSRA VÁR (modul-only, NINCS Core-build).** Felhasználói kérés
+**✅ MODUL-KIADÁS (2026-07-12): docconvert 1.2.0 + radio 1.1.0 KIADVA.** mod-docconvert-1.2.0 +
+mod-radio-1.1.0 release-ek (`--latest=false`!) + modules.json a main-en (push 0129e9d); minden zip
++ modules.json 200; a Core „Latest" MARADT `v3.29.9` (nincs latest-csapda), stabil linkjei
+sértetlenek. 75 pytest zöld, CI zöld, kulcs-szken tiszta. TANULSÁG MEGERŐSÍTVE: modul-release-t
+`--latest=false`-szal kell létrehozni, ha a Core marad a legfrissebb. Hírlevél a listának MÉG NEM
+ment. Az eredeti kódkész-állapot (referenciának):
+
+**➡️ ÚJ FUNKCIÓK (KIADVA a fentiek szerint; modul-only, NINCS Core-build).** Felhasználói kérés
 (2026-07-12), mind a 4 mérföldkő kész, 75 pytest zöld + CI, kulcs-szken tiszta:
 - **docconvert 1.2.0** (commit 3443a97) — M3 KÖTEGELT (fájllista + „Mappa hozzáadása", per-fájl
   állapot, cél-mappa) + M4 EGY FÁJLBA ÖSSZEFŰZÉS (`merge_documents`, fájlonkénti címmel). Új
