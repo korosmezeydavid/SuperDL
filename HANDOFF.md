@@ -132,7 +132,20 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-12 · dolgozott: Claude (3.29.9 KIADVA ✅)
+**Utolsó frissítés:** 2026-07-12 · dolgozott: Claude (3.29.9 KIADVA ✅ + 2 új modul-funkció kódkész)
+
+**➡️ ÚJ FUNKCIÓK KÓDKÉSZ — PUBLIKÁLÁSRA VÁR (modul-only, NINCS Core-build).** Felhasználói kérés
+(2026-07-12), mind a 4 mérföldkő kész, 75 pytest zöld + CI, kulcs-szken tiszta:
+- **docconvert 1.2.0** (commit 3443a97) — M3 KÖTEGELT (fájllista + „Mappa hozzáadása", per-fájl
+  állapot, cél-mappa) + M4 EGY FÁJLBA ÖSSZEFŰZÉS (`merge_documents`, fájlonkénti címmel). Új
+  `extract_book` (kép→OCR / közvetlen / exotikus→köztes TXT). zip: docconvert-1.2.0.zip
+  SHA d379a3d9eae685c747cd6eb9c1fb5d3d3c0d5d78c6797a67c1b667c6c4497c2f.
+- **radio 1.1.0** (commit 7c659e7) — M1 saját állomás URL-lel (`CustomStationDialog`→kedvencek) +
+  M2 megosztás a radio-browser NYILVÁNOS adatbázisába (`add_station`→POST /json/add, KIFEJEZETT
+  megerősítés után). zip: radio-1.1.0.zip SHA ed1dd0e365b52e8107a7d8cec6af89a4f26c14ec76337bcad75335eedc9672c0.
+- **modules.json MINDKETTŐNÉL SZÁNDÉKOSAN ÉRINTETLEN** — a 2 bejegyzés CSAK publikáláskor.
+  PUBLIKÁLÁS: mod-docconvert-1.2.0 + mod-radio-1.1.0 release a zipekkel + modules.json 2 bejegyzés
+  (build_module.py kiírta) + push. Core-build NEM kell.
 
 **3.29.9 KIADVA ✅ (2026-07-12).** Core `v3.29.9` „Latest" (4 asset) + `mod-iptv-1.0.3` +
 modules.json a main-en; forrás 51296ca; kulcs-szken TISZTA (forrás+iptv-zip+binárisok);
