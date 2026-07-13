@@ -1,10 +1,10 @@
 {
   "id": "radio",
   "name": "Internetes rádió",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "entry": "radio_mod",
   "category": "Média",
-  "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
+  "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. ÚJ: saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
   "min_core_api": "1.0",
   "requires_tools": [],
   "author": "Kőrösmezey Dávid"

@@ -98,6 +98,35 @@ def countries(min_count: int = 3) -> list[Country]:
     return out
 
 
+def add_station(name: str, url: str, homepage: str = "",
+                country_code: str = "", tags: str = "") -> dict:
+    """Új állomás BEKÜLDÉSE a radio-browser.info NYILVÁNOS közösségi
+    adatbázisába (POST /json/add). Sikernél a szerver JSON-t ad vissza
+    (ok, message, uuid); a duplikátumot maga a szerver kezeli (a meglévő
+    uuid-t adja). CSAK a felhasználó KIFEJEZETT jóváhagyásával hívjuk – a
+    beküldés nyilvános és nem visszavonható. Így más SuperDL-felhasználók
+    (és bárki) is megtalálja kereséssel, saját szerver nélkül."""
+    from urllib.parse import urlencode
+    params = {"name": name.strip(), "url": url.strip()}
+    if homepage.strip():
+        params["homepage"] = homepage.strip()
+    if country_code.strip():
+        params["countrycode"] = country_code.strip().upper()[:2]
+    if tags.strip():
+        params["tags"] = tags.strip()
+    data = urlencode(params).encode("utf-8")
+    last = None
+    for s in SERVERS:
+        try:
+            req = urllib.request.Request(
+                f"https://{s}/json/add", data=data,
+                headers={"User-Agent": "SuperDL/2.0"})
+            return json.load(urllib.request.urlopen(req, timeout=20))
+        except Exception as e:
+            last = e
+    raise last or RuntimeError("nincs elérhető rádió-szerver")
+
+
 def by_country_code(code: str, limit: int = 50) -> list[Station]:
     """Egy ország legnépszerűbb állomásai az ISO-kód PONTOS egyezésével.
     (A korábbi név szerinti `country=` keresés azért nem talált, mert pontos

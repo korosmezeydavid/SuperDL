@@ -36,9 +36,78 @@ másolása.  Ctrl+fel / Ctrl+le – hangerő.  Ctrl+Szóköz – szünet.  Esc �
 leállítás.  F9 – felvétel most.  Ctrl+R – időzített felvétel.  Ctrl+Shift+F –
 felvételek és időzítések kezelése.  A listákban Delete – törlés.
 
+SAJÁT ÁLLOMÁS ÉS MEGOSZTÁS
+- „Saját állomás hozzáadása”: ha egy rádió nincs a listában, itt megadhatod a
+  nevét és a stream-URL-jét – a kedvencek közé kerül, és rögtön hallgathatod.
+- „Megosztás a közösséggel”: a kijelölt (saját) állomást beküldheted a
+  radio-browser.info NYILVÁNOS közösségi adatbázisába – így más SuperDL-esek is
+  megtalálják kereséssel. A beküldés nyilvános, kérdés után történik; csak
+  saját, legális, nyilvánosan sugárzott állomást küldj be.
+
 TIPP
 A felvételek a célmappa „Rádiófelvételek” dátumozott almappájába kerülnek,
 MP3-ként. Az időzített felvételhez a program legyen nyitva a megadott időben."""
+
+
+class CustomStationDialog(wx.Dialog):
+    """Saját rádióállomás megadása (név + stream-URL, opcionális ország/címke).
+    Akadálymentes: minden mező címkézve, a Hozzáadás az alapértelmezett gomb."""
+
+    def __init__(self, parent):
+        super().__init__(parent, title="Saját rádióállomás hozzáadása",
+                         size=(560, 340))
+        self.station = None
+        p = wx.Panel(self)
+        v = wx.BoxSizer(wx.VERTICAL)
+        g = wx.FlexGridSizer(0, 2, 8, 8)
+        g.AddGrowableCol(1)
+
+        def row(label, acc_name, hint=""):
+            g.Add(wx.StaticText(p, label=label), 0, wx.ALIGN_CENTER_VERTICAL)
+            c = wx.TextCtrl(p)
+            c.SetName(acc_name)
+            if hint:
+                c.SetHint(hint)
+            g.Add(c, 0, wx.EXPAND)
+            return c
+
+        self.c_name = row("&Név:", "Állomás neve")
+        self.c_url = row("&Stream-URL:", "Stream URL",
+                         "http:// vagy https://… (mp3/aac/m3u8…)")
+        self.c_country = row("&Ország (ISO-kód, pl. HU):", "Ország ISO-kódja")
+        self.c_tags = row("&Címkék (vesszővel):", "Címkék", "pl. pop, hírek")
+        v.Add(g, 1, wx.EXPAND | wx.ALL, 12)
+        v.Add(wx.StaticText(
+            p, label="A saját állomás a KEDVENCEK közé kerül. A közösségi "
+            "megosztás külön, a főablak „Megosztás” gombjával, kérdés után "
+            "történik."), 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 12)
+
+        btns = wx.StdDialogButtonSizer()
+        ok = wx.Button(p, wx.ID_OK, "&Hozzáadás")
+        ok.SetDefault()
+        btns.AddButton(ok)
+        btns.AddButton(wx.Button(p, wx.ID_CANCEL, "Mé&gse"))
+        btns.Realize()
+        v.Add(btns, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
+        p.SetSizer(v)
+        self.Bind(wx.EVT_BUTTON, self._on_ok, id=wx.ID_OK)
+
+    def _on_ok(self, e):
+        name = self.c_name.GetValue().strip()
+        url = self.c_url.GetValue().strip()
+        if not name or not url:
+            wx.MessageBox("A név és a stream-URL is kötelező.", "Hiányzó adat",
+                          wx.OK | wx.ICON_WARNING, self)
+            return
+        if not (url.startswith("http://") or url.startswith("https://")):
+            wx.MessageBox("A stream-URL http:// vagy https:// címmel kezdődjön.",
+                          "Érvénytelen URL", wx.OK | wx.ICON_WARNING, self)
+            return
+        self.station = R.Station(
+            name=name, url=url,
+            country=self.c_country.GetValue().strip().upper()[:2],
+            tags=self.c_tags.GetValue().strip())
+        e.Skip()          # érvényes → a párbeszéd ID_OK-kal zárul
 
 
 class RadioFrame(wx.Frame):
@@ -149,6 +218,16 @@ class RadioFrame(wx.Frame):
         for b in (self.rec_btn, b_sched, b_recs):
             rec.Add(b, 0, wx.RIGHT, 6)
         v.Add(rec, 0, wx.LEFT | wx.BOTTOM, 8)
+
+        # saját állomás + közösségi megosztás
+        own = wx.BoxSizer(wx.HORIZONTAL)
+        b_own = wx.Button(p, label="Saját á&llomás hozzáadása…")
+        b_own.Bind(wx.EVT_BUTTON, lambda e: self._add_custom())
+        b_share = wx.Button(p, label="Meg&osztás a közösséggel…")
+        b_share.Bind(wx.EVT_BUTTON, lambda e: self._share_selected())
+        own.Add(b_own, 0, wx.RIGHT, 6)
+        own.Add(b_share, 0)
+        v.Add(own, 0, wx.LEFT | wx.BOTTOM, 8)
 
         v.Add(wx.StaticText(p, label="Ke&dvencek (Enter: lejátszás, "
               "Delete: törlés):"), 0, wx.LEFT, 8)
@@ -468,6 +547,77 @@ class RadioFrame(wx.Frame):
         for s in self.favorites:
             row = self.fav_list.InsertItem(self.fav_list.GetItemCount(), s.name)
             self.fav_list.SetItem(row, 1, s.country)
+
+    # ---- saját állomás + közösségi megosztás --------------------------
+
+    def _add_custom(self):
+        """Saját állomás (név + URL) → a kedvencek közé, és felajánljuk a
+        lejátszást. Így a listában nem szereplő rádiók is hallgathatók (M1)."""
+        dlg = CustomStationDialog(self)
+        try:
+            if dlg.ShowModal() != wx.ID_OK or not dlg.station:
+                return
+            st = dlg.station
+        finally:
+            dlg.Destroy()
+        if any(f.url == st.url for f in self.favorites):
+            self._announce("Ez az URL már a kedvencek között van.")
+        else:
+            self.favorites.append(st)
+            self._save_fav()
+            self._refresh_fav()
+            self._announce(f"Saját állomás a kedvencekhez adva: {st.name}")
+        if wx.MessageBox(f"Lejátsszam most: {st.name}?", "Saját állomás",
+                         wx.YES_NO | wx.ICON_QUESTION, self) == wx.YES:
+            self._play(st)
+
+    def _share_source(self) -> R.Station | None:
+        """A megosztandó állomás: a kedvencek kijelöltje elsőbbséggel (ide
+        kerülnek a saját állomások), különben a keresési lista kijelöltje."""
+        return self._fav_selected_station() or self._selected()
+
+    def _share_selected(self):
+        """A kijelölt állomás beküldése a radio-browser NYILVÁNOS közösségi
+        adatbázisába – KIFEJEZETT megerősítés után (M2)."""
+        st = self._share_source()
+        if not st:
+            self._announce("Előbb jelölj ki egy állomást (a kedvencekben vagy "
+                           "a listában).")
+            return
+        msg = (f"Megosztod a radio-browser.info NYILVÁNOS közösségi "
+               f"adatbázisában?\n\nÁllomás: {st.name}\nURL: {st.url}\n\n"
+               "Így más SuperDL-felhasználók (és bárki) is megtalálja "
+               "kereséssel. A beküldés NYILVÁNOS és nem vonható vissza. Csak "
+               "SAJÁT, legális, nyilvánosan sugárzott állomást küldj be.")
+        if wx.MessageBox(msg, "Megosztás a közösséggel",
+                         wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION,
+                         self) != wx.YES:
+            return
+        self._announce("Beküldés a radio-browser közösségi adatbázisába…")
+
+        def work():
+            try:
+                res = R.add_station(st.name, st.url,
+                                    country_code=st.country, tags=st.tags)
+                ok = bool(res.get("ok")) if isinstance(res, dict) else False
+                message = (res.get("message") if isinstance(res, dict)
+                           else "") or ""
+                uuid = res.get("uuid", "") if isinstance(res, dict) else ""
+                wx.CallAfter(self._share_done, ok, message, uuid)
+            except Exception as e:
+                wx.CallAfter(self._share_done, False, str(e), "")
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _share_done(self, ok: bool, message: str, uuid: str):
+        if ok:
+            self._announce(
+                "Megosztva! Az állomás beküldve a közösségi adatbázisba"
+                + (f" (azonosító: {uuid})." if uuid else ".")
+                + " Kis idő múlva keresésre is előjön.")
+        else:
+            self._announce("A megosztás nem sikerült: "
+                           + (message or "ismeretlen hiba") + ".")
 
     def _save_fav(self):
         store.save_radio_favorites([self._to_rec(f) for f in self.favorites])
