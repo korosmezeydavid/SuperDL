@@ -504,3 +504,66 @@ def convert(src, dst, out_format, in_encoding=None, out_encoding="utf-8",
     enc = f", {out_encoding} kódolással" if out_format == "txt" else ""
     return (f"Kész: „{book.title}” → {Path(dst).name} ({out_format.upper()}"
             f"{enc}). {book.chars} karakter, {len(book.sections)} szakasz.")
+
+
+# ---- KÖTEGELT mód: szöveg-kinyerés + több fájl EGY kimenetbe -----------
+
+def extract_book(src, in_encoding=None, ocr_engine="ai") -> booktext.Book:
+    """Egy bemenet szövegének kiolvasása Book-ba (az összefűzéshez). Kép → OCR;
+    a közvetlenül olvasható formátumok (txt/html/docx/epub/pdf) a beépített
+    olvasókkal; minden más (rtf/odt/md/fb2/mobi/doc/azw3) egy ideiglenes TXT-n át
+    a TELJES `convert()` úttal (Pandoc/Calibre) – így egy formátum sem zsákutca."""
+    in_ext = Path(src).suffix.lower()
+    if in_ext in ocr.IMAGE_EXTS:
+        text = ocr.ocr(src, ocr_engine)
+        if not text.strip():
+            raise RuntimeError("Az OCR nem talált szöveget a képen.")
+        return booktext.Book(title=Path(src).stem,
+                             sections=[booktext._clean(text)])
+    try:
+        return read_document(src, in_encoding)
+    except ValueError:
+        pass                                   # exotikus formátum → köztes TXT
+    tmp = Path(tempfile.gettempdir()) / (Path(src).stem + "_merge_tmp.txt")
+    try:
+        convert(src, str(tmp), "txt", in_encoding, "utf-8", ocr_engine)
+        return read_document(tmp, None)
+    finally:
+        tmp.unlink(missing_ok=True)
+
+
+def merge_documents(files, dst, out_format="txt", in_encoding=None,
+                    out_encoding="utf-8", ocr_engine="ai",
+                    on_file=None, progress=None) -> tuple[int, list]:
+    """Több dokumentum szövegét EGYETLEN kimenetbe fűzi, fájlonkénti címmel.
+    Visszaad: (sikeres_szám, [(fájlnév, hibaüzenet), …]). `on_file(index, név,
+    állapot, hiba)` a fájlonkénti visszajelzéshez (állapot: folyamatban/kész/
+    hiba), `progress(kész, összes)` a haladáshoz. Ha EGY fájl szövegét sem
+    sikerül kiolvasni, RuntimeError (nincs mit kiírni)."""
+    merged = booktext.Book(title=Path(dst).stem, sections=[])
+    ok = 0
+    errors: list = []
+    total = len(files)
+    for i, src in enumerate(files):
+        name = Path(src).name
+        if on_file:
+            on_file(i, name, "folyamatban", "")
+        try:
+            book = extract_book(src, in_encoding, ocr_engine)
+            title = (book.title or Path(src).stem).strip()
+            merged.sections.append(f"— {title} —")     # fájlonkénti fejléc
+            merged.sections.extend(s for s in book.sections if s.strip())
+            ok += 1
+            if on_file:
+                on_file(i, name, "kész", "")
+        except Exception as e:
+            errors.append((name, str(e)))
+            if on_file:
+                on_file(i, name, "hiba", str(e))
+        if progress:
+            progress(i + 1, total)
+    if ok == 0:
+        raise RuntimeError("Egyetlen fájl szövegét sem sikerült kiolvasni – "
+                           "a kimeneti fájlt nem hoztam létre.")
+    _write_any(merged, Path(dst), out_format, out_encoding)
+    return ok, errors

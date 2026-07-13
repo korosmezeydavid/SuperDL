@@ -1,12 +1,14 @@
 """Dokumentum-konverter ablak: szöveg-, könyv- és KÉP-formátumok átalakítása,
-kódolás-konverzió, és kép→szöveg OCR (több motorral). A gazdag formátumokhoz
-(RTF/ODT/MD/FB2, illetve MOBI/PDF) külső eszközöket (Pandoc, Calibre,
-LibreOffice) használ – a Pandoc igény szerint letölthető. Teljesen
-billentyűzetről kezelhető, felolvasott visszajelzéssel.
+kódolás-konverzió, és kép→szöveg OCR (több motorral). KÖTEGELT: több fájl vagy
+egy egész mappa egyszerre, mindegyik a saját kimenetébe VAGY egyetlen fájlba
+összefűzve. A gazdag formátumokhoz (RTF/ODT/MD/FB2, illetve MOBI/PDF) külső
+eszközöket (Pandoc, Calibre, LibreOffice) használ – a Pandoc igény szerint
+letölthető. Teljesen billentyűzetről kezelhető, felolvasott visszajelzéssel.
 """
 
 import os
 import threading
+from pathlib import Path
 
 import wx
 
@@ -19,26 +21,35 @@ HELP = """DOKUMENTUM-KONVERTER
 MIRE VALÓ
 Dokumentumok és képek átalakítása más formátumba (TXT, DOCX, EPUB, PDF, HTML,
 RTF, ODT, Markdown, FB2…), régi kódlapok javítása, és képből szöveg kiolvasása
-(OCR). Teljesen billentyűzetről kezelhető.
+(OCR). Egy fájl vagy AKÁR SOK fájl / egy egész mappa egyszerre. Teljesen
+billentyűzetről kezelhető.
 
 LÉPÉSRŐL LÉPÉSRE (vakon is)
-1. „Fájl betöltése" gomb (Tab-bal ráállsz, Enter). Válaszd ki a dokumentumot
-   vagy képet – a program bemondja, mit töltött be.
-2. Tab-bal a „Kimeneti formátum" listára, nyilakkal válaszd, mibe alakítsa
+1. „Fájlok hozzáadása" gomb (Tab-bal ráállsz, Enter). Egyszerre több fájlt is
+   kijelölhetsz. VAGY „Mappa hozzáadása" – a mappa összes támogatott fájlját
+   berakja a listába.
+2. A „Konvertálandó fájlok" lista mutatja, mi van kijelölve, és konvertáláskor
+   fájlonként az állapotot (folyamatban / kész / hiba). A Delete billentyű a
+   kijelölt sort kiveszi.
+3. Tab-bal a „Kimeneti formátum" listára, nyilakkal válaszd, mibe alakítsa
    (pl. TXT, DOCX, EPUB, PDF).
-3. TXT-nél a „Bemeneti kódolás" és „Kimeneti kódolás" listával állítható a
-   kódlap. Régi magyar szövegnél hagyd a bemenetet „Automatikus felismerés"-en
-   (a CP852-t és a CWI-2-t is felismeri).
-4. „Konvertálás" gomb – a végén a program bemondja, hova mentette.
-Képnél: OCR-rel kiolvassa a szöveget; az OCR-motort a listából választhatod.
+4. „Kimeneti mód": „Külön fájlokba" – mindegyik a saját fájljába (egy mappát
+   kell választanod); vagy „Egy fájlba összefűzve" – az összes szöveg EGYETLEN
+   fájlba kerül, fájlonkénti címmel (egy mentési nevet kell megadnod).
+5. TXT-nél a „Bemeneti kódolás" és „Kimeneti kódolás" listával állítható a
+   kódlap. Régi magyar szövegnél hagyd a bemenetet „Automatikus felismerés"-en.
+6. „Konvertálás" gomb – a végén a program bemondja, hova mentette, és hány fájl
+   sikerült.
+Képnél: OCR-rel olvassa ki a szöveget; az OCR-motort a listából választhatod.
 
 GYORSBILLENTYŰK
 F1 – ez a súgó.  Tab / Shift+Tab – mozgás a vezérlők közt.  Szóköz vagy Enter –
-gomb megnyomása.  Fel/le nyíl – választás a listákban.
+gomb.  Fel/le nyíl – választás a listákban.  Delete – kijelölt fájl kivétele.
 
 TIPPEK
 - Ha egy régi magyar szöveg „kacatosan" jön át, a bemeneti kódolásnál válaszd
   kézzel a „Magyar DOS (CP852)" vagy a „Magyar CWI-2" beállítást.
+- Az összefűzés jó pl. sok kis szövegfájl EGY dokumentummá fésüléséhez.
 - A gazdag formátumokhoz (RTF/ODT/MD, MOBI) a program szükség szerint letölti a
   Pandoc/Calibre segédet – ezt egyszer engedélyezned kell."""
 
@@ -51,20 +62,39 @@ WILDCARD = (
     "Kép (OCR-hez)|*.tif;*.tiff;*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.webp|"
     "Minden fájl|*.*")
 
+# kimeneti mód: külön fájlokba / egyetlen fájlba összefűzve
+CONVERT_MODES = [
+    ("Külön fájlokba (mindegyik a saját fájljába)", "separate"),
+    ("Egy fájlba összefűzve", "merge"),
+]
+
+
+def _unique(path: str) -> str:
+    """Ütközésmentes kimeneti út: ha létezik, sorszámot fűz a névhez."""
+    p = Path(path)
+    if not p.exists():
+        return str(p)
+    i = 2
+    while True:
+        cand = p.with_name(f"{p.stem} ({i}){p.suffix}")
+        if not cand.exists():
+            return str(cand)
+        i += 1
+
 
 class DocConvertFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Dokumentum-konverter",
-                         size=(820, 600))
+                         size=(860, 640))
         self.main = main
-        self.src = ""
+        self.files: list[str] = []         # a konvertálandó fájlok (teljes út)
         self._busy = False
         self._ocr_keys = list(ocr.ENGINES.keys())
         self._build()
         self.CreateStatusBar()
-        self._announce("Tölts be egy dokumentumot vagy képet, válaszd ki a "
-                       "kimeneti formátumot, és konvertálom. Képnél OCR-rel "
-                       "olvasom ki a szöveget. Súgó: F1.")
+        self._announce("Adj hozzá fájlokat vagy egy mappát, válaszd a kimeneti "
+                       "formátumot és módot, és konvertálom. Több fájlt "
+                       "egyszerre is, akár egy fájlba összefűzve. Súgó: F1.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
 
@@ -86,15 +116,30 @@ class DocConvertFrame(wx.Frame):
         p = wx.Panel(self)
         v = wx.BoxSizer(wx.VERTICAL)
 
-        top = wx.BoxSizer(wx.HORIZONTAL)
-        b = wx.Button(p, label="Fájl &betöltése…")
-        b.Bind(wx.EVT_BUTTON, lambda e: self._load())
-        self.src_lbl = wx.StaticText(p, label="Nincs betöltött fájl.")
-        self.src_lbl.SetName("Betöltött fájl")
-        top.Add(b, 0, wx.RIGHT, 8)
-        top.Add(self.src_lbl, 1, wx.ALIGN_CENTER_VERTICAL)
-        v.Add(top, 0, wx.EXPAND | wx.ALL, 8)
+        # ---- fájllista-műveletek ----
+        fb = wx.BoxSizer(wx.HORIZONTAL)
+        for label, handler in (
+                ("&Fájlok hozzáadása…", self._add_files),
+                ("&Mappa hozzáadása…", self._add_folder),
+                ("Kijelölt e&ltávolítása", self._remove_selected),
+                ("Lista ü&rítése", self._clear)):
+            b = wx.Button(p, label=label)
+            b.Bind(wx.EVT_BUTTON, lambda e, h=handler: h())
+            fb.Add(b, 0, wx.RIGHT, 6)
+        v.Add(fb, 0, wx.ALL, 8)
 
+        # ---- a konvertálandó fájlok listája (fájlonkénti állapottal) ----
+        self.list = wx.ListCtrl(
+            p, style=wx.LC_REPORT, name="Konvertálandó fájlok")
+        self.list.InsertColumn(0, "Fájl", width=430)
+        self.list.InsertColumn(1, "Állapot", width=180)
+        self.list.Bind(wx.EVT_KEY_DOWN, self._on_list_key)
+        v.Add(self.list, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
+        self.count_lbl = wx.StaticText(p, label="0 fájl a listában.")
+        self.count_lbl.SetName("Fájlok száma a listában")
+        v.Add(self.count_lbl, 0, wx.LEFT | wx.BOTTOM, 8)
+
+        # ---- beállítások ----
         g = wx.FlexGridSizer(0, 2, 8, 8)
         g.AddGrowableCol(1)
         g.Add(wx.StaticText(p, label="Kimeneti &formátum:"), 0,
@@ -104,6 +149,13 @@ class DocConvertFrame(wx.Frame):
         self.fmt_ch.SetSelection(0)
         self.fmt_ch.Bind(wx.EVT_CHOICE, lambda e: self._sync())
         g.Add(self.fmt_ch, 0, wx.EXPAND)
+
+        g.Add(wx.StaticText(p, label="Kimeneti &mód:"), 0,
+              wx.ALIGN_CENTER_VERTICAL)
+        self.mode_ch = wx.Choice(p, choices=[n for n, _ in CONVERT_MODES],
+                                 name="Kimeneti mód")
+        self.mode_ch.SetSelection(0)
+        g.Add(self.mode_ch, 0, wx.EXPAND)
 
         g.Add(wx.StaticText(p, label="Kimeneti &kódolás (TXT-nél):"), 0,
               wx.ALIGN_CENTER_VERTICAL)
@@ -115,8 +167,7 @@ class DocConvertFrame(wx.Frame):
         g.Add(wx.StaticText(p, label="Bemeneti kó&dolás (TXT-nél):"), 0,
               wx.ALIGN_CENTER_VERTICAL)
         # a bemeneti lista: „Automatikus felismerés" + a KONKRÉT kódlapok (a cwi2
-        # is, ami DEKÓDOLHATÓ). Az ENCODINGS[0] maga az auto, ezért azt kihagyjuk,
-        # nehogy kétszer szerepeljen.
+        # is, ami DEKÓDOLHATÓ). Az ENCODINGS[0] maga az auto, ezért azt kihagyjuk.
         self.in_enc_ch = wx.Choice(
             p, choices=["Automatikus felismerés"]
             + [n for n, _ in DC.ENCODINGS[1:]],
@@ -133,7 +184,7 @@ class DocConvertFrame(wx.Frame):
         g.Add(self.ocr_ch, 0, wx.EXPAND)
         v.Add(g, 0, wx.EXPAND | wx.ALL, 8)
 
-        self.conv_btn = wx.Button(p, label="&Konvertálás új fájlba…")
+        self.conv_btn = wx.Button(p, label="&Konvertálás")
         self.conv_btn.Bind(wx.EVT_BUTTON, lambda e: self._convert())
         v.Add(self.conv_btn, 0, wx.LEFT | wx.BOTTOM, 8)
 
@@ -149,9 +200,10 @@ class DocConvertFrame(wx.Frame):
 
         v.Add(wx.StaticText(p, label="&Eredmény:"), 0, wx.LEFT, 8)
         self.report = wx.TextCtrl(
-            p, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_BESTWRAP)
+            p, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_BESTWRAP,
+            size=(-1, 96))
         self.report.SetName("Eredmény")
-        v.Add(self.report, 1, wx.EXPAND | wx.ALL, 8)
+        v.Add(self.report, 0, wx.EXPAND | wx.ALL, 8)
 
         self.gauge = wx.Gauge(p, range=100)
         v.Add(self.gauge, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
@@ -195,6 +247,9 @@ class DocConvertFrame(wx.Frame):
     def _out_format(self) -> str:
         return DC.OUT_FORMATS[self.fmt_ch.GetSelection()][1]
 
+    def _mode(self) -> str:
+        return CONVERT_MODES[self.mode_ch.GetSelection()][1]
+
     def _out_encoding(self) -> str:
         return DC.OUT_ENCODINGS[self.enc_ch.GetSelection()][1]
 
@@ -205,6 +260,81 @@ class DocConvertFrame(wx.Frame):
     def _ocr_engine(self) -> str:
         i = self.ocr_ch.GetSelection()
         return self._ocr_keys[i] if 0 <= i < len(self._ocr_keys) else "ai"
+
+    # ---- fájllista kezelése -------------------------------------------
+
+    def _add_files(self):
+        dlg = wx.FileDialog(self, "Dokumentumok vagy képek hozzáadása",
+                            wildcard=WILDCARD,
+                            style=wx.FD_OPEN | wx.FD_MULTIPLE
+                            | wx.FD_FILE_MUST_EXIST)
+        if dlg.ShowModal() == wx.ID_OK:
+            self._add_paths(dlg.GetPaths())
+        dlg.Destroy()
+
+    def _add_folder(self):
+        dlg = wx.DirDialog(self, "Mappa hozzáadása (a támogatott fájljai)",
+                           style=wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)
+        if dlg.ShowModal() == wx.ID_OK:
+            folder = dlg.GetPath()
+            try:
+                found = [str(f) for f in sorted(Path(folder).iterdir())
+                         if f.is_file() and f.suffix.lower() in DC.IN_EXTS]
+            except OSError as e:
+                found = []
+                self._announce(f"A mappa nem olvasható: {e}")
+            if found:
+                self._add_paths(found)
+            else:
+                self._announce("Ebben a mappában nincs támogatott fájl.")
+        dlg.Destroy()
+
+    def _add_paths(self, paths):
+        have = set(self.files)
+        added = 0
+        for pth in paths:
+            if pth not in have:
+                self.files.append(pth)
+                have.add(pth)
+                added += 1
+        self._refresh_list()
+        self._announce(f"{added} fájl hozzáadva. Összesen "
+                       f"{len(self.files)} a listában.")
+
+    def _remove_selected(self):
+        idxs = []
+        i = self.list.GetFirstSelected()
+        while i != -1:
+            idxs.append(i)
+            i = self.list.GetNextSelected(i)
+        for i in sorted(idxs, reverse=True):
+            if 0 <= i < len(self.files):
+                self.files.pop(i)
+        self._refresh_list()
+        self._announce(f"{len(idxs)} fájl eltávolítva. Maradt "
+                       f"{len(self.files)}.")
+
+    def _clear(self):
+        self.files.clear()
+        self._refresh_list()
+        self._announce("A lista kiürítve.")
+
+    def _refresh_list(self):
+        self.list.DeleteAllItems()
+        for i, pth in enumerate(self.files):
+            self.list.InsertItem(i, os.path.basename(pth))
+            self.list.SetItem(i, 1, "várakozik")
+        self.count_lbl.SetLabel(f"{len(self.files)} fájl a listában.")
+
+    def _set_status(self, i: int, status: str):
+        if 0 <= i < self.list.GetItemCount():
+            self.list.SetItem(i, 1, status)
+
+    def _on_list_key(self, e):
+        if e.GetKeyCode() == wx.WXK_DELETE:
+            self._remove_selected()
+        else:
+            e.Skip()
 
     # ---- Pandoc letöltés ----------------------------------------------
 
@@ -232,61 +362,105 @@ class DocConvertFrame(wx.Frame):
         self._result("A Pandoc letöltve és kész." if path else
                      "A Pandoc letöltése nem sikerült (internet?).")
 
-    # ---- fájl + konvertálás -------------------------------------------
-
-    def _load(self):
-        dlg = wx.FileDialog(self, "Dokumentum vagy kép betöltése",
-                            wildcard=WILDCARD,
-                            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-        if dlg.ShowModal() == wx.ID_OK:
-            self.src = dlg.GetPath()
-            self.src_lbl.SetLabel(os.path.basename(self.src))
-            img = os.path.splitext(self.src)[1].lower() in ocr.IMAGE_EXTS
-            self._announce(f"Betöltve: {os.path.basename(self.src)}."
-                           + (" Kép – OCR-rel olvasom majd." if img else ""))
-        dlg.Destroy()
+    # ---- konvertálás --------------------------------------------------
 
     def _convert(self):
-        if not self.src:
-            self._result("Előbb tölts be egy dokumentumot vagy képet.")
+        if not self.files:
+            self._result("Előbb adj hozzá legalább egy fájlt (vagy egy mappát).")
             return
         if self._busy:
             return
         out_fmt = self._out_format()
-        root = os.path.splitext(self.src)[0]
-        suggested = os.path.basename(root) + "." + out_fmt
-        dlg = wx.FileDialog(self, "A konvertált fájl mentése",
-                            defaultDir=os.path.dirname(self.src),
-                            defaultFile=suggested,
-                            wildcard=f"{out_fmt.upper()}|*.{out_fmt}|"
-                                     "Minden fájl|*.*",
-                            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-        if dlg.ShowModal() != wx.ID_OK:
-            dlg.Destroy()
-            return
-        dst = dlg.GetPath()
-        dlg.Destroy()
-        self._busy = True
-        self.conv_btn.Enable(False)
-        self.gauge.Pulse()
-        self._announce("Konvertálás…")
-        src = self.src
+        mode = self._mode()
         in_enc, out_enc = self._in_encoding(), self._out_encoding()
         engine = self._ocr_engine()
+
+        if mode == "merge":
+            suggested = "osszefuzott." + out_fmt
+            dlg = wx.FileDialog(
+                self, "Az összefűzött fájl mentése", defaultFile=suggested,
+                wildcard=f"{out_fmt.upper()}|*.{out_fmt}|Minden fájl|*.*",
+                style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+            if dlg.ShowModal() != wx.ID_OK:
+                dlg.Destroy()
+                return
+            dst = dlg.GetPath()
+            dlg.Destroy()
+            target, extra = dst, None
+        else:
+            dlg = wx.DirDialog(self, "Cél-mappa a konvertált fájloknak",
+                               style=wx.DD_DEFAULT_STYLE)
+            if dlg.ShowModal() != wx.ID_OK:
+                dlg.Destroy()
+                return
+            target, extra = dlg.GetPath(), None
+            dlg.Destroy()
+
+        files = list(self.files)
+        self._busy = True
+        self.conv_btn.Enable(False)
+        self.gauge.SetValue(0)
+        self._announce("Konvertálás…")
+        for i in range(len(files)):
+            wx.CallAfter(self._set_status, i, "várakozik")
+
+        def work():
+            if mode == "merge":
+                self._run_merge(files, target, out_fmt, in_enc, out_enc, engine)
+            else:
+                self._run_separate(files, target, out_fmt, in_enc, out_enc,
+                                   engine)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _run_separate(self, files, out_dir, out_fmt, in_enc, out_enc, engine):
+        ok = 0
+        errors = []
+        total = len(files)
+        for i, src in enumerate(files):
+            wx.CallAfter(self._set_status, i, "folyamatban")
+            try:
+                base = os.path.splitext(os.path.basename(src))[0]
+                dst = _unique(os.path.join(out_dir, base + "." + out_fmt))
+                DC.convert(src, dst, out_fmt, in_enc, out_enc,
+                           ocr_engine=engine)
+                ok += 1
+                wx.CallAfter(self._set_status, i, "kész")
+            except Exception as e:
+                errors.append((os.path.basename(src), str(e)))
+                wx.CallAfter(self._set_status, i, "hiba")
+            wx.CallAfter(self.gauge.SetValue, int((i + 1) / total * 100))
+        msg = (f"Kész: {ok}/{total} fájl konvertálva ide: {out_dir}"
+               f" ({out_fmt.upper()}).")
+        if errors:
+            msg += "\n\nHibás fájlok:\n" + "\n".join(
+                f"• {n}: {err.splitlines()[0]}" for n, err in errors[:8])
+            if len(errors) > 8:
+                msg += f"\n… és további {len(errors) - 8}."
+        wx.CallAfter(self._done, msg)
+
+    def _run_merge(self, files, dst, out_fmt, in_enc, out_enc, engine):
+        def on_file(i, name, status, err):
+            wx.CallAfter(self._set_status, i, status)
 
         def prog(done, total):
             if total:
                 wx.CallAfter(self.gauge.SetValue, int(done / total * 100))
 
-        def work():
-            try:
-                msg = DC.convert(src, dst, out_fmt, in_enc, out_enc,
-                                 ocr_engine=engine, progress=prog)
-            except Exception as e:
-                msg = f"Hiba a konvertáláskor: {e}"
-            wx.CallAfter(self._done, msg)
-
-        threading.Thread(target=work, daemon=True).start()
+        try:
+            ok, errors = DC.merge_documents(
+                files, dst, out_fmt, in_enc, out_enc, ocr_engine=engine,
+                on_file=on_file, progress=prog)
+            msg = (f"Összefűzve: {ok}/{len(files)} fájl szövege ide: "
+                   f"{os.path.basename(dst)} ({out_fmt.upper()}).")
+            if errors:
+                msg += "\n\nKihagyott fájlok:\n" + "\n".join(
+                    f"• {n}: {err.splitlines()[0]}" for n, err in errors[:8])
+                if len(errors) > 8:
+                    msg += f"\n… és további {len(errors) - 8}."
+        except Exception as e:
+            msg = f"Az összefűzés nem sikerült: {e}"
+        wx.CallAfter(self._done, msg)
 
     def _done(self, msg):
         self._busy = False
