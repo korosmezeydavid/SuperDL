@@ -132,7 +132,15 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-12 · dolgozott: Claude (docconvert 1.2.0 + radio 1.1.0 KIADVA ✅)
+**Utolsó frissítés:** 2026-07-12 · dolgozott: Claude (radio 1.1.1 némítás kódkész; docconvert 1.2.0 + radio 1.1.0 KIADVA ✅)
+
+**➡️ radio 1.1.1 KÓDKÉSZ — PUBLIKÁLÁSRA VÁR (commit aaa85e7).** Laci kérése: NÉMÍTÁS a rádióban,
+hogy időzített/munkahelyi felvételnél a hallgatott hang elnémuljon, de a FELVÉTEL menjen tovább.
+Megvalósítva: `_toggle_mute()` (Player hangerő 0↔vissza; kézi `_vol` feloldja) + „Némítás be/ki"
+gomb + Ctrl+M. A felvevő (radiorec) KÜLÖN ffmpeg-folyamat → a némítás nem érinti. Fejnélküli
+teszttel igazolva (némítás NEM állítja le a felvételt). zip: radio-1.1.1.zip
+SHA bcc1036400184befe09425a3f926c12c2e6f04de545f28f64d7ebc263b4ab5e9; modules.json érintetlen a
+publikálásig. PUBLIKÁLÁS: mod-radio-1.1.1 (`--latest=false`) + modules.json radio-bejegyzés + push.
 
 **✅ MODUL-KIADÁS (2026-07-12): docconvert 1.2.0 + radio 1.1.0 KIADVA.** mod-docconvert-1.2.0 +
 mod-radio-1.1.0 release-ek (`--latest=false`!) + modules.json a main-en (push 0129e9d); minden zip
