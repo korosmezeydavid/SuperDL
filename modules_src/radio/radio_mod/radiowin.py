@@ -30,11 +30,18 @@ LÉPÉSRŐL LÉPÉSRE (vakon is)
    állomás is felvehető. Időzített felvétel: Ctrl+R (az állomást a KEDVENCEK
    közül választod, mettől meddig, egyszeri / minden nap / adott napokon).
 
+NÉMÍTÁS FELVÉTEL KÖZBEN
+A „Némítás be/ki” gomb (vagy Ctrl+M) elnémítja a HALLGATOTT hangot, de a
+FELVÉTEL zavartalanul tovább megy. Így pl. munkahelyen vagy időzített felvétel
+alatt csendben rögzítheted a műsort. (Ez nem szünet: a szünet – Ctrl+Szóköz –
+csak a lejátszást állítja meg, a némítás viszont halkít, a hang bármikor
+visszahozható.)
+
 GYORSBILLENTYŰK
 F1 – súgó.  Enter vagy F5 – lejátszás.  Ctrl+B – kedvencekhez.  Ctrl+C – URL
-másolása.  Ctrl+fel / Ctrl+le – hangerő.  Ctrl+Szóköz – szünet.  Esc –
-leállítás.  F9 – felvétel most.  Ctrl+R – időzített felvétel.  Ctrl+Shift+F –
-felvételek és időzítések kezelése.  A listákban Delete – törlés.
+másolása.  Ctrl+fel / Ctrl+le – hangerő.  Ctrl+M – némítás be/ki.  Ctrl+Szóköz –
+szünet.  Esc – leállítás.  F9 – felvétel most.  Ctrl+R – időzített felvétel.
+Ctrl+Shift+F – felvételek és időzítések kezelése.  A listákban Delete – törlés.
 
 SAJÁT ÁLLOMÁS ÉS MEGOSZTÁS
 - „Saját állomás hozzáadása”: ha egy rádió nincs a listában, itt megadhatod a
@@ -126,6 +133,7 @@ class RadioFrame(wx.Frame):
         self.countries: list[R.Country] = []
         self._country_limit = 50         # ország-top találatszám (Tovább növeli)
         self._cur_country: R.Country | None = None
+        self._pre_mute_vol = None        # némításkor ide mentjük a hangerőt
 
         self._build()
         self._refresh_fav()
@@ -202,6 +210,8 @@ class RadioFrame(wx.Frame):
                           ("&Leállítás", lambda e: self._stop()),
                           ("Hangerő −", lambda e: self._vol(-0.05)),
                           ("Hangerő +", lambda e: self._vol(0.05)),
+                          ("Né&mítás be/ki (Ctrl+M)",
+                           lambda e: self._toggle_mute()),
                           ("&Kedvenc", lambda e: self._fav_selected())):
             b = wx.Button(p, label=label)
             b.Bind(wx.EVT_BUTTON, fn)
@@ -245,7 +255,7 @@ class RadioFrame(wx.Frame):
         # gyorsbillentyűk (nem ütköznek a listák fel/le nyilával)
         ids = {k: wx.NewIdRef() for k in
                ("volup", "voldown", "stop", "pause", "play", "help", "fav",
-                "rec", "sched", "recs")}
+                "rec", "sched", "recs", "mute")}
         self.Bind(wx.EVT_MENU, lambda e: self._vol(0.05), id=ids["volup"])
         self.Bind(wx.EVT_MENU, lambda e: self._vol(-0.05), id=ids["voldown"])
         self.Bind(wx.EVT_MENU, lambda e: self._stop(), id=ids["stop"])
@@ -259,6 +269,7 @@ class RadioFrame(wx.Frame):
                   id=ids["sched"])
         self.Bind(wx.EVT_MENU, lambda e: self._recordings_dialog(),
                   id=ids["recs"])
+        self.Bind(wx.EVT_MENU, lambda e: self._toggle_mute(), id=ids["mute"])
         self.SetAcceleratorTable(wx.AcceleratorTable([
             (wx.ACCEL_CTRL, wx.WXK_UP, ids["volup"]),
             (wx.ACCEL_CTRL, wx.WXK_DOWN, ids["voldown"]),
@@ -266,6 +277,7 @@ class RadioFrame(wx.Frame):
             (wx.ACCEL_CTRL, wx.WXK_SPACE, ids["pause"]),
             (wx.ACCEL_NORMAL, wx.WXK_F5, ids["play"]),
             (wx.ACCEL_CTRL, ord('D'), ids["fav"]),
+            (wx.ACCEL_CTRL, ord('M'), ids["mute"]),
             (wx.ACCEL_NORMAL, wx.WXK_F9, ids["rec"]),
             (wx.ACCEL_CTRL, ord('R'), ids["sched"]),
             (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('F'), ids["recs"]),
@@ -428,10 +440,33 @@ class RadioFrame(wx.Frame):
             self._announce("Leállítva.")
 
     def _vol(self, delta):
+        self._pre_mute_vol = None        # kézi hangerő-állítás feloldja a némítást
         self.player.set_volume(self.player.volume + delta)
         self._announce(f"Hangerő: {round(self.player.volume * 100)} százalék"
                        + (f" – {self._cur.name}" if self._cur
                           and self.player.is_active() else "."))
+
+    def _toggle_mute(self):
+        """A LEJÁTSZÁS némítása/visszahangosítása. Csak a hallgatott hangot
+        némítja – a FELVÉTEL (külön ffmpeg-folyamat) ettől függetlenül tovább
+        megy, így pl. munkahelyen, időzített felvétel közben elnémítható a rádió
+        (Laci kérése). Ctrl+M-mel is."""
+        if self._pre_mute_vol is None:
+            self._pre_mute_vol = self.player.volume or 0.5   # jelenlegi hangerő
+            self.player.set_volume(0.0)
+            rec = ""
+            if self.rec:
+                try:
+                    if self.rec.snapshot_active():
+                        rec = " A felvétel tovább megy."
+                except Exception:
+                    pass
+            self._announce("Némítva (a hallgatott hang elnémult)." + rec)
+        else:
+            self.player.set_volume(self._pre_mute_vol)
+            self._pre_mute_vol = None
+            self._announce(f"Hang vissza: {round(self.player.volume * 100)} "
+                           "százalék.")
 
     # ---- felvétel -----------------------------------------------------
 
