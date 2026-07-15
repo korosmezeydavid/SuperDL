@@ -160,6 +160,26 @@ class FelolvasoFrame(wx.Frame):
             self._scan_sources()
         dlg.Destroy()
 
+    def open_file(self, path: str):
+        """Fájltársításból hívva: a megadott médiát betölti, a legjobb feliratot
+        (a magyar előre sorolt) magától kiválasztja és betölti, majd elindítja a
+        lejátszást – így egy dupla kattintás azonnal „olvasható filmet" ad."""
+        if not path or not os.path.isfile(path):
+            return
+        self.media = path
+        self.media_lbl.SetLabel(os.path.basename(path))
+        self._scan_sources()
+        if self._sources:
+            self.sub_ch.SetSelection(0)          # a legjobb (magyar) forrás
+            self._apply_sub()
+        # a felirat betöltése háttérszálon megy; a lejátszást kicsit később
+        # indítjuk, hogy a scheduler már készen álljon
+        wx.CallLater(700, self._start_if_ready)
+
+    def _start_if_ready(self):
+        if self.media and not self.film.is_active():
+            self._toggle()
+
     def _scan_sources(self):
         """A médiához tartozó feliratforrások összegyűjtése: mellé tett fájlok +
         beágyazott szöveges sávok."""

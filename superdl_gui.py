@@ -322,6 +322,57 @@ class MainFrame(wx.Frame):
         except Exception:
             import logging
             logging.getLogger("superdl").exception("modulbetöltés hiba")
+        # a modulok létrehozták a Média menüt → most tesszük bele a
+        # fájltársítás-kapcsolót (zene → Super M, videó → felirat-felolvasó)
+        self._add_media_switch()
+
+    def _add_media_switch(self):
+        """„Fájltársítások (zene/videó)…" a Média menübe – a rákattintott
+        médiát a SuperDL nyissa-e (kapcsoló). Csak a telepített/hordozható
+        exénél van értelme (Windowson)."""
+        try:
+            from superdl import fileassoc
+            if not fileassoc.available():
+                return
+            host = getattr(self, "_module_host", None)
+            if host is None:
+                return
+            menu = host.add_menu("&Média")
+            host.add_menu_item(
+                menu, "&Fájltársítások (zene/videó)…", self._on_media_switch,
+                help="A SuperDL nyissa-e meg a zene- és videófájlokat "
+                     "(dupla kattintásra)")
+        except Exception:
+            pass
+
+    def _on_media_switch(self, event=None):
+        from superdl import fileassoc
+        on = fileassoc.is_registered()
+        msg = ("A SuperDL MOSTANTÓL kezeli a zene- és videófájlokat: dupla "
+               "kattintásra a zene a Super M-ben, a videó a Felirat-felolvasó "
+               "lejátszóban nyílik meg.\n\nBe van kapcsolva. Kikapcsolod "
+               "(visszaáll a korábbi lejátszó)?"
+               if on else
+               "Bekapcsolod, hogy a SuperDL nyissa meg a zene- és videófájlokat?"
+               "\n\nEttől dupla kattintásra a ZENE a Super M-ben, a VIDEÓ a "
+               "Felirat-felolvasó lejátszóban nyílik meg. Csak a HKCU (saját "
+               "felhasználó) ágat írjuk, bármikor visszavonható. A Windows a "
+               "végső döntést néha külön megerősítteti.")
+        dlg = wx.MessageDialog(self, msg, "Fájltársítások",
+                               wx.YES_NO | wx.ICON_QUESTION)
+        dlg.SetYesNoLabels("Kikapcsolom" if on else "Bekapcsolom", "Mégse")
+        do = dlg.ShowModal() == wx.ID_YES
+        dlg.Destroy()
+        if not do:
+            return
+        try:
+            fileassoc.unregister() if on else fileassoc.register()
+            self._announce("Fájltársítások kikapcsolva." if on else
+                           "Fájltársítások bekapcsolva – a zene/videó mostantól "
+                           "a SuperDL-ben nyílik.", toast=True)
+        except Exception as e:
+            wx.MessageBox(f"A művelet nem sikerült: {e}", "Fájltársítások",
+                          wx.OK | wx.ICON_ERROR, self)
 
     # ---- felépítés ----------------------------------------------------
 
@@ -1345,6 +1396,38 @@ class MainFrame(wx.Frame):
         except Exception:
             pass
 
+    # a fájltársításhoz: melyik kiterjesztés melyik modult nyissa
+    _ASSOC_AUDIO = {".mp3", ".flac", ".m4a", ".aac", ".ogg", ".opus", ".wav",
+                    ".wma"}
+    _ASSOC_VIDEO = {".mp4", ".mkv", ".avi", ".mov", ".webm", ".m4v", ".ts",
+                    ".flv", ".wmv", ".mpg", ".mpeg", ".m2ts"}
+
+    def open_media_file(self, path: str):
+        """Fájltársításból: a rákattintott médiát a megfelelő modul-ablak nyitja
+        meg – hang → Super M, videó → Felirat-felolvasó lejátszó. A modult a
+        kulcsával nyitjuk (coremod host), majd az ablak `open_file`-jét hívjuk."""
+        try:
+            if not path or not os.path.isfile(path):
+                return
+            ext = os.path.splitext(path)[1].lower()
+            host = getattr(self, "_module_host", None)
+            if host is None:
+                return
+            if ext in self._ASSOC_AUDIO:
+                key = "superm_module"
+            elif ext in self._ASSOC_VIDEO:
+                key = "felolvaso_module"
+            else:
+                return
+            win = host.open_window(key)
+            if win is not None and hasattr(win, "open_file"):
+                win.open_file(path)
+            elif win is None:
+                self._announce("Ehhez a fájlhoz szükséges modul nincs telepítve "
+                               "(Eszközök → Modulok).", ok=False)
+        except Exception:
+            pass
+
     def _check_update_result(self):
         """Induláskor: ha volt függő önfrissítés, jelezzük, sikerült-e. A NÉMA
         csere-hibát (pl. a víruskereső fogja a friss fájlt) érthető, felolvasott
@@ -2172,6 +2255,19 @@ def _single_instance_mutex():
 
 
 def main():
+    # a telepítő (vagy haladó felhasználó) csendben be/kikapcsolhatja a
+    # fájltársításokat – GUI nélkül, azonnal kilépve
+    if "--register-file-assoc" in sys.argv or \
+            "--unregister-file-assoc" in sys.argv:
+        try:
+            from superdl import fileassoc
+            if "--register-file-assoc" in sys.argv:
+                fileassoc.register()
+            else:
+                fileassoc.unregister()
+        except Exception:
+            pass
+        return
     _maybe_wormhole()
     _single_instance_mutex()
     app = wx.App()
@@ -2186,6 +2282,12 @@ def main():
             frame._last_clip = data.GetText().strip()
         wx.TheClipboard.Close()
     frame.Show()
+    # fájltársítás: ha egy MÉDIAFÁJL útvonalával indultunk (dupla kattintás),
+    # a megfelelő modul-ablak nyissa meg (hang → Super M, videó → felolvasó).
+    media_arg = next((a for a in sys.argv[1:]
+                      if not a.startswith("-") and os.path.isfile(a)), None)
+    if media_arg:
+        wx.CallLater(600, lambda: frame.open_media_file(media_arg))
     app.MainLoop()
 
 

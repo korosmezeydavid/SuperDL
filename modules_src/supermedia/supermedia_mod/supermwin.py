@@ -448,6 +448,17 @@ class SuperMFrame(wx.Frame):
         if i >= 0:
             self._play_index(i)
 
+    def open_file(self, path: str):
+        """Fájltársításból hívva: a rákattintott zeneszám a lejátszási lista
+        végére kerül, és rögtön szólni kezd (Super M mint alap zenelejátszó)."""
+        import os
+        if not path or not os.path.isfile(path):
+            return
+        n = self.pl.add_files([path])
+        if n:
+            self._refresh()
+            self._play_index(len(self.pl) - 1)
+
     def _toggle(self):
         if self._crossfading:
             self._cancel_crossfade()

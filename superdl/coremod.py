@@ -211,6 +211,7 @@ class WxHost:
     def __init__(self, frame: wx.Frame):
         self.frame = frame
         self._windows: dict = {}
+        self._openers: dict = {}        # kulcs → megnyitó (fájltársításhoz)
 
     @property
     def main_frame(self):
@@ -344,7 +345,15 @@ class WxHost:
                 pass
             _bring_to_front(win)         # KRITIKUS: tényleg jöjjön elő és kapjon fókuszt
             return win
+        self._openers[key] = opener      # később kulcs szerint is nyithatóvá tesszük
         return opener
+
+    def open_window(self, key: str):
+        """Egy regisztrált modul-ablak megnyitása KULCS szerint (fájltársítás:
+        a rákattintott média a megfelelő modult nyitja). Visszaad: az
+        ablakpéldány vagy None (ha nincs ilyen kulcs / nem sikerült)."""
+        op = self._openers.get(key)
+        return op() if op else None
 
 
 # ---- a Core-bekötés összeállítása + a betöltő indítása ----------------

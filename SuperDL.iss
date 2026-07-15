@@ -28,6 +28,8 @@ PrivilegesRequiredOverridesAllowed=dialog
 AppMutex=SuperDL_SingleInstance_Mutex
 CloseApplications=yes
 RestartApplications=yes
+; a fajltarsitas-valtozasrol ertesitjuk a Windows shellt (opcionalis tarsitas-task)
+ChangesAssociations=yes
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
@@ -49,6 +51,7 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
+Name: "assocmedia"; Description: "Zene- és videofajlok tarsitasa a SuperDL-hez (dupla kattintasra a SuperDL nyitja meg)"; GroupDescription: "Fajltarsitasok:"; Flags: unchecked
 
 [Files]
 ; a teljes onedir-tartalom (exe + DLL-ek + adatmappák), almappákkal együtt
@@ -60,7 +63,13 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
+; opcionalis: a zene/video fajltarsitasok bekapcsolasa (HKCU, a SuperDL sajat logikajaval)
+Filename: "{app}\{#MyAppExeName}"; Parameters: "--register-file-assoc"; Tasks: assocmedia; Flags: runhidden
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; Flags: nowait postinstall skipifsilent
+
+[UninstallRun]
+; eltavolitaskor a fajltarsitasok visszavonasa (a rendszer-alapertelmezes visszaall)
+Filename: "{app}\{#MyAppExeName}"; Parameters: "--unregister-file-assoc"; Flags: runhidden; RunOnceId: "unassocmedia"
 
 [UninstallDelete]
 ; a frissítés-maradékok takarítása eltávolításkor (a felhasználói ADATOKAT –
