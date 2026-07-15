@@ -99,11 +99,11 @@
       "category": "Média",
       "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
       "latest": {
-        "version": "1.1.0",
+        "version": "1.1.1",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.0/radio-1.1.0.zip",
-        "sha256": "ed1dd0e365b52e8107a7d8cec6af89a4f26c14ec76337bcad75335eedc9672c0",
-        "size": 14884
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.1/radio-1.1.1.zip",
+        "sha256": "bcc1036400184befe09425a3f926c12c2e6f04de545f28f64d7ebc263b4ab5e9",
+        "size": 15532
       }
     },
     {
