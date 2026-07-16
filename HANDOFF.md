@@ -132,7 +132,22 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-16 · dolgozott: Claude (3.29.10 KIADVA ✅ — felolvasó + fájltársítások)
+**Utolsó frissítés:** 2026-07-16 · dolgozott: Claude (radiorec néma-megszakadás FIX kódkész)
+
+**➡️ radiorec FIX KÓDKÉSZ — PUBLIKÁLÁSRA VÁR (Core-változás → 3.29.11; commit ac6a367).**
+LACI JELEZTE: „F9-re indított felvétel a legváratlanabb pillanatokban leáll, és NEM ír semmiféle
+hibát." GYÖKÉR (három együtt): (1) nincs `-reconnect` → az élő adás megbicsaklásakor az ffmpeg
+KILÉP; (2) 15 mp-es `-rw_timeout` túl szigorú; (3) A NÉMASÁG OKA: a `_watch` bármely >8 KB fájlt
+„kész"-nek vett → a megszakadt felvételt SIKERESNEK hitte (`_on_done` „Felvétel kész"), és az
+ffmpeg stderr-je DEVNULL-ra ment. FIX: `-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 30`
+(VÉDŐKAPU: HTTP-protokoll kapcsolói! nem-http URL-nél „Option reconnect not found"-dal AZONNAL
+elszállna → csak `http(s)`-nél; ÉLESBEN igazolva: lavfi-nál hibázik, valódi rádió-streamnél kód=0);
+`-rw_timeout` 45 mp; `stderr=PIPE` + `_drain_err` (deque tail, a csövet ürítjük); `_premature()` →
+kézinél (F9) minden nem-user vég váratlan, időzítettnél <90% hossz → status HIBA érthető üzenettel
+(„kb. N perc rögzült; a fájl megmaradt és lejátszható" + a valódi ffmpeg-üzenet). 8 új pytest (103
+összesen). LACINAK VÁLASZLEVÉL: `C:\Users\msn\Documents\lacinak.txt` (a user küldi).
+
+**3.29.10 KIADVA ✅ (2026-07-16).**
 
 **3.29.10 KIADVA ✅ (2026-07-16).** Core `v3.29.10` „Latest" (4 asset) + `mod-felolvaso-1.0.0` (ÚJ,
 10. modul) + `mod-supermedia-1.2.3` (mindkettő `--latest=false`) + modules.json a main-en; forrás
