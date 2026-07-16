@@ -21,7 +21,9 @@ szabadon foghatók – a felvétel egyéni, személyes használatra készül.
 import re
 import subprocess
 import threading
+import time
 import uuid as _uuid
+from collections import deque
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -63,6 +65,7 @@ class ActiveRecording:
         self.error = ""
         self._proc = None
         self._stop = threading.Event()
+        self._err_tail = deque(maxlen=15)   # az ffmpeg utolsó hibasorai
 
     def start(self) -> bool:
         ff = _ffmpeg_exe()
@@ -70,37 +73,88 @@ class ActiveRecording:
             self.status, self.error = "hiba", "az ffmpeg nem érhető el"
             return False
         flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
-        cmd = [ff, "-hide_banner", "-loglevel", "error",
-               "-rw_timeout", "15000000",          # 15 mp I/O-időkorlát
-               "-i", self.url, "-vn",
-               "-c:a", "libmp3lame", "-b:a", "192k"]
+        cmd = [ff, "-hide_banner", "-loglevel", "error"]
+        # ÚJRACSATLAKOZÁS (Laci jelezte: „a legváratlanabb pillanatokban leáll"):
+        # az élő adás rendszeresen megbicsaklik (pufferelés, hálózati rezdülés, a
+        # szerver újraindítja) – e nélkül az ffmpeg KILÉP, és a felvétel véget ér.
+        # FIGYELEM: ezek a HTTP-PROTOKOLL kapcsolói! Nem-HTTP forrásnál az ffmpeg
+        # „Option reconnect not found"-dal AZONNAL elszállna, ezért csak http(s)
+        # streamnél tesszük hozzá (élesben igazolva: HTTP-nél elfogadja).
+        if str(self.url).lower().startswith(("http://", "https://")):
+            cmd += ["-reconnect", "1", "-reconnect_streamed", "1",
+                    "-reconnect_delay_max", "30"]
+        # az I/O-időkorlát enyhítve (15→45 mp): a rövid akadást már az
+        # újracsatlakozás kezeli, ne az időkorlát ölje meg a felvételt
+        cmd += ["-rw_timeout", "45000000",
+                "-i", self.url, "-vn",
+                "-c:a", "libmp3lame", "-b:a", "192k"]
         if self.duration_s and self.duration_s > 0:
             cmd += ["-t", str(int(self.duration_s))]
         cmd += ["-y", str(self.path)]
         try:
+            # a hibakimenetet NEM dobjuk el (eddig DEVNULL-ra ment = néma
+            # megállás); elmentjük az utolsó sorait, hogy hibánál a VALÓDI okot
+            # meg tudjuk mutatni
             self._proc = subprocess.Popen(
                 cmd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL, creationflags=flags)
+                stderr=subprocess.PIPE, creationflags=flags)
         except Exception as e:
             self.status, self.error = "hiba", str(e)
             return False
+        threading.Thread(target=self._drain_err, daemon=True).start()
         threading.Thread(target=self._watch, daemon=True).start()
         return True
 
+    def _drain_err(self):
+        """Az ffmpeg hibasorainak folyamatos olvasása (a csövet ki KELL üríteni,
+        különben megtelhet és megakasztaná a felvételt) – az utolsó sorokat
+        megtartjuk a hibaüzenethez."""
+        try:
+            for raw in self._proc.stderr:
+                line = raw.decode("utf-8", "replace").strip()
+                if line:
+                    self._err_tail.append(line)
+        except Exception:
+            pass
+
     def _watch(self):
         self._proc.wait()
+        time.sleep(0.2)                 # a hibasor-olvasó fejezze be
+        detail = " | ".join(self._err_tail)
         if self._stop.is_set():
             self.status = "leállítva"
-        elif self._has_audio():
-            self.status = "kész"
-        else:
+        elif not self._has_audio():
             self.status = "hiba"
-            self.error = "az állomás nem elérhető, vagy a felvétel megszakadt"
+            self.error = ("az állomás nem elérhető, vagy a felvétel azonnal "
+                          "megszakadt")
+            if detail:
+                self.error += f" – az ffmpeg üzenete: {detail}"
+        elif self._premature():
+            # EDDIG EZ CSENDBEN „kész" LETT (Laci: „leáll és nem ír semmiféle
+            # hibát”): a megszakadt felvételt sikeresnek hittük, mert volt benne
+            # adat. Mostantól JELEZZÜK – de kimondjuk, hogy a rész megmaradt.
+            self.status = "hiba"
+            mins = max(1, self.elapsed_s() // 60)
+            self.error = (f"a felvétel VÁRATLANUL megszakadt (kb. {mins} perc "
+                          "rögzült; a fájl megmaradt és lejátszható). Gyakori "
+                          "ok: az adás vagy az internet megbicsaklott")
+            if detail:
+                self.error += f" – az ffmpeg üzenete: {detail}"
+        else:
+            self.status = "kész"
         if self.on_done:
             try:
                 self.on_done(self)
             except Exception:
                 pass
+
+    def _premature(self) -> bool:
+        """VÁRATLANUL ért véget? Időzítettnél: a kértnél érdemben rövidebb lett.
+        Kézinél (F9): minden nem-felhasználói leállás váratlan – az ÉLŐ adás
+        magától nem ér véget, tehát ha az ffmpeg kilépett, valami közbejött."""
+        if self.duration_s and self.duration_s > 0:
+            return self.elapsed_s() < self.duration_s * 0.9
+        return True
 
     def _has_audio(self) -> bool:
         try:
