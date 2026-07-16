@@ -13,7 +13,7 @@ import threading
 
 import wx
 
-from . import narrator, subtitles
+from . import narrator, subtitles, ytsource
 from superdl.audioengine import Player
 
 HELP = """FELIRAT-FELOLVASÓ LEJÁTSZÓ
@@ -26,7 +26,10 @@ idegen nyelvű film: hallod az eredeti hangot, fölötte a felolvasott feliratot
 LÉPÉSRŐL LÉPÉSRE (vakon is)
 1. „Média betöltése" – válaszd ki a filmet vagy hangfájlt. A program magától
    megkeresi a mellé tett feliratot (.srt/.vtt), és a fájlba ágyazott
-   feliratsávokat is felkínálja.
+   feliratsávokat is felkínálja. VAGY illessz be egy YOUTUBE-LINKET a
+   „YouTube-link" mezőbe: a program letölti a videó feliratát (ha nincs magyar
+   kézi felirat, a YouTube AUTOMATIKUS, magyarra fordított feliratát) és azt
+   olvassa fel a videó hangja fölött.
 2. „Felirat" lista: válaszd ki, melyik feliratot olvassa (a magyar előre van
    sorolva). Ha külön fájlból akarod, „Feliratfájl tallózása".
 3. „Hang" lista: válaszd ki, milyen hanggal olvasson – helyi SAPI-hang, Edge
@@ -89,6 +92,20 @@ class FelolvasoFrame(wx.Frame):
         top.Add(b_load, 0, wx.RIGHT, 8)
         top.Add(self.media_lbl, 1, wx.ALIGN_CENTER_VERTICAL)
         v.Add(top, 0, wx.EXPAND | wx.ALL, 8)
+
+        # online link (YouTube stb.): a hangot streameljük, a feliratot a
+        # yt-dlp tölti le (manuális vagy AUTO – akár magyarra fordítva)
+        yt = wx.BoxSizer(wx.HORIZONTAL)
+        yt.Add(wx.StaticText(p, label="Y&ouTube-link:"), 0,
+               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.url_entry = wx.TextCtrl(p, style=wx.TE_PROCESS_ENTER)
+        self.url_entry.SetName("YouTube vagy más videó-link")
+        self.url_entry.Bind(wx.EVT_TEXT_ENTER, lambda e: self._load_url())
+        yt.Add(self.url_entry, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        b_url = wx.Button(p, label="Link be&töltése")
+        b_url.Bind(wx.EVT_BUTTON, lambda e: self._load_url())
+        yt.Add(b_url, 0)
+        v.Add(yt, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
 
         g = wx.FlexGridSizer(0, 3, 8, 8)
         g.AddGrowableCol(1)
@@ -179,6 +196,44 @@ class FelolvasoFrame(wx.Frame):
     def _start_if_ready(self):
         if self.media and not self.film.is_active():
             self._toggle()
+
+    def _load_url(self):
+        """Online link (YouTube stb.) betöltése: a yt-dlp feloldja a hang-
+        streamet és letölti a feliratot (manuális, vagy AUTO – magyarra fordítva
+        is), majd a megszokott módon felolvassuk."""
+        url = self.url_entry.GetValue().strip()
+        if not ytsource.is_url(url):
+            self._announce("Illessz be egy videó-linket (pl. YouTube).")
+            return
+        self._stop()
+        self._announce("Link feloldása és felirat letöltése… (kis türelem)")
+
+        def work():
+            try:
+                stream, cues, lang, title = ytsource.load_from_url(url)
+            except Exception as e:
+                wx.CallAfter(self._announce, f"A link nem tölthető be: {e}")
+                return
+            wx.CallAfter(self._url_ready, stream, cues, lang, title)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _url_ready(self, stream, cues, lang, title):
+        self.media = stream
+        self.media_lbl.SetLabel(title[:90])
+        self.cues = cues
+        self.sched = subtitles.CueScheduler(cues)
+        self._sources = []
+        self.sub_ch.Set([f"YouTube-felirat: {lang}" if lang
+                         else "(ehhez a videóhoz nincs felirat)"])
+        self.sub_ch.SetSelection(0)
+        if cues:
+            self._announce(f"Betöltve: {title}. Felirat: {lang}, {len(cues)} "
+                           "sor. Indíthatod a lejátszást (Szóköz).")
+        else:
+            self._announce(f"Betöltve: {title}. Ehhez a videóhoz NINCS "
+                           "felolvasható felirat – a hang lejátszható, de nincs "
+                           "mit felolvasni.")
 
     def _scan_sources(self):
         """A médiához tartozó feliratforrások összegyűjtése: mellé tett fájlok +
