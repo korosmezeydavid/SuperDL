@@ -132,7 +132,19 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-12 · dolgozott: Claude (radio 1.1.1 némítás KIADVA ✅)
+**Utolsó frissítés:** 2026-07-16 · dolgozott: Claude (3.29.10 KIADVA ✅ — felolvasó + fájltársítások)
+
+**3.29.10 KIADVA ✅ (2026-07-16).** Core `v3.29.10` „Latest" (4 asset) + `mod-felolvaso-1.0.0` (ÚJ,
+10. modul) + `mod-supermedia-1.2.3` (mindkettő `--latest=false`) + modules.json a main-en; forrás
+push; kulcs-szken TISZTA (forrás+binárisok+zipek); yt-dlp 2026.7.4; minden link 200; a Core maradt
+„Latest". Build-sorrend onedir→ISCC(3.29.10, ÚJ társítás-task)→CLI→onefile. TARTALOM: (M2) ÚJ
+felirat-felolvasó modul (idegen film + magyar felirat szinkron felolvasása, hang választható
+SAPI/Edge/eSpeak); (M1) fájltársítások (zene→Super M, videó→felolvasó) + Média-menü kapcsoló +
+telepítő opcionális task + `superdl/fileassoc.py` (HKCU, admin nélkül, visszavonható) + coremod
+`open_window` + gui fájl-arg routing. NEM VERIFIKÁLT ÉLESBEN: a dupla-kattintásos társítás és a
+felolvasó kettős hang-lejátszása valós telepített gépen. HÁTRA/ÚJ KÉRÉS: YouTube-link a
+felolvasóba (yt-dlp: stream-URL + felirat/caption letöltés → play+read) — TERV, create maximára vár.
+Hírlevél MÉG NEM ment.
 
 **✅ radio 1.1.1 KIADVA (2026-07-12, Laci: némítás).** mod-radio-1.1.1 (`--latest=false`) +
 modules.json a main-en (push fee64fe); zip + modules.json 200; a Core „Latest" MARADT `v3.29.9`.
