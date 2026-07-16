@@ -142,9 +142,13 @@ felirat-felolvasó modul (idegen film + magyar felirat szinkron felolvasása, ha
 SAPI/Edge/eSpeak); (M1) fájltársítások (zene→Super M, videó→felolvasó) + Média-menü kapcsoló +
 telepítő opcionális task + `superdl/fileassoc.py` (HKCU, admin nélkül, visszavonható) + coremod
 `open_window` + gui fájl-arg routing. NEM VERIFIKÁLT ÉLESBEN: a dupla-kattintásos társítás és a
-felolvasó kettős hang-lejátszása valós telepített gépen. HÁTRA/ÚJ KÉRÉS: YouTube-link a
-felolvasóba (yt-dlp: stream-URL + felirat/caption letöltés → play+read) — TERV, create maximára vár.
-Hírlevél MÉG NEM ment.
+felolvasó kettős hang-lejátszása valós telepített gépen. Hírlevél MÉG NEM ment.
+
+**✅ KÖVETŐ: felolvaso 1.1.0 KIADVA (2026-07-16) — YouTube-link a felolvasóba.** mod-felolvaso-1.1.0
+(`--latest=false`) + modules.json push d40cac5; zip+modules.json 200; Core maradt v3.29.10.
+`ytsource.py`: yt-dlp feloldja a hang-streamet + letölti a feliratot (manuális előny, majd a
+YouTube AUTO magyarra fordított feliratát) → a felolvasó olvassa. Élő végpróba OK (stream + 20
+magyar auto-felirat sor). 96 pytest zöld. HÁTRA (M3, elhalasztva): AI hang-szinkron (ElevenLabs).
 
 **✅ radio 1.1.1 KIADVA (2026-07-12, Laci: némítás).** mod-radio-1.1.1 (`--latest=false`) +
 modules.json a main-en (push fee64fe); zip + modules.json 200; a Core „Latest" MARADT `v3.29.9`.
