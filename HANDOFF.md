@@ -132,9 +132,22 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-16 · dolgozott: Claude (radiorec néma-megszakadás FIX kódkész)
+**Utolsó frissítés:** 2026-07-17 · dolgozott: Claude (3.29.11 KIADVA ✅)
 
-**➡️ radiorec FIX KÓDKÉSZ — PUBLIKÁLÁSRA VÁR (Core-változás → 3.29.11; commit ac6a367).**
+**3.29.11 KIADVA ✅ (2026-07-17).** Core `v3.29.11` „Latest" (4 asset) + `mod-felolvaso-1.2.0`
+(`--latest=false`) + modules.json; kulcs-szken TISZTA; minden link 200. TARTALOM: (1) a radiorec
+néma-megszakadás fix (lásd lent); (2) felolvaso 1.2.0 — a felolvasás TARTJA A LÉPÉST a
+filmfelirattal. MÉRÉS (a user kérte: „mennyire működik?"): valósághű film-ritmuson (45 karakteres
+sorok 3,1 mp-enként) alap tempón SAPI 0/4 sor fért bele (6,1 mp csúszás), eSpeak 2/4 (1,1), Edge
+0/4 (11,8 mp — soronként 1,6 mp HÁLÓZATI válaszidő) → egy 2 órás filmen percekre nőtt volna. FIX:
+`DEFAULT_RATE=7` + állítható tempó-SpinCtrl; ELŐRE-GYÁRTÁS (`_prefetch`/`_prefetch_done`/
+`_drop_ahead`, csak a 12 mp-es „láthatáron", ugrás/leállítás eldobja); `_closing` zárás-védelem;
+ytsource: a magyar felirat ne essen vissza CSENDBEN angolra (újrapróba). EREDMÉNY MÉRVE: SAPI 4/4
+(0,0 mp), eSpeak 4/4 (0,0), Edge 3/4 (0,5 mp). 108 pytest + CI zöld. LACINAK VÁLASZLEVÉL:
+`C:\Users\msn\Documents\lacinak.txt` (felvevő-fix + felolvasó-ajánlás, a méréssel). Hírlevél a
+3.29.11-ről MÉG NEM ment.
+
+**(archív) radiorec FIX — a 3.29.11-ben KIADVA (commit ac6a367).**
 LACI JELEZTE: „F9-re indított felvétel a legváratlanabb pillanatokban leáll, és NEM ír semmiféle
 hibát." GYÖKÉR (három együtt): (1) nincs `-reconnect` → az élő adás megbicsaklásakor az ffmpeg
 KILÉP; (2) 15 mp-es `-rw_timeout` túl szigorú; (3) A NÉMASÁG OKA: a `_watch` bármely >8 KB fájlt
