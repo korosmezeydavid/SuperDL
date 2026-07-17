@@ -97,14 +97,14 @@
       "id": "felolvaso",
       "name": "Felirat-felolvasó lejátszó",
       "category": "Média",
-      "description": "Idegen nyelvű film (vagy hangfájl) lejátszása úgy, hogy a magyar (vagy bármely szöveges) feliratot SZINKRONBAN, választható hanggal (helyi SAPI, Edge neurális online, vagy beépített eSpeak) felolvassa – így vakon is követhető az idegen nyelvű film. A film mellé tett .srt/.vtt feliratot magától megtalálja, a fájlba ágyazott szöveges feliratsávot is kezeli. ÚJ: YouTube-link is beilleszthető – a videó hangját streameli, a feliratot (kézi, vagy a YouTube automatikus, magyarra fordított feliratát) letölti és felolvassa.",
+      "description": "Idegen nyelvű film (vagy hangfájl) lejátszása úgy, hogy a magyar (vagy bármely szöveges) feliratot SZINKRONBAN, választható hanggal (helyi SAPI, Edge neurális online, vagy beépített eSpeak) felolvassa – így vakon is követhető az idegen nyelvű film. A film mellé tett .srt/.vtt feliratot magától megtalálja, a fájlba ágyazott szöveges feliratsávot is kezeli. A YouTube-link is beilleszthető – a videó hangját streameli, a feliratot (kézi, vagy a YouTube automatikus, magyarra fordított feliratát) letölti és felolvassa. A felolvasás TEMPÓJA állítható (alapból gyors, hogy tartsa a lépést a filmfelirattal), és a következő sort előre legyártja, így a neurális hang sem csúszik.",
       "latest": {
-        "version": "1.1.0",
+        "version": "1.2.0",
         "min_core_api": "1.0",
         "min_core_version": "3.29.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-felolvaso-1.1.0/felolvaso-1.1.0.zip",
-        "sha256": "fd6330851c54e0402edfdd80af50f11e44fc110b76311882ca8be595c31aaf34",
-        "size": 14468
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-felolvaso-1.2.0/felolvaso-1.2.0.zip",
+        "sha256": "3b830a78911e0e05a21be26c580435b9bb71e2cf3aae3b62e58bf3b3ac66300d",
+        "size": 15979
       }
     },
     {
