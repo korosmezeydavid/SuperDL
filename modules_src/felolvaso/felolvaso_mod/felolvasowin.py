@@ -48,6 +48,13 @@ TIPPEK
 
 DUCK = 0.22          # a film hangereje a felolvasás alatt (halkítás)
 
+# ALAP TEMPÓ: MÉRÉSSEL beállítva. Valósághű film-ritmusnál (45 karakteres sorok
+# 3,1 másodpercenként) alap tempón (0) a felolvasás NEM tartja a lépést: a SAPI
+# 4,7 mp/sor → 5 sor alatt 6 mp csúszás, ami egy egész filmen percekre nőne.
+# +7-en a SAPI 2,1 mp/sor, az eSpeak 2,2 mp/sor → mindkettő HIBÁTLANUL bírja
+# (nulla csúszás). Vakon amúgy is gyors beszédhez szokunk – de állítható.
+DEFAULT_RATE = 7
+
 
 class FelolvasoFrame(wx.Frame):
     def __init__(self, main):
@@ -62,6 +69,9 @@ class FelolvasoFrame(wx.Frame):
         self._narrating = False
         self._film_vol = 0.8
         self._cur_temp = None
+        self._ahead = {}          # ELŐRE legyártott hang: cue-index → fájl
+        self._ahead_busy = False
+        self._closing = False     # zárás alatt a háttérszálak ne nyúljanak hozzánk
 
         self.film = Player()
         self.film.on_state = lambda s: wx.CallAfter(self._on_film_state, s)
@@ -126,6 +136,17 @@ class FelolvasoFrame(wx.Frame):
         b_subload = wx.Button(p, label="Felirat be&töltése")
         b_subload.Bind(wx.EVT_BUTTON, lambda e: self._apply_sub())
         g.Add(b_subload, 0)
+
+        g.Add(wx.StaticText(p, label="Felolvasás &tempója:"), 0,
+              wx.ALIGN_CENTER_VERTICAL)
+        self.rate_sp = wx.SpinCtrl(p, min=-10, max=10, initial=DEFAULT_RATE)
+        self.rate_sp.SetName("Felolvasás tempója mínusz tíztől plusz tízig; "
+                             "nagyobb érték gyorsabb beszéd. A filmfeliratok "
+                             "gyorsan váltanak, ezért az alapérték gyors")
+        g.Add(self.rate_sp, 0, wx.EXPAND)
+        g.Add(wx.StaticText(p, label="(a filmfelirat gyorsan vált – a gyors "
+                                     "tempó tartja a lépést)"), 0,
+              wx.ALIGN_CENTER_VERTICAL)
         v.Add(g, 0, wx.EXPAND | wx.ALL, 8)
 
         ctl = wx.BoxSizer(wx.HORIZONTAL)
@@ -323,6 +344,7 @@ class FelolvasoFrame(wx.Frame):
         self.narr.stop()
         self.film.stop()
         self._narrating = False
+        self._drop_ahead()
         self._announce("Leállítva.")
 
     def _seek(self, delta):
@@ -331,6 +353,7 @@ class FelolvasoFrame(wx.Frame):
         pos = max(0.0, self.film.position() + delta)
         self.narr.stop()
         self._narrating = False
+        self._drop_ahead()            # az előre gyártott hangok elavultak
         self.film.set_volume(self._film_vol)
         self.film.seek(pos)
         if self.sched:
@@ -346,27 +369,93 @@ class FelolvasoFrame(wx.Frame):
     # ---- a szinkron szíve: időzítő --------------------------------------
 
     def _tick(self):
-        if self._narrating or not self.film.is_active() \
-                or self.film.is_paused() or not self.sched:
+        if not self.film.is_active() or self.film.is_paused() or not self.sched:
+            return
+        self._prefetch()                      # a KÖVETKEZŐ sor előre legyártása
+        if self._narrating:
             return
         cue = self.sched.next_due(self.film.position())
         if cue:
             self._narrate(cue)
 
+    def _prefetch(self):
+        """A soron következő feliratot ELŐRE legyártjuk, amíg az előző szól.
+        MÉRÉS: az Edge neurális hang soronként ~1,6 mp hálózati válaszidőt kér –
+        e nélkül még gyors tempón sem tartja a lépést a film-ritmussal. Az
+        időbélyegekből tudjuk, mi jön, így a késleltetés eltűnik."""
+        if self._ahead_busy or not self.sched:
+            return
+        i = self.sched._i                     # a következő, még ki nem adott sor
+        if i >= len(self.sched.cues) or i in self._ahead:
+            return
+        cue = self.sched.cues[i]
+        # csak ha már „a láthatáron" van (ne gyártsunk feleslegesen előre)
+        if cue.start - self.film.position() > 12.0:
+            return
+        self._ahead_busy = True
+        lbl, eng, vid = self._voice()
+        rate = self.rate_sp.GetValue()
+
+        def work():
+            path = None
+            try:
+                path = narrator.synth_to_file(eng, vid, cue.text, rate=rate)
+            except Exception:
+                path = None
+            if self._closing:                 # közben bezárták az ablakot
+                self._safe_del(path) if path else None
+                return
+            try:
+                wx.CallAfter(self._prefetch_done, i, path)
+            except Exception:
+                pass
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _prefetch_done(self, i, path):
+        self._ahead_busy = False
+        if self._closing:
+            if path:
+                self._safe_del(path)
+            return
+        if path:
+            self._ahead[i] = path
+
     def _narrate(self, cue):
         self._narrating = True
         self.cue_txt.SetValue(cue.text)
+        # az ELŐRE legyártott hang (a scheduler már továbblépett, ezért i-1)
+        idx = self.sched._i - 1
+        ready = self._ahead.pop(idx, None)
+        if ready:
+            self._play_narration(ready)       # azonnal szól: nincs késleltetés
+            return
         lbl, eng, vid = self._voice()
+        rate = self.rate_sp.GetValue()
 
         def work():
             try:
-                path = narrator.synth_to_file(eng, vid, cue.text)
+                path = narrator.synth_to_file(eng, vid, cue.text, rate=rate)
             except Exception:
-                wx.CallAfter(self._narration_done)
+                path = None
+            if self._closing:                 # közben bezárták az ablakot
+                self._safe_del(path) if path else None
                 return
-            wx.CallAfter(self._play_narration, path)
+            try:
+                if path:
+                    wx.CallAfter(self._play_narration, path)
+                else:
+                    wx.CallAfter(self._narration_done)
+            except Exception:
+                pass
 
         threading.Thread(target=work, daemon=True).start()
+
+    def _drop_ahead(self):
+        """Az előre gyártott hangok eldobása (ugrás/leállítás után elavultak)."""
+        for p in self._ahead.values():
+            self._safe_del(p)
+        self._ahead.clear()
 
     def _play_narration(self, path):
         if not self.film.is_active():        # közben leállt → eldobjuk
@@ -432,10 +521,14 @@ class FelolvasoFrame(wx.Frame):
                           wx.OK | wx.ICON_INFORMATION, self)
 
     def _on_close(self, e):
+        self._closing = True          # a futó gyártó-szálak ne nyúljanak hozzánk
         try:
             self.timer.Stop()
             self.narr.stop()
             self.film.stop()
+            self._drop_ahead()        # az ideiglenes hangfájlok takarítása
+            if self._cur_temp:
+                self._safe_del(self._cur_temp)
         except Exception:
             pass
         if getattr(self.main, "_felolvaso_win", None) is self:

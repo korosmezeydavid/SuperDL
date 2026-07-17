@@ -56,20 +56,26 @@ def _pick_sub_entry(track_list):
 
 def _load_subs(info: dict, prefer_langs):
     """(cue-lista, nyelv-címke) az első elérhető feliratból. Sorrend: a kért
-    nyelvek MANUÁLIS felirata, majd ugyanazok AUTO-felirata."""
+    nyelvek MANUÁLIS felirata, majd ugyanazok AUTO-felirata.
+
+    FONTOS: az ELSŐ kért nyelvnél (jellemzően magyar) egy hálózati megbicsaklás
+    NE dobjon át csendben a következő nyelvre – ezért újrapróbáljuk, és csak
+    tényleges hiányzásnál lépünk tovább (mérés közben egyszer némán angolra
+    váltott, pedig magyart kértünk)."""
     manual = info.get("subtitles") or {}
     auto = info.get("automatic_captions") or {}
     for src, tag in ((manual, "manuális"), (auto, "auto")):
         for lang in prefer_langs:
             entry = _pick_sub_entry(src.get(lang))
             if not entry:
-                continue
-            try:
-                cues = subtitles.parse_srt(_fetch_text(entry["url"]))
-            except Exception:
-                continue
-            if cues:
-                return cues, f"{lang} ({tag})"
+                continue                      # ez a nyelv tényleg nincs meg
+            for attempt in (1, 2):            # átmeneti hálózati hiba → újra
+                try:
+                    cues = subtitles.parse_srt(_fetch_text(entry["url"]))
+                except Exception:
+                    cues = []
+                if cues:
+                    return cues, f"{lang} ({tag})"
     return [], ""
 
 
