@@ -10,6 +10,7 @@ után is stimmel. Felolvasás alatt a film hangját lehalkítjuk (ducking).
 
 import os
 import threading
+import time
 
 import wx
 
@@ -37,8 +38,16 @@ LÉPÉSRŐL LÉPÉSRE (vakon is)
 4. „Lejátszás" (vagy Szóköz). A felolvasás alatt a film hangja halkabb.
 
 GYORSBILLENTYŰK
-F1 – súgó.  Szóköz – lejátszás/szünet.  Bal/jobb nyíl – 10 mp vissza/előre.
-Ctrl+fel / Ctrl+le – hangerő.  Esc – leállítás.
+F1 – súgó.  F8 – állapot bemondása (hibakereséshez).  Szóköz –
+lejátszás/szünet.  Bal/jobb nyíl – 10 mp vissza/előre.  Ctrl+fel / Ctrl+le –
+hangerő.  Esc – leállítás.
+
+HA NEM SZÓLAL MEG A FELIRAT
+- Nyomd meg az F8-at: bemondja, halad-e az idő, be van-e töltve a felirat, és
+  épp mit olvas. Ebből kiderül, hol akad.
+- Ha a program azt mondja, „a film hangját nem tudom lejátszani", akkor is
+  felolvassa a feliratot (film-hang nélkül, csend fölött) – a kép/hang formátuma
+  volt szokatlan, de a felirat így is követhető.
 
 TIPPEK
 - A felirat legyen a film MELLETT, hasonló névvel (pl. Film.hu.srt) – a program
@@ -72,6 +81,18 @@ class FelolvasoFrame(wx.Frame):
         self._ahead = {}          # ELŐRE legyártott hang: cue-index → fájl
         self._ahead_busy = False
         self._closing = False     # zárás alatt a háttérszálak ne nyúljanak hozzánk
+        # a narrációt vezérlő INTEGRÁLÓ óra (lásd _clock): a film hang-pozícióját
+        # követi, de ha az beragad, fali órával lép előre, hogy a felolvasás ne
+        # álljon le némán
+        self._clk_pos = 0.0
+        self._clk_apos = 0.0
+        self._clk_wall = 0.0
+        self._clk_t0 = 0.0
+        self._clk_started = False
+        # ha a film HANGJA nem játszható le, a feliratot csend fölött, tisztán
+        # fali órával akkor is felolvassuk (jobb a semminél)
+        self._subs_only = False
+        self._subs_paused = False
 
         self.film = Player()
         self.film.on_state = lambda s: wx.CallAfter(self._on_film_state, s)
@@ -328,14 +349,25 @@ class FelolvasoFrame(wx.Frame):
         if not self.media:
             self._announce("Előbb tölts be egy médiát.")
             return
+        if self._subs_only:                   # film-hang nélküli feliratolvasás
+            self._subs_paused = not self._subs_paused
+            if not self._subs_paused:
+                self._clock_reset(self._clk_pos, fresh=False)
+            self._announce("Szünet." if self._subs_paused else "Folytatás.")
+            return
         if self.film.is_active():
             paused = self.film.toggle_pause()
+            if not paused:
+                self._clock_reset(self._clk_pos, fresh=False)   # folytatás
             self._announce("Szünet." if paused else "Folytatás.")
         else:
+            self._subs_only = False
+            self._subs_paused = False
             self.film.set_volume(self._film_vol)
             self.film.play(self.media)
             if self.sched:
                 self.sched.reset_to(0.0)
+            self._clock_reset(0.0)
             self.timer.Start(150)
             self._announce("Lejátszás.")
 
@@ -344,13 +376,16 @@ class FelolvasoFrame(wx.Frame):
         self.narr.stop()
         self.film.stop()
         self._narrating = False
+        self._subs_only = False
+        self._subs_paused = False
         self._drop_ahead()
+        self._clock_reset(0.0)
         self._announce("Leállítva.")
 
     def _seek(self, delta):
         if not self.film.is_active():
             return
-        pos = max(0.0, self.film.position() + delta)
+        pos = max(0.0, self._clk_pos + delta)   # a felolvasott idővonalhoz mérten
         self.narr.stop()
         self._narrating = False
         self._drop_ahead()            # az előre gyártott hangok elavultak
@@ -358,6 +393,7 @@ class FelolvasoFrame(wx.Frame):
         self.film.seek(pos)
         if self.sched:
             self.sched.reset_to(pos)
+        self._clock_reset(pos)        # ugrás → ffmpeg-újraindulás → friss horgony
         self._announce(f"Ugrás: {int(pos // 60)} perc {int(pos % 60)} mp.")
 
     def _vol(self, delta):
@@ -369,14 +405,64 @@ class FelolvasoFrame(wx.Frame):
     # ---- a szinkron szíve: időzítő --------------------------------------
 
     def _tick(self):
-        if not self.film.is_active() or self.film.is_paused() or not self.sched:
+        if not self.sched:
             return
+        if self._subs_only:                   # film-hang nélküli feliratolvasás
+            if self._subs_paused:
+                return
+        elif not self.film.is_active() or self.film.is_paused():
+            return
+        pos = self._clock()                   # a narrációt vezérlő idő
         self._prefetch()                      # a KÖVETKEZŐ sor előre legyártása
         if self._narrating:
             return
-        cue = self.sched.next_due(self.film.position())
+        cue = self.sched.next_due(pos)
         if cue:
             self._narrate(cue)
+
+    def _clock_reset(self, pos, fresh=True):
+        """A narráció-óra újrahorgonyzása. `fresh=True`: a film hangja ELÖLRŐL
+        indul (lejátszás-indítás, ugrás → ffmpeg-újraindulás, indulási puffer);
+        `fresh=False`: csak folytatás szünetből (a hang azonnal szól tovább)."""
+        now = time.monotonic()
+        self._clk_pos = max(0.0, pos)
+        self._clk_apos = self.film.position()
+        self._clk_wall = now
+        if fresh:
+            self._clk_started = False
+            self._clk_t0 = now
+
+    def _clock(self):
+        """A narrációt vezérlő idő másodpercben. Amíg a film HANG-pozíciója
+        egészségesen halad, azt követi (pontos szinkron); ha beragad (indulási
+        puffer, nem dekódolható film-hang, stream-akadás), a fali óra lépteti
+        ELŐRE – így a felolvasás sosem áll le némán. Sosem ugrik vissza."""
+        now = time.monotonic()
+        dt = now - self._clk_wall
+        self._clk_wall = now
+        if dt <= 0:
+            return self._clk_pos
+        if self._subs_only:                   # nincs film-hang → tisztán fali óra
+            self._clk_pos += dt
+            return self._clk_pos
+        apos = self.film.position()
+        da = apos - self._clk_apos
+        self._clk_apos = apos
+        if da > 0:
+            self._clk_started = True
+        if self._clk_started and 0 < da <= dt * 4.0:
+            # a hang ténylegesen haladt → azt követjük, finom abszolút resynckel
+            self._clk_pos += da
+            self._clk_pos += (apos - self._clk_pos) * 0.15
+        elif self._clk_started:
+            # a hang elindult, de épp nem haladt (akadás) → fali óra viszi tovább
+            self._clk_pos += dt
+        elif now - self._clk_t0 > 2.5:
+            # a hang ~2,5 mp után sem indult el (nem dekódolható film-hang):
+            # a fali óra veszi át, hogy a felolvasás akkor is elinduljon
+            self._clk_pos += dt
+        # különben: normál indulási puffer alatt VÁRUNK (a pozíció 0 marad)
+        return self._clk_pos
 
     def _prefetch(self):
         """A soron következő feliratot ELŐRE legyártjuk, amíg az előző szól.
@@ -390,7 +476,7 @@ class FelolvasoFrame(wx.Frame):
             return
         cue = self.sched.cues[i]
         # csak ha már „a láthatáron" van (ne gyártsunk feleslegesen előre)
-        if cue.start - self.film.position() > 12.0:
+        if cue.start - self._clk_pos > 12.0:
             return
         self._ahead_busy = True
         lbl, eng, vid = self._voice()
@@ -458,12 +544,13 @@ class FelolvasoFrame(wx.Frame):
         self._ahead.clear()
 
     def _play_narration(self, path):
-        if not self.film.is_active():        # közben leállt → eldobjuk
+        if not self._subs_only and not self.film.is_active():   # közben leállt
             self._safe_del(path)
             self._narration_done()
             return
         self._cur_temp = path
-        self.film.set_volume(self._film_vol * DUCK)     # film halkítása
+        if not self._subs_only:
+            self.film.set_volume(self._film_vol * DUCK)     # film halkítása
         self.narr.play(path)
 
     def _on_narr_state(self, s):
@@ -487,10 +574,24 @@ class FelolvasoFrame(wx.Frame):
     def _on_film_state(self, s):
         if s.startswith("vége"):
             self.timer.Stop()
+            self._subs_only = False
             self._announce("A média véget ért.")
         elif s.startswith("hiba"):
-            self.timer.Stop()
-            self._announce(s)
+            # ha a film HANGJA nem játszható le, de VAN betöltött felirat:
+            # ne álljunk le némán – olvassuk a feliratot csend fölött, fali
+            # órával (ez pontosan a „megtalálja, de a mező üres" eset mentése)
+            if self.cues and self.sched and not self._subs_only:
+                self._subs_only = True
+                self._subs_paused = False
+                self._clock_reset(self._clk_pos)
+                if not self.timer.IsRunning():
+                    self.timer.Start(150)
+                self._announce("A film hangját nem tudom lejátszani, de a "
+                               "feliratot felolvasom (film-hang nélkül). "
+                               "Részletek: F8.")
+            else:
+                self.timer.Stop()
+                self._announce(s)
 
     # ---- billentyűk / súgó / zárás ------------------------------------
 
@@ -498,6 +599,8 @@ class FelolvasoFrame(wx.Frame):
         code = e.GetKeyCode()
         if code == wx.WXK_F1:
             self._help()
+        elif code == wx.WXK_F8:
+            self._diag()
         elif code == wx.WXK_SPACE and not isinstance(
                 self.FindFocus(), (wx.TextCtrl,)):
             self._toggle()
@@ -511,6 +614,34 @@ class FelolvasoFrame(wx.Frame):
             self._stop()
         else:
             e.Skip()
+
+    def _diag(self):
+        """F8: a felolvasás állapotának bemondása – hibakereséshez. Egy
+        gombnyomással kiderül, halad-e az idő, be van-e töltve a felirat, és
+        épp mit olvas – így egy elakadás pontosan behatárolható."""
+        if not self.media:
+            self._announce("Nincs betöltve média. Tölts be egy filmet vagy "
+                           "hangfájlt.")
+            return
+        n = len(self.cues)
+        if self._subs_only:
+            state = "felirat felolvasása film-hang nélkül"
+            if self._subs_paused:
+                state += " (szünet)"
+        elif not self.film.is_active():
+            state = "áll (nincs lejátszás – nyomd meg a Szóközt)"
+        elif self.film.is_paused():
+            state = "szünet"
+        else:
+            state = "lejátszás"
+        pos = self._clk_pos
+        cur = self.cue_txt.GetValue().strip() or "most éppen semmi"
+        subs = (f"{n} feliratsor betöltve" if n
+                else "NINCS betöltött felirat – nyomd meg a „Felirat betöltése” "
+                     "gombot")
+        self._announce(f"Állapot: {state}. Idő: {int(pos // 60)} perc "
+                       f"{int(pos % 60)} másodperc. {subs}. Épp felolvasva: "
+                       f"{cur}.")
 
     def _help(self):
         try:
