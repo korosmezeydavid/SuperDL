@@ -108,6 +108,29 @@ def test_f8_diagnosztika_letezik():
     assert "WXK_F8" in inspect.getsource(W.FelolvasoFrame._on_key)
 
 
+def test_announce_hangosan_is_beszel():
+    """VAK-KRITIKUS: a státuszsor/címke változását a képernyőolvasó nem olvassa
+    fel magától – az _announce-nak a program SAJÁT hangján (selfvoice) is be KELL
+    mondania, különben a felhasználó semmilyen jelzést (F8-at sem) nem hall."""
+    src = inspect.getsource(W.FelolvasoFrame._announce)
+    assert "selfvoice" in src
+    assert "speak" in src and "force=True" in src
+
+
+def test_f8_es_indulas_mondja_a_verziot():
+    """A felhasználó HALLJA a verziót (indításkor és F8-ra), hogy tudja, tényleg
+    a friss modul fut-e – ez oldja fel a »frissítettem, de ugyanaz« kétséget."""
+    assert hasattr(W, "MOD_VERSION")
+    assert "MOD_VERSION" in inspect.getsource(W.FelolvasoFrame._diag)
+
+
+def test_proaktiv_riasztas_ha_nem_indul():
+    """Ha a lejátszás elindul, de pár mp-ig egyetlen felirat sem szólal meg, a
+    program magától bemondja az állapotot (F8 nélkül is)."""
+    src = inspect.getsource(W.FelolvasoFrame._tick)
+    assert "_warned" in src and "_fired_any" in src
+
+
 def test_ugras_es_leallitas_ujrahorgonyozza_az_orat():
     """Ugrás/leállítás után az órát újra kell horgonyozni (különben a fali óra a
     régi ponthoz képest ugrana)."""

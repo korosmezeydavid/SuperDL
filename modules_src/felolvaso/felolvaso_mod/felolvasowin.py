@@ -64,6 +64,10 @@ DUCK = 0.22          # a film hangereje a felolvasás alatt (halkítás)
 # (nulla csúszás). Vakon amúgy is gyors beszédhez szokunk – de állítható.
 DEFAULT_RATE = 7
 
+# a modul verziója – a felhasználó HALLJA (indításkor és F8-ra), hogy tényleg a
+# friss változat fut-e (a manifest.json-nal kézzel szinkronban tartva)
+MOD_VERSION = "1.3.1"
+
 
 class FelolvasoFrame(wx.Frame):
     def __init__(self, main):
@@ -93,6 +97,11 @@ class FelolvasoFrame(wx.Frame):
         # fali órával akkor is felolvassuk (jobb a semminél)
         self._subs_only = False
         self._subs_paused = False
+        # proaktív riasztás: ha a lejátszás elindul, de pár mp-ig EGYETLEN felirat
+        # sem szólal meg, a program magától bemondja, mi az állapot (F8 nélkül is)
+        self._play_t0 = 0.0
+        self._fired_any = False
+        self._warned = False
 
         self.film = Player()
         self.film.on_state = lambda s: wx.CallAfter(self._on_film_state, s)
@@ -106,8 +115,9 @@ class FelolvasoFrame(wx.Frame):
         self.Bind(wx.EVT_TIMER, lambda e: self._tick(), self.timer)
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self.Bind(wx.EVT_CHAR_HOOK, self._on_key)
-        self._announce("Tölts be egy filmet vagy hangfájlt; a magyar feliratot "
-                       "szinkronban felolvasom. Súgó: F1.")
+        self._announce(f"Felirat-felolvasó {MOD_VERSION}. Tölts be egy filmet "
+                       "vagy hangfájlt; a magyar feliratot szinkronban "
+                       "felolvasom. Súgó: F1. Állapot: F8.")
 
     # ---- felépítés ----------------------------------------------------
 
@@ -199,6 +209,15 @@ class FelolvasoFrame(wx.Frame):
     def _announce(self, text):
         self.SetStatusText(text)
         self.now_lbl.SetLabel(text)
+        # FONTOS: vakon a státuszsor/címke változását a képernyőolvasó NEM olvassa
+        # fel magától – ezért a program SAJÁT hangján (SAPI/eSpeak) is bemondjuk.
+        # (force=True: akkor is szól, ha a self-voice alapból ki van kapcsolva.)
+        sv = getattr(self.main, "selfvoice", None)
+        if sv:
+            try:
+                sv.speak(text, force=True)
+            except Exception:
+                pass
 
     def _voice(self):
         i = self.voice_ch.GetSelection()
@@ -363,6 +382,9 @@ class FelolvasoFrame(wx.Frame):
         else:
             self._subs_only = False
             self._subs_paused = False
+            self._fired_any = False
+            self._warned = False
+            self._play_t0 = time.monotonic()
             self.film.set_volume(self._film_vol)
             self.film.play(self.media)
             if self.sched:
@@ -413,11 +435,19 @@ class FelolvasoFrame(wx.Frame):
         elif not self.film.is_active() or self.film.is_paused():
             return
         pos = self._clock()                   # a narrációt vezérlő idő
+        # proaktív: ha ~6 mp lejátszás után SEMMI nem szólalt meg, mondjuk el, mi
+        # az állapot – így a felhasználó F8 nélkül is tudja, hol akad (és halljuk,
+        # halad-e az idő egyáltalán)
+        if (not self._fired_any and not self._warned and self._play_t0
+                and time.monotonic() - self._play_t0 > 6.0):
+            self._warned = True
+            self._diag(prefix="A felolvasás még nem indult el. ")
         self._prefetch()                      # a KÖVETKEZŐ sor előre legyártása
         if self._narrating:
             return
         cue = self.sched.next_due(pos)
         if cue:
+            self._fired_any = True
             self._narrate(cue)
 
     def _clock_reset(self, pos, fresh=True):
@@ -583,6 +613,8 @@ class FelolvasoFrame(wx.Frame):
             if self.cues and self.sched and not self._subs_only:
                 self._subs_only = True
                 self._subs_paused = False
+                self._warned = False
+                self._play_t0 = time.monotonic()
                 self._clock_reset(self._clk_pos)
                 if not self.timer.IsRunning():
                     self.timer.Start(150)
@@ -615,13 +647,14 @@ class FelolvasoFrame(wx.Frame):
         else:
             e.Skip()
 
-    def _diag(self):
+    def _diag(self, prefix=""):
         """F8: a felolvasás állapotának bemondása – hibakereséshez. Egy
-        gombnyomással kiderül, halad-e az idő, be van-e töltve a felirat, és
-        épp mit olvas – így egy elakadás pontosan behatárolható."""
+        gombnyomással kiderül, MELYIK VERZIÓ fut, halad-e az idő, be van-e
+        töltve a felirat, és épp mit olvas – így egy elakadás pontosan
+        behatárolható."""
         if not self.media:
-            self._announce("Nincs betöltve média. Tölts be egy filmet vagy "
-                           "hangfájlt.")
+            self._announce(f"{prefix}Felirat-felolvasó {MOD_VERSION}. Nincs "
+                           "betöltve média. Tölts be egy filmet vagy hangfájlt.")
             return
         n = len(self.cues)
         if self._subs_only:
@@ -639,9 +672,9 @@ class FelolvasoFrame(wx.Frame):
         subs = (f"{n} feliratsor betöltve" if n
                 else "NINCS betöltött felirat – nyomd meg a „Felirat betöltése” "
                      "gombot")
-        self._announce(f"Állapot: {state}. Idő: {int(pos // 60)} perc "
-                       f"{int(pos % 60)} másodperc. {subs}. Épp felolvasva: "
-                       f"{cur}.")
+        self._announce(f"{prefix}Felirat-felolvasó {MOD_VERSION}. Állapot: "
+                       f"{state}. Idő: {int(pos // 60)} perc {int(pos % 60)} "
+                       f"másodperc. {subs}. Épp felolvasva: {cur}.")
 
     def _help(self):
         try:
