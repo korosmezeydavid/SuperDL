@@ -38,9 +38,16 @@ LÉPÉSRŐL LÉPÉSRE (vakon is)
 4. „Lejátszás" (vagy Szóköz). A felolvasás alatt a film hangja halkabb.
 
 GYORSBILLENTYŰK
-F1 – súgó.  F7 – a kiválasztott hang KIPRÓBÁLÁSA (film nélkül).  F8 – állapot
-bemondása (hibakereséshez).  Szóköz – lejátszás/szünet.  Bal/jobb nyíl – 10 mp
-vissza/előre.  Ctrl+fel / Ctrl+le – hangerő.  Esc – leállítás.
+F1 – súgó.  F6 – a film hangjának átvezetése az aktuális hangeszközre (pl.
+Bluetooth-ra váltás után).  F7 – a kiválasztott hang KIPRÓBÁLÁSA (film nélkül).
+F8 – állapot bemondása (hibakereséshez).  Szóköz – lejátszás/szünet.  Bal/jobb
+nyíl – 10 mp vissza/előre.  Ctrl+fel / Ctrl+le – hangerő.  Esc – leállítás.
+
+HANGESZKÖZ VÁLTÁSA (pl. BLUETOOTH)
+Ha lejátszás közben másik hangeszközre váltasz, a program igyekszik a film
+hangját magától átvinni az új eszközre (a felolvasás hangja amúgy is követi).
+Ha valamiért mégsem jönne át, nyomd meg az F6-ot: a film hangját azonnal
+átvezeti az aktuális hangeszközre.
 
 HA NEM SZÓLAL MEG A FELIRAT
 - Először nyomd meg az F7-et: kipróbálja a kiválasztott hangot. Ha ezt sem
@@ -69,7 +76,7 @@ DEFAULT_RATE = 7
 
 # a modul verziója – a felhasználó HALLJA (indításkor és F8-ra), hogy tényleg a
 # friss változat fut-e (a manifest.json-nal kézzel szinkronban tartva)
-MOD_VERSION = "1.4.1"
+MOD_VERSION = "1.4.2"
 
 
 class FelolvasoFrame(wx.Frame):
@@ -109,6 +116,12 @@ class FelolvasoFrame(wx.Frame):
         self._last_tts_err = ""
         self._last_ok = ""
         self._narr_fail = 0        # egymás utáni sikertelen narrációk száma
+        # HANGESZKÖZ-KÖVETÉS: a film egy HOSSZÚ streamet nyit, ami az indításkori
+        # eszközön ragad; a narráció rövid streamjei viszont az új alapeszközre
+        # kerülnek. Ha váltasz (pl. Bluetooth), a filmet ÚJRANYITJUK az új eszközön,
+        # hogy a kettő együtt szóljon. (F6-tal kézzel is átvezethető.)
+        self._film_dev = ""        # az eszköz, amin a film épp szól
+        self._dev_poll = 0         # ritkított eszköz-figyelés számlálója
 
         self.film = Player()
         self.film.on_state = lambda s: wx.CallAfter(self._on_film_state, s)
@@ -418,6 +431,8 @@ class FelolvasoFrame(wx.Frame):
             self._fired_any = False
             self._warned = False
             self._play_t0 = time.monotonic()
+            self._film_dev = self._cur_out_name()   # amin a film most megszólal
+            self._dev_poll = 0
             self.film.set_volume(self._film_vol)
             self.film.play(self.media)
             if self.sched:
@@ -468,6 +483,16 @@ class FelolvasoFrame(wx.Frame):
         elif not self.film.is_active() or self.film.is_paused():
             return
         pos = self._clock()                   # a narrációt vezérlő idő
+        # HANGESZKÖZ-KÖVETÉS (ritkítva, ~1,5 mp-enként, csak ha épp nem narrál):
+        # ha az alapeszköz megváltozott (pl. Bluetooth), a filmet átvezetjük rá
+        if not self._subs_only and not self._narrating and self.film.is_active():
+            self._dev_poll += 1
+            if self._dev_poll >= 10:
+                self._dev_poll = 0
+                dev = self._cur_out_name()
+                if dev and self._film_dev and dev != self._film_dev:
+                    self._reroute_audio(auto=True)
+                    return
         # proaktív: ha ~6 mp lejátszás után SEMMI nem szólalt meg, mondjuk el, mi
         # az állapot – így a felhasználó F8 nélkül is tudja, hol akad (és halljuk,
         # halad-e az idő egyáltalán)
@@ -710,6 +735,8 @@ class FelolvasoFrame(wx.Frame):
         code = e.GetKeyCode()
         if code == wx.WXK_F1:
             self._help()
+        elif code == wx.WXK_F6:
+            self._reroute_audio(auto=False)
         elif code == wx.WXK_F7:
             self._test_voice()
         elif code == wx.WXK_F8:
@@ -727,6 +754,40 @@ class FelolvasoFrame(wx.Frame):
             self._stop()
         else:
             e.Skip()
+
+    def _cur_out_name(self) -> str:
+        """A jelenlegi alapértelmezett KIMENETI hangeszköz neve (best-effort)."""
+        try:
+            import sounddevice as sd
+            d = sd.query_devices(kind="output")
+            return d.get("name", "") if isinstance(d, dict) else ""
+        except Exception:
+            return ""
+
+    def _reroute_audio(self, auto: bool = False):
+        """A film hangját ÁTVEZETI az aktuális alapértelmezett hangeszközre: a
+        jelenlegi pozíción újranyitja a film streamjét (ez az új eszközre kerül,
+        ahogy a narráció is). Így pl. Bluetooth-ra váltva a film hangja is átjön.
+        `auto=True`: eszközváltás magától észlelve; False: F6-tal kézzel."""
+        if self._subs_only or not self.film.is_active():
+            if not auto:
+                self._announce("Nincs mit átvezetni – előbb indítsd el egy film "
+                               "lejátszását.")
+            return
+        pos = self._clk_pos
+        self.narr.stop()
+        self._narrating = False
+        self._drop_ahead()
+        self.film.set_volume(self._film_vol)
+        self.film.seek(pos)                  # újranyitás → az AKTUÁLIS alapeszközre
+        if self.sched:
+            self.sched.reset_to(pos)
+        self._clock_reset(pos)
+        self._film_dev = self._cur_out_name()
+        dev = f" ({self._film_dev})" if self._film_dev else ""
+        self._announce((f"Hangeszköz-váltás: a film hangját átvezettem az új "
+                        f"eszközre{dev}.") if auto else
+                       (f"A film hangját átvezettem az aktuális hangeszközre{dev}."))
 
     def _test_voice(self):
         """F7: a KIVÁLASZTOTT felolvasó hang azonnali kipróbálása (film nélkül).
@@ -795,9 +856,12 @@ class FelolvasoFrame(wx.Frame):
             "NINCS használható hangmotor (sem SAPI, sem eSpeak)."
         err = (f" Utolsó hanghiba: {self._last_tts_err}."
                if self._last_tts_err else "")
+        outdev = self._cur_out_name()
+        dev = f" Hangeszköz: {outdev}." if outdev else ""
         self._announce(f"{prefix}Felirat-felolvasó {MOD_VERSION}. Állapot: "
                        f"{state}. Idő: {int(pos // 60)} perc {int(pos % 60)} "
-                       f"másodperc. {subs}. {hang}{err} Épp felolvasva: {cur}.")
+                       f"másodperc. {subs}. {hang}{err}{dev} Épp felolvasva: "
+                       f"{cur}.")
 
     def _help(self):
         try:

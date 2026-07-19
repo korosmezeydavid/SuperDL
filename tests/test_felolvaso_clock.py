@@ -172,6 +172,25 @@ def test_synth_espeak_tartalek_hiba_eseten():
     assert calls == ["sapi", "espeak"]      # előbb sapi, majd eSpeak-tartalék
 
 
+def test_hangeszkoz_kovetes_es_f6():
+    """A film HOSSZÚ streamje az indításkori eszközön ragad; eszközváltáskor
+    (pl. Bluetooth) át kell vezetni. Legyen automatikus követés a _tick-ben és
+    kézi F6 is."""
+    assert hasattr(W.FelolvasoFrame, "_reroute_audio")
+    ksrc = inspect.getsource(W.FelolvasoFrame._on_key)
+    assert "WXK_F6" in ksrc
+    tsrc = inspect.getsource(W.FelolvasoFrame._tick)
+    assert "_cur_out_name" in tsrc and "_reroute_audio" in tsrc
+
+
+def test_reroute_a_pozicion_ujranyit():
+    """Az átvezetés a jelenlegi pozíción nyitja újra a filmet (seek), és
+    újrahorgonyozza az órát – nem ugrik el az idővonal."""
+    src = inspect.getsource(W.FelolvasoFrame._reroute_audio)
+    assert "film.seek" in src
+    assert "_clock_reset" in src
+
+
 def test_sapi_com_init_a_szintezis_utban():
     """A SAPI COM-inicializálás legyen a szintézis-útvonalon (háttérszál-biztos)."""
     from modules_src.felolvaso.felolvaso_mod import narrator as N
