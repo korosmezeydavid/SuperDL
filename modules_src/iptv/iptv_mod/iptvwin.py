@@ -20,6 +20,16 @@ from superdl import store                   # megosztott tároló a Core-ból
 from superdl.audioengine import Player      # megosztott lejátszó a Core-ból
 
 
+def _net_ok(what):
+    """Internet-elő-ellenőrzés VÉDETTEN: régebbi Core-ban (nincs netcheck)
+    egyszerűen átengedjük, hogy a modul akkor is működjön."""
+    try:
+        from superdl import netcheck
+        return netcheck.require_online(what)
+    except Exception:
+        return True, ""
+
+
 HELP = """INTERNETES TV (IPTV)
 
 MIRE VALÓ
@@ -311,13 +321,18 @@ class IPTVFrame(wx.Frame):
 
     # ---- forrás betöltése ---------------------------------------------
 
-    def _bg(self, label, fn, done):
+    def _bg(self, label, fn, done, net_what=None):
         if self._busy:
             return
         self._busy = True
         self._announce(label)
 
         def work():
+            if net_what:                     # net-igényes forrás → előbb ellenőriz
+                ok, netmsg = _net_ok(net_what)
+                if not ok:
+                    wx.CallAfter(self._load_offline, netmsg)
+                    return
             try:
                 res = fn()
             except Exception as ex:
@@ -325,6 +340,10 @@ class IPTVFrame(wx.Frame):
                 return
             wx.CallAfter(done, res)
         threading.Thread(target=work, daemon=True).start()
+
+    def _load_offline(self, msg):
+        self._busy = False
+        self._announce(msg)
 
     def _load_failed(self, ex):
         self._busy = False
@@ -346,8 +365,10 @@ class IPTVFrame(wx.Frame):
         if not url:
             return
         self._save_conf()
+        net = ("az internetes lista betöltéséhez"
+               if url.lower().startswith(("http://", "https://")) else None)
         self._bg("Lista betöltése…", lambda: iptv.load_playlist(url),
-                 self._channels_loaded)
+                 self._channels_loaded, net_what=net)
 
     def _xtream_login(self):
         host = self.xt_host.GetValue().strip()
@@ -362,7 +383,7 @@ class IPTVFrame(wx.Frame):
         self._save_conf()
         self._bg("Bejelentkezés és csatornák lekérése…",
                  lambda: iptv.xtream_load(host, user, pwd),
-                 self._xtream_loaded)
+                 self._xtream_loaded, net_what="az Xtream-bejelentkezéshez")
 
     def _xtream_loaded(self, result):
         """A player_api-s bejelentkezés eredménye: (user_info, csatornák).
@@ -465,7 +486,16 @@ class IPTVFrame(wx.Frame):
             return
         self._cur = c
         self._announce(f"Kapcsolódás: {c.name} …")
-        self.player.play(c.url, c.name, audio_track=self._selected_audio_track())
+        track = self._selected_audio_track()
+
+        def go():                            # net-ellenőrzés a GUI fagyasztása nélkül
+            ok, msg = _net_ok("a csatorna megtekintéséhez")
+            if not ok:
+                wx.CallAfter(self._announce, msg)
+                return
+            wx.CallAfter(self.player.play, c.url, c.name, audio_track=track)
+
+        threading.Thread(target=go, daemon=True).start()
 
     def _selected_audio_track(self):
         i = self.audio_ch.GetSelection()

@@ -34,6 +34,20 @@ def _prefers_single_video(url: str) -> bool:
     return bool(parse_qs(u.query).get("v"))  # …/watch?v=<VIDEOID>
 
 
+def _looks_offline(m: str) -> bool:
+    """Hálózati/kapcsolati eredetű-e a hiba szövege (a netcheck közös mintáival,
+    ha elérhető; különben a leggyakoribb mintákkal)."""
+    try:
+        from . import netcheck
+        return netcheck.looks_like_offline(m)
+    except Exception:
+        return any(h in m for h in (
+            "getaddrinfo failed", "timed out", "timeout", "connection reset",
+            "connection refused", "network is unreachable",
+            "temporary failure in name resolution", "max retries exceeded",
+            "failed to establish"))
+
+
 def friendly_error(msg: str) -> str:
     """Ismert, gyakori hibák érthető, lépésenkénti magyar üzenete."""
     m = msg.lower()
@@ -122,10 +136,20 @@ def friendly_error(msg: str) -> str:
     if "429" in m or "too many requests" in m:
         return ("Az oldal átmenetileg KORLÁTOZ (túl sok kérés – 429). Várj "
                 "egy kicsit, és tölts le kevesebbet egyszerre.")
-    if ("getaddrinfo failed" in m or "timed out" in m or "timeout" in m
-            or "connection reset" in m or "connection refused" in m
-            or "unable to download webpage" in m or "network is unreachable" in m
-            or "temporary failure in name resolution" in m):
+    if ("unable to download webpage" in m or _looks_offline(m)):
+        # KÜLÖNBSÉGTÉTEL: egyáltalán nincs net, vagy csak ez a szolgáltatás nem
+        # válaszol (a felhasználó ezt kérte, hogy tudja, hol a gond)
+        try:
+            from . import netcheck
+            code, why = netcheck.offline_reason()
+        except Exception:
+            code, why = "", ""
+        if code == "no_internet":
+            return ("NINCS INTERNETKAPCSOLAT. " + why + " A program a "
+                    "félbeszakadt letöltést később folytatni tudja.")
+        if code == "service_down":
+            return ("Az internetkapcsolat működik, de EZ AZ OLDAL most nem "
+                    "érhető el. Próbáld újra pár perc múlva.")
         return ("HÁLÓZATI HIBA: az oldal nem érhető el. Ellenőrizd az "
                 "internetkapcsolatot, majd próbáld újra – a program a "
                 "félbeszakadt letöltést folytatni tudja.")

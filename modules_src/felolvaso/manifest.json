@@ -1,7 +1,7 @@
 {
   "id": "felolvaso",
   "name": "Felirat-felolvasó lejátszó",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "entry": "felolvaso_mod",
   "category": "Média",
   "description": "Idegen nyelvű film (vagy hangfájl) lejátszása úgy, hogy a magyar (vagy bármely szöveges) feliratot SZINKRONBAN, választható hanggal (helyi SAPI, Edge neurális online, vagy beépített eSpeak) felolvassa – így vakon is követhető az idegen nyelvű film. A film mellé tett .srt/.vtt feliratot magától megtalálja, a fájlba ágyazott szöveges feliratsávot is kezeli. A YouTube-link is beilleszthető – a videó hangját streameli, a feliratot (kézi, vagy a YouTube automatikus, magyarra fordított feliratát) letölti és felolvassa. A felolvasás TEMPÓJA állítható (alapból gyors, hogy tartsa a lépést a filmfelirattal), és a következő sort előre legyártja, így a neurális hang sem csúszik.",

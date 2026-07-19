@@ -73,11 +73,11 @@
       "category": "Média",
       "description": "Akadálymentes internetes TV (legális IPTV): saját m3u/Xtream forrás csatornái, felolvasott műsorújság (EPG), felvétel és emlékeztető, hangalámondás-sáv és élő felirat-felolvasás. Csak legális, saját előfizetésű forrásokhoz.",
       "latest": {
-        "version": "1.0.3",
+        "version": "1.0.4",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iptv-1.0.3/iptv-1.0.3.zip",
-        "sha256": "7ead47571d0973759bcaa0e99ec171f7a5e8b8bae0f2bfc8a165180f6f8992bc",
-        "size": 16323
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iptv-1.0.4/iptv-1.0.4.zip",
+        "sha256": "2c3cf12352bacd58c5f14c995843080081aa44c05b4600567053a4941eca80d6",
+        "size": 16699
       }
     },
     {
@@ -99,12 +99,12 @@
       "category": "Média",
       "description": "Idegen nyelvű film (vagy hangfájl) lejátszása úgy, hogy a magyar (vagy bármely szöveges) feliratot SZINKRONBAN, választható hanggal (helyi SAPI, Edge neurális online, vagy beépített eSpeak) felolvassa – így vakon is követhető az idegen nyelvű film. A film mellé tett .srt/.vtt feliratot magától megtalálja, a fájlba ágyazott szöveges feliratsávot is kezeli. A YouTube-link is beilleszthető – a videó hangját streameli, a feliratot (kézi, vagy a YouTube automatikus, magyarra fordított feliratát) letölti és felolvassa. A felolvasás TEMPÓJA állítható (alapból gyors, hogy tartsa a lépést a filmfelirattal), és a következő sort előre legyártja, így a neurális hang sem csúszik.",
       "latest": {
-        "version": "1.4.0",
+        "version": "1.4.1",
         "min_core_api": "1.0",
         "min_core_version": "3.29.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-felolvaso-1.4.0/felolvaso-1.4.0.zip",
-        "sha256": "145984c0995397dcaf31696d9301df9325b3c2b3aa7ddd295bcd9078eaae0bea",
-        "size": 20755
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-felolvaso-1.4.1/felolvaso-1.4.1.zip",
+        "sha256": "de1b335dc065bd107199165ea678553e1015e5254a5797ff88a01c182b0acd39",
+        "size": 20884
       }
     },
     {
@@ -113,11 +113,11 @@
       "category": "Média",
       "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
       "latest": {
-        "version": "1.1.1",
+        "version": "1.1.2",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.1/radio-1.1.1.zip",
-        "sha256": "bcc1036400184befe09425a3f926c12c2e6f04de545f28f64d7ebc263b4ab5e9",
-        "size": 15532
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.2/radio-1.1.2.zip",
+        "sha256": "266665ebc0ea8c3ec6cbba143c86f31f97aa441f953b62bdb0ddfa763c541477",
+        "size": 15972
       }
     },
     {

@@ -15,6 +15,16 @@ from superdl import store                       # megosztott tároló a Core-bó
 from superdl.audioengine import Player          # megosztott lejátszó a Core-ból
 from .radiorecwin import RecordingsDialog, ScheduleDialog   # a modulban
 
+
+def _net_ok(what):
+    """Internet-elő-ellenőrzés VÉDETTEN: ha a Core-ban nincs netcheck (régebbi
+    verzió), egyszerűen átengedjük (True) – a modul így régi Core-on is működik."""
+    try:
+        from superdl import netcheck
+        return netcheck.require_online(what)
+    except Exception:
+        return True, ""
+
 HELP = """INTERNETES RÁDIÓ
 
 MIRE VALÓ
@@ -302,6 +312,14 @@ class RadioFrame(wx.Frame):
     def _announce(self, text):
         self.SetStatusText(text)
         self.now_label.SetLabel(text)
+        # vakon a státuszsor/címke változását a képernyőolvasó nem olvassa fel
+        # magától – a program saját hangján (selfvoice) is bemondjuk
+        sv = getattr(self.main, "selfvoice", None)
+        if sv:
+            try:
+                sv.speak(text, force=True)
+            except Exception:
+                pass
 
     def _selected(self) -> R.Station | None:
         i = self.st_list.GetFirstSelected()
@@ -384,10 +402,15 @@ class RadioFrame(wx.Frame):
         self.SetStatusText(f"Keresés: {label} …")
 
         def work():
+            ok, netmsg = _net_ok("a rádióállomások kereséséhez")
+            if not ok:                       # nincs net → hangosan jelez
+                wx.CallAfter(self._announce, netmsg)
+                return
             try:
                 res = fn()
             except Exception as e:
-                wx.CallAfter(self.SetStatusText, f"Hiba: {e}")
+                from superdl import media
+                wx.CallAfter(self._announce, media.friendly_error(str(e)))
                 return
             wx.CallAfter(self._show, res, label)
             if on_done:
@@ -415,7 +438,15 @@ class RadioFrame(wx.Frame):
             return
         self._cur = st
         self._announce(f"Csatlakozás: {st.name} …")
-        self.player.play(st.url, title=st.name)
+
+        def go():                            # a net-ellenőrzés ne fagyassza a GUI-t
+            ok, msg = _net_ok("a rádió hallgatásához")
+            if not ok:                       # nincs net → hangosan jelez
+                wx.CallAfter(self._announce, msg)
+                return
+            wx.CallAfter(self.player.play, st.url, title=st.name)
+
+        threading.Thread(target=go, daemon=True).start()
 
     def _on_state(self, text):
         if text == "lejátszás" and self._cur:
@@ -487,6 +518,10 @@ class RadioFrame(wx.Frame):
             for r in running:
                 r.stop()
             self._announce(f"Felvétel leállítva és elmentve: {st.name}.")
+            return
+        ok, netmsg = _net_ok("a rádiófelvételhez")   # felvételhez net kell
+        if not ok:
+            self._announce(netmsg)
             return
         r = self.rec.start_manual(st.name, st.url)
         if r:

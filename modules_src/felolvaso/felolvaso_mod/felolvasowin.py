@@ -69,7 +69,7 @@ DEFAULT_RATE = 7
 
 # a modul verziója – a felhasználó HALLJA (indításkor és F8-ra), hogy tényleg a
 # friss változat fut-e (a manifest.json-nal kézzel szinkronban tartva)
-MOD_VERSION = "1.4.0"
+MOD_VERSION = "1.4.1"
 
 
 class FelolvasoFrame(wx.Frame):
@@ -291,6 +291,14 @@ class FelolvasoFrame(wx.Frame):
         self._announce("Link feloldása és felirat letöltése… (kis türelem)")
 
         def work():
+            try:                             # net-elő-ellenőrzés VÉDETTEN
+                from superdl import netcheck
+                ok, netmsg = netcheck.require_online("a videó-link megnyitásához")
+            except Exception:
+                ok, netmsg = True, ""
+            if not ok:                       # nincs net → hangosan jelez
+                wx.CallAfter(self._announce, netmsg)
+                return
             try:
                 stream, cues, lang, title = ytsource.load_from_url(url)
             except Exception as e:

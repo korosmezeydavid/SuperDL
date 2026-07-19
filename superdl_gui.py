@@ -54,7 +54,7 @@ from superdl.organizer import OrganizerManager
 # Az Internetes TV (IPTV) MOSTANTÓL külön MODUL.
 # A Hangoskönyv-készítő MOSTANTÓL a „Könyvek" MODULban.
 from superdl.radiorec import RecordManager
-from superdl import dayinfo, weather, search, store, aiclient, mediaai
+from superdl import dayinfo, weather, search, store, aiclient, mediaai, netcheck
 from superdl.settingsdialog import SettingsDialog
 from superdl.aiwin import run_ai, run_ai_progress
 # A Napi infó ABLAK MOSTANTÓL a „Szervezés" MODULban (az üdvözlés-backend a Core-ban).
@@ -738,6 +738,26 @@ class MainFrame(wx.Frame):
             note = wx.adv.NotificationMessage("SuperDL", text)
             note.Show(timeout=8)
 
+    def _net_warn(self, msg: str):
+        """Internet-hiány AKADÁLYMENTES jelzése: állapotsor + rendszerértesítés
+        (a képernyőolvasó felolvassa) ÉS a program saját hangja (selfvoice), hogy
+        vakon is biztosan hallható legyen."""
+        self._announce(msg, ok=False, toast=True)
+        try:
+            self.selfvoice.speak(msg, force=True)
+        except Exception:
+            pass
+
+    def _require_net(self, what: str) -> bool:
+        """Elő-ellenőrzés egy net-igényes művelet előtt (GUI-szálon). Ha nincs
+        net, HANGOSAN jelez és False-t ad. Figyelem: offline esetben ez pár
+        másodpercig tarthat – lehetőleg háttérszálból hívd (lásd `require_online`
+        a workerben)."""
+        ok, msg = netcheck.require_online(what)
+        if not ok:
+            self._net_warn(msg)
+        return ok
+
     def _seed_ratio(self) -> float:
         try:
             return max(0.0, float(str(self.settings.get("seed_ratio", "1.0"))
@@ -838,6 +858,10 @@ class MainFrame(wx.Frame):
         self.SetStatusText("URL vizsgálata...")
 
         def detect():
+            ok, msg = netcheck.require_online("a letöltéshez")
+            if not ok:                       # nincs net → azonnal, hangosan jelez
+                wx.CallAfter(self._net_warn, msg)
+                return
             if is_torrent_url(url):
                 kind = "torrent"
             else:
@@ -973,6 +997,8 @@ class MainFrame(wx.Frame):
         InfoDialog(self, page).ShowModal()
 
     def _on_check_updates(self, event=None):
+        if not self._require_net("a frissítés kereséséhez"):
+            return
         UpdateDialog(self).ShowModal()
 
     def _on_search_window(self, event=None):
@@ -1332,7 +1358,9 @@ class MainFrame(wx.Frame):
 
         def work():
             w = None
-            if city:
+            # csak ha van net (különben a köszöntő némán, időjárás nélkül áll
+            # össze – ez ambient funkció, itt NEM jelzünk hangosan)
+            if city and netcheck.online():
                 try:
                     w = weather.current(city)
                 except Exception:

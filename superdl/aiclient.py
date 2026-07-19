@@ -103,8 +103,20 @@ def _pick(cfg: dict, prefer: list[str] | None = None) -> str:
 
 # ---- nyilvános hívások ------------------------------------------------
 
+def _net_guard() -> None:
+    """Az MI-hívások mind internetet igényelnek. Ha nincs net, AZONNAL érthető
+    magyar hibát dobunk (a hívó felolvassa/megmutatja), nem futunk bele hosszú
+    hálózati időtúllépésbe vagy kriptikus hibába."""
+    from . import netcheck
+    if not netcheck.online():
+        raise RuntimeError(
+            "Nincs internetkapcsolat. Az MI-funkciókhoz internet kell. "
+            "Ellenőrizd a wifit vagy a mobilnetet, majd próbáld újra.")
+
+
 def chat(prompt: str, system: str = "", *, provider: str | None = None,
          model: str | None = None, max_tokens: int = 2000) -> str:
+    _net_guard()
     cfg = _cfg()
     p = provider or _pick(cfg)
     key, mdl = _key(cfg, p), _model(cfg, p, model)
@@ -122,6 +134,7 @@ def chat(prompt: str, system: str = "", *, provider: str | None = None,
 def vision(prompt: str, image_bytes: bytes, mime: str = "image/png", *,
            provider: str | None = None, model: str | None = None,
            max_tokens: int = 2000) -> str:
+    _net_guard()
     cfg = _cfg()
     p = provider or _pick(cfg)          # mind a négy tud képet
     key, mdl = _key(cfg, p), _model(cfg, p, model)
@@ -148,6 +161,7 @@ def analyze_video(prompt: str, *, youtube_url: str | None = None,
                   local_path: str | None = None, progress=None) -> str:
     """Videó KÉPI elemzése a Geminivel (a többi szolgáltató ezt nem tudja).
     YouTube-linket közvetlenül elemez; helyi fájlt feltölt a Files API-val."""
+    _net_guard()
     cfg = _cfg()
     if not _key(cfg, "gemini"):
         raise AIError("A videó képi elemzéséhez Google Gemini kulcs kell "
@@ -215,6 +229,7 @@ def _gemini_upload(key, path, progress=None):
 
 def transcribe(audio_path: str, *, srt: bool = False,
                language: str = "hu") -> str:
+    _net_guard()
     cfg = _cfg()
     p = _pick(cfg, prefer=["openai", "gemini"])
     if p not in ("openai", "gemini"):

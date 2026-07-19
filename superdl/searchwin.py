@@ -221,14 +221,31 @@ class MediaSearchFrame(wx.Frame):
         kind = ("video", "playlist", "channel")[self.kind_choice.GetSelection()]
 
         def work():
+            from . import netcheck
+            ok, msg = netcheck.require_online("a kereséshez")
+            if not ok:                       # nincs net → hangosan jelez
+                wx.CallAfter(self._net_fail, msg)
+                return
             try:
                 res = S.search(q, count=count, kind=kind)
             except Exception as e:
-                wx.CallAfter(self.SetStatusText, f"Keresési hiba: {e}")
+                from . import media
+                wx.CallAfter(self._net_fail, media.friendly_error(str(e)))
                 return
             wx.CallAfter(self._show_results, res, focus_first, keep)
 
         threading.Thread(target=work, daemon=True).start()
+
+    def _net_fail(self, msg: str):
+        """Keresési/hálózati hiba AKADÁLYMENTES jelzése: állapotsor + a fő ablak
+        saját hangja (selfvoice), hogy vakon is hallható legyen."""
+        self._announce(msg)
+        self.btn_more.Enable()
+        try:
+            if hasattr(self.main, "_net_warn"):
+                self.main._net_warn(msg)
+        except Exception:
+            pass
 
     @staticmethod
     def _dedup(items):

@@ -170,9 +170,18 @@ class ModuleManagerFrame(wx.Frame):
         installed = self._installed_map()
 
         def work():
+            from . import netcheck
+            ok, msg = netcheck.require_online("a modullista frissítéséhez")
+            if not ok:                       # nincs net → hangosan jelez
+                wx.CallAfter(self._refresh_offline, msg)
+                return
             entries = coremod.fetch_index()
             wx.CallAfter(self._populate, entries, installed)
         threading.Thread(target=work, daemon=True).start()
+
+    def _refresh_offline(self, msg):
+        self._busy = False
+        self._announce(msg)
 
     def _populate(self, entries, installed):
         self._busy = False
@@ -226,6 +235,11 @@ class ModuleManagerFrame(wx.Frame):
             wx.CallAfter(self.gauge.SetValue, int(max(0, min(1, frac)) * 100))
 
         def work():
+            from . import netcheck
+            ok, netmsg = netcheck.require_online("a modul telepítéséhez")
+            if not ok:                       # nincs net → hangosan jelez
+                wx.CallAfter(self._install_done, False, netmsg)
+                return
             try:
                 man = coremod.install_entry(self.loader, r["entry"], prog, self.root)
                 wx.CallAfter(self._install_done, True,
