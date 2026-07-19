@@ -131,6 +131,55 @@ def test_proaktiv_riasztas_ha_nem_indul():
     assert "_warned" in src and "_fired_any" in src
 
 
+def test_alapbol_magyar_hangot_valaszt():
+    """Ne a lista első (gyakran ANGOL SAPI) hangját válassza, hanem magyart /
+    a beépített eSpeak magyart – különben a magyar feliratot angolul olvasná."""
+    o = types.SimpleNamespace(_voices=[
+        ("SAPI – Microsoft Zira Desktop - English", "sapi", "Zira English"),
+        ("SAPI – Microsoft Szabolcs - Hungarian", "sapi", "Szabolcs Hungarian"),
+        ("eSpeak magyar", "espeak", "espeak:hu"),
+    ])
+    assert W.FelolvasoFrame._default_voice_index(o) == 1     # a magyar SAPI
+
+    o2 = types.SimpleNamespace(_voices=[
+        ("SAPI – Zira English", "sapi", "Zira English"),
+        ("eSpeak magyar", "espeak", "espeak:hu"),
+    ])
+    assert W.FelolvasoFrame._default_voice_index(o2) == 1    # a beépített eSpeak
+
+
+def test_synth_espeak_tartalek_hiba_eseten():
+    """Ha a választott motor hibázik, a _synth AUTOMATIKUSAN eSpeak-re vált –
+    inkább szóljon, mint hogy néma maradjon; a hibát visszaadja, nem nyeli el."""
+    from modules_src.felolvaso.felolvaso_mod import narrator as N
+    calls = []
+
+    def fake_synth(eng, vid, text, rate=0, pitch=0):
+        calls.append(eng)
+        if eng == "sapi":
+            raise RuntimeError("CoInitialize has not been called")
+        return "C:/tmp/ok.wav"
+
+    orig = N.synth_to_file
+    N.synth_to_file = fake_synth
+    try:
+        o = types.SimpleNamespace()
+        path, err = W.FelolvasoFrame._synth(o, "sapi", "v", "szöveg", 7)
+    finally:
+        N.synth_to_file = orig
+    assert path == "C:/tmp/ok.wav"          # az eSpeak-tartalék adott hangot
+    assert "sapi" in err.lower()            # a hibát NEM nyelte el
+    assert calls == ["sapi", "espeak"]      # előbb sapi, majd eSpeak-tartalék
+
+
+def test_sapi_com_init_a_szintezis_utban():
+    """A SAPI COM-inicializálás legyen a szintézis-útvonalon (háttérszál-biztos)."""
+    from modules_src.felolvaso.felolvaso_mod import narrator as N
+    src = inspect.getsource(N.synth_to_file)
+    assert "_com_init" in src
+    assert "CoInitialize" in inspect.getsource(N._com_init)
+
+
 def test_ugras_es_leallitas_ujrahorgonyozza_az_orat():
     """Ugrás/leállítás után az órát újra kell horgonyozni (különben a fali óra a
     régi ponthoz képest ugrana)."""

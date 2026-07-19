@@ -4,14 +4,44 @@ egy ideiglenes hangfájlba szintetizál, amit a lejátszó a film mellé megszó
 (a szinkront a hívó a lejátszási pozícióból vezérli).
 """
 
+import itertools
 import os
 import subprocess
 import tempfile
+import threading
 from pathlib import Path
 
 from superdl import selfvoice, tts
 
 _NOWIN = 0x08000000    # CREATE_NO_WINDOW
+
+# globálisan növekvő számláló az EGYEDI tempfájlnevekhez (a hash(text) önmagában
+# ütközhet azonos szövegű soroknál / párhuzamos gyártásnál)
+_seq = itertools.count()
+
+
+def _com_init() -> bool:
+    """A SAPI (COM) HÁTTÉRSZÁLON is használható legyen. A Microsoft COM szabálya:
+    minden COM-ot használó szálnak külön CoInitialize-t kell hívnia – e nélkül a
+    `win32com.client.Dispatch("SAPI.SpVoice")` a worker szálon
+    „CoInitialize has not been called" hibával elszáll (élesben igazolva). A
+    felirat-szintézis háttérszálon fut, ezért ITT kell inicializálni."""
+    try:
+        import pythoncom
+        pythoncom.CoInitialize()
+        return True
+    except Exception:
+        return False
+
+
+def _com_uninit(did: bool) -> None:
+    if not did:
+        return
+    try:
+        import pythoncom
+        pythoncom.CoUninitialize()
+    except Exception:
+        pass
 
 
 def voice_options() -> list[tuple[str, str, str]]:
@@ -33,8 +63,9 @@ def voice_options() -> list[tuple[str, str, str]]:
     if selfvoice.espeak_available():
         for name, vid in selfvoice.ESPEAK_VOICES:
             out.append((name, "espeak", vid))
-    if not out:                                      # végszükség: eSpeak alap
-        out.append(("eSpeak magyar (beépített)", "espeak", "espeak:hu"))
+    # FONTOS: nem elérhető motort SOHA nem kínálunk fel „működő" opcióként. Ha itt
+    # üres a lista, a hívó (felolvasowin) tiltja a lejátszást és HANGOSAN jelzi,
+    # hogy nincs használható hangmotor – nem lesz néma, magyarázat nélküli hiba.
     return out
 
 
@@ -46,8 +77,9 @@ def _synth_espeak(voice_id: str, text: str, rate: int, pitch: int) -> str:
         else (voice_id or "hu")
     wpm = max(80, min(320, 175 + rate * 12))
     pit = max(0, min(99, 50 + pitch * 4))
-    out = os.path.join(tempfile.gettempdir(),
-                       f"subnarr_{os.getpid()}_{abs(hash(text)) % 10**8}.wav")
+    out = os.path.join(
+        tempfile.gettempdir(),
+        f"subnarr_{os.getpid()}_{threading.get_ident()}_{next(_seq)}.wav")
     cmd = [exe, "-v", voice, "-s", str(wpm), "-p", str(pit), "-w", out]
     if data:
         cmd += ["--path", str(Path(data).parent)]
@@ -72,6 +104,16 @@ def synth_to_file(engine_key: str, voice_id: str, text: str,
     eng = tts.ENGINES.get(engine_key)
     if not eng:
         raise RuntimeError(f"ismeretlen hangmotor: {engine_key}")
-    base = os.path.join(tempfile.gettempdir(),
-                        f"subnarr_{os.getpid()}_{abs(hash(text)) % 10**8}")
+    # egyedi ideiglenes fájlnév (PID + a HÍVÓ szál azonosítója + számláló), hogy a
+    # párhuzamos előregyártás és az azonos szövegű sorok NE ütközzenek ugyanazon a
+    # néven (Windows fájlzár / féllegyártott WAV forrása lehet)
+    base = os.path.join(
+        tempfile.gettempdir(),
+        f"subnarr_{os.getpid()}_{threading.get_ident()}_{next(_seq)}")
+    if engine_key == "sapi":
+        did = _com_init()                 # SAPI COM a HÁTTÉRSZÁLON is
+        try:
+            return eng.synth(text, voice_id, base, pitch=pitch, rate=rate)
+        finally:
+            _com_uninit(did)
     return eng.synth(text, voice_id, base, pitch=pitch, rate=rate)

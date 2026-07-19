@@ -38,13 +38,16 @@ LÉPÉSRŐL LÉPÉSRE (vakon is)
 4. „Lejátszás" (vagy Szóköz). A felolvasás alatt a film hangja halkabb.
 
 GYORSBILLENTYŰK
-F1 – súgó.  F8 – állapot bemondása (hibakereséshez).  Szóköz –
-lejátszás/szünet.  Bal/jobb nyíl – 10 mp vissza/előre.  Ctrl+fel / Ctrl+le –
-hangerő.  Esc – leállítás.
+F1 – súgó.  F7 – a kiválasztott hang KIPRÓBÁLÁSA (film nélkül).  F8 – állapot
+bemondása (hibakereséshez).  Szóköz – lejátszás/szünet.  Bal/jobb nyíl – 10 mp
+vissza/előre.  Ctrl+fel / Ctrl+le – hangerő.  Esc – leállítás.
 
 HA NEM SZÓLAL MEG A FELIRAT
-- Nyomd meg az F8-at: bemondja, halad-e az idő, be van-e töltve a felirat, és
-  épp mit olvas. Ebből kiderül, hol akad.
+- Először nyomd meg az F7-et: kipróbálja a kiválasztott hangot. Ha ezt sem
+  hallod, a hanggal (vagy a hangeszközzel) van a gond – válts a „Hang” listában
+  másik hangra (pl. a beépített eSpeak magyarra), és próbáld újra.
+- Nyomd meg az F8-at: bemondja, halad-e az idő, be van-e töltve a felirat, épp
+  mit olvas, melyik hang aktív, és mi volt az utolsó hanghiba.
 - Ha a program azt mondja, „a film hangját nem tudom lejátszani", akkor is
   felolvassa a feliratot (film-hang nélkül, csend fölött) – a kép/hang formátuma
   volt szokatlan, de a felirat így is követhető.
@@ -66,7 +69,7 @@ DEFAULT_RATE = 7
 
 # a modul verziója – a felhasználó HALLJA (indításkor és F8-ra), hogy tényleg a
 # friss változat fut-e (a manifest.json-nal kézzel szinkronban tartva)
-MOD_VERSION = "1.3.1"
+MOD_VERSION = "1.4.0"
 
 
 class FelolvasoFrame(wx.Frame):
@@ -102,6 +105,10 @@ class FelolvasoFrame(wx.Frame):
         self._play_t0 = 0.0
         self._fired_any = False
         self._warned = False
+        # a felirat-hangosítás (TTS) diagnosztikájához: utolsó hiba / siker
+        self._last_tts_err = ""
+        self._last_ok = ""
+        self._narr_fail = 0        # egymás utáni sikertelen narrációk száma
 
         self.film = Player()
         self.film.on_state = lambda s: wx.CallAfter(self._on_film_state, s)
@@ -162,7 +169,7 @@ class FelolvasoFrame(wx.Frame):
         g.Add(wx.StaticText(p, label="&Hang:"), 0, wx.ALIGN_CENTER_VERTICAL)
         self.voice_ch = wx.Choice(p, choices=[lbl for lbl, _e, _v in self._voices]
                                   or ["(nincs hang)"], name="Felolvasó hang")
-        self.voice_ch.SetSelection(0)
+        self.voice_ch.SetSelection(self._default_voice_index())
         g.Add(self.voice_ch, 0, wx.EXPAND)
         b_subload = wx.Button(p, label="Felirat be&töltése")
         b_subload.Bind(wx.EVT_BUTTON, lambda e: self._apply_sub())
@@ -223,6 +230,20 @@ class FelolvasoFrame(wx.Frame):
         i = self.voice_ch.GetSelection()
         return self._voices[i] if 0 <= i < len(self._voices) else \
             ("eSpeak", "espeak", "espeak:hu")
+
+    def _default_voice_index(self) -> int:
+        """Alapból MAGYAR hangot válasszunk, ne a lista első (gyakran ANGOL SAPI)
+        hangját – különben a magyar feliratot angol kiejtéssel olvasná. Sorrend:
+        magyar SAPI/Edge → a beépített eSpeak magyar → végső esetben az első."""
+        hu = ("magyar", "hungar", "hu-", "hu_", "szabolcs", "espeak")
+        for idx, (lbl, eng, vid) in enumerate(self._voices):
+            hay = f"{lbl} {vid}".lower()
+            if eng in ("sapi", "edge") and any(k in hay for k in hu):
+                return idx
+        for idx, (lbl, eng, vid) in enumerate(self._voices):
+            if eng == "espeak":               # beépített magyar eSpeak
+                return idx
+        return 0
 
     # ---- média + felirat betöltése ------------------------------------
 
@@ -380,6 +401,10 @@ class FelolvasoFrame(wx.Frame):
                 self._clock_reset(self._clk_pos, fresh=False)   # folytatás
             self._announce("Szünet." if paused else "Folytatás.")
         else:
+            if not self._voices:
+                self._announce("Figyelem: nincs használható hangmotor (sem SAPI, "
+                               "sem eSpeak), így a feliratot nem tudom "
+                               "felolvasni. A film hangja megy. Súgó: F1.")
             self._subs_only = False
             self._subs_paused = False
             self._fired_any = False
@@ -513,23 +538,39 @@ class FelolvasoFrame(wx.Frame):
         rate = self.rate_sp.GetValue()
 
         def work():
-            path = None
-            try:
-                path = narrator.synth_to_file(eng, vid, cue.text, rate=rate)
-            except Exception:
-                path = None
+            path, err = self._synth(eng, vid, cue.text, rate)
             if self._closing:                 # közben bezárták az ablakot
                 self._safe_del(path) if path else None
                 return
             try:
-                wx.CallAfter(self._prefetch_done, i, path)
+                wx.CallAfter(self._prefetch_done, i, path, err)
             except Exception:
                 pass
 
         threading.Thread(target=work, daemon=True).start()
 
-    def _prefetch_done(self, i, path):
+    def _synth(self, eng, vid, text, rate):
+        """A felirat szövegének hangfájlba szintézise. Ha a választott motor
+        hibázik (pl. SAPI-hiba, Edge hálózati hiba), AUTOMATIKUSAN a beépített
+        magyar eSpeak-re vált – inkább szóljon, mint hogy néma maradjon. A hibát
+        NEM nyeljük el: visszaadjuk, hogy a hívó bemondhassa és F8-ra megmutassa.
+        Visszaad: (útvonal vagy None, hibaszöveg vagy '')."""
+        try:
+            return narrator.synth_to_file(eng, vid, text, rate=rate), ""
+        except Exception as e:
+            err = f"{eng}: {e}"
+        if eng != "espeak":                   # tartalék: beépített magyar eSpeak
+            try:
+                return (narrator.synth_to_file("espeak", "espeak:hu", text,
+                                               rate=rate), err)
+            except Exception as e2:
+                err = f"{err} | eSpeak-tartalék: {e2}"
+        return None, err
+
+    def _prefetch_done(self, i, path, err=""):
         self._ahead_busy = False
+        if err:
+            self._last_tts_err = err
         if self._closing:
             if path:
                 self._safe_del(path)
@@ -550,22 +591,43 @@ class FelolvasoFrame(wx.Frame):
         rate = self.rate_sp.GetValue()
 
         def work():
-            try:
-                path = narrator.synth_to_file(eng, vid, cue.text, rate=rate)
-            except Exception:
-                path = None
+            path, err = self._synth(eng, vid, cue.text, rate)
             if self._closing:                 # közben bezárták az ablakot
                 self._safe_del(path) if path else None
                 return
             try:
                 if path:
-                    wx.CallAfter(self._play_narration, path)
+                    wx.CallAfter(self._narration_ok, path, err, eng)
                 else:
-                    wx.CallAfter(self._narration_done)
+                    wx.CallAfter(self._narration_failed, eng, err)
             except Exception:
                 pass
 
         threading.Thread(target=work, daemon=True).start()
+
+    def _narration_ok(self, path, err, eng):
+        """Sikeres szintézis (esetleg eSpeak-tartalékkal). Ha tartalékra kellett
+        váltani (err nem üres, de van hang), EGYSZER bemondjuk – hogy a felhasználó
+        tudja: a választott hang nem ment, de mégis hall valamit."""
+        self._narr_fail = 0
+        self._last_ok = time.strftime("%H:%M:%S")
+        if err:
+            self._last_tts_err = err
+            if not getattr(self, "_fallback_said", False):
+                self._fallback_said = True
+                self._announce("A választott hang nem működött, átváltottam a "
+                               "beépített magyar eSpeak hangra. Részletek: F8.")
+        self._play_narration(path)
+
+    def _narration_failed(self, eng, err):
+        """A szintézis (a tartalékkal együtt) sem sikerült. NEM maradunk némán:
+        bemondjuk az okot, és F8-ra megmutatjuk a technikai részletet."""
+        self._last_tts_err = err or "ismeretlen hiba"
+        self._narr_fail += 1
+        self._narration_done()                # ducking vissza, narrating=False
+        if self._narr_fail <= 2 or self._narr_fail % 10 == 0:
+            self._announce(f"A felirat hangosítása nem sikerült. Hangmotor: "
+                           f"{eng}. Próbálj másik hangot. Részletek: F8.")
 
     def _drop_ahead(self):
         """Az előre gyártott hangok eldobása (ugrás/leállítás után elavultak)."""
@@ -584,7 +646,16 @@ class FelolvasoFrame(wx.Frame):
         self.narr.play(path)
 
     def _on_narr_state(self, s):
-        if s.startswith("vége") or s.startswith("hiba"):
+        if s.startswith("hiba"):
+            # a narrációs Player hibája (pl. a MÁSODIK hangstream nem nyílik meg
+            # egyes eszközökön) EDDIG „normál befejezésként" némán elveszett
+            self._last_tts_err = f"narráció-lejátszás: {s}"
+            self._narr_fail += 1
+            self._narration_done()
+            if self._narr_fail <= 2:
+                self._announce("A felirat hangja nem szólaltatható meg ezen a "
+                               "hangeszközön. Részletek: F8.")
+        elif s.startswith("vége"):
             self._narration_done()
 
     def _narration_done(self):
@@ -631,6 +702,8 @@ class FelolvasoFrame(wx.Frame):
         code = e.GetKeyCode()
         if code == wx.WXK_F1:
             self._help()
+        elif code == wx.WXK_F7:
+            self._test_voice()
         elif code == wx.WXK_F8:
             self._diag()
         elif code == wx.WXK_SPACE and not isinstance(
@@ -646,6 +719,43 @@ class FelolvasoFrame(wx.Frame):
             self._stop()
         else:
             e.Skip()
+
+    def _test_voice(self):
+        """F7: a KIVÁLASZTOTT felolvasó hang azonnali kipróbálása (film nélkül).
+        Így a felhasználó egy gombnyomással ellenőrizheti, hogy a hangútvonal
+        (szintézis + lejátszás) egyáltalán megszólal-e – ez a leggyorsabb módja a
+        „miért néma?" kérdés eldöntésének."""
+        if not self._voices:
+            self._announce("Nincs használható hangmotor (sem SAPI, sem eSpeak). "
+                           "A feliratot nem tudom felolvasni. Súgó: F1.")
+            return
+        lbl, eng, vid = self._voice()
+        rate = self.rate_sp.GetValue()
+        self._announce(f"Hang kipróbálása: {lbl}. Egy pillanat…")
+
+        def work():
+            path, err = self._synth(
+                eng, vid, "Ez a felolvasó hang próbája. Ha ezt hallod, a "
+                "felirat felolvasása működik.", rate)
+            if self._closing:
+                self._safe_del(path) if path else None
+                return
+            if path:
+                wx.CallAfter(self._play_test, path, err)
+            else:
+                wx.CallAfter(self._announce, "A hang kipróbálása NEM sikerült. "
+                             "Válassz másik hangot. Részletek: F8.")
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _play_test(self, path, err):
+        if err and not getattr(self, "_fallback_said", False):
+            self._fallback_said = True
+            self._last_tts_err = err
+            self._announce("A választott hang nem működött, a beépített magyar "
+                           "eSpeak hanggal próbálom. Részletek: F8.")
+        self._cur_temp = path             # a narr „vége" majd törli
+        self.narr.play(path)
 
     def _diag(self, prefix=""):
         """F8: a felolvasás állapotának bemondása – hibakereséshez. Egy
@@ -672,9 +782,14 @@ class FelolvasoFrame(wx.Frame):
         subs = (f"{n} feliratsor betöltve" if n
                 else "NINCS betöltött felirat – nyomd meg a „Felirat betöltése” "
                      "gombot")
+        lbl, eng, vid = self._voice()
+        hang = f"Hang: {lbl}." if self._voices else \
+            "NINCS használható hangmotor (sem SAPI, sem eSpeak)."
+        err = (f" Utolsó hanghiba: {self._last_tts_err}."
+               if self._last_tts_err else "")
         self._announce(f"{prefix}Felirat-felolvasó {MOD_VERSION}. Állapot: "
                        f"{state}. Idő: {int(pos // 60)} perc {int(pos % 60)} "
-                       f"másodperc. {subs}. Épp felolvasva: {cur}.")
+                       f"másodperc. {subs}. {hang}{err} Épp felolvasva: {cur}.")
 
     def _help(self):
         try:
