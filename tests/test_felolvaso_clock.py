@@ -191,6 +191,14 @@ def test_reroute_a_pozicion_ujranyit():
     assert "_clock_reset" in src
 
 
+def test_hangero_ctrl_fel_le():
+    """A HELP Ctrl+fel/le hangerőt ígér – legyen is bekötve (eddig hiányzott)."""
+    src = inspect.getsource(W.FelolvasoFrame._on_key)
+    assert "WXK_UP" in src and "WXK_DOWN" in src
+    assert "ControlDown" in src
+    assert "_vol(" in src
+
+
 def test_sapi_com_init_a_szintezis_utban():
     """A SAPI COM-inicializálás legyen a szintézis-útvonalon (háttérszál-biztos)."""
     from modules_src.felolvaso.felolvaso_mod import narrator as N

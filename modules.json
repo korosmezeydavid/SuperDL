@@ -99,12 +99,12 @@
       "category": "Média",
       "description": "Idegen nyelvű film (vagy hangfájl) lejátszása úgy, hogy a magyar (vagy bármely szöveges) feliratot SZINKRONBAN, választható hanggal (helyi SAPI, Edge neurális online, vagy beépített eSpeak) felolvassa – így vakon is követhető az idegen nyelvű film. A film mellé tett .srt/.vtt feliratot magától megtalálja, a fájlba ágyazott szöveges feliratsávot is kezeli. A YouTube-link is beilleszthető – a videó hangját streameli, a feliratot (kézi, vagy a YouTube automatikus, magyarra fordított feliratát) letölti és felolvassa. A felolvasás TEMPÓJA állítható (alapból gyors, hogy tartsa a lépést a filmfelirattal), és a következő sort előre legyártja, így a neurális hang sem csúszik.",
       "latest": {
-        "version": "1.4.2",
+        "version": "1.4.3",
         "min_core_api": "1.0",
         "min_core_version": "3.29.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-felolvaso-1.4.2/felolvaso-1.4.2.zip",
-        "sha256": "fb351343d3e465f05787034ce89bf839d5d5cad3ce2b5b9f148d4020339c6848",
-        "size": 21915
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-felolvaso-1.4.3/felolvaso-1.4.3.zip",
+        "sha256": "c612ff7691eae24a258ee5d0ade50fc9444c0df353817be89b8dc2861f6ade98",
+        "size": 21977
       }
     },
     {

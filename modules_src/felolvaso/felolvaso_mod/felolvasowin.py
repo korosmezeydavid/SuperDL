@@ -76,7 +76,7 @@ DEFAULT_RATE = 7
 
 # a modul verziója – a felhasználó HALLJA (indításkor és F8-ra), hogy tényleg a
 # friss változat fut-e (a manifest.json-nal kézzel szinkronban tartva)
-MOD_VERSION = "1.4.2"
+MOD_VERSION = "1.4.3"
 
 
 class FelolvasoFrame(wx.Frame):
@@ -741,6 +741,10 @@ class FelolvasoFrame(wx.Frame):
             self._test_voice()
         elif code == wx.WXK_F8:
             self._diag()
+        elif code == wx.WXK_UP and e.ControlDown():
+            self._vol(0.1)               # a HELP-ben ígért hangerő fel volt hiányzik
+        elif code == wx.WXK_DOWN and e.ControlDown():
+            self._vol(-0.1)              # hangerő le
         elif code == wx.WXK_SPACE and not isinstance(
                 self.FindFocus(), (wx.TextCtrl,)):
             self._toggle()

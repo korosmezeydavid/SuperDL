@@ -46,6 +46,13 @@ class Player:
         self._played = 0           # eddig megszólaltatott PCM-bájtok száma
         self._url = ""             # az aktuális forrás (a seek-hez)
         self._start_offset = 0.0   # a lejátszás kezdő-időpontja (seek után)
+        # LEJÁTSZÁS-GENERÁCIÓ: minden play() új generációt kap; a régi _feed szál
+        # a SAJÁT stop_eventjét és generációját figyeli, és csak akkor küld
+        # állapotot, ha a generációja még az aktuális. Enélkül a gyors stop+play
+        # (pl. seek) után a régi szál a KÖZÖS self._stop új, üres eseményét látná,
+        # és HAMIS „vége"/„hiba"-t küldene az ÚJ lejátszásra (a felolvasóban ez
+        # állította le a felirat-narrációt tekeréskor). [Herman Tibor: AUDIO-03]
+        self._generation = 0
 
     # ---- állapot ------------------------------------------------------
 
@@ -117,6 +124,8 @@ class Player:
             self._emit("hiba: az ffmpeg nem érhető el")
             return
         self._stop = threading.Event()
+        self._generation += 1
+        gen = self._generation
         self._paused.clear()
         self._played = 0
         self._start_offset = max(0.0, float(start))
@@ -137,11 +146,17 @@ class Player:
             return
         with self._lock:
             self._proc = proc
-        self._thread = threading.Thread(target=self._feed, args=(proc,),
-                                        daemon=True)
+        self._thread = threading.Thread(
+            target=self._feed, args=(proc, self._stop, gen), daemon=True)
         self._thread.start()
 
     # ---- belső --------------------------------------------------------
+
+    def _emit_gen(self, gen: int, text: str) -> None:
+        """Állapot kiadása CSAK akkor, ha a hívó szál generációja még az aktuális
+        – így a régi (leváltott) lejátszószál nem küld HAMIS állapotot az újra."""
+        if gen == self._generation:
+            self._emit(text)
 
     def _emit(self, text: str) -> None:
         if self.on_state:
@@ -150,7 +165,10 @@ class Player:
             except Exception:
                 pass
 
-    def _feed(self, proc) -> None:
+    def _feed(self, proc, stop_event, gen) -> None:
+        # FONTOS: a szál KIZÁRÓLAG a saját `stop_event`-jét figyeli (nem a közös
+        # self._stop-ot), és `gen`-en át küld állapotot – így egy leváltott régi
+        # szál nem küld HAMIS állapotot az új lejátszásra. [Herman Tibor AUDIO-03]
         import numpy as np
         import sounddevice as sd
         try:
@@ -158,14 +176,14 @@ class Player:
                                         dtype="int16", blocksize=2048)
             stream.start()
         except Exception as e:
-            self._emit(f"hiba: nincs hangkimenet ({e})")
+            self._emit_gen(gen, f"hiba: nincs hangkimenet ({e})")
             return
-        self._emit("lejátszás")
+        self._emit_gen(gen, "lejátszás")
         started = False
         failed = False
         err_msg = ""
         try:
-            while not self._stop.is_set():
+            while not stop_event.is_set():
                 if self._paused.is_set():
                     time.sleep(0.05)
                     continue
@@ -173,7 +191,8 @@ class Player:
                 if not raw:
                     break
                 started = True
-                self._played += len(raw)
+                if gen == self._generation:      # a pozíciót csak az AKTUÁLIS
+                    self._played += len(raw)      # lejátszás számolja
                 v = self._volume
                 if v >= 0.999:
                     stream.write(raw)
@@ -189,11 +208,11 @@ class Player:
                 stream.close()
             except Exception:
                 pass
-        if not self._stop.is_set():
+        if not stop_event.is_set():
             if failed and started:
-                self._emit(f"hiba: lejátszás megszakadt – {err_msg}")
+                self._emit_gen(gen, f"hiba: lejátszás megszakadt – {err_msg}")
             elif failed:
-                self._emit("hiba: a forrás nem játszható le")
+                self._emit_gen(gen, "hiba: a forrás nem játszható le")
             else:
-                self._emit("vége" if started else
-                           "hiba: a forrás nem játszható le")
+                self._emit_gen(gen, "vége" if started else
+                               "hiba: a forrás nem játszható le")

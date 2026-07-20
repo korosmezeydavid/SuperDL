@@ -171,20 +171,50 @@ class SelfVoice:
         if self._use_espeak:
             self._speak_espeak(text)
             return
-        if not self._voice:
-            return
         body = text
         if self.pitch:
             # SAPI-XML: a hangmagasság -10..10 -> absmiddle
             body = f'<pitch absmiddle="{self.pitch}"/>{text}'
+        # a hang leírását a HÍVÓ (fő) szálon oldjuk fel (ott él a fő COM-objektum)
+        desc = self._effective_voice_desc()
+        rate, vol = self.rate, self.volume
 
         def work():
-            with self._lock:
-                try:
-                    self._apply_voice()
-                    self._voice.Speak(body, 1)        # 1 = async
-                except Exception:
-                    pass
+            # FONTOS: a SAPI COM-ot használó HÁTTÉRSZÁLNAK saját CoInitialize kell,
+            # és a COM-objektumot is ITT kell létrehozni – a főszálon készített
+            # SpVoice más szálon „CoInitialize has not been called" com_error-t ad,
+            # amit a régi kód NÉMÁN elnyelt (ezért volt csendben az F8 és minden
+            # SAPI-hangos jelzés). Élesben igazolt hiba.
+            try:
+                import pythoncom
+                import win32com.client
+            except Exception:
+                return
+            did = False
+            try:
+                pythoncom.CoInitialize()
+                did = True
+            except Exception:
+                pass
+            try:
+                with self._lock:
+                    v = win32com.client.Dispatch("SAPI.SpVoice")
+                    v.Rate = rate
+                    v.Volume = vol
+                    if desc and not desc.startswith("espeak:"):
+                        for token in v.GetVoices():
+                            if desc.lower() in token.GetDescription().lower():
+                                v.Voice = token
+                                break
+                    v.Speak(body, 0)     # 0 = SZINKRON: a szál megvárja a végét
+            except Exception:
+                pass
+            finally:
+                if did:
+                    try:
+                        pythoncom.CoUninitialize()
+                    except Exception:
+                        pass
 
         threading.Thread(target=work, daemon=True).start()
 
