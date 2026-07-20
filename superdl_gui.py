@@ -55,6 +55,7 @@ from superdl.organizer import OrganizerManager
 # A Hangoskönyv-készítő MOSTANTÓL a „Könyvek" MODULban.
 from superdl.radiorec import RecordManager
 from superdl import dayinfo, weather, search, store, aiclient, mediaai, netcheck
+from superdl import autostart
 from superdl.settingsdialog import SettingsDialog
 from superdl.aiwin import run_ai, run_ai_progress
 # A Napi infó ABLAK MOSTANTÓL a „Szervezés" MODULban (az üdvözlés-backend a Core-ban).
@@ -231,6 +232,40 @@ class UrlDropTarget(wx.TextDropTarget):
         return True
 
 
+class _SuperDLTrayIcon(wx.adv.TaskBarIcon):
+    """Rendszertálca-ikon a HÁTTÉRBEN futó SuperDL-hez: megnyitás és kilépés.
+    Akadálymentes – a menüpontok képernyőolvasóval is elérhetők; dupla kattintás
+    (vagy Enter) előhozza az ablakot."""
+
+    ID_OPEN = wx.NewIdRef()
+    ID_QUIT = wx.NewIdRef()
+
+    def __init__(self, frame):
+        super().__init__()
+        self._frame = frame
+        try:
+            icon = frame.GetIcon()
+            if not icon or not icon.IsOk():
+                bmp = wx.ArtProvider.GetBitmap(wx.ART_INFORMATION, wx.ART_OTHER,
+                                               (16, 16))
+                icon = wx.Icon(bmp)
+            self.SetIcon(icon, "SuperDL – fut a háttérben (időzített felvételek)")
+        except Exception:
+            pass
+        self.Bind(wx.adv.EVT_TASKBAR_LEFT_DCLICK,
+                  lambda e: self._frame._show_from_tray())
+        self.Bind(wx.EVT_MENU, lambda e: self._frame._show_from_tray(),
+                  id=self.ID_OPEN)
+        self.Bind(wx.EVT_MENU, lambda e: self._frame._quit_app(), id=self.ID_QUIT)
+
+    def CreatePopupMenu(self):
+        m = wx.Menu()
+        m.Append(self.ID_OPEN, "SuperDL &megnyitása")
+        m.AppendSeparator()
+        m.Append(self.ID_QUIT, "&Kilépés a SuperDL-ből")
+        return m
+
+
 class MainFrame(wx.Frame):
     def __init__(self):
         super().__init__(None, title="SuperDL – akadálymentes médiaközpont",
@@ -245,6 +280,10 @@ class MainFrame(wx.Frame):
         self._search_win = None
         self._modmgr_win = None
         self._record_mgr = None
+        self._tray = None            # rendszertálca-ikon (háttérmódban)
+        self._bg_mode = False        # ha True: a bezárás a tálcára minimalizál
+        self._really_quit = False    # a tálca „Kilépés"-e állítja True-ra
+        self._tray_hint_said = False # az „a háttérben fut" jelzés egyszer szól
         self._known_rows: dict[int, int] = {}   # job.id -> listasor
         self._last_values: dict[int, tuple] = {}
         self._reported: dict[int, str] = {}
@@ -325,6 +364,7 @@ class MainFrame(wx.Frame):
         # a modulok létrehozták a Média menüt → most tesszük bele a
         # fájltársítás-kapcsolót (zene → Super M, videó → felirat-felolvasó)
         self._add_media_switch()
+        self._add_autostart_switch()   # „Indítás a Windows-szal (háttérben)…"
 
     def _add_media_switch(self):
         """„Fájltársítások (zene/videó)…" a Média menübe – a rákattintott
@@ -373,6 +413,58 @@ class MainFrame(wx.Frame):
         except Exception as e:
             wx.MessageBox(f"A művelet nem sikerült: {e}", "Fájltársítások",
                           wx.OK | wx.ICON_ERROR, self)
+
+    def _add_autostart_switch(self):
+        """„Indítás a Windows-szal (háttérben)…" a Média menübe – hogy az
+        időzített rádiófelvételek akkor is elinduljanak, ha nem nyitottad meg a
+        programot. Csak a telepített/hordozható exénél (Windowson)."""
+        try:
+            if not autostart.available():
+                return
+            host = getattr(self, "_module_host", None)
+            if host is None:
+                return
+            menu = host.add_menu("&Média")
+            host.add_menu_item(
+                menu, "Indítás a &Windows-szal (háttérben)…",
+                self._on_autostart_switch,
+                help="A SuperDL bejelentkezéskor magától elinduljon a háttérben, "
+                     "hogy az időzített felvételek is elmenjenek")
+        except Exception:
+            pass
+
+    def _on_autostart_switch(self, event=None):
+        on = autostart.is_enabled()
+        msg = ("A SuperDL MOSTANTÓL magától elindul a Windows-szal, a háttérben "
+               "(a tálcán), hogy az időzített rádiófelvételek akkor is "
+               "elinduljanak, ha nem nyitod meg.\n\nBe van kapcsolva. "
+               "Kikapcsolod?"
+               if on else
+               "Bekapcsolod, hogy a SuperDL a Windowsba való belépéskor magától "
+               "elinduljon a HÁTTÉRBEN?\n\nÍgy az időzített felvételek akkor is "
+               "elmennek, ha elfelejted megnyitni a programot. A háttérben futó "
+               "SuperDL a rendszertálcán érhető el (ott hozható elő és "
+               "léptethető ki). Rendszergazda NEM kell, bármikor visszavonható.")
+        dlg = wx.MessageDialog(self, msg, "Indítás a Windows-szal",
+                               wx.YES_NO | wx.ICON_QUESTION)
+        dlg.SetYesNoLabels("Kikapcsolom" if on else "Bekapcsolom", "Mégse")
+        do = dlg.ShowModal() == wx.ID_YES
+        dlg.Destroy()
+        if not do:
+            return
+        try:
+            if on:
+                autostart.disable()
+                self._announce("Az automatikus indítás kikapcsolva.", toast=True)
+            else:
+                autostart.enable()
+                self._ensure_tray()      # innentől a bezárás a tálcára minimalizál
+                self._announce("Bekapcsolva: a SuperDL mostantól a Windows-szal "
+                               "indul, a háttérben. A rendszertálcán éred el.",
+                               toast=True)
+        except Exception as e:
+            wx.MessageBox(f"A művelet nem sikerült: {e}",
+                          "Indítás a Windows-szal", wx.OK | wx.ICON_ERROR, self)
 
     # ---- felépítés ----------------------------------------------------
 
@@ -1954,7 +2046,54 @@ class MainFrame(wx.Frame):
                 and "\n" not in text and url_is_new(self.mgr, text):
             self._on_add(url=text)
 
+    # ---- háttérmód / rendszertálca --------------------------------------
+
+    def _ensure_tray(self):
+        """Létrehozza a tálca-ikont, és bekapcsolja a háttérmódot (a bezárás
+        innentől a tálcára minimalizál, nem lép ki)."""
+        if not wx.adv.TaskBarIcon.IsAvailable():
+            return
+        if self._tray is None:
+            try:
+                self._tray = _SuperDLTrayIcon(self)
+            except Exception:
+                self._tray = None
+                return
+        self._bg_mode = True
+
+    def _enter_background(self):
+        """A Windows-indításból (`--background`) hívva: NE mutassuk az ablakot,
+        csak a tálca-ikont; a felvétel-ütemező a háttérben megy."""
+        self._ensure_tray()
+        self._bg_mode = True
+        self.Hide()
+
+    def _show_from_tray(self):
+        """Az ablak előhozása a tálcáról (megnyitás/dupla kattintás)."""
+        self.Show()
+        if self.IsIconized():
+            self.Iconize(False)
+        self.Raise()
+        self.RequestUserAttention()
+
+    def _quit_app(self):
+        """Tényleges kilépés a tálca menüjéből (nem csak tálcára minimalizál)."""
+        self._really_quit = True
+        self.Close()
+
     def _on_close(self, event):
+        # HÁTTÉRMÓD: az ablak bezárása NE lépjen ki, csak a tálcára minimalizáljon
+        # – így az időzített felvételek tovább futnak. Kilépni a tálca menüjéből
+        # (vagy a Fájl → Kilépés) lehet, ami a _really_quit-et állítja.
+        if self._bg_mode and not self._really_quit and self._tray is not None:
+            self.Hide()
+            if not self._tray_hint_said:
+                self._tray_hint_said = True
+                self._announce("A SuperDL tovább fut a háttérben; kilépni a "
+                               "tálcaikon menüjéből tudsz.", toast=True)
+            if event.CanVeto():
+                event.Veto()
+            return
         running = self.mgr and any(
             j.progress.status in ("letöltés", "seedelés")
             for j in self.mgr.jobs)
@@ -1988,6 +2127,13 @@ class MainFrame(wx.Frame):
             self._search_win.Destroy()
         if self._organizer:
             self._organizer.shutdown()
+        if self._tray is not None:           # a tálca-ikon eltakarítása kilépéskor
+            try:
+                self._tray.RemoveIcon()
+                self._tray.Destroy()
+            except Exception:
+                pass
+            self._tray = None
         self._save_settings()
         self.timer.Stop()
         self.feed_timer.Stop()
@@ -2269,17 +2415,93 @@ def _maybe_wormhole():
         sys.exit(0)
 
 
-def _single_instance_mutex():
-    """Névvel ellátott mutex, hogy a (onedir) telepítő FELISMERJE és bezárhassa
-    a futó SuperDL-t önfrissítéskor (Inno Setup AppMutex). A handle-t nyitva
-    hagyjuk – a mutex a folyamat élettartamáig él."""
-    if os.name == "nt":
-        try:
-            import ctypes
-            ctypes.windll.kernel32.CreateMutexW(
-                None, False, "SuperDL_SingleInstance_Mutex")
-        except Exception:
-            pass
+_MUTEX_NAME = "SuperDL_SingleInstance_Mutex"
+_SHOW_EVENT_NAME = "SuperDL_Show_Event"
+_mutex_handle = None            # életben tartva a folyamat végéig
+
+
+def _open_handoff_path() -> str:
+    import tempfile
+    return os.path.join(tempfile.gettempdir(), "superdl_open.txt")
+
+
+def _instance_is_first() -> bool:
+    """CreateMutex – True, ha MI vagyunk az ELSŐ példány. A handle-t életben
+    tartjuk (a telepítő AppMutexe is ez). Ha már fut egy SuperDL, azt hozzuk elő,
+    és NEM indítunk másodikat – különben két RecordManager duplán venné fel az
+    időzített felvételeket."""
+    global _mutex_handle
+    if os.name != "nt":
+        return True
+    try:
+        import ctypes
+        _mutex_handle = ctypes.windll.kernel32.CreateMutexW(
+            None, False, _MUTEX_NAME)
+        return ctypes.windll.kernel32.GetLastError() != 183  # ERROR_ALREADY_EXISTS
+    except Exception:
+        return True
+
+
+def _signal_existing_to_show(open_file: str = "") -> None:
+    """Jelez a már futó példánynak, hogy hozza elő az ablakát (és opcionálisan
+    nyisson meg egy médiafájlt – pl. fájltársításos dupla kattintás háttérmódban)."""
+    if os.name != "nt":
+        return
+    try:
+        if open_file:
+            with open(_open_handoff_path(), "w", encoding="utf-8") as f:
+                f.write(open_file)
+    except Exception:
+        pass
+    try:
+        import ctypes
+        EVENT_MODIFY_STATE = 0x0002
+        h = ctypes.windll.kernel32.OpenEventW(EVENT_MODIFY_STATE, False,
+                                              _SHOW_EVENT_NAME)
+        if h:
+            ctypes.windll.kernel32.SetEvent(h)
+            ctypes.windll.kernel32.CloseHandle(h)
+    except Exception:
+        pass
+
+
+def _start_show_listener(frame) -> None:
+    """Az ELSŐ példány: névvel ellátott auto-reset esemény + figyelő szál. Ha egy
+    második indítás jelez, előhozzuk az ablakot (a rejtett háttérpéldányt is), és
+    ha átadott egy megnyitandó médiafájlt, azt is megnyitjuk."""
+    if os.name != "nt":
+        return
+    try:
+        import ctypes
+        h = ctypes.windll.kernel32.CreateEventW(None, False, False,
+                                                _SHOW_EVENT_NAME)
+        if not h:
+            return
+    except Exception:
+        return
+
+    def listen():
+        import ctypes
+        while True:
+            if ctypes.windll.kernel32.WaitForSingleObject(h, 0xFFFFFFFF) != 0:
+                break
+            path = ""
+            try:
+                p = _open_handoff_path()
+                if os.path.isfile(p):
+                    with open(p, encoding="utf-8") as f:
+                        path = f.read().strip()
+                    os.remove(p)
+            except Exception:
+                path = ""
+            try:
+                wx.CallAfter(frame._show_from_tray)
+                if path and os.path.isfile(path):
+                    wx.CallAfter(frame.open_media_file, path)
+            except Exception:
+                pass
+
+    threading.Thread(target=listen, daemon=True).start()
 
 
 def main():
@@ -2297,7 +2519,14 @@ def main():
             pass
         return
     _maybe_wormhole()
-    _single_instance_mutex()
+    media_arg = next((a for a in sys.argv[1:]
+                      if not a.startswith("-") and os.path.isfile(a)), None)
+    # EGY PÉLDÁNY: ha már fut egy SuperDL, azt hozzuk elő (és adjuk át neki a
+    # megnyitandó fájlt), majd lépjünk ki – ne induljon két RecordManager.
+    if not _instance_is_first():
+        _signal_existing_to_show(media_arg or "")
+        return
+    background = autostart.is_background_launch()
     app = wx.App()
     wx.InitAllImageHandlers()     # minden képformátum (PNG/JPEG/…) kezelése
     selfupdate.cleanup_old()      # korábbi önfrissítés maradékának törlése
@@ -2309,11 +2538,13 @@ def main():
             wx.TheClipboard.GetData(data)
             frame._last_clip = data.GetText().strip()
         wx.TheClipboard.Close()
-    frame.Show()
+    _start_show_listener(frame)   # második indítás → ezt a példányt hozza elő
+    if background:
+        frame._enter_background()  # REJTVE indul a tálcán (Windows-indításból)
+    else:
+        frame.Show()
     # fájltársítás: ha egy MÉDIAFÁJL útvonalával indultunk (dupla kattintás),
     # a megfelelő modul-ablak nyissa meg (hang → Super M, videó → felolvasó).
-    media_arg = next((a for a in sys.argv[1:]
-                      if not a.startswith("-") and os.path.isfile(a)), None)
     if media_arg:
         wx.CallLater(600, lambda: frame.open_media_file(media_arg))
     app.MainLoop()
