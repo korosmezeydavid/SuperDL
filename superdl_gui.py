@@ -77,6 +77,7 @@ ABOUT_TEXT = (
     "Akadálymentes médiaközpont: letöltés, média, rádió, hangoskönyv, "
     "könyvolvasó, hírek és napi infó\n\n"
     "Készítette: Kőrösmezey Dávid\n"
+    "Honlap: https://super-dl.com\n"
     "Elérhetőség: korosmezey.david.richard@gmail.com\n\n"
     "A „DL” mostantól nem csak letöltés: Digital Lounge – egy akadálymentes "
     "digitális médiaszalon. Közvetlen fájlokat, médiaoldalakat és torrenteket "
