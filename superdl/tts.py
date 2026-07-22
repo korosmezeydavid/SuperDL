@@ -13,9 +13,36 @@ darabolja a `char_limit` szerint.
 """
 
 import base64
+import contextlib
 import json
 import urllib.request
 from dataclasses import dataclass
+
+
+@contextlib.contextmanager
+def _sapi_com():
+    """A SAPI-t (win32com) használó szál KÖTELEZŐEN inicializálja a COM-ot.
+    E nélkül HÁTTÉRSZÁLON „CoInitialize has not been called” com_error jön, amit
+    a hívók néha némán elnyelnek (élesben igazolt hiba: a hangoskönyv-készítő
+    SAPI-hanggal háttérszálon elszállt). Ha a hívó szál (pl. wx főszál) már
+    inicializálta a COM-ot, a CoInitialize S_FALSE-t ad, de a számláló így is
+    kiegyensúlyozott a CoUninitialize-zal, ezért biztonságos mindkét esetben."""
+    did = False
+    try:
+        import pythoncom
+        pythoncom.CoInitialize()
+        did = True
+    except Exception:
+        did = False
+    try:
+        yield
+    finally:
+        if did:
+            try:
+                import pythoncom
+                pythoncom.CoUninitialize()
+            except Exception:
+                pass
 
 
 @dataclass
@@ -39,34 +66,41 @@ class SapiEngine:
 
     def voices(self, api_key: str = "") -> list[Voice]:
         import win32com.client
-        v = win32com.client.Dispatch("SAPI.SpVoice")
         out = []
-        for t in v.GetVoices():
-            desc = t.GetDescription()
-            lang = ""
-            try:
-                lang = t.GetAttribute("Language")
-            except Exception:
-                pass
-            out.append(Voice(id=desc, name=desc, lang=lang))
+        with _sapi_com():           # háttérszál-biztos COM-inicializálás
+            v = win32com.client.Dispatch("SAPI.SpVoice")
+            for t in v.GetVoices():
+                desc = t.GetDescription()
+                lang = ""
+                try:
+                    lang = t.GetAttribute("Language")
+                except Exception:
+                    pass
+                out.append(Voice(id=desc, name=desc, lang=lang))
+            t = None
+            v = None                # a COM-objektumokat még inicializált COM alatt engedjük el
         return out
 
     def synth(self, text, voice_id, out_base, pitch=0, rate=0,
               api_key="") -> str:
         import win32com.client
         path = out_base + ".wav"
-        fs = win32com.client.Dispatch("SAPI.SpFileStream")
-        fs.Open(path, 3)
-        v = win32com.client.Dispatch("SAPI.SpVoice")
-        for t in v.GetVoices():
-            if t.GetDescription() == voice_id:
-                v.Voice = t
-                break
-        v.AudioOutputStream = fs
-        v.Rate = max(-10, min(10, int(rate)))
-        xml = f"<pitch absmiddle='{max(-10, min(10, int(pitch)))}'/>"
-        v.Speak(xml + _xml_escape(text))
-        fs.Close()
+        with _sapi_com():           # háttérszál-biztos COM-inicializálás
+            fs = win32com.client.Dispatch("SAPI.SpFileStream")
+            fs.Open(path, 3)
+            v = win32com.client.Dispatch("SAPI.SpVoice")
+            for t in v.GetVoices():
+                if t.GetDescription() == voice_id:
+                    v.Voice = t
+                    break
+            v.AudioOutputStream = fs
+            v.Rate = max(-10, min(10, int(rate)))
+            xml = f"<pitch absmiddle='{max(-10, min(10, int(pitch)))}'/>"
+            v.Speak(xml + _xml_escape(text))
+            fs.Close()
+            t = None
+            v = None
+            fs = None               # a COM-objektumokat még inicializált COM alatt engedjük el
         return path
 
 
