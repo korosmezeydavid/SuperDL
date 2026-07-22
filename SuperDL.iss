@@ -40,6 +40,11 @@ SolidCompression=yes
 WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
+; WINDOWS 10 vagy újabb: a program 64 bites, és a beépített Python 3.14 minimuma
+; a Windows 10 (a 8.1/7 kiesett). Így a régebbi rendszeren TISZTA „Windows 10
+; szükséges" üzenet jön, nem egy kriptikus indulási hiba. (Sok vak felhasználó
+; Win10-en van – ez támogatott.)
+MinVersion=10.0
 UninstallDisplayIcon={app}\{#MyAppExeName}
 ; akadálymentes: nincs felesleges kép, tiszta szöveges varázsló
 SetupIconFile=
