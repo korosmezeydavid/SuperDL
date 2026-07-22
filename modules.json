@@ -6,13 +6,13 @@
       "id": "docconvert",
       "name": "Dokumentum-konverter",
       "category": "Könyvek",
-      "description": "Dokumentumok átalakítása formátumok közt (TXT, DOCX, EPUB, PDF, HTML, RTF, ODT, Markdown…), beépített PDF-fel és OCR-rel. Az első, modulként szállított SuperDL-funkció.",
+      "description": "Dokumentumok átalakítása formátumok közt (TXT, DOCX, EPUB, PDF, HTML, RTF, ODT, Markdown…), beépített PDF-fel és OCR-rel. ÚJ: kötegelt mód – több fájl vagy egy egész mappa egyszerre, mindegyik a saját fájljába VAGY egyetlen fájlba összefűzve.",
       "latest": {
-        "version": "1.2.0",
+        "version": "1.2.1",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-docconvert-1.2.0/docconvert-1.2.0.zip",
-        "sha256": "d379a3d9eae685c747cd6eb9c1fb5d3d3c0d5d78c6797a67c1b667c6c4497c2f",
-        "size": 16381
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-docconvert-1.2.1/docconvert-1.2.1.zip",
+        "sha256": "c9646b960a1c7ad464ae8a03bc162776013e3b57fe177d02cf4bea213b0d56d3",
+        "size": 16442
       }
     },
     {
@@ -21,11 +21,11 @@
       "category": "Eszközök",
       "description": "Nagy fájl küldése egy másik gépre felhő nélkül, bemondható kóddal, végpontok közötti titkosítással (magic-wormhole). A küldő is jelzést kap, amikor a fájl megérkezett.",
       "latest": {
-        "version": "1.0.3",
+        "version": "1.0.4",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-p2p-1.0.3/p2p-1.0.3.zip",
-        "sha256": "2a81c113540eae5516e591f206c3e8258f1e332339317fb90b0447243f8d780f",
-        "size": 6970
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-p2p-1.0.4/p2p-1.0.4.zip",
+        "sha256": "d4575591ab3202eea38ed00bd916fdd0034b4d75fb50287afb43f6785b9774e4",
+        "size": 8594
       }
     },
     {
@@ -34,11 +34,12 @@
       "category": "Média",
       "description": "Médiakészítő és -elemző eszközök egy csomagban: kötegelt médiakonvertáló, beszélő médiaelemző (LUFS/EBU R128), iPhone csengőhang-készítő, videókészítő (kép+zene) és videóvágó-összefűző.",
       "latest": {
-        "version": "1.4.3",
+        "version": "1.4.4",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.3/mediatools-1.4.3.zip",
-        "sha256": "9f25f615da3abcbc18545939637f5b76345228960ed7fd15a5e75a74f7e90a25",
-        "size": 39990
+        "min_core_version": "3.30.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.4/mediatools-1.4.4.zip",
+        "sha256": "2fdf0996c3bcf2c3edc0aa5f42a557f2e68ada0a86f1053a9a6a5da9572b2768",
+        "size": 40400
       }
     },
     {
@@ -60,11 +61,11 @@
       "category": "Könyvek",
       "description": "Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3, választható hanggal és sebességgel).",
       "latest": {
-        "version": "1.0.2",
+        "version": "1.0.3",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-konyvek-1.0.2/konyvek-1.0.2.zip",
-        "sha256": "1c45878b39c8478cef4d57f679d26aa8812c990453f201389cb8ced899c2665f",
-        "size": 15704
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-konyvek-1.0.3/konyvek-1.0.3.zip",
+        "sha256": "71bbda1b4432712b11d595811376a80f1b96155da359c2864a8f6c560413bfff",
+        "size": 15870
       }
     },
     {
@@ -73,11 +74,11 @@
       "category": "Média",
       "description": "Akadálymentes internetes TV (legális IPTV): saját m3u/Xtream forrás csatornái, felolvasott műsorújság (EPG), felvétel és emlékeztető, hangalámondás-sáv és élő felirat-felolvasás. Csak legális, saját előfizetésű forrásokhoz.",
       "latest": {
-        "version": "1.0.4",
+        "version": "1.0.5",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iptv-1.0.4/iptv-1.0.4.zip",
-        "sha256": "2c3cf12352bacd58c5f14c995843080081aa44c05b4600567053a4941eca80d6",
-        "size": 16699
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iptv-1.0.5/iptv-1.0.5.zip",
+        "sha256": "141ca889e11bac5fe33d394b90e68ae7e7610ae0237be89d3f2b81fda4965810",
+        "size": 17119
       }
     },
     {
@@ -86,11 +87,12 @@
       "category": "Média",
       "description": "Hang-műsorszóró stúdió, felvevő, szerkesztő és multistream egy csomagban: Super M (rádió-stúdió + médialejátszó, BASS-motor), Super Recorder (akadálymentes felvevő + fülre-szerkesztő: markeres vágás, 22 effekt, vokóder/harmonizer/ének-eltávolítás/2-sáv, undo/redo), VALÓS IDEJŰ VOICE CHANGER (élő mikrofon: hangmagasság + DX8-effektek monitorozva) és Super Stream (élő multistream). A BASS/bass_fx/numpy-runtime a Core-ból jön (core 3.28.5+ ajánlott).",
       "latest": {
-        "version": "1.2.3",
+        "version": "1.2.4",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supermedia-1.2.3/supermedia-1.2.3.zip",
-        "sha256": "a309981ed1a1a5f59935e8c7f449c63ec22e54cd3b7aa76da9231909983bd6d0",
-        "size": 62813
+        "min_core_version": "3.30.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supermedia-1.2.4/supermedia-1.2.4.zip",
+        "sha256": "7ec2da37090ad37e06e1549d59a3f8370a697bfb270443a6500716cad79f0c5d",
+        "size": 64457
       }
     },
     {
@@ -111,13 +113,13 @@
       "id": "radio",
       "name": "Internetes rádió",
       "category": "Média",
-      "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
+      "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: némítás (Ctrl+M) – a hallgatott hang elnémítható, miközben a felvétel zavartalanul tovább megy. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
       "latest": {
-        "version": "1.1.2",
+        "version": "1.1.3",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.2/radio-1.1.2.zip",
-        "sha256": "266665ebc0ea8c3ec6cbba143c86f31f97aa441f953b62bdb0ddfa763c541477",
-        "size": 15972
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.3/radio-1.1.3.zip",
+        "sha256": "80b9a1207cc755d5dc53bab93079f99b32ae4fcc3a72e05d69938282b8cb8ba8",
+        "size": 16017
       }
     },
     {
@@ -126,11 +128,11 @@
       "category": "AI",
       "description": "AI hangalámondás (audio description) videóhoz: a videó képi tartalmát AI írja le és hanggal mondja el, az eredeti hang alatta halkítva – így a videó vakon is „nézhető”. A leírás részletessége és elhelyezése (párbeszéd-szünet / kiterjesztett) választható; a saját AI-kulcsoddal megy.",
       "latest": {
-        "version": "1.0.3",
+        "version": "1.0.4",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-hangalamondas-1.0.3/hangalamondas-1.0.3.zip",
-        "sha256": "d6550cfbd04f95f339a868f8181d41d7651c4838e5f5599e74c4f13e663d7a3d",
-        "size": 11263
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-hangalamondas-1.0.4/hangalamondas-1.0.4.zip",
+        "sha256": "0a1ae8867872e8c2f0b0f532675cd13149ba9de5f451d32a49189ee4d374247c",
+        "size": 11313
       }
     }
   ]
