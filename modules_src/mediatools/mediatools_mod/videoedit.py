@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from superdl import ffmpeg as ffmpeg_mod    # megosztott Core-modulok
+from superdl import proc as procutil        # alfolyamat-életciklus (MK4)
 from superdl.videocompose import _find_font, human_time, wrap_caption
 
 OUT_FORMATS = (("MP4 – ajánlott", "mp4"), ("MKV", "mkv"), ("AVI", "avi"))
@@ -151,11 +152,7 @@ class VideoEditor:
 
     def stop(self):
         self._stop.set()
-        if self._proc and self._proc.poll() is None:
-            try:
-                self._proc.terminate()
-            except OSError:
-                pass
+        procutil.stop_proc(self._proc)     # terminate→wait→kill→wait + csövek
 
     def _ff(self):
         ff = ffmpeg_mod.find_ffmpeg()
@@ -410,6 +407,7 @@ class VideoEditor:
                 except (ValueError, ZeroDivisionError):
                     pass
         rc = self._proc.wait()
+        procutil.close_pipes(self._proc)      # a stdout bezárása (MK4)
         if self._stop.is_set():
             self.error = "a mentést megszakították"
             return False

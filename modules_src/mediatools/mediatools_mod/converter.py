@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from superdl import ffmpeg as ffmpeg_mod    # megosztott ffmpeg a Core-ból
+from superdl import proc as procutil        # alfolyamat-életciklus (MK4)
 
 # cél hangformátum -> (ffmpeg kodek, kiterjesztés, "natív" kodeknevek a remuxhoz)
 AUDIO_TARGETS = {
@@ -174,11 +175,7 @@ class Converter:
 
     def stop(self):
         self._stop.set()
-        if self._proc and self._proc.poll() is None:
-            try:
-                self._proc.terminate()
-            except OSError:
-                pass
+        procutil.stop_proc(self._proc)     # terminate→wait→kill→wait + csövek
 
     def run(self) -> tuple[int, int]:
         """Az összes fájl feldolgozása. Visszaad: (kész, hibás)."""
@@ -277,6 +274,7 @@ class Converter:
             elif line:                                    # ffmpeg-log/figyelmeztetés/hiba
                 tail.append(line)
         rc = self._proc.wait()
+        procutil.close_pipes(self._proc)      # a stdout bezárása fájlonként (MK4)
 
         if self._stop.is_set():
             job.status = "leállítva"

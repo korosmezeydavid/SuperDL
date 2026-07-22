@@ -23,6 +23,40 @@ _PCT_RE = re.compile(r"(\d{1,3})\s*%")           # a wormhole/tqdm haladás-%-a
 _NOWIN = 0x08000000 if os.name == "nt" else 0
 
 
+def _stop_proc(proc, timeout: float = 3.0) -> None:
+    """Gyerekfolyamat BIZTOS leállítása: terminate→wait→kill→wait + csövek
+    bezárása (MK4: a megszakított küldés/fogadás ne hagyjon árva folyamatot)."""
+    if proc is None:
+        return
+    try:
+        alive = proc.poll() is None
+    except Exception:
+        alive = False
+    if alive:
+        try:
+            proc.terminate()
+        except Exception:
+            pass
+        try:
+            proc.wait(timeout=timeout)
+        except Exception:
+            try:
+                proc.kill()
+            except Exception:
+                pass
+            try:
+                proc.wait(timeout=timeout)
+            except Exception:
+                pass
+    for name in ("stdout", "stderr", "stdin"):
+        s = getattr(proc, name, None)
+        if s is not None:
+            try:
+                s.close()
+            except Exception:
+                pass
+
+
 def _iter_segments(stream):
     """A wormhole kimenetének olvasása \\n ÉS \\r határon. FONTOS: a haladást a
     tqdm KOCSIVISSZA-val (\\r) frissíti ugyanabban a sorban, ezért a sima
@@ -74,11 +108,7 @@ class SendSession:
 
     def cancel(self):
         self._stop = True
-        if self._proc and self._proc.poll() is None:
-            try:
-                self._proc.terminate()
-            except OSError:
-                pass
+        _stop_proc(self._proc)     # terminate→wait→kill→wait + csövek
 
     def _run(self):
         # a haladás-elrejtést KIKAPCSOLTUK → a wormhole kiadja a haladás-%-ot
@@ -109,6 +139,7 @@ class SendSession:
                     last_pct = pct
                     self.on_progress(pct)
         rc = self._proc.wait()
+        _stop_proc(self._proc)      # a csövek bezárása a lefutás végén (MK4)
         if self._stop:
             self._emit_done(False, "A küldést megszakították.")
         elif rc == 0:
@@ -139,11 +170,7 @@ class ReceiveSession:
 
     def cancel(self):
         self._stop = True
-        if self._proc and self._proc.poll() is None:
-            try:
-                self._proc.terminate()
-            except OSError:
-                pass
+        _stop_proc(self._proc)     # terminate→wait→kill→wait + csövek
 
     def _run(self):
         try:
@@ -174,6 +201,7 @@ class ReceiveSession:
                     last_pct = pct
                     self.on_progress(pct)
         rc = self._proc.wait()
+        _stop_proc(self._proc)      # a csövek bezárása a lefutás végén (MK4)
         if self._stop:
             self._emit_done(False, "A fogadást megszakították.")
         elif rc == 0:

@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from . import ffmpeg as ffmpeg_mod
+from . import proc as procutil
 
 VIDEO_FORMATS = ("mp4", "mkv", "avi")
 IMAGE_EXTS = (".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp", ".tiff")
@@ -267,4 +268,7 @@ class VideoComposer:
             self.error = f"Renderelési hiba: {e}"
             return False
         finally:
+            # a renderelő ffmpeg learatása (stdout bezárása + wait) MINDEN ágon,
+            # majd a munkakönyvtár törlése (MK4: nincs leíró-/temp-szivárgás)
+            procutil.reap(self._proc)
             shutil.rmtree(work, ignore_errors=True)

@@ -26,6 +26,40 @@ UA = {"User-Agent": "SuperDL-IPTV"}
 _NOWIN = 0x08000000 if os.name == "nt" else 0
 
 
+def _stop_proc(proc, timeout: float = 3.0) -> None:
+    """Gyerekfolyamat BIZTOS leállítása: terminate→wait→kill→wait + csövek
+    bezárása (MK4: nincs leíró-szivárgás ismételt csatorna-váltás mellett)."""
+    if proc is None:
+        return
+    try:
+        alive = proc.poll() is None
+    except Exception:
+        alive = False
+    if alive:
+        try:
+            proc.terminate()
+        except Exception:
+            pass
+        try:
+            proc.wait(timeout=timeout)
+        except Exception:
+            try:
+                proc.kill()
+            except Exception:
+                pass
+            try:
+                proc.wait(timeout=timeout)
+            except Exception:
+                pass
+    for name in ("stdout", "stderr", "stdin"):
+        s = getattr(proc, name, None)
+        if s is not None:
+            try:
+                s.close()
+            except Exception:
+                pass
+
+
 def _ff() -> str | None:
     f = ffmpeg_mod.find_ffmpeg()
     if not f:
@@ -355,10 +389,17 @@ def stop_recording(proc) -> None:
         proc.stdin.flush()
         proc.wait(timeout=8)
     except Exception:
-        try:
-            proc.terminate()
-        except OSError:
-            pass
+        # ha a 'q' nem vezet szabályos kilépéshez: terminate→wait→kill→wait
+        _stop_proc(proc)
+    finally:
+        # a csövek biztos bezárása (a sikeres 'q'-ág után is)
+        for s in (getattr(proc, "stdin", None), getattr(proc, "stdout", None),
+                  getattr(proc, "stderr", None)):
+            if s is not None:
+                try:
+                    s.close()
+                except Exception:
+                    pass
 
 
 # ---- hang- és feliratsávok (E) ----------------------------------------
@@ -466,9 +507,5 @@ class SubtitleReader:
 
     def stop(self):
         self._stop.set()
-        if self._proc:
-            try:
-                self._proc.terminate()
-            except OSError:
-                pass
-            self._proc = None
+        p, self._proc = self._proc, None
+        _stop_proc(p)     # terminate→wait→kill→wait + stdout bezárása

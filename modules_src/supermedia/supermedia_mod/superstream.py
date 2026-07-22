@@ -18,6 +18,7 @@ import threading
 from dataclasses import dataclass
 
 from superdl import ffmpeg as ffmpeg_mod   # megosztott ffmpeg a Core-ból
+from superdl import proc as procutil       # alfolyamat-életciklus (MK4)
 
 _NOWIN = 0x08000000 if os.name == "nt" else 0
 
@@ -137,11 +138,7 @@ class Streamer:
 
     def stop(self):
         self._stop = True
-        if self._proc and self._proc.poll() is None:
-            try:
-                self._proc.terminate()
-            except OSError:
-                pass
+        procutil.stop_proc(self._proc)     # terminate→wait→kill→wait + csövek
 
     def _run(self):
         ff = ffmpeg_mod.find_ffmpeg()
@@ -174,6 +171,7 @@ class Streamer:
                     self.on_status("Élő adásban – a kép és a hang megy a "
                                    "megadott platform(ok)ra.")
         rc = self._proc.wait()
+        procutil.close_pipes(self._proc)      # a stdout bezárása (MK4)
         if self._stop:
             self._emit_done(True, "Az adást leállítottad.")
         elif rc == 0:

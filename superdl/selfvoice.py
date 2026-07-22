@@ -239,7 +239,8 @@ class SelfVoice:
                 if self._espeak_proc and self._espeak_proc.poll() is None:
                     try:
                         self._espeak_proc.terminate()
-                    except OSError:
+                        self._espeak_proc.wait(timeout=2)   # ne maradjon zombi
+                    except Exception:
                         pass
                 try:
                     self._espeak_proc = subprocess.Popen(
@@ -271,5 +272,6 @@ class SelfVoice:
             if self._espeak_proc and self._espeak_proc.poll() is None:
                 try:
                     self._espeak_proc.terminate()
-                except OSError:
+                    self._espeak_proc.wait(timeout=2)
+                except Exception:
                     pass

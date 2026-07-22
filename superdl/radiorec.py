@@ -181,6 +181,19 @@ class ActiveRecording:
                     p.kill()
                 except Exception:
                     pass
+                try:
+                    p.wait(timeout=3)
+                except Exception:
+                    pass
+            # a csövek bezárása, hogy a stderr-olvasó szál felszabaduljon és ne
+            # maradjon nyitott leíró (MK4: erőforrás-életciklus)
+            for s in (getattr(p, "stdin", None), getattr(p, "stderr", None),
+                      getattr(p, "stdout", None)):
+                if s is not None:
+                    try:
+                        s.close()
+                    except Exception:
+                        pass
         threading.Thread(target=killer, daemon=True).start()
 
     def is_active(self) -> bool:

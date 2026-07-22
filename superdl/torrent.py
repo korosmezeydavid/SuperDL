@@ -97,10 +97,23 @@ class Aria2Client:
         return data["result"]
 
     def shutdown(self):
+        # előbb sima RPC-leállítás, majd BEVÁRJUK a kilépést; ha nem hal meg
+        # időben, kill+wait (MK4: ne maradjon árva aria2c-folyamat/leíró)
         try:
             self.call("aria2.shutdown")
         except Exception:
-            self.proc.kill()
+            pass
+        try:
+            self.proc.wait(timeout=5)
+        except Exception:
+            try:
+                self.proc.kill()
+            except Exception:
+                pass
+            try:
+                self.proc.wait(timeout=3)
+            except Exception:
+                pass
 
 
 def shutdown_aria2() -> None:

@@ -12,6 +12,7 @@ import subprocess
 import threading
 import time
 
+from . import proc as procutil
 from .ffmpeg import ensure_ffmpeg, find_ffmpeg
 
 RATE = 44100
@@ -106,10 +107,9 @@ class Player:
         with self._lock:
             p, self._proc = self._proc, None
         if p:
-            try:
-                p.kill()
-            except Exception:
-                pass
+            # terminate→wait→kill→wait + csövek bezárása (MK4: nincs leíró-szivárgás
+            # ismételt stop/play mellett)
+            procutil.stop_proc(p)
 
     def play(self, url: str, title: str = "", progress=None,
              start: float = 0.0, audio_track: int | None = None) -> None:
@@ -208,6 +208,9 @@ class Player:
                 stream.close()
             except Exception:
                 pass
+            # a lejátszó ffmpeg learatása a szál végén: stdout bezárása + wait,
+            # hogy a normál („vége") lefutáskor se maradjon nyitott leíró (MK4)
+            procutil.reap(proc)
         if not stop_event.is_set():
             if failed and started:
                 self._emit_gen(gen, f"hiba: lejátszás megszakadt – {err_msg}")
