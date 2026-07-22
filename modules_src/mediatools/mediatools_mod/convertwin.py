@@ -63,6 +63,7 @@ class BatchConvertFrame(wx.Frame):
         self.files: list[str] = []
         self._converter = None
         self._running = False
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
 
         self._build()
         self.CreateStatusBar()
@@ -327,6 +328,8 @@ class BatchConvertFrame(wx.Frame):
         self._announce("Leállítás kérve…")
 
     def _finished(self, done: int, failed: int):
+        if self._closing:
+            return
         self._running = False
         self.go_btn.Enable()
         self.stop_btn.Disable()
@@ -351,9 +354,12 @@ class BatchConvertFrame(wx.Frame):
     # ---- egyéb --------------------------------------------------------
 
     def _announce(self, text: str):
+        if self._closing:
+            return
         self.SetStatusText(text)
 
     def _on_close(self, e):
+        self._closing = True
         if self._converter:
             self._converter.stop()
         self.main._convert_win = None

@@ -61,6 +61,7 @@ class SuperEditorFrame(wx.Frame):
         self.clip = supereditor.Clip()
         self._pos = 0.0                 # playhead (mp)
         self._busy = False
+        self._closing = False           # zárás alatt a háttér-callbackek kilépnek
         self._tmp = os.path.join(tempfile.gettempdir(),
                                  f"superedit_{os.getpid()}.wav")
         self.player = Player()
@@ -283,6 +284,8 @@ class SuperEditorFrame(wx.Frame):
     # ---- segéd -------------------------------------------------------
 
     def _announce(self, text):
+        if self._closing:
+            return
         self.SetStatusText(text)
         sv = getattr(self.main, "selfvoice", None)
         if sv:
@@ -705,6 +708,7 @@ class SuperEditorFrame(wx.Frame):
             self._announce(f"Mentve: {os.path.basename(out)}")
 
     def _on_close(self, e):
+        self._closing = True
         try:
             self.timer.Stop()
             self.player.stop()

@@ -59,6 +59,7 @@ class VideoEditFrame(wx.Frame):
         self.player = Player()
         self.player.on_state = lambda s: wx.CallAfter(self._player_state, s)
         self._rendering = False
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
 
         self._build()
         self.CreateStatusBar()
@@ -245,6 +246,8 @@ class VideoEditFrame(wx.Frame):
                        "hallgasd vissza, majd tegyél markert.)")
 
     def _player_state(self, text):
+        if self._closing:
+            return
         if text == "vége":
             self._announce("A hang vége. Vissza az elejére vagy Szóköz.")
         elif text.startswith("hiba"):
@@ -492,6 +495,8 @@ class VideoEditFrame(wx.Frame):
                 pass
 
     def _announce(self, text):
+        if self._closing:
+            return
         self.SetStatusText(text)
         self._speak(text)                    # hallható is, ne csak a státuszsorban
 
@@ -504,6 +509,7 @@ class VideoEditFrame(wx.Frame):
         wx.MessageBox(text, "Videóvágó", wx.OK | wx.ICON_INFORMATION, self)
 
     def _on_close(self, e):
+        self._closing = True
         try:
             self.player.stop()
             self.editor.stop()

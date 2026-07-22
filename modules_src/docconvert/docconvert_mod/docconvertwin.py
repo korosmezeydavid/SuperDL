@@ -89,6 +89,7 @@ class DocConvertFrame(wx.Frame):
         self.main = main
         self.files: list[str] = []         # a konvertálandó fájlok (teljes út)
         self._busy = False
+        self._closing = False              # zárás alatt a háttér-callbackek kilépnek
         self._ocr_keys = list(ocr.ENGINES.keys())
         self._build()
         self.CreateStatusBar()
@@ -214,6 +215,8 @@ class DocConvertFrame(wx.Frame):
     # ---- segédek ------------------------------------------------------
 
     def _announce(self, text):
+        if self._closing:
+            return
         self.SetStatusText(text)
 
     def _say(self, text):
@@ -225,6 +228,8 @@ class DocConvertFrame(wx.Frame):
                 pass
 
     def _result(self, text):
+        if self._closing:
+            return
         self.report.SetValue(text)
         self._announce(text.splitlines()[0] if text else "")
         self._say(text)
@@ -463,6 +468,8 @@ class DocConvertFrame(wx.Frame):
         wx.CallAfter(self._done, msg)
 
     def _done(self, msg):
+        if self._closing:
+            return
         self._busy = False
         self.conv_btn.Enable(True)
         self.gauge.SetValue(0)
@@ -470,6 +477,7 @@ class DocConvertFrame(wx.Frame):
         self._result(msg)
 
     def _on_close(self, e):
+        self._closing = True
         if getattr(self.main, "_docconvert_win", None) is self:
             self.main._docconvert_win = None
         self.Destroy()

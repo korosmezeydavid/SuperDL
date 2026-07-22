@@ -51,6 +51,7 @@ class VideoDescribeFrame(wx.Frame):
         self.src = ""
         self._desc = None
         self._running = False
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
 
         self._build()
         self.CreateStatusBar()
@@ -259,6 +260,8 @@ class VideoDescribeFrame(wx.Frame):
             sv.announce(key, state)
 
     def _done(self, ok, out):
+        if self._closing:
+            return
         self._running = False
         self.go_btn.Enable()
         self.gauge.SetValue(100 if ok else 0)
@@ -278,9 +281,12 @@ class VideoDescribeFrame(wx.Frame):
             wx.MessageBox(err, "Hiba", wx.OK | wx.ICON_ERROR, self)
 
     def _announce(self, text):
+        if self._closing:
+            return
         self.SetStatusText(text)
 
     def _on_close(self, e):
+        self._closing = True
         if self._desc:
             self._desc.stop()
         if getattr(self.main, "_videodescribe_win", None) is self:

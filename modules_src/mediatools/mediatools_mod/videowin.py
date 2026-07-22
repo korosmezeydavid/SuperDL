@@ -59,6 +59,7 @@ class VideoComposeFrame(wx.Frame):
         self.music = ""
         self.elements: list[VC.Element] = []
         self.player = Player()
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
         self.player.on_state = lambda s: wx.CallAfter(self._player_state, s)
         self._rendering = False
         self._composer = None
@@ -423,9 +424,12 @@ class VideoComposeFrame(wx.Frame):
         e.Skip()
 
     def _announce(self, text: str):
+        if self._closing:
+            return
         self.SetStatusText(text)
 
     def _on_close(self, e):
+        self._closing = True
         try:
             self.player.stop()
         except Exception:

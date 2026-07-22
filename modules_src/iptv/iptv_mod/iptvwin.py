@@ -63,6 +63,7 @@ class IPTVFrame(wx.Frame):
         super().__init__(main, title="SuperDL – Internetes TV (legális IPTV)",
                          size=(900, 680))
         self.main = main
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
         self.channels: list[iptv.Channel] = []
         self.filtered: list[iptv.Channel] = []
         self.favorites: list[iptv.Channel] = [
@@ -304,6 +305,8 @@ class IPTVFrame(wx.Frame):
     # ---- visszajelzés -------------------------------------------------
 
     def _announce(self, text):
+        if self._closing:
+            return
         self.SetStatusText(text)
 
     def _say(self, text):
@@ -781,6 +784,7 @@ class IPTVFrame(wx.Frame):
             "xt_user": self.xt_user.GetValue().strip()})
 
     def _on_close(self, e):
+        self._closing = True
         try:
             self.player.stop()
             if self._sub_reader:

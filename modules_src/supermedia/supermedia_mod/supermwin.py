@@ -83,6 +83,7 @@ class SuperMFrame(wx.Frame):
         super().__init__(main, title="SuperDL – Super M műsorszóró stúdió",
                          size=(820, 600))
         self.main = main
+        self._closing = False         # zárás alatt a háttér-callbackek kilépnek
         self.pl = PL.Playlist()
         self.air = SM.Mixer()         # a MŰSOR-BUSZ: ide keverünk mindent, EZT
         #                               hallja a kimenet és (M2) az enkóder
@@ -1035,10 +1036,13 @@ class SuperMFrame(wx.Frame):
             e.Skip()
 
     def _announce(self, text):
+        if self._closing:
+            return
         self.SetStatusText(text)
         self.now_lbl.SetLabel(text)
 
     def _on_close(self, e):
+        self._closing = True
         try:
             self.timer.Stop()
             if getattr(self, "caster", None):

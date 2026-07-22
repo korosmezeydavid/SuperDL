@@ -50,6 +50,7 @@ class BookFrame(wx.Frame):
         self.keys = store.load_tts_keys()
         self.preview = Player()
         self._busy = False
+        self._closing = False        # zárás alatt a háttér-callbackek ne nyúljanak hozzánk
 
         self._build()
         self.CreateStatusBar()
@@ -256,6 +257,8 @@ class BookFrame(wx.Frame):
         threading.Thread(target=work, daemon=True).start()
 
     def _show_voices(self, vs, err):
+        if self._closing:
+            return
         if vs is None:
             self.voice_list.Set([f"(Hiba: {err})"])
             self.voices = []
@@ -371,6 +374,8 @@ class BookFrame(wx.Frame):
                            "eltarthat egy ideig.")
 
         def prog(done, total, state):
+            if self._closing:
+                return
             pct = int(done / total * 100) if total else 0
             wx.CallAfter(self.gauge.SetValue, pct)
             wx.CallAfter(self.SetStatusText,
@@ -389,6 +394,8 @@ class BookFrame(wx.Frame):
         threading.Thread(target=work, daemon=True).start()
 
     def _done(self, res, err):
+        if self._closing:
+            return
         self._busy = False
         self.make_btn.Enable()
         self.gauge.SetValue(0)
@@ -416,6 +423,7 @@ class BookFrame(wx.Frame):
                           wx.OK | wx.ICON_INFORMATION, self)
 
     def _on_close(self, e):
+        self._closing = True         # a folyó háttérfeladat callbackje már kilép
         try:
             self.preview.stop()
         except Exception:

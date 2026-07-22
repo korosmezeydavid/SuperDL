@@ -43,6 +43,7 @@ class MediaAnalyzeFrame(wx.Frame):
         self.main = main
         self.src = ""
         self._busy = False
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
         self._build()
         self.CreateStatusBar()
         self._announce("Tölts be egy hang- vagy videófájlt, és elemzem: "
@@ -115,6 +116,8 @@ class MediaAnalyzeFrame(wx.Frame):
     # ---- visszajelzés -------------------------------------------------
 
     def _announce(self, text):
+        if self._closing:
+            return
         self.SetStatusText(text)
 
     def _say(self, text):
@@ -232,6 +235,7 @@ class MediaAnalyzeFrame(wx.Frame):
         self._set_report(msg, speak=msg)
 
     def _on_close(self, e):
+        self._closing = True
         if getattr(self.main, "_mediaanalyze_win", None) is self:
             self.main._mediaanalyze_win = None
         self.Destroy()

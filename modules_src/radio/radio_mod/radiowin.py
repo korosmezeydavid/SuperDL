@@ -132,6 +132,7 @@ class RadioFrame(wx.Frame):
         super().__init__(main, title="SuperDL – Internetes rádió",
                          size=(900, 640))
         self.main = main
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
         self.player = Player()
         self.player.on_state = lambda s: wx.CallAfter(self._on_state, s)
         self.rec = getattr(main, "_record_mgr", None)   # felvétel-kezelő
@@ -310,6 +311,8 @@ class RadioFrame(wx.Frame):
                 "uuid": s.uuid}
 
     def _announce(self, text):
+        if self._closing:
+            return
         self.SetStatusText(text)
         self.now_label.SetLabel(text)
         # vakon a státuszsor/címke változását a képernyőolvasó nem olvassa fel
@@ -717,6 +720,7 @@ class RadioFrame(wx.Frame):
                           wx.OK | wx.ICON_INFORMATION, self)
 
     def _on_close(self, e):
+        self._closing = True
         try:
             self.player.stop()
         except Exception:

@@ -46,6 +46,7 @@ class RingtoneFrame(wx.Frame):
         self.music = ""
         self.duration = 0.0
         self.start = None          # a kezdőpont (None = még nincs)
+        self._closing = False      # zárás alatt a háttér-callbackek kilépnek
         self.length = R.RING_MAX
         self.player = Player()
         self.player.on_state = lambda s: wx.CallAfter(self._player_state, s)
@@ -312,9 +313,12 @@ class RingtoneFrame(wx.Frame):
         e.Skip()
 
     def _announce(self, text: str):
+        if self._closing:
+            return
         self.SetStatusText(text)
 
     def _on_close(self, e):
+        self._closing = True
         try:
             self.player.stop()
         except Exception:

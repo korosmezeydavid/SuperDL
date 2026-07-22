@@ -48,6 +48,7 @@ class ReaderFrame(wx.Frame):
     def __init__(self, main, open_path: str = "", text: str = "", title=""):
         super().__init__(main, title="SuperDL – Könyvolvasó", size=(940, 720))
         self.main = main
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
         self.lib = main.library
         self.engine = ReadEngine(
             on_state=lambda d: wx.CallAfter(self._on_state, d))
@@ -226,6 +227,8 @@ class ReaderFrame(wx.Frame):
         threading.Thread(target=work, daemon=True).start()
 
     def _show_voices(self, key, vs):
+        if self._closing:
+            return
         if key != self._engine_key():
             return
         self._voices = vs
@@ -275,6 +278,8 @@ class ReaderFrame(wx.Frame):
             self._set_book(self._path, raw, self._title)
 
     def _set_book(self, path, text, title):
+        if self._closing:
+            return
         self.engine.stop()
         if self.sleep and self.sleep.active():   # új könyv → futó időzítő lemond
             self.sleep.cancel()
@@ -373,6 +378,8 @@ class ReaderFrame(wx.Frame):
                            f"(kb. {pct}%).")
 
     def _sleep_finish(self):
+        if self._closing:
+            return
         self._save_bookmark()
         self.engine.stop()
         self.engine.player.set_volume(self._base_vol)   # vissza normál hangerőre
@@ -417,6 +424,8 @@ class ReaderFrame(wx.Frame):
     # ---- állapot / könyvjelző -----------------------------------------
 
     def _on_state(self, d):
+        if self._closing:
+            return
         if d.get("error"):
             self.SetStatusText(f"Felolvasási hiba: {d['error']}")
             return
@@ -477,6 +486,7 @@ class ReaderFrame(wx.Frame):
             e.Skip()
 
     def _on_close(self, e):
+        self._closing = True
         self.save_timer.Stop()
         if self.sleep and self.sleep.active():
             self.sleep.cancel()
