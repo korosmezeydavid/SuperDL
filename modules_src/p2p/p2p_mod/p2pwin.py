@@ -29,12 +29,16 @@ FOGADÁS:
 2. „Fogadás" gomb – a program megkérdezi, hova mentse, és letölti.
 
 GYORSBILLENTYŰK
-F1 – súgó.  Tab / Shift+Tab – mozgás a vezérlők közt.  Enter – gomb.
+F1 – súgó.  F8 – hány százaléknál tart a küldés/fogadás (bemondva).
+Tab / Shift+Tab – mozgás a vezérlők közt.  Enter – gomb.
 
 TIPPEK
 - A kódot pontosan úgy add meg, ahogy hallottad (kötőjelekkel, kis/nagybetű nem
   számít).
-- Mindkét gépnek internet kell; a fájl NEM megy át külső szerveren."""
+- Mindkét gépnek internet kell; a fájl NEM megy át külső szerveren.
+- Ha egy küldés/fogadás közben be akarod zárni az ablakot, a program RÁKÉRDEZ,
+  nehogy véletlenül megszakítsd az átvitelt.
+- Menet közben az F8-cal bármikor megkérdezheted, hány százaléknál tart."""
 
 
 class P2PFrame(wx.Frame):
@@ -45,19 +49,48 @@ class P2PFrame(wx.Frame):
         self.send_session = None
         self.recv_session = None
         self._send_name = ""             # a küldött fájl neve a visszaigazoláshoz
+        self._closing = False            # zárás alatt a háttér-callbackek ne nyúljanak hozzánk
+        self._send_pct = -1              # utolsó ismert haladás (küldés/fogadás)
+        self._recv_pct = -1
 
         self._build()
         self.CreateStatusBar()
         self.SetStatusText("Küldéshez: Fájl kiválasztása. Fogadáshoz: írd be a "
-                           "küldőtől kapott kódot. Súgó: F1.")
+                           "küldőtől kapott kódot. Súgó: F1. Haladás: F8.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
 
     def _on_help_key(self, e):
-        if e.GetKeyCode() == wx.WXK_F1:
+        code = e.GetKeyCode()
+        if code == wx.WXK_F1:
             self._help()
+        elif code == wx.WXK_F8:
+            self._announce_progress()
         else:
             e.Skip()
+
+    def _speak(self, text):
+        sv = getattr(self.main, "selfvoice", None)
+        if sv:
+            try:
+                sv.speak(text, force=True)
+            except Exception:
+                pass
+
+    def _announce_progress(self):
+        """F8: bemondja, hány százaléknál tart az épp folyó küldés/fogadás."""
+        if self.send_session and self._send_pct >= 0:
+            msg = f"Küldés: {self._send_pct} százalék."
+        elif self.send_session:
+            msg = "Küldés folyamatban; a másik gép még nem kezdte el letölteni."
+        elif self.recv_session and self._recv_pct >= 0:
+            msg = f"Fogadás: {self._recv_pct} százalék."
+        elif self.recv_session:
+            msg = "Fogadás folyamatban; a kapcsolat épül."
+        else:
+            msg = "Most nincs folyamatban küldés vagy fogadás."
+        self.SetStatusText(msg)
+        self._speak(msg)
 
     def _help(self):
         try:
@@ -152,13 +185,24 @@ class P2PFrame(wx.Frame):
         self._sv("send", "start")
         self.SetStatusText(f"Küldés előkészítése: {Path(path).name} … "
                            "mindjárt megjelenik a kód.")
+        self._send_pct = -1
         self.send_session = p2p.SendSession(
             path,
             on_code=lambda c: wx.CallAfter(self._send_code, c),
-            on_done=lambda ok, msg: wx.CallAfter(self._send_done, ok, msg))
+            on_done=lambda ok, msg: wx.CallAfter(self._send_done, ok, msg),
+            on_progress=lambda p: wx.CallAfter(self._send_progress, p))
         self.send_session.start()
 
+    def _send_progress(self, pct):
+        if self._closing:
+            return
+        self._send_pct = pct
+        self.SetStatusText(f"Küldés folyamatban: {pct} százalék. (F8: haladás "
+                           "bemondása. Az ablakot tartsd nyitva.)")
+
     def _send_code(self, code):
+        if self._closing:
+            return
         self.code_out.SetValue(code)
         self.copy_btn.Enable()
         copied = self._copy_code()       # rögtön a vágólapra is tesszük
@@ -206,7 +250,10 @@ class P2PFrame(wx.Frame):
                 pass
 
     def _send_done(self, ok, msg):
+        if self._closing:
+            return
         self.send_session = None
+        self._send_pct = -1
         self.send_btn.Enable()
         self.send_cancel.Disable()
         self.copy_btn.Disable()
@@ -242,13 +289,25 @@ class P2PFrame(wx.Frame):
         self.recv_btn.Disable()
         self._sv("receive", "start")
         self.SetStatusText("Csatlakozás a küldőhöz… egy pillanat.")
+        self._recv_pct = -1
         self.recv_session = p2p.ReceiveSession(
             code, out_dir,
-            on_done=lambda ok, msg: wx.CallAfter(self._recv_done, ok, msg))
+            on_done=lambda ok, msg: wx.CallAfter(self._recv_done, ok, msg),
+            on_progress=lambda p: wx.CallAfter(self._recv_progress, p))
         self.recv_session.start()
 
+    def _recv_progress(self, pct):
+        if self._closing:
+            return
+        self._recv_pct = pct
+        self.SetStatusText(f"Fogadás folyamatban: {pct} százalék. "
+                           "(F8: haladás bemondása.)")
+
     def _recv_done(self, ok, msg):
+        if self._closing:
+            return
         self.recv_session = None
+        self._recv_pct = -1
         self.recv_btn.Enable()
         self._sv("receive", "done" if ok else "error")
         self.SetStatusText(msg)
@@ -267,6 +326,20 @@ class P2PFrame(wx.Frame):
         dlg.Destroy()
 
     def _on_close(self, e):
+        # MEGERŐSÍTÉS folyamatban lévő átvitelnél – ne szakítsuk meg véletlenül
+        # (felhasználói kérés). Csak akkor kérdezünk, ha tényleg van folyó művelet.
+        if (self.send_session or self.recv_session) and not self._closing:
+            what = "küldés" if self.send_session else "fogadás"
+            ans = wx.MessageBox(
+                f"Egy {what} van folyamatban. Ha most bezárod, MEGSZAKAD.\n\n"
+                "Biztosan bezárod és megszakítod?",
+                "Fájlküldés – folyamatban", wx.YES_NO | wx.NO_DEFAULT |
+                wx.ICON_WARNING, self)
+            if ans != wx.YES:
+                if e.CanVeto():
+                    e.Veto()            # marad nyitva, az átvitel folytatódik
+                return
+        self._closing = True            # innentől a háttér-callbackek kilépnek
         if self.send_session:
             self.send_session.cancel()
         if self.recv_session:

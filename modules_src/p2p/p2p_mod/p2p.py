@@ -19,7 +19,28 @@ from pathlib import Path
 
 _CODE_RE = re.compile(r"code is:\s*(\S+)", re.IGNORECASE)
 _INTO_RE = re.compile(r"into:\s*'([^']+)'", re.IGNORECASE)
+_PCT_RE = re.compile(r"(\d{1,3})\s*%")           # a wormhole/tqdm haladás-%-a
 _NOWIN = 0x08000000 if os.name == "nt" else 0
+
+
+def _iter_segments(stream):
+    """A wormhole kimenetének olvasása \\n ÉS \\r határon. FONTOS: a haladást a
+    tqdm KOCSIVISSZA-val (\\r) frissíti ugyanabban a sorban, ezért a sima
+    soronkénti (\\n) olvasás sosem látná a százalékot. Karakterenként olvasunk
+    (a haladás-kimenet kis mennyiségű), így a % élőben megjelenik."""
+    buf = ""
+    while True:
+        ch = stream.read(1)
+        if not ch:
+            break
+        if ch in ("\r", "\n"):
+            if buf:
+                yield buf
+            buf = ""
+        else:
+            buf += ch
+    if buf:
+        yield buf
 
 
 def wormhole_command(args: list[str]) -> list[str]:
@@ -40,10 +61,11 @@ class SendSession:
     """Egy fájl küldése. A `on_code(code)` akkor hívódik, amikor megvan a
     bemondható kód; `on_done(ok, message)` a végén."""
 
-    def __init__(self, path: str, on_code=None, on_done=None):
+    def __init__(self, path: str, on_code=None, on_done=None, on_progress=None):
         self.path = path
         self.on_code = on_code
         self.on_done = on_done
+        self.on_progress = on_progress    # on_progress(percent:int) átvitel közben
         self._proc = None
         self._stop = False
 
@@ -59,7 +81,9 @@ class SendSession:
                 pass
 
     def _run(self):
-        cmd = wormhole_command(["send", "--hide-progress", self.path])
+        # a haladás-elrejtést KIKAPCSOLTUK → a wormhole kiadja a haladás-%-ot
+        # (a tqdm a kimeneten), amit a felület élőben mutat/bemond
+        cmd = wormhole_command(["send", self.path])
         try:
             self._proc = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -69,14 +93,21 @@ class SendSession:
             self._emit_done(False, f"A küldés nem indult el: {e}")
             return
         code_sent = False
-        for line in self._proc.stdout:
+        last_pct = -1
+        for seg in _iter_segments(self._proc.stdout):
             if self._stop:
                 break
-            m = _CODE_RE.search(line)
+            m = _CODE_RE.search(seg)
             if m and not code_sent:
                 code_sent = True
                 if self.on_code:
                     self.on_code(m.group(1))
+            pm = _PCT_RE.search(seg)
+            if pm and self.on_progress:
+                pct = max(0, min(100, int(pm.group(1))))
+                if pct != last_pct:
+                    last_pct = pct
+                    self.on_progress(pct)
         rc = self._proc.wait()
         if self._stop:
             self._emit_done(False, "A küldést megszakították.")
@@ -94,10 +125,11 @@ class SendSession:
 class ReceiveSession:
     """Fájl fogadása a megadott kóddal a megadott mappába."""
 
-    def __init__(self, code: str, out_dir: str, on_done=None):
+    def __init__(self, code: str, out_dir: str, on_done=None, on_progress=None):
         self.code = code
         self.out_dir = out_dir
         self.on_done = on_done
+        self.on_progress = on_progress
         self._proc = None
         self._stop = False
         self.filename = ""
@@ -128,12 +160,19 @@ class ReceiveSession:
         except OSError as e:
             self._emit_done(False, f"A fogadás nem indult el: {e}")
             return
-        for line in self._proc.stdout:
+        last_pct = -1
+        for seg in _iter_segments(self._proc.stdout):
             if self._stop:
                 break
-            m = _INTO_RE.search(line)
+            m = _INTO_RE.search(seg)
             if m:
                 self.filename = m.group(1)
+            pm = _PCT_RE.search(seg)
+            if pm and self.on_progress:
+                pct = max(0, min(100, int(pm.group(1))))
+                if pct != last_pct:
+                    last_pct = pct
+                    self.on_progress(pct)
         rc = self._proc.wait()
         if self._stop:
             self._emit_done(False, "A fogadást megszakították.")
