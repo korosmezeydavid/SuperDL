@@ -39,7 +39,10 @@ LÉPÉSRŐL LÉPÉSRE (vakon is)
    program mindegyiket kimondja. Elrontottad? Visszavonás.
 4. Effektek: a listából válaszd (normalizálás, zajszűrés, echo, reverb…); külön
    a vokóder/harmonizer/ének-eltávolítás/2-sáv keverés.
-5. „Mentés” – WAV vagy MP3.
+5. „Mentés” – WAV vagy MP3. A mentés mellett beállíthatod a MINTAVÉTELT
+   („Eredeti” = a forrásé marad, pl. 48 kHz; vagy 44100/48000 Hz) és MP3 esetén a
+   BITRÁTÁT (128–320 kbps). A megnyitott fájl mostantól a saját mintavételével
+   töltődik be (a 48 kHz nem alakul 44,1-re).
 
 GYORSBILLENTYŰK
 F1 – súgó.  A szerkesztő műveletek F- és Ctrl-billentyűit a MENÜSOR mutatja
@@ -186,6 +189,22 @@ class SuperEditorFrame(wx.Frame):
         self.btn_save.Bind(wx.EVT_BUTTON, lambda e: self._on_save())
         for b in (self.btn_undo, self.btn_redo, self.btn_save):
             e2.Add(b, 0, wx.RIGHT, 6)
+        # MENTÉSI beállítások: mintavétel (a forrásé marad, vagy átalakítva) és
+        # MP3-bitráta – a felhasználó jelezte, hogy eddig a 48 kHz-et 44-re
+        # kényszerítette, és nem lehetett a bitrátát állítani
+        e2.Add(wx.StaticText(p, label="&Mintavétel:"), 0,
+               wx.ALIGN_CENTER_VERTICAL | wx.LEFT | wx.RIGHT, 4)
+        self.sr_ch = wx.Choice(p, choices=["Eredeti", "44100 Hz", "48000 Hz"],
+                               name="Mentési mintavétel")
+        self.sr_ch.SetSelection(0)
+        e2.Add(self.sr_ch, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
+        e2.Add(wx.StaticText(p, label="MP3 &bitráta:"), 0,
+               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
+        self.br_ch = wx.Choice(
+            p, choices=["128 kbps", "192 kbps", "256 kbps", "320 kbps"],
+            name="MP3 bitráta")
+        self.br_ch.SetSelection(2)                 # 256 kbps az alap
+        e2.Add(self.br_ch, 0, wx.ALIGN_CENTER_VERTICAL)
         v.Add(e2, 0, wx.LEFT | wx.BOTTOM, 8)
 
         p.SetSizer(v)
@@ -656,13 +675,20 @@ class SuperEditorFrame(wx.Frame):
         ext = ".mp3" if mp3 else ".wav"
         if not path.lower().endswith(ext):
             path += ext
+        # MENTÉSI mintavétel + MP3-bitráta a választókból (a GUI-szálon olvasva)
+        out_freq = {0: 0, 1: 44100, 2: 48000}.get(self.sr_ch.GetSelection(), 0)
+        mp3_bitrate = ["128k", "192k", "256k", "320k"][
+            max(0, self.br_ch.GetSelection())]
+        eff = out_freq or self.clip.freq
         self._busy = True
         self.btn_save.Disable()
-        self._announce("Mentés…")
+        self._announce(f"Mentés… ({eff} Hz"
+                       + (f", MP3 {mp3_bitrate}" if mp3 else "") + ")")
 
         def work():
             try:
-                out = self.clip.save(path, normalize=False)
+                out = self.clip.save(path, normalize=False, out_freq=out_freq,
+                                     mp3_bitrate=mp3_bitrate)
             except Exception as ex:
                 wx.CallAfter(self._save_done, None, str(ex))
                 return

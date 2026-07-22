@@ -39,16 +39,21 @@ def write_wav_bytes(path: str, pcm: bytes, freq: int, channels: int):
 
 def save_pcm(path: str, pcm: bytes, freq: int, channels: int, *,
              normalize: bool = False, fade_ms: int = 0,
-             trim_silence: bool = False, progress=None) -> str:
+             trim_silence: bool = False, out_freq: int = 0,
+             mp3_bitrate: str = "256k", progress=None) -> str:
     """A felvevő ÉS a szerkesztő KÖZÖS mentője. A kiterjesztés dönt a formátumról
-    (.wav/.mp3). Ha nincs utófeldolgozás ÉS WAV a cél → közvetlen írás; különben
-    a Core ffmpeg-jével (normalizálás=EBU R128 loudnorm, fade=afade, csend-vágás=
-    silenceremove az elejéről/végéről). Visszaadja a tényleges utat."""
+    (.wav/.mp3). Ha nincs utófeldolgozás, NINCS újramintavételezés ÉS WAV a cél →
+    közvetlen írás; különben a Core ffmpeg-jével (normalizálás=EBU R128 loudnorm,
+    fade=afade, csend-vágás=silenceremove). `out_freq`>0 esetén a megadott
+    MINTAVÉTELRE alakít (0 = a forrás mintavétele marad); MP3-nál a `mp3_bitrate`
+    (pl. „192k") a bitráta. Visszaadja a tényleges utat."""
     if not pcm:
         raise RuntimeError("Nincs hanganyag a mentéshez.")
     ext = Path(path).suffix.lower()
     want_mp3 = ext == ".mp3"
-    if not (want_mp3 or normalize or fade_ms > 0 or trim_silence):
+    target_freq = int(out_freq) if out_freq else freq
+    resample = target_freq != freq
+    if not (want_mp3 or normalize or fade_ms > 0 or trim_silence or resample):
         write_wav_bytes(path, pcm, freq, channels)
         return path
 
@@ -60,6 +65,7 @@ def save_pcm(path: str, pcm: bytes, freq: int, channels: int, *,
         ff = ffmpeg_mod.find_ffmpeg() if ff_dir else None
     if not ff:
         if not want_mp3:
+            # ffmpeg nélkül nincs újramintavételezés – a forrás mintavételével írjuk
             write_wav_bytes(path, pcm, freq, channels)
             tmp.unlink(missing_ok=True)
             return path
@@ -84,8 +90,10 @@ def save_pcm(path: str, pcm: bytes, freq: int, channels: int, *,
     cmd = [ff, "-y", "-i", str(tmp)]
     if filters:
         cmd += ["-af", ",".join(filters)]
+    if resample:
+        cmd += ["-ar", str(target_freq)]        # a kért MINTAVÉTELRE alakít
     if want_mp3:
-        cmd += ["-c:a", "libmp3lame", "-b:a", "256k"]
+        cmd += ["-c:a", "libmp3lame", "-b:a", str(mp3_bitrate)]  # állítható bitráta
     cmd += [path]
     flags = 0x08000000 if os.name == "nt" else 0
     try:
@@ -130,10 +138,40 @@ def process_pcm(pcm: bytes, freq: int, channels: int, af: str) -> bytes:
     return out
 
 
+def probe_audio(path: str):
+    """A hangfájl NATÍV mintavétele és csatornaszáma (ffprobe-bal), hogy import-
+    kor megőrizhessük az eredetit (pl. 48 kHz-et NE alakítsuk 44,1-re). Visszaad:
+    (freq, channels), vagy (0, 0) ha nem állapítható meg."""
+    ff = ffmpeg_mod.find_ffmpeg()
+    if not ff:
+        ff_dir = ffmpeg_mod.ensure_ffmpeg()
+        ff = ffmpeg_mod.find_ffmpeg() if ff_dir else None
+    if not ff:
+        return 0, 0
+    probe = str(Path(ff).with_name("ffprobe.exe")) if ff.lower().endswith(
+        "ffmpeg.exe") else "ffprobe"
+    flags = 0x08000000 if os.name == "nt" else 0
+    try:
+        r = subprocess.run(
+            [probe, "-v", "error", "-select_streams", "a:0", "-show_entries",
+             "stream=sample_rate,channels", "-of", "csv=p=0", path],
+            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL, creationflags=flags, timeout=20)
+    except (OSError, subprocess.SubprocessError):
+        return 0, 0
+    out = (r.stdout or b"").decode("utf-8", "replace").strip().split(",")
+    try:
+        freq = int(out[0]); ch = int(out[1]) if len(out) > 1 else 2
+        return (freq if freq > 0 else 0), (ch if ch > 0 else 2)
+    except (ValueError, IndexError):
+        return 0, 0
+
+
 def decode_to_pcm(path: str, freq: int = 44100, channels: int = 2,
                   progress=None) -> bytes:
     """Tetszőleges hangfájl (WAV/MP3/M4A/…) dekódolása nyers 16 bites PCM-mé a
-    Core ffmpeg-jével (a szerkesztőbe töltéshez)."""
+    Core ffmpeg-jével (a szerkesztőbe töltéshez). `freq`=0 esetén a forrás NATÍV
+    mintavételét tartja meg (nincs újramintavételezés)."""
     ff = ffmpeg_mod.find_ffmpeg()
     if not ff:
         ff_dir = ffmpeg_mod.ensure_ffmpeg(progress)
@@ -142,7 +180,10 @@ def decode_to_pcm(path: str, freq: int = 44100, channels: int = 2,
         raise RuntimeError("Az ffmpeg nem érhető el a megnyitáshoz.")
     flags = 0x08000000 if os.name == "nt" else 0
     cmd = [ff, "-v", "error", "-i", path, "-f", "s16le",
-           "-acodec", "pcm_s16le", "-ar", str(freq), "-ac", str(channels), "-"]
+           "-acodec", "pcm_s16le"]
+    if freq:                                  # 0 = natív mintavétel megtartása
+        cmd += ["-ar", str(freq)]
+    cmd += ["-ac", str(channels), "-"]
     r = subprocess.run(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
                        stderr=subprocess.DEVNULL, creationflags=flags)
     if r.returncode != 0 or not r.stdout:
@@ -267,10 +308,12 @@ class Recorder:
         write_wav_bytes(path, self.pcm_bytes(), self.freq, self.channels)
 
     def save(self, path: str, *, normalize: bool = False, fade_ms: int = 0,
-             trim_silence: bool = False, progress=None) -> str:
+             trim_silence: bool = False, out_freq: int = 0,
+             mp3_bitrate: str = "256k", progress=None) -> str:
         """A felvétel mentése (a közös `save_pcm`-en át)."""
         if not self.has_audio():
             raise RuntimeError("Nincs felvett hang a mentéshez.")
         return save_pcm(path, self.pcm_bytes(), self.freq, self.channels,
                         normalize=normalize, fade_ms=fade_ms,
-                        trim_silence=trim_silence, progress=progress)
+                        trim_silence=trim_silence, out_freq=out_freq,
+                        mp3_bitrate=mp3_bitrate, progress=progress)

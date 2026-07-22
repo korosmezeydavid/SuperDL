@@ -231,8 +231,14 @@ class Clip:
     # ---- ki/be -------------------------------------------------------
 
     @classmethod
-    def from_file(cls, path: str, freq: int = 44100, channels: int = 2,
+    def from_file(cls, path: str, freq: int = 0, channels: int = 0,
                   progress=None) -> "Clip":
+        # freq=0/channels=0 → a forrás NATÍV mintavételét/csatornáit őrizzük meg
+        # (pl. a 48 kHz-es anyag maradjon 48 kHz, ne alakuljon 44,1-re)
+        if not freq or not channels:
+            nf, nc = superrec.probe_audio(path)
+            freq = freq or nf or 44100
+            channels = channels or nc or 2
         pcm = superrec.decode_to_pcm(path, freq, channels, progress)
         return cls(pcm, freq, channels)
 
@@ -240,7 +246,9 @@ class Clip:
         superrec.write_wav_bytes(path, bytes(self.pcm), self.freq, self.channels)
 
     def save(self, path: str, *, normalize: bool = False, fade_ms: int = 0,
-             trim_silence: bool = False, progress=None) -> str:
+             trim_silence: bool = False, out_freq: int = 0,
+             mp3_bitrate: str = "256k", progress=None) -> str:
         return superrec.save_pcm(path, bytes(self.pcm), self.freq, self.channels,
                                  normalize=normalize, fade_ms=fade_ms,
-                                 trim_silence=trim_silence, progress=progress)
+                                 trim_silence=trim_silence, out_freq=out_freq,
+                                 mp3_bitrate=mp3_bitrate, progress=progress)
