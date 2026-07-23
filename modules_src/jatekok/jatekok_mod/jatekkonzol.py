@@ -66,8 +66,13 @@ class RetroHang:
             if self._stop or self._skip:
                 self._skip = False
                 continue
+            beall = self._get_gep()
+            if isinstance(beall, tuple):
+                kulcs, tempo = beall
+            else:
+                kulcs, tempo = beall, 1.0
             try:
-                path = RS.synth(szoveg, "", self._get_gep())
+                path = RS.synth(szoveg, "", kulcs, tempo_szorzo=tempo)
             except Exception:
                 continue
             if self._stop or self._skip:

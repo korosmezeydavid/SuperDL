@@ -339,6 +339,18 @@ def _retrovoice():
     return RV
 
 
+def _idonyujtas(x, faktor: float):
+    """A jel időbeli nyújtása/rövidítése lineáris újramintavételezéssel
+    (faktor>1 → hosszabb/lassabb). A hangmagasság kissé együtt mozog – egy
+    gépi hangnál ez teljesen rendben van."""
+    import numpy as np
+    if not x.size or abs(faktor - 1.0) <= 1e-3:
+        return x
+    n = max(1, int(round(len(x) * float(faktor))))
+    return np.interp(np.linspace(0, len(x) - 1, n),
+                     np.arange(len(x)), x).astype(float)
+
+
 def _klatt_szintezis(szoveg: str, g: RetroGep):
     """A „BraiLab – eSpeak-Klatt" hang: a régi retrovoice (eSpeak Klatt +
     numpy-DSP) adja az alapot, amit itt még kicsit TOMPÍTUNK (aluláteresztő),
@@ -355,6 +367,9 @@ def _klatt_szintezis(szoveg: str, g: RetroGep):
         except Exception:
             pass
     x = np.asarray(x, dtype=float)
+    # a retrovoice tempója fix, ezért a tempó-csúszkát itt időnyújtással adjuk
+    if g.tempo and abs(g.tempo - 1.0) > 1e-3:
+        x = _idonyujtas(x, g.tempo)
     if g.tompitas and g.tompitas > 0 and x.size:
         x = RV._lowpass(x, fs, float(g.tompitas))
     csucs = float(np.max(np.abs(x))) if x.size else 0.0
@@ -555,8 +570,13 @@ def available() -> bool:
         return False
 
 
-def synth(szoveg: str, out_path: str = "", gep_kulcs: str = "") -> str:
-    """A szöveg RETRÓ gépi hangon, WAV-fájlba. Visszaad: a fájl útja."""
+def synth(szoveg: str, out_path: str = "", gep_kulcs: str = "",
+          tempo_szorzo: float = 1.0) -> str:
+    """A szöveg RETRÓ gépi hangon, WAV-fájlba. Visszaad: a fájl útja.
+
+    `tempo_szorzo`: a beszéd időtartam-szorzója (1.0 = változatlan; >1 lassabb,
+    <1 gyorsabb). A hangválasztó tempó-csúszkája adja."""
+    import dataclasses
     import os
     import tempfile
     import uuid
@@ -565,6 +585,8 @@ def synth(szoveg: str, out_path: str = "", gep_kulcs: str = "") -> str:
     if not (szoveg or "").strip():
         raise ValueError("Nincs felolvasandó szöveg.")
     g = gep(gep_kulcs)
+    if tempo_szorzo and abs(tempo_szorzo - 1.0) > 1e-3:
+        g = dataclasses.replace(g, tempo=g.tempo * float(tempo_szorzo))
     x, fs = szintetizal(szoveg, g)
     out = out_path or os.path.join(
         tempfile.gettempdir(),

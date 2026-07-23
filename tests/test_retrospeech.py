@@ -208,6 +208,37 @@ def test_a_sajat_motor_nem_hiv_espeaket_kozvetlenul():
         assert tiltott not in kod, f"idegen artefaktum: {tiltott}"
 
 
+def test_a_tempo_szorzo_gyorsit_es_lassit(tmp_path):
+    """A hangválasztó tempó-csúszkája: nagyobb tempo_szorzo = hosszabb (lassabb)
+    hang, kisebb = rövidebb (gyorsabb). A saját motorra."""
+    import wave
+
+    def hossz(faktor):
+        p = str(tmp_path / f"t_{faktor}.wav")
+        RS.synth("Ez egy próbamondat a tempóhoz.", p, "gep_melv",
+                 tempo_szorzo=faktor)
+        with wave.open(p, "rb") as w:
+            return w.getnframes() / w.getframerate()
+
+    gyors, alap, lassu = hossz(0.7), hossz(1.0), hossz(1.4)
+    assert gyors < alap < lassu, f"{gyors:.2f} / {alap:.2f} / {lassu:.2f}"
+
+
+def test_a_tempo_szorzo_a_klatt_hangra_is_hat():
+    """Az eSpeak-Klatt hang tempója fix, ezért időnyújtással gyorsítunk/
+    lassítunk – a csúszka rá is hasson."""
+    import pytest
+    RV = pytest.importorskip("superdl.retrovoice")
+    if not RV.available():
+        pytest.skip("ehhez a teszthez eSpeak kell")
+    import dataclasses
+    g = RS.gep("brailab_klatt")
+    x_alap, fs = RS.szintetizal("Próbamondat.", g)
+    x_lassu, _ = RS.szintetizal("Próbamondat.",
+                                dataclasses.replace(g, tempo=1.5))
+    assert len(x_lassu) > len(x_alap) * 1.2
+
+
 def test_van_klatt_brailab_hang():
     """A külön, eSpeak-Klatt alapú BraiLab hang (a fejlesztő kérésére)."""
     g = RS.gep("brailab_klatt")

@@ -48,6 +48,7 @@ class JatekokFrame(wx.Frame):
         self._busy = False
         self._player = None
         self._hang = RS.ALAP_GEP
+        self._tempo = 1.0            # a beszéd időtartam-szorzója (1.0 = alap)
 
         self._build()
         self.CreateStatusBar()
@@ -118,6 +119,14 @@ class JatekokFrame(wx.Frame):
         self.hang_lst.SetSelection(0)
         self.hang_lst.Bind(wx.EVT_LISTBOX, lambda e: self._hang_valaszt())
         v.Add(self.hang_lst, 0, wx.EXPAND | wx.ALL, 8)
+
+        v.Add(wx.StaticText(
+            p, label="&Beszédtempó (nagyobb = gyorsabb):"), 0, wx.LEFT, 8)
+        self.tempo_cs = wx.Slider(p, value=100, minValue=50, maxValue=160,
+                                  style=wx.SL_HORIZONTAL | wx.SL_LABELS)
+        self.tempo_cs.SetName("Beszédtempó százalékban")
+        self.tempo_cs.Bind(wx.EVT_SLIDER, lambda e: self._tempo_valaszt())
+        v.Add(self.tempo_cs, 0, wx.EXPAND | wx.ALL, 8)
 
         v.Add(wx.StaticText(p, label="&Próbaszöveg:"), 0, wx.LEFT, 8)
         self.proba_txt = wx.TextCtrl(
@@ -190,6 +199,13 @@ class JatekokFrame(wx.Frame):
             self._hang = RS.GEPEK[i].kulcs
             self._announce(f"Hangkarakter: {RS.GEPEK[i].nev}", beszel=True)
 
+    def _tempo_valaszt(self):
+        # a csúszka „sebesség %", ebből lesz az időtartam-szorzó (nagyobb
+        # sebesség = rövidebb idő = gyorsabb beszéd)
+        szazalek = max(50, self.tempo_cs.GetValue())
+        self._tempo = 100.0 / szazalek
+        self._announce(f"Beszédtempó: {szazalek} százalék.", beszel=True)
+
     def _hangproba(self):
         szoveg = self.proba_txt.GetValue().strip()
         if not szoveg:
@@ -209,10 +225,11 @@ class JatekokFrame(wx.Frame):
         self._busy = True
         self._announce("Hang készítése…")
         hang = self._hang
+        tempo = self._tempo
 
         def work():
             try:
-                path = RS.synth(szoveg, "", hang)
+                path = RS.synth(szoveg, "", hang, tempo_szorzo=tempo)
             except Exception as e:
                 wx.CallAfter(self._hang_kesz, "", str(e))
                 return
@@ -260,7 +277,7 @@ class JatekokFrame(wx.Frame):
                 beszel=True)
             return
         try:
-            indit_jatek(self, j, lambda: self._hang)
+            indit_jatek(self, j, lambda: (self._hang, self._tempo))
         except Exception as e:
             self._announce(f"A játék nem indult el: {e}", beszel=True)
 
