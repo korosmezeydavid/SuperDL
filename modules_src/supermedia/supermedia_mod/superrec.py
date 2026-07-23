@@ -21,6 +21,7 @@ from pathlib import Path
 
 from . import superm_audio as A      # a BASS-betöltő + Record*-deklarációk
 from superdl import ffmpeg as ffmpeg_mod   # megosztott ffmpeg a Core-ból
+from superdl import mediaexport            # atomikus export (.part→ellenőrzés)
 
 
 def input_devices() -> list:
@@ -102,6 +103,10 @@ def save_pcm(path: str, pcm: bytes, freq: int, channels: int, *,
         if dur > sec:
             filters.append(f"afade=t=out:st={max(0.0, dur - sec):.3f}:d={sec:.3f}")
 
+    # ATOMIKUS EXPORT: a cél MELLÉ renderelünk, ellenőrizzük, és csak utána
+    # lép a helyére. Így egy megszakadt/hibás mentés NEM teszi tönkre a
+    # korábbi, jó fájlt. [Herman Tibi AUDIO-P0-04 / EDIT-P1-17]
+    part = mediaexport.part_path(path)
     cmd = [ff, "-y", "-i", str(tmp)]
     if filters:
         cmd += ["-af", ",".join(filters)]
@@ -109,11 +114,19 @@ def save_pcm(path: str, pcm: bytes, freq: int, channels: int, *,
         cmd += ["-ar", str(target_freq)]        # a kért MINTAVÉTELRE alakít
     if want_mp3:
         cmd += ["-c:a", "libmp3lame", "-b:a", str(mp3_bitrate)]  # állítható bitráta
-    cmd += [path]
+    cmd += [part]
     flags = 0x08000000 if os.name == "nt" else 0
     try:
         subprocess.run(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                        stderr=subprocess.DEVNULL, creationflags=flags, check=True)
+        ok, indok = mediaexport.verify_audio(part, mediaexport.ffprobe_for(ff))
+        if not ok:
+            raise RuntimeError(f"A mentett hang nem használható: {indok}. "
+                               "A korábbi fájl érintetlen maradt.")
+        mediaexport.commit(part, path)
+    except BaseException:
+        mediaexport.cleanup(part)               # nem marad félkész fájl
+        raise
     finally:
         tmp.unlink(missing_ok=True)
     return path

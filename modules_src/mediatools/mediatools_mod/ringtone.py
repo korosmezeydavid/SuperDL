@@ -13,6 +13,7 @@ import uuid
 from pathlib import Path
 
 from superdl import ffmpeg as ffmpeg_mod    # megosztott ffmpeg a Core-ból
+from superdl import mediaexport             # atomikus export (.part→ellenőrzés)
 
 RING_MAX = 30.0       # legnagyobb hossz másodpercben
 RING_MIN = 3.0        # legkisebb értelmes hossz
@@ -43,16 +44,32 @@ def make_ringtone(src: str, out: str, start: float, length: float,
     _ext, codec = FORMATS[fmt]
     start = max(0.0, start)
     length = clamp_length(length)
+    # ATOMIKUS EXPORT: a cél MELLÉ renderelünk, ellenőrizzük, és csak utána
+    # cseréljük. Enélkül egy megszakadt renderelés a MEGLÉVŐ csengőhangot
+    # csonka fájlra cserélte volna. [Herman Tibi RING-P0-04]
+    part = mediaexport.part_path(out)
     cmd = [ff, "-y", "-ss", f"{start:.3f}", "-i", src,
-           "-t", f"{length:.3f}", "-vn", *codec, out]
+           "-t", f"{length:.3f}", "-vn", *codec, part]
     flags = 0x08000000 if os.name == "nt" else 0   # CREATE_NO_WINDOW
     try:
         r = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True,
                            text=True, creationflags=flags, timeout=180)
     except (OSError, subprocess.SubprocessError) as e:
+        mediaexport.cleanup(part)
         return f"renderelési hiba: {e}"
-    if r.returncode != 0 or not os.path.isfile(out):
+    if r.returncode != 0:
+        mediaexport.cleanup(part)
         return "az ffmpeg hibával állt le – ellenőrizd a zenei fájlt"
+    ok, indok = mediaexport.verify_audio(part, mediaexport.ffprobe_for(ff))
+    if not ok:
+        mediaexport.cleanup(part)
+        return (f"a kész csengőhang nem használható: {indok} "
+                "(a korábbi fájl érintetlen maradt)")
+    try:
+        mediaexport.commit(part, out)
+    except OSError as e:
+        mediaexport.cleanup(part)
+        return f"a fájl nem menthető a helyére: {e}"
     return ""
 
 
