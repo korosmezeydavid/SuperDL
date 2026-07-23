@@ -220,3 +220,58 @@ def test_icssub_safe_label_metodusa():
     s = organizer.IcsSub(id="1", name="Munka",
                          url="https://outlook.office365.com/owa/calendar/TOKEN/x.ics")
     assert "TOKEN" not in s.safe_label()
+
+
+# ---- CAL-P0-03: az RRULE INTERVAL tényleges érvényesítése ------------------
+
+def _exp(rrule, start=datetime.datetime(2026, 8, 3, 10, 0), days=40):
+    hor = (start + datetime.timedelta(days=days)).date()
+    return organizer._expand_rrule(start, rrule, hor)
+
+
+def test_ketnaponta_nem_naponta():
+    occ = _exp("FREQ=DAILY;INTERVAL=2", days=10)
+    napok = [d.day for d in occ]
+    assert napok == [3, 5, 7, 9, 11, 13], napok
+
+
+def test_naponta_valtozatlanul_mukodik():
+    occ = _exp("FREQ=DAILY", days=4)
+    assert [d.day for d in occ] == [3, 4, 5, 6, 7]
+
+
+def test_daily_count_hatarol():
+    occ = _exp("FREQ=DAILY;COUNT=3", days=40)
+    assert len(occ) == 3
+
+
+def test_ketheti_nem_heti():
+    # 2026-08-03 hétfő; kéthetente hétfőn → 03, 17, 31
+    occ = _exp("FREQ=WEEKLY;INTERVAL=2;BYDAY=MO", days=40)
+    napok = [(d.month, d.day) for d in occ]
+    assert napok == [(8, 3), (8, 17), (8, 31)], napok
+
+
+def test_heti_tobb_nappal():
+    occ = _exp("FREQ=WEEKLY;BYDAY=MO,WE", days=14)
+    napok = [(d.month, d.day) for d in occ]
+    assert napok == [(8, 3), (8, 5), (8, 10), (8, 12), (8, 17)], napok
+
+
+def test_heti_byday_nelkul_a_kezdes_napjan():
+    occ = _exp("FREQ=WEEKLY", days=21)
+    assert [(d.month, d.day) for d in occ] == [(8, 3), (8, 10), (8, 17), (8, 24)]
+
+
+def test_nincs_elofordulas_a_kezdes_elott():
+    occ = _exp("FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,FR", days=20)
+    assert all(d >= datetime.datetime(2026, 8, 3, 10, 0) for d in occ)
+
+
+def test_regi_kezdodatum_eseten_is_eljut_a_horizontig():
+    """A régi 1000-es guard egy évekkel korábbi DTSTART-nál elfogyott, mielőtt
+    a mai előfordulásig ért volna – az esemény EL is tűnhetett."""
+    start = datetime.datetime(2016, 1, 1, 9, 0)
+    hor = datetime.date(2026, 8, 31)
+    occ = organizer._expand_rrule(start, "FREQ=DAILY", hor)
+    assert occ[-1].year == 2026, occ[-1]

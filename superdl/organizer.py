@@ -228,24 +228,47 @@ def _expand_rrule(start: datetime, rrule: str, horizon_end: _date) -> list[datet
     wanted = [daymap[d] for d in byday.split(",") if d in daymap]
 
     out: list[datetime] = []
-    cur = start
     end_dt = datetime(horizon_end.year, horizon_end.month, horizon_end.day,
                       23, 59)
+    interval = max(1, interval)
+    # A régi kód MINDIG 1 napot lépett, ezért az INTERVAL elveszett: a
+    # kétnaponta/kéthetente ismétlődő esemény NAPONTA/HETENTE jelent meg.
+    # [Herman Tibi CAL-P0-03]
     guard = 0
-    while cur <= end_dt and guard < 1000:
-        guard += 1
-        if until and cur > until:
-            break
-        ok = True
-        if freq == "WEEKLY" and wanted:
-            ok = cur.weekday() in wanted
-        if ok:
+    if freq == "DAILY":
+        step = timedelta(days=interval)
+        cur = start
+        while cur <= end_dt and guard < 20000:
+            guard += 1
+            if until and cur > until:
+                break
             out.append(cur)
             if count and len(out) >= count:
                 break
-        cur += timedelta(days=1 if freq == "DAILY" else 1)
-        if freq == "WEEKLY" and not wanted:
-            cur = start + timedelta(weeks=interval * len(out))
+            cur += step
+    else:                                   # WEEKLY
+        # BYDAY nélkül a kezdés napja az ismétlődő nap
+        days = sorted(wanted) if wanted else [start.weekday()]
+        week0 = start - timedelta(days=start.weekday())     # a kezdés hete (hétfő)
+        w = 0
+        stop = False
+        while not stop and guard < 20000:
+            guard += 1
+            base = week0 + timedelta(weeks=w * interval)    # az INTERVAL HETEK
+            if base > end_dt + timedelta(days=7):
+                break
+            for wd in days:
+                occ = base + timedelta(days=wd)
+                if occ < start:             # a kezdés előtti napokat kihagyjuk
+                    continue
+                if occ > end_dt or (until and occ > until):
+                    stop = True
+                    break
+                out.append(occ)
+                if count and len(out) >= count:
+                    stop = True
+                    break
+            w += 1
     return out or [start]
 
 
