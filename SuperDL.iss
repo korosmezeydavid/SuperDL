@@ -3,7 +3,7 @@
 ; (a verziót a build-szkript adja át; az alapérték lentebb)
 
 #ifndef MyAppVersion
-  #define MyAppVersion "4.0.0"
+  #define MyAppVersion "4.1.0"
 #endif
 #define MyAppName "SuperDL"
 #define MyAppPublisher "Kőrösmezey Dávid"
