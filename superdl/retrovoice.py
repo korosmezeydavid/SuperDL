@@ -41,22 +41,53 @@ class RetroPreset:
     sebesseg: int = 150   # eSpeak tempó (szó/perc)
     hangmagassag: int = 50   # eSpeak alap-hangmagasság (0..99)
     hangkozok: int = 20   # hanglejtés-tartomány (kicsi = monoton, gépies)
+    # ÉLESSÉG: e kettő nélkül a hang tompa, „rádióból szóló". A korabeli
+    # formánsszintézis valójában szúrós, átütő karakterű volt.
+    elohangsuly: float = 0.0   # elő-hangsúlyozás (0..0.9) – „harapós" felsők
+    elesseg_hz: int = 0        # a jelenlét-csúcs helye (Hz)
+    elesseg_db: float = 0.0    # a jelenlét-csúcs mértéke (dB)
 
 
 # A választható karakterek. Az elsőt tekintjük alapértelmezettnek.
 PRESETS: tuple[RetroPreset, ...] = (
+    # A HÁROM BEVÁLT karakter, ÉLESÍTVE: magasabb sávhatár, feljebb tolt
+    # mélyvágás (kevesebb dobozosság), elő-hangsúlyozás és jelenlét-csúcs.
     RetroPreset("brailab", "Retró beszélő gép (a legjellegzetesebb)",
-                variant="klatt2", bitek=8, tartas=1,
+                variant="klatt2", freq=11025, also_hz=380, felso_hz=4600,
+                bitek=8, tartas=1,
+                sebesseg=145, hangmagassag=45, hangkozok=15,
+                elohangsuly=0.38, elesseg_hz=3100, elesseg_db=5.5),
+    RetroPreset("terminal", "Terminál (tiszta, éles, korhű)",
+                variant="klatt4", freq=11025, also_hz=400, felso_hz=4800,
+                bitek=10, tartas=1,
+                sebesseg=155, hangmagassag=55, hangkozok=25,
+                elohangsuly=0.42, elesseg_hz=3300, elesseg_db=6.5),
+    RetroPreset("urhajo", "Űrhajó fedélzeti hang (mély, rekedtes)",
+                variant="klatt3", freq=11025, also_hz=300, felso_hz=4200,
+                bitek=8, tartas=1,
+                sebesseg=130, hangmagassag=25, hangkozok=10,
+                elohangsuly=0.28, elesseg_hz=2700, elesseg_db=4.5),
+    # MÉG SZÚRÓSABB változatok – ha a fentiek sem elég élesek
+    RetroPreset("brailab_eles", "Retró beszélő gép – NAGYON éles",
+                variant="klatt2", freq=11025, also_hz=450, felso_hz=5000,
+                bitek=8, tartas=1,
+                sebesseg=145, hangmagassag=45, hangkozok=15,
+                elohangsuly=0.62, elesseg_hz=3400, elesseg_db=8.5),
+    RetroPreset("terminal_eles", "Terminál – NAGYON éles",
+                variant="klatt4", freq=11025, also_hz=470, felso_hz=5000,
+                bitek=10, tartas=1,
+                sebesseg=155, hangmagassag=55, hangkozok=25,
+                elohangsuly=0.66, elesseg_hz=3500, elesseg_db=9.5),
+    # Az eredeti, TOMPÁBB 8 kHz-es változat – összehasonlításhoz megmarad
+    RetroPreset("brailab_tompa", "Retró beszélő gép – tompa (a korábbi)",
+                variant="klatt2", freq=8000, also_hz=300, felso_hz=3400,
+                bitek=8, tartas=1,
                 sebesseg=145, hangmagassag=45, hangkozok=15),
     RetroPreset("robot", "Kemény robot (durvább, gépiesebb)",
-                variant="robosoft", bitek=6, tartas=2,
-                sebesseg=140, hangmagassag=40, hangkozok=5),
-    RetroPreset("terminal", "Terminál (tisztább, de korhű)",
-                variant="klatt4", bitek=10, tartas=1, felso_hz=3800,
-                sebesseg=155, hangmagassag=55, hangkozok=25),
-    RetroPreset("urhajo", "Űrhajó fedélzeti hang (mély, lassú)",
-                variant="klatt3", bitek=8, tartas=1, felso_hz=3000,
-                sebesseg=130, hangmagassag=25, hangkozok=10),
+                variant="robosoft", freq=11025, also_hz=400, felso_hz=4400,
+                bitek=6, tartas=2,
+                sebesseg=140, hangmagassag=40, hangkozok=5,
+                elohangsuly=0.45, elesseg_hz=3000, elesseg_db=6.0),
     RetroPreset("tiszta", "Mai hang (összehasonlításhoz, nem retró)",
                 variant="", freq=22050, also_hz=0, felso_hz=0,
                 bitek=16, tartas=1, sebesseg=165, hangmagassag=50,
@@ -120,6 +151,39 @@ def _highpass(x, fs: int, fc: float, q: float = 0.707):
     return _biquad(x, b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0)
 
 
+def _peaking(x, fs: int, fc: float, db: float, q: float = 1.0):
+    """Csúcsos (peaking) EQ – a JELENLÉT-sáv kiemelése. Ez teszi a beszédet
+    „szúróssá", átütővé: a formánsszintézis eredeti karaktere is ilyen éles
+    volt, nem tompa. E nélkül a hang olyan, mintha rádióból szólna."""
+    import math
+    if not db or fc <= 0 or fc >= fs / 2:
+        return x
+    A = 10 ** (db / 40.0)
+    w = 2 * math.pi * fc / fs
+    cs, sn = math.cos(w), math.sin(w)
+    al = sn / (2 * q)
+    b0 = 1 + al * A
+    b1 = -2 * cs
+    b2 = 1 - al * A
+    a0 = 1 + al / A
+    a1 = -2 * cs
+    a2 = 1 - al / A
+    return _biquad(x, b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0)
+
+
+def _elohangsuly(x, k: float):
+    """Elő-hangsúlyozás (pre-emphasis): y[n] = x[n] − k·x[n−1].
+    A magasakat emeli, a mélyeket visszafogja – ettől lesz a hang „harapós",
+    és eltűnik belőle a dobozos, tompa jelleg."""
+    import numpy as np
+    if k <= 0 or x.size < 2:
+        return x
+    y = np.empty_like(x)
+    y[0] = x[0]
+    y[1:] = x[1:] - k * x[:-1]
+    return y
+
+
 def _resample(x, fs_be: int, fs_ki: int):
     """Egyszerű lineáris újramintavételezés. A tükrözés (aliasing) ellen a
     hívó ELŐTTE aluláteresztő szűrőt futtat – ez adja a korhű sávkorlátot."""
@@ -166,10 +230,15 @@ def retrofy(pcm_f, fs_be: int, p: RetroPreset):
         x = _lowpass(x, fs_be, min(p.felso_hz, fs_be / 2 - 200))
     # 2) korhű mintavételre alakítás
     x = _resample(x, fs_be, p.freq)
-    # 3) mély zörej levágása (a korabeli hangszórók sem adták vissza)
+    # 3) mély/dobozos rész levágása (a korabeli hangszórók sem adták vissza)
     if p.also_hz:
         x = _highpass(x, p.freq, p.also_hz)
-    # 4) durva kvantálás + minta-tartás → a jellegzetes „gépi szemcse"
+    # 4) ÉLESSÉG: elő-hangsúlyozás + jelenlét-csúcs → a hang „szúróssá",
+    #    átütővé válik, és eltűnik belőle a tompa, rádiós jelleg
+    x = _elohangsuly(x, p.elohangsuly)
+    if p.elesseg_db:
+        x = _peaking(x, p.freq, p.elesseg_hz, p.elesseg_db, q=1.1)
+    # 5) durva kvantálás + minta-tartás → a jellegzetes „gépi szemcse"
     x = _minta_tartas(x, p.tartas)
     x = _kvantal(x, p.bitek)
     # 5) normalizálás úgy, hogy ne vágjon

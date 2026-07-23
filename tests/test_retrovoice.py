@@ -54,7 +54,7 @@ def test_a_savkorlat_levagja_a_magasat():
     hangerőre hoz, ami elfedné a különbséget)."""
     p = RV.preset("brailab")
     also = RV._lowpass(_szinusz(500), 22050, p.felso_hz)
-    felso = RV._lowpass(_szinusz(7000), 22050, p.felso_hz)
+    felso = RV._lowpass(_szinusz(9000), 22050, p.felso_hz)
     assert np.max(np.abs(felso)) < np.max(np.abs(also)) * 0.25, \
         "a sáv fölötti hang nem halkul le eléggé"
 
@@ -115,7 +115,7 @@ def test_valodi_szintezis_korhu_wav_ot_ad(tmp_path):
     out = str(tmp_path / "retro.wav")
     RV.synth("Szia, ez egy próba.", out, "brailab")
     with wave.open(out, "rb") as w:
-        assert w.getframerate() == 8000, "nem korhű a mintavétel"
+        assert w.getframerate() == RV.preset("brailab").freq
         assert w.getnchannels() == 1 and w.getsampwidth() == 2
         assert w.getnframes() > 1000, "gyanúsan rövid a hang"
 
@@ -184,3 +184,67 @@ def test_az_ablak_a_kotelezo_akadalymentes_elemeket_hozza():
     assert "SetName(" in src, "nincsenek címkézve a vezérlők"
     assert "WXK_F1" in src and "HELP" in src, "nincs F1 súgó"
     assert "beszel=True" in src, "a kritikus állapotok nem hallhatók"
+
+
+# ---- ÉLESSÉG: a hang ne legyen tompa, „rádióból szóló" -------------------
+
+def _felso_sav_arany(x, fs):
+    """A 2 kHz feletti energia aránya – ez méri, mennyire „szúrós" a hang."""
+    sp = np.abs(np.fft.rfft(x * np.hanning(len(x))))
+    f = np.fft.rfftfreq(len(x), 1 / fs)
+    ossz = sp.sum() or 1.0
+    return float(sp[f >= 2000].sum() / ossz)
+
+
+def _zaj(fs=22050, mp=0.5):
+    rng = np.random.default_rng(42)
+    return rng.standard_normal(int(fs * mp)) * 0.3
+
+
+def test_az_elohangsuly_emeli_a_magasakat():
+    x = _zaj()
+    tompa = _felso_sav_arany(x, 22050)
+    eles = _felso_sav_arany(RV._elohangsuly(x, 0.6), 22050)
+    assert eles > tompa, "az elő-hangsúlyozás nem élesít"
+
+
+def test_az_elohangsuly_nullaval_nem_valtoztat():
+    x = _zaj()
+    assert np.array_equal(RV._elohangsuly(x, 0.0), x)
+
+
+def test_a_jelenlet_csucs_kiemel():
+    x = _zaj(fs=11025)
+    nyers = _felso_sav_arany(x, 11025)
+    emelt = _felso_sav_arany(RV._peaking(x, 11025, 3300, 9.0), 11025)
+    assert emelt > nyers, "a jelenlét-csúcs nem emel"
+
+
+def test_a_jelenlet_csucs_nulla_db_nel_nem_valtoztat():
+    x = _zaj(fs=11025)
+    assert np.array_equal(RV._peaking(x, 11025, 3300, 0.0), x)
+
+
+def test_az_elesitett_karakterek_szurosabbak_a_tompanal():
+    """A LÉNYEG: a felhasználó szerint a régi túl tompa volt („Szokol rádió").
+    Az élesített változatoknak mérhetően több felső energiája kell legyen."""
+    x = _zaj()
+    tompa, fs_t = RV.retrofy(x, 22050, RV.preset("brailab_tompa"))
+    for kulcs in ("brailab", "terminal", "brailab_eles", "terminal_eles"):
+        p = RV.preset(kulcs)
+        y, fs = RV.retrofy(x, 22050, p)
+        assert _felso_sav_arany(y, fs) > _felso_sav_arany(tompa, fs_t), \
+            f"{kulcs}: nem élesebb a tompa változatnál"
+
+
+def test_a_nagyon_eles_valtozat_a_legszurosabb():
+    x = _zaj()
+    a, fa = RV.retrofy(x, 22050, RV.preset("brailab"))
+    b, fb = RV.retrofy(x, 22050, RV.preset("brailab_eles"))
+    assert _felso_sav_arany(b, fb) > _felso_sav_arany(a, fa)
+
+
+def test_a_kedvenc_karakterek_megvannak():
+    """A fejlesztő ezt a hármat választotta ki – ne tűnjenek el."""
+    for kulcs in ("brailab", "terminal", "urhajo"):
+        assert kulcs in RV.PRESET_MAP, f"eltűnt a kiválasztott karakter: {kulcs}"
