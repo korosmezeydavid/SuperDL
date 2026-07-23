@@ -380,7 +380,8 @@ class SuperRecorderFrame(wx.Frame):
         try:
             self.timer.Stop()
             if self.rec:
-                self.rec.stop()
+                # a kiíró szál leáll és az ideiglenes PCM-fájl is törlődik
+                self.rec.close()
         except Exception:
             pass
         if getattr(self.main, "_superrec_win", None) is self:

@@ -38,28 +38,74 @@ def write_wav_bytes(path: str, pcm: bytes, freq: int, channels: int):
         w.writeframes(pcm)
 
 
+def write_wav_from_pcm_file(path: str, pcm_path: str, freq: int, channels: int,
+                            chunk: int = 4 << 20) -> None:
+    """WAV írása egy LEMEZEN lévő nyers PCM fájlból, DARABONKÉNT másolva.
+
+    Így egy több órás felvétel sem kerül egyszerre a memóriába (a régi út a
+    teljes hangot bytes-ként tartotta). [Herman Tibi REC-P0-02]"""
+    if not pcm_path or not os.path.exists(pcm_path):
+        raise RuntimeError("Nincs rögzített hanganyag a mentéshez.")
+    with wave.open(path, "wb") as w:
+        w.setnchannels(channels)
+        w.setsampwidth(2)
+        w.setframerate(freq)
+        with open(pcm_path, "rb") as f:
+            while True:
+                block = f.read(chunk)
+                if not block:
+                    break
+                w.writeframes(block)
+
+
+def save_pcm_file(path: str, pcm_path: str, freq: int, channels: int, **kw) -> str:
+    """A `save_pcm` STREAMELT párja: a forrás egy LEMEZEN lévő nyers PCM fájl,
+    így egy több órás felvétel sem kerül a memóriába. [REC-P0-02]"""
+    return save_pcm(path, b"", freq, channels, pcm_file=pcm_path, **kw)
+
+
 def save_pcm(path: str, pcm: bytes, freq: int, channels: int, *,
              normalize: bool = False, fade_ms: int = 0,
              trim_silence: bool = False, out_freq: int = 0,
-             mp3_bitrate: str = "256k", progress=None) -> str:
+             mp3_bitrate: str = "256k", progress=None,
+             pcm_file: str = "") -> str:
     """A felvevő ÉS a szerkesztő KÖZÖS mentője. A kiterjesztés dönt a formátumról
     (.wav/.mp3). Ha nincs utófeldolgozás, NINCS újramintavételezés ÉS WAV a cél →
     közvetlen írás; különben a Core ffmpeg-jével (normalizálás=EBU R128 loudnorm,
     fade=afade, csend-vágás=silenceremove). `out_freq`>0 esetén a megadott
     MINTAVÉTELRE alakít (0 = a forrás mintavétele marad); MP3-nál a `mp3_bitrate`
     (pl. „192k") a bitráta. Visszaadja a tényleges utat."""
-    if not pcm:
+    # A forrás VAGY memóriabeli PCM (szerkesztő), VAGY egy lemezen lévő nyers
+    # PCM fájl (felvevő – így a hosszú felvétel nem kerül a memóriába).
+    if not pcm and not pcm_file:
         raise RuntimeError("Nincs hanganyag a mentéshez.")
+    if pcm_file:
+        if not os.path.exists(pcm_file):
+            raise RuntimeError("A rögzített hanganyag nem található.")
+        nbytes = os.path.getsize(pcm_file)
+    else:
+        nbytes = len(pcm)
+    if nbytes <= 0:
+        raise RuntimeError("Nincs hanganyag a mentéshez.")
+
+    def _wav_forras(cel: str) -> None:
+        if pcm_file:
+            write_wav_from_pcm_file(cel, pcm_file, freq, channels)
+        else:
+            write_wav_bytes(cel, pcm, freq, channels)
+
     ext = Path(path).suffix.lower()
     want_mp3 = ext == ".mp3"
     target_freq = int(out_freq) if out_freq else freq
     resample = target_freq != freq
     if not (want_mp3 or normalize or fade_ms > 0 or trim_silence or resample):
-        write_wav_bytes(path, pcm, freq, channels)
+        _wav_forras(path)
         return path
 
-    tmp = Path(tempfile.gettempdir()) / f"superrec_{os.getpid()}_{id(pcm)}.wav"
-    write_wav_bytes(str(tmp), pcm, freq, channels)
+    import uuid as _uuid
+    tmp = (Path(tempfile.gettempdir())
+           / f"superrec_{os.getpid()}_{_uuid.uuid4().hex[:8]}.wav")
+    _wav_forras(str(tmp))
     ff = ffmpeg_mod.find_ffmpeg()
     if not ff:
         ff_dir = ffmpeg_mod.ensure_ffmpeg(progress)
@@ -88,7 +134,7 @@ def save_pcm(path: str, pcm: bytes, freq: int, channels: int, *,
                 "engedd letölteni az ffmpeg-et.")
         raise RuntimeError("Az ffmpeg nem érhető el a feldolgozáshoz/MP3-hoz.")
 
-    dur = len(pcm) / (freq * channels * 2) if (freq and channels) else 0.0
+    dur = nbytes / (freq * channels * 2) if (freq and channels) else 0.0
     filters = []
     if trim_silence:
         filters.append("silenceremove=start_periods=1:start_silence=0.2:"
@@ -230,8 +276,18 @@ class Recorder:
         self.channels = channels      # 2 = sztereó (ha nem megy, 1 = monó)
         self._h = 0
         self._proc = None             # a RECORDPROC-referenciát ÉLETBEN kell tartani
-        self._chunks: list[bytes] = []
-        self._bytes = 0
+        # LEMEZ-ALAPÚ rögzítés: a felvétel FOLYAMATOSAN fájlba íródik, a
+        # memóriában csak egy kis, ki nem írt puffer marad. Korábban az EGÉSZ
+        # felvétel a `_chunks` listában gyűlt: egy órányi 44,1 kHz-es sztereó
+        # hang több száz MB, 8 óra pedig biztos MemoryError (és a mentéskor
+        # további teljes másolatok készültek). [Herman Tibi REC-P0-01/02]
+        self._buf: list[bytes] = []   # csak a még ki nem írt darabok
+        self._buf_bytes = 0
+        self._bytes = 0               # a felvétel TELJES hossza bájtban
+        self._spill = ""              # a nyers PCM ideiglenes fájlja
+        self._fh = None               # a megnyitott írási leíró
+        self._writer = None           # a kiíró szál
+        self._writer_stop = threading.Event()
         self._lock = threading.Lock()
         self._paused = False
         self.recording = False
@@ -240,11 +296,54 @@ class Recorder:
 
     # ---- felvétel ----------------------------------------------------
 
+    # ---- lemez-alapú puffer ------------------------------------------
+
+    def _open_spill(self):
+        """A nyers PCM ideiglenes fájljának megnyitása + a kiíró szál indítása."""
+        if self._fh is not None:
+            return
+        import tempfile
+        import uuid as _uuid
+        self._spill = os.path.join(
+            tempfile.gettempdir(),
+            f"superrec_{os.getpid()}_{_uuid.uuid4().hex[:8]}.pcm")
+        self._fh = open(self._spill, "wb")
+        self._writer_stop.clear()
+        self._writer = threading.Thread(target=self._writer_loop, daemon=True)
+        self._writer.start()
+
+    def _drain(self):
+        """A pufferelt darabok kiírása lemezre (a felvevő szálon kívül)."""
+        with self._lock:
+            chunks, self._buf, self._buf_bytes = self._buf, [], 0
+        if chunks and self._fh is not None:
+            try:
+                self._fh.write(b"".join(chunks))
+            except OSError:
+                pass          # lemezhiba: a felvétel megy tovább, a mentés jelez
+
+    def _writer_loop(self):
+        while not self._writer_stop.wait(0.2):
+            self._drain()
+        self._drain()         # a leállításkor a maradék is menjen ki
+
+    def _flush(self):
+        """Minden ki nem írt adat lemezre kerül (mentés/olvasás előtt)."""
+        self._drain()
+        if self._fh is not None:
+            try:
+                self._fh.flush()
+            except OSError:
+                pass
+
     def _callback(self, handle, buffer, length, user):
         if not self._paused and length:
             data = C.string_at(buffer, length)
             with self._lock:
-                self._chunks.append(data)
+                # a visszahívás CSAK pufferel (rövid marad); a lemezre írást a
+                # külön kiíró szál végzi → nincs I/O a valós idejű hang-szálon
+                self._buf.append(data)
+                self._buf_bytes += length
                 self._bytes += length
             try:
                 arr = array.array("h")
@@ -261,6 +360,7 @@ class Recorder:
     def start(self):
         if self.recording:
             return
+        self._open_spill()        # a felvétel lemezre folyik, nem a memóriába
         b = A._lib()
         if self.device not in A._rec_inited:
             if not b.BASS_RecordInit(self.device):
@@ -300,15 +400,47 @@ class Recorder:
         self._h = 0
         self.recording = False
         self._paused = False
+        self._flush()             # a pufferelt maradék is kerüljön lemezre
+
+    def _close_spill(self):
+        """A kiíró szál leállítása és az ideiglenes fájl lezárása/törlése."""
+        self._writer_stop.set()
+        w, self._writer = self._writer, None
+        if w is not None:
+            try:
+                w.join(timeout=3)
+            except Exception:
+                pass
+        self._drain()
+        if self._fh is not None:
+            try:
+                self._fh.close()
+            except OSError:
+                pass
+            self._fh = None
+        if self._spill:
+            try:
+                if os.path.exists(self._spill):
+                    os.remove(self._spill)
+            except OSError:
+                pass
+            self._spill = ""
 
     def reset(self):
         """A felvett anyag eldobása (új felvételhez)."""
         self.stop()
+        self._close_spill()
         with self._lock:
-            self._chunks = []
+            self._buf = []
+            self._buf_bytes = 0
             self._bytes = 0
         self.peak = 0.0
         self.clipped = False
+
+    def close(self):
+        """Az erőforrások elengedése (ablak bezárásakor): szál + ideiglenes fájl."""
+        self.stop()
+        self._close_spill()
 
     # ---- állapot -----------------------------------------------------
 
@@ -328,20 +460,35 @@ class Recorder:
 
     # ---- mentés ------------------------------------------------------
 
+    def pcm_path(self) -> str:
+        """A nyers PCM ideiglenes fájljának útja (a felvétel LEMEZEN van).
+        Streamelt mentéshez/olvasáshoz – nem másolja memóriába."""
+        self._flush()
+        return self._spill
+
     def pcm_bytes(self) -> bytes:
-        with self._lock:
-            return b"".join(self._chunks)
+        """A teljes felvétel bájtokban. FIGYELEM: ez a HOSSZTÓL függő memóriát
+        igényel; hosszú felvételnél a `pcm_path()`/`save()` a helyes út."""
+        self._flush()
+        if not self._spill or not os.path.exists(self._spill):
+            return b""
+        with open(self._spill, "rb") as f:
+            return f.read()
 
     def _write_wav(self, path: str):
-        write_wav_bytes(path, self.pcm_bytes(), self.freq, self.channels)
+        """WAV írása a lemezen lévő nyers PCM-ből, STREAMELVE (a teljes hang
+        nem kerül egyszerre a memóriába)."""
+        self._flush()
+        write_wav_from_pcm_file(path, self._spill, self.freq, self.channels)
 
     def save(self, path: str, *, normalize: bool = False, fade_ms: int = 0,
              trim_silence: bool = False, out_freq: int = 0,
              mp3_bitrate: str = "256k", progress=None) -> str:
-        """A felvétel mentése (a közös `save_pcm`-en át)."""
+        """A felvétel mentése. A forrás a LEMEZEN lévő nyers PCM, így egy 8 órás
+        felvétel sem kerül teljes egészében a memóriába. [REC-P0-01/02]"""
         if not self.has_audio():
             raise RuntimeError("Nincs felvett hang a mentéshez.")
-        return save_pcm(path, self.pcm_bytes(), self.freq, self.channels,
-                        normalize=normalize, fade_ms=fade_ms,
-                        trim_silence=trim_silence, out_freq=out_freq,
-                        mp3_bitrate=mp3_bitrate, progress=progress)
+        return save_pcm_file(path, self.pcm_path(), self.freq, self.channels,
+                             normalize=normalize, fade_ms=fade_ms,
+                             trim_silence=trim_silence, out_freq=out_freq,
+                             mp3_bitrate=mp3_bitrate, progress=progress)

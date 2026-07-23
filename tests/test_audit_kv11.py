@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Memória-keret a visszavonáshoz + a mentetlen munka védelme.
 Herman Tibi EDIT-P0-01 / REC-P0-04 / EDIT-P0-06."""
+import os
 import pathlib
 import sys
 
@@ -94,3 +95,88 @@ def test_szerkesztes_utan_mentetlen_mentes_utan_tiszta():
     j = src.index("def _save_done")
     assert "self._saved = True" in src[j:j + 400], \
         "a sikeres mentés nem törli a mentetlen jelzést"
+
+
+# ---- REC-P0-01/02: a felvétel LEMEZRE folyik, nem a memóriába -------------
+
+from supermedia_mod import superrec as SR      # noqa: E402
+
+
+def _feed(r, mb: float):
+    """„Felvétel” szimulálása a visszahívás pufferén át."""
+    blokk = b"\x00\x01" * 8192                 # 16 KB
+    n = int(mb * 1024 * 1024 / len(blokk))
+    for _ in range(n):
+        with r._lock:
+            r._buf.append(blokk)
+            r._buf_bytes += len(blokk)
+            r._bytes += len(blokk)
+        if r._buf_bytes > 1_000_000:
+            r._drain()
+    r._flush()
+
+
+def test_a_felvetel_lemezre_kerul_es_a_memoria_ures_marad():
+    r = SR.Recorder()
+    try:
+        r._open_spill()
+        _feed(r, 8)
+        assert os.path.getsize(r._spill) == r._bytes, "nem minden ment lemezre"
+        assert r._buf_bytes == 0, "maradt bent nem kiírt puffer"
+    finally:
+        r.close()
+
+
+def test_a_spill_fajl_zaraskor_torlodik():
+    r = SR.Recorder()
+    r._open_spill()
+    _feed(r, 1)
+    p = r._spill
+    assert os.path.exists(p)
+    r.close()
+    assert not os.path.exists(p), "az ideiglenes PCM-fájl bent maradt"
+
+
+def test_streamelt_wav_mentes_helyes_hosszal(tmp_path):
+    import wave
+    r = SR.Recorder(freq=44100, channels=2)
+    try:
+        r._open_spill()
+        _feed(r, 4)
+        out = str(tmp_path / "felvetel.wav")
+        r.save(out)
+        with wave.open(out, "rb") as w:
+            assert w.getframerate() == 44100 and w.getnchannels() == 2
+            assert w.getnframes() == r._bytes // 4
+    finally:
+        r.close()
+
+
+def test_reset_uritte_a_felvetelt():
+    r = SR.Recorder()
+    try:
+        r._open_spill()
+        _feed(r, 1)
+        assert r.has_audio() is True
+        r.reset()
+        assert r.has_audio() is False and r._bytes == 0
+    finally:
+        r.close()
+
+
+def test_pcm_path_es_pcm_bytes_egyezik():
+    r = SR.Recorder()
+    try:
+        r._open_spill()
+        _feed(r, 1)
+        assert os.path.getsize(r.pcm_path()) == len(r.pcm_bytes())
+    finally:
+        r.close()
+
+
+def test_save_pcm_file_letezik_es_streamel():
+    src = (ROOT / "modules_src" / "supermedia" / "supermedia_mod"
+           / "superrec.py").read_text(encoding="utf-8")
+    assert "def save_pcm_file" in src
+    assert "def write_wav_from_pcm_file" in src
+    assert "self._chunks" not in src, "maradt memóriában gyűjtő chunk-lista"
