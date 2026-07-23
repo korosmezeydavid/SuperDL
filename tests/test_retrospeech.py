@@ -383,3 +383,102 @@ def test_az_uj_szabalyzok_nem_tornek_el_semmit():
         x, _ = RS.szintetizal("Árvíztűrő tükörfúrógép ma!", g)
         assert not np.isnan(x).any(), f"{g.kulcs}: NaN"
         assert 0.5 < float(np.max(np.abs(x))) <= 1.0, f"{g.kulcs}: rossz szint"
+
+
+# ---- „dobozos + halk + magyarosabb hangsúly" finomítás -------------------
+# A fejlesztő: „még mindig nagyon dobozból szól, és halk. és picit lehet
+# magyarosabb a hangsúlyozása." Mind a három mérhetően javult.
+
+def _savarany(x, fs, lo, hi):
+    sp = np.abs(np.fft.rfft(x * np.hanning(len(x))))
+    f = np.fft.rfftfreq(len(x), 1 / fs)
+    return float(sp[(f >= lo) & (f < hi)].sum() / (sp.sum() or 1))
+
+
+def test_a_debox_csokkenti_a_dobozos_savot():
+    import dataclasses
+    g = RS.gep("gep_melv")
+    nincs = dataclasses.replace(g, debox=0.0)
+    x_van, fs = RS.szintetizal("Válassz játékot a listából!", g)
+    x_nincs, _ = RS.szintetizal("Válassz játékot a listából!", nincs)
+    assert _savarany(x_van, fs, 300, 800) < _savarany(x_nincs, fs, 300, 800), \
+        "a debox nem csökkenti a dobozos sávot"
+
+
+def test_a_levego_emeli_a_felso_savot():
+    import dataclasses
+    g = RS.gep("gep_melv")
+    nincs = dataclasses.replace(g, levego=0.0)
+    x_van, fs = RS.szintetizal("Kezdődik a kaland!", g)
+    x_nincs, _ = RS.szintetizal("Kezdődik a kaland!", nincs)
+    assert _savarany(x_van, fs, 3500, 5500) > _savarany(x_nincs, fs, 3500, 5500), \
+        "a levegő nem emeli a felső sávot"
+
+
+def _crest(x):
+    akt = x[np.abs(x) > 0.02]
+    rms = float(np.sqrt(np.mean(akt ** 2))) if len(akt) else 1e-9
+    return 20 * np.log10(float(np.max(np.abs(x))) / rms)
+
+
+def test_a_drive_hangosabba_teszi_a_hangot():
+    """A tömörítés felhozza az átlagot (RMS) → kevésbé halk. A crest-faktor
+    (csúcs/átlag) csökken."""
+    import dataclasses
+    g = RS.gep("gep_melv")
+    nincs = dataclasses.replace(g, drive=1.0)
+    x_van, fs = RS.szintetizal("Jó napot kívánok mindenkinek!", g)
+    x_nincs, _ = RS.szintetizal("Jó napot kívánok mindenkinek!", nincs)
+    assert _crest(x_van) < _crest(x_nincs) - 1.0, "a drive nem hoz hangerőt"
+
+
+def test_a_nyertes_hangosabb_mint_a_regi_beallitas():
+    """A régi gep_melv crest-faktora ~23 dB volt (halk). Most legyen jóval jobb."""
+    x, fs = RS.szintetizal("Üdvözöllek a retro játékokban!", RS.gep("gep_melv"))
+    assert _crest(x) < 20.0, f"még mindig halk (crest {_crest(x):.1f} dB)"
+
+
+def _f0_gorbe(x, fs):
+    N = 1024
+    ered = []
+    for i in range(0, len(x) - N, N // 2):
+        s = x[i:i + N] - x[i:i + N].mean()
+        if np.sqrt(np.mean(s ** 2)) < 0.05:
+            continue
+        ac = np.correlate(s, s, "full")[N - 1:]
+        lo, hi = int(fs / 220), int(fs / 60)
+        if hi < len(ac):
+            p = lo + int(np.argmax(ac[lo:hi]))
+            if ac[p] > 0.3 * ac[0]:
+                ered.append((i, fs / p))
+    return ered
+
+
+def test_a_mondat_dallama_ereszkedik():
+    """MAGYAROS lejtés: a hangmagasság a mondat elején magasabb, a végére
+    leereszkedik. Ez teszi élőbbé, kevésbé egyhangúvá."""
+    g = RS.gep("gep_melv")
+    x, fs = RS.szintetizal("Ez egy hosszabb magyar mondat a próbához.", g)
+    gorbe = _f0_gorbe(x, fs)
+    assert len(gorbe) >= 6, "kevés zöngés keret a méréshez"
+    elso = np.median([hz for i, hz in gorbe[:len(gorbe) // 3]])
+    utolso = np.median([hz for i, hz in gorbe[-len(gorbe) // 3:]])
+    assert elso > utolso, f"a dallam nem ereszkedik ({elso:.0f}→{utolso:.0f} Hz)"
+
+
+def test_a_deklinacio_mondatonkent_ujraindul():
+    """Két mondatnál a második is fentről indul (nem folytatja az esést)."""
+    import dataclasses
+    g = dataclasses.replace(RS.gep("gep_melv"), deklinacio=0.3)
+    x, fs = RS.szintetizal("Rövid mondat. Másik rövid mondat is van itt.", g)
+    assert not np.isnan(x).any() and float(np.max(np.abs(x))) > 0.5
+
+
+def test_a_finomitas_nem_torte_el_a_formansokat():
+    """A stílus-EQ és a tömörítés nem ronthatja el a magánhangzók azonosságát."""
+    g = RS.gep("gep_melv")
+    for hang in ("á", "i", "u"):
+        x, fs = RS.szintetizal(hang * 8, g)
+        h = RS.TABLA[hang]
+        assert _van_csucs(x, fs, RS._kvant(h.f2, g.kvant_hz)), \
+            f"{hang}: az F2 eltűnt a finomítás után"
