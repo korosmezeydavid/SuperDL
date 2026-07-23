@@ -277,12 +277,197 @@ def test_gyufa_veget_er():
     assert any("pont" in p for _, p in ki)
 
 
+# =========================================================================
+#  Kvíz / oktató játékok
+# =========================================================================
+KVIZ = importlib.import_module(BASE + ".jatekok.kviz")
+
+
+def test_allatism_lejatszik():
+    def bot(k, ki):
+        return "5" if "hány kérdést" in k.lower() else ""
+    ki = _fut("allatism", bot)
+    assert any("helyes válasz" in p for _, p in ki)
+
+
+def test_fovaros_lejatszik():
+    def bot(k, ki):
+        return "5" if "hány kérdést" in k.lower() else ""
+    _fut("fovaros", bot)
+
+
+def test_fovaros_helyes_valaszt_elfogad():
+    """Ha a játékos jól válaszol, azt Helyesnek ismeri el."""
+    def bot(k, ki):
+        kl = k.lower()
+        if "hány kérdést" in kl:
+            return "3"
+        if "fővárosa" in kl:
+            for orsz, (fo, _al) in KVIZ._FOVAROS.items():
+                if orsz.lower() in kl:
+                    return fo
+        return ""
+    ki = U.lejatsz(JR.REGISZTER["fovaros"], bot)
+    assert any(p == "Helyes!" for _, p in ki), "a jó választ nem fogadta el"
+    assert any("3 helyes válasz 3-ből" in p for _, p in ki)
+
+
+def test_atomvad_lejatszik():
+    def bot(k, ki):
+        kl = k.lower()
+        if "új molekula" in kl:
+            return "nem"
+        return "1"                    # a pozíció-kérdésekre
+    ki = _fut("atomvad", bot)
+    assert any("molekula összeállt" in p for _, p in ki)
+
+
+def test_braille_ket_mod():
+    for mod in ("1", "2"):
+        def bot(k, ki, _m=mod):
+            kl = k.lower()
+            if "hány kérdést" in kl:
+                return "4"
+            if "mód" in kl:
+                return _m
+            return ""
+        _fut("braille", bot)
+
+
+def test_morse_gyakorlas_es_lemorzezes():
+    def bot1(k, ki):
+        kl = k.lower()
+        if "mit szeretnél" in kl:
+            return "1"
+        if "hány kérdést" in kl:
+            return "4"
+        return ""
+    _fut("morse", bot1)
+
+    def bot2(k, ki):
+        kl = k.lower()
+        if "mit szeretnél" in kl:
+            return "2"
+        if "írj be egy szót" in kl:
+            return "sos"
+        if "újabb szöveg" in kl:
+            return "nem"
+        return ""
+    ki = _fut("morse", bot2)
+    assert any("Morze:" in p for _, p in ki)
+
+
+def test_kitalal_veget_er():
+    def bot(k, ki):
+        return "nem" if "új fogalom" in k.lower() else ""
+    _fut("kitalal", bot)
+
+
+def test_szamtan_lejatszik_es_ures_muvelet():
+    def bot(k, ki):
+        kl = k.lower()
+        if "legnagyobb szám" in kl:
+            return "20"
+        if "műveletek" in kl:
+            return "+ -"
+        if "hány feladatot" in kl:
+            return "5"
+        return ""
+    _fut("szamtan", bot)
+
+    def bot_ures(k, ki):
+        kl = k.lower()
+        if "legnagyobb szám" in kl:
+            return "10"
+        if "műveletek" in kl:
+            return "xyz"           # nincs érvényes jel
+        if "hány feladatot" in kl:
+            return "2"
+        return ""
+    ki = _fut("szamtan", bot_ures)
+    assert any("minek ébresztettél fel" in p for _, p in ki)
+
+
+def test_memoria_veget_er_hibanal():
+    def bot(k, ki):
+        kl = k.lower()
+        if "írd vissza" in kl:
+            return "biztosan-rossz-valasz"
+        if "új játék" in kl:
+            return "nem"
+        return ""
+    ki = _fut("memoria", bot)
+    assert any("Hiba!" in p for _, p in ki)
+
+
+class _MemoryBot:
+    """Tanul a felfedett értékekből, és párokat alkot – így végigjátssza."""
+
+    def __init__(self):
+        import re
+        self._re = re.compile(r"^([a-d][1-4]): (.+)\.$")
+        self.ertek = {}
+        self.matched = set()
+        self.elso = None
+        self.masodik = None
+
+    def _tanul(self, ki):
+        for _, p in ki[-4:]:
+            m = self._re.match(p)
+            if m:
+                self.ertek[m.group(1)] = m.group(2)
+        for _, p in ki[-2:]:
+            if p.startswith("Pár!") and self.elso and self.masodik:
+                self.matched.update((self.elso, self.masodik))
+
+    def __call__(self, k, ki):
+        self._tanul(ki)
+        kl = k.lower()
+        rejtett = [f"{o}{s}" for s in range(1, 5) for o in "abcd"
+                   if f"{o}{s}" not in self.matched]
+        if "első mező" in kl:
+            for c in rejtett:
+                if c in self.ertek:
+                    for d in rejtett:
+                        if d != c and self.ertek.get(d) == self.ertek[c]:
+                            self.elso, self.masodik = c, d
+                            return c
+            for c in rejtett:
+                if c not in self.ertek:
+                    self.elso, self.masodik = c, None
+                    return c
+            self.elso, self.masodik = rejtett[0], None
+            return rejtett[0]
+        if "második mező" in kl:
+            if self.masodik:
+                return self.masodik
+            for c in rejtett:
+                if c != self.elso and c not in self.ertek:
+                    self.masodik = c
+                    return c
+            for c in rejtett:
+                if c != self.elso:
+                    self.masodik = c
+                    return c
+            return self.elso
+        return ""
+
+
+def test_memory_vegigjatszhato():
+    ki = _fut("memory", _MemoryBot())
+    assert any("Minden párt megtaláltál" in p for _, p in ki)
+
+
+def test_parver_tiz_kor():
+    _fut("parver", lambda k, ki: "")
+
+
 # ---- jogtisztaság: a játékkód nem hív idegen beszédmotort/alfolyamatot ----
 
 def test_jatekok_nem_hasznalnak_idegen_fuggoseget():
     import ast
     import inspect
-    for modnev in ("kartya", "logika", "_util"):
+    for modnev in ("kartya", "logika", "kviz", "_util"):
         mod = importlib.import_module(f"{BASE}.jatekok.{modnev}")
         fa = ast.parse(inspect.getsource(mod))
         for csp in ast.walk(fa):
