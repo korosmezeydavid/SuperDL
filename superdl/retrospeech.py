@@ -180,21 +180,34 @@ class RetroGep:
     sav_szuk: float = 1.0       # sávszélesség-szorzó (kisebb = csengőbb)
     kvant_hz: int = 0           # formáns-kvantálás lépcsője (0 = nincs)
     bitek: int = 0              # kimeneti bit-kvantálás (0 = nincs)
+    elesseg: float = 0.0        # utólagos jelenlét-emelés (0..1) – szúrósabb
+    hangero: float = 0.9        # a kimenet csúcs-szintje (0..1)
+    szotag_hangsuly: float = 0.0  # a hangsúlyos szótag amplitúdó-emelése (0..0.6)
 
 
 GEPEK: tuple[RetroGep, ...] = (
-    RetroGep("gep", "Beszélő gép (saját szintetizátor)",
-             alaphang=122.0, hangsuly=0.16, tempo=1.0,
-             atmenet_ms=12, sav_szuk=0.85, kvant_hz=60, bitek=9),
+    # A NYERTES: mély beszélő gép, most élesebbre, hangosabbra hangolva, több
+    # szótag-hangsúllyal (a fejlesztő választása és kérése).
+    RetroGep("gep_melv", "Beszélő gép – MÉLY (a nyertes)",
+             alaphang=92.0, hangsuly=0.22, tempo=1.05,
+             atmenet_ms=10, sav_szuk=0.8, kvant_hz=80, bitek=8,
+             elesseg=0.65, hangero=0.97, szotag_hangsuly=0.34),
+    RetroGep("gep_melv_extra", "Beszélő gép – MÉLY, még élesebb",
+             alaphang=90.0, hangsuly=0.26, tempo=1.06,
+             atmenet_ms=9, sav_szuk=0.75, kvant_hz=90, bitek=8,
+             elesseg=0.85, hangero=0.98, szotag_hangsuly=0.42),
+    RetroGep("gep", "Beszélő gép (közepes)",
+             alaphang=122.0, hangsuly=0.18, tempo=1.0,
+             atmenet_ms=12, sav_szuk=0.85, kvant_hz=60, bitek=9,
+             elesseg=0.5, hangero=0.95, szotag_hangsuly=0.28),
     RetroGep("gep_darabos", "Beszélő gép – NAGYON darabos",
-             alaphang=116.0, hangsuly=0.12, tempo=1.08,
-             atmenet_ms=4, sav_szuk=0.7, kvant_hz=120, bitek=7),
-    RetroGep("gep_melv", "Beszélő gép – mély",
-             alaphang=92.0, hangsuly=0.14, tempo=1.05,
-             atmenet_ms=10, sav_szuk=0.8, kvant_hz=80, bitek=8),
+             alaphang=116.0, hangsuly=0.14, tempo=1.08,
+             atmenet_ms=4, sav_szuk=0.7, kvant_hz=120, bitek=7,
+             elesseg=0.55, hangero=0.96, szotag_hangsuly=0.30),
     RetroGep("gep_magas", "Beszélő gép – magas, csipogós",
-             alaphang=158.0, hangsuly=0.18, tempo=0.96,
-             atmenet_ms=8, sav_szuk=0.75, kvant_hz=80, bitek=8),
+             alaphang=158.0, hangsuly=0.20, tempo=0.96,
+             atmenet_ms=8, sav_szuk=0.75, kvant_hz=80, bitek=8,
+             elesseg=0.6, hangero=0.95, szotag_hangsuly=0.30),
 )
 GEP_MAP = {g.kulcs: g for g in GEPEK}
 ALAP_GEP = GEPEK[0].kulcs
@@ -257,25 +270,29 @@ def szintetizal(szoveg: str, g: RetroGep):
     fs = g.fs
 
     # --- 1) idővonal: minden hangzó a SAJÁT hosszán, hangsúllyal ---
-    szakaszok = []          # (Hang, minta-szám)
+    # A magyar hangsúly a szó ELSŐ szótagján van: azt kicsit hosszabbra ÉS
+    # hangosabbra vesszük. A `szotag_hangsuly` szabályozza, mennyire.
+    szakaszok = []          # (Hang, minta-szám, hangsúlyos-e)
     elso_mgh = True
     for nev, szorzo in hangok:
         h = TABLA.get(nev)
         if h is None:
             continue
         ms = h.hossz * szorzo * g.tempo
+        hangsulyos = False
         if h.zarlat:
-            szakaszok.append((TABLA[" "], int(fs * h.zarlat * g.tempo / 1000)))
-        # a szó ELSŐ magánhangzója kicsit hosszabb (magyar hangsúly az 1. szótagon)
+            szakaszok.append((TABLA[" "], int(fs * h.zarlat * g.tempo / 1000),
+                              False))
         if h.tipus == "mgh":
             if elso_mgh:
-                ms *= 1.12
+                ms *= 1.14
+                hangsulyos = True
                 elso_mgh = False
         elif h.tipus == "szunet":
             elso_mgh = True
-        szakaszok.append((h, max(1, int(fs * ms / 1000))))
+        szakaszok.append((h, max(1, int(fs * ms / 1000)), hangsulyos))
 
-    ossz = sum(n for _, n in szakaszok)
+    ossz = sum(n for _, n, _ in szakaszok)
     if ossz <= 0:
         return np.zeros(0), fs
 
@@ -287,7 +304,8 @@ def szintetizal(szoveg: str, g: RetroGep):
     AMP = np.zeros(ossz); ZAJ = np.zeros(ossz); ZONGE = np.zeros(ossz)
 
     poz = 0
-    for h, n in szakaszok:
+    HSULY = np.ones(ossz)      # hangsúly-szorzó a hangmagassághoz
+    for h, n, hangsulyos in szakaszok:
         v = slice(poz, poz + n)
         F1[v] = _kvant(h.f1, g.kvant_hz)
         F2[v] = _kvant(h.f2, g.kvant_hz)
@@ -295,12 +313,16 @@ def szintetizal(szoveg: str, g: RetroGep):
         B1[v] = h.b1 * g.sav_szuk
         B2[v] = h.b2 * g.sav_szuk
         B3[v] = h.b3 * g.sav_szuk
-        AMP[v] = h.hangero
+        amp = h.hangero
+        if hangsulyos and g.szotag_hangsuly:
+            amp *= 1.0 + g.szotag_hangsuly            # hangosabb szótag
+            HSULY[v] = 1.0 + g.szotag_hangsuly * 0.35  # + kicsit magasabb hang
+        AMP[v] = amp
         ZAJ[v] = h.zaj
         ZONGE[v] = 0.0 if h.tipus in ("zongetlen", "szunet") else 1.0
         if h.tipus == "perges":          # „r": gyors amplitúdó-pergetés
             t = np.arange(n) / fs
-            AMP[v] = h.hangero * (0.55 + 0.45 * np.sign(
+            AMP[v] = amp * (0.55 + 0.45 * np.sign(
                 np.sin(2 * math.pi * 26.0 * t)))
         poz += n
 
@@ -315,8 +337,11 @@ def szintetizal(szoveg: str, g: RetroGep):
     rng = np.random.default_rng(4242)
     t = np.arange(ossz) / fs
     # enyhe hangsúly-ingadozás (a felhasználó kérte: legyen egy kis élet)
-    f0 = g.alaphang * (1.0 + g.hangsuly * 0.5 *
-                       np.sin(2 * math.pi * 0.7 * t))
+    # a hangmagasság: enyhe alap-ingadozás + a HANGSÚLYOS szótagok kiemelése
+    at = max(1, int(fs * g.atmenet_ms / 1000))
+    HSULY = np.convolve(HSULY, np.ones(at) / at, mode="same")
+    f0 = g.alaphang * HSULY * (1.0 + g.hangsuly * 0.5 *
+                               np.sin(2 * math.pi * 0.7 * t))
     fazis = np.cumsum(f0) / fs
     egesz = np.floor(fazis).astype(np.int64)
     imp = np.zeros(ossz)
@@ -362,6 +387,24 @@ def szintetizal(szoveg: str, g: RetroGep):
     ki = np.concatenate(([ki[0]], np.diff(ki)))
 
     ki *= AMP
+    # ÉLESSÉG: utólagos jelenlét-emelés (peaking EQ) – szúrósabb, „harapósabb"
+    if g.elesseg:
+        db = 8.0 * g.elesseg
+        w0 = 2 * math.pi * 2800.0 / fs
+        A = 10 ** (db / 40.0)
+        cs, sn = math.cos(w0), math.sin(w0)
+        al = sn / (2 * 1.1)
+        b0, b1c, b2c = 1 + al * A, -2 * cs, 1 - al * A
+        a0, a1c, a2c = 1 + al / A, -2 * cs, 1 - al / A
+        y1 = y2 = x1 = x2 = 0.0
+        out = np.empty_like(ki)
+        for i in range(ki.shape[0]):
+            xi = float(ki[i])
+            yi = (b0 * xi + b1c * x1 + b2c * x2 - a1c * y1 - a2c * y2) / a0
+            out[i] = yi
+            x2, x1 = x1, xi
+            y2, y1 = y1, yi
+        ki = out
     # SORREND: előbb NORMALIZÁLUNK, csak utána kvantálunk. Fordítva a
     # kvantálás lenullázná a jelet, mert a csúcsra normált rezonátor-lánc
     # kis abszolút értékeket ad (a 7 bites lépcső mindent 0-ra kerekítene).
@@ -369,11 +412,21 @@ def szintetizal(szoveg: str, g: RetroGep):
     # hangkimenetnél.
     csucs = float(np.max(np.abs(ki))) if ki.size else 0.0
     if csucs > 0:
-        ki = ki / csucs * 0.9
+        ki = ki / csucs * min(0.98, g.hangero)
     if g.bitek:
         lepcsok = float(2 ** (g.bitek - 1))
         ki = np.round(ki * lepcsok) / lepcsok
     return ki, fs
+
+
+def available() -> bool:
+    """Elérhető-e a retró hang? A motor TELJESEN saját (numpy), így ez mindig
+    igaz, ha a numpy betölthető."""
+    try:
+        import numpy            # noqa: F401
+        return True
+    except Exception:
+        return False
 
 
 def synth(szoveg: str, out_path: str = "", gep_kulcs: str = "") -> str:

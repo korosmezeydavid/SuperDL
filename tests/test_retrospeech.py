@@ -319,3 +319,67 @@ def test_egyik_karakter_sem_nemul_el(gk):
     x, _ = RS.szintetizal("Próba egy kettő három.", RS.gep(gk))
     assert float(np.max(np.abs(x))) > 0.5, f"{gk}: néma vagy alig hallható"
     assert not np.isnan(x).any(), f"{gk}: NaN a kimenetben"
+
+
+# ---- A NYERTES karakter finomítása (élesség, hangerő, hangsúly) ----------
+
+def test_gep_melv_a_nyertes_es_az_elso():
+    """A fejlesztő a gep_melv-et választotta – ez legyen az ALAPÉRTELMEZETT."""
+    assert RS.GEPEK[0].kulcs == "gep_melv"
+    assert RS.ALAP_GEP == "gep_melv"
+
+
+def test_a_nyertes_eles_hangos_hangsulyos():
+    g = RS.gep("gep_melv")
+    assert g.elesseg > 0.3, "nincs élesítés"
+    assert g.hangero > 0.9, "nem elég hangos"
+    assert g.szotag_hangsuly > 0.2, "kevés a szótag-hangsúly"
+
+
+def test_az_elesites_emeli_a_jelenletet():
+    """Azonos alap, csak az élesség kapcsolóban különböznek."""
+    import dataclasses
+    alap = RS.gep("gep_melv")
+    tompa = dataclasses.replace(alap, elesseg=0.0)
+    x_e, fs = RS.szintetizal("Válassz játékot most!", alap)
+    x_t, _ = RS.szintetizal("Válassz játékot most!", tompa)
+
+    def jelenlet(x, fs):
+        sp = np.abs(np.fft.rfft(x * np.hanning(len(x))))
+        f = np.fft.rfftfreq(len(x), 1 / fs)
+        return float(sp[(f >= 2200) & (f < 3600)].sum() / (sp.sum() or 1))
+    assert jelenlet(x_e, fs) > jelenlet(x_t, fs), "az élesítés nem emel"
+
+
+def test_a_szotag_hangsuly_amplitudo_ingadozast_ad():
+    """Azonos gép, csak a szótag-hangsúly különbözik → nagyobb dinamika."""
+    import dataclasses
+    alap = RS.gep("gep_melv")
+    lapos = dataclasses.replace(alap, szotag_hangsuly=0.0, hangsuly=0.05)
+    x_h, fs = RS.szintetizal("Kezdődik a nagy kaland ma!", alap)
+    x_l, _ = RS.szintetizal("Kezdődik a nagy kaland ma!", lapos)
+
+    def dinamika(x):
+        # az elején lévő hangsúlyos szótagok kiemelkednek: a szótag-csúcsok
+        # szórása nagyobb, ha van szótag-hangsúly
+        e = np.abs(x[:len(x) // 400 * 400]).reshape(-1, 400).max(axis=1)
+        e = e[e > 0.05]
+        return float(np.percentile(e, 90) - np.percentile(e, 40))
+    assert dinamika(x_h) > dinamika(x_l), "a hangsúly nem ad több dinamikát"
+
+
+def test_a_hangero_szabalyzo_hat():
+    import dataclasses
+    g = RS.gep("gep_melv")
+    halk = dataclasses.replace(g, hangero=0.4)
+    x_h, _ = RS.szintetizal("Teszt.", g)
+    x_l, _ = RS.szintetizal("Teszt.", halk)
+    assert float(np.max(np.abs(x_h))) > float(np.max(np.abs(x_l)))
+
+
+def test_az_uj_szabalyzok_nem_tornek_el_semmit():
+    """Minden karakter épkézláb beszédet ad (nem NaN, nem néma, nem vág)."""
+    for g in RS.GEPEK:
+        x, _ = RS.szintetizal("Árvíztűrő tükörfúrógép ma!", g)
+        assert not np.isnan(x).any(), f"{g.kulcs}: NaN"
+        assert 0.5 < float(np.max(np.abs(x))) <= 1.0, f"{g.kulcs}: rossz szint"

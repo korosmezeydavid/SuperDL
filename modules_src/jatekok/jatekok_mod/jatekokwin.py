@@ -9,7 +9,7 @@ import threading
 
 import wx
 
-from superdl import retrovoice as RV      # a Core saját retró hangmotorja
+from superdl import retrospeech as RS     # a Core SAJÁT formánsszintetizátora
 from . import katalogus
 
 
@@ -47,7 +47,7 @@ class JatekokFrame(wx.Frame):
         self._closing = False       # zárás alatt a háttér-callbackek kilépnek
         self._busy = False
         self._player = None
-        self._hang = RV.DEFAULT_PRESET
+        self._hang = RS.ALAP_GEP
 
         self._build()
         self.CreateStatusBar()
@@ -113,7 +113,7 @@ class JatekokFrame(wx.Frame):
         v.Add(wx.StaticText(p, label="&Hangkarakter (fel/le nyíl):"), 0,
               wx.LEFT, 8)
         self.hang_lst = wx.ListBox(
-            p, choices=[x.nev for x in RV.PRESETS], style=wx.LB_SINGLE)
+            p, choices=[x.nev for x in RS.GEPEK], style=wx.LB_SINGLE)
         self.hang_lst.SetName("Retró hangkarakter")
         self.hang_lst.SetSelection(0)
         self.hang_lst.Bind(wx.EVT_LISTBOX, lambda e: self._hang_valaszt())
@@ -186,9 +186,9 @@ class JatekokFrame(wx.Frame):
 
     def _hang_valaszt(self):
         i = self.hang_lst.GetSelection()
-        if 0 <= i < len(RV.PRESETS):
-            self._hang = RV.PRESETS[i].kulcs
-            self._announce(f"Hangkarakter: {RV.PRESETS[i].nev}", beszel=True)
+        if 0 <= i < len(RS.GEPEK):
+            self._hang = RS.GEPEK[i].kulcs
+            self._announce(f"Hangkarakter: {RS.GEPEK[i].nev}", beszel=True)
 
     def _hangproba(self):
         szoveg = self.proba_txt.GetValue().strip()
@@ -202,7 +202,7 @@ class JatekokFrame(wx.Frame):
         if self._busy:
             self._announce("Egy hang már készül, várd meg a végét.")
             return
-        if not RV.available():
+        if not RS.available():
             self._announce("A retró hanghoz szükséges beszédmotor nem érhető "
                            "el ezen a gépen.", beszel=True)
             return
@@ -212,7 +212,7 @@ class JatekokFrame(wx.Frame):
 
         def work():
             try:
-                path = RV.synth(szoveg, "", hang)
+                path = RS.synth(szoveg, "", hang)
             except Exception as e:
                 wx.CallAfter(self._hang_kesz, "", str(e))
                 return
