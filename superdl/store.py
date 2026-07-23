@@ -375,3 +375,27 @@ def load_ics_subs() -> list[dict]:
 def save_ics_subs(records: list[dict]) -> None:
     with _lock:
         save_json(ICS_SUBS_FILE, records)
+
+
+# --- ICS-CÍMEK TITKOSÍTVA ------------------------------------------------
+# Sok szolgáltatónál (Google, Outlook, iCloud) a privát naptár ICS-címe MAGA a
+# hozzáférési titok: aki látja, a teljes naptárat elolvashatja. Ezért a címeket
+# DPAPI-val titkosítva, a nem bizalmas mezőktől KÜLÖN tároljuk.
+# [Herman Tibi CAL-P0-04]
+ICS_URLS_FILE = CONFIG_DIR / "ics_urls.json"
+
+
+def load_ics_urls() -> dict:
+    """{feliratkozás_id: cím} a titkosított tárolóból."""
+    return _load_secret_config(ICS_URLS_FILE)
+
+
+def save_ics_urls(urls: dict) -> bool:
+    """A címek titkosított mentése. True, ha sikerült; False, ha a DPAPI nem
+    érhető el (ilyenkor a hívó dönt – de a felhasználót TÁJÉKOZTATNI kell)."""
+    try:
+        with _lock:
+            save_secret_json(ICS_URLS_FILE, urls)
+        return True
+    except SecretStoreError:
+        return False

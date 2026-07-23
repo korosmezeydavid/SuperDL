@@ -374,14 +374,33 @@ class OrganizerManager:
                                   for r in store.load_organizer_tasks()]
         self.notes: list[Note] = [self._mk(Note, r)
                                   for r in store.load_organizer_notes()]
+        self.secret_warning = ""      # ha a titkosított mentés nem sikerült
         self.ics_subs: list[IcsSub] = [self._mk(IcsSub, r)
                                        for r in store.load_ics_subs()]
+        # A címeket a TITKOSÍTOTT tárolóból pótoljuk; a régi telepítéseknél a
+        # nyílt fájlban lévő cím MIGRÁLÓDIK (a save() írja vissza titkosítva).
+        try:
+            _urls = store.load_ics_urls()
+        except Exception:
+            _urls = {}
+        _migralando = False
+        for s in self.ics_subs:
+            if not s.url and _urls.get(s.id):
+                s.url = _urls[s.id]
+            elif s.url:
+                _migralando = True    # régi, nyílt cím → titkosítva mentjük
         self.ics_events: list[Event] = []
         # ütemező-egészség (CAL-P0-06): a hibák nem tűnhetnek el némán
         self.last_tick_ok: datetime | None = None
         self.tick_errors = 0
         self.last_error = ""
         self._stop = threading.Event()
+        if _migralando:
+            # a nyílt fájlban talált címek AZONNAL titkosítva íródnak vissza
+            try:
+                self.save()
+            except Exception:
+                pass
         self._thread = threading.Thread(target=self._loop, daemon=True)
         self._thread.start()
         threading.Thread(target=self.sync_ics, daemon=True).start()
@@ -397,7 +416,21 @@ class OrganizerManager:
         store.save_organizer_events([asdict(e) for e in self.events])
         store.save_organizer_tasks([asdict(t) for t in self.tasks])
         store.save_organizer_notes([asdict(n) for n in self.notes])
-        store.save_ics_subs([asdict(s) for s in self.ics_subs])
+        # Az ICS-CÍMEK titkosítva, a nem bizalmas mezőktől KÜLÖN mennek: a privát
+        # naptár címe maga a hozzáférési titok. [Herman Tibi CAL-P0-04]
+        urls = {s.id: s.url for s in self.ics_subs if s.url}
+        titkositva = store.save_ics_urls(urls) if urls else True
+        rekordok = []
+        for s in self.ics_subs:
+            r = asdict(s)
+            if titkositva:
+                r["url"] = ""        # a nyílt fájlban NEM marad cím
+            rekordok.append(r)
+        if not titkositva and not self.secret_warning:
+            self.secret_warning = (
+                "A naptár-címeket nem sikerült titkosítva menteni (a Windows "
+                "DPAPI nem érhető el), ezért olvashatóan tárolódnak.")
+        store.save_ics_subs(rekordok)
 
     # ---- események ----------------------------------------------------
 

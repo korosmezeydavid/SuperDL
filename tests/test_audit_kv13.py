@@ -125,3 +125,47 @@ def test_a_felulet_a_konkret_okot_mondja():
     src = _src("docconvert/docconvert_mod/docconvertwin.py")
     assert "last_tool_error" in src, "a GUI csak általános hibát mond"
     assert "last_tool_warning" in src
+
+
+# ---- CAL-P0-04: az ICS-cím TITKOSÍTVA tárolódik ---------------------------
+
+def test_van_titkositott_ics_tarolo():
+    src = _core("superdl/store.py")
+    assert "def save_ics_urls" in src and "def load_ics_urls" in src
+    assert "ICS_URLS_FILE" in src
+    i = src.index("def save_ics_urls")
+    assert "save_secret_json" in src[i:i + 500], "nem titkosítva ment"
+
+
+def test_a_nyilt_fajlban_nem_marad_cim():
+    src = _core("superdl/organizer.py")
+    i = src.index("def save(self)")
+    torzs = src[i:i + 900]
+    assert 'r["url"] = ""' in torzs, "a nyílt rekordban bent marad a titkos cím"
+    assert "save_ics_urls" in torzs
+
+
+def test_regi_telepites_migralodik():
+    src = _core("superdl/organizer.py")
+    assert "_migralando" in src, "a régi nyílt címek nem migrálódnak"
+    assert "load_ics_urls" in src
+
+
+def test_dpapi_hiany_eseten_figyelmeztet():
+    """Ha nem sikerül titkosítani, a felhasználót TÁJÉKOZTATNI kell –
+    nem hihetjük titkosítottnak a nyílt adatot."""
+    src = _core("superdl/organizer.py")
+    assert "secret_warning" in src
+    assert "nem sikerült titkosítva menteni" in src
+
+
+def test_titkositott_mentes_es_visszaolvasas(tmp_path, monkeypatch):
+    from superdl import store
+    monkeypatch.setattr(store, "ICS_URLS_FILE", tmp_path / "ics_urls.json")
+    titok = "https://calendar.google.com/calendar/ical/TOKEN999/basic.ics"
+    if not store.save_ics_urls({"a1": titok}):
+        import pytest as _pt
+        _pt.skip("ezen a gépen nincs DPAPI")
+    nyers = (tmp_path / "ics_urls.json").read_text(encoding="utf-8")
+    assert titok not in nyers, "a titkos cím olvashatóan került a fájlba"
+    assert store.load_ics_urls().get("a1") == titok
