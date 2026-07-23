@@ -99,7 +99,19 @@ def save_pcm(path: str, pcm: bytes, freq: int, channels: int, *,
     target_freq = int(out_freq) if out_freq else freq
     resample = target_freq != freq
     if not (want_mp3 or normalize or fade_ms > 0 or trim_silence or resample):
-        _wav_forras(path)
+        # ATOMIKUSAN a feldolgozás nélküli WAV-nál is: enélkül egy megszakadt
+        # írás (lemez megtelt, áramszünet) a MEGLÉVŐ fájlt csonkára cserélte.
+        part = mediaexport.part_path(path)
+        try:
+            _wav_forras(part)
+            ok, indok = mediaexport.verify_audio(part)
+            if not ok:
+                raise RuntimeError(f"A mentett hang nem használható: {indok}. "
+                                   "A korábbi fájl érintetlen maradt.")
+            mediaexport.commit(part, path)
+        except BaseException:
+            mediaexport.cleanup(part)
+            raise
         return path
 
     import uuid as _uuid
