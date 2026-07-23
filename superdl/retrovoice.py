@@ -46,6 +46,15 @@ class RetroPreset:
     elohangsuly: float = 0.0   # elő-hangsúlyozás (0..0.9) – „harapós" felsők
     elesseg_hz: int = 0        # a jelenlét-csúcs helye (Hz)
     elesseg_db: float = 0.0    # a jelenlét-csúcs mértéke (dB)
+    # VOKÓDER: a gerjesztés lecserélése saját impulzussorozatra. EZ adja a
+    # valódi „chip-hangot" – enélkül az alapmotor karaktere átüt.
+    vokoderes: bool = False
+    savok: int = 12            # csatornák száma (kevesebb = gépiesebb)
+    keret_ms: int = 24         # keret-hossz (nagyobb = darabosabb)
+    alaphang: float = 118.0    # a zúgó impulzussorozat alapfrekvenciája (Hz)
+    szint_kvantalas: bool = True
+    szint_lepcso: int = 12     # sávszint-lépcsők (kevesebb = darabosabb)
+    zaj_hatar_hz: int = 2600   # e felett ZAJ gerjeszt (sziszegők)
 
 
 # A választható karakterek. Az elsőt tekintjük alapértelmezettnek.
@@ -78,6 +87,31 @@ PRESETS: tuple[RetroPreset, ...] = (
                 bitek=10, tartas=1,
                 sebesseg=155, hangmagassag=55, hangkozok=25,
                 elohangsuly=0.66, elesseg_hz=3500, elesseg_db=9.5),
+    # ===== VOKÓDERES karakterek: itt a GERJESZTÉS is a mienk =====
+    # Ez már nem „megszűrt eSpeak", hanem újraszintetizált beszéd: a
+    # burkológörbéket megtartjuk, a hangforrást saját impulzussorozatra
+    # cseréljük. Ettől lesz igazi 80-as évekbeli beszélő gép hangja.
+    RetroPreset("chip", "BESZÉLŐ CHIP (igazi retró, ajánlott)",
+                variant="klatt2", freq=11025, also_hz=200, felso_hz=4600,
+                bitek=8, tartas=1,
+                sebesseg=145, hangmagassag=45, hangkozok=15,
+                elohangsuly=0.30, elesseg_hz=3100, elesseg_db=5.0,
+                vokoderes=True, savok=14, keret_ms=22, alaphang=118.0,
+                szint_lepcso=14, zaj_hatar_hz=2600),
+    RetroPreset("chip_darabos", "BESZÉLŐ CHIP – darabosabb, gépiesebb",
+                variant="klatt2", freq=11025, also_hz=200, felso_hz=4600,
+                bitek=7, tartas=1,
+                sebesseg=140, hangmagassag=45, hangkozok=10,
+                elohangsuly=0.34, elesseg_hz=3200, elesseg_db=6.0,
+                vokoderes=True, savok=10, keret_ms=32, alaphang=112.0,
+                szint_lepcso=7, zaj_hatar_hz=2800),
+    RetroPreset("chip_melv", "BESZÉLŐ CHIP – mély, öblös gép",
+                variant="klatt3", freq=11025, also_hz=180, felso_hz=4200,
+                bitek=8, tartas=1,
+                sebesseg=132, hangmagassag=30, hangkozok=10,
+                elohangsuly=0.26, elesseg_hz=2700, elesseg_db=4.5,
+                vokoderes=True, savok=12, keret_ms=28, alaphang=88.0,
+                szint_lepcso=10, zaj_hatar_hz=2600),
     # Az eredeti, TOMPÁBB 8 kHz-es változat – összehasonlításhoz megmarad
     RetroPreset("brailab_tompa", "Retró beszélő gép – tompa (a korábbi)",
                 variant="klatt2", freq=8000, also_hz=300, felso_hz=3400,
@@ -218,6 +252,107 @@ def _minta_tartas(x, n: int):
     return y
 
 
+def _impulzus_sor(n: int, fs: int, f0: float):
+    """Szabályos IMPULZUSSOROZAT – ez a korabeli beszélő chipek gerjesztése.
+    Nem emberi hangszalag: egy zúgó, tökéletesen periodikus jel. Ettől lesz a
+    hang félreismerhetetlenül „gépi"."""
+    import numpy as np
+    if n <= 0 or f0 <= 0:
+        return np.zeros(max(0, n))
+    fazis = np.arange(n) * (f0 / fs)
+    egesz = np.floor(fazis).astype(np.int64)
+    x = np.zeros(n)
+    valt = np.empty(n, dtype=bool)
+    valt[0] = True
+    valt[1:] = egesz[1:] != egesz[:-1]
+    x[valt] = 1.0
+    return x - x.mean()          # egyenáram-mentesítés
+
+
+def _sav_hatarok(savok: int, also: float, felso: float):
+    """Logaritmikusan elosztott sávhatárok (a hallás így érzékel)."""
+    import numpy as np
+    return np.geomspace(max(60.0, also), felso, savok + 1)
+
+
+def vokoder(x, fs: int, p: RetroPreset):
+    """CSATORNA-VOKÓDER: a beszéd BURKOLÓGÖRBÉIT tartjuk meg, a gerjesztést
+    SAJÁT impulzussorozatra cseréljük.
+
+    EZ a lényegi különbség: az utófeldolgozás (szűrés, kvantálás) nem tünteti
+    el az alapmotor karakterét, mert a gerjesztés végig az övé marad. Itt
+    viszont a hangszalag-jelet ELDOBJUK, és egy nyers, periodikus
+    impulzussorozattal helyettesítjük – pontosan úgy, ahogy a 80-as évek
+    beszélő chipjei csinálták. A sávonkénti szinteket DURVÁN kvantáljuk, és
+    keretenként LÉPCSŐSEN tartjuk → ettől lesz „darabos"."""
+    import numpy as np
+    x = np.asarray(x, dtype=np.float64)
+    if x.size < 64:
+        return x
+
+    # keretméret a kért keret-hosszból (2 hatványa, hogy az FFT gyors legyen)
+    n_kert = max(64, int(fs * p.keret_ms / 1000.0))
+    N = 1 << int(np.ceil(np.log2(n_kert)))
+    hop = N // 2
+    ablak = np.hanning(N + 1)[:N]
+
+    # a gerjesztés: zöngés impulzussorozat + zöngétlen zaj (a sziszegőkhöz)
+    zonges = _impulzus_sor(x.size + N, fs, p.alaphang)
+    rng = np.random.default_rng(12345)
+    zaj = rng.standard_normal(x.size + N)
+
+    frekv = np.fft.rfftfreq(N, 1.0 / fs)
+    hatarok = _sav_hatarok(p.savok, p.also_hz or 120, min(p.felso_hz or fs / 2,
+                                                          fs / 2 - 1))
+    # melyik FFT-rekesz melyik sávba tartozik
+    sav_idx = [np.where((frekv >= hatarok[i]) & (frekv < hatarok[i + 1]))[0]
+               for i in range(p.savok)]
+
+    ki = np.zeros(x.size + N)
+    sulyok = np.zeros(x.size + N)
+    lepcsok = max(2, int(p.szint_lepcso))
+
+    for kezd in range(0, x.size, hop):
+        keret = np.zeros(N)
+        db = min(N, x.size - kezd)
+        keret[:db] = x[kezd:kezd + db]
+        X = np.fft.rfft(keret * ablak)
+
+        gerj = np.zeros(N)
+        gerj_z = np.zeros(N)
+        gerj[:N] = zonges[kezd:kezd + N]
+        gerj_z[:N] = zaj[kezd:kezd + N]
+        E = np.fft.rfft(gerj * ablak)
+        Ez = np.fft.rfft(gerj_z * ablak)
+
+        Y = np.zeros_like(X)
+        for i, idx in enumerate(sav_idx):
+            if idx.size == 0:
+                continue
+            # a sáv SZINTJE a beszédben
+            szint = float(np.sqrt(np.mean(np.abs(X[idx]) ** 2)))
+            # DURVA kvantálás → lépcsős, „darabos" átmenetek
+            if p.szint_kvantalas:
+                szint = round(szint * lepcsok) / lepcsok
+            if szint <= 0:
+                continue
+            # a felső sávokat ZAJ gerjeszti (sziszegők), az alsókat impulzus
+            forras = Ez if hatarok[i] >= p.zaj_hatar_hz else E
+            e = float(np.sqrt(np.mean(np.abs(forras[idx]) ** 2))) or 1e-9
+            Y[idx] = forras[idx] * (szint / e)
+
+        y = np.fft.irfft(Y, n=N) * ablak
+        ki[kezd:kezd + N] += y
+        sulyok[kezd:kezd + N] += ablak ** 2
+
+    sulyok[sulyok < 1e-6] = 1.0
+    ki = (ki / sulyok)[:x.size]
+    csucs = float(np.max(np.abs(ki))) if ki.size else 0.0
+    if csucs > 0:
+        ki = ki / csucs
+    return ki
+
+
 def retrofy(pcm_f, fs_be: int, p: RetroPreset):
     """A nyers hangból RETRÓ hang. Bemenet/kimenet: float tömb (-1..1).
     Visszaad: (feldolgozott, kimeneti_mintavétel)."""
@@ -230,6 +365,11 @@ def retrofy(pcm_f, fs_be: int, p: RetroPreset):
         x = _lowpass(x, fs_be, min(p.felso_hz, fs_be / 2 - 200))
     # 2) korhű mintavételre alakítás
     x = _resample(x, fs_be, p.freq)
+    # 2b) VOKÓDER: a gerjesztés lecserélése saját impulzussorozatra – ettől
+    #     szűnik meg az alapmotor felismerhető karaktere, és lesz igazi
+    #     „beszélő chip" hangzás
+    if p.vokoderes:
+        x = vokoder(x, p.freq, p)
     # 3) mély/dobozos rész levágása (a korabeli hangszórók sem adták vissza)
     if p.also_hz:
         x = _highpass(x, p.freq, p.also_hz)

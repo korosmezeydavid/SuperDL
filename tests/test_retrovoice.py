@@ -248,3 +248,105 @@ def test_a_kedvenc_karakterek_megvannak():
     """A fejlesztő ezt a hármat választotta ki – ne tűnjenek el."""
     for kulcs in ("brailab", "terminal", "urhajo"):
         assert kulcs in RV.PRESET_MAP, f"eltűnt a kiválasztott karakter: {kulcs}"
+
+
+# ---- VOKÓDER: a GERJESZTÉS lecserélése (az igazi retró hatás) ------------
+
+def _mert_alaphang(x, fs):
+    """A jel alapfrekvenciája autokorrelációval, zöngés kereteken."""
+    N = 2048
+    ered = []
+    ossz_rms = np.sqrt(np.mean(x ** 2)) or 1e-9
+    for i in range(0, max(0, len(x) - N), N // 2):
+        s = x[i:i + N]
+        if np.sqrt(np.mean(s ** 2)) < 0.10 * ossz_rms:
+            continue
+        s = s - s.mean()
+        ac = np.correlate(s, s, "full")[N - 1:]
+        lo, hi = int(fs / 300), int(fs / 60)
+        if hi >= len(ac) or lo >= hi:
+            continue
+        p = lo + int(np.argmax(ac[lo:hi]))
+        if ac[p] > 0.3 * ac[0]:
+            ered.append(fs / p)
+    return (float(np.median(ered)), float(np.std(ered))) if ered else (0.0, 0.0)
+
+
+def test_az_impulzussor_periodikus_es_egyenaram_mentes():
+    x = RV._impulzus_sor(11025, 11025, 100.0)
+    assert x.size == 11025
+    assert abs(float(np.mean(x))) < 1e-9, "van egyenáram-összetevő"
+    m, szoras = _mert_alaphang(x, 11025)
+    assert abs(m - 100.0) < 3.0, f"nem a kért alapfrekvencián zúg: {m}"
+
+
+def test_az_impulzussor_nulla_frekvencian_nem_dob():
+    assert RV._impulzus_sor(100, 11025, 0.0).size == 100
+
+
+def test_a_vokoder_ROGZITETT_hangmagassagot_ad():
+    """EZ A LÉNYEG: a vokóder ELDOBJA az alapmotor hangszalag-jelét, és saját,
+    tökéletesen periodikus impulzussorozattal helyettesíti. Enélkül a hang
+    „megszűrt eSpeak" marad, nem beszélő chip."""
+    p = RV.preset("chip")
+    assert p.vokoderes is True
+    fs = p.freq
+    # zöngés-szerű próbajel VÁLTOZÓ hangmagassággal
+    t = np.arange(int(fs * 1.2)) / fs
+    f0 = 150 + 60 * np.sin(2 * np.pi * 0.8 * t)      # 90..210 Hz között ingadozik
+    be = np.sin(2 * np.pi * np.cumsum(f0) / fs) * 0.6
+    be += 0.25 * np.sin(2 * np.pi * np.cumsum(f0 * 3) / fs)
+    ki = RV.vokoder(be, fs, p)
+    m_be, sz_be = _mert_alaphang(be, fs)
+    m_ki, sz_ki = _mert_alaphang(ki, fs)
+    assert sz_be > 5.0, "a próbajel nem ingadozott (rossz a teszt)"
+    assert sz_ki < 3.0, f"a kimenet MÉG mindig ingadozik (±{sz_ki:.1f})"
+    assert abs(m_ki - p.alaphang) < 6.0, \
+        f"nem a saját alapfrekvencián szól: {m_ki:.1f} != {p.alaphang}"
+
+
+def test_a_vokoder_megtartja_a_burkologorbet():
+    """A hangforrás cserélődik, de a HANGERŐ-menet (és így a beszéd
+    érthetősége) megmarad."""
+    p = RV.preset("chip")
+    fs = p.freq
+    t = np.arange(int(fs * 1.0)) / fs
+    burok = np.where((t % 0.25) < 0.12, 1.0, 0.05)     # szaggatott „szótagok"
+    be = np.sin(2 * np.pi * 140 * t) * burok
+    ki = RV.vokoder(be, fs, p)
+    n = min(len(be), len(ki)) // 512 * 512
+    e_be = np.abs(be[:n]).reshape(-1, 512).mean(axis=1)
+    e_ki = np.abs(ki[:n]).reshape(-1, 512).mean(axis=1)
+    korr = float(np.corrcoef(e_be, e_ki)[0, 1])
+    assert korr > 0.6, f"a burkológörbe elveszett (korreláció {korr:.2f})"
+
+
+def test_a_vokoder_rovid_jelre_nem_dob():
+    p = RV.preset("chip")
+    assert RV.vokoder(np.zeros(10), p.freq, p).size == 10
+
+
+def test_a_kevesebb_sav_es_lepcso_darabosabb():
+    """A „darabos" karakter kevesebb csatornából és durvább szint-lépcsőből jön."""
+    finom, durva = RV.preset("chip"), RV.preset("chip_darabos")
+    assert durva.savok < finom.savok
+    assert durva.szint_lepcso < finom.szint_lepcso
+    assert durva.keret_ms > finom.keret_ms
+
+
+def test_a_vokoderes_karakterek_leteznek():
+    vok = [p.kulcs for p in RV.PRESETS if p.vokoderes]
+    assert len(vok) >= 3, "kevés vokóderes karakter"
+    assert "chip" in vok
+
+
+@pytest.mark.skipif(not RV.available(), reason="nincs eSpeak ezen a gépen")
+def test_a_vokoderes_szintezis_vegigfut(tmp_path):
+    out = str(tmp_path / "chip.wav")
+    RV.synth("Ez egy próba mondat.", out, "chip")
+    with wave.open(out, "rb") as w:
+        a = np.frombuffer(w.readframes(w.getnframes()), dtype="<i2").astype(float)
+        fs = w.getframerate()
+    assert a.size > 1000
+    _, szoras = _mert_alaphang(a, fs)
+    assert szoras < 4.0, "a kész hang hangmagassága ingadozik (nem gépi)"
