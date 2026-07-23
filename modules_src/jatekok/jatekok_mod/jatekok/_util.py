@@ -34,6 +34,11 @@ class Ctx:
     def vege(self, szoveg=""):
         return ("vege", str(szoveg))
 
+    def hang(self, hangok):
+        """Rövid hangok lejátszása: [(frekvencia_Hz, hossz_ms), …]. A felület
+        szinuszként megszólaltatja; a teszt-hajtó egyszerűen átugorja."""
+        return ("hang", list(hangok))
+
 
 # ---- bemenet-értelmezés --------------------------------------------------
 

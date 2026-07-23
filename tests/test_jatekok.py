@@ -462,12 +462,167 @@ def test_parver_tiz_kor():
     _fut("parver", lambda k, ki: "")
 
 
+# =========================================================================
+#  Térbeli játékok: Lóugrás verseny, Labirintus
+# =========================================================================
+class _HorstepBot:
+    N = 7
+
+    def __init__(self):
+        self.cur = None
+        self.cand = []
+        self.i = 0
+
+    def __call__(self, k, ki):
+        import re
+        kl = k.lower()
+        if "táblaméret" in kl:
+            return "1"                     # 7×7
+        m = re.search(r"a\(z\) ([a-g])(\d+) mez", k, re.I)
+        if m:
+            cur = (m.group(1), int(m.group(2)))
+            if cur != self.cur:
+                self.cur = cur
+                y = ord(cur[0]) - ord("a")
+                x = cur[1] - 1
+                self.cand = []
+                for dx, dy in ((1, 2), (2, 1), (-1, 2), (-2, 1),
+                               (1, -2), (2, -1), (-1, -2), (-2, -1)):
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < self.N and 0 <= ny < self.N:
+                        self.cand.append(f"{chr(ord('a') + ny)}{nx + 1}")
+                self.i = 0
+            else:
+                self.i = (self.i + 1) % max(1, len(self.cand))
+            return self.cand[self.i] if self.cand else "a1"
+        return ""
+
+
+def test_horstep_lejatszhato():
+    ki = _fut("horstep", _HorstepBot())
+    assert any(("NYERTÉL" in p) or ("gép nyert" in p) for _, p in ki)
+
+
+class _LabirintBot:
+    """Jobbkéz-szabályos falkövető: perfekt labirintusban garantáltan kijut."""
+
+    def __init__(self):
+        self.facing = (0, 1)
+        self.order = None
+        self.oi = 0
+        self._cand = (0, 1)
+
+    @staticmethod
+    def _cw(d):
+        return {(0, -1): (1, 0), (1, 0): (0, 1),
+                (0, 1): (-1, 0), (-1, 0): (0, -1)}[d]
+
+    @staticmethod
+    def _ccw(d):
+        return {(0, -1): (-1, 0), (-1, 0): (0, 1),
+                (0, 1): (1, 0), (1, 0): (0, -1)}[d]
+
+    @staticmethod
+    def _name(d):
+        return {(0, -1): "fel", (1, 0): "jobb",
+                (0, 1): "le", (-1, 0): "bal"}[d]
+
+    def __call__(self, k, ki):
+        res = ""
+        for t, p in reversed(ki[:-1]):
+            if t == "mond":
+                res = p
+                break
+        sikeres = ("Léptél" in res) or ("Kijutottál" in res) or ("LABIRINTUS" in res)
+        if sikeres:
+            if "LABIRINTUS" not in res:
+                self.facing = self._cand
+            self.order = None
+        if self.order is None:
+            r = self._cw(self.facing)
+            self.order = [r, self.facing, self._ccw(self.facing),
+                          self._cw(self._cw(self.facing))]
+            self.oi = 0
+        else:
+            self.oi = min(self.oi + 1, 3)
+        self._cand = self.order[self.oi]
+        return self._name(self._cand)
+
+
+def test_labirint_megoldhato():
+    ki = _fut("labirint", _LabirintBot())
+    assert any("Kijutottál" in p for _, p in ki)
+
+
+# =========================================================================
+#  Kaland játékok
+# =========================================================================
+def test_csata_veget_er():
+    def bot(k, ki):
+        return "nem" if "új csata" in k.lower() else ""
+    ki = _fut("csata", bot)
+    assert any(("Győzelem" in p) or ("elfoglalták" in p) or ("döntetlen" in p)
+               for _, p in ki)
+
+
+def test_harcos_vegigjatszhato():
+    def bot(k, ki):
+        return "nem" if "újrajátszod" in k.lower() else "1"
+    ki = _fut("harcos", bot)
+    assert any("HŐS lettél" in p for _, p in ki)
+
+
+def test_allah_veget_er():
+    def bot(k, ki):
+        kl = k.lower()
+        if "emelet" in kl:
+            return "1"
+        if "szoba" in kl:
+            return "1"
+        if "új játék" in kl:
+            return "nem"
+        return ""
+    ki = _fut("allah", bot)
+    assert any(("Megtaláltad" in p) or ("Lejárt az idő" in p) for _, p in ki)
+
+
+class _ZongoraBot:
+    def __init__(self):
+        self.n = 0
+
+    def __call__(self, k, ki):
+        if "milyen hangot" in k.lower():
+            self.n += 1
+            return {1: "c d e", 2: "dallam"}.get(self.n, "kilép")
+        return ""
+
+
+def test_zongora_jatszik_hangot():
+    ki = _fut("zongora", _ZongoraBot())
+    assert any(t == "hang" for t, _ in ki), "nem szólalt meg hang"
+
+
+def test_szindbad_veget_er():
+    def bot(k, ki):
+        kl = k.lower()
+        if "neved" in kl:
+            return "Ali"
+        if "melyik hölgyet" in kl:
+            return "3"
+        if "párbaj" in kl:
+            return ""
+        if "új kaland" in kl:
+            return "nem"
+        return ""
+    _fut("szindbad", bot)
+
+
 # ---- jogtisztaság: a játékkód nem hív idegen beszédmotort/alfolyamatot ----
 
 def test_jatekok_nem_hasznalnak_idegen_fuggoseget():
     import ast
     import inspect
-    for modnev in ("kartya", "logika", "kviz", "_util"):
+    for modnev in ("kartya", "logika", "kviz", "kaland", "terkep", "_util"):
         mod = importlib.import_module(f"{BASE}.jatekok.{modnev}")
         fa = ast.parse(inspect.getsource(mod))
         for csp in ast.walk(fa):

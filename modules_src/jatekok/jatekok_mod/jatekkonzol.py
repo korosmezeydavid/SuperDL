@@ -113,6 +113,7 @@ class JatekKonzol(wx.Dialog):
         self._gen = None
         self._var = False               # épp bemenetre várunk-e
         self._hang = RetroHang(gep_getter)
+        self._tone_player = None
 
         self._build()
         self.Bind(wx.EVT_CLOSE, self._on_close)
@@ -192,6 +193,9 @@ class JatekKonzol(wx.Dialog):
             if typ == "mond":
                 self._ki(payload)
                 continue
+            if typ == "hang":
+                self._hang_tone(payload)
+                continue
             if typ == "kerdez":
                 self._ki(payload)
                 self._var_bemenet(True)
@@ -236,6 +240,42 @@ class JatekKonzol(wx.Dialog):
                     sv.speak(szoveg, force=True)
                 except Exception:
                     pass
+
+    def _hang_tone(self, hangok):
+        """Rövid szinuszhangok lejátszása (Zongora). WAV-ba szintetizálja és a
+        beszédtől külön lejátszón szólaltatja meg."""
+        if self._closing or not hangok:
+            return
+        try:
+            import os
+            import tempfile
+            import uuid
+            import wave
+            import numpy as np
+            fs = 22050
+            reszek = []
+            for freq, ms in hangok:
+                n = max(1, int(fs * ms / 1000.0))
+                t = np.arange(n) / fs
+                jel = 0.35 * np.sin(2 * np.pi * float(freq) * t)
+                burk = np.minimum(1.0, np.minimum(np.arange(n), n - np.arange(n))
+                                  / (0.02 * fs + 1))    # kattanás-mentes
+                reszek.append(jel * burk)
+                reszek.append(np.zeros(int(fs * 0.03)))
+            pcm = (np.clip(np.concatenate(reszek), -1, 1) * 32767).astype("<i2")
+            out = os.path.join(tempfile.gettempdir(),
+                               f"superdl_zongora_{uuid.uuid4().hex[:8]}.wav")
+            with wave.open(out, "wb") as w:
+                w.setnchannels(1)
+                w.setsampwidth(2)
+                w.setframerate(fs)
+                w.writeframes(pcm.tobytes())
+            if self._tone_player is None:
+                from superdl.audioengine import Player
+                self._tone_player = Player()
+            self._tone_player.play(out, "")
+        except Exception:
+            pass
 
     def _var_bemenet(self, van):
         self._var = van
@@ -282,6 +322,11 @@ class JatekKonzol(wx.Dialog):
             self._hang.leallit()
         except Exception:
             pass
+        try:
+            if self._tone_player:
+                self._tone_player.stop()
+        except Exception:
+            pass
         e.Skip()
 
 
@@ -296,6 +341,9 @@ class _KonzolCtx:
 
     def vege(self, szoveg=""):
         return ("vege", str(szoveg))
+
+    def hang(self, hangok):
+        return ("hang", list(hangok))
 
 
 # ---- a felület által hívott indítók -------------------------------------
