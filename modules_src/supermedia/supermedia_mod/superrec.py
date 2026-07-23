@@ -64,12 +64,27 @@ def save_pcm(path: str, pcm: bytes, freq: int, channels: int, *,
         ff_dir = ffmpeg_mod.ensure_ffmpeg(progress)
         ff = ffmpeg_mod.find_ffmpeg() if ff_dir else None
     if not ff:
-        if not want_mp3:
-            # ffmpeg nélkül nincs újramintavételezés – a forrás mintavételével írjuk
-            write_wav_bytes(path, pcm, freq, channels)
-            tmp.unlink(missing_ok=True)
-            return path
         tmp.unlink(missing_ok=True)
+        if not want_mp3:
+            # NINCS CSENDES DEGRADÁLÁS: idáig csak akkor jutunk, ha KÉRTEK
+            # utófeldolgozást (a „semmit sem kértek + WAV" ág fentebb visszatért).
+            # Korábban a nyers hangot írtuk ki és SIKERT jelentettünk, így a
+            # felhasználó azt hitte, normalizált/csendvágott/48 kHz-es fájlt
+            # kapott – pedig egyik kérése sem teljesült. [Herman Tibi REC-P0-03]
+            kert = []
+            if normalize:
+                kert.append("normalizálás")
+            if fade_ms > 0:
+                kert.append("fel-/lehalkítás")
+            if trim_silence:
+                kert.append("csend-vágás")
+            if resample:
+                kert.append(f"átalakítás {target_freq} Hz-re")
+            raise RuntimeError(
+                "Az ffmpeg nem érhető el, ezért a kért feldolgozás ("
+                + ", ".join(kert) + ") NEM végezhető el. A hang NINCS elveszve: "
+                "kapcsold ki a feldolgozást, és mentsd nyers WAV-ként, vagy "
+                "engedd letölteni az ffmpeg-et.")
         raise RuntimeError("Az ffmpeg nem érhető el a feldolgozáshoz/MP3-hoz.")
 
     dur = len(pcm) / (freq * channels * 2) if (freq and channels) else 0.0

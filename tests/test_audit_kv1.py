@@ -125,3 +125,44 @@ def test_nulla_hangero_nem_valtozik_07_re():
     src = p.read_text(encoding="utf-8")
     assert "player.volume or 0.7" not in src, \
         "a 0.0 hangerőt még mindig 0.7-re cseréli"
+
+
+# ---- REC-P0-03: nincs CSENDES degradálás ffmpeg hiányában ------------------
+
+def test_ffmpeg_hianyaban_nincs_csendes_degradalas(tmp_path, monkeypatch):
+    """Ha feldolgozást kértek, de nincs ffmpeg, a mentés HIBÁVAL álljon meg –
+    ne írjon nyers hangot 'siker' gyanánt."""
+    import sys
+    sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent.parent
+                          / "modules_src" / "supermedia"))
+    from supermedia_mod import superrec
+    from superdl import ffmpeg as ffmpeg_mod
+
+    monkeypatch.setattr(ffmpeg_mod, "find_ffmpeg", lambda: None)
+    monkeypatch.setattr(ffmpeg_mod, "ensure_ffmpeg", lambda *a, **k: None)
+
+    pcm = b"\x00\x01" * 8000
+    out = str(tmp_path / "teszt.wav")
+    try:
+        superrec.save_pcm(out, pcm, 44100, 2, normalize=True)
+    except RuntimeError as e:
+        assert "normalizálás" in str(e)
+        return
+    raise AssertionError("csendes degradálás: hiba nélkül tért vissza")
+
+
+def test_feldolgozas_nelkuli_wav_tovabbra_is_mehet(tmp_path, monkeypatch):
+    """Ha SEMMIT nem kértek, ffmpeg nélkül is menthető a nyers WAV."""
+    import sys
+    sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent.parent
+                          / "modules_src" / "supermedia"))
+    from supermedia_mod import superrec
+    from superdl import ffmpeg as ffmpeg_mod
+
+    monkeypatch.setattr(ffmpeg_mod, "find_ffmpeg", lambda: None)
+    monkeypatch.setattr(ffmpeg_mod, "ensure_ffmpeg", lambda *a, **k: None)
+
+    pcm = b"\x00\x01" * 8000
+    out = str(tmp_path / "nyers.wav")
+    assert superrec.save_pcm(out, pcm, 44100, 2) == out
+    assert __import__("os").path.getsize(out) > 1000
