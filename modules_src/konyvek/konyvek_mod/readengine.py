@@ -58,7 +58,9 @@ class ReadEngine:
         self._stop = threading.Event()
         self._skipped = False
         self._thread = None
-        self._pf: dict[int, str] = {}     # előre szintetizált darabok
+        self._pf: dict[tuple, str] = {}   # előre szintetizált darabok
+        self._gen = 0                     # MUNKAMENET-generáció [READ-P0-01]
+        self._last_prefetch_error = ""    # a néma elnyelés helyett
         self._pf_lock = threading.Lock()
         # TTS-paraméterek
         self.engine_key = "edge"
@@ -119,9 +121,16 @@ class ReadEngine:
         self._idx = self._index_for_char(from_char)
         with self._pf_lock:
             self._pf.clear()
-        self._stop = threading.Event()
+        # ÚJ MUNKAMENET: generáció + SAJÁT stop-esemény. Innentől a korábbi
+        # szálak eredménye eldobandó, akkor is, ha később érkeznek meg.
+        self._gen += 1
+        gen = self._gen
+        self._purge_old_generations(gen)
+        stop_event = threading.Event()
+        self._stop = stop_event
         self._skipped = False
-        self._thread = threading.Thread(target=self._worker, daemon=True)
+        self._thread = threading.Thread(target=self._worker,
+                                        args=(gen, stop_event), daemon=True)
         self._thread.start()
 
     def toggle_pause(self) -> bool:
@@ -143,6 +152,9 @@ class ReadEngine:
         self.player.stop()           # az aktuális darab leáll, a worker újraindul
 
     def stop(self) -> None:
+        # A generáció léptetése AZONNAL elavulttá tesz minden futó szálat,
+        # akkor is, ha a join időtúllépéssel tér vissza. [READ-P0-01]
+        self._gen += 1
         self._stop.set()
         self.player.stop()
         t = self._thread
@@ -152,6 +164,12 @@ class ReadEngine:
 
     # ---- belső --------------------------------------------------------
 
+    def _emit_gen(self, gen: int, **kw) -> None:
+        """Állapot kiadása CSAK az AKTUÁLIS munkamenetből – így egy régi,
+        leváltott szál nem küld hamis állapotot az új könyvre."""
+        if gen == self._gen:
+            self._emit(**kw)
+
     def _emit(self, **kw) -> None:
         if self.on_state:
             try:
@@ -159,63 +177,89 @@ class ReadEngine:
             except Exception:
                 pass
 
-    def _synth(self, idx: int) -> str:
-        base = str(READ_DIR / f"read_{idx % 4}")
+    def _purge_old_generations(self, gen: int) -> None:
+        """A KORÁBBI munkamenetek hangdarabjainak törlése. Generációnként külön
+        fájlnevet használunk (az ütközés ellen), ezért a régieket takarítani
+        kell – különben a könyvrészletek felhalmozódnának a lemezen."""
+        try:
+            elo = f"read_{gen}_"
+            for f in READ_DIR.glob("read_*"):
+                if not f.name.startswith(elo):
+                    try:
+                        f.unlink()
+                    except OSError:
+                        pass          # épp szól belőle: majd a következő körben
+        except OSError:
+            pass
+
+    def _synth(self, idx: int, gen: int) -> str:
+        # A fájlnév a MUNKAMENETHEZ kötött: a régi fix `read_{idx%4}` gyűrűt két
+        # olvasóablak (vagy egy régi előregyártó szál) egyszerre írhatta, így
+        # RÉGI hang kerülhetett az új mondathoz. [Herman Tibi READ-P0-02]
+        base = str(READ_DIR / f"read_{gen}_{idx % 4}")
         eng = tts.ENGINES[self.engine_key]
         return eng.synth(self._chunks[idx], self.voice_id, base,
                          self.pitch, self.rate, self.api_key)
 
-    def _begin_prefetch(self, idx: int) -> None:
-        if idx >= len(self._chunks):
+    def _begin_prefetch(self, idx: int, gen: int) -> None:
+        if idx >= len(self._chunks) or gen != self._gen:
             return
 
         def work():
             _co_init()
             try:
-                path = self._synth(idx)
+                path = self._synth(idx, gen)
                 with self._pf_lock:
-                    self._pf[idx] = path
-            except Exception:
-                pass
+                    if gen == self._gen:        # elavult eredményt eldobunk
+                        self._pf[(gen, idx)] = path
+            except Exception as e:
+                # a hiba NEM tűnhet el némán: ha az előregyártás bukik, a fő
+                # szál újra megpróbálja, de a diagnózishoz tudni kell róla
+                self._last_prefetch_error = f"{type(e).__name__}: {e}"
             finally:
                 _co_uninit()
         threading.Thread(target=work, daemon=True).start()
 
-    def _take_prefetch(self, idx: int):
+    def _take_prefetch(self, idx: int, gen: int):
         with self._pf_lock:
-            return self._pf.pop(idx, None)
+            return self._pf.pop((gen, idx), None)
 
-    def _worker(self) -> None:
+    def _worker(self, gen: int, stop_event) -> None:
         _co_init()      # a SAPI (COM) háttérszálon ezt igényli
         try:
-            self._run()
+            self._run(gen, stop_event)
         finally:
             _co_uninit()
 
-    def _run(self) -> None:
-        while not self._stop.is_set():
+    def _run(self, gen: int, stop_event) -> None:
+        # FONTOS: KIZÁRÓLAG a saját `stop_event`-jét és `gen`-jét figyeli, nem a
+        # közös self._stop-ot. A régi kód a lecserélhető közös eseményt olvasta,
+        # ezért egy elhúzódó (a 2 mp-es várakozást túlélő) TTS-szál az ÚJ könyv
+        # állapotán dolgozott tovább: keveredő mondatok, rossz könyvjelző.
+        # [Herman Tibi READ-P0-01]
+        while not stop_event.is_set() and gen == self._gen:
             idx = self._idx
             if idx >= len(self._chunks):
-                self._emit(done=True)
+                self._emit_gen(gen, done=True)
                 return
             pct = round(self._offsets[idx] / self._total * 100)
-            self._emit(idx=idx, total=len(self._chunks), pct=pct,
-                       text=self._chunks[idx], playing=True)
+            self._emit_gen(gen, idx=idx, total=len(self._chunks), pct=pct,
+                           text=self._chunks[idx], playing=True)
             try:
-                path = self._take_prefetch(idx) or self._synth(idx)
+                path = self._take_prefetch(idx, gen) or self._synth(idx, gen)
             except Exception as e:
-                self._emit(error=str(e))
+                self._emit_gen(gen, error=str(e))
                 return
-            if self._stop.is_set():
+            if stop_event.is_set() or gen != self._gen:
                 return
-            self._begin_prefetch(idx + 1)
+            self._begin_prefetch(idx + 1, gen)
             self.player.play(path, "")
             # várunk, amíg a darab végigszól (a szünet is „aktív")
             while self.player.is_active():
-                if self._stop.is_set():
+                if stop_event.is_set() or gen != self._gen:
                     return
                 time.sleep(0.05)
-            if self._stop.is_set():
+            if stop_event.is_set() or gen != self._gen:
                 return
             if self._skipped:
                 self._skipped = False     # a skip már beállította az _idx-et
