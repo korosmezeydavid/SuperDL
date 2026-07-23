@@ -1,12 +1,12 @@
 {
   "id": "supermedia",
   "name": "Super Media",
-  "version": "1.2.4",
+  "version": "1.3.0",
   "entry": "supermedia_mod",
   "category": "Média",
   "description": "Hang-műsorszóró stúdió, felvevő, szerkesztő és multistream egy csomagban: Super M (rádió-stúdió + médialejátszó, BASS-motor), Super Recorder (akadálymentes felvevő + fülre-szerkesztő: markeres vágás, 22 effekt, vokóder/harmonizer/ének-eltávolítás/2-sáv, undo/redo), VALÓS IDEJŰ VOICE CHANGER (élő mikrofon: hangmagasság + DX8-effektek monitorozva) és Super Stream (élő multistream). A BASS/bass_fx/numpy-runtime a Core-ból jön (core 3.28.5+ ajánlott).",
   "min_core_api": "1.0",
-  "min_core_version": "3.30.0",
+  "min_core_version": "4.0.0",
   "requires_tools": [],
   "author": "Kőrösmezey Dávid"
 }
