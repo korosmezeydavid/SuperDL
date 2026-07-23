@@ -10,6 +10,7 @@ M=marker itt, Ctrl+Z/Ctrl+Y=visszavonás/újra.
 
 import os
 import tempfile
+import uuid
 import threading
 
 import wx
@@ -62,8 +63,12 @@ class SuperEditorFrame(wx.Frame):
         self._pos = 0.0                 # playhead (mp)
         self._busy = False
         self._closing = False           # zárás alatt a háttér-callbackek kilépnek
+        # ABLAKONKÉNT egyedi: a régi, csak PID-alapú név ugyanazon folyamat
+        # MINDEN szerkesztőablakában azonos volt → két ablak egymás lejátszási
+        # fájlját írta/törölte (rossz hang szólalt meg). [Herman Tibi EDIT-P0-05]
         self._tmp = os.path.join(tempfile.gettempdir(),
-                                 f"superedit_{os.getpid()}.wav")
+                                 f"superedit_{os.getpid()}_"
+                                 f"{uuid.uuid4().hex[:8]}.wav")
         self.player = Player()
 
         p = wx.Panel(self)

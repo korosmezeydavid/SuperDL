@@ -39,6 +39,7 @@ class PodcastFrame(wx.Frame):
         super().__init__(main, title="SuperDL – Podcastok felfedezése",
                          size=(860, 600))
         self.main = main
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
         self.results: list[P.Podcast] = []
 
         self._build()
@@ -155,6 +156,8 @@ class PodcastFrame(wx.Frame):
         threading.Thread(target=work, daemon=True).start()
 
     def _show(self, res, label):
+        if self._closing:
+            return
         self.results = res
         self.list.DeleteAllItems()
         for pod in res:
@@ -231,6 +234,8 @@ class PodcastFrame(wx.Frame):
         threading.Thread(target=work, daemon=True).start()
 
     def _show_episodes(self, name, episodes):
+        if self._closing:
+            return
         if not episodes:
             self.SetStatusText(f"Nem találtam epizódot: {name}.")
             return
@@ -260,6 +265,7 @@ class PodcastFrame(wx.Frame):
             self.SetStatusText(f"RSS-cím a vágólapra másolva: {pod.feed_url}")
 
     def _on_close(self, e):
+        self._closing = True
         if getattr(self.main, "_podcast_win", None) is self:
             self.main._podcast_win = None
         self.Destroy()

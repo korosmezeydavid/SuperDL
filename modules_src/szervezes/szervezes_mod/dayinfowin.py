@@ -32,6 +32,8 @@ class DayInfoDialog(wx.Dialog):
         self._compose = compose_fn          # compose(weather_or_None) -> szöveg
         self._fetch = fetch_weather_fn      # fetch(on_done) háttérben
         self._speaker = speaker
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
+        self._wgen = 0               # időjárás-kérés generációja (stale-védelem)
 
         p = wx.Panel(self)
         v = wx.BoxSizer(wx.VERTICAL)
@@ -61,6 +63,11 @@ class DayInfoDialog(wx.Dialog):
         self._refresh()
         self.text.SetFocus()
         self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
+        self.Bind(wx.EVT_CLOSE, self._on_close)
+
+    def _on_close(self, e):
+        self._closing = True     # a folyamatban lévő időjárás-válasz eldobandó
+        e.Skip()
 
     def _on_help_key(self, e):
         if e.GetKeyCode() == wx.WXK_F1:
@@ -79,10 +86,18 @@ class DayInfoDialog(wx.Dialog):
 
     def _refresh(self):
         self._set_text(self._compose(None) + "\n\n(Időjárás frissítése…)")
+        self._wgen += 1
+        gen = self._wgen
 
         def done(w):
-            if self:                      # az ablak még él
+            # A puszta `if self:` NEM bizonyítja, hogy a natív ablak még él, és
+            # generáció nélkül egy RÉGI, lassú válasz felülírhatta a frisset.
+            # [Herman Tibi INFO-P0-01, INFO-P0-02]
+            def apply():
+                if self._closing or gen != self._wgen:
+                    return
                 self._set_text(self._compose(w))
+            wx.CallAfter(apply)
         self._fetch(done)
 
     def _speak(self):

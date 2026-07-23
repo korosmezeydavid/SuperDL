@@ -40,6 +40,7 @@ class SuperRecorderFrame(wx.Frame):
         super().__init__(main, title="SuperDL – Super Recorder (felvevő)",
                          size=(680, 460))
         self.main = main
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
         self.rec: superrec.Recorder | None = None
         self._busy = False
         self._last_clip_announced = False
@@ -176,6 +177,8 @@ class SuperRecorderFrame(wx.Frame):
     # ---- felvétel-vezérlés -------------------------------------------
 
     def _announce(self, text, force=True):
+        if self._closing:
+            return
         self.SetStatusText(text)
         sv = getattr(self.main, "selfvoice", None)
         if sv:
@@ -336,6 +339,8 @@ class SuperRecorderFrame(wx.Frame):
         threading.Thread(target=work, daemon=True).start()
 
     def _save_done(self, out, err):
+        if self._closing:
+            return
         self._busy = False
         self.btn_save.Enable()
         if err:
@@ -347,6 +352,7 @@ class SuperRecorderFrame(wx.Frame):
             self._announce(f"Mentve: {os.path.basename(out)}")
 
     def _on_close(self, e):
+        self._closing = True
         try:
             self.timer.Stop()
             if self.rec:

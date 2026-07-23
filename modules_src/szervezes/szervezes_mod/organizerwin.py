@@ -54,6 +54,7 @@ class OrganizerFrame(wx.Frame):
         super().__init__(main, title="SuperDL – Naptár, teendők, jegyzetek",
                          size=(880, 620))
         self.main = main
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
         self.mgr = manager
 
         self.nb = wx.Notebook(self)
@@ -70,6 +71,8 @@ class OrganizerFrame(wx.Frame):
         self.refresh_all()
 
     def _announce(self, text):
+        if self._closing:
+            return
         self.SetStatusText(text)
 
     def _on_help_key(self, e):
@@ -587,6 +590,7 @@ class OrganizerFrame(wx.Frame):
         IcsHelpDialog(self).ShowModal()
 
     def _on_close(self, e):
+        self._closing = True
         if getattr(self.main, "_organizer_win", None) is self:
             self.main._organizer_win = None
         self.Destroy()

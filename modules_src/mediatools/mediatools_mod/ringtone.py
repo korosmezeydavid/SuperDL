@@ -9,6 +9,7 @@ NINCS fade – pontos vágás. Az .m4r valójában AAC/M4A az „ipod" muxerrel.
 import os
 import subprocess
 import tempfile
+import uuid
 from pathlib import Path
 
 from superdl import ffmpeg as ffmpeg_mod    # megosztott ffmpeg a Core-ból
@@ -56,6 +57,11 @@ def make_ringtone(src: str, out: str, start: float, length: float,
 
 
 def preview_path(fmt: str = "mp3") -> str:
-    """Egy ideiglenes fájl útvonala a részlet meghallgatásához."""
+    """Egy EGYEDI ideiglenes fájl útvonala a részlet meghallgatásához.
+
+    Korábban fix `superdl_ring_preview` név volt: két ablak vagy két gyors
+    előnézet EGYMÁS fájlját írta felül, miközben a lejátszó olvasta (rossz
+    részlet szólt, fájlzárolási hiba). [Herman Tibi RING-P0-01]"""
     ext = FORMATS.get(fmt, FORMATS["mp3"])[0]
-    return str(Path(tempfile.gettempdir()) / f"superdl_ring_preview{ext}")
+    return str(Path(tempfile.gettempdir())
+               / f"superdl_ring_preview_{os.getpid()}_{uuid.uuid4().hex[:8]}{ext}")

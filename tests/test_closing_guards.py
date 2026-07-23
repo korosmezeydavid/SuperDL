@@ -24,6 +24,14 @@ WINDOWS = [
     "radio/radio_mod/radiowin.py",
     "supermedia/supermedia_mod/supereditwin.py",
     "supermedia/supermedia_mod/supermwin.py",
+    # 2. audit (Herman Tibi, kimaradt modulok): NEWS/POD/INFO/REC/VC-P0
+    "szervezes/szervezes_mod/newswin.py",
+    "szervezes/szervezes_mod/podcastwin.py",
+    "szervezes/szervezes_mod/dayinfowin.py",
+    "szervezes/szervezes_mod/organizerwin.py",
+    "supermedia/supermedia_mod/superrecwin.py",
+    "supermedia/supermedia_mod/supervoicewin.py",
+    "supermedia/supermedia_mod/superstreamwin.py",
 ]
 
 
@@ -50,7 +58,9 @@ def test_minden_ablak_beallitja_a_closingot_zaraskor():
 
 
 def test_van_legalabb_egy_ordott_callback():
-    """Legalább egy `if self._closing:` őr legyen a callbackekben."""
+    """Legalább egy `if self._closing` őr legyen a callbackekben. (Lehet
+    kombinált is, pl. `if self._closing or gen != self._wgen:` – a generációs
+    stale-védelemmel együtt.)"""
     for rel in WINDOWS:
         src = _src(rel)
-        assert "if self._closing:" in src, f"{rel}: nincs egyetlen _closing-őr sem"
+        assert "if self._closing" in src, f"{rel}: nincs egyetlen _closing-őr sem"

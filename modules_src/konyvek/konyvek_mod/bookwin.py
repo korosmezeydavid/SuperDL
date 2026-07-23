@@ -7,6 +7,7 @@ Akadálymentes: minden vezérlő címkézett és billentyűzetről elérhető.
 
 import os
 import tempfile
+import uuid
 import threading
 from pathlib import Path
 
@@ -325,7 +326,12 @@ class BookFrame(wx.Frame):
 
         def work():
             try:
-                base = os.path.join(tempfile.gettempdir(), "sdl_voicetest")
+                # EGYEDI név: a fix „sdl_voicetest” miatt két gyors hangteszt
+                # (vagy két ablak) egymás fájlját írta felül, és a régi worker
+                # a RÉGI beállítású hangot játszotta le. [Herman Tibi AB-P1-08]
+                base = os.path.join(tempfile.gettempdir(),
+                                    f"sdl_voicetest_{os.getpid()}_"
+                                    f"{uuid.uuid4().hex[:8]}")
                 path = eng.synth(
                     "Sziasztok! Így szól ez a hang. Ezzel készül a "
                     "hangoskönyved.", v.id, base, pitch=pitch, rate=rate,

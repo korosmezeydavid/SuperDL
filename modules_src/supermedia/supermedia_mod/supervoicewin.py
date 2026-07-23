@@ -39,6 +39,7 @@ class VoiceChangerFrame(wx.Frame):
         super().__init__(main, title="SuperDL – Valós idejű voice changer",
                          size=(640, 520))
         self.main = main
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
         self.vc: VC.VoiceChanger | None = None
 
         p = wx.Panel(self)
@@ -151,6 +152,8 @@ class VoiceChangerFrame(wx.Frame):
     # ---- segéd -------------------------------------------------------
 
     def _announce(self, text):
+        if self._closing:
+            return
         self.SetStatusText(text)
         sv = getattr(self.main, "selfvoice", None)
         if sv:
@@ -238,6 +241,7 @@ class VoiceChangerFrame(wx.Frame):
             self._announce("Ez az effekt most nem alkalmazható.")
 
     def _on_close(self, e):
+        self._closing = True
         try:
             if self.vc:
                 self.vc.stop()

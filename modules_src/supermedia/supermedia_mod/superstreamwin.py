@@ -39,6 +39,7 @@ class SuperStreamFrame(wx.Frame):
         super().__init__(main, title="SuperDL – Super Stream (élő multistream)",
                          size=(780, 600))
         self.main = main
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
         self.targets: list[SS.Target] = []
         self.streamer = None
         self._build()
@@ -144,6 +145,8 @@ class SuperStreamFrame(wx.Frame):
     # ---- segédek ------------------------------------------------------
 
     def _announce(self, text):
+        if self._closing:
+            return
         self.SetStatusText(text)
         sv = getattr(self.main, "selfvoice", None)
         if sv:
@@ -272,10 +275,13 @@ class SuperStreamFrame(wx.Frame):
         self.streamer.start()
 
     def _done(self, ok, msg):
+        if self._closing:
+            return
         self.go_btn.SetLabel("Élő adás &indítása")
         self._announce(msg)
 
     def _on_close(self, e):
+        self._closing = True
         if self.streamer and self.streamer.is_running():
             self.streamer.stop()
         if getattr(self.main, "_superstream_win", None) is self:

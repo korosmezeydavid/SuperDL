@@ -41,6 +41,7 @@ class NewsFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Hírolvasó", size=(900, 680))
         self.main = main
+        self._closing = False        # zárás alatt a háttér-callbackek kilépnek
         self.nm = news.NewsManager()        # saját példány (lemezről tölt)
         self.speaker = getattr(main, "speaker", None)
         self.articles: list[news.Article] = []
@@ -174,6 +175,8 @@ class NewsFrame(wx.Frame):
         threading.Thread(target=work, daemon=True).start()
 
     def _show_headlines(self, feed, title, arts):
+        if self._closing:
+            return
         self.articles = arts
         self.head_list.DeleteAllItems()
         for a in arts:
@@ -215,6 +218,8 @@ class NewsFrame(wx.Frame):
         threading.Thread(target=work, daemon=True).start()
 
     def _show_article(self, art, text):
+        if self._closing:
+            return
         header = art.title
         if art.published:
             header += f"\n{art.published}"
@@ -293,6 +298,8 @@ class NewsFrame(wx.Frame):
         dlg.Destroy()
 
     def _after_add(self):
+        if self._closing:
+            return
         self.feed_ch.Set([f.title or f.url for f in self.nm.feeds])
         self.feed_ch.SetSelection(len(self.nm.feeds) - 1)
         self._load_headlines()
@@ -310,6 +317,7 @@ class NewsFrame(wx.Frame):
             self._reload_feeds()
 
     def _on_close(self, e):
+        self._closing = True
         self._load_timer.Stop()
         self._stop_speech()
         if getattr(self.main, "_news_win", None) is self:
