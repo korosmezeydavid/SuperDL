@@ -75,3 +75,53 @@ def test_a_pin_beallitas_is_figyelmeztet():
     elozo = src[max(0, i - 400):i]
     assert "NEM titkosítja" in elozo, \
         "a PIN beállításakor nem hangzik el, hogy nem titkosít"
+
+
+# ---- DOCCONVERT-SUPPLY-001 / OCR-P0-02 / OCR-P1-12: Pandoc ellátási lánc ---
+
+def _core(rel: str) -> str:
+    return (ROOT / rel).read_text(encoding="utf-8")
+
+
+def test_pandoc_verzio_rogzitett_nem_latest():
+    src = _core("superdl/extratools.py")
+    assert "_PANDOC_VERSION" in src, "nincs rögzített Pandoc-verzió"
+    assert "releases/latest" not in src.split("def ensure_pandoc")[0].split(
+        "_pandoc_url")[-1], "még mindig a «latest» kiadást tölti"
+
+
+def test_pandoc_url_a_rogzitett_verziot_adja():
+    from superdl import extratools as ET
+    u = ET._pandoc_url()
+    assert ET._PANDOC_VERSION in u and u.endswith("windows-x86_64.zip")
+    assert "latest" not in u
+
+
+def test_van_sha256_ellenorzes_es_elutasitas():
+    src = _core("superdl/extratools.py")
+    assert "_PANDOC_SHA256" in src
+    assert "hashlib.sha256(data).hexdigest()" in src
+    assert "ELLENŐRZÉSE MEGBUKOTT" in src, "hash-eltérésnél nem utasít el"
+
+
+def test_pandoc_telepites_atomikus():
+    src = _core("superdl/extratools.py")
+    i = src.index("def ensure_pandoc")
+    torzs = src[i:i + 3200]
+    assert "os.replace(tmp, cel)" in torzs, "nem atomikus a telepítés"
+    assert ".part.exe" in torzs
+
+
+def test_a_hibak_nem_tunnek_el_nemam():
+    src = _core("superdl/extratools.py")
+    assert "last_tool_error" in src and "last_tool_warning" in src
+    i = src.index("def ensure_pandoc")
+    torzs = src[i:i + 3200]
+    for eset in ("BadZipFile", "PermissionError", "OSError"):
+        assert eset in torzs, f"{eset} nincs külön kezelve"
+
+
+def test_a_felulet_a_konkret_okot_mondja():
+    src = _src("docconvert/docconvert_mod/docconvertwin.py")
+    assert "last_tool_error" in src, "a GUI csak általános hibát mond"
+    assert "last_tool_warning" in src

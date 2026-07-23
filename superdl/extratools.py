@@ -13,10 +13,12 @@ A nagy külső eszközöket NEM sütjük az exébe (lean marad), hanem:
 import hashlib
 import io
 import json
+import os
 import shutil
 import sys
 import threading
 import urllib.request
+import uuid
 import zipfile
 from pathlib import Path
 
@@ -89,19 +91,33 @@ def _download(url: str, progress=None) -> bytes:
     return bytes(buf)
 
 
-def _latest_pandoc_url() -> str:
-    req = urllib.request.Request(
-        "https://api.github.com/repos/jgm/pandoc/releases/latest", headers=UA)
-    with urllib.request.urlopen(req, timeout=30) as r:
-        d = json.load(r)
-    for a in d.get("assets", []):
-        if a["name"].endswith("windows-x86_64.zip"):
-            return a["browser_download_url"]
-    raise RuntimeError("Nem található Windows Pandoc letöltés.")
+# RÖGZÍTETT Pandoc-verzió: a korábbi „latest" miatt a telepítés NEM volt
+# reprodukálható (gépenként/időben más bináris jöhetett). [DOCCONVERT-SUPPLY-001]
+_PANDOC_VERSION = "3.1.11"
+# A hivatalos csomag SHA-256-ja. Ha KI VAN TÖLTVE, kötelezően ellenőrizzük, és
+# eltérés esetén NEM telepítünk (a Tesseractnál bevált elv). Üresen hagyva a
+# telepítés megtörténik, de HITELESÍTETLENKÉNT jelezzük a felhasználónak.
+_PANDOC_SHA256 = ""
+
+# Az utolsó eszköz-telepítési hiba/figyelmeztetés – a néma `return None` helyett
+# a felület meg tudja mondani, MI a baj. [Herman Tibi OCR-P1-12]
+last_tool_error = ""
+last_tool_warning = ""
+
+
+def _pandoc_url(version: str = _PANDOC_VERSION) -> str:
+    """A RÖGZÍTETT verzió hivatalos Windows-csomagja (nem «latest»)."""
+    return (f"https://github.com/jgm/pandoc/releases/download/{version}/"
+            f"pandoc-{version}-windows-x86_64.zip")
 
 
 def ensure_pandoc(progress=None) -> str | None:
-    """A pandoc.exe elérési útja; ha nincs, letölti (~40 MB). Hiba esetén None."""
+    """A pandoc.exe elérési útja; ha nincs, letölti a RÖGZÍTETT verziót (~40 MB),
+    SHA-256-tal ellenőrizve (ha ismert), és ATOMIKUSAN telepíti.
+
+    Hiba esetén None, de az okot a `last_tool_error` megmondja (korábban minden
+    kivétel némán elnyelődött, így a hiba nem volt diagnosztizálható)."""
+    global last_tool_error, last_tool_warning
     p = find_pandoc()
     if p:
         return p
@@ -109,18 +125,58 @@ def ensure_pandoc(progress=None) -> str | None:
         p = find_pandoc()
         if p:
             return p
+        last_tool_error = last_tool_warning = ""
+        url = _pandoc_url()
         try:
-            data = _download(_latest_pandoc_url(), progress)
-            z = zipfile.ZipFile(io.BytesIO(data))
-            BIN.mkdir(parents=True, exist_ok=True)
-            for name in z.namelist():
-                if name.lower().endswith("pandoc.exe"):
-                    with z.open(name) as s, open(BIN / "pandoc.exe", "wb") as d:
-                        shutil.copyfileobj(s, d)
-                    return str(BIN / "pandoc.exe")
-        except Exception:
+            data = _download(url, progress)
+        except Exception as e:
+            last_tool_error = (f"A Pandoc letöltése nem sikerült ({type(e).__name__}). "
+                               "Ellenőrizd az internetkapcsolatot.")
             return None
-    return None
+        # INTEGRITÁS: ha ismerjük a hivatalos ujjlenyomatot, kötelező az egyezés
+        digest = hashlib.sha256(data).hexdigest()
+        if _PANDOC_SHA256:
+            if digest.lower() != _PANDOC_SHA256.lower():
+                last_tool_error = (
+                    "A letöltött Pandoc-csomag ELLENŐRZÉSE MEGBUKOTT "
+                    "(a fájl nem egyezik a hivatalos ujjlenyomattal), ezért NEM "
+                    "telepítettem. Próbáld később, vagy telepítsd kézzel.")
+                return None
+        else:
+            last_tool_warning = (
+                "A Pandoc csomagjához nincs beépített ujjlenyomat, ezért a "
+                "hitelességét nem tudtam ellenőrizni.")
+        try:
+            z = zipfile.ZipFile(io.BytesIO(data))
+            forras = next((n for n in z.namelist()
+                           if n.lower().endswith("pandoc.exe")), "")
+            if not forras:
+                last_tool_error = "A letöltött csomagban nincs pandoc.exe."
+                return None
+            BIN.mkdir(parents=True, exist_ok=True)
+            cel = BIN / "pandoc.exe"
+            # ATOMIKUS telepítés: előbb ideiglenes fájlba, majd csere – így egy
+            # megszakadt letöltés nem hagy sérült exét a helyén.
+            tmp = BIN / f"pandoc.{uuid.uuid4().hex[:8]}.part.exe"
+            try:
+                with z.open(forras) as s, open(tmp, "wb") as d:
+                    shutil.copyfileobj(s, d)
+                os.replace(tmp, cel)
+            finally:
+                try:
+                    if tmp.exists():
+                        tmp.unlink()
+                except OSError:
+                    pass
+            return str(cel)
+        except zipfile.BadZipFile:
+            last_tool_error = "A letöltött Pandoc-csomag sérült (hibás ZIP)."
+        except PermissionError:
+            last_tool_error = ("A Pandoc telepítéséhez nincs jogosultság a "
+                               f"{BIN} mappához.")
+        except OSError as e:
+            last_tool_error = f"A Pandoc telepítése nem sikerült: {e}"
+        return None
 
 
 def _superdl_repo() -> str:

@@ -364,8 +364,16 @@ class DocConvertFrame(wx.Frame):
         self._busy = False
         self.gauge.SetValue(0)
         self._refresh_tools()
-        self._result("A Pandoc letöltve és kész." if path else
-                     "A Pandoc letöltése nem sikerült (internet?).")
+        # A KONKRÉT okot mondjuk meg, ne csak azt, hogy „internet?" – a
+        # 403/rate limit/sérült ZIP/jogosultság/ujjlenyomat-hiba mind más
+        # teendőt jelent. [Herman Tibi OCR-P1-12]
+        hiba = getattr(extratools, "last_tool_error", "") or ""
+        figy = getattr(extratools, "last_tool_warning", "") or ""
+        if path:
+            self._result("A Pandoc letöltve és kész."
+                         + (f" FIGYELEM: {figy}" if figy else ""))
+        else:
+            self._result(hiba or "A Pandoc letöltése nem sikerült (internet?).")
 
     # ---- konvertálás --------------------------------------------------
 
