@@ -186,25 +186,45 @@ def test_tobb_gep_karakter_van():
 
 # ---- jogtisztaság --------------------------------------------------------
 
-def test_nem_hasznal_espeaket_es_idegen_artefaktumot():
-    """Ez a motor TELJESEN saját: se eSpeak-hívás, se idegen ROM.
-    A KÓDOT vizsgáljuk (a magyarázó szöveg említheti az eSpeak-et annak
-    indoklásához, MIÉRT nem használjuk)."""
+def test_a_sajat_motor_nem_hiv_espeaket_kozvetlenul():
+    """A SAJÁT formánsmotor útja továbbra sem hív eSpeaket vagy alfolyamatot.
+    (A külön, motor='klatt' hang SZÁNDÉKOSAN a retrovoice-on át eSpeak-Klattot
+    használ – ez a fejlesztő kifejezett kérése; a `retrovoice` importja ezért
+    megengedett, de közvetlen espeak/subprocess hívás NEM.)"""
     import ast
     import inspect
     fa = ast.parse(inspect.getsource(RS))
-    # semmilyen import nem hozhat be beszédmotort vagy alfolyamatot
     for csp in ast.walk(fa):
         if isinstance(csp, (ast.Import, ast.ImportFrom)):
             nev = (getattr(csp, "module", "") or "") + " " + " ".join(
                 a.name for a in csp.names)
-            for tiltott in ("espeak", "subprocess", "selfvoice", "retrovoice"):
-                assert tiltott not in nev.lower(),                     f"idegen/külső függőség: {nev.strip()}"
+            for tiltott in ("espeak", "subprocess", "selfvoice"):
+                assert tiltott not in nev.lower(), \
+                    f"közvetlen idegen függőség a saját motorban: {nev.strip()}"
     # a kódban (nem a szövegben) ne legyen idegen artefaktum-hivatkozás
     kod = "\n".join(l for l in inspect.getsource(RS).splitlines()
                     if not l.strip().startswith("#"))
     for tiltott in (".ROM", "BR4", "HL4"):
         assert tiltott not in kod, f"idegen artefaktum: {tiltott}"
+
+
+def test_van_klatt_brailab_hang():
+    """A külön, eSpeak-Klatt alapú BraiLab hang (a fejlesztő kérésére)."""
+    g = RS.gep("brailab_klatt")
+    assert g.motor == "klatt"
+    assert g.klatt_preset == "brailab"
+    assert g.tompitas > 0
+
+
+def test_a_klatt_brailab_megszolal():
+    """Ha van eSpeak, a klatt-hang tényleg ad hangot (a SuperDL-ben mindig van)."""
+    import pytest
+    RV = pytest.importorskip("superdl.retrovoice")
+    if not RV.available():
+        pytest.skip("ehhez a teszthez eSpeak kell (a kiadott programban be van építve)")
+    x, fs = RS.szintetizal("Teszt, egy kettő három.", RS.gep("brailab_klatt"))
+    assert x.size > 100 and fs > 0
+    assert float(np.max(np.abs(x))) <= 1.0
 
 
 # ---- REGRESSZIÓ: a négy hiba, ami néma sziszegést okozott ----------------

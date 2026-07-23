@@ -187,6 +187,9 @@ class RetroGep:
     levego: float = 0.0         # felső „levegő” hozzáadása (magas polc), dB
     drive: float = 1.0          # tömörítés/telítés a HANGERŐHÖZ (1 = nincs)
     deklinacio: float = 0.0     # mondat-lejtés (a magyaros, ereszkedő dallam)
+    motor: str = "sajat"        # "sajat" = ez a formánsmotor; "klatt" = eSpeak-Klatt
+    klatt_preset: str = ""      # motor="klatt" esetén a retrovoice-preset kulcsa
+    tompitas: float = 0.0       # motor="klatt": aluláteresztő vágás (Hz, 0 = nincs)
 
 
 GEPEK: tuple[RetroGep, ...] = (
@@ -212,6 +215,12 @@ GEPEK: tuple[RetroGep, ...] = (
              atmenet_ms=8, sav_szuk=0.80, kvant_hz=100, bitek=8,
              elesseg=0.80, hangero=0.99, szotag_hangsuly=0.38,
              debox=6.0, levego=9.0, drive=5.0, deklinacio=0.22),
+    # A régi, eSpeak-Klatt alapú BraiLab (retrovoice motor), kicsit tompítva –
+    # a fejlesztő külön kérésére, „hátha valakinek az kell". eSpeak kell hozzá,
+    # ami a SuperDL-be be van építve.
+    RetroGep("brailab_klatt", "BraiLab – eSpeak-Klatt (tompított)",
+             motor="klatt", klatt_preset="brailab", tompitas=2800.0,
+             hangero=0.97),
     RetroGep("gep", "Beszélő gép (közepes)",
              alaphang=122.0, hangsuly=0.18, tempo=1.0,
              atmenet_ms=12, sav_szuk=0.9, kvant_hz=60, bitek=9,
@@ -324,10 +333,43 @@ def _kvant(ertek: float, lepcso: int) -> float:
     return round(ertek / lepcso) * lepcso
 
 
+def _retrovoice():
+    """A retró eSpeak-Klatt motor betöltése (a SuperDL Core-ból)."""
+    from superdl import retrovoice as RV
+    return RV
+
+
+def _klatt_szintezis(szoveg: str, g: RetroGep):
+    """A „BraiLab – eSpeak-Klatt" hang: a régi retrovoice (eSpeak Klatt +
+    numpy-DSP) adja az alapot, amit itt még kicsit TOMPÍTUNK (aluláteresztő),
+    ahogy a fejlesztő kérte. Ehhez eSpeak kell – a SuperDL-ben be van építve."""
+    import os
+    import numpy as np
+    RV = _retrovoice()
+    path = RV.synth(szoveg, "", g.klatt_preset or "brailab")
+    try:
+        x, fs = RV._wav_be(path)
+    finally:
+        try:
+            os.remove(path)
+        except Exception:
+            pass
+    x = np.asarray(x, dtype=float)
+    if g.tompitas and g.tompitas > 0 and x.size:
+        x = RV._lowpass(x, fs, float(g.tompitas))
+    csucs = float(np.max(np.abs(x))) if x.size else 0.0
+    if csucs > 0:
+        x = x / csucs * min(0.98, g.hangero)
+    return x, fs
+
+
 def szintetizal(szoveg: str, g: RetroGep):
-    """A szöveg megszólaltatása SAJÁT formánsszintézissel.
+    """A szöveg megszólaltatása. Alapból a SAJÁT formánsmotorral; a
+    motor="klatt" hangoknál a retró eSpeak-Klatt motorral (lásd fent).
     Visszaad: (minta-tömb float −1..1, mintavétel)."""
     import numpy as np
+    if g.motor == "klatt":
+        return _klatt_szintezis(szoveg, g)
     hangok = szoveg_hangokra(szoveg)
     if not hangok:
         return np.zeros(0), g.fs
