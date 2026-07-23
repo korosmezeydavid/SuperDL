@@ -35,7 +35,15 @@ Tab / Shift+Tab – mozgás a vezérlők közt.  Enter – gomb.
 TIPPEK
 - A kódot pontosan úgy add meg, ahogy hallottad (kötőjelekkel, kis/nagybetű nem
   számít).
-- Mindkét gépnek internet kell; a fájl NEM megy át külső szerveren.
+- Mindkét gépnek internet kell. A fájl tartalma VÉGPONTOK KÖZÖTT TITKOSÍTVA
+  megy: csak a te géped és a másik gép tudja elolvasni. A kapcsolat felvételéhez
+  a program egy nyilvános találkozó-szolgáltatást használ, és ha a két gép
+  tűzfal/NAT miatt nem éri el egymást közvetlenül, a titkosított adat egy
+  továbbító szerveren keresztül halad. A tartalmat így SEM láthatja senki más,
+  de az adat útja nem minden esetben közvetlen.
+- A küldési kód EGYSZER használatos titok: aki megkapja, letöltheti a fájlt.
+  Az F8 újra elmondja; az átvitel végén és az ablak bezárásakor a program
+  törli a vágólapról.
 - Ha egy küldés/fogadás közben be akarod zárni az ablakot, a program RÁKÉRDEZ,
   nehogy véletlenül megszakítsd az átvitelt.
 - Menet közben az F8-cal bármikor megkérdezheted, hány százaléknál tart."""
@@ -212,6 +220,38 @@ class P2PFrame(wx.Frame):
                  " (A vágólapra másoláshoz nyomd meg a „Kód másolása” gombot.)")
         self.SetStatusText(f"A küldés kódja: {code}.{extra} Tartsd nyitva az "
                            "ablakot, amíg átmegy a fájl.")
+        # A kód a fájl átvételéhez szükséges TITOK, és a státuszsort a
+        # képernyőolvasó nem feltétlenül mondja be → AKTÍVAN, tagoltan
+        # elmondjuk (F8-cal bármikor újra kérhető). [Herman Tibi P2P-P0-02]
+        self._speak(f"A küldés kódja: {self._spell_code(code)}. "
+                    "Az F8 billentyűvel bármikor újra elmondom.")
+
+    @staticmethod
+    def _spell_code(code: str) -> str:
+        """A kód tagolt felolvasása: a wormhole-kód „szám-szó-szó" alakú, a
+        kötőjeleket szóra bontjuk, hogy telefonban is diktálható legyen."""
+        return code.replace("-", ", kötőjel, ")
+
+    def _clear_clipboard_code(self) -> None:
+        """A küldési kód TÖRLÉSE a vágólapról, ha még az van rajta. A kód
+        egyszer használatos titok; nem maradhat az ablak bezárása/az átvitel
+        vége után a vágólap-előzményben. [Herman Tibi P2P-P0-02]"""
+        code = self.code_out.GetValue().strip()
+        if not code:
+            return
+        try:
+            if not wx.TheClipboard.Open():
+                return
+            try:
+                data = wx.TextDataObject()
+                if (wx.TheClipboard.GetData(data)
+                        and data.GetText().strip() == code):
+                    wx.TheClipboard.SetData(wx.TextDataObject(""))
+                    wx.TheClipboard.Flush()
+            finally:
+                wx.TheClipboard.Close()
+        except Exception:
+            pass
 
     def _copy_code(self, manual: bool = False) -> bool:
         code = self.code_out.GetValue().strip()
@@ -254,6 +294,7 @@ class P2PFrame(wx.Frame):
             return
         self.send_session = None
         self._send_pct = -1
+        self._clear_clipboard_code()   # az egyszer használatos kód ne maradjon
         self.send_btn.Enable()
         self.send_cancel.Disable()
         self.copy_btn.Disable()
@@ -340,6 +381,7 @@ class P2PFrame(wx.Frame):
                     e.Veto()            # marad nyitva, az átvitel folytatódik
                 return
         self._closing = True            # innentől a háttér-callbackek kilépnek
+        self._clear_clipboard_code()    # a titkos kód ne maradjon a vágólapon
         if self.send_session:
             self.send_session.cancel()
         if self.recv_session:

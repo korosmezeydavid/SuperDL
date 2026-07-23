@@ -117,7 +117,8 @@ class VoiceChanger:
                     raise A.BassError("A mikrofon nem indítható (kód "
                                       f"{b.BASS_ErrorGetCode()}).")
             A._rec_inited.add(self.in_device)
-        b.BASS_RecordSetDevice(self.in_device if self.in_device >= 0 else 0)
+        # -1 = az IGAZI alapértelmezett mikrofon (nem a 0-s index) [VC-P0-02]
+        A.select_record_device(b, self.in_device)
         self._proc = A.RECORDPROC(self._record_cb)
         self._rec = b.BASS_RecordStart(self.freq, self.channels, 0,
                                        self._proc, None)

@@ -497,7 +497,10 @@ class OrganizerFrame(wx.Frame):
             msg = ("Állíts be PIN-kódot (max 6 számjegy), hogy a rezsi-fülbe "
                    "csak az nézhessen bele, aki ismeri.\n\n(Üresen hagyva nincs "
                    "lakat.) PIN:")
-        dlg = wx.TextEntryDialog(self, msg, "Rezsi – PIN-lakat")
+        # MASZKOLT bevitel: a sima TextEntryDialog a beírt PIN-t olvashatóan
+        # mutatta a képernyőn és a képernyőolvasó fájában (váll fölötti
+        # betekintés, képernyőmegosztás). [Herman Tibi ORG-P0-03]
+        dlg = wx.PasswordEntryDialog(self, msg, "Rezsi – PIN-lakat")
         if dlg.ShowModal() == wx.ID_OK:
             pin = "".join(c for c in dlg.GetValue() if c.isdigit())[:6]
             self.rz.set_pin(pin)

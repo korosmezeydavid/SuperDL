@@ -152,6 +152,8 @@ def _decl(b):
     b.BASS_RecordInit.restype = c_int
     b.BASS_RecordSetDevice.argtypes = [c_uint]
     b.BASS_RecordSetDevice.restype = c_int
+    b.BASS_RecordGetDevice.argtypes = []
+    b.BASS_RecordGetDevice.restype = c_uint
     b.BASS_RecordStart.argtypes = [c_uint, c_uint, c_uint, RECORDPROC, c_void_p]
     b.BASS_RecordStart.restype = c_uint
 
@@ -230,6 +232,25 @@ def record_devices() -> list:
 _rec_inited = set()
 
 
+def select_record_device(b, device: int) -> None:
+    """A felvevő eszköz kiválasztása – az ALAPÉRTELMEZETT (-1) HELYES kezelésével.
+
+    A korábbi `BASS_RecordSetDevice(device if device >= 0 else 0)` az
+    alapértelmezett kérésekor kézzel a 0-s indexre váltott, ami NEM feltétlenül
+    az aktuális alapértelmezett mikrofon → más eszközről ment a hang (élő adásnál
+    és felvételnél is súlyos). A RecordInit(-1) már a helyeset állította be;
+    azt kérdezzük vissza. [Herman Tibi VC-P0-02 / SM-P1-10 / REC-P1-10]"""
+    if device >= 0:
+        b.BASS_RecordSetDevice(device)
+        return
+    try:
+        cur = b.BASS_RecordGetDevice()
+        if cur is not None and 0 <= int(cur) < 0xFFFFFFFF:
+            b.BASS_RecordSetDevice(int(cur))
+    except Exception:
+        pass          # marad az, amit a RecordInit beállított
+
+
 class Mic:
     """Mikrofon-bemenet a műsor-buszra keverve (3. mérföldkő). NINCS zajkapu –
     a műsorvezető KÉZZEL kapcsolja be/ki (reteszelő gomb). „Kikapcsolt"
@@ -256,7 +277,7 @@ class Mic:
                         f"Mikrofon nem indítható (BASS_RecordInit kód "
                         f"{b.BASS_ErrorGetCode()}). Van csatlakoztatott mikrofon?")
             _rec_inited.add(self.device)
-        b.BASS_RecordSetDevice(self.device if self.device >= 0 else 0)
+        select_record_device(b, self.device)
         # próbáljuk sztereóban, ha nem megy, monóban
         h = b.BASS_RecordStart(self.freq, 2, 0, RECORDPROC(0), None)
         if not h:

@@ -256,7 +256,7 @@ class Recorder:
                         "A felvevő eszköz nem indítható (kód "
                         f"{b.BASS_ErrorGetCode()}). Van csatlakoztatott mikrofon?")
             A._rec_inited.add(self.device)
-        b.BASS_RecordSetDevice(self.device if self.device >= 0 else 0)
+        A.select_record_device(b, self.device)   # -1 = az IGAZI alapértelmezett
         self._proc = A.RECORDPROC(self._callback)
         h = b.BASS_RecordStart(self.freq, self.channels, 0, self._proc, None)
         if not h and self.channels == 2:               # essünk vissza monóra

@@ -11,6 +11,7 @@ maga a SuperDL.exe `--wh` kapcsolóval (a magic-wormhole bele van csomagolva).
 """
 
 import os
+import time
 import re
 import subprocess
 import sys
@@ -21,6 +22,16 @@ _CODE_RE = re.compile(r"code is:\s*(\S+)", re.IGNORECASE)
 _INTO_RE = re.compile(r"into:\s*'([^']+)'", re.IGNORECASE)
 _PCT_RE = re.compile(r"(\d{1,3})\s*%")           # a wormhole/tqdm haladás-%-a
 _NOWIN = 0x08000000 if os.name == "nt" else 0
+
+
+def _human_size(n: int) -> str:
+    """Bájtméret bemondható magyar alakban (a siker-visszaigazoláshoz)."""
+    n = int(n or 0)
+    for unit, hatar in (("gigabájt", 1024 ** 3), ("megabájt", 1024 ** 2),
+                        ("kilobájt", 1024)):
+        if n >= hatar:
+            return f"{n / hatar:.1f} {unit}".replace(".", ",")
+    return f"{n} bájt"
 
 
 def _stop_proc(proc, timeout: float = 3.0) -> None:
@@ -164,6 +175,7 @@ class ReceiveSession:
         self._proc = None
         self._stop = False
         self.filename = ""
+        self._started_at = 0.0        # a fogadott fájl azonosításához
 
     def start(self):
         threading.Thread(target=self._run, daemon=True).start()
@@ -173,6 +185,7 @@ class ReceiveSession:
         _stop_proc(self._proc)     # terminate→wait→kill→wait + csövek
 
     def _run(self):
+        self._started_at = time.time()
         try:
             os.makedirs(self.out_dir, exist_ok=True)
         except OSError as e:
@@ -205,13 +218,50 @@ class ReceiveSession:
         if self._stop:
             self._emit_done(False, "A fogadást megszakították.")
         elif rc == 0:
-            where = os.path.join(self.out_dir, self.filename) \
-                if self.filename else self.out_dir
-            self._emit_done(True, f"A fájl megérkezett: {where}")
+            # NEM elég a nullás kilépési kód! Vírusirtó-karantén, lemezhiba,
+            # megváltozott CLI-kimenet vagy részleges írás után is 0 jöhetne,
+            # és HAMIS „megérkezett" hangzana el. Ellenőrizzük a TÉNYLEGES
+            # fájlt: létezik-e és nem nulla méretű. [Herman Tibi P2P-P0-03]
+            ok, where, size = self._verify_received()
+            if ok:
+                self._emit_done(True, f"A fájl megérkezett: {where} "
+                                      f"({_human_size(size)}).")
+            else:
+                self._emit_done(
+                    False, "A küldés lezárult, de a fogadott fájlt NEM találom "
+                           f"a célmappában ({self.out_dir}). Ellenőrizd a "
+                           "vírusirtót és a szabad helyet, majd próbáld újra.")
         else:
             self._emit_done(False, "A fogadás nem sikerült – ellenőrizd a "
                                    "kódot (a küldőtől pontosan), és hogy a "
                                    "küldő épp küld-e.")
+
+    def _verify_received(self) -> tuple[bool, str, int]:
+        """A fogadott fájl TÉNYLEGES ellenőrzése: létezik-e és nem üres-e.
+        Ha a kimenetből ismerjük a nevet, azt nézzük; különben a célmappa
+        legfrissebb, a fogadás kezdete UTÁN módosított fájlját."""
+        try:
+            if self.filename:
+                p = os.path.join(self.out_dir, self.filename)
+                if os.path.isfile(p) and os.path.getsize(p) > 0:
+                    return True, p, os.path.getsize(p)
+                return False, p, 0
+            newest, newest_t = "", 0.0
+            for n in os.listdir(self.out_dir):
+                p = os.path.join(self.out_dir, n)
+                try:
+                    if not os.path.isfile(p) or os.path.getsize(p) <= 0:
+                        continue
+                    t = os.path.getmtime(p)
+                except OSError:
+                    continue
+                if t >= self._started_at - 1 and t > newest_t:
+                    newest, newest_t = p, t
+            if newest:
+                return True, newest, os.path.getsize(newest)
+        except OSError:
+            pass
+        return False, self.out_dir, 0
 
     def _emit_done(self, ok, msg):
         if self.on_done:
