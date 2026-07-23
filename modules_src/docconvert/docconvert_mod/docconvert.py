@@ -341,9 +341,55 @@ def _write_any(book, dst, out_format, out_encoding, progress=None):
 
 # ---- a fő belépő ------------------------------------------------------
 
+def validate_output(dst, out_format: str) -> None:
+    """A KÉSZ fájl szerkezeti ellenőrzése. Eddig a siker sok úton csak annyit
+    jelentett, hogy a külső program 0-val tért vissza – így egy nulla bájtos,
+    sérült ZIP-alapú DOCX/EPUB vagy olvashatatlan PDF is „késznek" látszott.
+    [Herman Tibi DOC-P0-05]"""
+    p = Path(dst)
+    if not p.is_file():
+        raise RuntimeError("A kimeneti fájl nem jött létre.")
+    meret = p.stat().st_size
+    if meret == 0:
+        raise RuntimeError("A kimeneti fájl ÜRES (0 bájt).")
+    fmt = (out_format or p.suffix.lstrip(".")).lower()
+    if fmt in ("docx", "epub"):
+        import zipfile as _zf
+        try:
+            with _zf.ZipFile(p) as z:
+                nevek = z.namelist()
+                if z.testzip() is not None:
+                    raise RuntimeError("sérült ZIP-bejegyzés")
+        except _zf.BadZipFile:
+            raise RuntimeError(
+                f"A kész {fmt.upper()} fájl SÉRÜLT (nem érvényes csomag).")
+        kell = "word/document.xml" if fmt == "docx" else "META-INF/container.xml"
+        if not any(n == kell or n.endswith("/" + kell) for n in nevek):
+            raise RuntimeError(
+                f"A kész {fmt.upper()} fájlból hiányzik a kötelező része "
+                f"({kell}).")
+    elif fmt == "pdf":
+        with open(p, "rb") as f:
+            if not f.read(5).startswith(b"%PDF"):
+                raise RuntimeError("A kész PDF fájl nem érvényes "
+                                   "(hiányzik a PDF-fejléc).")
+    elif fmt in ("txt", "md", "markdown", "html", "htm"):
+        if meret < 1:
+            raise RuntimeError("A kész szövegfájl üres.")
+
+
 def convert(src, dst, out_format, in_encoding=None, out_encoding="utf-8",
             ocr_engine="ai", progress=None) -> str:
-    """Konvertálás a legjobb elérhető úton. Visszaad: felolvasható eredmény."""
+    """Konvertálás a legjobb elérhető úton, a KIMENET ELLENŐRZÉSÉVEL.
+    Visszaad: felolvasható eredmény."""
+    uzenet = _convert_inner(src, dst, out_format, in_encoding, out_encoding,
+                            ocr_engine, progress)
+    validate_output(dst, out_format)      # csak ellenőrzött fájl lehet „kész"
+    return uzenet
+
+
+def _convert_inner(src, dst, out_format, in_encoding=None, out_encoding="utf-8",
+                   ocr_engine="ai", progress=None) -> str:
     in_ext = Path(src).suffix.lower()
 
     # 1) KÉP → OCR → szöveg → kimenet

@@ -185,9 +185,18 @@ class DocConvertFrame(wx.Frame):
         g.Add(self.ocr_ch, 0, wx.EXPAND)
         v.Add(g, 0, wx.EXPAND | wx.ALL, 8)
 
+        cb = wx.BoxSizer(wx.HORIZONTAL)
         self.conv_btn = wx.Button(p, label="&Konvertálás")
         self.conv_btn.Bind(wx.EVT_BUTTON, lambda e: self._convert())
-        v.Add(self.conv_btn, 0, wx.LEFT | wx.BOTTOM, 8)
+        cb.Add(self.conv_btn, 0, wx.RIGHT, 6)
+        # LEÁLLÍTÁS: a külső eszközök (Pandoc/Calibre/LibreOffice) sokáig
+        # blokkolhatnak, a köteg pedig órákig futhat. [Herman Tibi DOC-P0-03]
+        self.stop_btn = wx.Button(p, label="Konvertálás &leállítása")
+        self.stop_btn.SetName("A konvertálás leállítása")
+        self.stop_btn.Bind(wx.EVT_BUTTON, lambda e: self._on_stop_convert())
+        self.stop_btn.Enable(False)
+        cb.Add(self.stop_btn, 0)
+        v.Add(cb, 0, wx.LEFT | wx.BOTTOM, 8)
 
         # külső eszközök státusza + Pandoc-letöltés
         tb = wx.BoxSizer(wx.HORIZONTAL)
@@ -377,6 +386,20 @@ class DocConvertFrame(wx.Frame):
 
     # ---- konvertálás --------------------------------------------------
 
+    def _cancelled(self) -> bool:
+        ev = getattr(self, "_cancel", None)
+        return bool(ev is not None and ev.is_set())
+
+    def _on_stop_convert(self):
+        """A konvertálás leállítása a következő fájl előtt."""
+        ev = getattr(self, "_cancel", None)
+        if ev is not None and not ev.is_set():
+            ev.set()
+            if hasattr(self, "stop_btn"):
+                self.stop_btn.Enable(False)
+            self._announce("Leállítás kérve – a most futó fájl után "
+                           "befejezem.")
+
     def _convert(self):
         if not self.files:
             self._result("Előbb adj hozzá legalább egy fájlt (vagy egy mappát).")
@@ -411,7 +434,10 @@ class DocConvertFrame(wx.Frame):
 
         files = list(self.files)
         self._busy = True
+        self._cancel = threading.Event()   # megszakítás-jelző [DOC-P0-03]
         self.conv_btn.Enable(False)
+        if hasattr(self, 'stop_btn'):
+            self.stop_btn.Enable(True)
         self.gauge.SetValue(0)
         self._announce("Konvertálás…")
         for i in range(len(files)):
@@ -430,7 +456,14 @@ class DocConvertFrame(wx.Frame):
         ok = 0
         errors = []
         total = len(files)
+        megszakitva = False
         for i, src in enumerate(files):
+            # MEGSZAKÍTÁS: a külső eszközök (Pandoc/Calibre/LibreOffice) akár
+            # 10-15 percig blokkolhatnak, ezért fájlonként ellenőrzünk, hogy a
+            # felhasználó ne várjon a teljes köteg végéig. [DOC-P0-03]
+            if self._cancelled():
+                megszakitva = True
+                break
             wx.CallAfter(self._set_status, i, "folyamatban")
             try:
                 base = os.path.splitext(os.path.basename(src))[0]
@@ -443,8 +476,12 @@ class DocConvertFrame(wx.Frame):
                 errors.append((os.path.basename(src), str(e)))
                 wx.CallAfter(self._set_status, i, "hiba")
             wx.CallAfter(self.gauge.SetValue, int((i + 1) / total * 100))
-        msg = (f"Kész: {ok}/{total} fájl konvertálva ide: {out_dir}"
-               f" ({out_fmt.upper()}).")
+        if megszakitva:
+            msg = (f"LEÁLLÍTVA. Eddig {ok}/{total} fájl készült el ide: "
+                   f"{out_dir} ({out_fmt.upper()}). A többihez nem nyúltam.")
+        else:
+            msg = (f"Kész: {ok}/{total} fájl konvertálva ide: {out_dir}"
+                   f" ({out_fmt.upper()}).")
         if errors:
             msg += "\n\nHibás fájlok:\n" + "\n".join(
                 f"• {n}: {err.splitlines()[0]}" for n, err in errors[:8])
@@ -480,11 +517,28 @@ class DocConvertFrame(wx.Frame):
             return
         self._busy = False
         self.conv_btn.Enable(True)
+        if hasattr(self, "stop_btn"):
+            self.stop_btn.Enable(False)
         self.gauge.SetValue(0)
         self._refresh_tools()
         self._result(msg)
 
     def _on_close(self, e):
+        # MEGERŐSÍTÉS folyó konvertálásnál: eddig a bezárás után a worker és a
+        # külső programok tovább futottak. [Herman Tibi DOC-P0-03]
+        if self._busy and not self._closing:
+            ans = wx.MessageBox(
+                "A konvertálás FOLYAMATBAN van. Ha most bezárod, a program "
+                "a most futó fájl után leáll.\n\nBiztosan bezárod?",
+                "Dokumentum-konverter – folyamatban",
+                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING, self)
+            if ans != wx.YES:
+                if e.CanVeto():
+                    e.Veto()
+                return
+            ev = getattr(self, "_cancel", None)
+            if ev is not None:
+                ev.set()
         self._closing = True
         if getattr(self.main, "_docconvert_win", None) is self:
             self.main._docconvert_win = None
