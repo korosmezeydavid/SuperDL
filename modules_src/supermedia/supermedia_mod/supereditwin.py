@@ -63,6 +63,7 @@ class SuperEditorFrame(wx.Frame):
         self._pos = 0.0                 # playhead (mp)
         self._busy = False
         self._closing = False           # zárás alatt a háttér-callbackek kilépnek
+        self._saved = True              # van-e MENTETLEN szerkesztés? [EDIT-P0-06]
         # ABLAKONKÉNT egyedi: a régi, csak PID-alapú név ugyanazon folyamat
         # MINDEN szerkesztőablakában azonos volt → két ablak egymás lejátszási
         # fájlját írta/törölte (rossz hang szólalt meg). [Herman Tibi EDIT-P0-05]
@@ -340,6 +341,7 @@ class SuperEditorFrame(wx.Frame):
     def _loaded(self, clip, name):
         self._stop()
         self.clip = clip
+        self._saved = True              # frissen betöltve: nincs mentetlen munka
         self._pos = 0.0
         self._render()
         self.title_lbl.SetLabel(f"Hang: {name}  ({_human(clip.duration())})")
@@ -447,6 +449,7 @@ class SuperEditorFrame(wx.Frame):
         return sec
 
     def _after_edit(self, msg):
+        self._saved = False   # mostantól van mentetlen szerkesztés
         self._stop()
         self._render()
         self._refresh_markers()
@@ -710,9 +713,32 @@ class SuperEditorFrame(wx.Frame):
         if err:
             self._announce(f"A mentés nem sikerült: {err}")
         else:
+            self._saved = True
             self._announce(f"Mentve: {os.path.basename(out)}")
 
+    def _has_unsaved_edit(self) -> bool:
+        """Történt-e olyan szerkesztés, amit még nem mentettünk ki?
+        A visszavonási előzmény léte jelzi, hogy dolgoztunk a hangon."""
+        if self._saved:
+            return False
+        try:
+            return bool(self.clip.pcm) and self.clip.can_undo()
+        except Exception:
+            return False
+
     def _on_close(self, e):
+        # MENTETLEN SZERKESZTÉS VÉDELME: eddig egy véletlen Alt+F4 az összes
+        # vágást és effektet eldobta kérdés nélkül. [Herman Tibi EDIT-P0-06]
+        if not self._closing and self._has_unsaved_edit():
+            ans = wx.MessageBox(
+                "A szerkesztéseidet még nem mentetted el. Ha most bezárod, "
+                "ELVESZNEK.\n\nBiztosan bezárod mentés nélkül?",
+                "Fülre-szerkesztő – mentetlen munka",
+                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING, self)
+            if ans != wx.YES:
+                if e.CanVeto():
+                    e.Veto()
+                return
         self._closing = True
         try:
             self.timer.Stop()

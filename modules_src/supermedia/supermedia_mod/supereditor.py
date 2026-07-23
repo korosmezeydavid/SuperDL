@@ -22,6 +22,12 @@ class Clip:
         self._redo: list[tuple[bytes, list]] = []
         self.clipboard: bytes = b""
         self._max_undo = 30
+        # MEMÓRIA-KERET a visszavonáshoz. A darabszám önmagában NEM védett:
+        # egy egyórás sztereó felvétel PCM-je több száz MB, tehát 30 teljes
+        # pillanatkép több tíz GB is lehetett → MemoryError, fagyás, adatvesztés.
+        # Innentől a régi lépések a keret betelésekor kiesnek (a legutóbbi
+        # visszavonás MINDIG megmarad). [Herman Tibi EDIT-P0-01]
+        self._undo_budget = 512 * 1024 * 1024        # 512 MB
 
     # ---- alapok ------------------------------------------------------
 
@@ -48,10 +54,24 @@ class Clip:
 
     # ---- undo/redo ---------------------------------------------------
 
+    def _trim_history(self, tar: list) -> None:
+        """A verem nyesése DARABSZÁM és MEMÓRIA-KERET szerint is. A legutóbbi
+        lépés mindig megmarad, hogy legalább egy visszavonás mindig működjön."""
+        while len(tar) > self._max_undo:
+            tar.pop(0)
+        total = sum(len(p) for p, _ in tar)
+        while len(tar) > 1 and total > self._undo_budget:
+            p, _ = tar.pop(0)
+            total -= len(p)
+
+    def undo_memory_bytes(self) -> int:
+        """A visszavonási előzmény tényleges memóriaigénye (diagnosztikához)."""
+        return sum(len(p) for p, _ in self._undo) + \
+            sum(len(p) for p, _ in self._redo)
+
     def _snapshot(self):
         self._undo.append((bytes(self.pcm), list(self.markers)))
-        if len(self._undo) > self._max_undo:
-            self._undo.pop(0)
+        self._trim_history(self._undo)
         self._redo.clear()
 
     def can_undo(self) -> bool:
@@ -64,6 +84,7 @@ class Clip:
         if not self._undo:
             return False
         self._redo.append((bytes(self.pcm), list(self.markers)))
+        self._trim_history(self._redo)      # a redo-verem sem nőhet korlátlanul
         pcm, mk = self._undo.pop()
         self.pcm = bytearray(pcm)
         self.markers = mk
@@ -73,6 +94,7 @@ class Clip:
         if not self._redo:
             return False
         self._undo.append((bytes(self.pcm), list(self.markers)))
+        self._trim_history(self._undo)
         pcm, mk = self._redo.pop()
         self.pcm = bytearray(pcm)
         self.markers = mk

@@ -41,6 +41,7 @@ class SuperRecorderFrame(wx.Frame):
                          size=(680, 460))
         self.main = main
         self._closing = False        # zárás alatt a háttér-callbackek kilépnek
+        self._saved = True           # van-e MENTETLEN felvétel? [REC-P0-04]
         self.rec: superrec.Recorder | None = None
         self._busy = False
         self._last_clip_announced = False
@@ -202,6 +203,7 @@ class SuperRecorderFrame(wx.Frame):
             except Exception as e:
                 self._announce(f"A felvevő nem indult: {e}")
                 return
+        self._saved = False          # innentől van menteni való hang
         try:
             self.rec.start()
         except Exception as e:
@@ -349,9 +351,31 @@ class SuperRecorderFrame(wx.Frame):
                           wx.OK | wx.ICON_ERROR, self)
         else:
             import os
+            self._saved = True
             self._announce(f"Mentve: {os.path.basename(out)}")
 
+    def _has_unsaved_audio(self) -> bool:
+        """Van-e olyan felvett hang, amit még nem mentettünk el?"""
+        if self._saved or not self.rec:
+            return False
+        try:
+            return bool(self.rec.has_audio())
+        except Exception:
+            return True          # bizonytalanság esetén inkább kérdezzünk
+
     def _on_close(self, e):
+        # MENTETLEN FELVÉTEL VÉDELME: eddig egy véletlen Alt+F4 akár órányi
+        # hangot dobott el kérdés nélkül. [Herman Tibi REC-P0-04]
+        if not self._closing and self._has_unsaved_audio():
+            ans = wx.MessageBox(
+                "Van MENTETLEN felvételed. Ha most bezárod, a hang ELVÉSZ.\n\n"
+                "Biztosan bezárod mentés nélkül?",
+                "Super Recorder – mentetlen felvétel",
+                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING, self)
+            if ans != wx.YES:
+                if e.CanVeto():
+                    e.Veto()          # marad nyitva, a hang megmarad
+                return
         self._closing = True
         try:
             self.timer.Stop()
