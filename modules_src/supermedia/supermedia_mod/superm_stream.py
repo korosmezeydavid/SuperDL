@@ -66,6 +66,9 @@ class Caster:
         m.BASS_Encode_MP3_Start.restype = c_uint
         e.BASS_Encode_Stop.argtypes = [c_uint]
         e.BASS_Encode_Stop.restype = c_int
+        # az adás ÉLŐ voltának tényleges ellenőrzéséhez (SM-P0-02)
+        e.BASS_Encode_IsActive.argtypes = [c_uint]
+        e.BASS_Encode_IsActive.restype = c_uint
         e.BASS_Encode_CastInit.argtypes = [c_uint, c_char_p, c_char_p, c_char_p,
                                            c_char_p, c_char_p, c_char_p,
                                            c_char_p, c_char_p, c_uint, c_uint]
@@ -145,6 +148,28 @@ class Caster:
 
         self._henc = henc
         self.is_live = True
+        return True
+
+    def check_live(self) -> bool:
+        """VALÓDI adás-állapot. Az `is_live` eddig CSAK a kezdeti handshake
+        sikerét tárolta: ha a hálózat vagy a szerver közben bontott, a felület
+        továbbra is „ÉLŐ ADÁS"-t mutatott, miközben a hallgatók csendet kaptak.
+        Ez lekérdezi az enkóder tényleges állapotát. [Herman Tibi SM-P0-02]
+
+        Visszaad: True, ha az adás tényleg megy. Ha közben megszakadt, az
+        `is_live` False-ra vált, és a `last_error` megmondja, mi történt."""
+        if not self.is_live or not self._henc:
+            return False
+        try:
+            active = self._enc.BASS_Encode_IsActive(self._henc)
+        except Exception:
+            return True          # ha nem tudjuk lekérdezni, ne riasszunk hamisan
+        if int(active) == 0:     # BASS_ACTIVE_STOPPED → az adás megszakadt
+            self.is_live = False
+            self._henc = 0
+            self.last_error = ("Az adás megszakadt (a szerver vagy a hálózati "
+                               "kapcsolat bontott).")
+            return False
         return True
 
     def set_title(self, title: str):

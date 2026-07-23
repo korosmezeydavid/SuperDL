@@ -670,16 +670,16 @@ class SuperMFrame(wx.Frame):
         if self.caster.is_live:
             self.caster.stop()
             self._update_cast_btn()
-            self._announce("Az élő adás leállítva.")
+            self._announce_live("Az élő adás leállítva.")
             return
         host = self.srv_host.GetValue().strip()
         if not host:
-            self._announce("Az adás indításához add meg a kiszolgáló címét "
+            self._announce_live("Az adás indításához add meg a kiszolgáló címét "
                            "(host).")
             self.srv_host.SetFocus()
             return
         self._save_cfg()
-        self._announce("Kapcsolódás a szerverhez…")
+        self._announce_live("Kapcsolódás a szerverhez…")
         ok = self.caster.start(
             self.air.handle,
             host=host,
@@ -695,10 +695,10 @@ class SuperMFrame(wx.Frame):
             cur = self.pl.current()
             if cur:
                 self.caster.set_title(cur.title)
-            self._announce("ÉLŐ ADÁS megy! A műsor most a szerverre megy. "
+            self._announce_live("ÉLŐ ADÁS megy! A műsor most a szerverre megy. "
                            "Leállítás: Ctrl+G.")
         else:
-            self._announce("Az adás nem indult: " + self.caster.last_error)
+            self._announce_live("Az adás nem indult: " + self.caster.last_error)
 
     def _update_cast_btn(self):
         live = self.caster.is_live
@@ -761,7 +761,7 @@ class SuperMFrame(wx.Frame):
             self._mic_on = False
             self._recompute_duck()       # zene vissza (ha más nem halkít)
             self._update_mic_btn()
-            self._announce("Mikrofon KI. A zene vissza a teljes hangerőre.")
+            self._announce_live("Mikrofon KI. A zene vissza a teljes hangerőre.")
             return
         # --- BEKAPCSOLÁS (lazy megnyitás) ---
         if self.mic is None:
@@ -770,13 +770,13 @@ class SuperMFrame(wx.Frame):
                 self.mic.start()
             except SM.BassError as ex:
                 self.mic = None
-                self._announce("A mikrofon nem indítható: " + str(ex))
+                self._announce_live("A mikrofon nem indítható: " + str(ex))
                 return
         self.mic.slide_volume(1.0, 120)
         self._mic_on = True
         self._recompute_duck()
         self._update_mic_btn()
-        self._announce("Mikrofon ÉLŐ – beszélhetsz, a zene halkítva. "
+        self._announce_live("Mikrofon ÉLŐ – beszélhetsz, a zene halkítva. "
                        "Kikapcsolás: ugyanez a gomb vagy Ctrl+Numpad 1.")
 
     # ---- Jingle-Pad (4/A) ---------------------------------------------
@@ -908,6 +908,19 @@ class SuperMFrame(wx.Frame):
     # ---- időzítő: pozíció + automatikus továbblépés -------------------
 
     def _tick(self):
+        # AZ ADÁS TÉNYLEGES ÁLLAPOTA: ha a szerver/hálózat bontott, a felület
+        # eddig továbbra is „ÉLŐ ADÁS"-t mutatott, miközben a hallgatók csendet
+        # kaptak. Most néhány tized másodpercen belül HANGOSAN szólunk.
+        # [Herman Tibi SM-P0-02]
+        if getattr(self, "caster", None) and self.caster.is_live:
+            if not self.caster.check_live():
+                self._announce_live(
+                    "FIGYELEM: az adás MEGSZAKADT! " + self.caster.last_error
+                    + " A hallgatók most nem hallanak. Indítsd újra az adást.")
+                try:
+                    self._update_cast_btn()   # a gomb újra „adás indítása"
+                except Exception:
+                    pass
         # műsorvezető-bemondás vége → a zene halkítása vissza (fókusztól és
         # áttűnéstől függetlenül kell figyelni)
         if self._dj_speaking and self.dj_player and self.dj_player.ended():
@@ -1036,10 +1049,30 @@ class SuperMFrame(wx.Frame):
             e.Skip()
 
     def _announce(self, text):
+        """Rutin-állapot: státuszsor + címke. SZÁNDÉKOSAN néma, hogy a beszéd ne
+        fecsegjen bele a műsorba (számváltás, haladás)."""
         if self._closing:
             return
         self.SetStatusText(text)
         self.now_lbl.SetLabel(text)
+
+    def _announce_live(self, text):
+        """KRITIKUS állapot (élő adás, mikrofon, hiba): a státuszsoron felül
+        AKTÍVAN el is hangzik.
+
+        A státuszsor változását a képernyőolvasó NEM feltétlenül mondja be, így a
+        vak műsorvezető éles adásban nem kapott biztos visszaigazolást arról,
+        hogy tényleg megy-e az adás vagy él-e a mikrofon. A saját hang a
+        MONITOR-eszközre szól, nem az adásbuszra. [Herman Tibi SM-P0-01]"""
+        self._announce(text)
+        if self._closing:
+            return
+        sv = getattr(self.main, "selfvoice", None)
+        if sv:
+            try:
+                sv.speak(text, force=True)
+            except Exception:
+                pass      # a bemondás hibája SOHA nem döntheti meg az adást
 
     def _on_close(self, e):
         self._closing = True

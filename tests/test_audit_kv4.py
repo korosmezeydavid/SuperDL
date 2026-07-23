@@ -111,3 +111,42 @@ def test_kozos_eszkozvalaszto_letezik_es_hasznaljak():
     for rel in ("supermedia/supermedia_mod/superrec.py",
                 "supermedia/supermedia_mod/supervoicechanger.py"):
         assert "select_record_device" in _src(rel), f"{rel}: nem használja"
+
+
+# ---- SM-P0-01: az élő adás kritikus állapotai HALLHATÓK -------------------
+
+def test_super_m_kritikus_allapotai_bemondasra_kerulnek():
+    src = _src("supermedia/supermedia_mod/supermwin.py")
+    assert "def _announce_live" in src, "nincs kritikus (bemondó) állapot-út"
+    assert "sv.speak(text, force=True)" in src
+    # az élő adás és a mikrofon állapota nem maradhat néma
+    for kulcs in ("ÉLŐ ADÁS megy!", "Mikrofon ÉLŐ", "Mikrofon KI.",
+                  "Az élő adás leállítva.", "Az adás nem indult: "):
+        i = src.index(kulcs)
+        elozo = src.rfind("self._announce", 0, i)
+        assert src[elozo:elozo + 20].startswith("self._announce_live"), \
+            f"NÉMA marad: {kulcs}"
+
+
+def test_rutin_allapot_nem_fecseg_bele_a_musorba():
+    """A sima _announce SZÁNDÉKOSAN néma marad (nem beszél minden számváltásnál)."""
+    src = _src("supermedia/supermedia_mod/supermwin.py")
+    i = src.index("    def _announce(self, text):")
+    torzs = src[i:src.index("    def _announce_live")]
+    assert "speak" not in torzs, "a rutin _announce beszél – adás közben fecsegne"
+
+
+# ---- SM-P0-02: nincs HAMIS élő adás --------------------------------------
+
+def test_caster_valodi_elo_ellenorzest_ad():
+    src = _src("supermedia/supermedia_mod/superm_stream.py")
+    assert "def check_live" in src, "nincs valódi adás-állapot ellenőrzés"
+    assert "BASS_Encode_IsActive" in src
+
+
+def test_a_bontast_a_felulet_eszreveszi_es_bemondja():
+    src = _src("supermedia/supermedia_mod/supermwin.py")
+    i = src.index("    def _tick(self):")
+    torzs = src[i:i + 1200]
+    assert "check_live()" in torzs, "a _tick nem figyeli az adás valódi állapotát"
+    assert "MEGSZAKADT" in torzs
