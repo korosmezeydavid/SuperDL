@@ -202,6 +202,16 @@ GEPEK: tuple[RetroGep, ...] = (
              atmenet_ms=9, sav_szuk=0.8, kvant_hz=90, bitek=8,
              elesseg=1.0, hangero=0.99, szotag_hangsuly=0.46,
              debox=7.5, levego=10.0, drive=9.0, deklinacio=0.26),
+    # BraiLab-STÍLUS – a klasszikus magyar beszélő gép hangulata, a Philips
+    # MEA8000 formáns-chip AKUSZTIKAI jellemzői alapján ÚJRAALKOTVA (saját
+    # numpy-szintézis). NEM az eredeti ROM és NEM emulátor – jogtiszta.
+    # Jellemzők: tisztább/magasabb alaphang, csengő formánsok (szűk sáv),
+    # durvább kvantálás – ettől lesz „chippes”, mégis érthető.
+    RetroGep("brailab", "BraiLab-stílus (saját újraalkotás)",
+             alaphang=108.0, hangsuly=0.20, tempo=1.02,
+             atmenet_ms=8, sav_szuk=0.80, kvant_hz=100, bitek=8,
+             elesseg=0.80, hangero=0.99, szotag_hangsuly=0.38,
+             debox=6.0, levego=9.0, drive=5.0, deklinacio=0.22),
     RetroGep("gep", "Beszélő gép (közepes)",
              alaphang=122.0, hangsuly=0.18, tempo=1.0,
              atmenet_ms=12, sav_szuk=0.9, kvant_hz=60, bitek=9,
