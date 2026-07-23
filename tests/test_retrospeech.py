@@ -205,3 +205,117 @@ def test_nem_hasznal_espeaket_es_idegen_artefaktumot():
                     if not l.strip().startswith("#"))
     for tiltott in (".ROM", "BR4", "HL4"):
         assert tiltott not in kod, f"idegen artefaktum: {tiltott}"
+
+
+# ---- REGRESSZIÓ: a négy hiba, ami néma sziszegést okozott ----------------
+# A fejlesztő jelzése: „csak apró sziszegések hallatszódtak, semmi más".
+# A méréssel feltárt négy ok mindegyikére külön őr.
+
+def _profil(x, fs):
+    """Beszéd-jellemzők: néma blokkok aránya + a sávok energia-megoszlása."""
+    e = np.abs(x[:len(x) // 256 * 256]).reshape(-1, 256).max(axis=1)
+    sp = np.abs(np.fft.rfft(x * np.hanning(len(x))))
+    f = np.fft.rfftfreq(len(x), 1 / fs)
+    ossz = sp.sum() or 1.0
+    return {
+        "nema": float(np.mean(e < 0.01)),
+        "formans_sav": float(sp[(f >= 200) & (f < 1500)].sum() / ossz),
+        "magas": float(sp[f >= 3000].sum() / ossz),
+    }
+
+
+@pytest.mark.parametrize("gk", ["gep", "gep_darabos", "gep_melv", "gep_magas"])
+def test_a_kimenet_beszed_jellegu_nem_sziszeges(gk):
+    """A LÉNYEG: az energia a FORMÁNS-sávban legyen, ne a magasban, és ne
+    legyen szinte minden néma. A hibás állapotban: 92% néma, 3% formáns-sáv,
+    86% magas – vagyis puszta sziszegés."""
+    x, fs = RS.szintetizal("Üdvözöllek a retro játékok menüjében!", RS.gep(gk))
+    p = _profil(x, fs)
+    assert p["nema"] < 0.60, f"{gk}: a hang {p['nema']:.0%}-a néma"
+    assert p["formans_sav"] > 0.25, \
+        f"{gk}: alig van energia a formáns-sávban ({p['formans_sav']:.0%})"
+    assert p["magas"] < 0.40, f"{gk}: sziszegés uralja ({p['magas']:.0%})"
+
+
+def test_a_rezonator_allapota_folyamatos():
+    """1. HIBA: a szűrő-állapot blokkonkénti nullázása szétverte a hangot –
+    a rezonátornak CSENGENIE kell két zöngeimpulzus között."""
+    fs = 11025
+    n = fs // 2
+    imp = np.zeros(n)
+    imp[::90] = 1.0                       # ~122 Hz, a blokknál ritkábban
+    y = RS._rezonator(imp, np.full(n, 700.0), np.full(n, 90.0), fs,
+                      int(fs * 0.005))    # a blokk RÖVIDEBB a periódusnál
+    e = np.abs(y[:len(y) // 256 * 256]).reshape(-1, 256).max(axis=1)
+    assert float(np.mean(e < 0.01 * np.max(np.abs(y)))) < 0.10, \
+        "a rezonátor nem cseng végig (állapot-nullázás)"
+
+
+def test_a_rezonator_a_CSUCSRA_van_normalva():
+    """3. HIBA: DC-re normálva a magas formánsú réshangok 45-ször hangosabbak
+    lettek a magánhangzóknál. A csúcs-normálás után az erősítés a
+    középfrekvencián ~1, függetlenül attól, hol van a formáns."""
+    fs = 11025
+    n = fs
+    for f0 in (500.0, 1800.0, 3600.0):
+        t = np.arange(n) / fs
+        be = np.sin(2 * np.pi * f0 * t)    # pont a rezonancián
+        ki = RS._rezonator(be, np.full(n, f0), np.full(n, 100.0), fs, n)
+        # a rezonancián az erősítés legyen 1 körüli (nem 10, nem 0,01)
+        eros = float(np.sqrt(np.mean(ki[fs // 4:] ** 2)) /
+                     np.sqrt(np.mean(be ** 2)))
+        assert 0.5 < eros < 2.0, f"{f0} Hz-en az erősítés {eros:.2f}"
+
+
+def test_a_zonge_nem_halkabb_a_zajnal():
+    """2. HIBA: az egymintás impulzus túl kevés energiát hordozott, ezért a
+    zaj elnyomta a zöngét – a beszédből csak sziszegés maradt.
+
+    A LÁNCOT mérjük, nem a kész fájlokat: azokat külön-külön 0,9-re
+    normalizáljuk, ezért az arányuk nem lenne összehasonlítható.
+    """
+    g = RS.gep("gep")
+    fs, n = g.fs, g.fs // 2
+    lep = int(fs * 0.005)
+
+    def lanc(gerj, h):
+        y = RS._rezonator(gerj, np.full(n, h.f1), np.full(n, h.b1), fs, lep)
+        y = RS._rezonator(y, np.full(n, h.f2), np.full(n, h.b2), fs, lep)
+        y = RS._rezonator(y, np.full(n, h.f3), np.full(n, h.b3), fs, lep)
+        return np.concatenate(([y[0]], np.diff(y)))       # sugárzás
+
+    # a gerjesztés PONTOSAN úgy, ahogy a szintetizátor építi
+    imp = np.zeros(n)
+    imp[::int(fs / g.alaphang)] = 1.0
+    glott = RS._rezonator(imp, np.full(n, 240.0), np.full(n, 160.0), fs, n)
+    glott = glott / (float(np.sqrt(np.mean(glott ** 2))) or 1e-9)
+    rng = np.random.default_rng(1)
+    zaj = rng.standard_normal(n)
+    zaj = zaj / (float(np.sqrt(np.mean(zaj ** 2))) or 1e-9) * 0.04
+
+    a, sz = RS.TABLA["á"], RS.TABLA["sz"]
+    r_m = float(np.sqrt(np.mean(lanc(glott, a) ** 2))) * a.hangero
+    r_r = float(np.sqrt(np.mean(lanc(zaj, sz) ** 2))) * sz.hangero
+    arany = r_r / (r_m or 1e-9)
+    assert arany < 1.0, \
+        f"a réshang HANGOSABB a magánhangzónál ({arany:.1f}x) – sziszegés"
+    assert arany > 0.05, f"a réshang alig hallható ({arany:.2f}x)"
+
+
+def test_a_kvantalas_a_normalizalas_UTAN_tortenik():
+    """4. HIBA: fordított sorrendben a bit-kvantálás LENULLÁZTA a jelet
+    (a csúcsra normált lánc kis értékeket ad, a 7 bites lépcső mindent
+    0-ra kerekített)."""
+    import inspect
+    src = inspect.getsource(RS.szintetizal)
+    i_norm = src.index("ki = ki / csucs")
+    i_kvant = src.index("np.round(ki * lepcsok)")
+    assert i_norm < i_kvant, "a kvantálás megelőzi a normalizálást"
+
+
+@pytest.mark.parametrize("gk", ["gep", "gep_darabos", "gep_melv", "gep_magas"])
+def test_egyik_karakter_sem_nemul_el(gk):
+    """A `gep_darabos` (7 bit) teljesen elnémult a rossz sorrend miatt."""
+    x, _ = RS.szintetizal("Próba egy kettő három.", RS.gep(gk))
+    assert float(np.max(np.abs(x))) > 0.5, f"{gk}: néma vagy alig hallható"
+    assert not np.isnan(x).any(), f"{gk}: NaN a kimenetben"

@@ -204,20 +204,39 @@ def gep(kulcs: str) -> RetroGep:
     return GEP_MAP.get(kulcs or "", GEPEK[0])
 
 
-def _rezonator(x, f: float, bw: float, fs: int):
-    """Klatt-féle kétpólusú rezonátor – EGY formáns. A formánsszintézis
-    alapköve: a gerjesztést ezeken vezetjük át egymás után."""
+def _rezonator(x, F, B, fs: int, lep: int):
+    """Klatt-féle kétpólusú rezonátor – EGY formáns, IDŐBEN VÁLTOZÓ
+    paraméterekkel.
+
+    KRITIKUS: a szűrő ÁLLAPOTA (y1, y2) végig FOLYAMATOS. A rezonátornak
+    „csengenie" kell két zöngeimpulzus között – ha az állapotot blokkonként
+    lenulláznánk, a hang szétesne néma töredékekre (a gerjesztő impulzusok
+    ~90 mintánként jönnek, a paraméter-blokkok viszont rövidebbek). Ezért a
+    paramétereket blokkonként frissítjük, de az állapotot NEM."""
     import numpy as np
     T = 1.0 / fs
-    c = -math.exp(-2 * math.pi * bw * T)
-    b = 2 * math.exp(-math.pi * bw * T) * math.cos(2 * math.pi * f * T)
-    a = 1.0 - b - c
-    y = np.empty_like(x)
+    n = x.shape[0]
+    y = np.empty(n)
     y1 = y2 = 0.0
-    for i in range(x.shape[0]):
-        yi = a * x[i] + b * y1 + c * y2
-        y[i] = yi
-        y2, y1 = y1, yi
+    for kezd in range(0, n, lep):
+        veg = min(n, kezd + lep)
+        f = max(150.0, float(F[kezd]))
+        bw = max(40.0, float(B[kezd]))
+        c = -math.exp(-2 * math.pi * bw * T)
+        b = 2 * math.exp(-math.pi * bw * T) * math.cos(2 * math.pi * f * T)
+        # A CSÚCSRA normálunk, nem nulla frekvenciára. A régi `a = 1-b-c`
+        # egységnyi erősítést ad DC-n, de magas középfrekvencián a rezonancia-
+        # csúcs erősítése óriási: emiatt a magas formánsú réshangok („sz", „s")
+        # 40-50-szer hangosabbak lettek a magánhangzóknál – a beszédből csak
+        # sziszegés maradt.
+        w0 = 2 * math.pi * f * T
+        nev = complex(1.0, 0.0) - b * complex(math.cos(w0), -math.sin(w0)) \
+            - c * complex(math.cos(2 * w0), -math.sin(2 * w0))
+        a = abs(nev)
+        for i in range(kezd, veg):
+            yi = a * x[i] + b * y1 + c * y2
+            y[i] = yi
+            y2, y1 = y1, yi
     return y
 
 
@@ -305,23 +324,35 @@ def szintetizal(szoveg: str, g: RetroGep):
     valt[0] = True
     valt[1:] = egesz[1:] != egesz[:-1]
     imp[valt] = 1.0
-    zaj = rng.standard_normal(ossz) * 0.5
-    gerj = ZONGE * imp * (1.0 - ZAJ) + zaj * np.maximum(ZAJ, 1.0 - ZONGE)
+    # GLOTTISZ-GERJESZTÉS: az egymintás impulzus túl kevés energiát hordoz
+    # (90 mintánként egy tüske → RMS ~0,1), ezért a zaj elnyomná a zöngét, és a
+    # beszédből csak sziszegés maradna. A valódi hangszalag-jel szélesebb
+    # impulzus: az impulzussort egy kétpólusú szűrőn vezetjük át, ami
+    # glottisz-szerű alakot és rendes energiát ad neki.
+    glott = _rezonator(imp, np.full(ossz, 240.0), np.full(ossz, 160.0),
+                       fs, ossz)
+    # MINDKÉT forrást egységnyi hangerőre hozzuk, hogy az arányuk a
+    # hangzó-táblából (ZAJ) jöjjön, ne a véletlenből
+    zaj = rng.standard_normal(ossz)
+    e_g = float(np.sqrt(np.mean(glott ** 2))) or 1e-9
+    e_z = float(np.sqrt(np.mean(zaj ** 2))) or 1e-9
+    glott = glott / e_g
+    # A zaj szintje MÉRÉSSEL beállítva: a sugárzási differenciálás (+6 dB/okt)
+    # a magas formánsú réshangokat („sz", „s") jobban emeli, mint a mély
+    # magánhangzókat, ezért a nyers arány 5-6-szoros lenne. 0,04-nél az „sz"
+    # a magánhangzó ~0,4-szeresén szól – ez felel meg a valódi beszédnek.
+    zaj = zaj / e_z * 0.04
+    gerj = ZONGE * (1.0 - ZAJ) * glott + np.maximum(ZAJ, 1.0 - ZONGE) * zaj
 
     # --- 4) formáns-lánc ---
     # A pályák szakaszonként állandók, ezért szakaszonként futtatjuk a
     # rezonátorokat – így gyors marad, és a „lépcsőzés" megmarad.
-    ki = np.zeros(ossz)
-    lep = max(1, int(fs * 0.005))        # 5 ms-os felbontás a paramétereknél
-    for kezd in range(0, ossz, lep):
-        veg = min(ossz, kezd + lep)
-        s = gerj[kezd:veg]
-        if not np.any(s):
-            continue
-        y = _rezonator(s, max(150.0, F1[kezd]), max(40.0, B1[kezd]), fs)
-        y = _rezonator(y, max(300.0, F2[kezd]), max(50.0, B2[kezd]), fs)
-        y = _rezonator(y, max(500.0, F3[kezd]), max(60.0, B3[kezd]), fs)
-        ki[kezd:veg] = y
+    # A láncot EGYBEN futtatjuk (folyamatos szűrő-állapottal), a paramétereket
+    # 5 ms-onként frissítve. Így a rezonátorok végig csengenek.
+    lep = max(1, int(fs * 0.005))
+    ki = _rezonator(gerj, F1, B1, fs, lep)
+    ki = _rezonator(ki, F2, B2, fs, lep)
+    ki = _rezonator(ki, F3, B3, fs, lep)
 
     # --- 4b) SUGÁRZÁSI KARAKTERISZTIKA ---
     # A valódi hangképzésben a száj nyílása differenciálóként viselkedik
@@ -331,12 +362,17 @@ def szintetizal(szoveg: str, g: RetroGep):
     ki = np.concatenate(([ki[0]], np.diff(ki)))
 
     ki *= AMP
-    if g.bitek:
-        lepcsok = float(2 ** (g.bitek - 1))
-        ki = np.round(ki * lepcsok) / lepcsok
+    # SORREND: előbb NORMALIZÁLUNK, csak utána kvantálunk. Fordítva a
+    # kvantálás lenullázná a jelet, mert a csúcsra normált rezonátor-lánc
+    # kis abszolút értékeket ad (a 7 bites lépcső mindent 0-ra kerekítene).
+    # Így a bit-kvantálás a teljes kivezérlésű jelre hat – mint egy korabeli
+    # hangkimenetnél.
     csucs = float(np.max(np.abs(ki))) if ki.size else 0.0
     if csucs > 0:
         ki = ki / csucs * 0.9
+    if g.bitek:
+        lepcsok = float(2 ** (g.bitek - 1))
+        ki = np.round(ki * lepcsok) / lepcsok
     return ki, fs
 
 
