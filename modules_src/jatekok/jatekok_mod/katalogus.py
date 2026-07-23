@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-"""A játékok KATALÓGUSA – ide kerülnek be az egyes játékok.
+"""A játékok KATALÓGUSA – a felület ebből építi a két listát (Retró / Saját).
 
-Ez a keretrendszer „nyilvántartása": a felület ebből építi a két listát. Egy
-játék hozzáadásához elég ide egy sor, és megírni az indító függvényét.
+Minden RETRÓ játék a klasszikus magyar vakos DOS-játékok akadálymentes,
+modern újraalkotása. A szerzőket a fejlesztő megkereste és ÍRÁSOS engedélyt
+kapott; minden játék indulásakor elhangzik és megjelenik a SZERZŐ-MEGJELÖLÉS
+(lásd `attribucio_szoveg`). Ahol a szerző ismeretlen, ott „várjuk a szerző
+jelentkezését" felirat szerepel.
 
-FONTOS ELV: ha egy játék még NINCS kész, az `indit=None` marad. A felület
-ilyenkor MEGMONDJA, hogy még készül – SOHA nem tesz úgy, mintha elindult
-volna. (Ugyanaz az elv, mint a program többi részében: nincs hamis siker.)
+A tényleges játéklogika a `jatekok/` alcsomag generátor-korutinjaiban él; egy
+játék akkor „indítható", ha a kulcsa szerepel a `jatekok.REGISZTER`-ben. Ha
+még nincs megírva, a felület tisztességesen közli: „még készül" – nincs hamis
+siker.
 """
 from dataclasses import dataclass
-from typing import Callable, Optional
 
 
 @dataclass(frozen=True)
@@ -17,35 +20,160 @@ class Jatek:
     kulcs: str
     nev: str
     leiras: str
-    indit: Optional[Callable] = None      # indit(szulo_ablak) -> None
+    retro: bool = True            # retró hang + szerző-intro (False = saját)
+    szerzo: str = ""              # eredeti szerző (üres = ismeretlen)
+    ev: str = ""                  # az eredeti megjelenés éve
+    jogtulaj: str = ""            # a szerzői jog jogosultja (üres = mint szerző)
+    felnott: bool = False         # 18+ tartalom (figyelmeztetéssel indul)
 
 
-# ---------------------------------------------------------------- RETRÓ
-# A 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű retró
-# beszédhanggal. A szerzőkkel egyeztetett, engedélyezett tartalom.
+# az ismétlődő szerzők, hogy ne gépeljük el őket
+VAKODA = "Iván Várhelyi (VAKODA Software)"
+PILLE = "a Pille software"
+TURAI = "Turai László (Brailab Software)"
+
+
+# =====================================================================
+#  RETRÓ JÁTÉKOK
+# =====================================================================
 RETRO: tuple[Jatek, ...] = (
-    Jatek("akaszto", "Akasztófa",
-          "Klasszikus betűkitalálós játék: magyar szavak, korhű gépi hanggal."),
+    # ---- kártya / kocka / szerencse ----
+    Jatek("huszonegy", "Huszonegy (21)",
+          "Magyar kártyás huszonegyezés a gép ellen: állj meg időben, "
+          "vagy húzz még – 14 és 21 között kell maradnod.",
+          szerzo=PILLE, ev="1994"),
+    Jatek("hazard", "Itt a piros, hol a piros?",
+          "Három gyufásdoboz, egyben a piros golyó. Találd ki, melyikben!",
+          szerzo=PILLE, ev="1994"),
+    Jatek("snobli", "Snóbli",
+          "A klasszikus kocsmai érme-kitalálós: hány érme van a kezekben?",
+          szerzo=VAKODA, ev="1993"),
+    Jatek("kocka3", "Kockadobás – három kocka",
+          "Három kockával dobtok felváltva; egyformákra extra pont jár.",
+          szerzo=PILLE, ev="1994"),
+    Jatek("kocka1", "Kockajáték – összeg",
+          "Egyszerű kockás pontverseny a gép ellen: a nagyobb összeg nyer.",
+          szerzo="L. Bonta", ev="1994"),
+    Jatek("kockadob", "Kockadobás – mezőverseny",
+          "Egy kockával lépegettek a célig; aki a másikra lép, kiüti a startra.",
+          szerzo=PILLE, ev="1994"),
+    Jatek("rulett", "Rulett",
+          "Kaszinó rulett: tégy számra, színre, párosra vagy tucatra.",
+          szerzo=VAKODA, ev="1993"),
+    Jatek("rulibuli", "Rulibuli",
+          "Egyszerűsített rulett: a szám páros vagy páratlan lesz-e?",
+          szerzo=TURAI, ev="1996"),
+    Jatek("gyufa", "Gyufapöci",
+          "Pöcköld a gyufásdobozt pontokért – de vigyázz, a kockázat visszaüthet.",
+          szerzo=VAKODA, ev="1993"),
+
+    # ---- logika / stratégia ----
     Jatek("mastermind", "Mastermind (kódtörő)",
-          "Találd ki a rejtett számsort a visszajelzések alapján."),
-    Jatek("nim", "Nim-játék",
-          "Gyufaszálas logikai játék a gép ellen – aki az utolsót elveszi, nyer."),
+          "Találd ki a gép négy színből álló, sorrendes kódját a "
+          "fekete-fehér visszajelzések alapján.",
+          szerzo=VAKODA, ev="1993"),
+    Jatek("nim", "Négyzet kirakó (Nim)",
+          "Húsz négyzet, körönként 1–3. Aki az utolsót rakja le, VESZT.",
+          szerzo=PILLE, ev="1994"),
     Jatek("torpedo", "Torpedó",
-          "Hajókeresés hangalapú rácson, bemondott koordinátákkal."),
-    Jatek("kockapoker", "Kockapóker",
-          "Kockadobós szerencsejáték, bemondott dobásokkal és pontokkal."),
-    Jatek("szojatek", "Szójáték",
-          "Szókincsfejlesztő betű- és szófejtő feladatok."),
+          "Tízszer tízes rácson négy rejtett X-et kell megtalálnod.",
+          szerzo=PILLE, ev="1994"),
+    Jatek("horstep", "Lóugrás verseny",
+          "Sakkló-lépésekkel érj a tábla túlsó sarkába a gép előtt.",
+          szerzo=PILLE, ev="1994"),
+    Jatek("labirint", "Labirintus",
+          "Tapogatózz ki a labirintusból: iránnyal lépsz, a falat bemondja.",
+          szerzo=PILLE, ev="1994"),
+    Jatek("parbaj", "Párbaj",
+          "Négy pozíció, rejtett ellenfél: találd el, hol áll, mielőtt ő téged.",
+          szerzo="", ev=""),                      # ismeretlen szerző
+    Jatek("teke", "Teve-parki tekeparti",
+          "Kilenc bábu, középen a király (3 pont). Guríts a gép (Frédi) ellen!",
+          szerzo=TURAI, ev="1996"),
+
+    # ---- kvíz / oktató ----
+    Jatek("allatism", "Állatismeret",
+          "Biológiai kvíz állatokról: hol él, mivel táplálkozik, hová tartozik.",
+          szerzo=VAKODA, ev="1993"),
+    Jatek("fovaros", "Főváros",
+          "Földrajzi kvíz: mondd meg az országok fővárosát.",
+          szerzo=VAKODA, ev="1993"),
+    Jatek("atomvad", "Atomvadász",
+          "Kémiai betűvadászat: keresd a vegyjeleket a szavakban.",
+          szerzo=VAKODA, ev="1993"),
+    Jatek("braille", "Braille gyakorlat",
+          "Betű és pontkombináció megfeleltetése – a Braille-írás gyakorlása.",
+          szerzo="VAKODA Software", ev="1993"),
+    Jatek("morse", "Morse ábécé",
+          "Tanuld és gyakorold a Morse-kódot: betűből jel, jelből betű.",
+          szerzo=TURAI, ev="1996"),
+    Jatek("kitalal", "Szókitaláló",
+          "A gép egy fogalomra gondol; tulajdonságok alapján találd ki.",
+          szerzo=VAKODA, ev="1993"),
+    Jatek("szamtan", "Számtan tanár",
+          "Fejszámoló feladatok testre szabható művelettel és nagyságrenddel.",
+          szerzo=VAKODA, ev="1993"),
+    Jatek("memoria", "Memória – sorrend",
+          "Jegyezd meg a növekvő sorozatot, és mondd vissza pontosan!",
+          szerzo=VAKODA, ev="1993"),
+    Jatek("memory", "Memory – párosító",
+          "A klasszikus párkereső memóriajáték, hangalapú rácson.",
+          szerzo=VAKODA, ev="1993"),
+    Jatek("parver", "Billentyűzet verseny",
+          "Reakciójáték: nyomd le minél gyorsabban a bemondott billentyűt.",
+          szerzo="VAKODA Software", ev="1993"),
+
+    # ---- kaland / egyéb ----
+    Jatek("csata", "Csata – várvédés",
+          "Védd meg a várat a törökök ostromától – lövésről lövésre.",
+          szerzo=TURAI, ev="1996"),
+    Jatek("harcos", "Országút harcosa",
+          "Választásos kalandkönyv a járvány utáni világban, felfegyverzett "
+          "Dodge Interceptorral.",
+          szerzo="Varga Tamás (Sir-Soft) és Pál Zsolt (Pille software)",
+          ev="1995–96"),
+    Jatek("allah", "Allah szakálla",
+          "Sugárzásmérővel keresd az időzített bombát a százemeletes "
+          "szállodában, mielőtt lejár az idő.",
+          szerzo="Csapó Endre (Marx György ötletéből)", ev="1993"),
+    Jatek("zongora", "Zongora",
+          "Zongorázz a számítógép billentyűzetén – egész és félhangok, oktávok.",
+          szerzo="L. Turai", ev="1995"),
+    Jatek("szindbad", "Szindbád (18+)",
+          "Felnőtt hangvételű, humoros választásos kaland: mentsd meg a "
+          "szultán hajóját, és válassz a jutalomból okosan.",
+          szerzo=TURAI, ev="1996", felnott=True),
+
+    # ---- a JATEK.EXE gyűjtemény mini-játékai (klasszikus/közkincs
+    #      mechanikák; a szerző egyelőre ismeretlen – várjuk a jelentkezését) ----
+    Jatek("domino", "Dominó",
+          "A klasszikus dominó a gép ellen: illeszd a köveket a végekhez."),
+    Jatek("tozsde", "Tőzsde",
+          "Kis piac-szimuláció: vásárolj olcsón, adj el drágán."),
+    Jatek("korong", "Korong",
+          "Pozíciós táblás játék: fordítsd a magad színére a korongokat."),
+    Jatek("nyulfarm", "Nyúlfarm",
+          "Tenyészd és gazdálkodd fel a nyúlfarmodat évről évre."),
+    Jatek("hamurabi", "Hamurabi",
+          "Az ősi királyság-menedzsment: vess, arass, etesd a népet."),
+    Jatek("mokita", "Mokita",
+          "Kis logikai mini-játék a gyűjteményből."),
 )
 
-# ------------------------------------------------------- SUPERDL SAJÁT
+
+# =====================================================================
+#  SUPERDL SAJÁT JÁTÉKOK  (nem retró: normál hang, nincs szerző-intro)
+# =====================================================================
 SAJAT: tuple[Jatek, ...] = (
     Jatek("hangmemoria", "Hangmemória",
-          "Párosítsd a hangokat! Tisztán hallás utáni memóriajáték."),
+          "Párosítsd a hangokat! Tisztán hallás utáni memóriajáték.",
+          retro=False),
     Jatek("iranyerzek", "Iránytű",
-          "Térbeli hallás gyakorlása: honnan jön a hang?"),
+          "Térbeli hallás gyakorlása: honnan jön a hang?",
+          retro=False),
     Jatek("reakcio", "Reakcióidő",
-          "Milyen gyorsan reagálsz a jelre? Napi eredménykövetéssel."),
+          "Milyen gyorsan reagálsz a jelre? Napi eredménykövetéssel.",
+          retro=False),
 )
 
 
@@ -53,8 +181,27 @@ def mind() -> tuple[Jatek, ...]:
     return RETRO + SAJAT
 
 
-def keres(kulcs: str) -> Optional[Jatek]:
+def keres(kulcs: str):
     for j in mind():
         if j.kulcs == kulcs:
             return j
     return None
+
+
+# ---- szerző-megjelölés (a fejlesztő KIFEJEZETT kérése) ------------------
+
+def attribucio_szoveg(j: Jatek) -> str:
+    """A minden retró játék elején elhangzó és megjelenő szerző-megjelölés."""
+    if j.szerzo:
+        elso = f"Ezt a játékot készítette: {j.szerzo}"
+        if j.ev:
+            elso += f", {j.ev}-ban"
+        elso += "."
+    else:
+        elso = ("Ennek a játéknak a szerzője egyelőre ismeretlen – "
+                "várjuk a szerző jelentkezését.")
+    kozep = (" Modernizálta Kőrösmezey Dávid, köszönettel azokért az órákért, "
+             "amit együtt tölthettünk el ezen játékok játszásakor.")
+    jog = j.jogtulaj or j.szerzo
+    veg = f" A szerzői jogok {jog} illetik." if jog else ""
+    return elso + kozep + veg

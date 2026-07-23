@@ -5,8 +5,8 @@ A modul saját ablakot ad, két szekcióval:
     korhű RETRÓ BESZÉDHANGGAL;
   • SuperDL saját játékok – a program saját, akadálymentes játékai.
 
-A retró hangot a Core `retrovoice` motorja adja: SAJÁT kód, saját táblák –
-semmilyen idegen ROM-ot vagy chip-kódot nem használ.
+A retró hangot a Core `retrospeech` formáns-motorja adja: SAJÁT kód, saját
+táblák – semmilyen idegen ROM-ot vagy chip-kódot nem használ.
 
 register(core): „Játékok" menü + a Játékok ablak; unregister leszerel."""
 

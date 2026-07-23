@@ -251,7 +251,8 @@ class JatekokFrame(wx.Frame):
         if not j:
             self._announce("Előbb válassz játékot a listából.", beszel=True)
             return
-        if not j.indit:
+        from .jatekkonzol import indithato, indit_jatek
+        if not indithato(j.kulcs):
             # A keretrendszer kész, a játék maga még nem – ezt MEGMONDJUK,
             # nem teszünk úgy, mintha elindult volna.
             self._announce(
@@ -259,7 +260,7 @@ class JatekokFrame(wx.Frame):
                 beszel=True)
             return
         try:
-            j.indit(self)
+            indit_jatek(self, j, lambda: self._hang)
         except Exception as e:
             self._announce(f"A játék nem indult el: {e}", beszel=True)
 

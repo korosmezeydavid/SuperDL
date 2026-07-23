@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+"""A megírt játékok REGISZTERE: kulcs → generátor-korutin.
+
+Egy játék akkor indítható a felületről, ha a kulcsa itt szerepel. A még meg
+nem írt játékok egyszerűen kimaradnak innen, és a felület tisztességesen
+közli, hogy „még készül" – SOHA nincs hamis siker.
+
+Új játék bekötése: írd meg a generátort a megfelelő modulban, majd vedd fel
+ide egy sorral.
+"""
+from . import kartya, logika
+
+REGISZTER = {
+    # logika / stratégia
+    "nim": logika.jatek_nim,
+    "mastermind": logika.jatek_mastermind,
+    "torpedo": logika.jatek_torpedo,
+    "teke": logika.jatek_teke,
+    "parbaj": logika.jatek_parbaj,
+    # kártya / kocka / szerencse
+    "huszonegy": kartya.jatek_huszonegy,
+    "hazard": kartya.jatek_hazard,
+    "snobli": kartya.jatek_snobli,
+    "kocka3": kartya.jatek_kocka3,
+    "kocka1": kartya.jatek_kocka1,
+    "kockadob": kartya.jatek_kockadob,
+    "rulett": kartya.jatek_rulett,
+    "rulibuli": kartya.jatek_rulibuli,
+    "gyufa": kartya.jatek_gyufa,
+}
+
+
+def van(kulcs: str) -> bool:
+    return kulcs in REGISZTER
+
+
+def get(kulcs: str):
+    return REGISZTER.get(kulcs)

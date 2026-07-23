@@ -175,7 +175,9 @@ def test_a_felulet_megmondja_ha_a_jatek_meg_keszul():
     src = _src("modules_src/jatekok/jatekok_mod/jatekokwin.py")
     assert "még készül" in src
     i = src.index("def _indit")
-    assert "if not j.indit" in src[i:i + 600]
+    # a kapu a regiszter-alapú „indítható-e" ellenőrzés (a katalógusban már
+    # nincs indit-mező; a felület a megírt játékok regiszteréből dönt)
+    assert "if not indithato" in src[i:i + 600]
 
 
 def test_az_ablak_a_kotelezo_akadalymentes_elemeket_hozza():
