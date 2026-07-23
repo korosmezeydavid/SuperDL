@@ -38,6 +38,10 @@ LÉPÉSRŐL LÉPÉSRE (vakon is)
 4. JEGYZETEK: a listában Enter = megnyitás/szerkesztés.
 5. REZSI: rendszeres és egyszeri költségek; havi/éves összesítés; opcionális
    PIN-lakat (a „Feloldás” gombbal nyitod).
+   FONTOS: a PIN csak KÉPERNYŐZÁR – a véletlen betekintés ellen véd. Az adatok
+   NINCSENEK titkosítva: aki hozzáfér a géped fájljaihoz (vagy egy biztonsági
+   mentéshez), PIN nélkül is elolvashatja őket. Ha ez fontos, ne tárolj itt
+   érzékeny pénzügyi adatot.
 6. ICS: külső naptárba/böngészőbe szinkronizálható hivatkozás.
 
 GYORSBILLENTYŰK
@@ -494,7 +498,10 @@ class OrganizerFrame(wx.Frame):
                    "megváltoztatja; ÜRESEN hagyva a lakatot TÖRLÖD.\n\nÚj PIN "
                    "(max 6 számjegy):")
         else:
-            msg = ("Állíts be PIN-kódot (max 6 számjegy), hogy a rezsi-fülbe "
+            msg = ("FIGYELEM: a PIN csak KÉPERNYŐZÁR (a véletlen betekintés\n"
+                   "ellen). Az adatokat NEM titkosítja: a fájlokhoz férő\n"
+                   "más program vagy személy PIN nélkül is elolvashatja.\n\n"
+                   "Állíts be PIN-kódot (max 6 számjegy), hogy a rezsi-fülbe "
                    "csak az nézhessen bele, aki ismeri.\n\n(Üresen hagyva nincs "
                    "lakat.) PIN:")
         # MASZKOLT bevitel: a sima TextEntryDialog a beírt PIN-t olvashatóan
