@@ -34,7 +34,13 @@ def _clean(t: str) -> str:
 
 
 def _from_txt(path: Path) -> Book:
-    raw = path.read_text(encoding="utf-8", errors="replace")
+    # A KÖZÖS dekódolóval: a régi magyar kódlapok (CP1250, CP852, CWI-2) és a
+    # kettős kódolás is helyreáll. Korábban itt fix UTF-8 + `errors="replace"`
+    # volt, ezért a régi könyvekben a magyar betűk pótló jelre cserélődtek, és a
+    # felolvasó a kacatot mondta be – LÁTHATATLAN adatvesztéssel.
+    # [Herman Tibi TEXT-P0-01]
+    from . import textdecode
+    raw = textdecode.read_text_file(path)
     return Book(title=path.stem, sections=[_clean(raw)])
 
 
