@@ -351,7 +351,11 @@ class ReaderFrame(wx.Frame):
             self.SetStatusText("Alvás-időzítő kikapcsolva.")
             return
         from .sleeptimer import SleepTimer
-        self._base_vol = self.engine.player.volume or 0.7
+        # A 0.0 hangerő ÉRVÉNYES érték: az `or 0.7` a szándékos némítást
+        # 0,7-re állította vissza, és az alvás-időzítő után megszólalt a hang.
+        # [Herman Tibi READ-P1-14]
+        _v = getattr(self.engine.player, "volume", None)
+        self._base_vol = 0.7 if _v is None else float(_v)
         self.sleep = SleepTimer(
             mins * 60,
             on_mark=lambda q: wx.CallAfter(self._sleep_mark, q),

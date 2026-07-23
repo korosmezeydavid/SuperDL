@@ -14,6 +14,7 @@ eseményeknél fut le magától; a KÜLSŐ (ICS) eseményeknél SOHA – azokná
 emlékeztető/figyelmeztetés van (nehogy idegen naptár megnyithasson valamit).
 """
 
+import logging
 import threading
 import urllib.request
 import uuid as _uuid
@@ -21,6 +22,8 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta, date as _date
 
 from . import store
+
+_log = logging.getLogger(__name__)
 
 ACTION_NONE, ACTION_OPEN, ACTION_SPEAK = "none", "open", "speak"
 REPEAT_NONE, REPEAT_DAILY, REPEAT_WEEKLY = "none", "daily", "weekly"
@@ -59,6 +62,15 @@ class Event:
         return datetime(on.year, on.month, on.day, h, m)
 
     def occurs_on(self, day: _date) -> bool:
+        # Az ismétlődés SOHA nem kezdődhet a megadott kezdődátum ELŐTT.
+        # Enélkül egy jövő hónapra felvett napi/heti esemény MÁR MA elsülne
+        # (hibás emlékeztető és automatikus akció). [Herman Tibi CAL-P0-01]
+        if self.repeat in (REPEAT_DAILY, REPEAT_WEEKLY):
+            try:
+                if day < _date.fromisoformat(self.date):
+                    return False
+            except (TypeError, ValueError):
+                pass          # hiányzó/hibás kezdődátum: a régi viselkedés marad
         if self.repeat == REPEAT_DAILY:
             return True
         if self.repeat == REPEAT_WEEKLY:
@@ -249,6 +261,10 @@ class OrganizerManager:
         self.ics_subs: list[IcsSub] = [self._mk(IcsSub, r)
                                        for r in store.load_ics_subs()]
         self.ics_events: list[Event] = []
+        # ütemező-egészség (CAL-P0-06): a hibák nem tűnhetnek el némán
+        self.last_tick_ok: datetime | None = None
+        self.tick_errors = 0
+        self.last_error = ""
         self._stop = threading.Event()
         self._thread = threading.Thread(target=self._loop, daemon=True)
         self._thread.start()
@@ -386,8 +402,23 @@ class OrganizerManager:
         while not self._stop.wait(20):
             try:
                 self._tick()
-            except Exception:
-                pass
+                self.last_tick_ok = datetime.now()
+            except Exception as e:
+                # NE tűnjön el némán: e nélkül egyetlen hibás rekord után az
+                # ÖSSZES emlékeztető csendben kimaradhat, és nem derül ki, miért.
+                # [Herman Tibi CAL-P0-06]
+                self.tick_errors += 1
+                self.last_error = f"{type(e).__name__}: {e}"
+                _log.exception("Az emlékeztető-ütemező hibája (%d. alkalom)",
+                               self.tick_errors)
+
+    def scheduler_health(self) -> dict:
+        """Az ütemező állapota a diagnosztikához (F8): mikor futott le utoljára
+        hibátlanul, hány hiba volt, és mi volt az utolsó."""
+        return {"utolso_sikeres": (self.last_tick_ok.isoformat(timespec="seconds")
+                                   if self.last_tick_ok else "még nem futott"),
+                "hibak_szama": self.tick_errors,
+                "utolso_hiba": self.last_error or "nincs"}
 
     def _tick(self):
         now = datetime.now()

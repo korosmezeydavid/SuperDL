@@ -77,7 +77,21 @@ def clean_book(book):
 _CLAUSE_SEPS = (", ", "; ", ": ", " – ", " — ", ") ")
 
 
-def _wrap_long(s: str, limit: int) -> list[str]:
+def _byte_window(s: str, limit: int) -> int:
+    """Hány KARAKTER fér bele `limit` UTF-8 BÁJTBA? (bájt-alapú daraboláshoz)"""
+    if len(s.encode("utf-8")) <= limit:
+        return len(s)
+    lo, hi = 0, len(s)
+    while lo < hi:                       # bináris keresés a leghosszabb prefixre
+        mid = (lo + hi + 1) // 2
+        if len(s[:mid].encode("utf-8")) <= limit:
+            lo = mid
+        else:
+            hi = mid - 1
+    return max(1, lo)
+
+
+def _wrap_long(s: str, limit: int, by_bytes: bool = False) -> list[str]:
     """Egy `limit`-nél HOSSZABB szöveg feldarabolása legfeljebb `limit` hosszú
     részekre, LEHETŐLEG TAGMONDAT-HATÁRON (vessző, pontosvessző, kettőspont,
     gondolatjel), különben szóhatáron – SEMMIT EL NEM DOBVA. Így a darabok közti
@@ -87,16 +101,19 @@ def _wrap_long(s: str, limit: int) -> list[str]:
     elhagyta), a szaggatottság elkerülésével."""
     out: list[str] = []
     s = s.strip()
-    while len(s) > limit:
-        window = s[:limit]
+    size = _utf8_len if by_bytes else len
+    while size(s) > limit:
+        # bájt-módban a limit BÁJT, ezért a karakter-ablakot ki kell számolni
+        win = _byte_window(s, limit) if by_bytes else limit
+        window = s[:win]
         cut = -1
         for sep in _CLAUSE_SEPS:                 # utolsó tagmondat-határ a limiten belül
             p = window.rfind(sep)
             if p >= 0:
                 cut = max(cut, p + len(sep.rstrip()))   # a vessző/jel UTÁN vágunk
-        if cut < limit // 2:                     # nincs jó tagmondat-határ a 2. felében
+        if cut < win // 2:                       # nincs jó tagmondat-határ a 2. felében
             sp = window.rfind(" ")
-            cut = sp if sp > 0 else limit        # szóhatár, végső esetben kemény vágás
+            cut = sp if sp > 0 else win          # szóhatár, végső esetben kemény vágás
         out.append(s[:cut].strip())
         s = s[cut:].strip()
     if s:
@@ -104,11 +121,20 @@ def _wrap_long(s: str, limit: int) -> list[str]:
     return out
 
 
-def chunk_text(text: str, limit: int) -> list[str]:
-    """A szöveget legfeljebb `limit` karakteres darabokra bontja, lehetőleg
+def _utf8_len(s: str) -> int:
+    return len(s.encode("utf-8"))
+
+
+def chunk_text(text: str, limit: int, by_bytes: bool = False) -> list[str]:
+    """A szöveget legfeljebb `limit` méretű darabokra bontja, lehetőleg
     bekezdés- és mondathatáron. A limitnél hosszabb mondatot TÖBB darabra bontja
-    (szóhatáron) – SOHA nem csonkolja, hogy a felolvasás teljes legyen."""
+    (szóhatáron) – SOHA nem csonkolja, hogy a felolvasás teljes legyen.
+
+    `by_bytes=True` esetén a méret UTF-8 BÁJTBAN értendő. A Google Cloud TTS
+    korlátja bájtalapú, a magyar ékezetek pedig 2 bájtosak – karakterben mérve
+    egy „5000 alatti” darab is 400/413 hibát adhatna. [Herman Tibi AB-P1-10]"""
     limit = limit if limit and limit > 0 else DEFAULT_CHUNK
+    size = _utf8_len if by_bytes else len
     chunks: list[str] = []
     cur = ""
 
@@ -122,24 +148,24 @@ def chunk_text(text: str, limit: int) -> list[str]:
         para = para.strip()
         if not para:
             continue
-        if len(cur) + len(para) + 1 <= limit:
+        if size(cur) + size(para) + 1 <= limit:
             cur = (cur + "\n" + para) if cur else para
-        elif len(para) <= limit:
+        elif size(para) <= limit:
             flush()
             cur = para
         else:
             flush()
             for sent in re.split(r"(?<=[.!?])\s+", para):
-                if len(cur) + len(sent) + 1 <= limit:
+                if size(cur) + size(sent) + 1 <= limit:
                     cur = (cur + " " + sent) if cur else sent
-                elif len(sent) <= limit:
+                elif size(sent) <= limit:
                     flush()
                     cur = sent
                 else:
                     # a limitnél HOSSZABB mondat: több darabra bontjuk, SEMMIT
                     # el nem dobva (a régi sent[:limit] itt vágta le a végét)
                     flush()
-                    pieces = _wrap_long(sent, limit)
+                    pieces = _wrap_long(sent, limit, by_bytes)
                     chunks.extend(pieces[:-1])
                     cur = pieces[-1] if pieces else ""
     flush()
@@ -166,8 +192,12 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
     ff = _ffmpeg_exe()
     flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
+    # Ha a motor BÁJT-alapú korlátot deklarál (Google Cloud), akkor UTF-8
+    # bájtban darabolunk – különben a magyar ékezetes szöveg túllépné a limitet.
+    _blimit = int(getattr(eng, "byte_limit", 0) or 0)
     parts = ([INTRO.format(title=book.title)]
-             + chunk_text(book.text, eng.char_limit)
+             + chunk_text(book.text, _blimit or eng.char_limit,
+                          by_bytes=bool(_blimit))
              + [OUTRO])
     total = len(parts)
     work = Path(tempfile.mkdtemp(prefix="sdl_book_"))

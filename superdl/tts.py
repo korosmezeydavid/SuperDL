@@ -15,6 +15,7 @@ darabolja a `char_limit` szerint.
 import base64
 import contextlib
 import json
+import re
 import urllib.request
 from dataclasses import dataclass
 
@@ -172,8 +173,9 @@ class GeminiEngine:
 
     def synth(self, text, voice_id, out_base, pitch=0, rate=0,
               api_key="") -> str:
+        # a kulcs FEJLÉCBEN megy (nem az URL-ben) – így kivételben sem szivárog
         url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
-               f"{self.model}:generateContent?key={api_key}")
+               f"{self.model}:generateContent")
         body = {
             "contents": [{"parts": [{"text": text}]}],
             "generationConfig": {
@@ -182,7 +184,7 @@ class GeminiEngine:
                     "prebuiltVoiceConfig": {"voiceName": voice_id}}},
             },
         }
-        data = _post_json(url, body)
+        data = _post_json(url, body, api_key=api_key)
         part = data["candidates"][0]["content"]["parts"][0]
         pcm = base64.b64decode(part["inlineData"]["data"])
         path = out_base + ".wav"
@@ -197,13 +199,17 @@ class CloudEngine:
     key = "cloud"
     name = "Google Cloud Text-to-Speech (saját API-kulcs)"
     char_limit = 5000
+    # A szolgáltatás korlátja BÁJTBAN értendő (nem karakterben): a magyar
+    # ékezetek 2 bájtosak, ezért karakterben mérve túlléphetnénk a limitet.
+    # Tartalékkal 4800, mert a kérés kerete is beleszámít. [Herman Tibi AB-P1-10]
+    byte_limit = 4800
     supports_pitch = True
     supports_rate = True
     needs_key = True
 
     def voices(self, api_key: str = "") -> list[Voice]:
-        url = f"https://texttospeech.googleapis.com/v1/voices?key={api_key}"
-        data = _get_json(url)
+        url = "https://texttospeech.googleapis.com/v1/voices"
+        data = _get_json(url, api_key=api_key)
         out = []
         for v in data.get("voices", []):
             lang = (v.get("languageCodes") or [""])[0]
@@ -216,8 +222,7 @@ class CloudEngine:
     def synth(self, text, voice_id, out_base, pitch=0, rate=0,
               api_key="") -> str:
         lang = "-".join(voice_id.split("-")[:2]) if "-" in voice_id else "en-US"
-        url = (f"https://texttospeech.googleapis.com/v1/text:synthesize"
-               f"?key={api_key}")
+        url = "https://texttospeech.googleapis.com/v1/text:synthesize"
         body = {
             "input": {"text": text},
             "voice": {"languageCode": lang, "name": voice_id},
@@ -225,7 +230,7 @@ class CloudEngine:
                             "speakingRate": max(0.25, min(4.0, 1 + rate * 0.1)),
                             "pitch": max(-20.0, min(20.0, float(pitch)))},
         }
-        data = _post_json(url, body)
+        data = _post_json(url, body, api_key=api_key)
         path = out_base + ".mp3"
         with open(path, "wb") as f:
             f.write(base64.b64decode(data["audioContent"]))
@@ -251,16 +256,49 @@ def _write_wav(path, pcm: bytes, rate=24000, channels=1, width=2) -> None:
         w.writeframes(pcm)
 
 
-def _get_json(url, timeout=30):
-    req = urllib.request.Request(url, headers={"User-Agent": "SuperDL"})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return json.load(r)
+def redact(text: str, *secrets: str) -> str:
+    """Az API-kulcsok MASZKOLÁSA minden felhasználónak megjelenő szövegben.
+    A hálózati kivételek szövege tartalmazhatja a kérés URL-jét/fejlécét; e nélkül
+    a titkos kulcs megjelenhetne a képernyőn, a képernyőolvasó beszédében vagy egy
+    támogatási levélben. [Herman Tibi AB-P0-05 / TTS-SEC-001]"""
+    out = str(text)
+    for s in secrets:
+        s = (s or "").strip()
+        if len(s) >= 8:                       # rövid „kulcs” nem valódi titok
+            out = out.replace(s, "***")
+    # biztonsági háló: bármilyen key=... query-paraméter maradványa
+    return re.sub(r"(?i)([?&]key=)[^&\s\"']+", r"\1***", out)
 
 
-def _post_json(url, body, timeout=120):
+class TTSError(RuntimeError):
+    """TTS-hiba MASZKOLT szöveggel (soha nem tartalmaz API-kulcsot)."""
+
+
+def _api_headers(api_key: str = "") -> dict:
+    """A Google API-k a kulcsot FEJLÉCBEN is elfogadják (x-goog-api-key). Így a
+    kulcs NEM kerül az URL-be, tehát a kivételek/naplók URL-je sem szivárogtatja."""
+    h = {"User-Agent": "SuperDL"}
+    if api_key:
+        h["x-goog-api-key"] = api_key
+    return h
+
+
+def _get_json(url, timeout=30, api_key=""):
+    req = urllib.request.Request(url, headers=_api_headers(api_key))
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return json.load(r)
+    except Exception as e:
+        raise TTSError(redact(e, api_key)) from None
+
+
+def _post_json(url, body, timeout=120, api_key=""):
     data = json.dumps(body).encode("utf-8")
-    req = urllib.request.Request(
-        url, data=data,
-        headers={"Content-Type": "application/json", "User-Agent": "SuperDL"})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return json.load(r)
+    headers = _api_headers(api_key)
+    headers["Content-Type"] = "application/json"
+    req = urllib.request.Request(url, data=data, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return json.load(r)
+    except Exception as e:
+        raise TTSError(redact(e, api_key)) from None

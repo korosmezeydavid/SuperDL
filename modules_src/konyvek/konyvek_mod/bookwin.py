@@ -109,8 +109,10 @@ class BookFrame(wx.Frame):
         v.Add(r2, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
 
         self.key_lbl = wx.StaticText(p, label="API-&kulcs:")
-        self.key_txt = wx.TextCtrl(p)
-        self.key_txt.SetName("API-kulcs (a Gemini és a Cloud motorhoz)")
+        # JELSZÓMEZŐ: a kulcs se a képernyőn, se a képernyőolvasó
+        # akadálymentességi fájában ne legyen olvasható. [Herman Tibi AB-P0-01]
+        self.key_txt = wx.TextCtrl(p, style=wx.TE_PASSWORD)
+        self.key_txt.SetName("API-kulcs (a Gemini és a Cloud motorhoz), rejtett mező")
         self.key_txt.Bind(wx.EVT_KILL_FOCUS, lambda e: (self._save_key(),
                                                         e.Skip()))
         rk = wx.BoxSizer(wx.HORIZONTAL)
