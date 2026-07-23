@@ -10,6 +10,8 @@ import webbrowser
 
 import wx
 
+from superdl import urlpolicy   # közös URL-biztonság a Core-ból
+
 from superdl import feeds                      # megosztott feliratkozás-rendszer
 from superdl.medialistwin import MediaListDialog  # megosztott médialista a Core-ból
 from . import podcast as P                      # a podcast-backend a modulban van
@@ -252,6 +254,11 @@ class PodcastFrame(wx.Frame):
     def _open_browser(self):
         pod = self._selected()
         if pod and pod.page_url:
+            # a cím külső API-ból jön → csak http/https [POD-P1-12]
+            if not urlpolicy.is_web_url(pod.page_url):
+                self.SetStatusText("Ez a hivatkozás nem webcím, ezért "
+                                   "biztonsági okból nem nyitom meg.")
+                return
             webbrowser.open(pod.page_url)
             self.SetStatusText(f"Megnyitva a böngészőben: {pod.name}")
         elif pod:

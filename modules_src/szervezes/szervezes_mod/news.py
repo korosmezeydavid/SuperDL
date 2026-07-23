@@ -13,6 +13,7 @@ import urllib.request
 from dataclasses import dataclass
 
 from superdl import store        # megosztott tároló a Core-ból
+from superdl import urlpolicy    # közös SSRF-/méret-védelem a Core-ból
 
 UA = {"User-Agent": "Mozilla/5.0 (SuperDL hírolvasó)"}
 
@@ -106,10 +107,14 @@ def fetch_article_text(url: str, fallback: str = "") -> str:
     if not url:
         return fallback
     try:
-        req = urllib.request.Request(url, headers=UA)
-        with urllib.request.urlopen(req, timeout=20) as r:
-            raw = r.read()
-        charset = r.headers.get_content_charset() or "utf-8"
+        # ELLENŐRZÖTT letöltés: a cikk címe a feedből jön (tehát idegen
+        # forrásból), ezért nem mutathat a saját gépre/házi hálózatra, és van
+        # méretkorlát a tömörítési bomba ellen. [Herman Tibi NEWS-P0-02/P1-05]
+        with urlpolicy.safe_open(url, timeout=20) as r:
+            raw = r.read(urlpolicy.DEFAULT_MAX_BYTES + 1)
+            if len(raw) > urlpolicy.DEFAULT_MAX_BYTES:
+                return fallback          # túl nagy oldal: marad az összefoglaló
+            charset = r.headers.get_content_charset() or "utf-8"
         html = raw.decode(charset, "replace")
     except Exception:
         return fallback

@@ -22,6 +22,7 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta, date as _date
 
 from . import store
+from . import urlpolicy
 
 _log = logging.getLogger(__name__)
 
@@ -456,10 +457,10 @@ class OrganizerManager:
             subs = list(self.ics_subs)
         for sub in subs:
             try:
-                req = urllib.request.Request(
-                    sub.url, headers={"User-Agent": "SuperDL/3.0"})
-                with urllib.request.urlopen(req, timeout=25) as r:
-                    raw = r.read().decode("utf-8", errors="replace")
+                # ELLENŐRZÖTT letöltés: csak http/https, nem mutathat a saját
+                # gépre/házi hálózatra (átirányítás után sem), és van
+                # méretkorlát. [Herman Tibi CAL-P0-07]
+                raw = urlpolicy.safe_read_text(sub.url, timeout=25)
                 evs = parse_ics(raw, horizon)
                 all_events.extend(evs)
                 sub.last_sync = datetime.now().strftime("%Y-%m-%d %H:%M")

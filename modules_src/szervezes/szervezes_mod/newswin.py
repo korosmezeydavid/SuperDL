@@ -11,6 +11,8 @@ import webbrowser
 
 import wx
 
+from superdl import urlpolicy   # közös URL-biztonság a Core-ból
+
 from superdl import aiclient        # megosztott AI-kliens a Core-ból
 from superdl.aiwin import run_ai     # megosztott AI-segédablak a Core-ból
 from . import news                   # a hír-backend a modulban van
@@ -248,8 +250,16 @@ class NewsFrame(wx.Frame):
 
     def _open_browser(self):
         art = self._selected_article()
-        if art and art.link:
-            webbrowser.open(art.link)
+        if not (art and art.link):
+            return
+        # A cikk címe a FEEDBŐL jön (idegen forrás): csak webes címet nyitunk
+        # meg, hogy ne indulhasson helyi fájl vagy egyedi protokoll.
+        # [Herman Tibi NEWS-P1-10]
+        if not urlpolicy.is_web_url(art.link):
+            self._announce("Ez a hivatkozás nem webcím, ezért biztonsági "
+                           "okból nem nyitom meg.")
+            return
+        webbrowser.open(art.link)
 
     # ---- AI: összefoglaló / fordítás ----------------------------------
 
