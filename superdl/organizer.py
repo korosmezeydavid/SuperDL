@@ -120,6 +120,47 @@ class IcsSub:
         return safe_url_label(self.url)
 
 
+# Futtatható / parancsfájl kiterjesztések: ezeket AUTOMATIKUSAN SOHA nem
+# indítjuk el. A naptár JSON-ja helyben módosítható vagy importálható, így egy
+# rosszindulatú (vagy sérült) bejegyzés programot futtathatna a háttérben.
+_VESZELYES_KITERJESZTESEK = {
+    ".exe", ".com", ".bat", ".cmd", ".ps1", ".psm1", ".vbs", ".vbe", ".js",
+    ".jse", ".wsf", ".wsh", ".scr", ".msi", ".msp", ".cpl", ".hta", ".jar",
+    ".reg", ".lnk", ".pif", ".sct", ".inf", ".application",
+}
+
+
+def check_action_target(target: str) -> tuple[bool, str, str]:
+    """Elindítható-e AUTOMATIKUSAN egy időzített esemény „megnyitás" akciója?
+
+    Visszaad: (szabad-e, típus, magyar indoklás). A típus „url" vagy „fajl".
+
+    Enélkül a `os.startfile()` bármilyen programot/parancsfájlt elindíthatott
+    volna a felhasználó jelenléte nélkül. [Herman Tibi CAL-P0-05]"""
+    t = (target or "").strip()
+    if not t:
+        return False, "", "Nincs megadva, mit kellene megnyitni."
+    low = t.lower()
+    if low.startswith(("http://", "https://", "mailto:")):
+        return True, "url", ""
+    if "://" in t.split("/", 1)[0] or low.startswith(("javascript:", "file:",
+                                                      "data:", "vbscript:")):
+        return False, "", ("Ez a hivatkozás nem webcím és nem levélcím, ezért "
+                           "biztonsági okból nem nyitom meg magától.")
+    from pathlib import Path as _P
+    try:
+        p = _P(t)
+        if p.suffix.lower() in _VESZELYES_KITERJESZTESEK:
+            return False, "", ("Ez futtatható program vagy parancsfájl. "
+                               "Biztonsági okból NEM indítom el magától; "
+                               "nyisd meg kézzel, ha tényleg ezt szeretnéd.")
+        if not p.is_file():
+            return False, "", "A megnyitandó fájl nem található."
+    except OSError:
+        return False, "", "A megadott útvonal nem értelmezhető."
+    return True, "fajl", ""
+
+
 def safe_url_label(url: str) -> str:
     """Csak a séma+kiszolgáló látszik; ha van útvonal/lekérdezés (tipikusan ez
     hordozza a titkot), azt „titkos link" jelöli."""

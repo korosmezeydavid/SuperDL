@@ -83,3 +83,51 @@ def test_bongeszo_megnyitas_csak_webcimre():
                 "modules_src/szervezes/szervezes_mod/podcastwin.py"):
         src = _src(rel)
         assert "urlpolicy.is_web_url" in src, f"{rel}: őrizetlen webbrowser.open"
+
+
+# ---- CAL-P0-05: az automatikus naptár-akció engedélyezési listája ----------
+
+from superdl.organizer import check_action_target      # noqa: E402
+
+
+@pytest.mark.parametrize("t", [
+    "C:/Windows/System32/cmd.exe", "x.bat", "x.cmd", "x.ps1", "x.vbs",
+    "x.js", "x.scr", "x.msi", "x.hta", "x.reg", "x.lnk",
+])
+def test_futtathato_soha_nem_indul_automatikusan(t):
+    ok, _, indok = check_action_target(t)
+    assert ok is False and indok
+
+
+@pytest.mark.parametrize("t", [
+    "javascript:alert(1)", "file:///C:/x", "data:text/html,x", "vbscript:x",
+    "custom://x", "",
+])
+def test_veszelyes_semak_blokkolva(t):
+    assert check_action_target(t)[0] is False
+
+
+@pytest.mark.parametrize("t", [
+    "https://pelda.hu/talalkozo", "http://pelda.hu", "mailto:a@b.hu",
+])
+def test_webcim_es_levelcim_szabad(t):
+    ok, tipus, _ = check_action_target(t)
+    assert ok is True and tipus == "url"
+
+
+def test_letezo_artalmatlan_fajl_szabad(tmp_path):
+    p = tmp_path / "jegyzet.txt"
+    p.write_text("szia", encoding="utf-8")
+    ok, tipus, _ = check_action_target(str(p))
+    assert ok is True and tipus == "fajl"
+
+
+def test_nem_letezo_fajl_nem_indul():
+    assert check_action_target("C:/nincs/ilyen/fajl.txt")[0] is False
+
+
+def test_gui_hasznalja_az_engedelyezesi_listat():
+    src = _src("superdl_gui.py")
+    assert "check_action_target" in src, "a GUI őrizetlenül indít akciót"
+    i = src.index("check_action_target")
+    assert "os.startfile" in src[i:i + 900]

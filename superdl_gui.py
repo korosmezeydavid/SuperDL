@@ -1143,8 +1143,18 @@ class MainFrame(wx.Frame):
             target = (ev.action_data or "").strip()
             if not target:
                 return
+            # ENGEDÉLYEZÉSI LISTA: automatikusan csak webcím/levélcím vagy
+            # létező, NEM futtatható fájl nyílhat meg. A naptár JSON-ja helyben
+            # módosítható/importálható, enélkül programot indíthatna a háttérben.
+            # [Herman Tibi CAL-P0-05]
+            from superdl.organizer import check_action_target
+            szabad, tipus, indok = check_action_target(target)
+            if not szabad:
+                self._announce(f"Az időzített megnyitást nem hajtom végre. "
+                               f"{indok}", ok=False)
+                return
             try:
-                if target.startswith(("http://", "https://", "mailto:")):
+                if tipus == "url":
                     webbrowser.open(target)
                 else:
                     os.startfile(target)
