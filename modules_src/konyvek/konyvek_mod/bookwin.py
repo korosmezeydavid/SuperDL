@@ -185,9 +185,18 @@ class BookFrame(wx.Frame):
         self.gauge = wx.Gauge(p, range=100)
         v.Add(self.gauge, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
 
+        mk = wx.BoxSizer(wx.HORIZONTAL)
         self.make_btn = wx.Button(p, label="Hangoskönyv &készítése")
         self.make_btn.Bind(wx.EVT_BUTTON, lambda e: self._on_make())
-        v.Add(self.make_btn, 0, wx.ALL, 8)
+        mk.Add(self.make_btn, 0, wx.RIGHT, 6)
+        # LEÁLLÍTÁS: a többórás (felhő-TTS-nél FIZETŐS) munka megszakítható
+        # legyen. [Herman Tibi AB-P0-02]
+        self.stop_btn = wx.Button(p, label="Készítés &leállítása")
+        self.stop_btn.SetName("Hangoskönyv készítésének leállítása")
+        self.stop_btn.Bind(wx.EVT_BUTTON, lambda e: self._on_stop_make())
+        self.stop_btn.Disable()
+        mk.Add(self.stop_btn, 0)
+        v.Add(mk, 0, wx.ALL, 8)
 
         p.SetSizer(v)
 
@@ -377,7 +386,9 @@ class BookFrame(wx.Frame):
         out = os.path.join(self.out_txt.GetValue(), safe + ".mp3")
 
         self._busy = True
+        self._cancel = threading.Event()      # megszakítás-jelző [AB-P0-02]
         self.make_btn.Disable()
+        self.stop_btn.Enable()
         self.SetStatusText("Hangoskönyv készítése… ez hosszabb könyvnél "
                            "eltarthat egy ideig.")
 
@@ -393,7 +404,8 @@ class BookFrame(wx.Frame):
             try:
                 res = audiobook.build(
                     book, eng_key, v.id, out, pitch=pitch, rate=rate,
-                    api_key=key, split_minutes=split, progress=prog)
+                    api_key=key, split_minutes=split, progress=prog,
+                    cancel=self._cancel)
             except Exception as ex:
                 wx.CallAfter(self._done, None, str(ex))
                 return
@@ -401,11 +413,21 @@ class BookFrame(wx.Frame):
 
         threading.Thread(target=work, daemon=True).start()
 
+    def _on_stop_make(self):
+        """A készítés megszakítása a legközelebbi biztonságos ponton."""
+        ev = getattr(self, "_cancel", None)
+        if ev is not None and not ev.is_set():
+            ev.set()
+            self.stop_btn.Disable()
+            self.SetStatusText("Leállítás kérve – a program a következő "
+                               "biztonságos ponton befejezi.")
+
     def _done(self, res, err):
         if self._closing:
             return
         self._busy = False
         self.make_btn.Enable()
+        self.stop_btn.Disable()
         self.gauge.SetValue(0)
         if err:
             self.SetStatusText(f"Hiba a készítés során: {err}")
@@ -431,6 +453,23 @@ class BookFrame(wx.Frame):
                           wx.OK | wx.ICON_INFORMATION, self)
 
     def _on_close(self, e):
+        # MEGERŐSÍTÉS folyó készítésnél: eddig az ablak bezárása után a
+        # worker, a felhő-hívások és az ffmpeg TOVÁBB futottak (fizetős
+        # munka, árva folyamatok). [Herman Tibi AB-P0-02]
+        if self._busy and not self._closing:
+            ans = wx.MessageBox(
+                "A hangoskönyv készítése FOLYAMATBAN van. Ha most "
+                "bezárod, a program leállítja és a félkész fájlok "
+                "törlődnek.\n\nBiztosan bezárod?",
+                "Hangoskönyv készítő – folyamatban",
+                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING, self)
+            if ans != wx.YES:
+                if e.CanVeto():
+                    e.Veto()
+                return
+            ev = getattr(self, "_cancel", None)
+            if ev is not None:
+                ev.set()      # a worker a következő ponton kilép
         self._closing = True         # a folyó háttérfeladat callbackje már kilép
         try:
             self.preview.stop()

@@ -17,6 +17,10 @@ from . import tts
 from .ffmpeg import ensure_ffmpeg, find_ffmpeg
 
 # A program által beállított, FIX bevezető és záró szöveg (nem szerkeszthető).
+class AudiobookCancelled(RuntimeError):
+    """A felhasználó megszakította a hangoskönyv készítését. [AB-P0-02]"""
+
+
 INTRO = ("{title}. Ezt a hangoskönyvet a SuperDL program készítette, "
          "kizárólag egyéni, személyes használatra.")
 OUTRO = ("A hangoskönyv vége. Ezt a felvételt a SuperDL program olvasta fel, "
@@ -185,9 +189,22 @@ def _ffmpeg_exe(progress=None) -> str:
 
 
 def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
-          api_key="", split_minutes=0, progress=None) -> list[str]:
+          api_key="", split_minutes=0, progress=None, cancel=None) -> list[str]:
     """Elkészíti a hangoskönyvet. Visszaadja a létrejött fájl(ok) listáját.
-    `progress(kész, összes, állapot)` hívható a folyamatjelzéshez."""
+    `progress(kész, összes, állapot)` hívható a folyamatjelzéshez.
+
+    `cancel`: opcionális threading.Event – ha beállítják, a munka a LEGKÖZELEBBI
+    biztonságos ponton MEGSZAKAD (`AudiobookCancelled`), és a félkész fájlok
+    törlődnek. Enélkül egy többórás, felhő-TTS-nél FIZETŐS munkát nem lehetett
+    leállítani, és ablakbezárás után is tovább futott. [Herman Tibi AB-P0-02]"""
+    def _megszakitva() -> bool:
+        return bool(cancel is not None and cancel.is_set())
+
+    def _ellenoriz():
+        if _megszakitva():
+            raise AudiobookCancelled(
+                "A hangoskönyv készítését megszakítottad.")
+
     eng = tts.ENGINES[engine_key]
     ff = _ffmpeg_exe()
     flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
@@ -202,8 +219,12 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
     total = len(parts)
     work = Path(tempfile.mkdtemp(prefix="sdl_book_"))
     norm_files: list[Path] = []
+    stage_dirs: list[Path] = []      # a cél melletti köztes mappák (takarításhoz)
     try:
         for i, text in enumerate(parts):
+            # minden darab ELŐTT: megszakították-e? Így egy felhő-TTS-nél
+            # fizetős munka nem megy tovább feleslegesen. [AB-P0-02]
+            _ellenoriz()
             if progress:
                 progress(i, total, "felolvasás")
             raw = eng.synth(text, voice_id, str(work / f"p{i:04d}"),
@@ -227,27 +248,60 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
             "".join(f"file '{n.as_posix()}'\n" for n in norm_files),
             encoding="utf-8")
 
+        _ellenoriz()
         out = Path(out_path)
         out.parent.mkdir(parents=True, exist_ok=True)
+        # A VÉGLEGES fájlokat csak a teljes siker + ellenőrzés UTÁN hozzuk létre.
+        # Korábban az ffmpeg `-y`-nal KÖZVETLENÜL a végleges névre írt, így egy
+        # megszakadt munka a MEGLÉVŐ hangoskönyvet csonkára cserélte, és a régi
+        # darabolt sávok is bent maradhattak. [Herman Tibi AB-P0-03]
+        # A köztes mappa a CÉL MELLETT van (nem a temp-ben): csak azonos köteten
+        # atomikus az `os.replace`. A finally-ág mindenképp eltakarítja.
+        import uuid as _uuid
+        stage = out.parent / f".superdl_kesz_{_uuid.uuid4().hex[:8]}"
+        stage.mkdir(parents=True, exist_ok=True)
+        stage_dirs.append(stage)
         if split_minutes and split_minutes > 0:
-            pattern = str(out.with_name(out.stem + "_%03d" + out.suffix))
+            pattern = str(stage / (out.stem + "_%03d" + out.suffix))
             subprocess.run(
                 [ff, "-y", "-f", "concat", "-safe", "0", "-i", str(listfile),
                  "-f", "segment", "-segment_time", str(int(split_minutes * 60)),
                  "-c", "copy", pattern, "-loglevel", "quiet"],
                 stdin=subprocess.DEVNULL, creationflags=flags, check=True)
-            import glob
-            results = sorted(glob.glob(
-                str(out.with_name(out.stem + "_*" + out.suffix))))
+            keszek = sorted(stage.glob(out.stem + "_*" + out.suffix))
         else:
+            egy = stage / out.name
             subprocess.run(
                 [ff, "-y", "-f", "concat", "-safe", "0", "-i", str(listfile),
-                 "-c", "copy", str(out), "-loglevel", "quiet"],
+                 "-c", "copy", str(egy), "-loglevel", "quiet"],
                 stdin=subprocess.DEVNULL, creationflags=flags, check=True)
-            results = [str(out)]
+            keszek = [egy]
+
+        # KIMENET-ELLENŐRZÉS: eddig a puszta visszatérési kód számított sikernek,
+        # így nulla hosszú, csonka vagy hiányzó sáv is „késznek" látszott.
+        # [Herman Tibi AB-P0-04]
+        if not keszek:
+            raise RuntimeError("A hangoskönyv nem jött létre (nincs kimeneti "
+                               "fájl). Próbáld újra.")
+        for f in keszek:
+            if not f.is_file() or f.stat().st_size < 1024:
+                raise RuntimeError(
+                    f"A(z) „{f.name}” sáv üres vagy csonka, ezért NEM mentem el "
+                    "a hangoskönyvet. A korábbi fájljaid érintetlenek.")
+
+        _ellenoriz()
+        if progress:
+            progress(total, total, "mentés")
+        results = []
+        for f in keszek:
+            cel = out.with_name(f.name)
+            os.replace(str(f), str(cel))     # atomikus, azonos köteten
+            results.append(str(cel))
         if progress:
             progress(total, total, "kész")
         return results
     finally:
         import shutil
         shutil.rmtree(work, ignore_errors=True)
+        for d in stage_dirs:         # megszakításnál/hibánál sem marad szemét
+            shutil.rmtree(d, ignore_errors=True)
