@@ -10,3 +10,6 @@ ebooklib>=0.18
 pypdf>=4.0
 fpdf2>=2.7
 beautifulsoup4>=4.12
+# IANA időzóna-adatbázis (Windowson nincs beépítve) – az ICS TZID
+# helyes értelmezéséhez KELL, különben órákkal téves emlékeztetők.
+tzdata>=2024.1

@@ -111,6 +111,30 @@ class IcsSub:
     url: str
     last_sync: str = ""
 
+    def safe_label(self) -> str:
+        """A naptár-cím MEGJELENÍTHETŐ alakja. Sok szolgáltatónál (Google,
+        Outlook, iCloud) a privát ICS-cím maga a HOZZÁFÉRÉSI TITOK: aki látja,
+        a teljes naptárat elolvashatja. Ezért a felületen csak a szolgáltató
+        neve látszik, a titkos rész nem. [Herman Tibi CAL-P0-04]"""
+        return safe_url_label(self.url)
+
+
+def safe_url_label(url: str) -> str:
+    """Csak a séma+kiszolgáló látszik; ha van útvonal/lekérdezés (tipikusan ez
+    hordozza a titkot), azt „titkos link" jelöli."""
+    u = (url or "").strip()
+    if not u:
+        return "(nincs cím)"
+    try:
+        from urllib.parse import urlsplit
+        s = urlsplit(u)
+        if not s.netloc:
+            return "(ismeretlen cím)"
+        titkos = bool((s.path or "").strip("/") or s.query)
+        return f"{s.netloc} – titkos link" if titkos else s.netloc
+    except Exception:
+        return "(ismeretlen cím)"
+
 
 # ---- ICS (iCalendar) feldolgozás --------------------------------------
 
@@ -130,9 +154,32 @@ def _unescape(v: str) -> str:
             .replace("\\;", ";").replace("\\\\", "\\"))
 
 
+def _tzid_of(params: str) -> str:
+    """A DTSTART;TZID=Europe/Budapest:… paraméterből az időzóna neve."""
+    for part in (params or "").split(";"):
+        if part.strip().upper().startswith("TZID="):
+            return part.split("=", 1)[1].strip().strip('"')
+    return ""
+
+
+def _zone(tzid: str):
+    """IANA időzóna objektum, ha elérhető (zoneinfo/tzdata); különben None."""
+    if not tzid:
+        return None
+    try:
+        from zoneinfo import ZoneInfo
+        return ZoneInfo(tzid)
+    except Exception:
+        return None          # nincs tzdata vagy ismeretlen zóna → naiv marad
+
+
 def _parse_dt(val: str, params: str):
-    """Egy DTSTART/DTEND érték -> (datetime, csak_dátum?). UTC (Z végű) esetén
-    helyi időre vált. Hiba esetén None."""
+    """Egy DTSTART/DTEND érték -> (datetime, csak_dátum?). UTC (Z végű) ÉS a
+    TZID=… szerinti zónás idő is HELYI időre vált. Hiba esetén None.
+
+    A TZID figyelmen kívül hagyása miatt egy `DTSTART;TZID=America/New_York`
+    esemény a gép helyi idejeként jelent meg → az emlékeztető ÓRÁKKAL
+    tévedhetett (nyári/téli átállásnál különösen). [Herman Tibi CAL-P0-02]"""
     val = val.strip()
     is_date = "VALUE=DATE" in params.upper() or (len(val) == 8 and "T" not in val)
     try:
@@ -144,6 +191,10 @@ def _parse_dt(val: str, params: str):
         dt = datetime.strptime(core, "%Y%m%dT%H%M%S")
         if utc:                         # UTC -> helyi idő
             dt = dt.replace(tzinfo=_tz_utc()).astimezone().replace(tzinfo=None)
+        else:
+            z = _zone(_tzid_of(params))
+            if z is not None:           # TZID -> helyi idő (DST-helyesen)
+                dt = dt.replace(tzinfo=z).astimezone().replace(tzinfo=None)
         return dt, False
     except (ValueError, TypeError):
         return None

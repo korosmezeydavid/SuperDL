@@ -522,7 +522,7 @@ class OrganizerFrame(wx.Frame):
               0, wx.ALL, 8)
         self.ics_list = wx.ListCtrl(p, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.ics_list.SetName("ICS-feliratkozások")
-        for i, (t, w) in enumerate((("Név", 240), ("Cím (URL)", 360),
+        for i, (t, w) in enumerate((("Név", 240), ("Kiszolgáló", 360),
                                     ("Utolsó frissítés", 160))):
             self.ics_list.InsertColumn(i, t, width=w)
         self.ics_list.Bind(wx.EVT_KEY_DOWN, self._on_ics_key)
@@ -544,7 +544,9 @@ class OrganizerFrame(wx.Frame):
         self.ics_list.DeleteAllItems()
         for s in self.mgr.ics_subs:
             row = self.ics_list.InsertItem(self.ics_list.GetItemCount(), s.name)
-            self.ics_list.SetItem(row, 1, s.url)
+            # NEM a teljes URL: a privát naptár-cím maga a hozzáférési titok,
+            # és a képernyőolvasó felolvasná. [Herman Tibi CAL-P0-04]
+            self.ics_list.SetItem(row, 1, s.safe_label())
             self.ics_list.SetItem(row, 2, s.last_sync or "még nem")
 
     def _sel_ics(self):

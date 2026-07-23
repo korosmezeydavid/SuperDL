@@ -9,6 +9,8 @@ binaries = [('bin\\aria2c.exe', '.'),
             ('bin\\ffprobe.exe', '.')]
 hiddenimports = ['win32com.client', 'pythoncom', 'pywintypes', 'win32crypt']
 datas += collect_data_files('docx')
+# IANA időzónák (ICS TZID) – Windowson nincs rendszer-tzdata
+datas += collect_data_files('tzdata')
 hiddenimports += collect_submodules('yt_dlp')
 hiddenimports += collect_submodules('feedparser')
 hiddenimports += collect_submodules('ebooklib')

@@ -166,3 +166,57 @@ def test_feldolgozas_nelkuli_wav_tovabbra_is_mehet(tmp_path, monkeypatch):
     out = str(tmp_path / "nyers.wav")
     assert superrec.save_pcm(out, pcm, 44100, 2) == out
     assert __import__("os").path.getsize(out) > 1000
+
+
+# ---- CAL-P0-02: az ICS TZID értelmezése (órákkal téves emlékeztetők) -------
+
+def test_tzid_szerinti_ido_helyi_idore_valt():
+    """A TZID-t eddig FIGYELMEN KÍVÜL hagytuk: egy New York-i esemény a gép
+    helyi idejeként jelent meg. Most a zóna szerint vált át."""
+    from zoneinfo import ZoneInfo
+    val = "20260815T100000"
+    dt_naiv, _ = organizer._parse_dt(val, "")
+    dt_ny, _ = organizer._parse_dt(val, ";TZID=America/New_York")
+    varhato = (datetime.datetime(2026, 8, 15, 10, 0)
+               .replace(tzinfo=ZoneInfo("America/New_York"))
+               .astimezone().replace(tzinfo=None))
+    assert dt_ny == varhato, f"{dt_ny} != {varhato}"
+    assert dt_ny != dt_naiv, "a TZID-t továbbra sem veszi figyelembe"
+
+
+def test_ismeretlen_tzid_nem_dob_hibat():
+    dt, _ = organizer._parse_dt("20260815T100000", ";TZID=Nincs/Ilyen")
+    assert dt == datetime.datetime(2026, 8, 15, 10, 0)   # naiv marad
+
+
+def test_utc_z_tovabbra_is_helyesen_valt():
+    dt, _ = organizer._parse_dt("20260815T100000Z", "")
+    assert dt is not None
+
+
+def test_egesz_napos_esemeny_valtozatlan():
+    dt, is_date = organizer._parse_dt("20260815", ";VALUE=DATE")
+    assert is_date is True and dt == datetime.datetime(2026, 8, 15)
+
+
+# ---- CAL-P0-04: a titkos ICS-cím nem jelenhet meg teljesen ----------------
+
+def test_titkos_ics_cim_maszkolva_jelenik_meg():
+    lab = organizer.safe_url_label(
+        "https://calendar.google.com/calendar/ical/abc123TITOK/private-xyz/basic.ics")
+    assert "TITOK" not in lab and "private-xyz" not in lab
+    assert "calendar.google.com" in lab and "titkos link" in lab
+
+
+def test_egyszeru_cim_eseten_csak_a_kiszolgalo():
+    assert organizer.safe_url_label("https://pelda.hu") == "pelda.hu"
+
+
+def test_ures_cim_kezelese():
+    assert "nincs" in organizer.safe_url_label("").lower()
+
+
+def test_icssub_safe_label_metodusa():
+    s = organizer.IcsSub(id="1", name="Munka",
+                         url="https://outlook.office365.com/owa/calendar/TOKEN/x.ics")
+    assert "TOKEN" not in s.safe_label()
