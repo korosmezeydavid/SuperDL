@@ -1,0 +1,12 @@
+{
+  "id": "jatekok",
+  "name": "Játékok",
+  "version": "0.1.0",
+  "entry": "jatekok_mod",
+  "category": "Játékok",
+  "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód.",
+  "min_core_api": "1.0",
+  "min_core_version": "4.1.0",
+  "requires_tools": [],
+  "author": "Kőrösmezey Dávid"
+}
