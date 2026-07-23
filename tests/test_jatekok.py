@@ -617,12 +617,91 @@ def test_szindbad_veget_er():
     _fut("szindbad", bot)
 
 
+# =========================================================================
+#  A JATEK.EXE gyűjtemény mini-játékai
+# =========================================================================
+def test_domino_automatan_lejatszhato():
+    ki = _fut("domino", lambda k, ki: "")     # Enter = automatikus lépés
+    assert any("NYERTÉL" in p or "gép nyert" in p or "döntetlen" in p
+               for _, p in ki)
+
+
+def test_tozsde_tiz_nap():
+    def bot(k, ki):
+        return "t" if "mit teszel" in k.lower() else ""
+    ki = _fut("tozsde", bot)
+    assert any("vagyonod" in p for _, p in ki)
+
+
+def test_korong_automatan_lejatszhato():
+    ki = _fut("korong", lambda k, ki: "")     # Enter = a gép lép helyetted
+    assert any("Vége!" in p for _, p in ki)
+
+
+def test_korong_ervenyes_lepest_elfogad():
+    """A kezdőállásból a d3 (sötét) érvényes lépés – el kell fogadni."""
+    def bot(k, ki):
+        kl = k.lower()
+        if "hová raksz" in kl:
+            return "d3"
+        return ""     # a folytatásban a gépre bízzuk
+    # csak az első emberi lépést vizsgáljuk determinisztikusan
+    KORONG = importlib.import_module(BASE + ".jatekok.mini")
+    tabla = [["."] * 8 for _ in range(8)]
+    tabla[3][3] = tabla[4][4] = "O"
+    tabla[3][4] = tabla[4][3] = "X"
+    legal = KORONG._rev_legal(tabla, "X")
+    assert (3, 2) in legal, "a d3 nem számít érvényesnek (koordináta-hiba?)"
+
+
+def test_nyulfarm_lejatszik():
+    def bot(k, ki):
+        return "2" if "hány nyulat adsz el" in k.lower() else ""
+    _fut("nyulfarm", bot)
+
+
+def test_hamurabi_lejatszik():
+    def bot(k, ki):
+        kl = k.lower()
+        if "holdat veszel" in kl:
+            return "0"
+        if "osztasz szét" in kl:
+            return "100000"
+        if "holdat vetsz" in kl:
+            return "100000"
+        return ""
+    ki = _fut("hamurabi", bot)
+    assert any(("Letelt a tíz év" in p) or ("fellázadt" in p)
+               or ("Kihalt" in p) for _, p in ki)
+
+
+class _MokitaBot:
+    def __init__(self):
+        import itertools
+        self.perms = iter("".join(p)
+                          for p in itertools.permutations("123456789", 3))
+
+    def __call__(self, k, ki):
+        kl = k.lower()
+        if "tipp" in kl:
+            return next(self.perms, "123")
+        if "új játék" in kl:
+            return "nem"
+        return ""
+
+
+def test_mokita_megfejtheto():
+    ki = _fut("mokita", _MokitaBot())
+    assert any("Kitaláltad" in p for _, p in ki)
+
+
 # ---- jogtisztaság: a játékkód nem hív idegen beszédmotort/alfolyamatot ----
 
 def test_jatekok_nem_hasznalnak_idegen_fuggoseget():
     import ast
     import inspect
-    for modnev in ("kartya", "logika", "kviz", "kaland", "terkep", "_util"):
+    for modnev in ("kartya", "logika", "kviz", "kaland", "terkep", "mini",
+                   "_util"):
         mod = importlib.import_module(f"{BASE}.jatekok.{modnev}")
         fa = ast.parse(inspect.getsource(mod))
         for csp in ast.walk(fa):
