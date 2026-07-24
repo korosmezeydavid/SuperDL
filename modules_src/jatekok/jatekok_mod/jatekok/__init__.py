@@ -8,7 +8,7 @@ közli, hogy „még készül" – SOHA nincs hamis siker.
 Új játék bekötése: írd meg a generátort a megfelelő modulban, majd vedd fel
 ide egy sorral.
 """
-from . import kaland, kartya, kviz, logika, mini, terkep
+from . import kaland, kartya, kviz, logika, mini, sajat, terkep
 
 REGISZTER = {
     # logika / stratégia
@@ -53,6 +53,9 @@ REGISZTER = {
     "nyulfarm": mini.jatek_nyulfarm,
     "hamurabi": mini.jatek_hamurabi,
     "mokita": mini.jatek_mokita,
+    # SuperDL SAJÁT játékok (nem retró)
+    "slot": sajat.jatek_slot,
+    "uno": sajat.jatek_uno,
 }
 
 

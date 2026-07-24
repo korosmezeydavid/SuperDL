@@ -50,7 +50,7 @@ def test_egyezik_ekezet_es_kisbetu():
 # ---- minden RETRÓ játék indítható-e a katalógusból -----------------------
 
 def test_regiszter_kulcsai_a_katalogusban_vannak():
-    kat_kulcsok = {j.kulcs for j in KAT.RETRO}
+    kat_kulcsok = {j.kulcs for j in KAT.mind()}      # RETRO + SAJÁT
     for k in JR.REGISZTER:
         assert k in kat_kulcsok, f"{k} nincs a katalógusban"
 
@@ -695,13 +695,80 @@ def test_mokita_megfejtheto():
     assert any("Kitaláltad" in p for _, p in ki)
 
 
+# =========================================================================
+#  SuperDL SAJÁT játékok (nem retró): Slot, UNO
+# =========================================================================
+class _SlotBot:
+    def __init__(self):
+        self.n = 0
+
+    def __call__(self, k, ki):
+        if "pörgetsz" in k.lower():
+            self.n += 1
+            return "kilép" if self.n > 8 else ""
+        return ""
+
+
+def test_slot_lejatszhato_es_ad_hangot():
+    ki = _fut("slot", _SlotBot())
+    assert any(t == "effekt" and p == "porgetes" for t, p in ki), \
+        "nincs pörgetés-hang"
+    assert any("érmé" in p for _, p in ki)
+
+
+class _UnoBot:
+    """Aktívan lerak: elsőre az 1-est, elutasításkor az első rakhatót."""
+
+    def __call__(self, k, ki):
+        import re
+        kl = k.lower()
+        if "milyen színt" in kl:
+            return "kék"
+        if "lerakod?" in kl:
+            return "igen"
+        if "új játék" in kl:
+            return "nem"
+        if "melyik lapot rakod" in kl:
+            for _, p in reversed(ki):
+                m = re.search(r"Rakható sorszámok: ([\d, ]+)", p)
+                if m:
+                    return m.group(1).split(",")[0].strip()
+                if "A lapjaid:" in p:
+                    break
+            return "1"
+        return ""
+
+
+def test_uno_vegigjatszhato():
+    ki = _fut("uno", _UnoBot())
+    assert any(("NYERTÉL" in p) or ("nyert" in p) for _, p in ki)
+    assert any(t == "effekt" and p == "kartya" for t, p in ki), \
+        "nincs kártyahang"
+
+
+def test_uno_huzo_bottal_is_veget_er():
+    """Ha a játékos csak húz/passzol, akkor is véget ér (valamelyik gép nyer)."""
+    def bot(k, ki):
+        kl = k.lower()
+        if "melyik lapot rakod" in kl:
+            return "h"
+        if "lerakod?" in kl:
+            return "nem"
+        if "milyen színt" in kl:
+            return "piros"
+        if "új játék" in kl:
+            return "nem"
+        return ""
+    _fut("uno", bot)
+
+
 # ---- jogtisztaság: a játékkód nem hív idegen beszédmotort/alfolyamatot ----
 
 def test_jatekok_nem_hasznalnak_idegen_fuggoseget():
     import ast
     import inspect
     for modnev in ("kartya", "logika", "kviz", "kaland", "terkep", "mini",
-                   "_util"):
+                   "sajat", "_util"):
         mod = importlib.import_module(f"{BASE}.jatekok.{modnev}")
         fa = ast.parse(inspect.getsource(mod))
         for csp in ast.walk(fa):

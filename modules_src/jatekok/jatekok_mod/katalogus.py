@@ -165,14 +165,17 @@ RETRO: tuple[Jatek, ...] = (
 #  SUPERDL SAJÁT JÁTÉKOK  (nem retró: normál hang, nincs szerző-intro)
 # =====================================================================
 SAJAT: tuple[Jatek, ...] = (
-    Jatek("hangmemoria", "Hangmemória",
-          "Párosítsd a hangokat! Tisztán hallás utáni memóriajáték.",
+    Jatek("uno", "UNO",
+          "A klasszikus UNO három valódi nevű ellenféllel, kártyahangokkal. "
+          "Rakj színben vagy értékben, és fogyj ki elsőként!",
           retro=False),
-    Jatek("iranyerzek", "Iránytű",
-          "Térbeli hallás gyakorlása: honnan jön a hang?",
+    Jatek("slot", "Félkarú rabló",
+          "Pörgesd a tárcsákat érmékért – fémes érme-, pörgetés- és "
+          "nyeremény-hanggal.",
           retro=False),
-    Jatek("reakcio", "Reakcióidő",
-          "Milyen gyorsan reagálsz a jelre? Napi eredménykövetéssel.",
+    Jatek("millebornes", "Mille Bornes (1000 mérföld)",
+          "A klasszikus francia autós kártyajáték: távkártyák, veszélyek, "
+          "ellenszerek és mentességek – cél az 1000 mérföld.",
           retro=False),
 )
 

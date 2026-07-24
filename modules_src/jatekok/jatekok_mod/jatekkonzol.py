@@ -72,7 +72,11 @@ class RetroHang:
             else:
                 kulcs, tempo = beall, 1.0
             try:
-                path = RS.synth(szoveg, "", kulcs, tempo_szorzo=tempo)
+                try:
+                    path = RS.synth(szoveg, "", kulcs, tempo_szorzo=tempo)
+                except TypeError:
+                    # régebbi Core: nincs tempo_szorzo – tempó nélkül, de NEM néma
+                    path = RS.synth(szoveg, "", kulcs)
             except Exception:
                 continue
             if self._stop or self._skip:
@@ -119,6 +123,7 @@ class JatekKonzol(wx.Dialog):
         self._var = False               # épp bemenetre várunk-e
         self._hang = RetroHang(gep_getter)
         self._tone_player = None
+        self._sapi = None            # rendszer-TTS tartalék (lusta)
 
         self._build()
         self.Bind(wx.EVT_CLOSE, self._on_close)
@@ -149,9 +154,13 @@ class JatekKonzol(wx.Dialog):
         b_ujra.Bind(wx.EVT_BUTTON, lambda e: self._indul())
         sor.Add(b_ujra, 0, wx.RIGHT, 6)
         self.hang_kapcs = wx.CheckBox(self, label="&Retró hang beszéljen")
-        self.hang_kapcs.SetValue(True)
+        self.hang_kapcs.SetValue(bool(self.jatek.retro))
         self.hang_kapcs.Bind(wx.EVT_CHECKBOX, self._hang_kapcsol)
         sor.Add(self.hang_kapcs, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        if not self.jatek.retro:
+            # a Saját játékok NEM a retró géphangon szólnak, hanem normál
+            # rendszerhangon – a retró kapcsoló itt nem értelmes
+            self.hang_kapcs.Hide()
         b_ki = wx.Button(self, label="&Kilépés a játékból")
         b_ki.Bind(wx.EVT_BUTTON, lambda e: self.Close())
         sor.Add(b_ki, 0)
@@ -201,6 +210,9 @@ class JatekKonzol(wx.Dialog):
             if typ == "hang":
                 self._hang_tone(payload)
                 continue
+            if typ == "effekt":
+                self._effekt(payload)
+                continue
             if typ == "kerdez":
                 self._ki(payload)
                 self._var_bemenet(True)
@@ -239,12 +251,31 @@ class JatekKonzol(wx.Dialog):
         if self.hang_kapcs.GetValue():
             self._hang.mond(szoveg)
         else:
-            sv = getattr(self.main, "selfvoice", None)
-            if sv:
-                try:
-                    sv.speak(szoveg, force=True)
-                except Exception:
-                    pass
+            self._beszel_rendszer(szoveg)
+
+    def _beszel_rendszer(self, szoveg):
+        """Normál (nem retró) felolvasás: app SelfVoice, különben rendszer-TTS
+        (SAPI) – így a Saját játékok akkor sem némák, ha a SelfVoice ki van
+        kapcsolva (alapból az)."""
+        sv = getattr(self.main, "selfvoice", None)
+        if sv:
+            try:
+                sv.speak(szoveg, force=True)
+                return
+            except Exception:
+                pass
+        if self._sapi is None:
+            try:
+                from superdl.speech import Speaker
+                sp = Speaker()
+                self._sapi = sp if getattr(sp, "available", False) else False
+            except Exception:
+                self._sapi = False
+        if self._sapi:
+            try:
+                self._sapi.speak(szoveg)
+            except Exception:
+                pass
 
     def _hang_tone(self, hangok):
         """Rövid szinuszhangok lejátszása (Zongora). WAV-ba szintetizálja és a
@@ -270,6 +301,37 @@ class JatekKonzol(wx.Dialog):
             pcm = (np.clip(np.concatenate(reszek), -1, 1) * 32767).astype("<i2")
             out = os.path.join(tempfile.gettempdir(),
                                f"superdl_zongora_{uuid.uuid4().hex[:8]}.wav")
+            with wave.open(out, "wb") as w:
+                w.setnchannels(1)
+                w.setsampwidth(2)
+                w.setframerate(fs)
+                w.writeframes(pcm.tobytes())
+            if self._tone_player is None:
+                from superdl.audioengine import Player
+                self._tone_player = Player()
+            self._tone_player.play(out, "")
+        except Exception:
+            pass
+
+    def _effekt(self, nev):
+        """Egy megnevezett játékhang (swish, érme, pörgetés…) lejátszása. A
+        hullámformát a `hangok` modul szintetizálja (numpy), a beszédtől külön
+        lejátszón szól."""
+        if self._closing or not nev:
+            return
+        try:
+            import os
+            import tempfile
+            import uuid
+            import wave
+            import numpy as np
+            from . import hangok
+            x, fs = hangok.keszit(str(nev))
+            if x is None or not len(x):
+                return
+            pcm = (np.clip(x, -1, 1) * 32767).astype("<i2")
+            out = os.path.join(tempfile.gettempdir(),
+                               f"superdl_sfx_{uuid.uuid4().hex[:8]}.wav")
             with wave.open(out, "wb") as w:
                 w.setnchannels(1)
                 w.setsampwidth(2)
@@ -349,6 +411,9 @@ class _KonzolCtx:
 
     def hang(self, hangok):
         return ("hang", list(hangok))
+
+    def effekt(self, nev):
+        return ("effekt", str(nev))
 
 
 # ---- a felület által hívott indítók -------------------------------------

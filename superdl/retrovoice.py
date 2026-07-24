@@ -451,14 +451,17 @@ def _wav_ki(path: str, x, fs: int) -> None:
 
 # ------------------------------------------------------------- API
 
-def synth(text: str, out_path: str = "", preset_kulcs: str = "") -> str:
+def synth(text: str, out_path: str = "", preset_kulcs: str = "",
+          preset_obj=None) -> str:
     """A megadott szöveg RETRÓ hangon, WAV-fájlba. Visszaad: a fájl útja.
 
-    A hívó törölje a fájlt, ha már nincs rá szüksége (vagy használja a
+    `preset_obj` megadva közvetlenül azt a RetroPreset-et használja (a hívó
+    testre szabhatja pl. a hangmagasságot/sebességet); különben a kulcs alapján
+    választ. A hívó törölje a fájlt, ha már nincs rá szüksége (vagy használja a
     `speak()`-et, ami magától takarít)."""
     if not (text or "").strip():
         raise ValueError("Nincs felolvasandó szöveg.")
-    p = preset(preset_kulcs)
+    p = preset_obj if preset_obj is not None else preset(preset_kulcs)
     out = out_path or os.path.join(
         tempfile.gettempdir(),
         f"superdl_retro_{os.getpid()}_{uuid.uuid4().hex[:8]}.wav")

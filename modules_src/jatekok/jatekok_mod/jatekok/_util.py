@@ -39,6 +39,11 @@ class Ctx:
         szinuszként megszólaltatja; a teszt-hajtó egyszerűen átugorja."""
         return ("hang", list(hangok))
 
+    def effekt(self, nev):
+        """Egy megnevezett játékhang (pl. „kartya", „erme", „porgetes"). A
+        felület szintetizálja és lejátssza; a teszt-hajtó átugorja."""
+        return ("effekt", str(nev))
+
 
 # ---- bemenet-értelmezés --------------------------------------------------
 

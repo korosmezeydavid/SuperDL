@@ -49,6 +49,7 @@ class JatekokFrame(wx.Frame):
         self._player = None
         self._hang = RS.ALAP_GEP
         self._tempo = 1.0            # a beszéd időtartam-szorzója (1.0 = alap)
+        self._sapi = None            # rendszer-TTS tartalék (lusta)
 
         self._build()
         self.CreateStatusBar()
@@ -154,12 +155,35 @@ class JatekokFrame(wx.Frame):
             return
         self.SetStatusText(text)
         if beszel:
-            sv = getattr(self.main, "selfvoice", None)
-            if sv:
-                try:
-                    sv.speak(text, force=True)
-                except Exception:
-                    pass
+            self._beszel(text)
+
+    def _beszel(self, text):
+        """Megbízhatóan HALLHATÓ bemondás: előbb az app SelfVoice-a (ha be van
+        kapcsolva), különben a rendszer-TTS (SAPI) – így akkor sem néma, ha a
+        SelfVoice ki van kapcsolva (alapból az)."""
+        sv = getattr(self.main, "selfvoice", None)
+        if sv:
+            try:
+                sv.speak(text, force=True)
+                return
+            except Exception:
+                pass
+        sp = self._sapi_hang()
+        if sp is not None:
+            try:
+                sp.speak(text)
+            except Exception:
+                pass
+
+    def _sapi_hang(self):
+        if self._sapi is None:
+            try:
+                from superdl.speech import Speaker
+                sp = Speaker()
+                self._sapi = sp if getattr(sp, "available", False) else False
+            except Exception:
+                self._sapi = False
+        return self._sapi or None
 
     # ---- kijelölés / leírás -------------------------------------------
 
@@ -229,7 +253,11 @@ class JatekokFrame(wx.Frame):
 
         def work():
             try:
-                path = RS.synth(szoveg, "", hang, tempo_szorzo=tempo)
+                try:
+                    path = RS.synth(szoveg, "", hang, tempo_szorzo=tempo)
+                except TypeError:
+                    # régebbi Core: nincs tempo_szorzo – tempó nélkül, de NEM néma
+                    path = RS.synth(szoveg, "", hang)
             except Exception as e:
                 wx.CallAfter(self._hang_kesz, "", str(e))
                 return

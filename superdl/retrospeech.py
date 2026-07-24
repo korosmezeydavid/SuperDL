@@ -190,6 +190,7 @@ class RetroGep:
     motor: str = "sajat"        # "sajat" = ez a formánsmotor; "klatt" = eSpeak-Klatt
     klatt_preset: str = ""      # motor="klatt" esetén a retrovoice-preset kulcsa
     tompitas: float = 0.0       # motor="klatt": aluláteresztő vágás (Hz, 0 = nincs)
+    klatt_pitch: int = 0        # motor="klatt": eSpeak hangmagasság 0..99 (0 = alap)
 
 
 GEPEK: tuple[RetroGep, ...] = (
@@ -220,7 +221,7 @@ GEPEK: tuple[RetroGep, ...] = (
     # ami a SuperDL-be be van építve.
     RetroGep("brailab_klatt", "BraiLab – eSpeak-Klatt (tompított)",
              motor="klatt", klatt_preset="brailab", tompitas=2800.0,
-             hangero=0.97),
+             klatt_pitch=28, hangero=0.97),
     RetroGep("gep", "Beszélő gép (közepes)",
              alaphang=122.0, hangsuly=0.18, tempo=1.0,
              atmenet_ms=12, sav_szuk=0.9, kvant_hz=60, bitek=9,
@@ -339,26 +340,26 @@ def _retrovoice():
     return RV
 
 
-def _idonyujtas(x, faktor: float):
-    """A jel időbeli nyújtása/rövidítése lineáris újramintavételezéssel
-    (faktor>1 → hosszabb/lassabb). A hangmagasság kissé együtt mozog – egy
-    gépi hangnál ez teljesen rendben van."""
-    import numpy as np
-    if not x.size or abs(faktor - 1.0) <= 1e-3:
-        return x
-    n = max(1, int(round(len(x) * float(faktor))))
-    return np.interp(np.linspace(0, len(x) - 1, n),
-                     np.arange(len(x)), x).astype(float)
-
-
 def _klatt_szintezis(szoveg: str, g: RetroGep):
     """A „BraiLab – eSpeak-Klatt" hang: a régi retrovoice (eSpeak Klatt +
     numpy-DSP) adja az alapot, amit itt még kicsit TOMPÍTUNK (aluláteresztő),
-    ahogy a fejlesztő kérte. Ehhez eSpeak kell – a SuperDL-ben be van építve."""
+    ahogy a fejlesztő kérte. Ehhez eSpeak kell – a SuperDL-ben be van építve.
+
+    A hangmagasságot a `klatt_pitch` (eSpeak pitch 0..99) adja – így NEM
+    magas/idegesítő. A tempót az eSpeak SEBESSÉGÉVEL állítjuk (nem
+    újramintavételezéssel), ezért a tempó NEM tolja el a hangmagasságot."""
+    import dataclasses
     import os
     import numpy as np
     RV = _retrovoice()
-    path = RV.synth(szoveg, "", g.klatt_preset or "brailab")
+    alap = RV.preset(g.klatt_preset or "brailab")
+    valt = {}
+    if g.klatt_pitch:
+        valt["hangmagassag"] = max(0, min(99, int(g.klatt_pitch)))
+    if g.tempo and abs(g.tempo - 1.0) > 1e-3:
+        valt["sebesseg"] = int(max(80, min(400, round(alap.sebesseg / g.tempo))))
+    p = dataclasses.replace(alap, **valt) if valt else alap
+    path = RV.synth(szoveg, "", preset_obj=p)
     try:
         x, fs = RV._wav_be(path)
     finally:
@@ -367,9 +368,6 @@ def _klatt_szintezis(szoveg: str, g: RetroGep):
         except Exception:
             pass
     x = np.asarray(x, dtype=float)
-    # a retrovoice tempója fix, ezért a tempó-csúszkát itt időnyújtással adjuk
-    if g.tempo and abs(g.tempo - 1.0) > 1e-3:
-        x = _idonyujtas(x, g.tempo)
     if g.tompitas and g.tompitas > 0 and x.size:
         x = RV._lowpass(x, fs, float(g.tompitas))
     csucs = float(np.max(np.abs(x))) if x.size else 0.0
