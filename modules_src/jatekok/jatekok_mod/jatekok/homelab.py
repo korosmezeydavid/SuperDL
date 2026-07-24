@@ -635,3 +635,161 @@ def jatek_foldrajz(ctx):
                 node = tip[2] if valasz else tip[3]
                 break
     yield ctx.vege("Köszönöm a játékot!")
+
+
+# ================================================================ SZÁMKITALÁLÓ 2
+# Forrás: SZAMKIT2.HTP – a gép gondol egy számot 0 és a megadott felső határ
+# között; tippelsz, „NAGYOBBAT/KISSEBBET GONDOLTAM", plusz ellentmondás- és
+# ismétlés-figyelés, szurka-piszka üzenetekkel. Minden szöveg a forrásból.
+
+def jatek_szamkit2(ctx):
+    yield ctx.mond("SZÁMKITALÁLÓS JÁTÉK.")
+    while True:
+        v = yield ctx.kerdez("MEKKORA SZÁMIG JÁTSZUNK?")
+        bu = szam(v, 1, 1000000)
+        if bu is None:
+            continue
+        es = random.randint(0, bu)
+        yield ctx.mond(f"GONDOLTAM EGY SZÁMOT 0 ÉS {bu} KÖZÖTT.")
+        sa, po, elso = 0, 1, True
+        while True:
+            v = yield ctx.kerdez("PRÓBÁLD MEG KITALÁLNI!" if elso
+                                 else "PRÓBÁLD MEG UJRA!")
+            elso = False
+            va = szam(v)
+            if va is None:
+                yield ctx.mond("Számot kérek.")
+                continue
+            if va == es:
+                if po > 10:
+                    yield ctx.mond("VÉGŰL HA NEHEZEN IS DE ELTALÁLTAD!")
+                else:
+                    yield ctx.mond("ELTALÁLTAD GRATULÁLOK!")
+                yield ctx.mond(f"A PRÖBÁLKOZÁSAID SZÁMA {po} VOLT.")
+                break
+            if va < 0:
+                yield ctx.mond("EZ OSTOBASÁG VOLT INKÁBB MEGÁLLOK!")
+                yield ctx.vege("SZERBUSZ!")
+                return
+            if (va > sa and es < sa) or (va < sa and es > sa):
+                yield ctx.mond("HIBÁS ELKÉPZELÉS!")
+                yield ctx.mond("EZT A SZÁMOT MÁR TAGADTAM A VÁLASZOMMAL!")
+                po += 1
+                continue
+            if va == sa:
+                yield ctx.mond("AZ ELŐBB IS EZT PRÖBÁLTAD!")
+                po += 1
+                continue
+            if va > bu:
+                yield ctx.mond(f"NEM TUDSZ SZÁMOLNI FIAM CSAK {bu}-IG "
+                               "TIPPELHETSZ!")
+                po += 1
+                continue
+            yield ctx.mond("NAGYOBBAT GONDOLTAM." if va < es
+                           else "KISSEBBET GONDOLTAM.")
+            sa, po = va, po + 1
+        v = yield ctx.kerdez("JÁTSZUNK MÉGEGGYET?")
+        if not igen(v, False):
+            yield ctx.mond("REMÉLEM JÖL SZÖRAKOZTUNK EGGYŰT!")
+            break
+    yield ctx.vege("SZERBUSZ!")
+
+
+# ================================================================= DOBÓKOCKA
+# Forrás: DOBOKOC.HTP – dobókockás pontgyűjtő. Az eredetiben két ember játszik;
+# nálunk TE a gép ellen (akadálymentes, egyszemélyes), az eredeti szabállyal:
+# 3 dobás, de a hatos újabb három dobást ad; 55/77/99 pontnál „legurul a kocka"
+# és nulláról kezded; 99 fölött vége, a több pont nyer. Üzenetek a forrásból.
+
+def _dobokoc_kor(p, aktiv):
+    """A gép egy körének lepörgetése (nem yield-el). Visszaad: üzenetsor +
+    (vege, új-pont)."""
+    d = 0
+    uzenetek = []
+    while True:
+        g = random.randint(1, 6)
+        d += 1
+        p += g
+        uzenetek.append(f"A gép dobott: {g}. Összesen: {p}.")
+        if p in (55, 77, 99):
+            p, d = 0, 0
+            uzenetek.append("HOPPÁ! LEGURULT A KOCKA AZ ASZTALRÖL! ÍGY "
+                            "KEZDHETED ELŐRŐL A JÁTÉKOT!")
+            continue
+        if p > 99:
+            return uzenetek, True, p
+        if p < 6:
+            p = 0
+        if g == 6:
+            d = 0
+            uzenetek.append("UJJABB HÁROM DOBÁS ILLET MEG.")
+            continue
+        if d < 3:
+            continue
+        uzenetek.append(f"{p} PONTOD VAN. NEKED MOST NINCS TŐBB DOBÁSOD.")
+        return uzenetek, False, p
+
+
+def jatek_dobokoc(ctx):
+    yield ctx.mond(
+        "JÁTÉK A DOBÓKOCKÁVAL! Felváltva dobtok a géppel. Három dobás jár, de "
+        "ha hatost dobsz, újabb három dobás illet meg! Ha a pontod 55, 77 vagy "
+        "99, legurul a kocka az asztalról, és nulláról kezded. Kilencvenkilenc "
+        "fölött vége, és a több pont nyer.")
+    jatszmak = [0, 0]
+    while True:
+        p = [0, 0]
+        vege = False
+        aktiv = 0
+        while not vege:
+            if aktiv == 0:
+                yield ctx.mond(f"Te jössz. {p[0]} pontod van. Dobjál!")
+                d = 0
+                while True:
+                    yield ctx.kerdez("Dobáshoz nyomj Entert!")
+                    g = random.randint(1, 6)
+                    d += 1
+                    p[0] += g
+                    yield ctx.mond(f"Dobtál: {g}. Összesen: {p[0]}.")
+                    if p[0] in (55, 77, 99):
+                        p[0], d = 0, 0
+                        yield ctx.mond("HOPPÁ! LEGURULT A KOCKA AZ ASZTALRÖL! "
+                                       "ÍGY ELŐRŐL KEZDHETED A JÁTÉKOT.")
+                        continue
+                    if p[0] > 99:
+                        vege = True
+                        break
+                    if p[0] < 6:
+                        p[0] = 0
+                    if g == 6:
+                        d = 0
+                        yield ctx.mond("UJJABB HÁROM DOBÁS ILLET MEG.")
+                        continue
+                    if d < 3:
+                        continue
+                    yield ctx.mond(f"{p[0]} PONTOD VAN. NEKED MOST NINCS TŐBB "
+                                   "DOBÁSOD.")
+                    break
+            else:
+                yield ctx.mond("A gép következik.")
+                uzenetek, vege, p[1] = _dobokoc_kor(p[1], 1)
+                for u in uzenetek:
+                    yield ctx.mond(u)
+            if not vege:
+                aktiv = 1 - aktiv
+        yield ctx.mond("ÁLLJATOK FEL! EREDMÉNYT HIRDETEK.")
+        if p[0] > p[1]:
+            jatszmak[0] += 1
+            yield ctx.mond(f"{p[0]} PONTTAL MEGNYERTED A JÁTSZMÁT! GRATULÁLOK! "
+                           "ŰGYES VOLTÁL!")
+        elif p[1] > p[0]:
+            jatszmak[1] += 1
+            yield ctx.mond(f"A gép {p[1]} PONTTAL MEGNYERTE A JÁTSZMÁT! AZÉRT "
+                           "NE PITYEREGJ!")
+        else:
+            yield ctx.mond("Döntetlen ez a játszma!")
+        yield ctx.mond(f"Játszmák: te {jatszmak[0]}, a gép {jatszmak[1]}.")
+        v = yield ctx.kerdez("AKARTOK MÉG JÁTSZANI? (I/N)")
+        if not igen(v, False):
+            break
+    yield ctx.vege("KÖSZÖNÖM HOGY IRÁNYÍTHATTAM A JÁTÉKOT. JÖK VOLTATOK.")

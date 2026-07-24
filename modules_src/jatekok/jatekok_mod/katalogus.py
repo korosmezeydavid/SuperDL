@@ -184,6 +184,12 @@ RETRO: tuple[Jatek, ...] = (
     Jatek("foldrajz", "Földrajz – kitalálom az országod",
           "Gondolj egy európai országra, és igen–nem kérdésekkel kitalálom, "
           "melyikre gondoltál!"),
+    Jatek("szamkit2", "Számkitaláló 2",
+          "A gép egy számra gondol nulla és az általad megadott felső határ "
+          "között; tippelj, és a nagyobbat–kisebbet jelzésekből fejtsd ki."),
+    Jatek("dobokoc", "Dobókocka",
+          "Pontgyűjtő kockajáték a gép ellen: a hatos új dobásokat ad, de 55, "
+          "77 és 99 pontnál legurul a kocka – 99 fölött a több pont nyer."),
 )
 
 

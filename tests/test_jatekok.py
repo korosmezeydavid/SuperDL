@@ -999,6 +999,58 @@ def test_foldrajz_lejatszhato_es_talal():
     assert any("Köszönöm a játékot" in p for _, p in ki)
 
 
+class _SzamKit2Bot:
+    def __init__(self):
+        self.lo, self.hi, self.g = 0, None, None
+
+    def __call__(self, k, ki):
+        import re
+        kl = k.lower()
+        if "mekkora számig" in kl:
+            return "50"
+        if "mégeggyet" in kl:
+            return "N"
+        if "próbáld meg" in kl:
+            if self.hi is None:
+                for _, p in reversed(ki):
+                    m = re.search(r"0 ÉS (\d+) KÖZÖTT", p)
+                    if m:
+                        self.hi = int(m.group(1))
+                        break
+                self.hi = self.hi if self.hi is not None else 50
+            for _, p in reversed(ki[:-1]):
+                if "NAGYOBBAT GONDOLTAM" in p:
+                    self.lo = self.g + 1
+                    break
+                if "KISSEBBET GONDOLTAM" in p:
+                    self.hi = self.g - 1
+                    break
+                if "GONDOLTAM EGY SZÁMOT" in p:
+                    break
+            self.g = (self.lo + self.hi) // 2
+            return str(self.g)
+        return ""
+
+
+def test_szamkit2_kitalalhato():
+    ki = _fut("szamkit2", _SzamKit2Bot())
+    assert any("ELTALÁLTAD GRATULÁLOK" in p or "ELTALÁLTAD" in p
+               for _, p in ki)
+
+
+def test_dobokoc_veget_er():
+    def bot(k, ki):
+        kl = k.lower()
+        if "dobáshoz nyomj entert" in kl:
+            return ""
+        if "akartok még játszani" in kl:
+            return "N"
+        return ""
+    ki = _fut("dobokoc", bot)
+    assert any("MEGNYERTED A JÁTSZMÁT" in p or "MEGNYERTE A JÁTSZMÁT" in p
+               or "Döntetlen" in p for _, p in ki)
+
+
 # ---- jogtisztaság: a játékkód nem hív idegen beszédmotort/alfolyamatot ----
 
 def test_jatekok_nem_hasznalnak_idegen_fuggoseget():

@@ -64,6 +64,8 @@ REGISZTER = {
     "memteszt": homelab.jatek_memteszt,
     "lotto": homelab.jatek_lotto,
     "foldrajz": homelab.jatek_foldrajz,
+    "szamkit2": homelab.jatek_szamkit2,
+    "dobokoc": homelab.jatek_dobokoc,
 }
 
 
