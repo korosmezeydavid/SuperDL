@@ -19,8 +19,11 @@ from . import store
 class Episode:
     title: str
     guid: str
-    url: str               # a médiamelléklet (enclosure) URL-je
+    url: str               # médiánál az enclosure URL-je; cikknél a bejegyzés
     published: str = ""
+    is_media: bool = True  # True: letölthető/lejátszható média; False: cikk
+    summary: str = ""      # cikknél a bejegyzés szövege (RSS-olvasóhoz)
+    page: str = ""         # a bejegyzés weboldala (böngészőben megnyitáshoz)
 
 
 @dataclass
@@ -32,12 +35,13 @@ class Subscription:
     auto: bool = True                      # automatikusan tölti-e az újakat
     seen: set = field(default_factory=set)  # már letöltött epizód-azonosítók
     last_check: float = 0.0
+    article: bool = False                  # True: cikk-feed (olvasnivaló, nem média)
 
     def to_record(self) -> dict:
         return {"feed_url": self.feed_url, "title": self.title,
                 "out_dir": self.out_dir, "audio_only": self.audio_only,
                 "auto": self.auto, "seen": sorted(self.seen),
-                "last_check": self.last_check}
+                "last_check": self.last_check, "article": self.article}
 
     @classmethod
     def from_record(cls, r: dict) -> "Subscription":
@@ -46,7 +50,8 @@ class Subscription:
                    audio_only=r.get("audio_only", True),
                    auto=r.get("auto", True),
                    seen=set(r.get("seen", [])),
-                   last_check=r.get("last_check", 0.0))
+                   last_check=r.get("last_check", 0.0),
+                   article=r.get("article", False))
 
 
 def parse_feed(feed_url: str) -> tuple[str, list[Episode]]:
@@ -71,15 +76,20 @@ def parse_feed(feed_url: str) -> tuple[str, list[Episode]]:
                 if mc.get("url"):
                     media_url = mc["url"]
                     break
-        # 3. tartalék: maga a bejegyzés linkje (sima RSS)
+        page = entry.get("link", "")
+        is_media = bool(media_url)
+        # 3. média nélkül SIMA CIKK (pl. blog/hír-feed): a bejegyzés maga a
+        #    tartalom – nem letöltendő videó, hanem OLVASNIVALÓ.
         if not media_url:
-            media_url = entry.get("link", "")
+            media_url = page
         if not media_url:
             continue
         guid = entry.get("id") or entry.get("guid") or media_url
         episodes.append(Episode(
             title=entry.get("title", "epizód"), guid=guid,
-            url=media_url, published=entry.get("published", "")))
+            url=media_url, published=entry.get("published", ""),
+            is_media=is_media, page=page,
+            summary=(entry.get("summary", "") if not is_media else "")))
     return title, episodes
 
 
@@ -109,6 +119,8 @@ class FeedManager:
                                audio_only=audio_only)
             title, episodes = parse_feed(feed_url)
             sub.title = title
+            # cikk-feed, ha egyetlen letölthető média sincs benne (pl. blog/hír)
+            sub.article = bool(episodes) and not any(e.is_media for e in episodes)
             if mark_existing:
                 sub.seen = {e.guid for e in episodes}
             self.subs.append(sub)

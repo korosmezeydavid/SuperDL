@@ -1254,10 +1254,16 @@ class MainFrame(wx.Frame):
         def work():
             try:
                 sub = self.fm.subscribe(url, out_dir=out_dir, audio_only=audio)
-                wx.CallAfter(
-                    self._announce,
-                    f"Feliratkozva: {sub.title} ({len(sub.seen)} meglévő "
-                    f"epizód kihagyva, csak az újakat tölti).")
+                if sub.article:
+                    uz = (f"Feliratkozva: {sub.title}. Ez egy CIKK-hírcsatorna "
+                          "(nincs benne letölthető média). Olvasáshoz: "
+                          "Feliratkozások kezelése (Ctrl+L), majd Enter a "
+                          "böngészéshez.")
+                else:
+                    uz = (f"Feliratkozva: {sub.title} ({len(sub.seen)} meglévő "
+                          "epizód kihagyva, csak az újakat tölti). Böngészés: "
+                          "Ctrl+L, majd Enter.")
+                wx.CallAfter(self._announce, uz)
             except Exception as e:
                 wx.CallAfter(self._announce,
                              f"Nem sikerült a feliratkozás: {e}", False)
@@ -1265,7 +1271,8 @@ class MainFrame(wx.Frame):
         threading.Thread(target=work, daemon=True).start()
 
     def _on_manage_subs(self, event=None):
-        dlg = SubsDialog(self, self.fm)
+        dlg = SubsDialog(self, self.fm, resolve_fn=self._resolve_video,
+                         download_fn=self._download_url)
         dlg.ShowModal()
         dlg.Destroy()
 
@@ -1295,14 +1302,29 @@ class MainFrame(wx.Frame):
                 self._announce("Nincs új epizód a feliratkozásokban.")
             return
         mgr = self._ensure_mgr()
+        media_db = 0
+        cikk = []
         for sub, ep in found:
-            job = mgr.add(ep.url, out_dir=sub.out_dir or self.dir_entry.GetValue(),
+            if not getattr(ep, "is_media", True):
+                # cikk-hírcsatorna: NEM töltjük le médiaként, csak jelezzük és
+                # látottnak jelöljük (a Ctrl+L → Böngészésben olvasható)
+                cikk.append(ep.title)
+                self.fm.mark_seen(sub, ep)
+                continue
+            job = mgr.add(ep.url,
+                          out_dir=sub.out_dir or self.dir_entry.GetValue(),
                           audio_only=sub.audio_only)
             job.progress.filename = ep.title
             self._row_for(job)
             self._feed_pending[job.id] = (sub, ep)
-        self._announce(f"{len(found)} új epizód letöltése elindult.",
-                       toast=True)
+            media_db += 1
+        if media_db:
+            self._announce(f"{media_db} új epizód letöltése elindult.",
+                           toast=True)
+        if cikk:
+            self._announce(f"{len(cikk)} új cikk a feliratkozásokban "
+                           f"(pl. {cikk[0]}). Olvasás: Ctrl+L, majd Enter.",
+                           toast=True)
 
     # ---- YouTube-csatornák: figyelés, friss videók --------------------
 
@@ -2151,40 +2173,182 @@ class MainFrame(wx.Frame):
         event.Skip()
 
 
-class SubsDialog(wx.Dialog):
-    """Feliratkozások listája és törlése - akadálymentes."""
+def _html_strip(s: str) -> str:
+    """Egyszerű HTML→olvasható szöveg (a cikk-feedek összefoglalóihoz)."""
+    import html
+    import re
+    if not s:
+        return ""
+    s = re.sub(r"(?is)<(script|style).*?</\1>", "", s)
+    s = re.sub(r"(?i)<br\s*/?>", "\n", s)
+    s = re.sub(r"(?i)</p\s*>", "\n\n", s)
+    s = re.sub(r"<[^>]+>", "", s)
+    s = html.unescape(s)
+    return re.sub(r"\n{3,}", "\n\n", s).strip()
 
-    def __init__(self, parent, fm: FeedManager):
+
+class FeedReaderDialog(wx.Dialog):
+    """RSS-OLVASÓ cikk-feedekhez (blog/hír): a bejegyzések listája, a kijelölt
+    szövege felolvasható, és böngészőben is megnyitható. Akadálymentes."""
+
+    def __init__(self, parent, cim, episodes):
+        super().__init__(parent, title=f"Olvasó – {cim}", size=(820, 620),
+                         style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        self.episodes = episodes
+        v = wx.BoxSizer(wx.VERTICAL)
+        v.Add(wx.StaticText(
+            self, label="&Bejegyzések (fel/le nyíl, Enter: elolvasás):"),
+            0, wx.ALL, 8)
+        self.lst = wx.ListBox(self, choices=[e.title for e in episodes],
+                              style=wx.LB_SINGLE)
+        self.lst.SetName("Bejegyzések listája")
+        self.lst.Bind(wx.EVT_LISTBOX, lambda e: self._read())
+        v.Add(self.lst, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
+
+        v.Add(wx.StaticText(self, label="A bejegyzés szö&vege:"),
+              0, wx.LEFT | wx.TOP, 8)
+        self.txt = wx.TextCtrl(
+            self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2)
+        self.txt.SetName("A bejegyzés szövege")
+        v.Add(self.txt, 2, wx.EXPAND | wx.ALL, 8)
+
+        sor = wx.BoxSizer(wx.HORIZONTAL)
+        b_open = wx.Button(self, label="Megnyitás &böngészőben (O)")
+        b_open.Bind(wx.EVT_BUTTON, lambda e: self._open())
+        b_close = wx.Button(self, wx.ID_CLOSE, "Be&zárás")
+        b_close.Bind(wx.EVT_BUTTON, lambda e: self.EndModal(wx.ID_CLOSE))
+        sor.Add(b_open, 0, wx.RIGHT, 6)
+        sor.Add(b_close, 0)
+        v.Add(sor, 0, wx.ALL, 8)
+        self.SetSizer(v)
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_key)
+        if episodes:
+            self.lst.SetSelection(0)
+            self._read()
+        self.lst.SetFocus()
+
+    def _sel(self):
+        i = self.lst.GetSelection()
+        return self.episodes[i] if 0 <= i < len(self.episodes) else None
+
+    def _read(self):
+        e = self._sel()
+        if not e:
+            return
+        szoveg = _html_strip(e.summary)
+        if not szoveg:
+            szoveg = ("(Ehhez a bejegyzéshez nincs szöveg a hírcsatornában – "
+                      "nyisd meg böngészőben az O billentyűvel.)")
+        fej = e.title + (f"\n{e.published}" if e.published else "")
+        self.txt.SetValue(fej + "\n\n" + szoveg)
+        self.txt.SetInsertionPoint(0)
+
+    def _open(self):
+        e = self._sel()
+        if e and (e.page or e.url):
+            import webbrowser
+            webbrowser.open(e.page or e.url)
+            self.SetTitle("Megnyitva a böngészőben…")
+
+    def _on_key(self, e):
+        k = e.GetKeyCode()
+        if k in (ord("O"), ord("o")):
+            self._open()
+        elif k == wx.WXK_ESCAPE:
+            self.EndModal(wx.ID_CLOSE)
+        else:
+            e.Skip()
+
+
+class SubsDialog(wx.Dialog):
+    """Feliratkozások listája, böngészés és törlés - akadálymentes."""
+
+    def __init__(self, parent, fm: FeedManager, resolve_fn=None,
+                 download_fn=None):
         super().__init__(parent, title="Feliratkozások kezelése",
-                         size=(560, 380))
+                         size=(620, 420))
         self.fm = fm
+        self._resolve = resolve_fn
+        self._download = download_fn
         vbox = wx.BoxSizer(wx.VERTICAL)
 
-        lbl = wx.StaticText(self, label="&Feliratkozások:")
+        lbl = wx.StaticText(
+            self, label="&Feliratkozások (Enter: epizódok/cikkek böngészése):")
         self.listbox = wx.ListBox(self, style=wx.LB_SINGLE)
         self.listbox.SetName("Feliratkozások listája")
+        self.listbox.Bind(wx.EVT_LISTBOX_DCLICK, lambda e: self._browse())
         vbox.Add(lbl, 0, wx.ALL, 8)
         vbox.Add(self.listbox, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
 
         btns = wx.BoxSizer(wx.HORIZONTAL)
+        btn_browse = wx.Button(self, label="&Böngészés (Enter)")
         btn_del = wx.Button(self, label="Kijelölt &törlése")
         btn_close = wx.Button(self, wx.ID_CLOSE, "&Bezárás")
+        btns.Add(btn_browse, 0, wx.RIGHT, 6)
         btns.Add(btn_del, 0, wx.RIGHT, 6)
         btns.Add(btn_close, 0)
         vbox.Add(btns, 0, wx.ALL, 8)
         self.SetSizer(vbox)
 
+        btn_browse.Bind(wx.EVT_BUTTON, lambda e: self._browse())
         btn_del.Bind(wx.EVT_BUTTON, self._on_delete)
         btn_close.Bind(wx.EVT_BUTTON, lambda e: self.EndModal(wx.ID_CLOSE))
+        self.Bind(wx.EVT_CHAR_HOOK, self._on_key)
         self._refresh()
         self.listbox.SetFocus()
 
     def _refresh(self):
         self.listbox.Clear()
         for s in self.fm.subs:
-            mode = "hang" if s.audio_only else "videó"
-            self.listbox.Append(f"{s.title}  ({mode}, {len(s.seen)} epizód "
+            mode = "cikk" if s.article else ("hang" if s.audio_only else "videó")
+            szo = "bejegyzés" if s.article else "epizód"
+            self.listbox.Append(f"{s.title}  ({mode}, {len(s.seen)} {szo} "
                                 f"látva)  –  {s.feed_url}")
+
+    def _on_key(self, e):
+        if e.GetKeyCode() in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER) \
+                and self.FindFocus() is self.listbox:
+            self._browse()
+        else:
+            e.Skip()
+
+    def _browse(self):
+        i = self.listbox.GetSelection()
+        if i == wx.NOT_FOUND or i >= len(self.fm.subs):
+            return
+        sub = self.fm.subs[i]
+        from superdl import feeds
+        self.SetStatusText(f"Bejegyzések lekérése: {sub.title} …") \
+            if hasattr(self, "SetStatusText") else None
+
+        def work():
+            try:
+                _title, episodes = feeds.parse_feed(sub.feed_url)
+            except Exception as ex:
+                wx.CallAfter(wx.MessageBox, f"Nem sikerült lekérni: {ex}",
+                             "Hiba", wx.OK | wx.ICON_ERROR, self)
+                return
+            wx.CallAfter(self._open_browser_dlg, sub, episodes)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _open_browser_dlg(self, sub, episodes):
+        if not episodes:
+            wx.MessageBox("Nem találtam bejegyzést ebben a hírcsatornában.",
+                          "Üres", wx.OK | wx.ICON_INFORMATION, self)
+            return
+        van_media = any(e.is_media for e in episodes)
+        if not van_media:
+            dlg = FeedReaderDialog(self, sub.title, episodes)
+            dlg.ShowModal()
+            dlg.Destroy()
+        else:
+            from superdl.medialistwin import MediaListDialog
+            items = [(e.title, e.published, e.url) for e in episodes]
+            dlg = MediaListDialog(self, f"Epizódok – {sub.title}", items,
+                                  self._resolve, self._download)
+            dlg.ShowModal()
+            dlg.Destroy()
 
     def _on_delete(self, event):
         i = self.listbox.GetSelection()
