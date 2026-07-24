@@ -37,6 +37,7 @@ DEFAULT_FEEDS = [
     ("Gazdaság", "Portfolio", "https://www.portfolio.hu/rss/all.xml"),
     ("Életmód", "NLC", "https://nlc.hu/feed/"),
     ("Akadálymentesség", "MVGYOSZ", "https://www.mvgyosz.hu/feed/"),
+    ("Akadálymentesség", "ITSzemle", "https://itszemle.hu/feed/rss"),
 ]
 
 
@@ -160,7 +161,7 @@ class NewsManager:
         # a bővített, kategorizált beépített forrásokat EGYSZER hozzáadjuk a
         # meglévőkhöz is (frissítéskor); a felhasználó saját forrásai és
         # törlései megmaradnak (marker fájl jelzi, hogy már megtörtént)
-        marker = store.CONFIG_DIR / "news_defaults_v2.done"
+        marker = store.CONFIG_DIR / "news_defaults_v3.done"
         if not marker.exists():
             by_url = {f.url: f for f in self.feeds}
             for cat, title, url in DEFAULT_FEEDS:
