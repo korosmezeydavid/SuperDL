@@ -172,6 +172,12 @@ RETRO: tuple[Jatek, ...] = (
     Jatek("amoba", "Amőba",
           "Öt egy sorban a gép ellen 17-szer 17-es táblán: a te jeled az X, "
           "a gépé az O. Védekező játékstílus is kérhető."),
+    Jatek("nimjatek", "Nim játék",
+          "Az nyer, aki utolsónak vesz: te adod a kezdő állást (2–5 kupac), "
+          "a gép a nim-összeg szerint optimálisan lép."),
+    Jatek("memteszt", "Memóriateszt",
+          "A gép szám–szó párokat mond; jegyezd meg, és mondd vissza sorban – "
+          "egyre több párral, egészen húszig."),
 )
 
 

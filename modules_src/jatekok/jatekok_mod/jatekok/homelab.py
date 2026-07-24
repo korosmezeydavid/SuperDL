@@ -8,7 +8,7 @@ kapja a szerző-megjelölésben. A BR4.ROM-hoz nem nyúlunk, gépi kódot nem
 másolunk; a VISELKEDÉST írjuk újra."""
 import random
 
-from ._util import igen, szam
+from ._util import igen, szam, ekezet_nelkul
 
 
 # ================================================================= BLACKJACK
@@ -349,3 +349,132 @@ def jatek_amoba(ctx):
         if not igen(v, False):
             break
     yield ctx.vege("Köszönöm a játékot!")
+
+
+# ==================================================================== NIM JÁTÉK
+# Forrás: NIMJATEK.HTP – „AZ NYER, AKI UTOLSÓNAK VESZ". A játékos adja a kezdő
+# állást (2-5 kupac, egyenként 1-1000). A gép XOR (nim-összeg) optimális
+# stratégiával lép. (A forrás győzelem-ellenőrzése csak az első 4 kupacot
+# nézte – a hivatalos leírás javítást kér: az ÖSSZES kupacot nézzük.)
+
+def _nim_ai(kupacok):
+    x = 0
+    for a in kupacok:
+        x ^= a
+    if x != 0:
+        for i, a in enumerate(kupacok):
+            cel = x ^ a
+            if cel < a:
+                return i, a - cel
+    i = max(range(len(kupacok)), key=lambda j: kupacok[j])
+    if kupacok[i] == 0:
+        for j in range(len(kupacok)):
+            if kupacok[j] > 0:
+                i = j
+                break
+    return i, (kupacok[i] + 1) // 2
+
+
+def jatek_nimjatek(ctx):
+    yield ctx.mond("NIM JÁTÉK. AZ NYER, AKI UTOLSÓNAK VESZ. ADD MEG A KEZDŐ "
+                   "ÁLLÁST.")
+    while True:
+        v = yield ctx.kerdez("HÁNY KUPAC LEGYEN? (2-5)")
+        k = szam(v, 2, 5)
+        if k is not None:
+            break
+    kupacok = []
+    for n in range(1, k + 1):
+        while True:
+            v = yield ctx.kerdez(f"A({n})= (1-1000)")
+            a = szam(v, 1, 1000)
+            if a is not None:
+                kupacok.append(a)
+                break
+    while True:
+        yield ctx.mond("A kupacok: "
+                       + ", ".join(str(x) for x in kupacok) + ".")
+        while True:
+            v = yield ctx.kerdez("HONNAN VESZEL?")
+            n = szam(v, 1, k)
+            if n is None:
+                continue
+            if kupacok[n - 1] == 0:
+                yield ctx.mond("Az a kupac üres.")
+                continue
+            break
+        while True:
+            v = yield ctx.kerdez("ÉS ABBÓL MENNYIT?")
+            m = szam(v, 1, kupacok[n - 1])
+            if m is not None:
+                break
+        kupacok[n - 1] -= m
+        if sum(kupacok) == 0:
+            yield ctx.mond("TE NYERTÉL")
+            break
+        gi, gm = _nim_ai(kupacok)
+        kupacok[gi] -= gm
+        yield ctx.mond(f"ÉN MEG {gi + 1}-BŐL {gm} DB-T.")
+        if sum(kupacok) == 0:
+            yield ctx.mond("EN NYERTEM")
+            break
+    yield ctx.vege("Köszönöm a játékot!")
+
+
+# ================================================================= MEMÓRIATESZT
+# Forrás: MEMTESZT.HTP – a gép szám+szó párokat mond, meg kell jegyezni, majd
+# sorban visszamondani. Az eredeti szólista és üzenetek. A forrás ON AA GOTO-ja
+# 20 körnél megáll, ezért 20 párnál teljesített a teszt.
+_MEMTESZT_SZAVAK = ["SZEKRÉNY", "ASZTAL", "NADRÁG", "SZOKNYA", "MACSKA",
+                    "ZONGORA", "ORSZÁG", "VACSORA", "KENYÉR", "ORGONA",
+                    "BUZOGÁNY", "CSÓTÁNY", "DELFIN", "ELEFÁNT", "CIGARETTA",
+                    "KILINCS"]
+
+
+def _memteszt_ell(v, parok):
+    toks = (v or "").strip().split()
+    if len(toks) < 2 * len(parok):
+        return False
+    for i, (s, w) in enumerate(parok):
+        ns, nw = toks[2 * i], toks[2 * i + 1]
+        if not ns.isdigit() or int(ns) != s:
+            return False
+        if ekezet_nelkul(nw) != ekezet_nelkul(w):
+            return False
+    return True
+
+
+def jatek_memteszt(ctx):
+    yield ctx.mond(
+        "MEMÓRIA TESZT. Számokat és szavakat fogok mondani. Meg kell jegyezned "
+        "őket! Később ismételned kell ezeket az egymáshoz rendelt párokat. "
+        "Minden szám és szó egy pár.")
+    while True:
+        yield ctx.mond("FIGYELJ! INDULUNK!")
+        parok = []
+        pont = 0
+        while True:
+            parok.append((random.randint(1, 30),
+                          random.choice(_MEMTESZT_SZAVAK)))
+            bemutat = ", ".join(f"{s} {w}" for s, w in parok)
+            yield ctx.mond("A párok: " + bemutat + ".")
+            v = yield ctx.kerdez("ISMÉTELD MEG A SZÁMOKAT ÉS SZAVAKAT! "
+                                 "(szám szó, szám szó, …)")
+            if _memteszt_ell(v, parok):
+                pont += len(parok)
+                if len(parok) >= 20:
+                    yield ctx.mond("EZ RENDKIVŰLI TELJESITMÉNY VOLT! KÁPRÁZATOS "
+                                   "MEMÓRIÁD VAN! GRATULÁLOK!")
+                    yield ctx.mond(f"A JÁTÉK ALATT {pont} PONTOT ÉRTÉL EL.")
+                    break
+                yield ctx.mond("EDDIG JÖ! FOLYTASSUK TOVÁBB!")
+            else:
+                yield ctx.mond("HIBÁZTÁL. SAJNÁLOM!")
+                yield ctx.mond("A HELYES VÁLASZOK AZ ALÁBBIAK VOLTAK: "
+                               + bemutat + ".")
+                yield ctx.mond(f"A JÁTÉK ALATT {pont} PONTOT ÉRTÉL EL.")
+                break
+        v = yield ctx.kerdez("JÁTSZUNK MÉG TOVÁBB?")
+        if not igen(v, False):
+            break
+    yield ctx.vege("KÖSZÖNÖM A JÁTÉKOT!")

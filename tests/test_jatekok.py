@@ -870,6 +870,62 @@ def test_amoba_ot_egy_sorban_nyer():
     assert not HL._amoba_nyer(board, 3, 4, "O")
 
 
+class _NimBot:
+    def __call__(self, k, ki):
+        import re
+        kl = k.lower()
+        if "hány kupac" in kl:
+            return "3"
+        if k.startswith("A("):
+            return "3"
+        if "honnan veszel" in kl:
+            for _, p in reversed(ki):
+                if p.startswith("A kupacok:"):
+                    nums = [int(x) for x in re.findall(r"\d+", p)]
+                    for idx, val in enumerate(nums):
+                        if val > 0:
+                            return str(idx + 1)
+            return "1"
+        if "abból mennyit" in kl:
+            return "1"
+        return ""
+
+
+def test_nimjatek_lejatszhato():
+    ki = _fut("nimjatek", _NimBot())
+    assert any(("TE NYERTÉL" in p) or ("EN NYERTEM" in p) for _, p in ki)
+
+
+def test_nim_ai_nyero_allasban_nullaz():
+    """XOR≠0 állásból a gép nim-összeg 0-ra visz (nyerő lépés)."""
+    HL = importlib.import_module(BASE + ".jatekok.homelab")
+    i, m = HL._nim_ai([1, 2, 4])          # XOR = 7 ≠ 0
+    kupac = [1, 2, 4]
+    kupac[i] -= m
+    assert kupac[0] ^ kupac[1] ^ kupac[2] == 0
+
+
+class _MemtesztBot:
+    def __call__(self, k, ki):
+        kl = k.lower()
+        if "játszunk még" in kl:
+            return "N"
+        if "ismételd meg" in kl:
+            for _, p in reversed(ki):
+                if p.startswith("A párok:"):
+                    body = p[len("A párok:"):].strip().rstrip(".")
+                    return " ".join(x.strip() for x in body.split(","))
+            return ""
+        return ""
+
+
+def test_memteszt_a_forras_szavaival_es_veget_er():
+    ki = _fut("memteszt", _MemtesztBot())
+    assert any("RENDKIVŰLI TELJESITMÉNY" in p for _, p in ki)
+    HL = importlib.import_module(BASE + ".jatekok.homelab")
+    assert "SZEKRÉNY" in HL._MEMTESZT_SZAVAK and "KILINCS" in HL._MEMTESZT_SZAVAK
+
+
 # ---- jogtisztaság: a játékkód nem hív idegen beszédmotort/alfolyamatot ----
 
 def test_jatekok_nem_hasznalnak_idegen_fuggoseget():

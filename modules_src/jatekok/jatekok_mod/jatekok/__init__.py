@@ -60,6 +60,8 @@ REGISZTER = {
     "blackjack": homelab.jatek_blackjack,
     "szamkit1": homelab.jatek_szamkit1,
     "amoba": homelab.jatek_amoba,
+    "nimjatek": homelab.jatek_nimjatek,
+    "memteszt": homelab.jatek_memteszt,
 }
 
 
