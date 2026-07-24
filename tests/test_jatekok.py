@@ -65,7 +65,7 @@ def test_minden_regisztralt_jatek_fuggveny():
 def test_attribucio_ismert_szerzovel():
     j = KAT.keres("huszonegy")
     sz = KAT.attribucio_szoveg(j)
-    assert "Pille" in sz
+    assert "Ócsvári Áron" in sz
     assert "Modernizálta Kőrösmezey Dávid" in sz
     assert "szerzői jogok" in sz
 
@@ -174,16 +174,37 @@ def test_parbaj_veget_er():
     _fut("parbaj", bot)
 
 
-def test_huszonegy_egy_kor_lejatszik():
+def test_huszonegy_aron_egy_parti_lejatszik():
+    """Ócsvári Áron Huszonegye: k-val indul, húz, majd az összesítővel zárul."""
     def bot(k, ki):
         kl = k.lower()
-        if "kérsz még lapot" in kl:
-            return "nem"
-        if "új kör" in kl:
-            return "nem"
+        if "válasszon" in kl:
+            return "k"
+        if "újra húzni" in kl:
+            return "i"
+        if "még egyet" in kl:
+            return "n"
         return ""
     ki = _fut("huszonegy", bot)
-    assert any("Végeredmény" in p for _, p in ki)
+    assert any("eredmények" in p for _, p in ki)          # a záró összesítő
+
+
+def test_huszonegy_aron_szabaly_menupont():
+    """Az 's' menüpont szó szerint kiírja a forrás szabályát (Áron kreditjével),
+    majd 'n'-re udvariasan búcsúzik és véget ér."""
+    ki = U.lejatsz(JR.REGISZTER["huszonegy"], iter(["s", "n"]))
+    assert ki[-1][0] == "vege"
+    assert any("Legalább két lapot" in p for _, p in ki)   # eredeti szabály
+    assert any("Ócsvári Áron" in p for _, p in ki)         # a kredit a szabályban
+    assert any("Viszlát" in p for _, p in ki)
+
+
+def test_huszonegy_aron_szabalytalan_megallas_kiesik():
+    """A forrás szabálya: két lap alatt / 15 pont alatt megállni tilos – aki
+    az első lap után megáll, „kiesett" (a partit zárja, nem lövi ki a gépet)."""
+    ki = U.lejatsz(JR.REGISZTER["huszonegy"], iter(["k", "n"]))
+    assert ki[-1][0] == "vege"
+    assert any("kiesett" in p for _, p in ki)
 
 
 def test_hazard_lejatszik():

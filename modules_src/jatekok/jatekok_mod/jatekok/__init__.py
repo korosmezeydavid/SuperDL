@@ -20,7 +20,7 @@ REGISZTER = {
     "horstep": terkep.jatek_horstep,
     "labirint": terkep.jatek_labirint,
     # kártya / kocka / szerencse
-    "huszonegy": kartya.jatek_huszonegy,
+    "huszonegy": homelab.jatek_huszonegy,   # Ócsvári Áron hiteles verziója
     "hazard": kartya.jatek_hazard,
     "snobli": kartya.jatek_snobli,
     "kocka3": kartya.jatek_kocka3,

@@ -39,9 +39,10 @@ TURAI = "Turai László (Brailab Software)"
 RETRO: tuple[Jatek, ...] = (
     # ---- kártya / kocka / szerencse ----
     Jatek("huszonegy", "Huszonegy (21)",
-          "Magyar kártyás huszonegyezés a gép ellen: állj meg időben, "
-          "vagy húzz még – 14 és 21 között kell maradnod.",
-          szerzo=PILLE, ev="1994"),
+          "Ócsvári Áron magyar kártyás huszonegyese a gép ellen: legalább két "
+          "lapot kérj, 15 pont alatt ne állj meg, és maradj 21-en vagy alatta "
+          "– a gép 19-ig húz, aki 21 fölé megy, befuccsol.",
+          szerzo="Ócsvári Áron", ev="2010"),
     Jatek("hazard", "Itt a piros, hol a piros?",
           "Három gyufásdoboz, egyben a piros golyó. Találd ki, melyikben!",
           szerzo=PILLE, ev="1994"),

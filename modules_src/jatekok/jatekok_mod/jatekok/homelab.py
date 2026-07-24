@@ -793,3 +793,175 @@ def jatek_dobokoc(ctx):
         if not igen(v, False):
             break
     yield ctx.vege("KÖSZÖNÖM HOGY IRÁNYÍTHATTAM A JÁTÉKOT. JÖK VOLTATOK.")
+
+
+# ================================================================= HUSZONEGY
+# Forrás: Ócsvári Áron „Huszonegyes kártyajáték", 2010. 05. 29.
+# (oaron1@gmail.com, http://oarononline.try.hu). A program nyílt forráskódú,
+# a szerző kifejezett engedélyével és a kreditje megtartásával kerül ide.
+# MINDEN szöveg és szabály a FORRÁSBÓL, szó szerint: 32 lapos magyar kártya;
+# legalább két lapot kérni kell, és 15 pont alatt megállni nem szabad; a gép
+# 19-ig húz; aki 21 fölé megy, befuccsol.
+
+_H21_SZINEK = ("piros", "zöld", "makk", "tök")
+_H21_LAPOK = (("alsó", 2), ("felső", 3), ("király", 4), ("ász", 11),
+              ("hét", 7), ("nyolc", 8), ("kilenc", 9), ("tíz", 10))
+
+# a „szabályok" menüpont teljes szövege – szó szerint a forrásból
+_H21_SZABALY = (
+    "A bankár mindenkinek egy lapot ad, utoljára magának is. Ezután minden "
+    "játékos tesz. Legalább két lapot kérni kell, és 15 pont alatt megállni "
+    "nem szabad. Ha a pontszám nagyobb 21-nél, a játékos befuccsol, vagyis "
+    "veszít. Egyébként az nyer, akinek több pontja van. A lapok értékei: "
+    "Alsó: 2, Felső: 3, Király: 4, Ász: 11. A hetes, nyolcas, kilences és "
+    "tizes kártyák értékei egyértelműek. :) Kellemes szórakozást! Készítette: "
+    "Ócsvári Áron – oaron1@gmail.com")
+
+
+def _h21_pakli():
+    """A 32 lapos magyar pakli: (lapnév, érték) párok."""
+    return [(f"{sz} {nev}", ertek)
+            for sz in _H21_SZINEK for nev, ertek in _H21_LAPOK]
+
+
+def _h21_huz(pakli, huzott):
+    """Egy még ki nem húzott lap véletlen kiválasztása → (lapnév, érték)."""
+    szabad = [i for i in range(len(pakli)) if i not in huzott]
+    i = random.choice(szabad)
+    huzott.add(i)
+    return pakli[i]
+
+
+def _h21_eredmeny(jszam, jnyert, gnyert, dontetlen, vesztett):
+    """A kilépéskori összesítő – a forrás fordulataival, szó szerint."""
+    if jszam == 1 and jnyert == 0 and gnyert == 0:
+        return ("Nos akkor az eredmények... A lejátszott 1 játékból ön egy "
+                "menetet sem nyert meg, de mivel én sem, ezért mind a ketten "
+                "elbuktuk! Máskor talán több szerencsénk lesz... Azért "
+                "gratulálok, remélem máskor is találkozunk!")
+    s = f"Nos akkor az eredmények... A lejátszott {jszam} játékból ön "
+    s += ("egy menetet sem nyert meg," if jnyert == 0
+          else f"{jnyert} menetet nyert meg,")
+    s += (" én egy menetet sem" if gnyert == 0
+          else f" én {gnyert} menetet,")
+    s += (" és egy sem lett döntetlen." if dontetlen == 0
+          else f" és {dontetlen} lett döntetlen.")
+    if vesztett > 0:
+        s += f" Szégyen, de {vesztett} menetet mind a ketten elbuktunk!"
+    return s + " Gratulálok, remélem máskor is találkozunk!"
+
+
+def jatek_huszonegy(ctx):
+    yield ctx.mond("Üdvözlöm a huszonegyes játékban!")
+
+    # ---- kezdőmenü: k / s / n --------------------------------------------
+    while True:
+        v = yield ctx.kerdez("Kérem, válasszon: k – játék kezdése, "
+                             "s – a játék szabályainak elolvasása, "
+                             "n – kilépés.")
+        d = (v or "").strip().lower()[:1]
+        if d == "s":
+            yield ctx.mond(_H21_SZABALY)
+            yield ctx.mond("Kedvet kapott a játékra? Ha igen, nyomja meg a k "
+                           "betűt! Ha meg megíjedt... Akkor ne kerüljön a "
+                           "szemem elé, és nyomja meg az n betűt!")
+            continue
+        if d == "n":
+            yield ctx.vege("Rendben, értettem... Viszlát!")
+            return
+        if d == "k":
+            break
+        # bármi más: újra a menü
+
+    jszam = jnyert = gnyert = dontetlen = vesztett = 0
+
+    # ---- a menetek -------------------------------------------------------
+    while True:
+        pakli = _h21_pakli()
+        huzott = set()
+        jszam += 1
+        nev, ertek = _h21_huz(pakli, huzott)
+        jatekos = ertek
+        kszam = 1
+        yield ctx.mond(f"Az első húzott kártyája a {nev}, melynek értéke: "
+                       f"{ertek}.")
+
+        dont = ""
+        gep = 0
+        kilep = False
+        while not kilep:
+            if jatekos <= 21:
+                v = yield ctx.kerdez("Szeretne újra húzni? (i/n)")
+                dont = (v or "").strip().lower()[:1]
+            # lapkérés – a forrás szerint legfeljebb az 5. lapig, 21-ig
+            if dont == "i" and kszam <= 4 and jatekos <= 21:
+                nev, ertek = _h21_huz(pakli, huzott)
+                jatekos += ertek
+                kszam += 1
+                yield ctx.mond(f"A kapott kártya a {nev}, melynek értéke: "
+                               f"{ertek}. A kártyái összértéke: {jatekos}.")
+            if kszam > 4 or jatekos >= 21:
+                if jatekos == 21:
+                    yield ctx.mond("Az nevet a legjobban, aki utoljára nevet!")
+                    yield ctx.mond("Most én következem!")
+                else:
+                    yield ctx.mond("Sajnálom, ennél többet nem húzhat! Épp "
+                                   "ezért én jövök!")
+            if dont == "n" or kszam > 4 or jatekos >= 21:
+                if kszam < 2 or jatekos < 15:
+                    yield ctx.mond(
+                        "Szabálytalan művelet, ezért ön kiesett! Máskor "
+                        "figyelmesebben olvassa el a játék leírását! Én nem "
+                        "szomorkodok, mivel ilyenkor mindent visz a bank!")
+                    yield ctx.vege()
+                    return
+                # a gép húz, amíg el nem éri a 19-et
+                gep = 0
+                while gep < 19:
+                    nev, ertek = _h21_huz(pakli, huzott)
+                    gep += ertek
+                    yield ctx.mond(f"A kapott kártya a {nev}, melynek értéke: "
+                                   f"{ertek}. A kártyáim értéke: {gep}.")
+                kilep = True
+
+        yield ctx.mond(f"Az én kártyáim értéke: {gep}, az öné pedig "
+                       f"{jatekos}.")
+
+        # ---- a nyertes kiválasztása (a forrás elágazásai szerint) --------
+        if jatekos <= 21 and gep <= 21:
+            if jatekos > gep:
+                yield ctx.mond("Gratulálok, ön nyert!")
+                jnyert += 1
+            elif jatekos == gep:
+                yield ctx.mond("Hopsz, döntetlen! Önnek kivételesen nagy "
+                               "szerencséje van...")
+                dontetlen += 1
+            else:
+                yield ctx.mond("Hát ez ma önnek nem jött be... Na de nembaj, "
+                               "majd legközelebb!")
+                gnyert += 1
+        else:
+            if jatekos > 21 and gep > 21:
+                yield ctx.mond("Hát így jártunk, egyikünk se nyert.")
+                vesztett += 1
+            elif jatekos <= 21:
+                yield ctx.mond("Gratulálok, ön nyert!")
+                jnyert += 1
+            else:
+                yield ctx.mond("Sajnálom, ön sajnos most nem nyert... De ne "
+                               "adja fel, próbálkozzon tovább!")
+                gnyert += 1
+
+        # ---- új parti? ---------------------------------------------------
+        while True:
+            v = yield ctx.kerdez("Szeretne még egyet játszani? (i/n)")
+            d = (v or "").strip().lower()[:1]
+            if d == "i":
+                yield ctx.mond("Akkor hajrá! Úgyis én fogok nyerni!")
+                break
+            if d == "n":
+                yield ctx.mond(_h21_eredmeny(jszam, jnyert, gnyert,
+                                             dontetlen, vesztett))
+                yield ctx.vege()
+                return
+            # bármi más: újra kérdez
