@@ -148,12 +148,45 @@ class ActiveRecording:
             except Exception:
                 pass
 
+    def _recorded_seconds(self) -> float:
+        """A ténylegesen RÖGZÍTETT hang hossza másodpercben (ffprobe-bal). Ez a
+        MEGBÍZHATÓ mérték: az élő stream az elején puffer-löketet küldhet, ezért
+        a fali óra rövidebb lehet, mint a rögzített hang – ne a fali órából
+        döntsük el, teljes-e a felvétel."""
+        try:
+            ff = _ffmpeg_exe()
+            if not ff:
+                return 0.0
+            probe = str(Path(ff).with_name("ffprobe.exe"))
+            if not Path(probe).is_file():
+                return 0.0
+            flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+            r = subprocess.run(
+                [probe, "-v", "error", "-show_entries", "format=duration",
+                 "-of", "default=nk=1:nw=1", str(self.path)],
+                capture_output=True, text=True, timeout=20, creationflags=flags)
+            return float((r.stdout or "0").strip() or 0)
+        except Exception:
+            return 0.0
+
     def _premature(self) -> bool:
         """VÁRATLANUL ért véget? Időzítettnél: a kértnél érdemben rövidebb lett.
-        Kézinél (F9): minden nem-felhasználói leállás váratlan – az ÉLŐ adás
-        magától nem ér véget, tehát ha az ffmpeg kilépett, valami közbejött."""
+        A RÖGZÍTETT HANG HOSSZÁT nézzük (nem a fali órát!), mert az élő stream
+        puffer-löketei miatt a felvétel hamarabb elkészülhet, mint amennyi valós
+        idő eltelt. Kézinél (F9): minden nem-felhasználói leállás váratlan – az
+        élő adás magától nem ér véget, tehát ha az ffmpeg kilépett, valami
+        közbejött."""
         if self.duration_s and self.duration_s > 0:
-            return self.elapsed_s() < self.duration_s * 0.9
+            rogzitett = self._recorded_seconds()
+            if rogzitett > 0:
+                return rogzitett < self.duration_s * 0.9
+            # ha az ffprobe nem mér, a FÁJLMÉRETBŐL becslünk (192 kbps ≈ 24000
+            # bájt/mp) – ez is jobb, mint a fali óra
+            try:
+                sz = self.path.stat().st_size
+            except OSError:
+                sz = 0
+            return sz < self.duration_s * 24000 * 0.9
         return True
 
     def _has_audio(self) -> bool:
