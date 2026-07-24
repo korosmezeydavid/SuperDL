@@ -144,7 +144,6 @@ class RadioFrame(wx.Frame):
         self.player.on_state = lambda s: wx.CallAfter(self._on_state, s)
         self.rec = getattr(main, "_record_mgr", None)   # felvétel-kezelő
         self._manual_rec = None                          # folyó kézi felvétel
-        self._sapi = None                                # rendszer-TTS tartalék
         self.stations: list[R.Station] = []
         self.favorites: list[R.Station] = [
             self._from_rec(r) for r in store.load_radio_favorites()]
@@ -323,28 +322,13 @@ class RadioFrame(wx.Frame):
             return
         self.SetStatusText(text)
         self.now_label.SetLabel(text)
-        # vakon a státuszsor/címke változását a képernyőolvasó nem olvassa fel
-        # magától – ezért HANGOSAN is bemondjuk. Előbb az app SelfVoice-a (ha be
-        # van kapcsolva), különben a rendszer-TTS (SAPI) – így akkor sem NÉMA,
-        # ha a SelfVoice ki van kapcsolva (alapból az). Enélkül a felvétel-gomb
-        # „nem reagál" hatását kelti, pedig csak nem hallható a válasza.
+        # A képernyőolvasó a fő bejelentő; a program SAJÁT hangja (selfvoice)
+        # csak OPCIONÁLIS kiegészítés (a beállításokban kapcsolható). NEM
+        # kényszerítünk külön SAPI-hangot a screen reader mellé.
         sv = getattr(self.main, "selfvoice", None)
         if sv:
             try:
                 sv.speak(text, force=True)
-                return
-            except Exception:
-                pass
-        if self._sapi is None:
-            try:
-                from superdl.speech import Speaker
-                sp = Speaker()
-                self._sapi = sp if getattr(sp, "available", False) else False
-            except Exception:
-                self._sapi = False
-        if self._sapi:
-            try:
-                self._sapi.speak(text)
             except Exception:
                 pass
 
