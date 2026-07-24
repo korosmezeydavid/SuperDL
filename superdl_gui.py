@@ -133,8 +133,14 @@ HOWITWORKS_TEXT = (
     "hallgatása, kedvencekkel.\n"
     "  • Időzítés: megadott időpontban indítja a letöltést.\n"
     "  • Folytatás: a félbeszakadt letöltéseket újraindításkor felkínálja.\n"
-    "  • Podcast/RSS: feliratkozol egy csatornára, az új epizódokat magától "
-    "letölti.\n"
+    "  • Podcast és RSS-olvasó: feliratkozol egy csatorna vagy hírcsatorna "
+    "címére (Ctrl+R). A feliratkozásokat a Ctrl+L nyitja meg; ott a kijelölt "
+    "csatornán Enter a Böngészés. Ha a feed CIKKEKET tartalmaz (pl. blog vagy "
+    "hír), az olvasóban a bejegyzés szövege felolvasható, és böngészőben is "
+    "megnyitható (O). Ha PODCAST (hang/videó melléklettel), az epizódok "
+    "lejátszhatók és letölthetők. A program 15 percenként megnézi a "
+    "feliratkozásokat: az új podcast-epizódot magától letölti, az új cikkről "
+    "pedig üzenetben szól.\n"
     "  • Hangos összefoglaló (Ctrl+J): egy mondatban felolvassa az állapotot.\n"
     "  • Sebességkorlát: az összes letöltésre együttesen érvényes.\n"
     "  • Frissítés: a letöltőmotorok új verzióit felkínálja telepítésre."
@@ -267,6 +273,16 @@ class _SuperDLTrayIcon(wx.adv.TaskBarIcon):
         return m
 
 
+WELCOME_TEXT = (
+    "Üdvözöllek a SuperDL-ben!\n"
+    "Ez egy akadálymentes médiaközpont: letöltés, rádió, hangoskönyv, "
+    "podcast- és RSS-olvasó, médiaeszközök, könyvek, játékok és sok más – "
+    "mind a felső menükből.\n"
+    "Ha most ismerkedsz vele, nyomd meg az F1-et a súgóért. A menük között a "
+    "szokásos módon mozogsz; új letöltéshez Ctrl+N."
+)
+
+
 class MainFrame(wx.Frame):
     def __init__(self):
         super().__init__(None, title="SuperDL – akadálymentes médiaközpont",
@@ -345,11 +361,10 @@ class MainFrame(wx.Frame):
         # BIZTONSÁG: nem hivatalos frissítési forrás → hangos figyelmeztetés
         wx.CallLater(1600, self._repo_security_notice)
 
-        # induló fókusz: ha az URL-sor rejtve van, a letöltési listára álljunk
-        if self.settings.get("hide_url_row"):
-            self.dl_list.SetFocus()
-        else:
-            self.url_entry.SetFocus()
+        # induló fókusz: a BARÁTSÁGOS ÜDVÖZLŐ fogad, nem a letöltési lista –
+        # így egy kezdő felhasználót nem „dob be" rögtön a letöltésekbe.
+        self.welcome.SetInsertionPoint(0)
+        self.welcome.SetFocus()
         wx.CallAfter(self._init_modules)
 
     def _init_modules(self):
@@ -600,8 +615,8 @@ class MainFrame(wx.Frame):
         mb.Append(m_ai, "&AI")
 
         m_help = wx.Menu()
-        mi_keys = m_help.Append(wx.ID_ANY, "&Billentyűparancsok\tF1")
-        mi_how = m_help.Append(wx.ID_ANY, "&Hogyan működik")
+        mi_how = m_help.Append(wx.ID_ANY, "&Hogyan működik – részletes súgó\tF1")
+        mi_keys = m_help.Append(wx.ID_ANY, "&Billentyűparancsok")
         mi_priv = m_help.Append(wx.ID_ANY, "&Adatkezelés és adatvédelem")
         mi_aikeys = m_help.Append(
             wx.ID_ANY, "AI-&kulcsok beszerzése…",
@@ -672,6 +687,15 @@ class MainFrame(wx.Frame):
         panel = wx.Panel(self)
         self._main_panel = panel
         vbox = wx.BoxSizer(wx.VERTICAL)
+
+        # ÜDVÖZLŐ (kezdőképernyő): induláskor ez fogad, nem a letöltési lista.
+        # A SuperDL rég túlnőtt a letöltőn – ez egy akadálymentes médiaközpont.
+        self.welcome = wx.TextCtrl(
+            panel, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
+            size=(-1, 96))
+        self.welcome.SetName("Üdvözlő – kezdőképernyő")
+        self.welcome.SetValue(WELCOME_TEXT)
+        vbox.Add(self.welcome, 0, wx.EXPAND | wx.ALL, 8)
 
         # URL-sor
         row1 = wx.BoxSizer(wx.HORIZONTAL)
