@@ -58,6 +58,8 @@ REGISZTER = {
     "uno": sajat.jatek_uno,
     # HITELES portok a hivatalos Homelab/Brailab gyűjteményből
     "blackjack": homelab.jatek_blackjack,
+    "szamkit1": homelab.jatek_szamkit1,
+    "amoba": homelab.jatek_amoba,
 }
 
 

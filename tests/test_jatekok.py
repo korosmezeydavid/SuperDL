@@ -803,6 +803,73 @@ def test_blackjack_szerzoje_a_forras_szerinti():
     assert "Halmágyi István" in KAT.attribucio_szoveg(j)
 
 
+class _Szamkit1Bot:
+    """Bináris kereséssel megtalálja a számot."""
+
+    def __init__(self):
+        self.lo, self.hi, self.g = 1, 100, 50
+
+    def __call__(self, k, ki):
+        kl = k.lower()
+        if "szeretnél még" in kl:
+            return "N"
+        if "kérem a tippet" in kl:
+            for _, p in reversed(ki[:-1]):
+                if "NAGYOBBAT" in p:
+                    self.lo = self.g + 1
+                    break
+                if "KISSEBBET" in p:
+                    self.hi = self.g - 1
+                    break
+                if "KÉREM A TIPPET" in p:
+                    break
+            self.g = (self.lo + self.hi) // 2
+            return str(self.g)
+        return ""
+
+
+def test_szamkit1_kitalalhato():
+    ki = _fut("szamkit1", _Szamkit1Bot())
+    assert any("ELTALÁLTAD" in p for _, p in ki)
+    assert any("TIPPED VOLT" in p for _, p in ki)
+
+
+class _AmobaBot:
+    def __init__(self):
+        self.i = 0
+
+    def __call__(self, k, ki):
+        kl = k.lower()
+        if "védekező" in kl:
+            return "N"
+        if "játszunk még" in kl:
+            return "N"
+        if "hová raksz" in kl:
+            b = "ABCDEFGHIJKLMNOPR"
+            c = b[self.i % 17]
+            r = b[(self.i // 17) % 17]
+            self.i += 1
+            return f"{c} {r}"
+        return ""
+
+
+def test_amoba_lejatszhato_es_a_gep_lep():
+    ki = _fut("amoba", _AmobaBot())
+    assert any("Gondolkodom" in p for _, p in ki)
+    assert any(("GYŐZTÉL" in p) or ("MOST ÉN NYERTEM" in p) or
+               ("döntetlen" in p) for _, p in ki)
+
+
+def test_amoba_ot_egy_sorban_nyer():
+    """A vízszintes ötös érzékelése (a győzelmi feltétel helyes)."""
+    HL = importlib.import_module(BASE + ".jatekok.homelab")
+    board = [["."] * 17 for _ in range(17)]
+    for c in range(5):
+        board[3][c] = "X"
+    assert HL._amoba_nyer(board, 3, 4, "X")
+    assert not HL._amoba_nyer(board, 3, 4, "O")
+
+
 # ---- jogtisztaság: a játékkód nem hív idegen beszédmotort/alfolyamatot ----
 
 def test_jatekok_nem_hasznalnak_idegen_fuggoseget():

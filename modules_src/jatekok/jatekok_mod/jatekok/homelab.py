@@ -8,7 +8,7 @@ kapja a szerző-megjelölésben. A BR4.ROM-hoz nem nyúlunk, gépi kódot nem
 másolunk; a VISELKEDÉST írjuk újra."""
 import random
 
-from ._util import igen
+from ._util import igen, szam
 
 
 # ================================================================= BLACKJACK
@@ -173,4 +173,179 @@ def jatek_blackjack(ctx):
             yield ctx.mond("Elfogyott a pénzed. Vége a játéknak.")
             break
 
+    yield ctx.vege("Köszönöm a játékot!")
+
+
+# ============================================================== SZÁMKITALÁLÓ
+# Forrás: SZAMKIT1.HTP – a gép számra gondol, a játékos tippel; „NAGYOBBAT!" /
+# „KISSEBBET!" visszajelzés. Az üzenetek a forrásból, szó szerint.
+
+def jatek_szamkit1(ctx):
+    yield ctx.mond("SZÁMKITALÁLÓ JÁTÉK. Egy számra gondolok 1 és 100 között.")
+    while True:
+        a = random.randint(1, 100)
+        c = 0
+        while True:
+            v = yield ctx.kerdez("KÉREM A TIPPET!")
+            b = szam(v)
+            if b is None:
+                yield ctx.mond("Számot kérek.")
+                continue
+            c += 1
+            if a > b:
+                yield ctx.mond("NAGYOBBAT!")
+            elif a < b:
+                yield ctx.mond("KISSEBBET!")
+            else:
+                yield ctx.mond("ELTALÁLTAD!")
+                yield ctx.mond(f"{c} TIPPED VOLT.")
+                break
+        v = yield ctx.kerdez("SZERETNÉL MÉG JÁTSZANI?")
+        if not igen(v, False):
+            break
+    yield ctx.vege("NAGYON SAJNÁLOM MERT IGEN JÖ JÁTÉKOS VOLTÁL.")
+
+
+# ==================================================================== AMŐBA
+# Forrás: AMOBA.HTP – 17×17-es amőba (öt egy sorban) a gép ellen. A játékos
+# jele X, a gépé O. Az oszlopokat és sorokat A-tól R-ig betűk jelölik (a Q
+# kimarad!). Kérdőjellel letapogatható a mező. Üzenetek a forrásból.
+_AMOBA_BETUK = "ABCDEFGHIJKLMNOPR"      # 17 betű, a Q szándékosan kimarad
+_AMOBA_N = 17
+
+
+def _amoba_koord(v):
+    t = [ch for ch in (v or "").upper() if ch in _AMOBA_BETUK]
+    if len(t) < 2:
+        return None
+    return (_AMOBA_BETUK.index(t[0]), _AMOBA_BETUK.index(t[1]))   # (oszlop, sor)
+
+
+def _amoba_nyer(board, r, c, jel):
+    n = _AMOBA_N
+    for dr, dc in ((0, 1), (1, 0), (1, 1), (1, -1)):
+        db = 1
+        for s in (1, -1):
+            nr, nc = r + dr * s, c + dc * s
+            while 0 <= nr < n and 0 <= nc < n and board[nr][nc] == jel:
+                db += 1
+                nr += dr * s
+                nc += dc * s
+        if db >= 5:
+            return True
+    return False
+
+
+def _amoba_minta(hossz, nyilt):
+    if hossz >= 5:
+        return 100000
+    if hossz == 4:
+        return 10000 if nyilt == 2 else 1200
+    if hossz == 3:
+        return 1000 if nyilt == 2 else 120
+    if hossz == 2:
+        return 100 if nyilt == 2 else 12
+    return 1 if nyilt else 0
+
+
+def _amoba_ertek(board, r, c, jel):
+    n = _AMOBA_N
+    ossz = 0
+    for dr, dc in ((0, 1), (1, 0), (1, 1), (1, -1)):
+        hossz = 1
+        nyilt = 0
+        for s in (1, -1):
+            nr, nc = r + dr * s, c + dc * s
+            while 0 <= nr < n and 0 <= nc < n and board[nr][nc] == jel:
+                hossz += 1
+                nr += dr * s
+                nc += dc * s
+            if 0 <= nr < n and 0 <= nc < n and board[nr][nc] == ".":
+                nyilt += 1
+        ossz += _amoba_minta(hossz, nyilt)
+    return ossz
+
+
+def _amoba_lep(board, vedekezo):
+    n = _AMOBA_N
+    cellak = set()
+    van_ko = False
+    for r in range(n):
+        for c in range(n):
+            if board[r][c] != ".":
+                van_ko = True
+                for dr in range(-2, 3):
+                    for dc in range(-2, 3):
+                        nr, nc = r + dr, c + dc
+                        if 0 <= nr < n and 0 <= nc < n and board[nr][nc] == ".":
+                            cellak.add((nr, nc))
+    if not van_ko:
+        return (n // 2, n // 2)
+    w_def = 1.4 if vedekezo else 1.0
+    legjobb, legjobb_ert = None, -1.0
+    for (r, c) in cellak:
+        tamado = _amoba_ertek(board, r, c, "O")
+        vedo = _amoba_ertek(board, r, c, "X")
+        ert = tamado + w_def * vedo
+        if ert > legjobb_ert:
+            legjobb_ert, legjobb = ert, (r, c)
+    return legjobb
+
+
+def jatek_amoba(ctx):
+    yield ctx.mond(
+        "AMŐBA JÁTÉK A SZÁMÍTÓGÉP ELLEN. A játék célja a játékos ikszeiből 5 "
+        "darabot felhelyezni egymás mellé egyenes vonalban vízszintesen, "
+        "függőlegesen vagy átlósan. Természetesen a gép is erre törekszik, de "
+        "az ő jele az O betű. A játéktábla 17 oszlopból és 17 sorból áll. Az A "
+        "A a bal felső, az R R a jobb alsó sarok. Először a kívánt pont "
+        "oszlopát, majd a sorát add meg betűvel, például: H H. Kérdőjellel "
+        "letapogathatod a mezőt.")
+    v = yield ctx.kerdez("KÉRI E A VÉDEKEZŐ JÁTÉKSTÍLUST I VAGY N?")
+    vedekezo = igen(v, False)
+    while True:
+        board = [["."] * _AMOBA_N for _ in range(_AMOBA_N)]
+        gyoztes = None
+        while gyoztes is None:
+            yield ctx.mond("TE JÖSSZ!")
+            while True:
+                v = yield ctx.kerdez("HOVÁ RAKSZ? (oszlop és sor betűje, pl. H H)")
+                t = (v or "").strip()
+                if t.startswith("?"):
+                    cella = _amoba_koord(t[1:])
+                    if cella is None:
+                        yield ctx.mond("KÉRDEZZ!")
+                        continue
+                    col, row = cella
+                    b = board[row][col]
+                    yield ctx.mond("A TIED." if b == "X" else
+                                   "AZ ENYÉM." if b == "O" else "MÉG ŰRES.")
+                    continue
+                cella = _amoba_koord(t)
+                if cella is None:
+                    yield ctx.mond("NEM JÖL RAKTÁL!")
+                    continue
+                col, row = cella
+                if board[row][col] != ".":
+                    yield ctx.mond("NEM JÖL RAKTÁL!")
+                    continue
+                board[row][col] = "X"
+                break
+            if _amoba_nyer(board, row, col, "X"):
+                yield ctx.mond("TE GYŐZTÉL    GRATULÁLOK !")
+                break
+            if all(board[r][c] != "." for r in range(_AMOBA_N)
+                   for c in range(_AMOBA_N)):
+                yield ctx.mond("Betelt a tábla – döntetlen.")
+                break
+            yield ctx.mond("Gondolkodom.")
+            gr, gc = _amoba_lep(board, vedekezo)
+            board[gr][gc] = "O"
+            yield ctx.mond(f"Lépek: {_AMOBA_BETUK[gc]} {_AMOBA_BETUK[gr]}.")
+            if _amoba_nyer(board, gr, gc, "O"):
+                yield ctx.mond("MA NEM VAGY FORMÁBAN    MOST ÉN NYERTEM!")
+                break
+        v = yield ctx.kerdez("JÁTSZUNK MÉG EGYET I VAGY N?")
+        if not igen(v, False):
+            break
     yield ctx.vege("Köszönöm a játékot!")

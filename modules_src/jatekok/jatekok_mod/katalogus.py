@@ -166,6 +166,12 @@ RETRO: tuple[Jatek, ...] = (
           "Kaszinó blackjack az osztó ellen: 21-hez közel túllépés nélkül, "
           "tét, lapkérés, megállás, duplázás és split.",
           szerzo="Halmágyi István", ev="1985"),
+    Jatek("szamkit1", "Számkitaláló",
+          "A gép egy számra gondol 1 és 100 között; tippelj, és a "
+          "„nagyobbat / kisebbet” jelzésekkel találd ki minél kevesebből."),
+    Jatek("amoba", "Amőba",
+          "Öt egy sorban a gép ellen 17-szer 17-es táblán: a te jeled az X, "
+          "a gépé az O. Védekező játékstílus is kérhető."),
 )
 
 
