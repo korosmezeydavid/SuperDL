@@ -64,6 +64,16 @@ class SettingsDialog(wx.Dialog):
         btns.Realize()
         outer.Add(btns, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
         self.SetSizer(outer)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Beállítások",
+                  "BEÁLLÍTÁSOK\n\nA program testreszabása lapfülekre rendezve "
+                  "(célmappa, hang, felolvasás, hálózat, biztonság stb.).\n"
+                  "• Ctrl+Tab: váltás a lapok között.\n"
+                  "• Tab / nyilak: mozgás a beállítások között; a "
+                  "jelölőnégyzeteket Szóközzel kapcsolod.\n"
+                  "• OK: mentés; Mégse: elvetés.\n\n"
+                  "A saját hang (SelfVoice) itt kapcsolható be azoknak, akik "
+                  "nem futtatnak képernyőolvasót.")
         self.Bind(wx.EVT_BUTTON, self._on_ok, id=wx.ID_OK)
 
     # ---- segéd: címke + vezérlő egy sorban ----------------------------

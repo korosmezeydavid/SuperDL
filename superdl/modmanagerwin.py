@@ -117,6 +117,14 @@ class ModuleManagerFrame(wx.Frame):
         v.Add(self.gauge, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
 
         p.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Modulkezelő",
+                  "MODULKEZELŐ\n\nItt telepíthetsz, frissíthetsz és "
+                  "eltávolíthatsz modulokat (könyvek, rádió, játékok stb.).\n"
+                  "• Fel/le nyíl: választás a listából.\n"
+                  "• A gombokkal (vagy Enterrel) telepíted/frissíted a "
+                  "kijelöltet; a modul saját ablaka a menüből nyílik.\n"
+                  "• Ha egy modul újabb programverziót igényel, a lista jelzi.")
         self.install_btn.Disable()
         self.remove_btn.Disable()
 

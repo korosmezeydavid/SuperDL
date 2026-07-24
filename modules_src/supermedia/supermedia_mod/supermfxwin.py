@@ -41,6 +41,13 @@ class EffectRackDialog(wx.Dialog):
         row.Add(close, 0)
         v.Add(row, 0, wx.ALL, 10)
         p.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Effektek",
+                  "HANGEFFEKTEK\n\nItt kapcsolod be és állítod a csatorna "
+                  "effektjeit (pl. visszhang, mélynyomás).\n"
+                  "• A csúszkákkal és jelölőnégyzetekkel állítod az egyes "
+                  "effekteket.\n• „Mind ki”: az összes effekt kikapcsolása.\n"
+                  "• Bezárás: vissza a lejátszóhoz.")
 
     def _retarget(self):
         ch = self._chan() or 0

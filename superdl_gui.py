@@ -2211,6 +2211,37 @@ def _html_strip(s: str) -> str:
     return re.sub(r"\n{3,}", "\n\n", s).strip()
 
 
+def _mutasd_sugo(win, cim, szoveg):
+    """Egységes, felolvasható súgó-megjelenítés (a Core helpdialogjával)."""
+    try:
+        from superdl import helpdialog
+        helpdialog.show_help(win, cim, szoveg)
+    except Exception:
+        wx.MessageBox(szoveg, cim, wx.OK | wx.ICON_INFORMATION, win)
+
+
+_SUGO_OLVASO = (
+    "RSS-OLVASÓ\n\n"
+    "A hírcsatorna bejegyzéseit olvashatod itt.\n\n"
+    "• Fel/le nyíl: mozgás a bejegyzések között; a kijelölt szövege alul "
+    "megjelenik és felolvasható.\n"
+    "• O: a bejegyzés megnyitása a böngészőben (a teljes cikkhez).\n"
+    "• Escape vagy Bezárás: vissza.\n\n"
+    "Ha egy bejegyzéshez nincs szöveg a csatornában, az O-val a böngészőben "
+    "olvasható el.")
+
+_SUGO_SUBS = (
+    "FELIRATKOZÁSOK KEZELÉSE\n\n"
+    "A podcast- és RSS-feliratkozásaid listája.\n\n"
+    "• Fel/le nyíl: választás a feliratkozások közül.\n"
+    "• Enter vagy Böngészés: a kijelölt csatorna tartalmának megnyitása. "
+    "Cikk-csatornánál az RSS-olvasó nyílik meg (olvasás, böngésző), "
+    "podcastnál az epizódlista (lejátszás, letöltés).\n"
+    "• Kijelölt törlése: leiratkozás.\n\n"
+    "Új feliratkozás a fő ablakból: Ctrl+R. A program 15 percenként ellenőrzi "
+    "a csatornákat: az új podcast-epizódot letölti, az új cikkről szól.")
+
+
 class FeedReaderDialog(wx.Dialog):
     """RSS-OLVASÓ cikk-feedekhez (blog/hír): a bejegyzések listája, a kijelölt
     szövege felolvasható, és böngészőben is megnyitható. Akadálymentes."""
@@ -2276,7 +2307,9 @@ class FeedReaderDialog(wx.Dialog):
 
     def _on_key(self, e):
         k = e.GetKeyCode()
-        if k in (ord("O"), ord("o")):
+        if k == wx.WXK_F1:
+            _mutasd_sugo(self, "Súgó – RSS-olvasó", _SUGO_OLVASO)
+        elif k in (ord("O"), ord("o")):
             self._open()
         elif k == wx.WXK_ESCAPE:
             self.EndModal(wx.ID_CLOSE)
@@ -2330,7 +2363,9 @@ class SubsDialog(wx.Dialog):
                                 f"látva)  –  {s.feed_url}")
 
     def _on_key(self, e):
-        if e.GetKeyCode() in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER) \
+        if e.GetKeyCode() == wx.WXK_F1:
+            _mutasd_sugo(self, "Súgó – Feliratkozások", _SUGO_SUBS)
+        elif e.GetKeyCode() in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER) \
                 and self.FindFocus() is self.listbox:
             self._browse()
         else:
@@ -2446,6 +2481,13 @@ class UpdateDialog(wx.Dialog):
         btns.Add(btn_close, 0)
         vbox.Add(btns, 0, wx.EXPAND | wx.ALL, 8)
         self.SetSizer(vbox)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Frissítések",
+                  "FRISSÍTÉSEK\n\nItt keresheted és telepítheted a "
+                  "letöltőmotorok (yt-dlp, aria2 stb.) új verzióit.\n"
+                  "• Keresés: megnézi, van-e újabb verzió.\n"
+                  "• Telepítés: letölti és beállítja az újat.\n"
+                  "• Bezárás: vissza.")
 
         self.btn_check.Bind(wx.EVT_BUTTON, lambda e: self._check())
         self.btn_inst.Bind(wx.EVT_BUTTON, lambda e: self._install())

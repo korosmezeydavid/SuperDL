@@ -107,7 +107,14 @@ class CustomStationDialog(wx.Dialog):
         btns.Realize()
         v.Add(btns, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
         p.SetSizer(v)
-        self.Bind(wx.EVT_BUTTON, self._on_ok, id=wx.ID_OK)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Saját állomás",
+                  "SAJÁT RÁDIÓÁLLOMÁS\n\nEgy nem listázott rádió hozzáadása a "
+                  "saját stream-címével.\n• Add meg az állomás nevét és a "
+                  "streaming URL-t (m3u, pls vagy közvetlen hangstream).\n"
+                  "• OK: hozzáadja a kedvenceidhez.\n\n"
+                  "Ha nem tudod a stream-címet, gyakran a rádió weboldalán, a "
+                  "„hallgatás” vagy „lejátszó” hivatkozásnál található.")
 
     def _on_ok(self, e):
         name = self.c_name.GetValue().strip()

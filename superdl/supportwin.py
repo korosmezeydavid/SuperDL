@@ -61,6 +61,13 @@ class SupportDialog(wx.Dialog):
             row.Add(b, 0, wx.RIGHT, 6)
         v.Add(row, 0, wx.ALL | wx.ALIGN_RIGHT, 8)
         self.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Támogatás",
+                  "KÖSZÖNET ÉS TÁMOGATÁS\n\nA SuperDL ingyenes. Ha szeretnéd "
+                  "támogatni a fejlesztést, itt találod a lehetőségeket – de "
+                  "ez sosem kötelező.\n• A gombokkal megnyithatod a "
+                  "megadott oldalt, vagy vágólapra másolhatod az adatokat.\n"
+                  "• Escape: bezárás.")
         txt.SetInsertionPoint(0)
         txt.SetFocus()
 

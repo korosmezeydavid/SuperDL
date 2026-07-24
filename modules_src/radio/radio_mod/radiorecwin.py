@@ -101,6 +101,14 @@ class ScheduleDialog(wx.Dialog):
         v.Add(btns, 0, wx.ALL | wx.ALIGN_RIGHT, 12)
 
         p.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Felvétel ütemezése",
+                  "FELVÉTEL ÜTEMEZÉSE\n\nEgy rádióadás automatikus rögzítése "
+                  "megadott időben.\n• Válaszd ki az állomást, add meg a "
+                  "kezdést és a hosszt (vagy a befejezést).\n• Ismétlődés is "
+                  "beállítható (pl. naponta).\n• OK: az ütemezés mentése.\n\n"
+                  "A program a háttérben elindítja a felvételt a megadott "
+                  "időben, akkor is, ha közben mást csinálsz.")
         self.Bind(wx.EVT_BUTTON, self._on_ok, id=wx.ID_OK)
         self.station_choice.SetFocus()
 
@@ -186,6 +194,13 @@ class RecordingsDialog(wx.Dialog):
         v.Add(wx.Button(p, wx.ID_CANCEL, "&Bezárás"), 0,
               wx.ALL | wx.ALIGN_RIGHT, 10)
         p.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Felvételek",
+                  "FELVÉTELEK\n\nAz elkészült és a folyamatban lévő rádió-"
+                  "felvételeid.\n• Fel/le nyíl: választás.\n"
+                  "• A gombokkal lejátszhatod, megnyithatod a mappát, vagy "
+                  "törölheted a kijelöltet.\n• A folyamatban lévő felvétel "
+                  "állapota is látszik.")
 
         self._refresh()
         self.timer = wx.Timer(self)

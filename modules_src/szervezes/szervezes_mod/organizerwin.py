@@ -705,6 +705,11 @@ class EventDialog(wx.Dialog):
         btns.Realize()
         v.Add(btns, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
         p.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Űrlap",
+                  "ŰRLAP\n\nTöltsd ki a mezőket – Tabbal vagy fel/le nyíllal "
+                  "lépsz közöttük, a képernyőolvasó minden mező nevét "
+                  "felolvassa.\n• OK: mentés.\n• Mégse vagy Escape: elvetés.")
         self.Bind(wx.EVT_BUTTON, self._on_ok, id=wx.ID_OK)
         self.title.SetFocus()
 
@@ -789,6 +794,11 @@ class TaskDialog(wx.Dialog):
         btns.Realize()
         v.Add(btns, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
         p.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Űrlap",
+                  "ŰRLAP\n\nTöltsd ki a mezőket – Tabbal vagy fel/le nyíllal "
+                  "lépsz közöttük, a képernyőolvasó minden mező nevét "
+                  "felolvassa.\n• OK: mentés.\n• Mégse vagy Escape: elvetés.")
         self.Bind(wx.EVT_BUTTON, self._on_ok, id=wx.ID_OK)
         self.title.SetFocus()
 
@@ -852,6 +862,12 @@ class RezsiItemDialog(wx.Dialog):
         btns.Realize()
         v.Add(btns, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
         p.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Rezsi-tétel",
+                  "REZSI-TÉTEL\n\nEgy rendszeres kiadás (pl. villany, víz) "
+                  "rögzítése.\n• Add meg a nevét, összegét és a befizetési "
+                  "határidőt.\n• OK: mentés. A program a határidő előtt "
+                  "emlékeztet.")
         self.Bind(wx.EVT_BUTTON, self._on_ok, id=wx.ID_OK)
         self.name.SetFocus()
 
@@ -898,6 +914,11 @@ class NoteDialog(wx.Dialog):
         btns.Realize()
         v.Add(btns, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
         p.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Űrlap",
+                  "ŰRLAP\n\nTöltsd ki a mezőket – Tabbal vagy fel/le nyíllal "
+                  "lépsz közöttük, a képernyőolvasó minden mező nevét "
+                  "felolvassa.\n• OK: mentés.\n• Mégse vagy Escape: elvetés.")
         self.Bind(wx.EVT_BUTTON, self._on_ok, id=wx.ID_OK)
         self.title.SetFocus()
 
@@ -945,6 +966,13 @@ class IcsDialog(wx.Dialog):
         btns.Realize()
         v.Add(btns, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
         p.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Naptár importálása",
+                  "NAPTÁR IMPORTÁLÁSA (ICS)\n\nEgy internetes naptár "
+                  "hozzáadása a címével.\n• Illeszd be az ICS-naptár URL-jét.\n"
+                  "• OK: a program letölti és megjeleníti az eseményeit.\n\n"
+                  "Az ICS-cím gyakran a naptár megosztási beállításainál "
+                  "található.")
         self.Bind(wx.EVT_BUTTON, self._on_ok, id=wx.ID_OK)
         self.url_txt.SetFocus()
 

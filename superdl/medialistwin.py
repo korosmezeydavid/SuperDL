@@ -57,6 +57,12 @@ class MediaListDialog(wx.Dialog):
         v.Add(wx.Button(p, wx.ID_CANCEL, "&Bezárás"), 0,
               wx.ALL | wx.ALIGN_RIGHT, 8)
         p.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Médialista",
+                  "MÉDIALISTA\n\nEgy forrás (podcast, csatorna) összes tétele.\n"
+                  "• Fel/le nyíl: választás.\n• Enter: online lejátszás.\n"
+                  "• D: a kijelölt letöltése.\n• Szóköz: szünet; Escape: "
+                  "leállítás.\n• Ctrl+C: az URL másolása.")
 
         ids = {k: wx.NewIdRef() for k in ("stop", "pause")}
         self.Bind(wx.EVT_MENU, lambda e: self._stop(), id=ids["stop"])

@@ -40,6 +40,12 @@ class AIResultFrame(wx.Frame):
             row.Add(b, 0, wx.RIGHT, 6)
         v.Add(row, 0, wx.ALL, 8)
         p.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – AI eredmény",
+                  "AI EREDMÉNY\n\nItt jelenik meg az AI válasza, amint "
+                  "elkészül.\n• A szövegmezőben fel/le nyíllal olvasható a "
+                  "teljes válasz.\n• Ctrl+C: a kijelölt szöveg másolása.\n"
+                  "• Escape: az ablak bezárása.")
 
         sid = wx.NewIdRef()
         self.Bind(wx.EVT_MENU, lambda e: self._stop(), id=sid)

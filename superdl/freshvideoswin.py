@@ -59,6 +59,12 @@ class FreshVideosDialog(wx.Dialog):
         v.Add(wx.Button(p, wx.ID_CANCEL, "&Bezárás"), 0,
               wx.ALL | wx.ALIGN_RIGHT, 8)
         p.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Friss videók",
+                  "FRISS VIDÓK\n\nA figyelt YouTube-csatornák új videói.\n"
+                  "• Fel/le nyíl: választás.\n• Enter: online lejátszás.\n"
+                  "• D: a kijelölt videó letöltése.\n• Escape: bezárás.\n\n"
+                  "Csatornák kezelése és feliratkozás: a Letöltések menüből.")
 
         ids = {k: wx.NewIdRef() for k in
                ("dl", "stop", "pause", "volup", "voldown")}
@@ -227,6 +233,13 @@ class ChannelsDialog(wx.Dialog):
         v.Add(wx.Button(p, wx.ID_CANCEL, "&Bezárás"), 0,
               wx.ALL | wx.ALIGN_RIGHT, 8)
         p.SetSizer(v)
+        from superdl.uihelp import bind_help
+        bind_help(self, "Súgó – Csatornák",
+                  "YOUTUBE-CSATORNÁK\n\nA figyelt csatornák listája.\n"
+                  "• Új csatorna: add meg a címét.\n"
+                  "• Böngészés: a kijelölt csatorna régebbi videói.\n"
+                  "• Figyelés ki/be, illetve törlés a gombokkal.\n"
+                  "• Ellenőrzés: új videók keresése most.")
 
         self._refresh()
         self.lst.SetFocus()
