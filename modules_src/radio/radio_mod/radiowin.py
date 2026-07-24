@@ -525,9 +525,13 @@ class RadioFrame(wx.Frame):
         # erre az állomásra (URL szerint) fut-e már felvétel? → akkor leállítjuk
         running = [r for r in self.rec.snapshot_active() if r.url == st.url]
         if running:
+            utolso = running[-1]
             for r in running:
                 r.stop()
-            self._announce(f"Felvétel leállítva és elmentve: {st.name}.")
+            # MONDJUK MEG, HOVÁ MENTETTÜK – a leggyakoribb panasz, hogy „nem
+            # találom a felvételt": a fájl a célmappa Rádiófelvételek almappájában
+            self._announce(f"Felvétel leállítva és elmentve: {st.name}. "
+                           f"A fájl helye: {utolso.path}")
             return
         ok, netmsg = _net_ok("a rádiófelvételhez")   # felvételhez net kell
         if not ok:
@@ -537,9 +541,11 @@ class RadioFrame(wx.Frame):
         if r:
             n = len(self.rec.snapshot_active())
             extra = (f" Most {n} felvétel fut egyszerre." if n > 1 else "")
+            # MONDJUK MEG a MAPPÁT is, hogy a felhasználó tudja, hova készül
             self._announce(
-                f"Felvétel folyamatban: {st.name}.{extra} Leállítás: F9 ezen "
-                "az állomáson, vagy a Felvételek kezelése (Ctrl+Shift+F).")
+                f"Felvétel folyamatban: {st.name}.{extra} A fájl ide kerül: "
+                f"{r.path.parent}. Leállítás: F9 ezen az állomáson, vagy a "
+                "Felvételek kezelése (Ctrl+Shift+F).")
         else:
             self._announce("A felvétel nem indult el – próbáld újra, vagy "
                            "ellenőrizd, hogy az állomás szól-e.")
