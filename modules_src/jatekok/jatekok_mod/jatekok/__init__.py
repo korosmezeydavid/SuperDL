@@ -8,7 +8,7 @@ közli, hogy „még készül" – SOHA nincs hamis siker.
 Új játék bekötése: írd meg a generátort a megfelelő modulban, majd vedd fel
 ide egy sorral.
 """
-from . import kaland, kartya, kviz, logika, mini, sajat, terkep
+from . import homelab, kaland, kartya, kviz, logika, mini, sajat, terkep
 
 REGISZTER = {
     # logika / stratégia
@@ -56,6 +56,8 @@ REGISZTER = {
     # SuperDL SAJÁT játékok (nem retró)
     "slot": sajat.jatek_slot,
     "uno": sajat.jatek_uno,
+    # HITELES portok a hivatalos Homelab/Brailab gyűjteményből
+    "blackjack": homelab.jatek_blackjack,
 }
 
 

@@ -762,13 +762,54 @@ def test_uno_huzo_bottal_is_veget_er():
     _fut("uno", bot)
 
 
+# =========================================================================
+#  HITELES Homelab-portok
+# =========================================================================
+class _BjBot:
+    def __init__(self):
+        self.n = 0
+
+    def __call__(self, k, ki):
+        kl = k.lower()
+        if "mennyit teszel" in kl:
+            self.n += 1
+            return "0" if self.n > 4 else "10"
+        if "biztosítást" in kl or "szétválasztod" in kl:
+            return "nem"
+        if "parancs" in kl:
+            return "0"                     # megállás (stand)
+        return ""
+
+
+def test_blackjack_lejatszhato():
+    ki = _fut("blackjack", _BjBot())
+    assert any("EREDMÉNYEM" in p for _, p in ki)
+
+
+def test_blackjack_a_forras_szovegeit_hasznalja():
+    """Retró-hűség: az eredeti üzenetek megvannak a kódban."""
+    import inspect
+    src = inspect.getsource(
+        importlib.import_module(BASE + ".jatekok.homelab"))
+    for uzenet in ("TUL SOK! 500 A FELSŐ HATÁR", "A FEDETT LAPOM",
+                   "AZ EREDMÉNYEM", "TUL KÉSŐ DUPLÁZNI, ÖREGEM!",
+                   "ELSŐ KÉZ JÁTSZIK"):
+        assert uzenet in src, f"hiányzik az eredeti üzenet: {uzenet}"
+
+
+def test_blackjack_szerzoje_a_forras_szerinti():
+    j = KAT.keres("blackjack")
+    assert j.szerzo == "Halmágyi István" and j.ev == "1985"
+    assert "Halmágyi István" in KAT.attribucio_szoveg(j)
+
+
 # ---- jogtisztaság: a játékkód nem hív idegen beszédmotort/alfolyamatot ----
 
 def test_jatekok_nem_hasznalnak_idegen_fuggoseget():
     import ast
     import inspect
     for modnev in ("kartya", "logika", "kviz", "kaland", "terkep", "mini",
-                   "sajat", "_util"):
+                   "sajat", "homelab", "_util"):
         mod = importlib.import_module(f"{BASE}.jatekok.{modnev}")
         fa = ast.parse(inspect.getsource(mod))
         for csp in ast.walk(fa):

@@ -158,6 +158,14 @@ RETRO: tuple[Jatek, ...] = (
           "Az ősi királyság-menedzsment: vess, arass, etesd a népet."),
     Jatek("mokita", "Mokita",
           "Kis logikai mini-játék a gyűjteményből."),
+
+    # ---- HITELES portok a hivatalos Homelab/Brailab gyűjteményből
+    #      (Documents\játékok) – a szabályokat, üzeneteket és állandókat a
+    #      FORRÁS szerint követve, az EREDETI szerzők megjelölésével ----
+    Jatek("blackjack", "Blackjack",
+          "Kaszinó blackjack az osztó ellen: 21-hez közel túllépés nélkül, "
+          "tét, lapkérés, megállás, duplázás és split.",
+          szerzo="Halmágyi István", ev="1985"),
 )
 
 
@@ -166,12 +174,12 @@ RETRO: tuple[Jatek, ...] = (
 # =====================================================================
 SAJAT: tuple[Jatek, ...] = (
     Jatek("uno", "UNO",
-          "A klasszikus UNO három valódi nevű ellenféllel, kártyahangokkal. "
-          "Rakj színben vagy értékben, és fogyj ki elsőként!",
+          "A klasszikus UNO három ellenféllel: rakj színben vagy értékben "
+          "egyezőt, és fogyj ki elsőként a lapjaidból!",
           retro=False),
     Jatek("slot", "Félkarú rabló",
-          "Pörgesd a tárcsákat érmékért – fémes érme-, pörgetés- és "
-          "nyeremény-hanggal.",
+          "Pörgesd a tárcsákat, és gyűjts minél több érmét a nyerőtáblázat "
+          "szerint.",
           retro=False),
     Jatek("millebornes", "Mille Bornes (1000 mérföld)",
           "A klasszikus francia autós kártyajáték: távkártyák, veszélyek, "
