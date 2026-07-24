@@ -478,3 +478,40 @@ def jatek_memteszt(ctx):
         if not igen(v, False):
             break
     yield ctx.vege("KÖSZÖNÖM A JÁTÉKOT!")
+
+
+# ======================================================================= LOTTÓ
+# Forrás: LOTTO.HTP – lottószám-tipp generátor. 1-255 szelvény; hagyományos
+# (5/90) vagy hatos (6/45) lottó. A gép sorra bemondja a kihúzott számokat.
+_LOTTO_SORSZAM = ["AZ ELSŐ SZÁM", "A MÁSODIK SZÁM", "A HARMADIK SZÁM",
+                  "A NEGYEDIK SZÁM", "AZ ÖTÖDIK SZÁM", "A HATODIK SZÁM"]
+
+
+def jatek_lotto(ctx):
+    yield ctx.mond("LOTTÓ SZERENCSE.")
+    while True:
+        v = yield ctx.kerdez("HÁNY SZELVÉNYRE ÁLLÍTSAK ÖSSZE TIPPET?")
+        h = szam(v, 1, 255)
+        if h is None:
+            yield ctx.mond("MINIMUM 1 MAXIMUM 255 SZELVÉNYRE LEHET KÉRNI "
+                           "TIPPET.")
+            continue
+        break
+    while True:
+        v = yield ctx.kerdez("HA HAGYOMÁNYOS LOTTÓHOZ KELL TIPP, ÍRJ 1-ET, HA "
+                             "HATOS LOTTÓHOZ, 2-ŐT.")
+        t = (v or "").strip()
+        if t == "1":
+            sz, db = 90, 5
+            break
+        if t == "2":
+            sz, db = 45, 6
+            break
+        yield ctx.mond("NE KUKACOSKODJ VELEM!")
+    for i in range(1, h + 1):
+        szamok = sorted(random.sample(range(1, sz + 1), db))
+        yield ctx.mond(f"{i}. szelvény:")
+        for j, n in enumerate(szamok):
+            yield ctx.mond(f"{_LOTTO_SORSZAM[j]}: {n}.")
+    yield ctx.mond("A KÉRT SZÁMÚ SZELVÉNYRE A TIPP ELFOGYOTT.")
+    yield ctx.vege("Köszönöm a játékot!")

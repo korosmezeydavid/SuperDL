@@ -926,6 +926,30 @@ def test_memteszt_a_forras_szavaival_es_veget_er():
     assert "SZEKRÉNY" in HL._MEMTESZT_SZAVAK and "KILINCS" in HL._MEMTESZT_SZAVAK
 
 
+def test_lotto_otos_es_hatos():
+    def bot(k, ki):
+        kl = k.lower()
+        if "hány szelvényre" in kl:
+            return "3"
+        if "hagyományos" in kl:
+            return "1"
+        return ""
+    ki = _fut("lotto", bot)
+    # 5 szám / szelvény, három szelvény
+    assert sum(1 for _, p in ki if p.startswith("AZ ELSŐ SZÁM")) == 3
+    assert any("A TIPP ELFOGYOTT" in p for _, p in ki)
+
+    def bot6(k, ki):
+        kl = k.lower()
+        if "hány szelvényre" in kl:
+            return "1"
+        if "hagyományos" in kl:
+            return "2"                      # hatos lottó
+        return ""
+    ki = _fut("lotto", bot6)
+    assert any(p.startswith("A HATODIK SZÁM") for _, p in ki)
+
+
 # ---- jogtisztaság: a játékkód nem hív idegen beszédmotort/alfolyamatot ----
 
 def test_jatekok_nem_hasznalnak_idegen_fuggoseget():

@@ -178,6 +178,9 @@ RETRO: tuple[Jatek, ...] = (
     Jatek("memteszt", "Memóriateszt",
           "A gép szám–szó párokat mond; jegyezd meg, és mondd vissza sorban – "
           "egyre több párral, egészen húszig."),
+    Jatek("lotto", "Lottó szerencse",
+          "Lottószám-tipp generátor: hagyományos ötös lottó (5/90) vagy hatos "
+          "lottó (6/45), akár 255 szelvényre."),
 )
 
 
