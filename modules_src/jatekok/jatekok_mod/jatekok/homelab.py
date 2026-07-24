@@ -515,3 +515,123 @@ def jatek_lotto(ctx):
             yield ctx.mond(f"{_LOTTO_SORSZAM[j]}: {n}.")
     yield ctx.mond("A KÉRT SZÁMÚ SZELVÉNYRE A TIPP ELFOGYOTT.")
     yield ctx.vege("Köszönöm a játékot!")
+
+
+# ==================================================================== FÖLDRAJZ
+# Forrás: FOLDRAJZ.HTP – a gép igen/nem kérdésekkel kitalálja, melyik EURÓPAI
+# országra gondolsz. A döntési fa PONTOSAN a BASIC-forrás szerint (a sorszámok
+# a node-azonosítók). ("q", kérdés, IGEN-cél, NEM-cél) / ("g", ország).
+_FOLDRAJZ_FA = {
+    90:  ("q", "Az ország nagyobb Magyarországnál?", 930, 120),
+    120: ("q", "Az ország törpeállam?", 150, 370),
+    150: ("q", "Olaszország területén fekszik?", 180, 250),
+    180: ("q", "Az ország vezetője a Pápa?", 210, 230),
+    210: ("g", "a Vatikánra"),
+    230: ("g", "San Marinóra"),
+    250: ("q", "Az ország Franciaországgal határos?", 300, 274),
+    274: ("q", "Afrikához ez az ország fekszik a legközelebb?", 277, 280),
+    277: ("g", "Gibraltárra"),
+    280: ("g", "Liechtensteinre"),
+    300: ("q", "Az ország köztársaság?", 330, 350),
+    330: ("g", "Andorrára"),
+    350: ("g", "Monacóra"),
+    370: ("q", "Az ország szigetország?", 400, 510),
+    400: ("q", "Éghajlata mediterrán?", 430, 490),
+    430: ("q", "Fővárosa La Valetta?", 455, 470),
+    455: ("g", "Máltára"),
+    470: ("g", "Ciprusra"),
+    490: ("g", "Írországra"),
+    510: ("q", "BENELUX állam?", 540, 660),
+    540: ("q", "Európa legsűrűbben lakott állama?", 570, 590),
+    570: ("g", "Hollandiára"),
+    590: ("q", "Hivatalos nyelve a flamand és a francia?", 620, 640),
+    620: ("g", "Belgiumra"),
+    640: ("g", "Luxemburgra"),
+    660: ("q", "Zászlójában van fehér szín?", 690, 860),
+    690: ("q", "Az ország éghajlata óceáni?", 720, 740),
+    720: ("g", "Dániára"),
+    740: ("q", "Semleges ország?", 764, 790),
+    764: ("q", "Fővárosa adott már otthont csúcsértekezletnek?", 820, 770),
+    770: ("g", "Svájcra"),
+    790: ("q", "Fővárosa adott már otthont csúcsértekezletnek?", 820, 840),
+    820: ("g", "Ausztriára"),
+    840: ("g", "Magyarországra"),
+    860: ("q", "Csak egy országgal határos?", 890, 910),
+    890: ("g", "Portugáliára"),
+    910: ("g", "Albániára"),
+    930: ("q", "Magyarországgal határos?", 960, 1130),
+    960: ("q", "Az ország tagja a világbanknak?", 990, 1010),
+    990: ("g", "Jugoszláviára"),
+    1010: ("q", "Két egyenjogú tagállam alkotja?", 1040, 1060),
+    1040: ("g", "Csehszlovákiára"),
+    1060: ("q", "A világ ipari termelésének egyötödét adja?", 1090, 1110),
+    1090: ("g", "a Szovjetunióra"),
+    1110: ("g", "Romániára"),
+    1130: ("q", "Skandináv állam?", 1160, 1280),
+    1160: ("q", "Az ezer tó országának nevezik?", 1190, 1210),
+    1190: ("g", "Finnországra"),
+    1210: ("q", "Az egy főre jutó áramtermelésben első a földön?", 1240, 1260),
+    1240: ("g", "Norvégiára"),
+    1260: ("g", "Svédországra"),
+    1280: ("q", "Az ország a Balkán félszigeten fekszik?", 1310, 1380),
+    1310: ("q", "A zászlójában ugyanazok a színek, mint a magyar zászlóban?",
+           1340, 1360),
+    1340: ("g", "Bulgáriára"),
+    1360: ("g", "Görögországra"),
+    1380: ("q", "Szigetország?", 1410, 1480),
+    1410: ("q", "1976 január elsejétől tagja a Közös Piacnak?", 1440, 1460),
+    1440: ("g", "Nagybritanniára"),
+    1460: ("g", "Izlandra"),
+    1480: ("q", "Szocialista ország?", 1510, 1580),
+    1510: ("q", "Az éves szaporulata nagyobb, mint 5 százalék?", 1540, 1560),
+    1540: ("g", "Lengyelországra"),
+    1560: ("g", "a Német Demokratikus Köztársaságra"),
+    1580: ("q", "Andorrával határos?", 1610, 1680),
+    1610: ("q", "A NÁTÓBÓL 1966-ban lépett ki?", 1640, 1660),
+    1640: ("g", "Franciaországra"),
+    1660: ("g", "Spanyolországra"),
+    1680: ("q", "Lakosságának nagy része mohamedán?", 1710, 1730),
+    1710: ("g", "Törökországra"),
+    1730: ("q", "A lakosságának nagyobb része katolikus?", 1760, 1780),
+    1760: ("g", "Olaszországra"),
+    1780: ("g", "a Német Szövetségi Köztársaságra"),
+}
+
+
+def _cap(s):
+    return s[:1].upper() + s[1:]
+
+
+def jatek_foldrajz(ctx):
+    yield ctx.mond("FÖLDRAJZ. Gondolj egy európai országra, és kitalálom, "
+                   "melyikre gondoltál! A kérdéseimre I-vel (igen) vagy N-nel "
+                   "(nem) válaszolj.")
+    while True:
+        v = yield ctx.kerdez("Szeretnél játszani? (I/N)")
+        if not igen(v, True):
+            yield ctx.mond("Nagyon sajnálom! Viszontlátásra.")
+            break
+        yield ctx.mond("Gondolj egy európai országra!")
+        v = yield ctx.kerdez("Megvan? (I/N)")
+        while not igen(v, True):
+            v = yield ctx.kerdez("Megvan? (I/N)")
+        node = 90
+        while True:
+            tip = _FOLDRAJZ_FA[node]
+            if tip[0] == "g":
+                v = yield ctx.kerdez(_cap(tip[1]) + " gondoltál? (I/N)")
+                if igen(v, True):
+                    yield ctx.mond("Köszönöm a játékot, nagyon élvezetes volt!")
+                else:
+                    yield ctx.mond("Sajnálom, de valahol hibáztál a "
+                                   "válaszadásban.")
+                break
+            while True:
+                v = yield ctx.kerdez(tip[1] + " (I/N)")
+                valasz = igen(v, None)
+                if valasz is None:
+                    yield ctx.mond("Kérlek, I vagy N legyen a válasz.")
+                    continue
+                node = tip[2] if valasz else tip[3]
+                break
+    yield ctx.vege("Köszönöm a játékot!")

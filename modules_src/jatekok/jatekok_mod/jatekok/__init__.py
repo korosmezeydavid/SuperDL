@@ -63,6 +63,7 @@ REGISZTER = {
     "nimjatek": homelab.jatek_nimjatek,
     "memteszt": homelab.jatek_memteszt,
     "lotto": homelab.jatek_lotto,
+    "foldrajz": homelab.jatek_foldrajz,
 }
 
 

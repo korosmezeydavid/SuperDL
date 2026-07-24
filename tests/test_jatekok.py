@@ -950,6 +950,55 @@ def test_lotto_otos_es_hatos():
     assert any(p.startswith("A HATODIK SZÁM") for _, p in ki)
 
 
+def test_foldrajz_donesi_fa_ep():
+    """Minden kérdés IGEN/NEM célja létező node; a végpontok tippek."""
+    HL = importlib.import_module(BASE + ".jatekok.homelab")
+    fa = HL._FOLDRAJZ_FA
+    for node, tip in fa.items():
+        if tip[0] == "q":
+            assert tip[2] in fa and tip[3] in fa, f"{node}: rossz cél"
+        else:
+            assert tip[0] == "g" and isinstance(tip[1], str)
+
+
+def test_foldrajz_franciaorszag_utvonal():
+    """A forrás fája szerint: nagyobb, nem határos, nem skandináv, nem balkáni,
+    nem sziget, nem szocialista, Andorrával határos, NÁTÓ-ból kilépett →
+    Franciaország."""
+    valaszok = iter(["I",           # Szeretnél játszani?
+                     "I",           # Megvan?
+                     "I",           # nagyobb Magyarországnál?
+                     "N",           # Magyarországgal határos?
+                     "N",           # Skandináv?
+                     "N",           # Balkán?
+                     "N",           # Sziget?
+                     "N",           # Szocialista?
+                     "I",           # Andorrával határos?
+                     "I",           # NÁTÓ 1966?
+                     "I",           # (a tippet elfogadom)
+                     "N"])          # Szeretnél játszani? -> vége
+
+    def bot(k, ki):
+        return next(valaszok, "N")
+    ki = _fut("foldrajz", bot)
+    assert any("Franciaországra gondoltál?" in p for _, p in ki)
+
+
+def test_foldrajz_lejatszhato_es_talal():
+    def bot(k, ki):
+        kl = k.lower()
+        if "szeretnél játszani" in kl:
+            return "N" if any("gondoltál?" in p for _, p in ki) else "I"
+        if "megvan" in kl:
+            return "I"
+        if "gondoltál?" in kl:
+            return "I"
+        return "N"
+    ki = _fut("foldrajz", bot)
+    assert any("gondoltál?" in p for _, p in ki)
+    assert any("Köszönöm a játékot" in p for _, p in ki)
+
+
 # ---- jogtisztaság: a játékkód nem hív idegen beszédmotort/alfolyamatot ----
 
 def test_jatekok_nem_hasznalnak_idegen_fuggoseget():
