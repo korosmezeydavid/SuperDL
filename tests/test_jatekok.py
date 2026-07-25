@@ -207,6 +207,66 @@ def test_huszonegy_aron_szabalytalan_megallas_kiesik():
     assert any("kiesett" in p for _, p in ki)
 
 
+def test_kocka_hat_dobas_eredmenyhirdetes():
+    """KOCKA: bemutatkozás, ismertető, 6-6 dobás, majd EREDMÉNYHIRDETÉS."""
+    def bot(k, ki):
+        kl = k.lower()
+        if "utónev" in kl:
+            return "Dávid"
+        if "ismertetőt" in kl:
+            return "i"
+        if "kezdhetjük" in kl:
+            return "i"
+        if "te dobsz" in kl:
+            return "k"
+        return ""
+    ki = _fut("kocka", bot)
+    assert any("EREDMÉNYHIRDETÉS" in p for _, p in ki)
+    # hatszor dobtunk (hatszor kért „te dobsz")
+    assert sum(1 for t, p in ki
+               if t == "kerdez" and "te dobsz" in p.lower()) == 6
+
+
+def test_fejtoro_tiz_kerdes_helyes_valasz_kituno():
+    """FEJTÖRŐ: tíz szorzás; végig a helyes szorzatot adva 50 pont → RAGYOGÓAN."""
+    import re
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "utónev" in kl:
+            return "Dávid"
+        if "ismertetőt" in kl:
+            return "n"
+        if "tanulást" in kl:
+            return "i"
+        if "mennyi" in kl:
+            m = re.search(r"(\d+)\s*\*\s*(\d+)", k)
+            return str(int(m.group(1)) * int(m.group(2)))
+        return ""
+    ki = _fut("fejtoro", bot)
+    assert sum(1 for t, p in ki
+               if t == "kerdez" and "mennyi" in p.lower()) == 10
+    assert any("RAGYOGÓAN" in p for _, p in ki)
+
+
+def test_fejtoro_ures_valasz_buta_ag():
+    """Üres válasz a forrás „SZ=0" (buta vagy) ágára visz, mínusz tíz pont."""
+    def bot(k, ki):
+        kl = k.lower()
+        if "utónev" in kl:
+            return "Dávid"
+        if "ismertetőt" in kl:
+            return "n"
+        if "tanulást" in kl:
+            return "i"
+        if "mennyi" in kl:
+            return ""          # nincs válasz
+        return ""
+    ki = _fut("fejtoro", bot)
+    assert any("BUTA VAGY" in p for _, p in ki)
+    assert any("ELÉGTELEN" in p for _, p in ki)   # 10×(−10) → elégtelen
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()

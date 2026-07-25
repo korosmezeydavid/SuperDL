@@ -66,6 +66,8 @@ REGISZTER = {
     "foldrajz": homelab.jatek_foldrajz,
     "szamkit2": homelab.jatek_szamkit2,
     "dobokoc": homelab.jatek_dobokoc,
+    "kocka": homelab.jatek_kocka,
+    "fejtoro": homelab.jatek_fejtoro,
 }
 
 

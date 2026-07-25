@@ -965,3 +965,170 @@ def jatek_huszonegy(ctx):
                 yield ctx.vege()
                 return
             # bármi más: újra kérdez
+
+
+# ================================================================= KOCKAJÁTÉK
+# Forrás: KOCKA.HTP (Homelab 4 / Brailab). Egyszemélyes kockapárbaj a gép
+# ellen: hatszor dobsz te, hatszor a gép, a nagyobb összeg nyer. A párbeszéd
+# szó szerint a forrásból; a mangolt ékezeteket a valódi (Brailabon megjelent)
+# magyar szöveghez igazítva. Az eredeti időzítés-alapú „gördülő kocka" (a K
+# lenyomásának pillanata adta az értéket) akadálymentes megfelelője: dobásra
+# egyenletes 1–6 véletlen.
+
+_KOCKA_ISMERTETO = (
+    "A JÁTÉKOT EGY SZEMÉLY JÁTSZHATJA.",
+    "A JÁTÉKBAN HATSZOR DOBHATSZ ÉS HATSZOR DOBHATOK ÉN AMI EGY FORDULÓNAK "
+    "SZÁMÍT.",
+    "HA ARRA KÉRLEK HOGY DOBJÁL AKKOR NEKED CSAK A KÁ BILLENTYT KELL "
+    "MEGPÖTTYINTENI.",
+    "AMÍG EZT NEM TESZED MEG A KOCKA GURUL GURUL ÉS GURUL.",
+    "ÉN A DOBÁSOK UTÁN MINDÍG ÖSSZESÍTEK ÉS KÖZLÖM AZ ADDIG SZERZETT "
+    "PONTSZÁMOKAT.",
+    "VIGYÁZZ AZÉRT!",
+    "EGY OLYAN MESTERT MINT ÉN NAGYON NEHÉZ LEGYŐZNI.",
+    "EZT PERSZE NEM AZÉRT MONDOM HOGY ELIJESSZELEK.",
+    "JÓ SZÓRAKOZÁST KÍVÁN A PROGRAM KÉSZÍTŐJE.",
+)
+_KOCKA_ORD = ("AZ ELSŐ", "A MÁSODIK", "A HARMADIK", "A NEGYEDIK",
+              "AZ ÖTÖDIK", "A HATODIK")
+_KOCKA_OSSZ = (None, "A KÉT", "A HÁROM", "A NÉGY", "AZ ÖT", "A HAT")
+
+
+def jatek_kocka(ctx):
+    yield ctx.mond("KOCKAJÁTÉK!")
+    nev = ((yield ctx.kerdez("KÉRLEK MUTATKOZZÁL BE. MI AZ UTÓNEVED?"))
+           or "").strip() or "BARÁTOM"
+    yield ctx.mond(f"SZERBUSZ {nev}. ÉN HOMELAB 4 VAGYOK.")
+    v = yield ctx.kerdez(f"{nev} KÉRED AZ ISMERTETŐT? (I VAGY N)")
+    if igen(v, False):
+        for sor in _KOCKA_ISMERTETO:
+            yield ctx.mond(sor)
+
+    while True:
+        v = yield ctx.kerdez("AKKOR KEZDHETJÜK A JÁTÉKOT? (I VAGY N)")
+        if igen(v, False):
+            break
+        yield ctx.mond("NE VICCELJ VELEM! NE BOSSZANTS FÖLBARÁTOM!")
+        yield ctx.mond("HÁT JÓ.")
+        yield ctx.mond("EGY KICSIT MÉG HAGYLAK GONDOLKODNI. DE NE ÖRÜLJ! "
+                       "NEMSOKÁRA MEGINT FÖLTESZEK EGY KÉRDÉST BARÁTOM.")
+
+    te = gep = 0
+    for i in range(6):
+        biztat = "DE ÜGYES LEGYÉL ÁM!" if i == 0 else "LÉGYSZÍVES DOBJÁL."
+        yield ctx.kerdez(f"{nev} MOST TE DOBSZ. {biztat} "
+                         "(Nyomd meg a K betűt, majd Enter, a dobáshoz.)")
+        d = random.randint(1, 6)
+        te += d
+        yield ctx.mond(f"{_KOCKA_ORD[i]} DOBÁSOD ÉRTÉKE {d}.")
+        yield ctx.mond(f"CSAK {d}!")
+        if i > 0:
+            yield ctx.mond(f"{_KOCKA_OSSZ[i]} DOBÁSOD ÖSSZÉRTÉKE {te}.")
+
+        yield ctx.mond("FIGYELJ! MOST ÉN DOBOK.")
+        g = random.randint(1, 6)
+        gep += g
+        yield ctx.mond(f"{_KOCKA_ORD[i]} DOBÁSOM ÉRTÉKE {g}.")
+        yield ctx.mond("JÓ DOBÁS VOLT !" if i == 0 else "JÓ DOBÁS VOLT!")
+        if i > 0:
+            yield ctx.mond(f"{_KOCKA_OSSZ[i]} DOBÁSOM ÖSSZÉRTÉKE {gep}.")
+
+    yield ctx.mond(f"EREDMÉNYHIRDETÉS! {nev}! EREDMÉNYHIRDETÉS!")
+    if te > gep:
+        yield ctx.mond(f"{nev} GRATULÁLOK NEKED! SAJNOS MOST KIKAPTAM TŐLED. "
+                       "HÁNY PONTTAL IS?")
+        yield ctx.vege(f"Ó CSAK {te - gep} PONTTAL! DE FOGUNK MÉG MI JÁTSZANI! "
+                       "ÉN NEM ADOM FÖL. SOHA. SOHA!")
+    elif te < gep:
+        yield ctx.mond("HA HA! HA HA HA!")
+        yield ctx.vege(
+            "MEGLÁTSZIK HOGY KI A MESTER A KOCKADOBÁSBAN BARÁTOM! "
+            f"{gep - te} PONTTAL KIKAPTÁL TŐLEM. NE BÚSLAKODJ {nev}. "
+            "MAJD MÁSKOR MEGPRÓBÁLOD!")
+    else:
+        yield ctx.vege(
+            "DÖNTETLEN A KETTŐNK EREDMÉNYE BARÁTOM! "
+            f"{te} PONTOD VAN NEKED ÉS NEKEM. KÉRSZ-E VISSZAVÁGÓT? {nev}! "
+            "GONDOLKODJ EL EZEN! ÉN ADDIG MAJD VÁROK.")
+
+
+# =================================================================== FEJTÖRŐ
+# Forrás: FEJTORO.HTP (Homelab 4). Tíz szorzási feladat; jó válasz +5, rossz
+# −10, a végén osztályzat. A párbeszéd szó szerint a forrásból. Az eredeti ~10
+# másodperces gondolkodási időt AKADÁLYMENTESSÉGBŐL nem kényszerítjük ki (a vak
+# játékosnak nyugodtan lehet gépelni); az üres/nulla válasz a forrás „SZ=0"
+# ágára visz (a „buta vagy" büntetés), a hibás szám a „szorzótábla" ágra.
+
+_FEJTORO_ISMERTETO = (
+    "TÍZ KÉRDÉSRE KELL FELELNED!",
+    "MINDEN JÓ VÁLASZODAT ÖT PONTTAL DÍJAZOM.",
+    "HA VISZONT ROSSZUL VÁLASZOLSZ!",
+    "AKKOR SZIGORÚAN TÍZ PONTODAT ELVESZEM.",
+    "KÖRÜLBELÜL TÍZ MÁSODPERC GONDOLKODÁSI IDŐ ÁLL RENDELKEZÉSEDRE.",
+    "HA VÁLASZOLNI KÍVÁNSZ AKKOR CSAK A MEGFELELŐ SZÁMOT VAGY SZÁMOKAT KELL "
+    "MEGPÖCCINTENED.",
+    "AMENNYIBEN A GONDOLKODÁSI IDŐN BELÜL NEM VÁLASZOLSZ A MEGADOTT KÉRDÉSRE "
+    "UGYANCSAK TÍZ PONTOT VESZEK EL TŐLED.",
+    "JÓ FEJTÖRÉST KÍVÁNOK NEKED!",
+)
+
+
+def jatek_fejtoro(ctx):
+    yield ctx.mond("*MATEMATIKA*")
+    yield ctx.mond("SZERBUSZ! ÉN HOMELAB 4 SZÁMÍTÓGÉP VAGYOK.")
+    while True:
+        nev = ((yield ctx.kerdez("ÉS NEKED MI AZ UTÓNEVED? KÉRLEK ÍRD BE!"))
+               or "").strip()
+        if nev:
+            break
+        yield ctx.mond("ARRA KÉRTELEK HOGY MUTATKOZZÁL BE! NEM PEDIG ARRA "
+                       "HOGY JÁTSZÁL VELEM!")
+    v = yield ctx.kerdez(f"{nev} KÉRED AZ ISMERTETŐT? (I VAGY N)")
+    if igen(v, False):
+        for sor in _FEJTORO_ISMERTETO:
+            yield ctx.mond(sor)
+
+    while True:
+        v = yield ctx.kerdez("KEZDHETJÜK A TANULÁST? (I VAGY N)")
+        if igen(v, False):
+            break
+        yield ctx.mond("HA KEZDHETÜNK KÉRLEK NYOMD LE AZ I BILLENTYT!")
+
+    pont = 0
+    for _ in range(10):
+        a = random.randint(1, 9)
+        b = random.randint(1, 9)
+        helyes = a * b
+        v = yield ctx.kerdez(f"{nev}! mennyi {a}*{b}?")
+        sz = szam(v)
+        if sz is not None and sz == helyes:
+            yield ctx.mond("GRATULÁLOK! JÓL MEGFEJTETTED A SZÁMOT! EZ PLUSSZ "
+                           "ÖT PONTOT JELENT NEKED.")
+            pont += 5
+        elif sz is None or sz == 0:
+            yield ctx.mond("JAJ DE BUTA VAGY! ILYEN EGYSZER KÉRDÉSRE SEM TUDSZ "
+                           "VÁLASZOLNI? VAGY TALÁN ALUDTÁL? EZÉRT TÍZ PONT "
+                           "LEVONÁS JÁR!")
+            pont -= 10
+        else:
+            yield ctx.mond(f"HOGY TANULTAD MEG A SZORZÓTÁBLÁT? HOGYAN LEHETNE "
+                           f"{a}*{b} {sz}? EZ MINUSZ TÍZ PONTOT JELENT.")
+            pont -= 10
+        yield ctx.mond(f"{a}*{b}={helyes}.")
+        yield ctx.mond(f"MOST {pont} PONTOD VAN.")
+
+    if pont < 1:
+        yield ctx.vege("ELÉGTELEN A TUDÁSOD! HA SOKAT TANULSZ MÉG VIHETED "
+                       "FÖLJEBB IS BARÁTOM.")
+    elif pont < 16:
+        yield ctx.vege("ELÉGSÉGES EREDMÉNY A TUDÁSOD! TANULNI SOSEM ÁRT. EZT "
+                       "JÓ LESZ HA BELÁTOD.")
+    elif pont < 31:
+        yield ctx.vege("KÖZEPES AZ EREDMÉNYED ÉS A TUDÁSOD! TANULJ MÉG EGY "
+                       "KICSIT! NEM BÁNOD MEG. MEGLÁTOD!")
+    elif pont < 41:
+        yield ctx.vege("JÓ AZ ELMÉD ÉS A TUDÁSOD! EZÉRT MÁR DÍCSÉRET JÁR. "
+                       "CSAK ÍGY TOVÁBB BARÁTOM!")
+    else:
+        yield ctx.vege("RAGYOGÓAN MEGY A MATEMATIKA NEKED! EZÉRT MÁR "
+                       "GRATULÁCIÓ JÁR. GRATULÁLOK NEKED!")

@@ -191,6 +191,12 @@ RETRO: tuple[Jatek, ...] = (
     Jatek("dobokoc", "Dobókocka",
           "Pontgyűjtő kockajáték a gép ellen: a hatos új dobásokat ad, de 55, "
           "77 és 99 pontnál legurul a kocka – 99 fölött a több pont nyer."),
+    Jatek("kocka", "Kockajáték – hat dobás",
+          "HOMELAB 4 kockapárbaj: hatszor dobsz te, hatszor a gép, a nagyobb "
+          "összeg nyer – az eredeti Brailab-párbeszéddel."),
+    Jatek("fejtoro", "Fejtörő – matematika",
+          "A HOMELAB 4 gép tíz szorzási feladatot ad; a jó válasz öt pont, a "
+          "rossz mínusz tíz, a végén osztályzatot kapsz a tudásodra."),
 )
 
 
