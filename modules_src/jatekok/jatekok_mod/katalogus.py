@@ -212,6 +212,17 @@ RETRO: tuple[Jatek, ...] = (
           "Akár négy játékos fogad a nyolcvanas évek Forma-1-eseire (Lauda, "
           "Prost, McLaren, Alboreto): tégy tétet, és gyűjts 800 forintig!",
           szerzo="Balogh Tibor", ev="1984"),
+    Jatek("szokita", "Szó kitalálós játék",
+          "Szó-mastermind: a gép egy hárombetűs magyar szóra gondol, te "
+          "hárombetűs szavakat tippelsz, és megmondja, hány betű egyezik a "
+          "helyén – X-re elárulja a szót."),
+    Jatek("szofajok", "Szófajok",
+          "Nyelvtani gyorskvíz: a gép szót mond, te felismered a szófaját "
+          "(névelő, számnév, főnév, ige, melléknév) – a végén osztályzattal."),
+    Jatek("reszeg", "Részeg vagyok, rózsám (18+)",
+          "Felnőtt, humoros számkitaláló 0 és 20 között konyakért: minden rossz "
+          "tipp egy felesbe kerül, tíz tipp után te fizetsz – hat kör után záróra!",
+          szerzo="Schuck Antal", ev="1987", felnott=True),
 )
 
 

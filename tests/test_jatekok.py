@@ -384,6 +384,67 @@ def test_fogadas_balogh_tibor_es_lezarul():
     assert any("VERSENY GYŐZTESE" in p for _, p in ki)  # legalább egy futam
 
 
+def test_szokita_szo_mastermind_lezarul():
+    """SZOKITA: pár tipp után X-szel elárultatjuk a szót, majd nem kérünk újat."""
+    def bot(k, ki):
+        kl = k.lower()
+        if "ismertetését" in kl:
+            return "n"
+        if "tipped" in kl:
+            n = sum(1 for t, p in ki if t == "kerdez" and "tipped" in p.lower())
+            return "X" if n > 6 else "ABC"
+        if "gondoljak új" in kl:
+            return "n"
+        return ""
+    ki = _fut("szokita", bot)
+    assert any("GONDOLT SZÓ" in p for _, p in ki)     # X → elárulja
+
+
+def test_szofajok_kviz_osztalyzattal():
+    """SZOFAJOK: három szóra válaszolunk, a végén osztályzat, majd kilépés."""
+    def bot(k, ki):
+        kl = k.lower()
+        if "hány kérdést" in kl:
+            return "3"
+        if "névelő" in kl and "számnév" in kl:        # a szófaj-kérdés
+            return "f"
+        if "mégegyszer" in kl:
+            return "n"
+        return ""
+    ki = _fut("szofajok", bot)
+    assert sum(1 for t, p in ki if t == "mond" and "MILYEN SZÓ" in p) == 3
+    assert any("SZERBUSZ" in p for _, p in ki)
+
+
+def test_reszeg_schuck_antal_binaris_nyer():
+    """RÉSZEG (Schuck Antal): felezéssel 0–20 között megtaláljuk a számot →
+    NYERTÉL; majd nemleges válaszra kirak."""
+    st = {"lo": 0, "hi": 20, "guess": None}
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "ismertetőt" in kl:
+            return "n"
+        if "tipped" in kl:
+            monds = [p.lower() for t, p in ki if t == "mond"]
+            if st["guess"] is not None:
+                for mp in reversed(monds):
+                    if "túl nagy" in mp:
+                        st["hi"] = st["guess"] - 1
+                        break
+                    if "túl kicsi" in mp:
+                        st["lo"] = st["guess"] + 1
+                        break
+            st["guess"] = (st["lo"] + st["hi"]) // 2
+            return str(st["guess"])
+        if "inni" in kl:
+            return "n"
+        return ""
+    ki = _fut("reszeg", bot)
+    assert any("NYERTÉL" in p for _, p in ki)
+    assert any("MARS KI" in p for _, p in ki)
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()

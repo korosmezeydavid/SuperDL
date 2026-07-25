@@ -1757,3 +1757,238 @@ def jatek_gyufapoc(ctx):
             continue
         yield ctx.vege("KÖSZÖNÖM A JÁTÉKOT!")
         return
+
+
+# =============================================== SZÓ KITALÁLÓS JÁTÉK (SZOKITA)
+# Forrás: SZOKITA.HTP (Homelab). Szó-mastermind: a gép egy 3 betűs magyar szóra
+# gondol (a forrás 328 szavas listájából), te 3 betűs szavakat tippelsz, és
+# megmondja, hány betű egyezik a SORSZÁM szerint is. X-re elárulja a szót. Az
+# összehasonlítás ékezet-érzéketlen (a korabeli töltő ékezet-eltolása miatt).
+
+_SZOKITA_SZAVAK = (
+    'ADÓ AKÓ ARA ÁLL BAB BÁJ BÉL BOT CÉG DÁN DÓM EDE ELV ÉRT FAL FEN FOG GAZ '
+    'GÉP HAJ HÁJ HEG HOL IDA INT JAJ JÓD KAN KÁN KÉK KÉR KOS KÖR LAP LÁT LES '
+    'LOM MAR MÁZ MÉH MÓD NÉV OLÁ ORR ÓTA PAP PÉK PÓZ RAK RÉG RÉZ RÜH SÁS SOM '
+    'SÜT TÁG TÁR TÉR TÓT TUS VAD VAS VÁR VÉG VÉT ZÁR ADU ALÁ ARC ÁRT BAJ BÁL '
+    'BÉR BÓK CÉH DÉL DÖF EDZ ETA ÉRV FAR FÉK FOK GÁT GÉZ HAL HÁL HÉJ HON IDE '
+    'INY JÁR JÓS KAP KÁR KÉL KÉS KÓD KÖT LAT LÁZ LÉC LOP MÁJ MEG MÉN NAP NÉZ '
+    'OLD ORV ÖLT PÁL PÉP PUD RÁF RÉM ROM SAH SÁV SOR SZÓ TÁJ TÁV TÉT TÖK ÜDE '
+    'VAJ VÁD VÁZ VÉL VON ZUG AGA APA ÁCS ÁRU BAK BÁN BOG BÖK CÉL DÉR DÖG EGY '
+    'ÉLC ÉSZ FED FÉL FON GÁZ GÓL HAS HÁM HÉT HOZ IGA IRT JEL JÖN KAR KEL KÉM '
+    'KÉZ KÓR KÖZ LÁB LEL LÉK LÓG MÁK MER MÉR NÁD NOS OLT OTT ÖNT PÁR POR RAB '
+    'RÁG RÉS ROP SAV SEB SÖR TAG TÁL TEJ TOK TÖM ÜDV VAK VÁG VER VÉN ZAB AGY '
+    'APÓ ÁGY ÁSÓ BAL BÁR BOJ CÁR COL DOB DUG EKE ÉPP ÉVA FEJ FÉM FUT GÉM HAB '
+    'HAT HÁT HÉV HÓD IGE ITT JÉG JUH KAS KEN KÉN KIÉ KÖD KUN LÁM LEN LÉP LÖK '
+    'MÁR MEZ MÉZ NEM ODA OLY ÓDA ÖRV PEJ PÓK RAG RÁK RÉT RÖG SÁL SEM SUT TAR '
+    'TÁN TÉL TOL TÖR ÜGY VAN VÁJ VET VÉR ZAJ AHA APU ÁLD ÁSZ BÁB BÉG BOR CET '
+    'DAL DOH DÜH ELÉ ÉRC FAJ FEL FÉR FÜL GÉN HAD HÁG HÁZ HIT HUN IMA IZÉ JOG '
+    'JUT KÁD KÉJ KÉP KOR KÖP LAK LÁP LEP LÉT MAG MÁS MÉG MOS NÉP ODU ONT ÓRA '
+    'PAD PER PÓR RAJ RÁZ RÉV RUM SÁR SOK SÜL TAT TÁP TÉP TOR TUD ÜST VAR VÁM '
+    'VÉD VÉS ZÁP'
+).split()
+
+
+def _szokita_norm(w):
+    return ekezet_nelkul((w or "").strip()).upper()
+
+
+def jatek_szokita(ctx):
+    yield ctx.mond("SZÓ KITALÁLÓS JÁTÉK.")
+    v = yield ctx.kerdez("KÉRED A SZABÁLYOK ISMERTETÉSÉT? (igen/nem)")
+    if igen(v, False):
+        yield ctx.mond("GONDOLOK EGY HÁROMBETŰS SZÓRA, AMIT KI KELL TALÁLNI.")
+        yield ctx.mond("Minden tipp után megmondom, hány KÖZÖS betű van a "
+                       "tippelt és az általam gondolt szóban.")
+        yield ctx.mond("KÖZÖS BETŰKNEK A SORSZÁM SZERINT IS MEGEGYEZŐ BETŰKET "
+                       "TEKINTJÜK.")
+        yield ctx.mond("Ha nem sikerül kitalálnod a szót, de mégis kíváncsi "
+                       "vagy rá, írj be egy ikszet.")
+
+    while True:
+        szo = random.choice(_SZOKITA_SZAVAK)
+        cel = _szokita_norm(szo)
+        p = 0
+        yield ctx.mond("Gondoltam egy szót. TIPPELJ!")
+        while True:
+            v = yield ctx.kerdez("A tipped (3 betűs szó, vagy X a megoldásért):")
+            tn = _szokita_norm(v)
+            if tn == "X":
+                if p == 0:
+                    yield ctx.mond("EJNYE! MEG SE PRÓBÁLOD?")
+                elif p <= 5:
+                    yield ctx.mond("NE ADD FEL! MÉG ÖTSZÖR SEM PRÓBÁLKOZTÁL.")
+                    continue
+                else:
+                    yield ctx.mond(f"A GONDOLT SZÓ {szo}. {p} TIPPED VOLT.")
+                break
+            if len(tn) != 3 or not tn.isalpha() or tn[0] == tn[1]:
+                yield ctx.mond("ÉRVÉNYTELEN!")
+                continue
+            p += 1
+            t = sum(1 for k in range(3) if cel[k] == tn[k])
+            if t == 0:
+                yield ctx.mond("NEM TALÁLT!")
+            elif t < 3:
+                yield ctx.mond(f"{t} betűt talált.")
+            else:
+                yield ctx.mond(f"TALÁLT! {p} TIPPEL NYERTÉL.")
+                break
+        v = yield ctx.kerdez("Gondoljak új szót? (igen/nem)")
+        if igen(v, True):
+            continue
+        yield ctx.vege("Jó szórakozást volt! Viszlát!")
+        return
+
+
+# ================================================================== SZÓFAJOK
+# Forrás: SZOFAJOK.HTP (Homelab). A gép szót mond, te felismered a SZÓFAJÁT:
+# N=névelő, S=számnév, F=főnév, I=ige, M=melléknév. A forrás 60 szó-párja
+# (a hiányzó SZÁMNÉV/MELLÉKNÉV meghatározás pótolva). A végén osztályzat.
+
+_SZOFAJOK_PAROK = (
+    ('FUT', 'IGE'), ('OLVAS', 'IGE'), ('TANUL', 'IGE'), ('MOZDUL', 'IGE'),
+    ('HALLGAT', 'IGE'), ('PIHEN', 'IGE'), ('ÉNEKEL', 'IGE'),
+    ('CSAVARODIK', 'IGE'), ('TÁNCOL', 'IGE'), ('A', 'NÉVELŐ'),
+    ('KETTŐ', 'SZÁMNÉV'), ('SZOBA', 'FŐNÉV'), ('ASZTAL', 'FŐNÉV'),
+    ('SZÉK', 'FŐNÉV'), ('LÁMPA', 'FŐNÉV'), ('HÁROM', 'SZÁMNÉV'),
+    ('HÁZ', 'FŐNÉV'), ('EBÉD', 'FŐNÉV'), ('ISKOLA', 'FŐNÉV'),
+    ('GÁBOR', 'FŐNÉV'), ('TAMÁS', 'FŐNÉV'), ('DUNA', 'FŐNÉV'),
+    ('BAKONY', 'FŐNÉV'), ('ÍRÁS', 'FŐNÉV'), ('JÁTÉK', 'FŐNÉV'),
+    ('ÓRA', 'FŐNÉV'), ('MAGNETOFON', 'FŐNÉV'), ('DÉLCEG', 'MELLÉKNÉV'),
+    ('SÜKET', 'MELLÉKNÉV'), ('VAK', 'MELLÉKNÉV'), ('PIROS', 'MELLÉKNÉV'),
+    ('ALACSONY', 'MELLÉKNÉV'), ('NAGY', 'MELLÉKNÉV'), ('ZENÉL', 'IGE'),
+    ('FORDUL', 'IGE'), ('ÉL', 'IGE'), ('FEKETE', 'MELLÉKNÉV'),
+    ('MORCOS', 'MELLÉKNÉV'), ('ROSSZ', 'MELLÉKNÉV'), ('SOK', 'SZÁMNÉV'),
+    ('SZERÉNY', 'MELLÉKNÉV'), ('SZAPORA', 'MELLÉKNÉV'), ('MAJOM', 'FŐNÉV'),
+    ('PÁVIÁN', 'FŐNÉV'), ('PINGVIN', 'FŐNÉV'), ('AZ', 'NÉVELŐ'),
+    ('CSÍKOS', 'MELLÉKNÉV'), ('ZSARNOK', 'MELLÉKNÉV'), ('MÁRTI', 'FŐNÉV'),
+    ('ZSOLTIKA', 'FŐNÉV'), ('ÉREM', 'FŐNÉV'), ('HASOGAT', 'IGE'),
+    ('VAN', 'IGE'), ('FELEL', 'IGE'), ('KRISZTUS', 'FŐNÉV'),
+    ('LENIN', 'FŐNÉV'), ('BUDAPEST', 'FŐNÉV'), ('VARANGY', 'FŐNÉV'),
+    ('TOLLÁSZKODIK', 'IGE'), ('CSILLAG', 'FŐNÉV'),
+)
+_SZOFAJOK_DICSER = ("JÓL VÁLASZOLTÁL!", "JÓL TUDTAD!", "JÓ A VÁLASZ!",
+                    "EZ A HELYES!", "ÍGY VAN!")
+_SZOFAJOK_ROSSZ = ("NEM JÓ!", "TÉVEDÉS!", "NEM TALÁLT!")
+
+
+def jatek_szofajok(ctx):
+    yield ctx.mond("SZÓFAJOK")
+    yield ctx.mond("SZAVAKAT FOGOK MONDANI.")
+    yield ctx.mond("FEL KELL ISMERNED ŐKET!")
+    yield ctx.mond("MINDIG KÉRDEZZ ELŐSZÖR MAGADBAN, AZUTÁN VÁLASZOLJ!")
+    while True:
+        while True:
+            v = yield ctx.kerdez("HÁNY KÉRDÉST ADJAK?")
+            db = szam(v, 1, len(_SZOFAJOK_PAROK))
+            if db is not None:
+                break
+            yield ctx.mond(f"Egy és {len(_SZOFAJOK_PAROK)} közötti számot kérek.")
+
+        jo = rossz = 0
+        elozo = None
+        for _ in range(db):
+            szo, szofaj = random.choice(_SZOFAJOK_PAROK)
+            while szo == elozo:
+                szo, szofaj = random.choice(_SZOFAJOK_PAROK)
+            elozo = szo
+            yield ctx.mond("MILYEN SZÓ A KÖVETKEZŐ?")
+            v = yield ctx.kerdez(f"{szo}  (N=névelő, S=számnév, F=főnév, "
+                                 "I=ige, M=melléknév)")
+            valasz = _szokita_norm(v)[:1]
+            helyes = _szokita_norm(szofaj)[:1]
+            if valasz == helyes:
+                yield ctx.mond(random.choice(_SZOFAJOK_DICSER))
+                jo += 1
+            else:
+                yield ctx.mond(random.choice(_SZOFAJOK_ROSSZ))
+                yield ctx.mond(f"A HELYES VÁLASZ {szofaj} LETT VOLNA!")
+                rossz += 1
+
+        if jo == 0:
+            yield ctx.mond("POCSÉK EREDMÉNY!")
+            yield ctx.mond("LEGALÁBB VÉLETLENÜL ELTALÁLHATTÁL VOLNA VALAMIT!")
+            yield ctx.mond("TANULJ, MERT ILYEN MARADSZ!")
+        elif rossz > jo:
+            yield ctx.mond("GYENGE TELJESÍTMÉNY!")
+            yield ctx.mond("TÖBBET KELL FOGLALKOZNOD A NYELVTANNAL!")
+            yield ctx.mond("TÖBB ROSSZ VÁLASZOD VOLT MINT JÓ.")
+        elif rossz == jo:
+            yield ctx.mond("ENNÉL MÉG TÖBBRE VAGY KÉPES.")
+            yield ctx.mond("FELE JÓ VOLT, DE FELE ROSSZ!")
+        elif rossz == 0:
+            yield ctx.mond("GRATULÁLOK!")
+            yield ctx.mond("KIFOGÁSTALANUL DOLGOZTÁL.")
+        else:
+            yield ctx.mond("BEFEJEZTED A VÁLASZOKAT.")
+            yield ctx.mond(f"ROSSZ VÁLASZOD {rossz} VOLT.")
+            yield ctx.mond(f"{db} VÁLASZBÓL {jo} VOLT JÓ!")
+
+        v = yield ctx.kerdez("AKARSZ MÉGEGYSZER PRÓBÁLKOZNI? (igen/nem)")
+        if igen(v, False):
+            continue
+        yield ctx.vege("SZERBUSZ!")
+        return
+
+
+# =========================================================== RÉSZEG (RESZEG)
+# Forrás: RESZEG.HTP – „KÉSZ RUN TETTE: SCHUCK ANTAL", 1987. november 7–11.
+# (Ugyanaz a szerző, mint a Célozz a hajórának.) Számkitaláló 0 és 20 között,
+# konyakért; minden rossz tipp egy felesbe kerül. Tíz tipp után „fizetsz nekem".
+# Hat kör után záróra. Felnőtt, humoros hangvétel.
+
+def jatek_reszeg(ctx):
+    v = yield ctx.kerdez("KÉRED AZ ISMERTETŐT? (igen/nem)")
+    d = (v or "").strip().lower()
+    if d.startswith("i"):
+        yield ctx.mond("EGY SZÁMRA FOGOK GONDOLNI 0 ÉS 20 KÖZÖTT.")
+        yield ctx.mond("PRÓBÁLD MEG KITALÁLNI. FÉL LITER KONYAK A JUTALMAD, HA "
+                       "SIKERÜL.")
+        yield ctx.mond("VISZONT MINDEN ROSSZ TIPP UTÁN LEVONOK EGY FELEST.")
+        yield ctx.mond("AZT HISZEM, TISZTESSÉGES AZ AJÁNLATOM.")
+        yield ctx.mond("KEZDJÜK!")
+    elif not d.startswith("n"):
+        yield ctx.mond("MÉG NEM IS ITTÁL, DE MÁR NEM TUDSZ VISELKEDNI!")
+
+    kor = 0
+    while True:
+        kor += 1
+        if kor == 7:
+            yield ctx.mond("SAJNÁLOM, DE ZÁRÓRA VAN, ÉS NINCS TÖBB KONYAKOM.")
+            yield ctx.vege("KÜLÖNBEN IS RÉSZEG DISZNÓKAT NEM ITATOK!")
+            return
+        a = random.randint(1, 20)
+        yield ctx.mond("GONDOLTAM 1 SZÁMOT 0 ÉS 20 KÖZÖTT. TIPPELHETSZ.")
+        d = 0                    # tippek száma
+        rossz = 0                # rossz tippek (a jutalomból levonva)
+        tul = 0                  # a „fizetsz nekem" mód tippjei (10 tipp után)
+        while True:
+            v = yield ctx.kerdez("A tipped (0–20):")
+            b = szam(v)
+            if b is None:
+                yield ctx.mond("Számot kérek.")
+                continue
+            d += 1
+            if d > 10:           # tíz tipp után: már te fizetsz
+                if a == b:
+                    yield ctx.mond("HUK! GRATULÁLOK, ELTALÁLTAD. HAVER, "
+                                   f"FIZETHETSZ NEKEM {tul} FELEST.")
+                    break
+                tul += 1
+                yield ctx.mond("TÚL NAGY." if a < b else "TÚL KICSI.")
+                yield ctx.mond("EGY FELESEDNEK LŐTTEK.")
+                continue
+            if a == b:
+                yield ctx.mond(f"GRATULÁLOK, NYERTÉL {10 - rossz} FELEST! "
+                               "EGÉSZSÉGEDRE!")
+                break
+            rossz += 1
+            yield ctx.mond("TÚL NAGY." if a < b else "TÚL KICSI.")
+            yield ctx.mond("EGY FELESEDNEK LŐTTEK.")
+
+        v = yield ctx.kerdez("AKARSZ-E MÉG INNI? (igen/nem)")
+        if (v or "").strip().lower().startswith("i"):
+            continue
+        yield ctx.mond("MARS KI!")
+        yield ctx.vege("HA TEJET INNÁL, AZ IS POCSÉKBA MENNE!")
+        return
