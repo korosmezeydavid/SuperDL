@@ -147,7 +147,9 @@ def jatek_snobli(ctx):
             yield ctx.mond("Nulla és hat közötti számot kérek.")
             continue
         geptipp = geprejt + random.randint(0, 3)
-        reszek = [f"A gép {geprejt} érmét rejtett, összesen {ossz} volt."]
+        # a gép TIPPJÉT is mondjuk el (eddig kimaradt – listás visszajelzés):
+        reszek = [f"A gép {geptipp}-re tippelt. A gép {geprejt} érmét rejtett, "
+                  f"összesen {ossz} volt."]
         et, gt = entipp == ossz, geptipp == ossz
         if et and not gt:
             en += 1

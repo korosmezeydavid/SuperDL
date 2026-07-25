@@ -238,10 +238,9 @@ SAJAT: tuple[Jatek, ...] = (
           "Pörgesd a tárcsákat, és gyűjts minél több érmét a nyerőtáblázat "
           "szerint.",
           retro=False),
-    Jatek("millebornes", "Mille Bornes (1000 mérföld)",
-          "A klasszikus francia autós kártyajáték: távkártyák, veszélyek, "
-          "ellenszerek és mentességek – cél az 1000 mérföld.",
-          retro=False),
+    # Mille Bornes: EGYELŐRE KIVÉVE a listáról, mert még nincs megírva (a
+    # katalógusban lógott, de „nem indult el" – listás visszajelzés). Ha kész a
+    # jatek_millebornes és bekerül a REGISZTER-be, ezt visszatesszük.
 )
 
 
