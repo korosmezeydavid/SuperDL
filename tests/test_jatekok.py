@@ -445,6 +445,26 @@ def test_reszeg_schuck_antal_binaris_nyer():
     assert any("MARS KI" in p for _, p in ki)
 
 
+def test_betpoker_pontallas_es_feladas():
+    """BETŰPÖKER: a ** pontállást mond (nem tipp), a * feladja és elárulja a szót."""
+    st = {"n": 0}
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "szabályokat" in kl:
+            return "n"
+        if "kérem a szót" in kl:
+            st["n"] += 1
+            return "**" if st["n"] == 1 else "*"
+        if "játszunk még" in kl:
+            return "n"
+        return ""
+    ki = _fut("betpoker", bot)
+    assert any("betű" in p and "hossza" in p for _, p in ki)   # hossz-tipp
+    assert any("pontod van" in p for _, p in ki)               # ** pontállás
+    assert any("A szó" in p and "tipped volt" in p for _, p in ki)  # * feladás
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()

@@ -1992,3 +1992,110 @@ def jatek_reszeg(ctx):
         yield ctx.mond("MARS KI!")
         yield ctx.vege("HA TEJET INNÁL, AZ IS POCSÉKBA MENNE!")
         return
+
+
+# ================================================================= BETŰPÖKER
+# Forrás: BETPOKER.HTP (Homelab). Szó-mastermind PONTOZÁSSAL: a gép egy szóra
+# gondol (257 szavas lista, 3–10 betű), megmondja a hosszát; te azonos hosszú
+# szavakat tippelsz, és megmondja, hány betű van a helyén. 200 pont az előleg,
+# a rossz tippekért von; a megismételt rossz tipp külön −10. * = feladás,
+# ** = pontállás. Ékezet-érzéketlen összevetés (mint a SZOKITA).
+
+_BETPOKER_SZAVAK = (
+    "HÁZ ÁGY PAD TÉL KÁD MÉZ ÁSÓ RÉZ NAP ÓRA VAJ CÉL BOR VAD KÉP ODU JÉG SIP "
+    "SÜT SÜN HAL HID FIU DIÓ VIZ MOS DOB ZÁR VÉR SEB AJTÓ ALMA AVAR ARAT ADAT "
+    "AKTA BABA CICA CSÓK CSAP DARU DOMB EGÉR EBÉD ESTE ESIK ÉDES ÉRIK ÉTEL FALU "
+    "FÖLD FÉSÜ ERDÖ GYOM GYIK GOMB HAJÓ IRÁS ITAL LIBA LÁNY MOZI AUTÓ NÉNI NYÁR "
+    "NYUL OBOA ORSÓ ÖREG PART PARK POLC PULT RÉPA RUCA RIGÓ RIAD RÁCS SAJT SIET "
+    "SZÉK SZIV SZÓL TEST TURÓ TYUK UTCA UGAT ÜRES ÜVEG ÜRGE VÁZA VERS PIAC ZENE "
+    "ZSIR ZSEB ZSÁK ZORD ABLAK ALKOT ÁLLAT ÁRVIZ ÁRKÁD ÁRULÓ BANÁN BALTA BOLHA "
+    "BIRKA BUTIK BUTOR BUNDA BÖGRE BÜNÖS BORSÓ BETEG BORDÓ CÉLOZ CUKOR CÉKLA "
+    "CÉRNA CSONT CSUCS DARÁL DIVAT DOBOZ DÁTUM EZÜST EVEZÖ ESZIK ISZIK EPEKÖ "
+    "ERNYÖ ÉRTÉK ÉRZÉS FEHÉR FORRÓ FORMA FESTÖ GITÁR GALLY GÖDÖR GYALU GYORS "
+    "HORDÓ HURKA IRODA IRIGY JÁTÉK JÁRDA JÁRMÜ KULCS KERES KÖRTE KALAP KOCSI "
+    "LÁMPA PIÓCA SAS PATIKA CSÓNAK CSENGÖ TAPÉTA PILLANAT SZEDER TEJFÖL RÓKA "
+    "TRÉFA SÜSÜ SÖR KUTYA KACSA LABDA LIGET MACKÓ MALAC MÉTER MOSODA ORVOS OKTAT "
+    "ÖNTÖZ PAPIR POSTA PEREC SÁTOR SZÖLÖ SZITA TEHÉN TÖRPE TORTA VERÉB VONAT "
+    "ÜZLET ALTATÓ ASZTAL ÁRUHÁZ CSOMAG CSAVAR CSALÁD DOMINÓ ELEDEL FEKETE GALAMB "
+    "GYEREK HIRDET KAGYLÓ FARKAS SZIGET SZÖVET SZILVA POKRÓC MACSKA HEGEDÜ "
+    "ZONGORA FURULYA KENGURU SZUNYOG HATALOM MONDÓKA PAPRIKA MOZDONY HÜTÖGÉP "
+    "VILLAMOS MANDARIN SZEKRÉNY RADIÁTOR MEGÉRTÉS TÜRELEM UDVARIAS SZÖRP "
+    "OROSZLÁN BÜNTETÉS KORCSOLYA BOLDOGSÁG BILLENTYÜ SZÁGULDÁS SZIMFÓNIA "
+    "TÖRTÉNELEM PATAK FORDULÓ BIRODALOM IGAZSÁGOS KARÁCSONY BABLEVES TAKARMÁNY "
+    "MIKULÁS MARADÉK PADLÁS PINCE GYÜMÖLCS FÉK"
+).split()
+
+
+def jatek_betpoker(ctx):
+    yield ctx.mond("BETŰPÖKER.")
+    v = yield ctx.kerdez("Ismertessem a játékszabályokat? (i/n)")
+    if igen(v, False):
+        yield ctx.mond("Egy szót kell kitalálnod.")
+        yield ctx.mond("A játékhoz kapsz előlegbe 200 pontot.")
+        yield ctx.mond("Ebből vonok le a rossz tippekért!")
+        yield ctx.mond("Ha kétszer egyformán tippelsz rosszul, többet vonok le!")
+        yield ctx.mond("Segítségül a szó hosszát és az azonos helyen lévő betűk "
+                       "számát közlöm.")
+        yield ctx.mond("Ha feladod, akkor írj egy csillagot: *")
+        yield ctx.mond("Ha kíváncsi vagy, hány pontod van még, írj két "
+                       "csillagot: ** – ezt nem számolom tippnek!")
+
+    while True:
+        szo = random.choice(_BETPOKER_SZAVAK)
+        cel = _szokita_norm(szo)
+        hossz = len(cel)
+        tipp_db = 0
+        buntetes = 0
+        eddigi = []
+        yield ctx.mond(f"A szó hossza {hossz} betű.")
+        while True:
+            v = yield ctx.kerdez("Kérem a szót! (* = feladás, ** = pontállás)")
+            f = (v or "").strip()
+            pont = 200 - (10 - hossz) * tipp_db - buntetes
+            if f == "**":
+                yield ctx.mond(f"{pont} pontod van.")
+                continue
+            tipp_db += 1
+            if f == "*":
+                yield ctx.mond(f"A szó {szo}. {tipp_db} tipped volt!")
+                break
+            pont = 200 - (10 - hossz) * tipp_db - buntetes
+            if pont < 0:
+                yield ctx.mond("Elfogytak a pontjaid.")
+                yield ctx.mond(f"A szó {szo}. Eddig {tipp_db} tipped volt!")
+                break
+            tn = _szokita_norm(f)
+            if len(tn) < hossz:
+                yield ctx.mond("Kevesebb betűt adtál meg!")
+                continue
+            if len(tn) > hossz:
+                yield ctx.mond("Több betűt adtál meg!")
+                continue
+            if tn in eddigi:
+                yield ctx.mond("Ilyen tipped már volt! Figyelj jobban! Ezért "
+                               "büntetésből levonok tíz pontot!")
+                buntetes += 10
+            else:
+                eddigi.append(tn)
+            talalat = sum(1 for k in range(hossz) if cel[k] == tn[k])
+            yield ctx.mond(f"{talalat} betű van a helyén.")
+            if talalat == hossz:
+                pont = 200 - (10 - hossz) * tipp_db - buntetes
+                yield ctx.mond(f"Eltaláltad {tipp_db} tippből. {pont} pontot "
+                               "szereztél.")
+                if pont > 150:
+                    yield ctx.mond("Rendkívül ügyesen játszottál! Remélem, hogy "
+                                   "nem csak szerencséd volt.")
+                elif pont > 100:
+                    yield ctx.mond("Ügyes voltál!")
+                elif pont >= 50:
+                    yield ctx.mond("Szépen játszottál.")
+                else:
+                    yield ctx.mond("Megkínlódtál érte, de azért sikerült "
+                                   "kitalálnod!")
+                break
+        v = yield ctx.kerdez("Játszunk még? (i/n)")
+        if igen(v, False):
+            continue
+        yield ctx.vege("Remélem, nemsokára találkozunk! Köszönöm a játékot!")
+        return

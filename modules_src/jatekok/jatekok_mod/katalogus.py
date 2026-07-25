@@ -223,6 +223,10 @@ RETRO: tuple[Jatek, ...] = (
           "Felnőtt, humoros számkitaláló 0 és 20 között konyakért: minden rossz "
           "tipp egy felesbe kerül, tíz tipp után te fizetsz – hat kör után záróra!",
           szerzo="Schuck Antal", ev="1987", felnott=True),
+    Jatek("betpoker", "Betűpöker",
+          "Szó-mastermind pontozással: a gép egy szóra gondol, megmondja a "
+          "hosszát, te azonos hosszú szavakat tippelsz, és megtudod, hány betű "
+          "van a helyén – 200 pontból gazdálkodsz a rossz tippekért."),
 )
 
 
