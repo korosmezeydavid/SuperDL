@@ -43,7 +43,9 @@ def _safe(name: str) -> str:
 
 
 def _out_path(base_dir: str, station_name: str, when: datetime) -> Path:
-    folder = Path(base_dir) / "Rádiófelvételek" / when.strftime("%Y-%m-%d")
+    # a vezető/záró szóköz Windowson WinError 123-at okoz (' C:\\...' érvénytelen)
+    base = str(base_dir or "").strip() or str(Path.home() / "Downloads")
+    folder = Path(base) / "Rádiófelvételek" / when.strftime("%Y-%m-%d")
     folder.mkdir(parents=True, exist_ok=True)
     fname = f"{_safe(station_name)} {when.strftime('%Y-%m-%d %H-%M-%S')}.mp3"
     return folder / fname
@@ -309,7 +311,7 @@ class RecordManager:
             d = self._base_dir_getter()
         except Exception:
             d = ""
-        return d or str(Path.home() / "Downloads")
+        return (d or "").strip() or str(Path.home() / "Downloads")
 
     def _emit(self, text, level="info"):
         if self.on_event:

@@ -84,6 +84,17 @@ def test_reconnect_csak_http_nal():
     assert "stderr=subprocess.PIPE" in src
 
 
+def test_out_path_vezeto_szokoz_nem_okoz_winerror(tmp_path):
+    """A célmappa értékében lévő VEZETŐ/ZÁRÓ szóköz Windowson WinError 123-at
+    okozott (' C:\\...' → érvénytelen útvonal, nem jött létre a Rádiófelvételek
+    mappa). Az _out_path most trimmel, így a mappa létrejön."""
+    p = rr._out_path(f"  {tmp_path}  ", "Hobby Rádió",
+                     datetime(2026, 7, 25, 20, 0, 0))
+    assert p.parent.is_dir()
+    assert not str(p).startswith(" ")
+    assert "Rádiófelvételek" in str(p)
+
+
 def test_start_manual_last_error_a_valodi_okot_adja(tmp_path, monkeypatch):
     """Ha a felvétel nem indul (pl. hiányzó ffmpeg), a kezelő a VALÓDI okot a
     last_error-ba teszi – ezt a rádióablak HANGOSAN felolvassa, nem néma."""

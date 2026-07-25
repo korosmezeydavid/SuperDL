@@ -143,6 +143,23 @@ class RadioFrame(wx.Frame):
         self.player = Player()
         self.player.on_state = lambda s: wx.CallAfter(self._on_state, s)
         self.rec = getattr(main, "_record_mgr", None)   # felvétel-kezelő
+        # A célmappa értékében lévő VEZETŐ/ZÁRÓ SZÓKÖZ WinError 123-at okozott a
+        # Rádiófelvételek mappa létrehozásánál (' C:\\Users\\...' → érvénytelen
+        # útvonal). A kezelő útvonal-getterét megtisztítjuk – exe-build nélkül,
+        # a régi Core-on is. A wrap idempotens (az EREDETI gettert csomagolja),
+        # és minden felvételre hat (a kézire és az időzítettre is).
+        if self.rec and not getattr(self.rec, "_dir_getter_wrapped", False):
+            _orig_getter = self.rec._base_dir_getter
+
+            def _clean_dir(_g=_orig_getter):
+                try:
+                    d = _g()
+                except Exception:
+                    d = ""
+                return (d or "").strip()
+
+            self.rec._base_dir_getter = _clean_dir
+            self.rec._dir_getter_wrapped = True
         self._manual_rec = None                          # folyó kézi felvétel
         self.stations: list[R.Station] = []
         self.favorites: list[R.Station] = [
