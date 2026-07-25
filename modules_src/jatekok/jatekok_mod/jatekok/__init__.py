@@ -28,7 +28,7 @@ REGISZTER = {
     "kockadob": kartya.jatek_kockadob,
     "rulett": kartya.jatek_rulett,
     "rulibuli": kartya.jatek_rulibuli,
-    "gyufa": kartya.jatek_gyufa,
+    "gyufa": homelab.jatek_gyufapoc,   # forráshű GYUFAPOC (a régi általános helyett)
     # kvíz / oktató
     "allatism": kviz.jatek_allatism,
     "fovaros": kviz.jatek_fovaros,

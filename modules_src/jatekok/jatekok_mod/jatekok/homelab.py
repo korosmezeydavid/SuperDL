@@ -1563,3 +1563,197 @@ def jatek_fogadas(ctx):
                          else "elfogyott a pénzed, kiestél")
                 yield ctx.mond(f"{nevek[i]}: elvesztetted a {tet[i]} "
                                f"forintodat, {allap}.")
+
+
+# ============================================== GYUFAPÖCKÖLŐ JÁTÉK (GYUFAPOC)
+# Forrás: GYUFAPOC.HTP (Homelab). TELJES, forráshű újraírás (a listás kérésre):
+# szabály-ismertető, elérendő pontszám (>=2), 1–5 játékos + a gép („Brailab"),
+# pöckölés-esélyek a forrásból (SEMMI 5/11, KETTŐ 4/11, ÖT 1/11, a maradékból
+# NEM FORDULT MEG 2/3, TÍZ 1/3), F/M döntés, gép-AI és a záró szövegek.
+# A pöckölést mindig a JÁTÉKOS kezdeményezi (P), az E az állást mondja.
+
+_GYUFAPOC_SZABALY = (
+    "A gyufapöckölés népszerű játék.",
+    "A játékos egy gyufásdobozt az asztal széléről felfelé pöcköl.",
+    "Ha a mintás oldalával felfelé esik le a doboz, két pontot ér.",
+    "Ha az élére esik, az öt pont.",
+    "Minden dobásnál kérdezheted az eredményt az E betűvel.",
+    "Folytatni az F, eredményt tartani az M betűvel kell.",
+    "Ha a hátlapja van felül a doboznak, akkor az eredmény nulla.",
+    "Ha valami csoda folytán a legkisebb lapján áll meg a gyufa, akkor az tíz "
+    "pontot jelent!",
+)
+
+
+def _gyufapoc_dobas():
+    """Egy pöckölés eredménye a FORRÁS valószínűségeivel → (üzenet, pont)."""
+    xx = random.randint(1, 11)
+    if xx <= 5:
+        return "SEMMI!", 0
+    if xx <= 9:
+        return "KETTŐ!", 2
+    if xx == 10:
+        return "ÖT!", 5
+    if random.randint(1, 3) == 3:          # a 11-esből 1/3 a csoda
+        return "TÍZ!", 10
+    return "NEM FORDULT MEG!", 0
+
+
+def _gyufapoc_allas(nevek, pont, gep_jatszik, gep_pont):
+    reszek = [f"{nevek[i]}: {pont[i]} pont" for i in range(len(nevek))]
+    if gep_jatszik:
+        reszek.append(f"Brailab (én): {gep_pont} pont")
+    return "Állás – " + ", ".join(reszek) + ". Pöckölj!"
+
+
+def _gyufapoc_gep_dont(ma, gep_pont, pont, cel):
+    """A gép megtartja (True) vagy folytatja (False) – a forrás logikájával."""
+    legjobb_ember = max(pont) if pont else 0
+    if ma >= 10:
+        return True, "Nahogy megtartom!"
+    if gep_pont + ma >= cel:
+        return True, "Nahogy megtartom!"
+    if gep_pont > legjobb_ember:
+        return True, "Vezetek. Minek kockáztassak?"
+    if pont and all(p > gep_pont for p in pont):
+        return False, "Utolsó vagyok. Nincs vesztenivalóm!"
+    if random.randint(1, 2) == 1:
+        return True, "Nem kockáztatok."
+    return False, "Megpróbálom mégegyszer!"
+
+
+def jatek_gyufapoc(ctx):
+    yield ctx.mond("GYUFAPÖCKÖLŐ JÁTÉK")
+    v = yield ctx.kerdez("Kéred a szabályokat? (i/n)")
+    if igen(v, False):
+        while True:
+            for sor in _GYUFAPOC_SZABALY:
+                yield ctx.mond(sor)
+            v = yield ctx.kerdez("Értetted? (i/n)")
+            if igen(v, True):
+                break
+
+    while True:                                  # egy teljes játszma
+        while True:
+            v = yield ctx.kerdez("Mi legyen az elérendő pontszám?")
+            cel = szam(v)
+            if cel is not None and cel >= 2:
+                break
+            yield ctx.mond("Ostobaságokat ne írj!")
+        while True:
+            v = yield ctx.kerdez("Hányan szeretnétek játszani? (1–5)")
+            jatszok = szam(v, 1, 5)
+            if jatszok is not None:
+                break
+            yield ctx.mond("Egytől ötig lehet!")
+
+        nevek = []
+        if jatszok == 1:
+            v = yield ctx.kerdez("Írd ide a nevedet!")
+            nevek.append((v or "").strip() or "Játékos")
+            gep_jatszik = True
+        else:
+            v = yield ctx.kerdez("Én is játszak? (i/n)")
+            gep_jatszik = igen(v, False)
+            yield ctx.mond("Köszönöm." if gep_jatszik else "Sajnálom.")
+            kerdesek = ("Kérem az első nevet!", "Kérem a másodikat is!",
+                        "A harmadik nevet kérem!",
+                        "Szeretném a negyedik nevet is tudni!",
+                        "Örülnék az ötödik névnek!")
+            for i in range(jatszok):
+                v = yield ctx.kerdez(kerdesek[i])
+                nevek.append((v or "").strip() or f"{i + 1}. játékos")
+        if gep_jatszik:
+            yield ctx.mond("Én meg Brailab vagyok!")
+
+        pont = [0] * len(nevek)
+        gep_pont = 0
+        yield ctx.mond(f"{nevek[0]}, kezdd el a játékot!")
+        yield ctx.mond("A P betűvel pöckölhetsz!")
+
+        gyoztes = None
+        while gyoztes is None:
+            for idx in range(len(nevek)):
+                ma = 0
+                fo = 0
+                while True:                      # egy emberi kör
+                    while True:                  # pöckölés (P) / eredmény (E)
+                        v = yield ctx.kerdez(
+                            f"{nevek[idx]}: pöckölj! (P) — vagy E: eredmény")
+                        if (v or "").strip().lower().startswith("e"):
+                            yield ctx.mond(_gyufapoc_allas(
+                                nevek, pont, gep_jatszik, gep_pont))
+                            continue
+                        break
+                    do, ertek = _gyufapoc_dobas()
+                    yield ctx.mond(do)
+                    if do == "SEMMI!":
+                        ma = 0
+                        break
+                    if do == "NEM FORDULT MEG!":
+                        fo += 1
+                        if fo == 2:
+                            ma = 0
+                            break
+                        yield ctx.mond("Pöckölj újra!")
+                        continue
+                    ma += ertek
+                    v = yield ctx.kerdez("Folytatod vagy marad az eredmény? "
+                                         "(F/M)")
+                    if (v or "").strip().lower().startswith("m"):
+                        break
+                    yield ctx.mond("Pöckölj újra!")
+                pont[idx] += ma
+                yield ctx.mond(f"{nevek[idx]} pontja: {pont[idx]}.")
+                if pont[idx] >= cel:
+                    gyoztes = nevek[idx]
+                    break
+            if gyoztes is not None:
+                break
+
+            if gep_jatszik:                      # a gép köre
+                yield ctx.mond("Én jövök!")
+                ma = 0
+                fo = 0
+                while True:
+                    do, ertek = _gyufapoc_dobas()
+                    yield ctx.mond(do)
+                    if do == "SEMMI!":
+                        ma = 0
+                        break
+                    if do == "NEM FORDULT MEG!":
+                        fo += 1
+                        if fo == 2:
+                            ma = 0
+                            break
+                        yield ctx.mond("Újra pöckölök!")
+                        continue
+                    ma += ertek
+                    tart, uzenet = _gyufapoc_gep_dont(ma, gep_pont, pont, cel)
+                    yield ctx.mond(uzenet)
+                    if tart:
+                        break
+                gep_pont += ma
+                yield ctx.mond(f"Nekem {gep_pont} pontom van.")
+                if gep_pont >= cel:
+                    gyoztes = "Brailab"
+                    break
+
+        if gyoztes == "Brailab":
+            yield ctx.mond("Én győztem!")
+            if len(nevek) == 1:
+                yield ctx.mond(f"Neked {pont[0]} pontod volt.")
+            else:
+                yield ctx.mond("De ti is szépen játszottatok!")
+        elif len(nevek) == 1:
+            yield ctx.mond("Te győztél!")
+            yield ctx.mond(f"Nekem {gep_pont} pontom volt.")
+        else:
+            yield ctx.mond(f"{gyoztes} győzött!")
+            yield ctx.mond("Gratuláljunk neki!")
+
+        v = yield ctx.kerdez("Játszunk még egyet? (i/n)")
+        if igen(v, False):
+            continue
+        yield ctx.vege("KÖSZÖNÖM A JÁTÉKOT!")
+        return

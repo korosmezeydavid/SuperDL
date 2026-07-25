@@ -64,9 +64,10 @@ RETRO: tuple[Jatek, ...] = (
     Jatek("rulibuli", "Rulibuli",
           "Egyszerűsített rulett: a szám páros vagy páratlan lesz-e?",
           szerzo=TURAI, ev="1996"),
-    Jatek("gyufa", "Gyufapöci",
-          "Pöcköld a gyufásdobozt pontokért – de vigyázz, a kockázat visszaüthet.",
-          szerzo=VAKODA, ev="1993"),
+    Jatek("gyufa", "Gyufapöckölő játék",
+          "Pöcköld a gyufásdobozt pontokért (2, 5 vagy a csoda 10) – tartsd meg "
+          "vagy kockáztass tovább; 1–5 játékos és a Brailab gép ellen az "
+          "elérendő pontszámig. A hivatalos Homelab-forrás hű átültetése."),
 
     # ---- logika / stratégia ----
     Jatek("mastermind", "Mastermind (kódtörő)",

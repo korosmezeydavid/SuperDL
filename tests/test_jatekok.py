@@ -463,38 +463,51 @@ def test_rulibuli_jatszhato_es_kilep():
     _fut("rulibuli", _RulibuliBot())
 
 
-def test_gyufa_veget_er():
-    def bot(k, ki):
-        kl = k.lower()
-        if "pontig" in kl:
-            return "10"
-        if "pöckölj" in kl:
-            return ""            # a JÁTÉKOS indítja az első pöckölést
-        if "megtartod" in kl:
-            return "m"
-        return ""
-    ki = _fut("gyufa", bot)
-    assert any("pont" in p for _, p in ki)
+def _gyufapoc_bot(k, ki):
+    kl = k.lower()
+    if "szabályokat" in kl:
+        return "n"
+    if "elérendő pontszám" in kl:
+        return "6"
+    if "hányan" in kl:
+        return "1"
+    if "írd ide a neved" in kl:
+        return "Dávid"
+    if "pöckölj" in kl:            # pöckölés-felszólítás (a JÁTÉKOS indítja)
+        return "p"
+    if "folytatod vagy marad" in kl:
+        return "m"                 # az első pontnál bankolunk
+    if "játszunk még" in kl:
+        return "n"
+    return ""
 
 
-def test_gyufa_elso_pockolest_a_jatekos_inditja():
-    """Homelab-listás bug: eddig a gép pöckölt az első körben a játékos helyett.
-    Most a „Te jössz." után a JÁTÉKOST kéri pöckölni, mielőtt pont születne."""
-    def bot(k, ki):
-        kl = k.lower()
-        if "pontig" in kl:
-            return "10"
-        if "pöckölj" in kl:
-            return ""
-        if "megtartod" in kl:
-            return "m"
-        return ""
-    ki = _fut("gyufa", bot)
-    # az első „Te jössz." után a következő KÉRDÉS a pöckölésre szólít fel
-    tipusok = [(t, p) for t, p in ki]
-    tj = next(i for i, (t, p) in enumerate(tipusok) if t == "mond" and "Te jössz" in p)
-    kov_kerdes = next(p for t, p in tipusok[tj:] if t == "kerdez")
-    assert "öckölj" in kov_kerdes         # „Pöckölj egyet!" – nem azonnali eredmény
+def test_gyufapoc_forrashu_lezarul():
+    """A GYUFAPOC forráshű átültetése: szabály-kérdés, elérendő pontszám,
+    játékosszám, majd P-vel pöckölés a Brailab gép ellen a célpontszámig."""
+    ki = _fut("gyufa", _gyufapoc_bot)
+    assert any("GYUFAPÖCKÖLŐ JÁTÉK" in p for _, p in ki)
+    assert any("Brailab" in p for _, p in ki)       # a gép mint Brailab
+    assert ki[-1][0] == "vege"
+
+
+def test_gyufapoc_elso_pockolest_a_jatekos_inditja():
+    """Homelab-listás bug: eddig a gép pöckölt a játékos helyett. Most az első
+    dobás-eredmény ELŐTT a JÁTÉKOST kéri pöckölni (P)."""
+    ki = _fut("gyufa", _gyufapoc_bot)
+    tipusok = list(ki)
+    kezd = next(i for i, (t, p) in enumerate(tipusok)
+                if t == "mond" and "kezdd el a játékot" in p)
+    kov_kerdes = next(p for t, p in tipusok[kezd:] if t == "kerdez")
+    assert "pöckölj" in kov_kerdes.lower()          # nem azonnali gép-dobás
+
+
+def test_gyufapoc_szabaly_menupont():
+    """Az 'i'-re kiírja a szabályt (pöckölés-pontok), majd 'Értetted?'-re tovább."""
+    lepesek = iter(["i", "i", "2", "1", "Teszt", "p", "m", "n"])
+    ki = U.lejatsz(JR.REGISZTER["gyufa"], lepesek)
+    assert any("népszerű játék" in p for _, p in ki)
+    assert ki[-1][0] == "vege"
 
 
 # =========================================================================
