@@ -212,6 +212,12 @@ def jatek_szamkit1(ctx):
 # kimarad!). Kérdőjellel letapogatható a mező. Üzenetek a forrásból.
 _AMOBA_BETUK = "ABCDEFGHIJKLMNOPR"      # 17 betű, a Q szándékosan kimarad
 _AMOBA_N = 17
+# a gép SZÖVEGES DUMÁJA lépéskor (a forrásból – ez adja a játék humorát)
+_AMOBA_DUMA = (
+    "MEGVAN.", "TESSÉK.", "ÍGY NI!", "NESZE TE TRÓGER!", "NA, ERRE MIT LÉPSZ?",
+    "MICSODA EGY ERŐSZAKOS EMBER VAGY!", "EZ TÉNYLEG NEM FÉR A BŐRÉBEN!",
+    "CSAK NEM FORGATSZ VALAMIT A FEJEDBEN?",
+)
 
 
 def _amoba_koord(v):
@@ -341,6 +347,7 @@ def jatek_amoba(ctx):
             yield ctx.mond("Gondolkodom.")
             gr, gc = _amoba_lep(board, vedekezo)
             board[gr][gc] = "O"
+            yield ctx.mond(random.choice(_AMOBA_DUMA))     # a forrás humoros dumája
             yield ctx.mond(f"Lépek: {_AMOBA_BETUK[gc]} {_AMOBA_BETUK[gr]}.")
             if _amoba_nyer(board, gr, gc, "O"):
                 yield ctx.mond("MA NEM VAGY FORMÁBAN    MOST ÉN NYERTEM!")
