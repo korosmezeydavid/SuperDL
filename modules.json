@@ -118,11 +118,11 @@
       "category": "Média",
       "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: némítás (Ctrl+M) – a hallgatott hang elnémítható, miközben a felvétel zavartalanul tovább megy. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
       "latest": {
-        "version": "1.1.5",
+        "version": "1.1.6",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.5/radio-1.1.5.zip",
-        "sha256": "8199c347ca8b8ca070c4140ae09ed693475e010031466314f38578b9d3a3e1de",
-        "size": 18265
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.6/radio-1.1.6.zip",
+        "sha256": "2cc735c7fb7a6d00dcac425e04ece3b6f375d633eae145f91fc88228e40c7b63",
+        "size": 18355
       }
     },
     {
