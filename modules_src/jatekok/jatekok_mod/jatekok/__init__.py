@@ -68,6 +68,8 @@ REGISZTER = {
     "dobokoc": homelab.jatek_dobokoc,
     "kocka": homelab.jatek_kocka,
     "fejtoro": homelab.jatek_fejtoro,
+    "kockaparti": homelab.jatek_kockaparti,
+    "celozz": homelab.jatek_celozz,
 }
 
 

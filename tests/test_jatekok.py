@@ -267,6 +267,68 @@ def test_fejtoro_ures_valasz_buta_ag():
     assert any("ELÉGTELEN" in p for _, p in ki)   # 10×(−10) → elégtelen
 
 
+def test_kockaparti_ket_menet_eredmenyhirdetes():
+    """KOCKAPARTI: te szabod meg a menetszámot; 2 menet után eredményhirdetés."""
+    def bot(k, ki):
+        kl = k.lower()
+        if "utónev" in kl:
+            return "Dávid"
+        if "ismertetőt" in kl:
+            return "n"
+        if "kezdhetjük" in kl:
+            return "i"
+        if "hány menet" in kl:
+            return "2"
+        if "te dobsz" in kl:
+            return "k"
+        if "visszavágót" in kl:
+            return "n"
+        return ""
+    ki = _fut("kockaparti", bot)
+    assert any("EREDMÉNYHIRDETÉS" in p for _, p in ki)
+
+
+def test_kockaparti_ervenytelen_menetszam():
+    """0 vagy 100 fölötti menetszámra a forrás szövegével reklamál, majd újrakér."""
+    def bot(k, ki):
+        kl = k.lower()
+        if "utónev" in kl:
+            return "Dávid"
+        if "ismertetőt" in kl:
+            return "n"
+        if "kezdhetjük" in kl:
+            return "i"
+        if "hány menet" in kl:
+            # először 0 (túl kicsi), majd 200 (túl nagy), végül 1
+            n = sum(1 for t, p in ki if t == "kerdez" and "hány menet" in p.lower())
+            return {1: "0", 2: "200"}.get(n, "1")
+        if "te dobsz" in kl:
+            return "k"
+        if "visszavágót" in kl:
+            return "n"
+        return ""
+    ki = _fut("kockaparti", bot)
+    assert any("NE SZÓRAKOZZÁL VELEM" in p for _, p in ki)
+    assert any("TÚL NAGY SZÁM" in p for _, p in ki)
+
+
+def test_celozz_schuck_antal_es_lezarul():
+    """CÉLOZZ: a szerző (Schuck Antal) ajánlása elhangzik; a parti rendben zárul
+    (10 lövedék után hadbíróság vagy találat, majd nemleges maradás)."""
+    def bot(k, ki):
+        kl = k.lower()
+        if "felkészültél" in kl:
+            return "i"
+        if "koordinátát" in kl:
+            return "1"
+        if "maradsz" in kl:
+            return "n"
+        return ""
+    ki = _fut("celozz", bot)
+    assert any("Schuck Antal" in p for _, p in ki)
+    assert any("VISZONTLÁTÁSRA" in p for _, p in ki)
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()

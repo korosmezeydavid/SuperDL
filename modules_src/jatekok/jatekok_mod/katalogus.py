@@ -197,6 +197,13 @@ RETRO: tuple[Jatek, ...] = (
     Jatek("fejtoro", "Fejtörő – matematika",
           "A HOMELAB 4 gép tíz szorzási feladatot ad; a jó válasz öt pont, a "
           "rossz mínusz tíz, a végén osztályzatot kapsz a tudásodra."),
+    Jatek("kockaparti", "Kockaparti – tetszőleges menet",
+          "Mint a kockajáték, de te szabod meg, hány menet legyen a forduló "
+          "(1–100); döntetlennél visszavágót kérhetsz a gép ellen."),
+    Jatek("celozz", "Célozz a hajóra!",
+          "Tengeri tüzérjáték 20-szor 20-as mezőn: rejtett ellenséges hajó, "
+          "10 lövedék, égtáj-visszajelzés – süllyeszd el, vagy jön a hadbíróság!",
+          szerzo="Schuck Antal", ev="1987"),
 )
 
 
