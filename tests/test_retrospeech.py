@@ -428,6 +428,16 @@ def test_a_hangero_szabalyzo_hat():
     assert float(np.max(np.abs(x_h))) > float(np.max(np.abs(x_l)))
 
 
+def test_kattanas_mentes_indulas_es_zaras():
+    """A KATTOGÁS ellen (listás visszajelzés): a hang 0-ról fel- és 0-ra
+    leúsztatva indul/zárul (nincs pattanás az elején/végén), és az első pár
+    minta növekvő (fade-in)."""
+    x, _ = RS.szintetizal("Válassz játékot!", RS.gep("gep_melv"))
+    assert x.size > 20
+    assert abs(float(x[0])) < 1e-6 and abs(float(x[-1])) < 1e-6
+    assert abs(float(x[0])) <= abs(float(x[3]))       # felúsztatás
+
+
 def test_az_uj_szabalyzok_nem_tornek_el_semmit():
     """Minden karakter épkézláb beszédet ad (nem NaN, nem néma, nem vág).
     Az eSpeak-Klatt (BraiLab) hang eSpeaket igényel; ahol az nincs (pl. Linux

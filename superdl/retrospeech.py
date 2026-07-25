@@ -463,8 +463,8 @@ def szintetizal(szoveg: str, g: RetroGep):
         ZONGE[v] = 0.0 if h.tipus in ("zongetlen", "szunet") else 1.0
         if h.tipus == "perges":          # „r": gyors amplitúdó-pergetés
             t = np.arange(n) / fs
-            AMP[v] = amp * (0.55 + 0.45 * np.sign(
-                np.sin(2 * math.pi * 26.0 * t)))
+            # SZINUSZOS pergetés (nem négyszög): a np.sign kemény élei kattantak
+            AMP[v] = amp * (0.6 + 0.4 * np.sin(2 * math.pi * 26.0 * t))
         poz += n
 
     # rövid átcsúsztatás a határokon (atmenet_ms) – kicsi érték = darabos
@@ -473,6 +473,15 @@ def szintetizal(szoveg: str, g: RetroGep):
         k = np.ones(at) / at
         for arr in (F1, F2, F3, B1, B2, B3, AMP):
             arr[:] = np.convolve(arr, k, mode="same")
+    # A ZÖNGE/ZAJ kapuját KÜLÖN, kicsit hosszabban (~8 ms) simítjuk: a zöngés↔
+    # zöngétlen és a zaj be/ki KEMÉNY lépcsője kattant minden fonéma-határon
+    # („ahogy formálja a szavakat"). A formáns-lépcsőt (retró karakter) nem
+    # bántjuk – csak a gerjesztés kapuját lágyítjuk, így megszűnik a kattogás.
+    atz = max(at, int(fs * 0.008))
+    if atz > 1:
+        kz = np.ones(atz) / atz
+        ZONGE[:] = np.convolve(ZONGE, kz, mode="same")
+        ZAJ[:] = np.convolve(ZAJ, kz, mode="same")
 
     # --- 3) gerjesztés: zöngés impulzussor + zaj ---
     rng = np.random.default_rng(4242)
@@ -555,6 +564,13 @@ def szintetizal(szoveg: str, g: RetroGep):
     if g.bitek:
         lepcsok = float(2 ** (g.bitek - 1))
         ki = np.round(ki * lepcsok) / lepcsok
+    # KATTANÁS-MENTES INDÍTÁS/ZÁRÁS: rövid (~6 ms) fel-/leúsztatás a legelső és
+    # legutolsó mintáknál, hogy a hang ne PATTANJON az elején/végén.
+    nf = min(ki.size // 2, max(1, int(fs * 0.006)))
+    if nf > 1:
+        ramp = np.linspace(0.0, 1.0, nf)
+        ki[:nf] *= ramp
+        ki[-nf:] *= ramp[::-1]
     return ki, fs
 
 
