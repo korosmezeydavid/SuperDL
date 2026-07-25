@@ -11,6 +11,10 @@ AUDIO_FORMATS = ["MP3", "M4A", "OPUS", "FLAC", "WAV", "AAC"]
 VIDEO_FORMATS = ["MP4", "MKV", "WEBM"]
 AUDIO_BITRATES = ["128", "192", "256", "320"]
 SAMPLERATES = [("Eredeti", ""), ("44100 Hz", "44100"), ("48000 Hz", "48000")]
+# Rádiófelvétel: formátum (címke, tárolt kulcs) és választható bitráták
+RADIO_REC_FORMATS = [("MP3 (univerzális)", "mp3"),
+                     ("Opus, OGG (kisebb fájl, jobb minőség)", "opus")]
+RADIO_REC_BITRATES = ["64", "96", "128", "160", "192", "256", "320"]
 COOKIE_CHOICES = ["Nincs", "Chrome", "Firefox", "Edge", "Brave", "Opera",
                   "Vivaldi", "Chromium", "cookies.txt fájl…"]
 VOICE_LABELS = [
@@ -50,6 +54,7 @@ class SettingsDialog(wx.Dialog):
         outer = wx.BoxSizer(wx.VERTICAL)
         self.nb = wx.Notebook(self)
         self.nb.AddPage(self._page_download(), "Letöltés")
+        self.nb.AddPage(self._page_radiorec(), "Rádió felvétel")
         self.nb.AddPage(self._page_cookies(), "Fiók / Sütik")
         self.nb.AddPage(self._page_general(), "Általános")
         self.nb.AddPage(self._page_sound(), "Hangjelzések / Beszéd")
@@ -150,6 +155,57 @@ class SettingsDialog(wx.Dialog):
         v.Add(self.c_playlist, 0, wx.ALL, 10)
         p.SetSizer(v)
         return p
+
+    # ---- Rádió felvétel fül -------------------------------------------
+
+    def _page_radiorec(self):
+        p = wx.Panel(self.nb)
+        v = wx.BoxSizer(wx.VERTICAL)
+        rr = self.s.get("radiorec", {}) or {}
+        v.Add(wx.StaticText(p, label="A rádiófelvételek formátuma, minősége és "
+                            "darabolása. A hosszú adást egyben vagy percenkénti "
+                            "darabokban is rögzítheted."), 0, wx.ALL, 8)
+
+        self.c_rrfmt = wx.Choice(p, choices=[t for t, _ in RADIO_REC_FORMATS])
+        cur_fmt = str(rr.get("format", "mp3")).lower()
+        self.c_rrfmt.SetSelection(next(
+            (i for i, (_, val) in enumerate(RADIO_REC_FORMATS)
+             if val == cur_fmt), 0))
+        self._row(p, v, "&Formátum:", self.c_rrfmt)
+
+        self.c_rrbr = wx.Choice(p, choices=RADIO_REC_BITRATES)
+        if self.c_rrbr.SetStringSelection(
+                str(rr.get("bitrate_kbps", 192))) is False:
+            self.c_rrbr.SetStringSelection("192")
+        self._row(p, v, "&Bitráta (kbps – nagyobb = jobb minőség):", self.c_rrbr)
+
+        self.c_rrsr = wx.Choice(p, choices=[t for t, _ in SAMPLERATES])
+        cur_sr = str(rr.get("sample_rate", "") or "")
+        self.c_rrsr.SetSelection(next(
+            (i for i, (_, val) in enumerate(SAMPLERATES) if val == cur_sr), 0))
+        self._row(p, v, "&Mintavétel:", self.c_rrsr)
+
+        self.c_rrsplit = wx.RadioBox(
+            p, label="Felvétel módja",
+            choices=["Egyben – egyetlen fájl (akár 6 óra is)",
+                     "Darabolva – percenkénti fájlok"],
+            majorDimension=1, style=wx.RA_SPECIFY_COLS)
+        self.c_rrsplit.SetName("Felvétel módja")
+        self.c_rrsplit.SetSelection(
+            1 if int(rr.get("chunk_minutes", 0) or 0) > 0 else 0)
+        self.c_rrsplit.Bind(wx.EVT_RADIOBOX, lambda e: self._rr_split_toggle())
+        v.Add(self.c_rrsplit, 0, wx.EXPAND | wx.ALL, 8)
+
+        init_min = int(rr.get("chunk_minutes", 0) or 0)
+        self.c_rrmin = wx.SpinCtrl(p, min=1, max=360,
+                                   initial=init_min if init_min >= 1 else 30)
+        self._row(p, v, "Egy &darab hossza (perc):", self.c_rrmin)
+        self._rr_split_toggle()
+        p.SetSizer(v)
+        return p
+
+    def _rr_split_toggle(self):
+        self.c_rrmin.Enable(self.c_rrsplit.GetSelection() == 1)
 
     # ---- Fiók / Sütik fül ---------------------------------------------
 
@@ -435,6 +491,14 @@ class SettingsDialog(wx.Dialog):
             "video_format": self.c_vfmt.GetStringSelection() or "MP4",
             "audio_bitrate": self.c_abr.GetStringSelection() or "192",
             "audio_samplerate": SAMPLERATES[self.c_asr.GetSelection()][1],
+            "radiorec": {
+                "format": RADIO_REC_FORMATS[self.c_rrfmt.GetSelection()][1],
+                "bitrate_kbps": int(self.c_rrbr.GetStringSelection() or "192"),
+                "sample_rate":
+                    int(SAMPLERATES[self.c_rrsr.GetSelection()][1] or 0),
+                "chunk_minutes": (self.c_rrmin.GetValue()
+                                  if self.c_rrsplit.GetSelection() == 1 else 0),
+            },
             "seed_ratio": self.c_seed.GetValue().strip() or "1.0",
             "playlist_folders": self.c_playlist.GetValue(),
             "cookies": self.c_cookies.GetStringSelection() or "Nincs",

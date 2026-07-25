@@ -42,12 +42,51 @@ def _safe(name: str) -> str:
     return (name or "rádió")[:80]
 
 
-def _out_path(base_dir: str, station_name: str, when: datetime) -> Path:
+# A választható felvételi formátumok: kulcs → (ffmpeg-kódoló, kiterjesztés,
+# szegmens-formátum a daraboláshoz). MP3 = univerzális; Opus = jobb minőség
+# kisebb méreten (mindkettő tisztán darabolható a segment muxerrel).
+_FORMATUMOK = {
+    "mp3":  ("libmp3lame", "mp3", "mp3"),
+    "opus": ("libopus",    "ogg", "ogg"),
+}
+
+
+def _norm_opts(options) -> dict:
+    """A beállításokból (dict) egységes felvételi opciók: kódoló, kiterjesztés,
+    bitráta, mintavétel, darab-hossz. Hibás/hiányzó érték → biztonságos alap."""
+    o = options or {}
+    fmt = str(o.get("format", "mp3")).lower()
+    encoder, ext, segfmt = _FORMATUMOK.get(fmt, _FORMATUMOK["mp3"])
+    try:
+        br = int(o.get("bitrate_kbps", 192))
+    except (TypeError, ValueError):
+        br = 192
+    br = min(max(br, 32), 320)
+    try:
+        chunk_min = max(0, int(o.get("chunk_minutes", 0)))
+    except (TypeError, ValueError):
+        chunk_min = 0
+    try:
+        sr = int(o.get("sample_rate", 0) or 0)
+    except (TypeError, ValueError):
+        sr = 0
+    return {"encoder": encoder, "ext": ext, "segfmt": segfmt,
+            "bitrate_kbps": br, "bitrate": f"{br}k",
+            "chunk_seconds": chunk_min * 60, "sample_rate": sr}
+
+
+def _rec_folder(base_dir: str, when: datetime) -> Path:
     # a vezető/záró szóköz Windowson WinError 123-at okoz (' C:\\...' érvénytelen)
     base = str(base_dir or "").strip() or str(Path.home() / "Downloads")
     folder = Path(base) / "Rádiófelvételek" / when.strftime("%Y-%m-%d")
     folder.mkdir(parents=True, exist_ok=True)
-    fname = f"{_safe(station_name)} {when.strftime('%Y-%m-%d %H-%M-%S')}.mp3"
+    return folder
+
+
+def _out_path(base_dir: str, station_name: str, when: datetime,
+              ext: str = "mp3") -> Path:
+    folder = _rec_folder(base_dir, when)
+    fname = f"{_safe(station_name)} {when.strftime('%Y-%m-%d %H-%M-%S')}.{ext}"
     return folder / fname
 
 
@@ -55,14 +94,24 @@ class ActiveRecording:
     """Egyetlen, épp futó (vagy frissen befejezett) felvétel."""
 
     def __init__(self, station_name, url, base_dir, duration_s=None,
-                 scheduled=False, on_done=None):
+                 scheduled=False, on_done=None, options=None):
         self.station_name = station_name
         self.url = url
         self.duration_s = duration_s
         self.scheduled = scheduled
         self.on_done = on_done
+        self.opts = _norm_opts(options)
+        self.ext = self.opts["ext"]
+        self.chunk_seconds = self.opts["chunk_seconds"]
         self.start_time = datetime.now()
-        self.path = _out_path(base_dir, station_name, self.start_time)
+        self._folder = _rec_folder(base_dir, self.start_time)
+        self._stem = (f"{_safe(station_name)} "
+                      f"{self.start_time.strftime('%Y-%m-%d %H-%M-%S')}")
+        # darabolt módban self.path REPREZENTATÍV (a .parent a mappa); a valódi
+        # kimenet a szegmens-minta (…- 000.mp3, - 001.mp3, …)
+        self.path = self._folder / f"{self._stem}.{self.ext}"
+        self._pattern = (str(self._folder / f"{self._stem} - %03d.{self.ext}")
+                         if self.chunk_seconds > 0 else None)
         self.status = "felvétel"        # felvétel / kész / leállítva / hiba
         self.error = ""
         self._proc = None
@@ -89,10 +138,20 @@ class ActiveRecording:
         # újracsatlakozás kezeli, ne az időkorlát ölje meg a felvételt
         cmd += ["-rw_timeout", "45000000",
                 "-i", self.url, "-vn",
-                "-c:a", "libmp3lame", "-b:a", "192k"]
+                "-c:a", self.opts["encoder"], "-b:a", self.opts["bitrate"]]
+        if self.opts["sample_rate"]:
+            cmd += ["-ar", str(self.opts["sample_rate"])]
         if self.duration_s and self.duration_s > 0:
             cmd += ["-t", str(int(self.duration_s))]
-        cmd += ["-y", str(self.path)]
+        if self.chunk_seconds > 0:
+            # DARABOLÁS: a segment muxer N másodpercenként új fájlt nyit, akár
+            # 6 órán át – így a hosszú adás is kezelhető darabokban marad
+            cmd += ["-f", "segment",
+                    "-segment_time", str(self.chunk_seconds),
+                    "-segment_format", self.opts["segfmt"],
+                    "-reset_timestamps", "1", "-y", self._pattern]
+        else:
+            cmd += ["-y", str(self.path)]
         try:
             # a hibakimenetet NEM dobjuk el (eddig DEVNULL-ra ment = néma
             # megállás); elmentjük az utolsó sorait, hogy hibánál a VALÓDI okot
@@ -150,11 +209,27 @@ class ActiveRecording:
             except Exception:
                 pass
 
-    def _recorded_seconds(self) -> float:
-        """A ténylegesen RÖGZÍTETT hang hossza másodpercben (ffprobe-bal). Ez a
-        MEGBÍZHATÓ mérték: az élő stream az elején puffer-löketet küldhet, ezért
-        a fali óra rövidebb lehet, mint a rögzített hang – ne a fali órából
-        döntsük el, teljes-e a felvétel."""
+    def _output_files(self) -> list:
+        """A ténylegesen létrejött kimeneti fájl(ok): egyben módban egy, darabolt
+        módban a szegmensek (időrendben)."""
+        if self.chunk_seconds > 0:
+            try:
+                return sorted(self._folder.glob(f"{self._stem} - *.{self.ext}"))
+            except OSError:
+                return []
+        try:
+            return [self.path] if self.path.is_file() else []
+        except OSError:
+            return []
+
+    def hely_szoveg(self) -> str:
+        """Hova került a felvétel – a felhasználónak bemondható/megjeleníthető."""
+        if self.chunk_seconds > 0:
+            return f"{self._folder} mappa ({len(self._output_files())} részben)"
+        return str(self.path)
+
+    @staticmethod
+    def _probe_seconds(path) -> float:
         try:
             ff = _ffmpeg_exe()
             if not ff:
@@ -165,11 +240,18 @@ class ActiveRecording:
             flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
             r = subprocess.run(
                 [probe, "-v", "error", "-show_entries", "format=duration",
-                 "-of", "default=nk=1:nw=1", str(self.path)],
+                 "-of", "default=nk=1:nw=1", str(path)],
                 capture_output=True, text=True, timeout=20, creationflags=flags)
             return float((r.stdout or "0").strip() or 0)
         except Exception:
             return 0.0
+
+    def _recorded_seconds(self) -> float:
+        """A ténylegesen RÖGZÍTETT hang összhossza másodpercben (ffprobe-bal, az
+        összes kimeneti fájlon). Ez a MEGBÍZHATÓ mérték: az élő stream az elején
+        puffer-löketet küldhet, ezért a fali óra rövidebb lehet, mint a rögzített
+        hang – ne a fali órából döntsük el, teljes-e a felvétel."""
+        return sum(self._probe_seconds(f) for f in self._output_files())
 
     def _premature(self) -> bool:
         """VÁRATLANUL ért véget? Időzítettnél: a kértnél érdemben rövidebb lett.
@@ -182,18 +264,19 @@ class ActiveRecording:
             rogzitett = self._recorded_seconds()
             if rogzitett > 0:
                 return rogzitett < self.duration_s * 0.9
-            # ha az ffprobe nem mér, a FÁJLMÉRETBŐL becslünk (192 kbps ≈ 24000
-            # bájt/mp) – ez is jobb, mint a fali óra
+            # ha az ffprobe nem mér, a FÁJLMÉRET(EK)BŐL becslünk – a bitrátához
+            # igazítva (bájt/mp ≈ kbps × 1000 / 8); ez is jobb, mint a fali óra
             try:
-                sz = self.path.stat().st_size
+                sz = sum(f.stat().st_size for f in self._output_files())
             except OSError:
                 sz = 0
-            return sz < self.duration_s * 24000 * 0.9
+            bps = self.opts["bitrate_kbps"] * 1000 / 8
+            return sz < self.duration_s * bps * 0.9
         return True
 
     def _has_audio(self) -> bool:
         try:
-            return self.path.is_file() and self.path.stat().st_size > 8192
+            return any(f.stat().st_size > 8192 for f in self._output_files())
         except OSError:
             return False
 
@@ -283,8 +366,9 @@ class RecordManager:
               "end_m", "repeat", "weekdays", "date", "enabled",
               "last_run_date"}
 
-    def __init__(self, base_dir_getter, on_event=None):
+    def __init__(self, base_dir_getter, on_event=None, options_getter=None):
         self._base_dir_getter = base_dir_getter      # hívható -> str
+        self._options_getter = options_getter        # hívható -> dict (felvételi opciók)
         self.on_event = on_event                     # hívható(szöveg, szint)
         self.last_error = ""                         # az utolsó indítási hiba
         self.active: list[ActiveRecording] = []
@@ -312,6 +396,14 @@ class RecordManager:
         except Exception:
             d = ""
         return (d or "").strip() or str(Path.home() / "Downloads")
+
+    def options(self) -> dict:
+        """A felhasználó felvételi beállításai (formátum, bitráta, mintavétel,
+        darabolás). Hiba/hiányzó getter esetén üres → mindenütt biztonságos alap."""
+        try:
+            return self._options_getter() or {} if self._options_getter else {}
+        except Exception:
+            return {}
 
     def _emit(self, text, level="info"):
         if self.on_event:
@@ -352,7 +444,7 @@ class RecordManager:
     def start_manual(self, station_name, url, duration_s=None):
         rec = ActiveRecording(station_name, url, self.base_dir(),
                               duration_s=duration_s, scheduled=False,
-                              on_done=self._on_done)
+                              on_done=self._on_done, options=self.options())
         if rec.start():
             self.last_error = ""
             with self._lock:
@@ -421,7 +513,7 @@ class RecordManager:
     def _fire(self, s: Schedule, duration: int, today: str):
         rec = ActiveRecording(s.station_name, s.url, self.base_dir(),
                               duration_s=duration, scheduled=True,
-                              on_done=self._on_done)
+                              on_done=self._on_done, options=self.options())
         if rec.start():
             s.last_run_date = today
             if s.repeat == "once":

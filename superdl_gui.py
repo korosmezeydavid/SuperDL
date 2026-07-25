@@ -324,7 +324,8 @@ class MainFrame(wx.Frame):
         self._record_mgr = RecordManager(
             lambda: self.dir_entry.GetValue(),
             on_event=lambda text, level:
-                wx.CallAfter(self._on_record_event, text, level))
+                wx.CallAfter(self._on_record_event, text, level),
+            options_getter=lambda: self.settings.get("radiorec", {}))
 
         # naptár/szervező: az emlékeztetők és az időzített akciók akkor is
         # elsülnek, ha a szervező-ablak épp zárva van (a program fusson)

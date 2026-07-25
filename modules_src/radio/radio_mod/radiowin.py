@@ -594,9 +594,11 @@ class RadioFrame(wx.Frame):
                 for r in running:
                     r.stop()
                 # MONDJUK MEG, HOVÁ MENTETTÜK – gyakori panasz, hogy „nem
-                # találom": a fájl a célmappa Rádiófelvételek almappájában
+                # találom": a hely_szoveg egyben/darabolt módban is helyes
+                # (getattr: régi Core-on a sima útvonalat mondjuk)
+                hova = getattr(utolso, "hely_szoveg", lambda: str(utolso.path))()
                 self._announce(f"Felvétel leállítva és elmentve: {st.name}. "
-                               f"A fájl helye: {utolso.path}", focus=True)
+                               f"A fájl helye: {hova}", focus=True)
                 return
             ok, netmsg = _net_ok("a rádiófelvételhez")   # felvételhez net kell
             if not ok:

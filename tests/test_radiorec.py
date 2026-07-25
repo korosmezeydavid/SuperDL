@@ -95,6 +95,39 @@ def test_out_path_vezeto_szokoz_nem_okoz_winerror(tmp_path):
     assert "Rádiófelvételek" in str(p)
 
 
+def test_norm_opts_alap_egyeni_es_hibas():
+    o = rr._norm_opts({})
+    assert o["encoder"] == "libmp3lame" and o["bitrate"] == "192k"
+    assert o["chunk_seconds"] == 0 and o["ext"] == "mp3"
+    o2 = rr._norm_opts({"format": "opus", "bitrate_kbps": 96,
+                        "chunk_minutes": 30, "sample_rate": 48000})
+    assert o2["encoder"] == "libopus" and o2["ext"] == "ogg"
+    assert o2["chunk_seconds"] == 1800 and o2["bitrate"] == "96k"
+    assert o2["sample_rate"] == 48000
+    o3 = rr._norm_opts({"format": "x", "bitrate_kbps": "nem", "chunk_minutes": -5})
+    assert o3["encoder"] == "libmp3lame" and o3["chunk_seconds"] == 0
+
+
+def test_darabolt_felvetel_szegmens_parancs(tmp_path):
+    """Darabolt módban a start() a segment muxert használja, %03d-mintával."""
+    r = rr.ActiveRecording("T", "http://x/s", tmp_path,
+                           options={"chunk_minutes": 5, "bitrate_kbps": 128})
+    assert r.chunk_seconds == 300
+    assert r._pattern and "%03d" in r._pattern
+    src = inspect.getsource(rr.ActiveRecording.start)
+    assert '"-f", "segment"' in src and '"-segment_time"' in src
+
+
+def test_output_files_es_hely_szoveg_darabolt(tmp_path):
+    r = rr.ActiveRecording("T", "http://x/s", tmp_path,
+                           options={"chunk_minutes": 1})
+    (r._folder / f"{r._stem} - 000.mp3").write_bytes(b"x" * 20000)
+    (r._folder / f"{r._stem} - 001.mp3").write_bytes(b"x" * 20000)
+    assert len(r._output_files()) == 2
+    assert "2 részben" in r.hely_szoveg()
+    assert r._has_audio() is True
+
+
 def test_start_manual_last_error_a_valodi_okot_adja(tmp_path, monkeypatch):
     """Ha a felvétel nem indul (pl. hiányzó ffmpeg), a kezelő a VALÓDI okot a
     last_error-ba teszi – ezt a rádióablak HANGOSAN felolvassa, nem néma."""
