@@ -429,9 +429,16 @@ def test_a_hangero_szabalyzo_hat():
 
 
 def test_az_uj_szabalyzok_nem_tornek_el_semmit():
-    """Minden karakter épkézláb beszédet ad (nem NaN, nem néma, nem vág)."""
+    """Minden karakter épkézláb beszédet ad (nem NaN, nem néma, nem vág).
+    Az eSpeak-Klatt (BraiLab) hang eSpeaket igényel; ahol az nincs (pl. Linux
+    CI), azt a karaktert kihagyjuk – a kiadott programban mindig van eSpeak."""
     for g in RS.GEPEK:
-        x, _ = RS.szintetizal("Árvíztűrő tükörfúrógép ma!", g)
+        try:
+            x, _ = RS.szintetizal("Árvíztűrő tükörfúrógép ma!", g)
+        except RuntimeError as e:
+            if "eSpeak" in str(e) or "beszédmotor" in str(e):
+                continue
+            raise
         assert not np.isnan(x).any(), f"{g.kulcs}: NaN"
         assert 0.5 < float(np.max(np.abs(x))) <= 1.0, f"{g.kulcs}: rossz szint"
 
