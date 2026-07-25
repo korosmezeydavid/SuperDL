@@ -82,3 +82,15 @@ def test_reconnect_csak_http_nal():
     assert 'startswith(("http://", "https://"))' in src
     # a hibakimenet NEM mehet a kukába (különben néma a megállás)
     assert "stderr=subprocess.PIPE" in src
+
+
+def test_start_manual_last_error_a_valodi_okot_adja(tmp_path, monkeypatch):
+    """Ha a felvétel nem indul (pl. hiányzó ffmpeg), a kezelő a VALÓDI okot a
+    last_error-ba teszi – ezt a rádióablak HANGOSAN felolvassa, nem néma."""
+    mgr = rr.RecordManager(lambda: str(tmp_path))
+    mgr._stop.set()                                  # az időzítő-szál ne dolgozzon
+    # színleljük, hogy nincs ffmpeg → a start() „hiba"-val tér vissza
+    monkeypatch.setattr(rr, "_ffmpeg_exe", lambda *a, **k: None)
+    r = mgr.start_manual("Teszt", "http://x/stream")
+    assert r is None
+    assert "ffmpeg" in mgr.last_error

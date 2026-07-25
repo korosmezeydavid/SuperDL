@@ -218,9 +218,17 @@ class RadioFrame(wx.Frame):
                           lambda e: self._play(self._selected()))
         v.Add(self.st_list, 3, wx.EXPAND | wx.ALL, 8)
 
-        self.now_label = wx.StaticText(p, label="Most nem szól semmi.")
-        self.now_label.SetName("Lejátszás állapota")
-        v.Add(self.now_label, 0, wx.LEFT | wx.BOTTOM, 8)
+        # Állapot/bejelentés mező. FONTOS akadálymentesség: FÓKUSZÁLHATÓ,
+        # csak-olvasható szövegmező (nem StaticText), mert a képernyőolvasó a
+        # StaticText/státuszsor változását NEM olvassa fel magától. A fontos
+        # bejelentéseknél (pl. felvétel) ide visszük a fókuszt → a képernyő-
+        # olvasó azonnal felolvassa, külön SAPI-hang nélkül.
+        v.Add(wx.StaticText(p, label="Álla&pot:"), 0, wx.LEFT, 8)
+        self.now_label = wx.TextCtrl(
+            p, style=wx.TE_READONLY | wx.TE_MULTILINE | wx.TE_NO_VSCROLL,
+            value="Most nem szól semmi.", size=(-1, 52))
+        self.now_label.SetName("Állapot és bejelentések")
+        v.Add(self.now_label, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
 
         ctl = wx.BoxSizer(wx.HORIZONTAL)
         for label, fn in (("Le&játszás", lambda e: self._play(self._selected())),
@@ -317,14 +325,22 @@ class RadioFrame(wx.Frame):
                 "bitrate": s.bitrate, "country": s.country, "tags": s.tags,
                 "uuid": s.uuid}
 
-    def _announce(self, text):
+    def _announce(self, text, focus=False):
         if self._closing:
             return
         self.SetStatusText(text)
-        self.now_label.SetLabel(text)
-        # A képernyőolvasó a fő bejelentő; a program SAJÁT hangja (selfvoice)
-        # csak OPCIONÁLIS kiegészítés (a beállításokban kapcsolható). NEM
-        # kényszerítünk külön SAPI-hangot a screen reader mellé.
+        self.now_label.SetValue(text)
+        # A képernyőolvasó a fő bejelentő. Mivel a mező változását magától nem
+        # olvassa fel, a FONTOS (felhasználó által kiváltott) bejelentéseknél a
+        # fókuszt ráhelyezzük az állapotmezőre → a képernyőolvasó azonnal
+        # felolvassa. A gyorsbillentyűk ablak-szintűek, így ez nem töri meg
+        # őket. NINCS külön SAPI-hang (a selfvoice csak opcionális kiegészítés).
+        if focus and not self._closing:
+            try:
+                self.now_label.SetFocus()
+                self.now_label.SetInsertionPointEnd()
+            except Exception:
+                pass
         sv = getattr(self.main, "selfvoice", None)
         if sv:
             try:
@@ -517,7 +533,7 @@ class RadioFrame(wx.Frame):
         állomás is felvehető (mindegyiket külön F9-cel indítod/állítod le),
         miközben akár egy másikat hallgatsz."""
         if not self.rec:
-            self._announce("A felvétel-kezelő nem érhető el.")
+            self._announce("A felvétel-kezelő nem érhető el.", focus=True)
             return
         # az állomás: a keresési lista VAGY a KEDVENCEK kijelöltje, vagy ha
         # egyik sincs, az épp szóló adás. (Eddig csak a keresési listát nézte,
@@ -525,24 +541,33 @@ class RadioFrame(wx.Frame):
         st = self._selected() or self._fav_selected_station() or self._cur
         if not st:
             self._announce("Előbb válassz ki egy állomást a felvételhez – a "
-                           "keresési listából vagy a kedvencek közül.")
+                           "keresési listából vagy a kedvencek közül.",
+                           focus=True)
             return
         # erre az állomásra (URL szerint) fut-e már felvétel? → akkor leállítjuk
-        running = [r for r in self.rec.snapshot_active() if r.url == st.url]
-        if running:
-            utolso = running[-1]
-            for r in running:
-                r.stop()
-            # MONDJUK MEG, HOVÁ MENTETTÜK – a leggyakoribb panasz, hogy „nem
-            # találom a felvételt": a fájl a célmappa Rádiófelvételek almappájában
-            self._announce(f"Felvétel leállítva és elmentve: {st.name}. "
-                           f"A fájl helye: {utolso.path}")
+        try:
+            running = [r for r in self.rec.snapshot_active()
+                       if r.url == st.url]
+            if running:
+                utolso = running[-1]
+                for r in running:
+                    r.stop()
+                # MONDJUK MEG, HOVÁ MENTETTÜK – gyakori panasz, hogy „nem
+                # találom": a fájl a célmappa Rádiófelvételek almappájában
+                self._announce(f"Felvétel leállítva és elmentve: {st.name}. "
+                               f"A fájl helye: {utolso.path}", focus=True)
+                return
+            ok, netmsg = _net_ok("a rádiófelvételhez")   # felvételhez net kell
+            if not ok:
+                self._announce(netmsg, focus=True)
+                return
+            r = self.rec.start_manual(st.name, st.url)
+        except Exception as e:
+            # SOHA ne bukjon el némán: a kivételt (pl. hiányzó célmappa, ffmpeg,
+            # jogosultság) HANGOSAN, a képernyőolvasónak felolvasva jelezzük
+            self._announce("A felvétel indítása nem sikerült. Ok: "
+                           f"{e}", focus=True)
             return
-        ok, netmsg = _net_ok("a rádiófelvételhez")   # felvételhez net kell
-        if not ok:
-            self._announce(netmsg)
-            return
-        r = self.rec.start_manual(st.name, st.url)
         if r:
             n = len(self.rec.snapshot_active())
             extra = (f" Most {n} felvétel fut egyszerre." if n > 1 else "")
@@ -550,10 +575,17 @@ class RadioFrame(wx.Frame):
             self._announce(
                 f"Felvétel folyamatban: {st.name}.{extra} A fájl ide kerül: "
                 f"{r.path.parent}. Leállítás: F9 ezen az állomáson, vagy a "
-                "Felvételek kezelése (Ctrl+Shift+F).")
+                "Felvételek kezelése (Ctrl+Shift+F).", focus=True)
         else:
-            self._announce("A felvétel nem indult el – próbáld újra, vagy "
-                           "ellenőrizd, hogy az állomás szól-e.")
+            # a start_manual None-t ad → a kezelő beállította az okot; adjuk
+            # vissza a VALÓDI hibát (pl. „az ffmpeg nem érhető el"), ne csak
+            # egy általános mondatot
+            ok_str = getattr(self.rec, "last_error", "") or ""
+            reszlet = f" Ok: {ok_str}." if ok_str else ""
+            self._announce(
+                "A felvétel nem indult el." + reszlet + " Ellenőrizd, hogy az "
+                "állomás szól-e, és hogy be van-e állítva a célmappa.",
+                focus=True)
 
     def _schedule_dialog(self):
         if not self.rec:

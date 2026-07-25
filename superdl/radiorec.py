@@ -284,6 +284,7 @@ class RecordManager:
     def __init__(self, base_dir_getter, on_event=None):
         self._base_dir_getter = base_dir_getter      # hívható -> str
         self.on_event = on_event                     # hívható(szöveg, szint)
+        self.last_error = ""                         # az utolsó indítási hiba
         self.active: list[ActiveRecording] = []
         self._lock = threading.Lock()
         self.schedules: list[Schedule] = []
@@ -351,11 +352,13 @@ class RecordManager:
                               duration_s=duration_s, scheduled=False,
                               on_done=self._on_done)
         if rec.start():
+            self.last_error = ""
             with self._lock:
                 self.active.append(rec)
             self._emit(f"Felvétel elindult: {station_name} → {rec.path.name}",
                        "start")
             return rec
+        self.last_error = rec.error                   # a VALÓDI ok (pl. ffmpeg)
         self._emit(f"A felvétel nem indult el: {rec.error}", "error")
         return None
 
