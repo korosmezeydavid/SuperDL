@@ -118,11 +118,11 @@
       "category": "Média",
       "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: némítás (Ctrl+M) – a hallgatott hang elnémítható, miközben a felvétel zavartalanul tovább megy. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
       "latest": {
-        "version": "1.1.4",
+        "version": "1.1.5",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.4/radio-1.1.4.zip",
-        "sha256": "0a06f103810bca406dcd54c81b0be5f7468c88bbbc742a5c5258e88115854d75",
-        "size": 17875
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.5/radio-1.1.5.zip",
+        "sha256": "8199c347ca8b8ca070c4140ae09ed693475e010031466314f38578b9d3a3e1de",
+        "size": 18265
       }
     },
     {
@@ -144,12 +144,12 @@
       "category": "Játékok",
       "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód.",
       "latest": {
-        "version": "1.0.0",
+        "version": "1.1.0",
         "min_core_api": "1.0",
         "min_core_version": "4.1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.0.0/jatekok-1.0.0.zip",
-        "sha256": "0f2c5f9d6f7629a3d5fca544cdc04c93f4fcd27e2e48c5f50c64a9dae6e11706",
-        "size": 67475
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.1.0/jatekok-1.1.0.zip",
+        "sha256": "b787d11dd0d306188849a44d901d90af5a08152bf665b3a45697761def003deb",
+        "size": 77213
       }
     }
   ]
