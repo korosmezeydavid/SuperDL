@@ -49,12 +49,12 @@
       "category": "Szervezés",
       "description": "Szervezés-eszközök egy csomagban: akadálymentes Hírolvasó (RSS), Podcast-felfedező, Naptár/teendők/jegyzetek (emlékeztetővel, ICS-szinkronnal) ÚJ rezsi/költség-kalkulátor füllel (havi/éves összesítés, naptári emlékeztetők, opcionális PIN-lakat), és Napi infó (időjárás, névnap).",
       "latest": {
-        "version": "1.3.0",
+        "version": "1.3.1",
         "min_core_api": "1.0",
         "min_core_version": "4.0.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.3.0/szervezes-1.3.0.zip",
-        "sha256": "89fb7879b22700364af1e5b86e320b143e706b3694fc108b05f56ac3225c6765",
-        "size": 30005
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.3.1/szervezes-1.3.1.zip",
+        "sha256": "e513cc9827595d5ff3bd84a56631de5b9a52a2dc677fc156adf685661887846e",
+        "size": 30404
       }
     },
     {
@@ -118,11 +118,11 @@
       "category": "Média",
       "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: némítás (Ctrl+M) – a hallgatott hang elnémítható, miközben a felvétel zavartalanul tovább megy. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
       "latest": {
-        "version": "1.1.3",
+        "version": "1.1.4",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.3/radio-1.1.3.zip",
-        "sha256": "80b9a1207cc755d5dc53bab93079f99b32ae4fcc3a72e05d69938282b8cb8ba8",
-        "size": 16017
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.4/radio-1.1.4.zip",
+        "sha256": "0a06f103810bca406dcd54c81b0be5f7468c88bbbc742a5c5258e88115854d75",
+        "size": 17875
       }
     },
     {
@@ -136,6 +136,20 @@
         "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-hangalamondas-1.0.4/hangalamondas-1.0.4.zip",
         "sha256": "0a1ae8867872e8c2f0b0f532675cd13149ba9de5f451d32a49189ee4d374247c",
         "size": 11313
+      }
+    },
+    {
+      "id": "jatekok",
+      "name": "Játékok",
+      "category": "Játékok",
+      "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód.",
+      "latest": {
+        "version": "1.0.0",
+        "min_core_api": "1.0",
+        "min_core_version": "4.1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.0.0/jatekok-1.0.0.zip",
+        "sha256": "0f2c5f9d6f7629a3d5fca544cdc04c93f4fcd27e2e48c5f50c64a9dae6e11706",
+        "size": 67475
       }
     }
   ]
