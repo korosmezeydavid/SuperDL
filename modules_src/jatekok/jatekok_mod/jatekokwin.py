@@ -10,7 +10,10 @@ import threading
 import wx
 
 from superdl import retrospeech as RS     # a Core SAJÁT formánsszintetizátora
+from superdl import store                 # a választott hang megőrzéséhez
 from . import katalogus
+
+_HANG_CFG = "jatekok.json"                 # a felhasználó hang+tempó beállítása
 
 
 HELP = """JÁTÉKOK
@@ -47,8 +50,15 @@ class JatekokFrame(wx.Frame):
         self._closing = False       # zárás alatt a háttér-callbackek kilépnek
         self._busy = False
         self._player = None
-        self._hang = RS.ALAP_GEP
-        self._tempo = 1.0            # a beszéd időtartam-szorzója (1.0 = alap)
+        # Laci kérése: NE mindig az első hang legyen a modul indulásakor, hanem
+        # amit a felhasználó egyszer beállított. A választást a store-ban őrizzük.
+        cfg = store.load_json(store.CONFIG_DIR / _HANG_CFG, {})
+        kulcsok = [g.kulcs for g in RS.GEPEK]
+        self._hang = cfg.get("hang") if cfg.get("hang") in kulcsok else RS.ALAP_GEP
+        self._tempo_szazalek = int(cfg.get("tempo") or 100)
+        if not 50 <= self._tempo_szazalek <= 160:
+            self._tempo_szazalek = 100
+        self._tempo = 100.0 / self._tempo_szazalek   # a beszéd időtartam-szorzója
         self._sapi = None            # rendszer-TTS tartalék (lusta)
 
         self._build()
@@ -117,13 +127,16 @@ class JatekokFrame(wx.Frame):
         self.hang_lst = wx.ListBox(
             p, choices=[x.nev for x in RS.GEPEK], style=wx.LB_SINGLE)
         self.hang_lst.SetName("Retró hangkarakter")
-        self.hang_lst.SetSelection(0)
+        kulcsok = [x.kulcs for x in RS.GEPEK]
+        self.hang_lst.SetSelection(kulcsok.index(self._hang)
+                                   if self._hang in kulcsok else 0)
         self.hang_lst.Bind(wx.EVT_LISTBOX, lambda e: self._hang_valaszt())
         v.Add(self.hang_lst, 0, wx.EXPAND | wx.ALL, 8)
 
         v.Add(wx.StaticText(
             p, label="&Beszédtempó (nagyobb = gyorsabb):"), 0, wx.LEFT, 8)
-        self.tempo_cs = wx.Slider(p, value=100, minValue=50, maxValue=160,
+        self.tempo_cs = wx.Slider(p, value=self._tempo_szazalek,
+                                  minValue=50, maxValue=160,
                                   style=wx.SL_HORIZONTAL | wx.SL_LABELS)
         self.tempo_cs.SetName("Beszédtempó százalékban")
         self.tempo_cs.Bind(wx.EVT_SLIDER, lambda e: self._tempo_valaszt())
@@ -158,9 +171,15 @@ class JatekokFrame(wx.Frame):
             self._beszel(text)
 
     def _beszel(self, text):
-        """Megbízhatóan HALLHATÓ bemondás: előbb az app SelfVoice-a (ha be van
-        kapcsolva), különben a rendszer-TTS (SAPI) – így akkor sem néma, ha a
-        SelfVoice ki van kapcsolva (alapból az)."""
+        """Megbízhatóan HALLHATÓ bemondás. ELŐBB a FUTÓ képernyőolvasó (Tolk) –
+        a felhasználó saját, magyar hangján; ha nincs, az app SelfVoice-a, végül
+        a rendszer-TTS (SAPI)."""
+        try:
+            from superdl import screenreader
+            if screenreader.speak(text):
+                return
+        except Exception:
+            pass
         sv = getattr(self.main, "selfvoice", None)
         if sv:
             try:
@@ -221,14 +240,25 @@ class JatekokFrame(wx.Frame):
         i = self.hang_lst.GetSelection()
         if 0 <= i < len(RS.GEPEK):
             self._hang = RS.GEPEK[i].kulcs
+            self._save_hang_cfg()
             self._announce(f"Hangkarakter: {RS.GEPEK[i].nev}", beszel=True)
 
     def _tempo_valaszt(self):
         # a csúszka „sebesség %", ebből lesz az időtartam-szorzó (nagyobb
         # sebesség = rövidebb idő = gyorsabb beszéd)
         szazalek = max(50, self.tempo_cs.GetValue())
+        self._tempo_szazalek = szazalek
         self._tempo = 100.0 / szazalek
+        self._save_hang_cfg()
         self._announce(f"Beszédtempó: {szazalek} százalék.", beszel=True)
+
+    def _save_hang_cfg(self):
+        """A választott hang + tempó megőrzése a következő indításig (Laci)."""
+        try:
+            store.save_json(store.CONFIG_DIR / _HANG_CFG,
+                            {"hang": self._hang, "tempo": self._tempo_szazalek})
+        except Exception:
+            pass
 
     def _hangproba(self):
         szoveg = self.proba_txt.GetValue().strip()

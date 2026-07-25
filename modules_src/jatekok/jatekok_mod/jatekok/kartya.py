@@ -405,6 +405,9 @@ def jatek_gyufa(ctx):
     while en < cel and gep < cel:
         yield ctx.mond("Te jössz.")
         bank = 0
+        # az ELSŐ pöckölést is a JÁTÉKOS kezdeményezi (eddig a gép pöckölt
+        # helyette – Homelab-listás visszajelzés); a további pöckölést a „P" indítja
+        yield ctx.kerdez("Pöckölj egyet! (nyomj Entert)")
         while True:
             p = _gyufa_pocc()
             if p == 0:

@@ -254,9 +254,16 @@ class JatekKonzol(wx.Dialog):
             self._beszel_rendszer(szoveg)
 
     def _beszel_rendszer(self, szoveg):
-        """Normál (nem retró) felolvasás: app SelfVoice, különben rendszer-TTS
-        (SAPI) – így a Saját játékok akkor sem némák, ha a SelfVoice ki van
-        kapcsolva (alapból az)."""
+        """Normál (nem retró) felolvasás. ELŐBB a FUTÓ képernyőolvasó (Tolk) –
+        így a felhasználó a saját, megszokott, magyar hangján hallja (Farkas nem
+        érti a retrót; Áron kérte a Tolkot). Ha nincs képernyőolvasó, marad az
+        app SelfVoice, különben a rendszer-TTS (SAPI)."""
+        try:
+            from superdl import screenreader
+            if screenreader.speak(szoveg):
+                return
+        except Exception:
+            pass
         sv = getattr(self.main, "selfvoice", None)
         if sv:
             try:

@@ -413,11 +413,33 @@ def test_gyufa_veget_er():
         kl = k.lower()
         if "pontig" in kl:
             return "10"
+        if "pöckölj" in kl:
+            return ""            # a JÁTÉKOS indítja az első pöckölést
         if "megtartod" in kl:
             return "m"
         return ""
     ki = _fut("gyufa", bot)
     assert any("pont" in p for _, p in ki)
+
+
+def test_gyufa_elso_pockolest_a_jatekos_inditja():
+    """Homelab-listás bug: eddig a gép pöckölt az első körben a játékos helyett.
+    Most a „Te jössz." után a JÁTÉKOST kéri pöckölni, mielőtt pont születne."""
+    def bot(k, ki):
+        kl = k.lower()
+        if "pontig" in kl:
+            return "10"
+        if "pöckölj" in kl:
+            return ""
+        if "megtartod" in kl:
+            return "m"
+        return ""
+    ki = _fut("gyufa", bot)
+    # az első „Te jössz." után a következő KÉRDÉS a pöckölésre szólít fel
+    tipusok = [(t, p) for t, p in ki]
+    tj = next(i for i, (t, p) in enumerate(tipusok) if t == "mond" and "Te jössz" in p)
+    kov_kerdes = next(p for t, p in tipusok[tj:] if t == "kerdez")
+    assert "öckölj" in kov_kerdes         # „Pöckölj egyet!" – nem azonnali eredmény
 
 
 # =========================================================================

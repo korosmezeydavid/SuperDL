@@ -166,7 +166,7 @@ class RadioFrame(wx.Frame):
             self._from_rec(r) for r in store.load_radio_favorites()]
         self._cur: R.Station | None = None
         self.countries: list[R.Country] = []
-        self._country_limit = 50         # ország-top találatszám (Tovább növeli)
+        self._country_limit = 200        # ország-top találatszám (Tovább növeli)
         self._cur_country: R.Country | None = None
         self._pre_mute_vol = None        # némításkor ide mentjük a hangerőt
 
@@ -347,11 +347,19 @@ class RadioFrame(wx.Frame):
             return
         self.SetStatusText(text)
         self.now_label.SetValue(text)
-        # A képernyőolvasó a fő bejelentő. Mivel a mező változását magától nem
-        # olvassa fel, a FONTOS (felhasználó által kiváltott) bejelentéseknél a
-        # fókuszt ráhelyezzük az állapotmezőre → a képernyőolvasó azonnal
-        # felolvassa. A gyorsbillentyűk ablak-szintűek, így ez nem töri meg
-        # őket. NINCS külön SAPI-hang (a selfvoice csak opcionális kiegészítés).
+        # ELŐBB a FUTÓ képernyőolvasó (Tolk): ilyenkor NEM kell fókuszt lopni, a
+        # felhasználó a saját hangján hallja a bejelentést. Ez a legszebb
+        # megoldás (Áron kérte a Tolkot).
+        try:
+            from superdl import screenreader
+            if screenreader.speak(text):
+                return
+        except Exception:
+            pass
+        # Nincs képernyőolvasó: a mező változását magától nem olvassa fel semmi,
+        # ezért a FONTOS bejelentéseknél a fókuszt az állapotmezőre visszük →
+        # a képernyőolvasó (ha mégis van) felolvassa. A gyorsbillentyűk
+        # ablak-szintűek, így ez nem töri meg őket.
         if focus and not self._closing:
             try:
                 self.now_label.SetFocus()
@@ -423,7 +431,7 @@ class RadioFrame(wx.Frame):
         if not (0 <= i < len(self.countries)):
             return
         self._cur_country = self.countries[i]
-        self._country_limit = 50
+        self._country_limit = 200
         s = getattr(self.main, "settings", None)        # utolsó ország mentése
         if isinstance(s, dict):
             s["radio_country"] = self._cur_country.code
@@ -431,16 +439,32 @@ class RadioFrame(wx.Frame):
 
     def _on_country_more(self):
         if self._cur_country:
-            self._country_limit += 50
+            self._country_limit += 200
             self._fetch_country()
 
     def _fetch_country(self):
         c = self._cur_country
         self.b_country_more.Disable()
+
+        def done(res):
+            # van-e még? (a lekért mennyiséget elértük → valószínűleg van több)
+            tobb = len(res) >= self._country_limit
+            self.b_country_more.Enable(tobb)
+            # MONDJUK BE, hány állomás jött és hogy van-e még – különben a
+            # felhasználó azt hiszi, ennyi az összes (Farkas: „383 van, de csak
+            # 50-et mutat"). A teljes szám az ország-választóból (c.count).
+            uz = f"{len(res)} állomás betöltve"
+            if c.count:
+                uz += f", összesen {c.count} van ebben az országban"
+            if tobb:
+                uz += (". További állomásokért nyomd meg a Tovább gombot a "
+                       "lista alatt.")
+            else:
+                uz += "."
+            self._announce(uz, focus=True)
+
         self._fetch(lambda: R.by_country_code(c.code, self._country_limit),
-                    f"{c.name} – legnépszerűbb állomások",
-                    on_done=lambda res: self.b_country_more.Enable(
-                        len(res) >= self._country_limit))
+                    f"{c.name} – legnépszerűbb állomások", on_done=done)
 
     def _fetch(self, fn, label, on_done=None):
         self.SetStatusText(f"Keresés: {label} …")
