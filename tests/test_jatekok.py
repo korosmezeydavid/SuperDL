@@ -329,6 +329,61 @@ def test_celozz_schuck_antal_es_lezarul():
     assert any("VISZONTLÁTÁSRA" in p for _, p in ki)
 
 
+def test_tizfeles_binaris_kereses_nyer():
+    """TÍZ FELES: felezős tippeléssel 1–100 között 10 tippen belül BIZTOS nyer,
+    tehát nem fogynak el a felesek; a végén 'n'-re udvariasan búcsúzik."""
+    st = {"lo": 1, "hi": 100, "guess": None}
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "ismertetőt" in kl:
+            return "n"
+        if "legnagyobb gondolt" in kl:
+            st.update(lo=1, hi=100, guess=None)
+            return "100"
+        if "tipp" in kl:
+            monds = [p.lower() for t, p in ki if t == "mond"]
+            if monds and st["guess"] is not None:
+                if "nagyobb számot" in monds[-1]:
+                    st["lo"] = st["guess"] + 1
+                elif "kissebb számot" in monds[-1]:
+                    st["hi"] = st["guess"] - 1
+            st["guess"] = (st["lo"] + st["hi"]) // 2
+            return str(st["guess"])
+        if "szeretnél még" in kl:
+            return "n"
+        return ""
+    ki = _fut("tizfeles", bot)
+    assert not any("ELFOGYTAK A FELESEID" in p for _, p in ki)   # nem vesztett
+    assert any("BARÁTOM" in p or "SZERENCSEJÁTÉKON" in p for _, p in ki)
+
+
+def test_fogadas_balogh_tibor_es_lezarul():
+    """FOGADÁS: egy játékos all-in fogadásokkal – vagy 800-ig jut (GYŐZTÉL), vagy
+    kiesik (MINDENKI VESZTETT); mindenképp lefut egy futam és rendben zárul."""
+    import re
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "ismertetőt" in kl:
+            return "n"
+        if "hány játékos" in kl:
+            return "1"
+        if "játékos neve" in kl:
+            return "Dávid"
+        if "melyik versenyzőre" in kl:
+            return "Lauda"
+        if "mekkora összeggel" in kl:
+            m = re.search(r"és (\d+) között", k)
+            return m.group(1) if m else "0"
+        if "ismétlés" in kl:
+            return "n"
+        return ""
+    ki = _fut("fogadas", bot)
+    assert any("Balogh Tibor" in p for _, p in ki)      # a szerző elhangzik
+    assert any("VERSENY GYŐZTESE" in p for _, p in ki)  # legalább egy futam
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()

@@ -70,6 +70,8 @@ REGISZTER = {
     "fejtoro": homelab.jatek_fejtoro,
     "kockaparti": homelab.jatek_kockaparti,
     "celozz": homelab.jatek_celozz,
+    "tizfeles": homelab.jatek_tizfeles,
+    "fogadas": homelab.jatek_fogadas,
 }
 
 

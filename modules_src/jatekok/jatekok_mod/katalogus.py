@@ -204,6 +204,13 @@ RETRO: tuple[Jatek, ...] = (
           "Tengeri tüzérjáték 20-szor 20-as mezőn: rejtett ellenséges hajó, "
           "10 lövedék, égtáj-visszajelzés – süllyeszd el, vagy jön a hadbíróság!",
           szerzo="Schuck Antal", ev="1987"),
+    Jatek("tizfeles", "Tíz feles a tudományod",
+          "Számkitaláló tíz tippel, csavaros, pálinkás humorral: minél hamarabb "
+          "találod el a gondolt számot, annál több „feles” a jutalom."),
+    Jatek("fogadas", "Fogadásos autóverseny",
+          "Akár négy játékos fogad a nyolcvanas évek Forma-1-eseire (Lauda, "
+          "Prost, McLaren, Alboreto): tégy tétet, és gyűjts 800 forintig!",
+          szerzo="Balogh Tibor", ev="1984"),
 )
 
 

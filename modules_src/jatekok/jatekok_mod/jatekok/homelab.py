@@ -1348,3 +1348,218 @@ def jatek_celozz(ctx):
                                "VISZONTLÁTÁSRA.")
                 return
             yield ctx.mond("MI EZ A FEGYELMEZETLENSÉG? PONTOS VÁLASZT KÉREK!")
+
+
+# ========================================================= TÍZ FELES (10FELES)
+# Forrás: 10FELES.HTP (Homelab). Számkitaláló 1..N között, TÍZ tippel; minél
+# hamarabb találsz, annál több „feles" a jutalom – csavaros, pálinkás humorral.
+# Öt kör után a gép „nem játszik részegekkel". A szöveg szó szerint a forrásból.
+
+_TIZFELES_ISMERTETO = (
+    "HA FÖLTESZEM NEKED AZT A KÉRDÉST HOGY MI LEHESSEN A LEGNAGYOBB GONDOLT "
+    "SZÁM AKKOR NEKED IDE EGY SZÁMOT KELL BEÍRNI.",
+    "HA PÉLDÁUL SZÁZAT ÍRSZ BE AKKOR ÉN 1 ÉS 100 KÖZÖTT VÁLASZTHATOK CSAK KI "
+    "SZÁMOT.",
+    "TERMÉSZETESEN IDE BÁRMILYEN MÁS SZÁMOT IS BEÍRHATSZ, NULLA ÉS A NEGATÍV "
+    "SZÁMOK KIVÉTELÉVEL.",
+    "ÉN A MEGADOTT HATÁRON BELÜL BÁRMELYIK SZÁMRA GONDOLHATOK, AMIT NEKED KI "
+    "KELL TALÁLNI.",
+    "FIGYELEM! CSAK TÍZ FELESED VAN.",
+    "EZ AZT JELENTI HOGY TÍZSZER TIPPELHETSZ CSAK A GONDOLT SZÁMRA.",
+    "AHÁNYSZOR NEM TALÁLOD EL A GONDOLT SZÁMOT, ANNYIVAL KEVESEBB FELEST "
+    "NYERHETSZ CSAK.",
+    "JÓ SZÓRAKOZÁST KÍVÁN A PROGRAM KÉSZÍTŐJE A JÁTÉKHOZ.",
+)
+# a győzelmi üzenet aszerint, hányadik tippre találtál el (1..10) – szó szerint
+_TIZFELES_NYERT = (
+    "GRATULÁLOK AZ EREDMÉNYHEZ BARÁTOM! HA ILYEN JÓL TUDSZ TIPPELNI, PRÓBÁLD "
+    "KI SZERENCSEJÁTÉKON!",
+    "KIVÁLÓ EREDMÉNY MÉG EZ IS BARÁTOM! KÖSZÖNÖM A FELESEDET! A TÖBBI KILENCET "
+    "NEKED AJÁNLOM!",
+    "EZ MÁR CSAK JÓ EREDMÉNY BARÁTOM! NE BÚSLAKODJ! JUTALOMBÓL ITT VAN NYOLC "
+    "FELES. EGÉSZSÉGEDRE! NEKED MEG EZT KÍVÁNOM.",
+    "JÓ EREDMÉNY MÉG A TUDOMÁNYOD! HÁROM FELESEDET MEGITTAM, HÉT MARADT NEKED. "
+    "EZ A JUTALMAD BARÁTOM!",
+    "JÓ KEDVEM KEZD LENNI A NÉGY FELESEDTŐL BARÁTOM! DE JÓ NEKED, TE MÉG "
+    "MEGIHATSZ HATOT! LELKEMET NEM SZÁNOD?",
+    "ÖT FELEST VESZÍTETTÉL BARÁTOM! ÉN EZEKET MEGITTAM. A TÖBBI ÖT A TIÉD "
+    "BARÁTOM!",
+    "ELÉGSÉGES EREDMÉNY BARÁTOM! NÉGY FELES A TIED, HAT AZ ENYÉM! KÖSZÖNÖM "
+    "BARÁTOM!",
+    "TUDÁSODÉRT HÁROM FELES A JUTALOM! A MARADÉK HETET MAJD ÉN MEGISZOM.",
+    "GYENGE A TUDÁSOD ÁTLAGA BARÁTOM! NYOLC FELES MÁR MÉREG. KETTŐ A TIÉD "
+    "PAJTÁSOM!",
+    "EGY FELESED MARADT CSAK BARÁTOM! DE ÉN TŐLED MÁR EZT IS SAJNÁLOM.",
+)
+
+
+def jatek_tizfeles(ctx):
+    yield ctx.mond("TÍZ FELES A TUDOMÁNYOD! HA A SZÁMOT ELTALÁLOD.")
+    v = yield ctx.kerdez("KÉRED AZ ISMERTETŐT? (I VAGY N)")
+    if igen(v, False):
+        for sor in _TIZFELES_ISMERTETO:
+            yield ctx.mond(sor)
+
+    kor = 0
+    while True:
+        while True:
+            v = yield ctx.kerdez("MI LEHESSEN A LEGNAGYOBB GONDOLT SZÁM?")
+            felso = szam(v)
+            if felso is not None and felso >= 1:
+                break
+            yield ctx.mond("LEHETŐLEG 1 VAGY ANNÁL NAGYOBB SZÁMOT KÉREK.")
+        x = random.randint(1, felso)
+        yield ctx.mond(f"GONDOLTAM EGY SZÁMOT 1 ÉS {felso} KÖZÖTT.")
+
+        talalt = False
+        i = 0
+        while i < 10:
+            v = yield ctx.kerdez(f"{i + 1}. tipp (1 és {felso} között):")
+            tipp = szam(v)
+            if tipp is None:
+                yield ctx.mond("Számot kérek – ez a tipp nem számít.")
+                continue                       # érvénytelenre ne fogyjon feles
+            i += 1
+            if tipp < x:
+                yield ctx.mond("NAGYOBB SZÁMOT KERESS! UGROTT EGY FELES!")
+            elif tipp > x:
+                yield ctx.mond("KISSEBB SZÁMOT KERESS! UGROTT EGY FELES!")
+            else:
+                yield ctx.mond(_TIZFELES_NYERT[i - 1])
+                talalt = True
+                break
+        if not talalt:
+            yield ctx.mond("VESZÍTETTÉL BARÁTOM! ELFOGYTAK A FELESEID. A "
+                           f"GONDOLT SZÁM {x} VOLT PAJTÁSOM.")
+
+        kor += 1
+        if kor == 5:
+            yield ctx.vege(
+                "ÁLLJUNK MEG EGY SZÓRA! NEM GONDOLOD HOGY KICSIT SOKAT ITTÁL "
+                "MÁR BARÁTOM? GONDOLKODJ EL EZEN. ÉN RÉSZEGEKKEL NEM JÁTSZOM!")
+            return
+        v = yield ctx.kerdez("SZERETNÉL MÉG VELEM JÁTSZANI? (I VAGY N)")
+        if igen(v, False):
+            yield ctx.mond("AKKOR TOVÁBBI JÓ SZÓRAKOZÁST A JÁTÉKHOZ.")
+            continue
+        yield ctx.vege("REMÉLEM AKKOR JÓL SZÓRAKOZTÁL BARÁTOM! HA MÁSKOR "
+                       "UNATKOZOL, KAPCSOLJ BE BÁTRAN! MEGLÁTOD. NEM BÁNOD!")
+        return
+
+
+# ============================================== FOGADÁSOS AUTÓVERSENY (FOGADAS)
+# Forrás: FOGADAS.HTP – „Produced by Balogh Tibor", HOMELAB 3, 1984. december
+# (átdolgozott változat: 1986. július). Több (max 4) játékos fogad az 1980-as
+# évek Forma-1-eseire (Lauda, Prost, McLaren, Alboreto); mindenki 200 forinttal
+# indul, a nyertes fogadás a téttel nő, a vesztes csökken, 0-nál kiesel, 800
+# forinttól nyersz. A grafikus versenyt akadálymentesen: véletlen futam, a
+# győztest bemondjuk.
+
+_FOGADAS_ISMERTETO = (
+    "EZ EGY AUTÓVERSENY JÁTÉK.",
+    "A JÁTÉKOT MAX NÉGYEN JÁTSZHATJÁK.",
+    "MINDEN JÁTÉKOS MEGNEVEZ EGY AUTÓVERSENYZŐT AKIRE FOGADNI AKAR, ÉS MEGADJA "
+    "A TÉTET, AMENNYIRE A NYERÉSI ESÉLYEIT ÉRTÉKELI.",
+    "A KÉRDÉSEKET SAMU, A GÉP TESZI FEL.",
+    "AZ AUTÓVERSENYZŐK NEVEI: LAUDA, PROST, MC LAREN, ALBORETO.",
+    "FIGYELJ! A VERSENYZŐK NEVEIT PRECÍZEN ÍRD LE.",
+)
+_FOGADAS_VERSENYZOK = ("LAUDA", "PROST", "MC LAREN", "ALBORETO")
+
+
+def _fogadas_versenyzo(v):
+    """A beírt nevet a négy versenyzőhöz illeszti (ékezet/szóköz/kisbetű nélkül)."""
+    t = ekezet_nelkul((v or "").strip().lower()).replace(" ", "")
+    if not t:
+        return None
+    for nev in _FOGADAS_VERSENYZOK:
+        n = ekezet_nelkul(nev.lower()).replace(" ", "")
+        if n == t or n.startswith(t):
+            return nev
+    return None
+
+
+def jatek_fogadas(ctx):
+    yield ctx.mond("HOMELAB 3 – FOGADÁSOS AUTÓVERSENY. Produced by Balogh "
+                   "Tibor, 1984.")
+    v = yield ctx.kerdez("Kéred az ismertetőt? (i/n)")
+    if igen(v, False):
+        for sor in _FOGADAS_ISMERTETO:
+            yield ctx.mond(sor)
+
+    while True:
+        v = yield ctx.kerdez("HÁNY JÁTÉKOS JÁTSZIK? (MAX 4 FŐ)")
+        letszam = szam(v, 1, 4)
+        if letszam is not None:
+            break
+        yield ctx.mond("Egy és négy közötti számot kérek.")
+    nevek = []
+    for i in range(letszam):
+        v = yield ctx.kerdez(f"{i + 1}. JÁTÉKOS NEVE?")
+        nevek.append((v or "").strip() or f"{i + 1}. játékos")
+    penz = [200] * letszam                     # mindenki 200 forinttal indul
+
+    while True:
+        aktiv = [i for i in range(letszam) if penz[i] > 0]
+        if not aktiv:
+            yield ctx.mond("MINDENKI VESZTETT!")
+            v = yield ctx.kerdez("ISMÉTLÉS? (I=IGEN, N=NEM)")
+            if igen(v, False):
+                penz = [200] * letszam
+                continue
+            yield ctx.vege("JÖHET A KÖVETKEZŐ PROGRAM.")
+            return
+        gyoztes = next((i for i in aktiv if penz[i] >= 800), None)
+        if gyoztes is not None:
+            yield ctx.mond(f"{nevek[gyoztes]}, GYŐZTÉL!")
+            v = yield ctx.kerdez("ISMÉTLÉS? (I=IGEN, N=NEM)")
+            if igen(v, False):
+                penz = [200] * letszam
+                continue
+            yield ctx.vege("JÖHET A KÖVETKEZŐ PROGRAM.")
+            return
+
+        tet = [0] * letszam
+        valasztott = [None] * letszam
+        for i in aktiv:
+            yield ctx.mond(f"{nevek[i]}, NEKED {penz[i]} FORINTOD VAN.")
+            while True:
+                v = yield ctx.kerdez("MELYIK VERSENYZŐRE TESZEL? "
+                                     "(Lauda, Prost, Mc Laren, Alboreto)")
+                vz = _fogadas_versenyzo(v)
+                if vz:
+                    break
+                yield ctx.mond("Ilyen versenyző nincs – írd pontosan: Lauda, "
+                               "Prost, Mc Laren vagy Alboreto.")
+            valasztott[i] = vz
+            while True:
+                v = yield ctx.kerdez(f"MEKKORA ÖSSZEGGEL FOGADSZ {vz} "
+                                     f"GYŐZELMÉRE? (0 és {penz[i]} között)")
+                t = szam(v, 0, penz[i])
+                if t is not None:
+                    break
+                yield ctx.mond(f"Nulla és {penz[i]} közötti tétet kérek.")
+            tet[i] = t
+
+        # a verseny: a négy versenyző véletlenül halad, az első a célban nyer
+        yield ctx.mond("Rajt! A versenyzők elindultak...")
+        poz = {nev: 0 for nev in _FOGADAS_VERSENYZOK}
+        while True:
+            fut = random.choice(_FOGADAS_VERSENYZOK)
+            poz[fut] += 1
+            if poz[fut] >= 20:
+                gyoztes_vz = fut
+                break
+        yield ctx.mond(f"A VERSENY GYŐZTESE: {gyoztes_vz}!")
+
+        for i in aktiv:
+            if valasztott[i] == gyoztes_vz:
+                penz[i] += tet[i]
+                yield ctx.mond(f"{nevek[i]}: nyertél {tet[i]} forintot, "
+                               f"egyenleged {penz[i]} forint.")
+            else:
+                penz[i] -= tet[i]
+                allap = (f"egyenleged {penz[i]} forint" if penz[i] > 0
+                         else "elfogyott a pénzed, kiestél")
+                yield ctx.mond(f"{nevek[i]}: elvesztetted a {tet[i]} "
+                               f"forintodat, {allap}.")
