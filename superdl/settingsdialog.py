@@ -305,6 +305,20 @@ class SettingsDialog(wx.Dialog):
         p = wx.Panel(self.nb)
         v = wx.BoxSizer(wx.VERTICAL)
 
+        # legfelül, a legfontosabb: csak a képernyőolvasó beszéljen
+        v.Add(wx.StaticText(p, label="KÉPERNYŐOLVASÓ-MÓD – ha képernyőolvasót "
+              "(NVDA, JAWS) használsz, ez minden EGYÉB program-beszédet elnémít, "
+              "hogy semmi ne beszéljen bele."), 0, wx.LEFT | wx.TOP, 10)
+        self.c_sronly = wx.CheckBox(
+            p, label="&Csak a képernyőolvasó beszéljen "
+                     "(a program saját hangja és minden gépi felolvasás kikapcsol)")
+        self.c_sronly.SetName("Csak a képernyőolvasó beszéljen; a program saját "
+                              "hangja és minden gépi felolvasás elnémul, a "
+                              "visszajelzéseket a képernyőolvasó mondja")
+        self.c_sronly.SetValue(bool(self.s.get("screenreader_only", False)))
+        v.Add(self.c_sronly, 0, wx.ALL, 8)
+        v.Add(wx.StaticLine(p), 0, wx.EXPAND | wx.ALL, 8)
+
         v.Add(wx.StaticText(p, label="SZÁZALÉK-PITTYEGÉS – hosszú "
               "műveleteknél (letöltés, konvertálás, renderelés…)"), 0,
               wx.LEFT | wx.TOP, 10)
@@ -510,6 +524,7 @@ class SettingsDialog(wx.Dialog):
             "voice_mode": VOICE_LABELS[self.c_voice.GetSelection()][1],
             "beep_enabled": self.c_beep.GetValue(),
             "beep_volume": self.c_beepvol.GetValue(),
+            "screenreader_only": self.c_sronly.GetValue(),
             "selfvoice_enabled": self.c_sv.GetValue(),
             "selfvoice_off": self.c_sv_off.GetValue(),
             "hide_url_row": self.c_hide_url.GetValue(),

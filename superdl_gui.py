@@ -788,6 +788,7 @@ class MainFrame(wx.Frame):
             "video_format": "MP4", "audio_bitrate": "192",
             "audio_samplerate": "",
             "beep_enabled": True, "beep_volume": 30,
+            "screenreader_only": False,
             "selfvoice_enabled": False, "selfvoice_off": False,
             "hide_url_row": False, "startup_signal": True,
             "selfvoice_voice": "",
@@ -806,16 +807,21 @@ class MainFrame(wx.Frame):
         # „Csak hang" ALAPBÓL: induláskor a mentett állapotot állítjuk vissza,
         # így nem kell minden indításkor újra bepipálni (Maxi jelezte)
         self.audio_chk.SetValue(bool(s.get("audio_only", False)))
-        self.mi_tts.Enable(self.speaker.available)
-        self.mi_tts.Check(bool(s.get("tts")) and self.speaker.available)
+        # Képernyőolvasó-mód: minden EGYÉB program-beszéd némuljon, csak a
+        # képernyőolvasó (NVDA/JAWS) beszéljen – a felhasználó kifejezett kérése.
+        sr_only = bool(s.get("screenreader_only", False))
+        self.mi_tts.Enable(self.speaker.available and not sr_only)
+        self.mi_tts.Check(bool(s.get("tts")) and self.speaker.available
+                          and not sr_only)
         self.mi_sounds.Check(bool(s.get("sounds", True)))
-        self.speaker.set_mode(str(s.get("voice_mode", "auto")))
+        self.speaker.set_mode("off" if sr_only
+                              else str(s.get("voice_mode", "auto")))
         # M12: pittyegés + self-voice művelet-bejelentő konfigurálása
         sounds.set_progress(enabled=bool(s.get("beep_enabled", True)),
                             amp=int(s.get("beep_volume", 30)) / 100.0)
         self.selfvoice.configure(
-            enabled=bool(s.get("selfvoice_enabled", False)),
-            muted=bool(s.get("selfvoice_off", False)),
+            enabled=bool(s.get("selfvoice_enabled", False)) and not sr_only,
+            muted=bool(s.get("selfvoice_off", False)) or sr_only,
             voice_desc=str(s.get("selfvoice_voice", "") or ""),
             rate=int(s.get("selfvoice_rate", 0)),
             pitch=int(s.get("selfvoice_pitch", 0)),
@@ -852,6 +858,18 @@ class MainFrame(wx.Frame):
             sounds.play(sound)
         else:
             beep(ok)
+        # Képernyőolvasó-módban a visszajelzést maga a képernyőolvasó mondja
+        # (nem a program hangja). Ha nincs támogatott olvasó, marad a toast,
+        # hogy a jelzés akkor se maradjon néma.
+        if self.settings.get("screenreader_only", False):
+            spoke = False
+            try:
+                from superdl import screenreader
+                spoke = screenreader.speak(text)
+            except Exception:
+                spoke = False
+            if spoke:
+                return
         if toast and self.settings.get("notify", True):
             note = wx.adv.NotificationMessage("SuperDL", text)
             note.Show(timeout=8)
@@ -872,9 +890,19 @@ class MainFrame(wx.Frame):
         (Újratesztelés / OK); True-t ad, ha a teszt végül sikerült. Bárhonnan
         hívható (a modálist szükség esetén a GUI-szálra marsallja)."""
         from superdl import netdialog
-        return netdialog.ensure_online(
-            self, mihez=what,
-            speak=lambda t: self.selfvoice.speak(t, force=True))
+
+        def say(t):
+            # képernyőolvasó-módban a képernyőolvasó mondja, különben a selfvoice
+            if self.settings.get("screenreader_only", False):
+                try:
+                    from superdl import screenreader
+                    if screenreader.speak(t):
+                        return
+                except Exception:
+                    pass
+            self.selfvoice.speak(t, force=True)
+
+        return netdialog.ensure_online(self, mihez=what, speak=say)
 
     def _seed_ratio(self) -> float:
         try:

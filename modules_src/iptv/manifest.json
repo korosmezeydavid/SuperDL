@@ -1,10 +1,10 @@
 {
   "id": "iptv",
   "name": "Internetes TV",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "entry": "iptv_mod",
   "category": "Média",
-  "description": "Akadálymentes internetes TV (legális IPTV): saját m3u/Xtream forrás csatornái, felolvasott műsorújság (EPG), felvétel és emlékeztető, hangalámondás-sáv és élő felirat-felolvasás. Csak legális, saját előfizetésű forrásokhoz.",
+  "description": "Akadálymentes internetes TV (legális IPTV): saját m3u/Xtream forrás csatornái, felolvasott műsorújság (EPG), felvétel és emlékeztető, hangalámondás-sáv és élő felirat-felolvasás. ÚJ: ha nincs internet, akadálymentes felugró jelzi, újratesztelés-gombbal. Csak legális, saját előfizetésű forrásokhoz.",
   "min_core_api": "1.0",
   "requires_tools": [],
   "author": "Kőrösmezey Dávid"
