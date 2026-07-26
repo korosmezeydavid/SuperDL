@@ -272,6 +272,12 @@ RETRO: tuple[Jatek, ...] = (
           "Kis fejtörő a géppel: két számot kér, kitalálod a szorzatukat (durva "
           "hibára megkapod a magadét!), majd az összegüket, végül gondol egy "
           "számot 1 és 100 között, amit ki kell találnod."),
+    Jatek("atlantisz", "Atlantisz",
+          "Tengeri navigáció egy 100-szor 100-as rácson: nyolc égtáj felé "
+          "hajózol, radarral kutatod a rejtett szigetet, közben fogy az "
+          "üzemanyag – négy olajkút menthet meg. Találd meg a szigetet, mielőtt "
+          "kifogysz vagy ismeretlen vizekre tévedsz!",
+          szerzo="Kisvarga Zsolt"),
 )
 
 

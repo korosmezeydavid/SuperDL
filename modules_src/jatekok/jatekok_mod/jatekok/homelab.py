@@ -2814,3 +2814,168 @@ def jatek_jvelem(ctx):
             return
         yield ctx.mond("Nagyobb számot gondoltam." if x < titok
                        else "Kisebb számot gondoltam.")
+
+
+# =================================================================== ATLANTISZ
+# Forrás: ATLANTIS.bas – Készítette: Kisvarga Zsolt.
+# Tengeri navigáció: egy 100×100-as rácson (1,1 bal felső – 100,100 jobb alsó)
+# egy rejtett szigetet kell megtalálnod. Nyolc égtáj felé mozoghatsz 1–10 km-t;
+# van radar (szárazföld 10 km-en belül + irány), 150 liter üzemanyag, és négy
+# olajkút, amit 50 liter alatt jelez a radar. Az üzenetek a forrásból.
+
+_ATL_IRANY = {1: "észak", 2: "északkelet", 3: "kelet", 4: "délkelet",
+              5: "dél", 6: "délnyugat", 7: "nyugat", 8: "északnyugat"}
+_ATL_LEP = {1: (-1, 0), 2: (-1, 1), 3: (0, 1), 4: (1, 1), 5: (1, 0),
+            6: (1, -1), 7: (0, -1), 8: (-1, -1)}          # (dX, dY)
+_ATL_SORSZAM = ("Az első", "A második", "A harmadik", "A negyedik")
+
+
+def _atl_irany_kod(x, y, cx, cy):
+    """A (cx,cy) cél égtáj-iránya (1–8) a hajóhoz (x,y) képest – a forrás szerint
+    (X a függőleges: észak = kisebb X; Y a vízszintes: kelet = nagyobb Y)."""
+    if x > cx and y == cy:
+        return 1
+    if x > cx and y < cy:
+        return 2
+    if x == cx and y < cy:
+        return 3
+    if x < cx and y < cy:
+        return 4
+    if x < cx and y == cy:
+        return 5
+    if x < cx and y > cy:
+        return 6
+    if x == cx and y > cy:
+        return 7
+    if x > cx and y > cy:
+        return 8
+    return 0
+
+
+def jatek_atlantisz(ctx):
+    yield ctx.mond("Atlantisz!")
+    v = yield ctx.kerdez("Kéred a játékszabályt? (i/n)")
+    if igen(v, False):
+        yield ctx.mond(
+            "Egy szigetet kell megtalálnod a hatalmas tengeren. Ezt a tengert úgy "
+            "kell elképzelned, mint egy nagy négyzetet, ami függőlegesen és "
+            "vízszintesen is száz kockából áll. Az 1,1 pozíció a négyzet bal "
+            "felső, a 100,100 pozíció a jobb alsó sarka. A tengeren a nyolc égtáj "
+            "bármely irányába mozoghatsz, egytől tíz kilométeres távolságban. A "
+            "tengeren négy olajkút is található, amit általában csak akkor tudsz "
+            "megtalálni, ha az üzemanyagod ötven liter alá esik – ilyenkor közlöm "
+            "az olajkutak irányait. A sziget felderítéséhez radar komputer is "
+            "segít: megtudhatod, mennyi üzemanyagod van, és van-e szárazföld tíz "
+            "kilométeres körzetben. Az irányt így állíthatod: 1 észak, 2 "
+            "északkelet, 3 kelet, 4 délkelet, 5 dél, 6 délnyugat, 7 nyugat, 8 "
+            "északnyugat, 9 radar komputer, 0 segélykérés vagy a játék feladása. "
+            "Izgalmas felderítést kíván a program készítője, Kisvarga Zsolt!")
+    v = yield ctx.kerdez("Akarod, hogy játék közben mindig mondjam a hajó "
+                         "pozícióját? (i/n)")
+    poz_mod = igen(v, False)
+
+    xx, yy = random.randint(1, 100), random.randint(1, 100)      # a sziget
+    while True:
+        x, y = random.randint(1, 100), random.randint(1, 100)    # a hajó
+        if (x, y) != (xx, yy):
+            break
+    cc, dd, ee, ff = xx - 10, xx + 10, yy - 10, yy + 10
+    u = 150
+    kutak = []
+    while len(kutak) < 4:
+        p = (random.randint(1, 100), random.randint(1, 100))
+        if p not in kutak and p != (xx, yy):
+            kutak.append(p)
+    seged_db = 0
+
+    yield ctx.mond(f"A hajó indulásra kész. A hajód jelenlegi pozíciója "
+                   f"függőleges {x}, vízszintes {y}. Indulás!")
+
+    def veszit_sziget():
+        return ctx.vege(f"A sziget pozíciója függőleges {xx}, vízszintes {yy} "
+                        "volt. A szigeten vulkánkitörés történt. Megsemmisült a "
+                        "sziget!")
+
+    while True:
+        v = yield ctx.kerdez("Irány? (1–8 égtáj, 9 radar komputer, 0 "
+                             "segélykérés vagy feladás)")
+        c = szam(v, 0, 9)
+        if c is None:
+            continue
+
+        if c == 9:                                   # radar komputer
+            if cc <= x <= dd and ee <= y <= ff:
+                d = _atl_irany_kod(x, y, xx, yy)
+                yield ctx.mond("A radar komputer szárazföldet jelez tíz "
+                               "kilométeres körzetben. A szárazföld hajóhoz "
+                               f"számított iránya {_ATL_IRANY.get(d, 'itt')}.")
+            else:
+                yield ctx.mond("A radar komputer szerint tíz kilométeres "
+                               "körzetben nincs szárazföld.")
+            yield ctx.mond(f"Az üzemanyag {u} liter.")
+            if u <= 50:
+                for i, (ax, ay) in enumerate(kutak):
+                    belul = (ax - 10 <= x <= ax + 10) and (ay - 10 <= y <= ay + 10)
+                    d = _atl_irany_kod(x, y, ax, ay)
+                    hol = ("tíz kilométeren belül található" if belul
+                           else "tíz kilométeren kívül van")
+                    yield ctx.mond(f"{_ATL_SORSZAM[i]} olajkút {hol}. A hajóhoz "
+                                   f"számított iránya {_ATL_IRANY.get(d, 'itt')}.")
+            continue
+
+        if c == 0:                                   # segélykérés / feladás
+            v2 = yield ctx.kerdez("Segítségkérés: 1. Játék feladása: 2.")
+            d2 = szam(v2, 1, 2)
+            if d2 == 2:
+                yield veszit_sziget()
+                return
+            if d2 == 1:
+                seged_db += 1
+                if seged_db > 5:
+                    yield ctx.mond("Sajnos többet nem segíthetek!")
+                else:
+                    d = _atl_irany_kod(x, y, xx, yy)
+                    yield ctx.mond("A sziget hajóhoz számított iránya "
+                                   f"{_ATL_IRANY.get(d, 'itt')}.")
+            continue
+
+        # 1–8: hajózás
+        irany = c
+        v2 = yield ctx.kerdez(f"Hány kilométert akarsz hajózni "
+                              f"{_ATL_IRANY[irany]} felé? (1–10)")
+        km = szam(v2, 1, 10)
+        if km is None:
+            continue
+        dx, dy = _ATL_LEP[irany]
+        for step in range(km):
+            u -= 1
+            if u <= 0:
+                yield ctx.mond("Nem sikerült megtalálnod a szigetet! Az "
+                               "üzemanyagod elfogyott.")
+                yield veszit_sziget()
+                return
+            x += dx
+            y += dy
+            if (x, y) == (xx, yy):
+                yield ctx.vege("Kiválóan navigáltad a hajódat! Ügyesen "
+                               "megtaláltad a felderítendő szigetet. Homelab 4 "
+                               "navigációs kitüntetésben részesítelek! A "
+                               "mihamarabbi viszontlátásra!")
+                return
+            if (x, y) in kutak:
+                yield ctx.mond("Megtaláltad az egyik olajkutat! A jelenlegi "
+                               f"pozíciód függőleges {x}, vízszintes {y}.")
+                vv = yield ctx.kerdez("Feltöltöd az üzemanyag tartályodat? (i/n)")
+                if igen(vv, False):
+                    u = 150
+                    yield ctx.mond("Az üzemanyag tartály már tele is van. "
+                                   "Mehetsz tovább.")
+                else:
+                    yield ctx.mond("Akkor megyünk is tovább!")
+            if x < 1 or y < 1 or x > 100 or y > 100:
+                yield ctx.mond("Nem jól navigáltad a hajód! Ismeretlen vizekre "
+                               "tévedtél. Az expedíció meghiúsult. Eltévedtél.")
+                yield ctx.vege("Ezért a kaland is véget ért!")
+                return
+            if poz_mod or step == km - 1:
+                yield ctx.mond(f"Pozíciód függőleges {x}, vízszintes {y}.")

@@ -752,6 +752,58 @@ def test_jvelem_szorzat_osszeg_es_szamkitalalas():
     assert "eltaláltad" in sz
 
 
+def test_atlantisz_kisvarga_feladas():
+    """ATLANTISZ: a 0 → 2 (feladás) felfedi a szigetet és lezárul."""
+    import random
+    random.seed(1)
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "játékszabályt" in kl:
+            return "n"
+        if "pozícióját" in kl:
+            return "n"
+        if "irány?" in kl:
+            return "0"
+        if "feladása" in kl:
+            return "2"
+        return ""
+    ki = _fut("atlantisz", bot)
+    sz = U.szoveg(ki).lower()
+    assert "atlantisz" in sz and "megsemmisült a sziget" in sz
+    j = next(x for x in KAT.RETRO if x.kulcs == "atlantisz")
+    assert j.szerzo == "Kisvarga Zsolt"
+
+
+def test_atlantisz_radar_es_hajozas_veget_er():
+    """ATLANTISZ: radar után folyamatos hajózás egy irányba – kifogyás vagy a
+    rács széle miatt véget ér."""
+    import random
+    random.seed(5)
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "játékszabályt" in kl:
+            return "n"
+        if "pozícióját" in kl:
+            return "i"                    # pozíció-mód is működik
+        if "irány?" in kl:
+            # előbb radar, aztán végig kelet
+            if not any("radar komputer szerint" in p or "radar komputer száraz" in p
+                       for _, p in ki):
+                return "9"
+            return "3"
+        if "hány kilométert" in kl:
+            return "10"
+        if "feltöltöd" in kl:
+            return "i"
+        return ""
+    ki = _fut("atlantisz", bot)
+    sz = U.szoveg(ki).lower()
+    assert "üzemanyag" in sz
+    assert ki[-1][0] == "vege"
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()
