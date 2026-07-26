@@ -804,6 +804,69 @@ def test_atlantisz_radar_es_hajozas_veget_er():
     assert ki[-1][0] == "vege"
 
 
+def test_szammem_kisvarga_veszit_es_pontoz():
+    """SZÁMMEM: sok rossz visszaírás → tíz hiba fölött eredményhirdetés."""
+    import random
+    random.seed(1)
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "játékszabályt" in kl:
+            return "n"
+        if "utóneved" in kl:
+            return "Teszt"
+        if "írd vissza" in kl:
+            return "9999999999"            # gyakran hibás → gyűlnek a hibapontok
+        return ""
+    ki = _fut("szammem", bot)
+    sz = U.szoveg(ki).lower()
+    assert "homelab 4" in sz
+    assert "pontszámod" in sz              # eredményhirdetés
+    j = next(x for x in KAT.RETRO if x.kulcs == "szammem")
+    assert j.szerzo == "Kisvarga Zsolt"
+
+
+def test_szammem_nevtelen_elutasitas():
+    """Névtelenül nem játszik – a forrás szövegével udvariasan elzavar."""
+    def bot(k, ki):
+        kl = k.lower()
+        if "játékszabályt" in kl:
+            return "n"
+        if "utóneved" in kl:
+            return ""
+        return ""
+    ki = _fut("szammem", bot)
+    sz = U.szoveg(ki).lower()
+    assert "na csá" in sz
+
+
+def test_szammem_helyes_visszairas_novekszik():
+    """Helyesen visszaírva a számsor körönként hosszabb lesz (a csaló bot a
+    kihirdetett számsort visszhangozza; pár kör után kilép egy hibával)."""
+    import random
+    random.seed(3)
+    st = {"kor": 0}
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "játékszabályt" in kl:
+            return "n"
+        if "utóneved" in kl:
+            return "Anna"
+        if "írd vissza" in kl:
+            st["kor"] += 1
+            if st["kor"] > 3:
+                return "0"                 # elrontjuk, hogy véget érjen
+            # az utolsó „A számsor: …” visszhangzása
+            sor = next((p for t, p in reversed(ki)
+                        if t == "mond" and "A számsor:" in p), "")
+            return "".join(c for c in sor if c in "123456789")
+        return ""
+    ki = _fut("szammem", bot)
+    assert any("Mehetünk tovább" in p for _, p in ki)   # volt hibátlan kör
+    assert ki[-1][0] == "vege"
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()

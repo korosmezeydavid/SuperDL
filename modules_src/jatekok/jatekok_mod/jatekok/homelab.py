@@ -2979,3 +2979,80 @@ def jatek_atlantisz(ctx):
                 return
             if poz_mod or step == km - 1:
                 yield ctx.mond(f"Pozíciód függőleges {x}, vízszintes {y}.")
+
+
+# ==================================================================== SZÁMMEM
+# Forrás: SZAMMEM.bas – Készítette: Kisvarga Zsolt.
+# Szám-memóriajáték: a gép egy számsort ad, ami körönként EGY számmal nő; te
+# sorban visszaírod. Minden hibás számjegy egy hibapont; tíznél több hiba a vég.
+# 255-nél a győzelem. Az időlimitet akadálymentességből elhagytuk; a záró
+# pontozás és a csípős szövegek a forrásból.
+
+def jatek_szammem(ctx):
+    yield ctx.mond("Számos memória fejlesztő játék!")
+    v = yield ctx.kerdez("Szeretnéd tudni a játékszabályt? (i/n)")
+    if igen(v, False):
+        yield ctx.mond(
+            "A játékban számsorozatokat adok meg neked, ami minden egyes "
+            "visszaírás után egy számmal növekszik. A számokat legjobb tudásod "
+            "szerint, egyenként és helyes sorrendben próbáld visszaírni nekem. A "
+            "játékot addig játszhatod, amíg nem érsz el tizenegy hibát, vagy ha "
+            "el nem jutsz a 255 darabos határig. Jó fejtörést kíván a program "
+            "készítője, Kisvarga Zsolt.")
+    v = yield ctx.kerdez("Akkor most légy szíves, mutatkozz be! Mi az utóneved?")
+    nev = (v or "").strip()
+    if not nev:
+        yield ctx.vege("Nem szoktam olyanokkal játszani, akik szégyellik vagy "
+                       "nem akarják elárulni a nevüket! Na csá!")
+        return
+    yield ctx.mond(f"Ó, de illetlen vagyok! Az én nevem Homelab 4, és számítógép "
+                   f"vagyok! Kezdünk, {nev}! Figyelj rám jól!")
+
+    sorozat = []
+    hibapont = 0
+    while len(sorozat) < 255:
+        sorozat.append(str(random.randint(1, 9)))
+        yield ctx.mond("Ezt írd be utánam jól! A számsor: "
+                       + ", ".join(sorozat) + ".")
+        v = yield ctx.kerdez(f"Írd vissza a(z) {len(sorozat)} számot, sorban:")
+        tipp = [c for c in (v or "") if c in "123456789"]
+        hiba_kor = sum(1 for i, jo in enumerate(sorozat)
+                       if (tipp[i] if i < len(tipp) else "") != jo)
+        if hiba_kor == 0:
+            yield ctx.mond("Rendben van! Mehetünk tovább.")
+        else:
+            hibapont += hiba_kor
+            yield ctx.mond(f"Ebben a körben {hiba_kor} tévedés volt. Minden "
+                           "tévedésért egy hibapont jár!")
+            if hibapont > 10:
+                break
+
+    hs = len(sorozat)
+    if hs >= 255 and hibapont <= 10:
+        yield ctx.vege(f"{nev}! Glória lebegjen a fejed fölött! Szuper "
+                       "teljesítményt értél el! Ehhez csak gratulálni tudok.")
+        return
+
+    re = hs * hs
+    le = hibapont * 10
+    ve = re - le
+    yield ctx.mond("Ez már sajnos több mint tíz hiba! Eredményhirdetésre kerül a "
+                   "sor. Miért nem figyeltél jobban oda?")
+    yield ctx.mond(f"{hs} számot tudtál megjegyezni, amiért {re} pont jár. De "
+                   f"viszont van {hibapont} súlyos hibád, amiért {le} pont "
+                   f"elvonás jár. {ve} az elért pontszámod!")
+    if ve <= 50:
+        zaro = ("Csapnivaló a memóriaterületed! Tanulhatnál tőlem, barátom!")
+    elif ve <= 100:
+        zaro = ("Gyenge az eszed átlaga! Engem nem csak játékra lehet használni, "
+                "hanem tanulásra is!")
+    elif ve <= 150:
+        zaro = ("Erre az eredményre se jót, se rosszat nem mondhatok! Közepes "
+                "eredmény, már nem olyan rossz dolog!")
+    elif ve <= 200:
+        zaro = ("Kezdesz feltörni! Nagyon jó ez az eredmény! Szerintem tudnál "
+                "jobbat is! Ha ráérsz, próbálkozz jobb eredményt elérni!")
+    else:
+        zaro = ("Prímák a tranzisztoraid és a csipjeid! Kiváló eredményt értél "
+                "el! Puszi puszi!")
+    yield ctx.vege(zaro)

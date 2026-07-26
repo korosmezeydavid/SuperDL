@@ -278,6 +278,11 @@ RETRO: tuple[Jatek, ...] = (
           "üzemanyag – négy olajkút menthet meg. Találd meg a szigetet, mielőtt "
           "kifogysz vagy ismeretlen vizekre tévedsz!",
           szerzo="Kisvarga Zsolt"),
+    Jatek("szammem", "Számemória",
+          "Szám-memóriajáték: a gép egy számsort ad, ami körönként eggyel "
+          "hosszabb, és neked sorban vissza kell írnod. Minden hibás számjegy "
+          "egy hibapont; tíznél több hiba a vég. Meddig jutsz a fejben?",
+          szerzo="Kisvarga Zsolt"),
 )
 
 
