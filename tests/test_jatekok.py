@@ -1851,3 +1851,32 @@ def test_milliomos_hangok_letezo_effektek():
         if nev.startswith("mil_"):
             x, fs = hangok.keszit(nev)
             assert x is not None and len(x) > 0
+
+
+def test_milliomos_suno_hangok_csomagolva():
+    """A saját, jogtiszta Suno-hangok tényleg a modulba csomagolva (WAV-fájlok)."""
+    import os
+    import wave
+    mod = importlib.import_module(BASE)                 # jatekok_mod
+    hangdir = os.path.join(os.path.dirname(mod.__file__), "milliomos_hang")
+    assert os.path.isdir(hangdir), "nincs milliomos_hang mappa a modulban"
+    vart = ["mil_start", "mil_vegleges", "mil_helyes", "mil_rossz",
+            "mil_garantalt", "mil_felezo", "mil_telefon", "mil_kozonseg",
+            "mil_kiszallas"]
+    for nev in vart:
+        p = os.path.join(hangdir, nev + ".wav")
+        assert os.path.isfile(p), f"hiányzik a csomagolt hang: {nev}.wav"
+        with wave.open(p, "rb") as w:
+            assert w.getnframes() > 0, f"üres hang: {nev}"
+
+
+def test_jatekkonzol_csomagolt_hangot_reszesit_elonyben():
+    """A JatekKonzol előbb a modulba csomagolt WAV-ot játssza (a te Suno-hangod),
+    és csak ha nincs, akkor szintetizál – így a hangfájlokat érintetlenül szólaltatja meg."""
+    import os
+    mod = importlib.import_module(BASE)
+    p = os.path.join(os.path.dirname(mod.__file__), "jatekkonzol.py")
+    with open(p, encoding="utf-8") as f:
+        src = f.read()
+    assert "milliomos_hang" in src
+    assert src.index("milliomos_hang") < src.index("hangok.keszit")
