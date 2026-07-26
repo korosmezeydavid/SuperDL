@@ -1700,3 +1700,121 @@ def test_jatekok_nem_hasznalnak_idegen_fuggoseget():
                        + " ".join(a.name for a in csp.names)).lower()
                 for tilt in ("espeak", "subprocess", "os.system"):
                     assert tilt not in nev, f"{modnev}: idegen függőség: {nev}"
+
+
+# =========================================================================
+#  MILLIOMOS KVÍZ (saját, jogtiszta, LOIM-inspirált) – végigjátszások
+# =========================================================================
+
+def _milliomos_modul():
+    return importlib.import_module(BASE + ".jatekok.milliomos")
+
+
+def _milliomos_valaszkereso():
+    """Kérdésszöveg → helyes betű (a „csaló" teszt-bot ezzel válaszol jól)."""
+    M = _milliomos_modul()
+    return {k["kerdes"]: k["helyes"] for k in M._kerdesek()}
+
+
+def test_milliomos_kerdesbank_betoltodik():
+    M = _milliomos_modul()
+    db = M._kerdesek()
+    assert len(db) >= 900
+    # minden tétel jól formált, a helyes betű A–D
+    for k in db[:50]:
+        assert k["helyes"] in ("A", "B", "C", "D")
+        assert 1 <= k["nehezseg"] <= 15
+    # a fődíj 40 millió, 15 lépcső, két garantált pont
+    assert M._LETRA[-1] == 40_000_000 and len(M._LETRA) == 15
+    assert M._GARANTALT == {4, 9}
+
+
+def test_milliomos_fonyeremeny_vegigjatszhato():
+    """Végig a helyes választ adva eljut a főnyereményig (40 millió)."""
+    import random
+    random.seed(1)
+    by_q = _milliomos_valaszkereso()
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "végleges" in kl:
+            return "i"
+        if "a válaszod" in kl:
+            for t, p in reversed(ki):
+                if t == "mond" and p in by_q:
+                    return by_q[p]
+            return "A"
+        return ""
+    ki = U.lejatsz(JR.REGISZTER["milliomos"], bot)
+    sz = U.szoveg(ki).lower()
+    assert "milliomos kvíz" in sz
+    assert "főnyereményt" in sz and "negyvenmillió" in sz
+    assert ki[-1][0] == "vege"
+
+
+def test_milliomos_megallas_hazaviszi_a_penzt():
+    """Két helyes válasz után kiszállás → a megszerzett pénzzel zárul."""
+    import random
+    random.seed(2)
+    by_q = _milliomos_valaszkereso()
+    st = {"n": 0}
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "végleges" in kl:
+            return "i"
+        if "a válaszod" in kl:
+            st["n"] += 1
+            if st["n"] >= 3:
+                return "M"                      # a 3. kérdésnél kiszáll
+            for t, p in reversed(ki):
+                if t == "mond" and p in by_q:
+                    return by_q[p]
+            return "A"
+        return ""
+    ki = U.lejatsz(JR.REGISZTER["milliomos"], bot)
+    sz = U.szoveg(ki).lower()
+    assert "megálltál" in sz
+    assert ki[-1][0] == "vege"
+
+
+def test_milliomos_harom_segitseg_mukodik():
+    """Az első kérdésnél mindhárom segítség (felezés, telefon, közönség)."""
+    import random
+    random.seed(3)
+    by_q = _milliomos_valaszkereso()
+    used = {"F": False, "T": False, "K": False}
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "végleges" in kl:
+            return "i"
+        if "a válaszod" in kl:
+            for s in ("F", "T", "K"):
+                if not used[s]:
+                    used[s] = True
+                    return s
+            for t, p in reversed(ki):
+                if t == "mond" and p in by_q:
+                    return by_q[p]
+            return "M"                          # segítségek után álljunk meg
+        return ""
+    ki = U.lejatsz(JR.REGISZTER["milliomos"], bot)
+    sz = U.szoveg(ki).lower()
+    assert "felezés" in sz
+    assert "a közönség szavazott" in sz
+    assert "felhívtad a barátodat" in sz
+
+
+def test_milliomos_saját_es_nem_a_musorbol():
+    """Jogtisztaság: a katalógus-cím NEM a védjegy, a leírás jelzi az
+    INSPIRÁCIÓT, és a modulban semmilyen műsor-hangfájl/Vágó-hivatkozás nincs."""
+    import inspect
+    M = _milliomos_modul()
+    j = KAT.keres("milliomos")
+    assert j.nev == "Milliomos kvíz"                 # nem a védjegy-cím
+    assert j.retro is False                          # saját játék, nem retró
+    assert "inspir" in j.leiras.lower()
+    src = inspect.getsource(M).lower()
+    for tilt in ("vago", "vág", ".wav", "assets", "loim", "takfej"):
+        assert tilt not in src, f"tiltott hivatkozás a forrásban: {tilt}"

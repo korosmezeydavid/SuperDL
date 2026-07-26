@@ -279,6 +279,13 @@ RETRO: tuple[Jatek, ...] = (
 #  SUPERDL SAJÁT JÁTÉKOK  (nem retró: normál hang, nincs szerző-intro)
 # =====================================================================
 SAJAT: tuple[Jatek, ...] = (
+    Jatek("milliomos", "Milliomos kvíz",
+          "A népszerű „Legyen Ön is Milliomos” kvízműsor által INSPIRÁLT, "
+          "akadálymentes kvízjáték: 15 lépcsős pénzlétra 40 millió forintig, "
+          "garantált pontokkal, három segítséggel (felezés, telefonos segítség, "
+          "közönségszavazás) és több mint ezer kérdéssel. Saját, jogtiszta "
+          "változat – a műsor zenéje és hangja nélkül.",
+          retro=False),
     Jatek("uno", "UNO",
           "A klasszikus UNO három ellenféllel: rakj színben vagy értékben "
           "egyezőt, és fogyj ki elsőként a lapjaidból!",
