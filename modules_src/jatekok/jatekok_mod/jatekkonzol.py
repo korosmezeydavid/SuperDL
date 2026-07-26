@@ -213,6 +213,9 @@ class JatekKonzol(wx.Dialog):
             if typ == "effekt":
                 self._effekt(payload)
                 continue
+            if typ == "enek":
+                self._enek(payload)
+                continue
             if typ == "kerdez":
                 self._ki(payload)
                 self._var_bemenet(True)
@@ -351,6 +354,42 @@ class JatekKonzol(wx.Dialog):
             pcm = (np.clip(x, -1, 1) * 32767).astype("<i2")
             out = os.path.join(tempfile.gettempdir(),
                                f"superdl_sfx_{uuid.uuid4().hex[:8]}.wav")
+            with wave.open(out, "wb") as w:
+                w.setnchannels(1)
+                w.setsampwidth(2)
+                w.setframerate(fs)
+                w.writeframes(pcm.tobytes())
+            if self._tone_player is None:
+                from superdl.audioengine import Player
+                self._tone_player = Player()
+            self._tone_player.play(out, "")
+        except Exception:
+            pass
+
+    def _enek(self, payload):
+        """A gép ELÉNEKLI a dalt (a SAJÁT formáns-szintetizátorral). A payload:
+        (sorok, gépkulcs). WAV-ba rendereljük, és a hang-lejátszón szólaltatjuk."""
+        if self._closing:
+            return
+        try:
+            sorok, gep = payload
+        except Exception:
+            return
+        if not sorok:
+            return
+        try:
+            import os
+            import tempfile
+            import uuid
+            import wave
+            import numpy as np
+            from . import enek as EN
+            y, fs = EN.enekel(sorok, gep)
+            if y is None or not len(y):
+                return
+            pcm = (np.clip(y, -1, 1) * 32767).astype("<i2")
+            out = os.path.join(tempfile.gettempdir(),
+                               f"superdl_enek_{uuid.uuid4().hex[:8]}.wav")
             with wave.open(out, "wb") as w:
                 w.setnchannels(1)
                 w.setsampwidth(2)

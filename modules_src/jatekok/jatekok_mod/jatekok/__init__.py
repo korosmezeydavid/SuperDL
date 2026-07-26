@@ -57,6 +57,7 @@ REGISZTER = {
     "slot": sajat.jatek_slot,
     "uno": sajat.jatek_uno,
     "milliomos": milliomos.jatek_milliomos,   # LOIM-inspirált kvíz, saját, jogtiszta
+    "enektanito": sajat.jatek_enektanito,     # a gép a saját hangján énekel
     # HITELES portok a hivatalos Homelab/Brailab gyűjteményből
     "blackjack": homelab.jatek_blackjack,
     "szamkit1": homelab.jatek_szamkit1,

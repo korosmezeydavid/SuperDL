@@ -301,6 +301,15 @@ SAJAT: tuple[Jatek, ...] = (
           "A klasszikus UNO három ellenféllel: rakj színben vagy értékben "
           "egyezőt, és fogyj ki elsőként a lapjaidból!",
           retro=False),
+    Jatek("enektanito", "Gépi ének",
+          "Taníts a gépnek egy dalt, és a saját formáns-hangján elénekli! "
+          "Soronként adsz meg egy hangot: SZÓTAG HANGNÉV HOSSZ (pl. „bo g4 0.4”). "
+          "A hangnév egy betű (c, d, e, f, g, a, h) és egy oktávszám (a 4 a "
+          "középső), a hossz másodpercben vagy szóval (fél, negyed). Parancsok: "
+          "énekeld, súgó, példa skála, példa boci, töröl, kész. A hangot 100 "
+          "százalékban a mi saját szintetizátorunk adja – nincs benne idegen "
+          "hangminta.",
+          retro=False),
     Jatek("slot", "Félkarú rabló",
           "Pörgesd a tárcsákat, és gyűjts minél több érmét a nyerőtáblázat "
           "szerint.",

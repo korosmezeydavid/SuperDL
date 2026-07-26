@@ -867,6 +867,44 @@ def test_szammem_helyes_visszairas_novekszik():
     assert ki[-1][0] == "vege"
 
 
+def test_enek_motor_renderel_es_ertelmez():
+    """A GÉPI ÉNEK motorja: hangnév→Hz, sor-értelmezés, és valódi audio-render."""
+    EN = importlib.import_module(BASE + ".enek")
+    assert abs(EN.frekv("a4") - 440.0) < 0.5
+    assert EN.frekv("c5") > EN.frekv("c4")               # magasabb oktáv
+    assert EN.parse_sor("bo g4 0.4") == ("bo", "g4", 0.4)
+    assert EN.parse_sor("- c4 fél")[2] == 0.5            # szavas hossz
+    assert EN.parse_sor("kész") is None                  # parancs, nem hang
+    y, fs = EN.enekel(EN.PELDAK["skála"], "brailab")
+    assert y is not None and len(y) > 0                  # tényleg megszólal
+
+
+def test_enektanito_sugo_es_enekel():
+    """A tool: súgó, néhány hang beírása, majd „énekeld" → a gép ÉNEKEL."""
+    st = {"n": 0}
+
+    def bot(k, ki):
+        st["n"] += 1
+        return {1: "súgó", 2: "bo g4 0.4", 3: "ci g4 0.4",
+                4: "énekeld"}.get(st["n"], "kész")
+    ki = U.lejatsz(JR.REGISZTER["enektanito"], bot)
+    assert any(t == "enek" for t, _ in ki)               # elhangzott ének-parancs
+    assert any("SZÓTAG HANGNÉV HOSSZ" in p
+               for t, p in ki if t == "mond")            # a súgó megjelent
+    assert ki[-1][0] == "vege"
+
+
+def test_enektanito_beepitett_pelda():
+    """A „példa skála" betölt és el is énekel egy beépített dalt."""
+    def bot(k, ki):
+        if not any(t == "enek" for t, _ in ki):
+            return "példa skála"
+        return "kész"
+    ki = U.lejatsz(JR.REGISZTER["enektanito"], bot)
+    enekek = [p for t, p in ki if t == "enek"]
+    assert enekek and len(enekek[0][0]) == 8             # a skála 8 hang
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()

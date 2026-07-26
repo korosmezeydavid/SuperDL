@@ -279,3 +279,77 @@ def jatek_uno(ctx):
         if not igen(v, False):
             break
     yield ctx.vege("Köszönöm a játékot!")
+
+
+# ================================================================ GÉPI ÉNEK
+# A SuperDL saját formáns-szintetizátora dallamra énekel. Nem játék, hanem
+# kreatív eszköz: taníts a gépnek egy dalt (szótag + hangnév + hossz soronként),
+# és elénekli a saját hangján. Semmi idegen hangminta – 100% saját szintézis.
+
+from .. import enek as _EN
+
+_ENEK_SUGO = (
+    "GÉPI ÉNEK – így taníts a gépnek egy dalt. Soronként adj meg egy hangot "
+    "ebben a formában: SZÓTAG HANGNÉV HOSSZ. Például: bo g4 0.4 – a bo szótagot "
+    "a g4 hangon, 0,4 másodpercig. A SZÓTAG az, amit énekeljen (pl. bo, ci, lá); "
+    "ha csak dallam kell szöveg nélkül, írj a szótag helyére kötőjelet, például: "
+    "kötőjel c4 0.5. A HANGNÉV egy betű – c, d, e, f, g, a, h – és egy oktávszám, "
+    "ahol a 4 a középső; például c4, g4, c5. A nagyobb oktávszám magasabb hang: a "
+    "c5 egy oktávval a c4 fölött van. A HOSSZ másodpercben, például 0.4 vagy 0.5, "
+    "vagy szóval: egész, fél, negyed, nyolcad. Parancsok: énekeld – elénekli, "
+    "amit eddig beírtál; súgó – ez a leírás; példa skála vagy példa boci – egy "
+    "beépített dal; töröl – üríti a dalt; kész – kilépés.")
+
+
+def jatek_enektanito(ctx):
+    yield ctx.mond(
+        "Gépi ének! Itt megtaníthatsz a gépnek egy dalt, és a saját "
+        "formáns-hangján elénekli neked. Soronként adj meg egy hangot így: "
+        "szótag, hangnév, hossz – például: bo g4 0.4. A részletes leíráshoz írd "
+        "azt, hogy súgó. Beépített példáért írd: példa skála, vagy példa boci.")
+    dal = []
+    while True:
+        v = yield ctx.kerdez("Adj meg egy hangot (szótag hangnév hossz), vagy "
+                             "parancsot (énekeld / súgó / példa / töröl / kész):")
+        s = (v or "").strip()
+        al = ekezet_nelkul(s.lower())
+        if not s:
+            continue
+        if al in ("kesz", "vege", "kilepes"):
+            yield ctx.vege("Viszlát! Bármikor visszajöhetsz zenélni.")
+            return
+        if al == "sugo":
+            yield ctx.mond(_ENEK_SUGO)
+            continue
+        if al == "torol":
+            dal = []
+            yield ctx.mond("Üres a dal, kezdheted elölről.")
+            continue
+        if al.startswith("pelda"):
+            kulcs = ("boci" if "boci" in al
+                     else "skála" if "skala" in al else None)
+            if kulcs is None:
+                yield ctx.mond("Példák: példa skála, vagy példa boci.")
+                continue
+            dal = list(_EN.PELDAK[kulcs])
+            yield ctx.mond(f"Betöltöttem a(z) {kulcs} példát, most elénekelem!")
+            yield ctx.enek(dal)
+            continue
+        if al in ("enekeld", "enek", "dal", "enekelj"):
+            if not dal:
+                yield ctx.mond("Még nincs egyetlen hang sem. Adj meg legalább "
+                               "egyet, vagy próbáld: példa skála.")
+                continue
+            yield ctx.mond(f"Éneklem a {len(dal)} hangból álló dalt!")
+            yield ctx.enek(dal)
+            continue
+        hang = _EN.parse_sor(s)
+        if hang is None:
+            yield ctx.mond("Ezt nem értem. A formátum: szótag hangnév hossz, "
+                           "például: lá a4 0.5. Segítségért írd: súgó.")
+            continue
+        dal.append(hang)
+        szotag, hangnev, hossz = hang
+        yield ctx.mond(f"Felvéve: {szotag or 'dúdolás'}, a {hangnev} hangon, "
+                       f"{hossz} másodperc. Eddig {len(dal)} hang a dalban. Ha "
+                       "kész vagy, írd: énekeld.")

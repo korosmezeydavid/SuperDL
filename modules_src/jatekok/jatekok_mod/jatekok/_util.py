@@ -44,6 +44,12 @@ class Ctx:
         felület szintetizálja és lejátssza; a teszt-hajtó átugorja."""
         return ("effekt", str(nev))
 
+    def enek(self, sorok, gep="brailab"):
+        """A gép ELÉNEKEL egy dalt a saját formáns-hangján. `sorok`: a dal
+        [(szótag, hangnév, hossz), …] listája (lásd az `enek` modult). A felület
+        szintetizálja és lejátssza; a teszt-hajtó átugorja."""
+        return ("enek", (list(sorok), str(gep)))
+
 
 # ---- bemenet-értelmezés --------------------------------------------------
 
