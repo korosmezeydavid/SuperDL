@@ -82,6 +82,9 @@ REGISZTER = {
     "nurmi": homelab.jatek_nurmi,
     "penzfel": homelab.jatek_penzfel,
     "kincs": homelab.jatek_kincs,
+    "apollo": homelab.jatek_apollo,
+    "simon15": homelab.jatek_simon15,
+    "jvelem": homelab.jatek_jvelem,
 }
 
 

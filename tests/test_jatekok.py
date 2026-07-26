@@ -680,6 +680,78 @@ def test_kincs_sudi_gabor_lejatszik():
     assert j.szerzo == "Sűdi Gábor" and j.ev == "1985"
 
 
+def test_apollo_holdraszallas_lezarul():
+    """APOLLÓ: fékezés nélkül (0 rakéta) is leszáll (kemény landolás), és a
+    leszállási jelentéssel rendben lezárul. A fizika determinisztikus."""
+    def bot(k, ki):
+        kl = k.lower()
+        if "kezdhetjük" in kl:
+            return "i"
+        if "rakéták száma" in kl:
+            return "0"
+        if "újra kísérletezni" in kl:
+            return "n"
+        return ""
+    ki = _fut("apollo", bot)
+    sz = U.szoveg(ki).lower()
+    assert "holdra szálló" in sz
+    assert "leszállási sebesség" in sz
+
+
+def test_simon15_csapo_endre_gyozelem():
+    """SZÁJMON 15: a dallamot pontosan visszajátszva mind a hét menet sikerül."""
+    import random
+    random.seed(5)
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "játszd vissza" in kl:
+            dallam = next((p for t, p in reversed(ki)
+                           if t == "mond" and p.startswith("A dallam:")), "")
+            return " ".join(c for c in dallam if c in "1234")
+        if "kezded elölről" in kl:
+            return "n"
+        return ""
+    ki = _fut("simon15", bot)
+    sz = U.szoveg(ki).lower()
+    assert "őszintén gratulálok" in sz
+    j = next(x for x in KAT.RETRO if x.kulcs == "simon15")
+    assert j.szerzo == "Csapó Endre" and j.ev == "1988"
+
+
+def test_jvelem_szorzat_osszeg_es_szamkitalalas():
+    """JÁTSSZ VELEM: helyes szorzat és összeg, majd bináris kereséssel a szám."""
+    import random
+    random.seed(9)
+    st = {"lo": 1, "hi": 100, "last": 50}
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "kérek egy számot" in kl:
+            return "6"
+        if "kérek még egyet" in kl:
+            return "7"
+        if "össze vannak szorozva" in kl:
+            return "42"
+        if "összegük" in kl:
+            return "13"
+        if "tippelj" in kl:
+            last = next((p.lower() for t, p in reversed(ki)
+                         if t == "mond"
+                         and ("nagyobb" in p.lower() or "kisebb" in p.lower())), "")
+            if "nagyobb" in last:
+                st["lo"] = st["last"] + 1
+            elif "kisebb" in last:
+                st["hi"] = st["last"] - 1
+            st["last"] = (st["lo"] + st["hi"]) // 2
+            return str(st["last"])
+        return ""
+    ki = _fut("jvelem", bot)
+    sz = U.szoveg(ki).lower()
+    assert "gratulálok, okos vagy" in sz
+    assert "eltaláltad" in sz
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()

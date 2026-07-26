@@ -2651,3 +2651,166 @@ def jatek_kincs(ctx):
             continue
         yield ctx.vege("Viszlát, kincsvadász!")
         return
+
+
+# ===================================================================== APOLLÓ
+# Forrás: APOLLO.bas. Holdraszálló szimulátor: 20 km magasból, 10 m/s-mal
+# közeledsz; alkalmanként megadod, hány fékezőrakétát indítasz (0–100, összesen
+# 700), a fizika frissíti a sebességet, tömeget, magasságot. Cél a sima
+# leszállás: 2 m/s alatt kitűnő, 12 alatt túléli a személyzet, felette meghal.
+# A fizikai képletek és az üzenetek a forrásból.
+
+def jatek_apollo(ctx):
+    yield ctx.mond(
+        "Apolló. Ön egy Holdra szálló űrhajó parancsnoka. Az űrhajó 20 kilométer "
+        "magasságban, 10 méter másodpercenkénti sebességgel közeledik a Hold "
+        "felé. Az űrhajó tömege 12000 kilogramm. A fékezőrakéták száma 700 darab. "
+        "Az egyszerre indítható fékezőrakéták száma maximum 100 darab. Egy rakéta "
+        "fékezőereje 90 newton. Egy fékezőrakéta tömege 10 kilogramm. A "
+        "fékezőrakéták 10 másodpercig fékeznek. A cél a sima leszállás a Hold "
+        "felszínére. A program megkérdi alkalmanként a felhasználandó "
+        "fékezőrakéták számát.")
+    v = yield ctx.kerdez("Kezdhetjük? (i/n)")
+    if not igen(v, False):
+        yield ctx.vege("Sok sikert!")
+        return
+    while True:
+        H, G, GR, RS = 20000.0, 12000.0, 10.0, 700
+        FR, A, VK, T = 900.0, 3.07, 10.0, 0
+        V = VK
+        while True:
+            if RS > 0:
+                vr = yield ctx.kerdez(f"A felhasználandó rakéták száma? "
+                                      f"(0–100; még {RS} darab van)")
+                R = szam(vr, 0, 100)
+                if R is None:
+                    yield ctx.mond("Nulla és száz közötti számot kérek.")
+                    continue
+                R = min(R, RS)
+                RS -= R
+                G -= GR * R
+            else:
+                R = 0
+            for N in range(1, 11):
+                F = R * FR / G
+                S = (A - F) / 2 + VK
+                H -= S
+                V = 2 * S - VK
+                VK = V
+                if H <= 0.01:
+                    break
+            T += N
+            if abs(V) < 0.01:
+                V = 0.0
+            if H <= 0.01:
+                H = 0.0
+                break
+            yield ctx.mond(f"{T} másodperc után a sebesség {V:.2f} méter "
+                           f"másodpercenként. A tömeg {G:.0f} kilogramm. A "
+                           f"magasság {H:.0f} méter. És még van {RS} darab rakéta.")
+            if RS <= 0 and H > 0:
+                yield ctx.mond("Elfogytak a fékezőrakéták, az űrhajó szabadon "
+                               "zuhan tovább!")
+        yield ctx.mond(f"Leszállási sebesség: {V:.2f} méter másodpercenként, "
+                       f"azaz {3.6 * V:.1f} kilométer óránként. A leszállás ideje "
+                       f"{T} másodperc.")
+        if V <= 2:
+            yield ctx.mond("Kitűnő teljesítmény, gratulálok!")
+        elif V < 12:
+            yield ctx.mond("Közepes teljesítmény, de a személyzet túlélte a "
+                           "leszállást.")
+        else:
+            yield ctx.mond("Gyenge teljesítmény, a személyzet meghalt.")
+        v = yield ctx.kerdez("Akar újra kísérletezni? (i/n)")
+        if igen(v, False):
+            continue
+        yield ctx.vege("Sok sikert!")
+        return
+
+
+# ================================================================= SZÁJMON 15
+# Forrás: SIMON15.bas – Készítette: Csapó Endre, 1988.
+# Zenei memóriajáték: a gép ad egy dallamot (a négy hang 1–4), te visszajátszod.
+# Hibátlan menet után a dallam két hanggal hosszabb (3, 5, 7 … 15); hét hibátlan
+# menet a győzelem. Hibánál a játék elölről indul. Az üzenetek a forrásból.
+
+def jatek_simon15(ctx):
+    yield ctx.mond(
+        "Szájmon 15! Ez egy egyszerű zenei játék. A gép ad néhány zenei hangot, "
+        "ezt a kis dallamot vissza kell játszanod. A négy hang az 1, 2, 3 és 4 "
+        "számmal adható meg. Ha hibázol, Szájmon leáll, és a játék újra elölről "
+        "indul. Hibátlan dallam esetén Szájmon egy másik dallamot ad, de ez már "
+        "két hanggal több lesz! És ez így megy egészen hét meneten keresztül. "
+        "Ekkor megnyerted a játékot. Igen jó füleket és kellemes szórakozást "
+        "kíván a játék készítője, Csapó Endre!")
+    while True:
+        hossz = 3
+        vege = False
+        while hossz < 17:
+            dallam = [random.randint(1, 4) for _ in range(hossz)]
+            yield ctx.mond("A dallam: " + ", ".join(str(x) for x in dallam) + ".")
+            v = yield ctx.kerdez(f"Játszd vissza a {hossz} hangot! "
+                                 "(1–4 közötti számok)")
+            tipp = [int(c) for c in (v or "") if c in "1234"]
+            if tipp == dallam:
+                hossz += 2
+                if hossz < 17:
+                    yield ctx.mond("Hibátlan! Jöjjön a következő, hosszabb dallam.")
+            else:
+                yield ctx.mond("Hibáztál! Szájmon leáll.")
+                w = yield ctx.kerdez("Kezded elölről? (i/n)")
+                if not igen(w, False):
+                    vege = True
+                break
+        if hossz >= 17:
+            yield ctx.vege("Őszintén gratulálok! Önnek remek füle és igen jó "
+                           "memóriája van!")
+            return
+        if vege:
+            yield ctx.vege("Viszlát, Szájmon legközelebb újra vár!")
+            return
+
+
+# =============================================================== JÁTSSZ VELEM
+# Forrás: J-VELEM.bas. Kis fejtörő: két számot kérek, kitalálod a szorzatukat
+# (durva hibára „De hülye vagy!"), majd az összegüket, végül gondolok egy számot
+# 1 és 100 között, amit ki kell találnod. Az üzenetek a forrásból.
+
+def jatek_jvelem(ctx):
+    yield ctx.mond("Játssz velem!")
+    while True:
+        a = szam((yield ctx.kerdez("Kérek egy számot!")))
+        b = szam((yield ctx.kerdez("Kérek még egyet!")))
+        if a is None or b is None:
+            yield ctx.mond("Számot kérek!")
+            continue
+        break
+    szorzat = a * b
+    while True:
+        x = szam((yield ctx.kerdez("Szerinted mennyi az eredmény, ha össze "
+                                   "vannak szorozva?")))
+        if x == szorzat:
+            yield ctx.mond("Gratulálok, okos vagy!")
+            break
+        if x is None or abs(szorzat - x) > 5:
+            yield ctx.mond("De hülye vagy!")
+        else:
+            yield ctx.mond("Hát nem egészen.")
+    while True:
+        x = szam((yield ctx.kerdez("Mennyi az összegük?")))
+        if x == a + b:
+            break
+    yield ctx.mond("Gondoltam egy számot 1 és 100 között.")
+    titok = random.randint(1, 100)
+    tipp_db = 0
+    while True:
+        x = szam((yield ctx.kerdez("Tippelj! (1–100)")), 1, 100)
+        if x is None:
+            yield ctx.mond("Figyelmeztetlek, ne szórakozzál!")
+            continue
+        tipp_db += 1
+        if x == titok:
+            yield ctx.vege(f"Eltaláltad {tipp_db} tippből! Okos vagy!")
+            return
+        yield ctx.mond("Nagyobb számot gondoltam." if x < titok
+                       else "Kisebb számot gondoltam.")

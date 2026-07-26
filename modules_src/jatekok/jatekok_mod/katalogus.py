@@ -258,6 +258,20 @@ RETRO: tuple[Jatek, ...] = (
           "gödrökkel keresed, égtáj-segítséggel, tíz próbálkozásból. Találd meg, "
           "mielőtt elfogynak az ásásaid!",
           szerzo="Sűdi Gábor", ev="1985"),
+    Jatek("apollo", "Apolló – holdraszállás",
+          "Holdraszálló szimulátor: 20 kilométer magasból, 10 méter "
+          "másodpercenként közeledsz. Alkalmanként megadod, hány fékezőrakétát "
+          "indíts (összesen 700); a fizika dönt. Két méter per másodperc alatt "
+          "kitűnő a leszállás, tizenkettő felett a személyzet odavész."),
+    Jatek("simon15", "Szájmon 15",
+          "Zenei memóriajáték: a gép ad egy dallamot (a négy hang 1–4), te "
+          "visszajátszod. Hibátlan menet után a dallam két hanggal hosszabb; hét "
+          "hibátlan menet a győzelem. Egy hiba, és kezdheted elölről!",
+          szerzo="Csapó Endre", ev="1988"),
+    Jatek("jvelem", "Játssz velem",
+          "Kis fejtörő a géppel: két számot kér, kitalálod a szorzatukat (durva "
+          "hibára megkapod a magadét!), majd az összegüket, végül gondol egy "
+          "számot 1 és 100 között, amit ki kell találnod."),
 )
 
 
