@@ -473,6 +473,9 @@ class _KonzolCtx:
     def effekt(self, nev):
         return ("effekt", str(nev))
 
+    def enek(self, sorok, gep="brailab"):
+        return ("enek", (list(sorok), str(gep)))
+
 
 # ---- a felület által hívott indítók -------------------------------------
 

@@ -894,6 +894,20 @@ def test_enektanito_sugo_es_enekel():
     assert ki[-1][0] == "vege"
 
 
+def test_konzol_ctx_szinkron_az_util_ctx_szel():
+    """A valós felület _KonzolCtx-je UGYANAZOKAT a parancs-metódusokat adja,
+    mint a teszt _util.Ctx – így nem fordulhat elő, hogy egy játék a tesztben
+    megy, élesben meg elszáll (pl. a hiányzó enek miatt)."""
+    import os
+    mod = importlib.import_module(BASE)
+    p = os.path.join(os.path.dirname(mod.__file__), "jatekkonzol.py")
+    with open(p, encoding="utf-8") as f:
+        konzol_src = f.read()
+    for nev in ("mond", "kerdez", "vege", "hang", "effekt", "enek"):
+        assert callable(getattr(U.Ctx, nev, None)), f"_util.Ctx-ból hiányzik: {nev}"
+        assert f"def {nev}(" in konzol_src, f"_KonzolCtx-ból hiányzik: {nev}"
+
+
 def test_enektanito_beepitett_pelda():
     """A „példa skála" betölt és el is énekel egy beépített dalt."""
     def bot(k, ki):
