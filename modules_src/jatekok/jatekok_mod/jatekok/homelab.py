@@ -2274,3 +2274,194 @@ def jatek_randi(ctx):
                    "Sajnálom. Sajnálom! De ez pech.")
     yield ctx.vege(f"{ts}. Jegyezd meg e telefonszámot, ha ráérsz! Próbáld meg "
                    "felhívni. Ezt ajánlom!")
+
+
+# ================================================================== LÓVERSENY
+# Forrás: LOVERSNY.bas. Fogadós lóverseny: Brailab a versenybíró, 1–10 játékos,
+# fejenként 2000 Ft. Hat véletlen ló a 30-ból, mindenki egy rajtszámra és egy
+# tétre fogad; a győztesre 100%, a másodikra 50%, a harmadikra 25% jár, egyébként
+# a tét elveszik. Aki elfogy, kiesik. A tét-méret dumái és a befutó-kommentek a
+# forrásból, szó szerint.
+
+_LOVERSENY_LOVAK = (
+    "Csillagfény", "Titanik", "Csokoládé", "Fincsi", "Táltos",
+    "Szélvész", "Lady", "Félix", "Gyémánt", "Szerencse",
+    "Ördög", "Imperiál", "Musztafa", "Jeromis", "Principi",
+    "Rúró", "Friderika", "Viharverés", "Pántlika", "Amalgám",
+    "Testőr", "Mangó", "Zsoldos", "Dalis", "Kalózfi",
+    "Kőszméte", "Martina", "Élis", "Tumán", "Cerná",
+)
+_LOVERSENY_SORSZAM = (
+    "Az első", "A második", "A harmadik", "A negyedik", "Az ötödik",
+    "A hatodik", "A hetedik", "A nyolcadik", "A kilencedik", "A tizedik",
+)
+_LOVERSENY_HELYEZES = {
+    1: "Szerintem is ő volt erre a helyezésre a legesélyesebb.",
+    2: "Hát igen! A másodiknak is nagyon szép lenni.",
+    3: "Nem vártam ezt az eredményt! Magam is nagyon meglepődtem.",
+    4: "Hát igen! {lo} azt nyújtotta, amit maximálisan nyújtani tudott.",
+    5: "Jobb eredményt is futhatott volna {lo}!",
+    6: "Ide nincs semmi hozzáfűzni valóm! Az utolsó hely az utolsó hely.",
+}
+
+
+def _loverseny_tet_duma(tet, lo, nev):
+    if tet < 100:
+        return (f"Zsugori vagy! Nem gondolod? {tet} forinttal. Ki lehet "
+                "törölni a ...ot.")
+    if tet < 200:
+        return (f"Elhiszem, hogy fáj kiadni pénzt! Ha {lo} lennék, ennyi "
+                "pénzért el sem indulnék!")
+    if tet < 300:
+        return (f"Nem igen erőltetted meg a kasszánál magad! Ha {lo} lennék, "
+                "a pálya felénél megállnék!")
+    if tet < 400:
+        return (f"A ló okos állat. Ha {lo} lennék, a cél előtt földbe "
+                "gyökerezne a lábam!")
+    if tet < 500:
+        return (f"Kezdesz bátorodni! {tet} forintot kiadni! Talán ennyi "
+                f"pénzért {lo} is hajlandó lesz futni!")
+    if tet < 600:
+        return (f"{nev}, ha így folytatod, a végén jó lóversenyzőként "
+                "zárhatod!")
+    if tet < 700:
+        return (f"{tet} forintra már érdemes odafigyelni! Ha elveszíted, lesz "
+                "mit tőled bezsebelni!")
+    if tet < 800:
+        return (f"{tet} forint már jó pénz! Talán a jó isten segít neked, ad "
+                "egy kis szerencsét!")
+    if tet < 900:
+        return (f"Remélem, {lo} rosszul szalad! {tet} forint. Talán a "
+                "kasszámban marad!")
+    if tet < 1000:
+        return (f"Nem győzöm figyelni a fejlődésed! {tet} forintot kiadni! "
+                "Szép teljesítmény. Lesz mit elnyernem tőled!")
+    return (f"{tet} forintnál már alamuszi vagyok! Remélem, a pénzed elnyerem. "
+            "Jaj de izgatott vagyok!")
+
+
+def jatek_loverseny(ctx):
+    yield ctx.mond(
+        "Lóverseny! Brailab vagyok, a versenybíróság vezetője! A játékszabályok "
+        "nagyon egyszerűek. Figyelj, elmondom őket! A játék kezdésekor mindenki "
+        "kap 2000 forintot tőlem, amiből meg lehet tenni a tetszőleges nagyságú "
+        "tétet. Ha tétedet rossz lóra teszed, a tétednek én örülhetek. Ha a "
+        "választott paci nem első, hanem második vagy harmadik, téted nem "
+        "veszik el, csak kevesebbet kamatozik.")
+    while True:
+        v = yield ctx.kerdez("Hány játékos akar részt venni a játékban? (1–10)")
+        ab = szam(v, 1, 10)
+        if ab is None:
+            yield ctx.mond("A játékosok száma legalább egy, legfeljebb tíz lehet.")
+            continue
+        break
+    yield ctx.mond(f"Köszönöm! A játékban {ab} játékos fog részt venni.")
+    nevek = []
+    for i in range(ab):
+        while True:
+            kerd = ("Mi a neved?" if ab == 1
+                    else f"{_LOVERSENY_SORSZAM[i]} játékos neve?")
+            v = yield ctx.kerdez(kerd)
+            nev = (v or "").strip()
+            if nev:
+                nevek.append(nev)
+                break
+            yield ctx.mond("Ne próbálj velem kiszúrni!")
+    yield ctx.mond("Köszönöm a bemutatkozást! Kezdjék a játékot.")
+
+    penzek = [2000] * ab
+    jatekosok = list(range(ab))      # a még játékban lévők indexei
+
+    while True:
+        tobb = len(jatekosok) > 1
+        yield ctx.mond("Türelmet kér a versenybíróság! Összeállítjuk a "
+                       "versenyben részt vevő lovak névsorát. Megvan a névsor! Íme!")
+        mezony = random.sample(_LOVERSENY_LOVAK, 6)
+        for r, lo in enumerate(mezony, start=1):
+            yield ctx.mond(f"{r}. rajtszámmal {lo}.")
+        tett_lo, tett_osszeg = {}, {}
+        for idx in jatekosok:
+            nev = nevek[idx]
+            while True:
+                v = yield ctx.kerdez(f"{nev}! Hányas rajtszámú lóra teszed a "
+                                     "tétedet? (1–6)")
+                ac = szam(v, 1, 6)
+                if ac is None:
+                    yield ctx.mond("Ne törd magad! Nem tudsz kiszúrni velem!")
+                    continue
+                break
+            lo = mezony[ac - 1]
+            tett_lo[idx] = lo
+            while True:
+                v = yield ctx.kerdez(f"Mennyi tétet szánsz rá? (1–{penzek[idx]} Ft)")
+                tet = szam(v, 1, penzek[idx])
+                if tet is None:
+                    yield ctx.mond("Nincs is ennyi pénzed, vagy túl kevés a tét!")
+                    continue
+                break
+            tett_osszeg[idx] = tet
+            yield ctx.mond(f"{lo}, {tet} forint. {nev} részéről.")
+            yield ctx.mond(_loverseny_tet_duma(tet, lo, nev))
+
+        yield ctx.mond("Figyelem, figyelem! A sípszó elhangzásakor indul a "
+                       "futam. A futam elindult!")
+        sorrend = random.sample(mezony, 6)     # a befutási sorrend
+        yield ctx.mond("Heuréka! Heuréka! Minden versenyző áthaladt a "
+                       "célvonalon. A befutási sorrend a következő.")
+        for hely, lo in enumerate(sorrend, start=1):
+            yield ctx.mond(f"{hely}. helyen {lo} végzett. "
+                           + _LOVERSENY_HELYEZES[hely].format(lo=lo))
+
+        yield ctx.mond("Ki volt szerencsés és ki volt szerencsétlen? "
+                       + ("Figyeljetek rám!" if tobb else "Figyelj rám!")
+                       + " Azonnal megnézem.")
+        elso, masodik, harmadik = sorrend[0], sorrend[1], sorrend[2]
+        maradok = []
+        for idx in jatekosok:
+            nev, lo, tet = nevek[idx], tett_lo[idx], tett_osszeg[idx]
+            yield ctx.mond(f"{nev}, a te megtett lovad {lo}, {tet} forint téttel.")
+            ss = 100 if lo == elso else 50 if lo == masodik else 25 if lo == harmadik else 0
+            if ss:
+                nyer = int((tet / 100) * ss)
+                yield ctx.mond(f"A nyeremény tétednek {ss} százaléka.")
+                if nyer < 1:
+                    yield ctx.mond("De a tét oly kicsi, hogy nem jár rá semmi!")
+                else:
+                    penzek[idx] += nyer
+                    yield ctx.mond(f"A nyereményed {nyer} forint.")
+                yield ctx.mond(f"Összesen van {penzek[idx]} forint pénzed.")
+            else:
+                penzek[idx] -= tet
+                yield ctx.mond(f"Jaj, jaj! Szomorú vagy, elhiszem. De ami jár "
+                               f"nekem, azt elveszem! {tet} volt a téted, én ezt "
+                               "elvonom a pénzedből.")
+                if penzek[idx] <= 0:
+                    yield ctx.mond(f"{nev}, elfogyott a pénzed! Pénz nélkül nem "
+                                   "lehet játszani. Töröllek a játékból téged!")
+                else:
+                    yield ctx.mond(f"Így maradt {penzek[idx]} forintnyi pénzed.")
+            if penzek[idx] > 0:
+                maradok.append(idx)
+
+        if not maradok:
+            yield ctx.vege("Köszönöm a játékot! Dagad a zsebem a sok pénztől. "
+                           "Játszunk máskor is, ha jónak látod!")
+            return
+        yield ctx.mond(f"A játékban maradt {len(maradok)} játékos.")
+        folytatok = []
+        for idx in maradok:
+            nev = nevek[idx]
+            kerd = (f"{nev}, te akarsz még játszani? (i/n)"
+                    if len(maradok) > 1 else "Akarsz még játszani? (i/n)")
+            v = yield ctx.kerdez(kerd)
+            if igen(v, False):
+                yield ctx.mond("Rendben van! Akkor megyünk tovább.")
+                folytatok.append(idx)
+            else:
+                yield ctx.mond("Kár, hogy már nem játszol! Emlékeimben bent "
+                               "leszel. Garantálom!")
+        if not folytatok:
+            yield ctx.vege("Köszönöm a játékot! Dagad a zsebem a sok pénztől. "
+                           "Játszunk máskor is, ha jónak látod!")
+            return
+        jatekosok = folytatok

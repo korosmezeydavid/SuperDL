@@ -561,6 +561,56 @@ def test_randi_negy_rossz_tipp_ugrott_a_randi():
     assert ki[-1][0] == "vege"
 
 
+def test_loverseny_egy_jatekos_lejatszik():
+    """LÓVERSENY: egy játékos fogad, lefut a futam, kifizetés, majd kilép."""
+    import random
+    random.seed(3)
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "hány játékos" in kl:
+            return "1"
+        if "neved" in kl:
+            return "Teszt"
+        if "rajtszámú" in kl:
+            return "1"
+        if "tétet szánsz" in kl:
+            return "500"
+        if "akarsz még játszani" in kl:
+            return "n"
+        return ""
+    ki = _fut("loverseny", bot)
+    sz = U.szoveg(ki).lower()
+    assert "lóverseny" in sz and "brailab" in sz
+    assert "befutási sorrend" in sz
+    assert "téttel" in sz                          # eljut a kifizetésig
+    assert "jó lóversenyzőként" in sz              # az 500-as tét dumája (forrás)
+
+
+def test_loverseny_ket_jatekos_es_folytatas():
+    """Két játékossal a többes számú szövegek is működnek; egy kör után kilépnek."""
+    import random
+    random.seed(11)
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "hány játékos" in kl:
+            return "2"
+        if "játékos neve" in kl:
+            return "Anna" if "első" in kl else "Béla"
+        if "rajtszámú" in kl:
+            return "2"
+        if "tétet szánsz" in kl:
+            return "100"
+        if "akarsz még játszani" in kl:
+            return "n"
+        return ""
+    ki = _fut("loverseny", bot)
+    sz = U.szoveg(ki).lower()
+    assert "figyeljetek rám" in sz                 # többes szám
+    assert "anna" in sz and "béla" in sz
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()

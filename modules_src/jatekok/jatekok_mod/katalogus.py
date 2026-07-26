@@ -238,6 +238,11 @@ RETRO: tuple[Jatek, ...] = (
           "segítséggel). Fejtsd meg az egészet, és jöhet a randi – a Homelab "
           "klasszikus csattanójával a végén.",
           szerzo="Kisvarga Zsolt"),
+    Jatek("loverseny", "Lóverseny",
+          "Fogadós lóverseny Brailabbal, a versenybíróval: 1–10 játékos, "
+          "fejenként 2000 forint. Fogadj egy rajtszámra és egy tétre – a "
+          "győztesre 100, a másodikra 50, a harmadikra 25 százalék jár, "
+          "egyébként a tét bánja. Aki elfogy, kiesik."),
 )
 
 
