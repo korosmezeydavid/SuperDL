@@ -517,9 +517,34 @@ def jatek_lotto(ctx):
         yield ctx.mond("NE KUKACOSKODJ VELEM!")
     for i in range(1, h + 1):
         szamok = sorted(random.sample(range(1, sz + 1), db))
-        yield ctx.mond(f"{i}. szelvény:")
-        for j, n in enumerate(szamok):
-            yield ctx.mond(f"{_LOTTO_SORSZAM[j]}: {n}.")
+        # MONDHATOM? – csak IGEN-re húzom ki; NEM-re/másra csípős duma (forrásból)
+        while True:
+            v = yield ctx.kerdez(f"{i}. szelvény. MONDHATOM? (i/n)")
+            d = (v or "").strip().lower()[:1]
+            if d == "i":
+                break
+            if d == "n":
+                yield ctx.mond("ISMERED A LAJHÁRT? MERT MÉG Ő IS GYORSABB "
+                               "NÁLAD!")
+            else:
+                yield ctx.mond("TE NAGYON SZERETSZ ENGEM CSESZEGETNI! DE MI "
+                               "LENNE, HA ÉN CSESZEGETNÉLEK TÉGED?")
+        # a számok kihúzása, majd MEGISMÉTELJEM? (IGEN-re újra, NEM-re tovább,
+        # bármi másra „NE CSESZEGESS!" és újra kérdez – a forrás szerint)
+        ki = True
+        while True:
+            if ki:
+                for j, n in enumerate(szamok):
+                    yield ctx.mond(f"{_LOTTO_SORSZAM[j]}: {n}.")
+                ki = False
+            v = yield ctx.kerdez("MEGISMÉTELJEM? (i/n)")
+            d = (v or "").strip().lower()[:1]
+            if d == "n":
+                break
+            if d == "i":
+                ki = True
+            else:
+                yield ctx.mond("NE CSESZEGESS!")
     yield ctx.mond("A KÉRT SZÁMÚ SZELVÉNYRE A TIPP ELFOGYOTT.")
     yield ctx.vege("Köszönöm a játékot!")
 

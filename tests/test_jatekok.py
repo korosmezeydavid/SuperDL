@@ -1247,20 +1247,53 @@ def test_lotto_otos_es_hatos():
             return "3"
         if "hagyományos" in kl:
             return "1"
+        if "mondhatom" in kl:
+            return "i"
+        if "megismételjem" in kl:
+            return "n"
         return ""
     ki = _fut("lotto", bot)
     # 5 szám / szelvény, három szelvény
     assert sum(1 for _, p in ki if p.startswith("AZ ELSŐ SZÁM")) == 3
     assert any("A TIPP ELFOGYOTT" in p for _, p in ki)
 
-    def bot6(k, ki):
+
+def test_lotto_csipos_duma():
+    """A LOTTÓ csípős dumája (forrásból): NEM-re a lajhár-, másra a cseszegetős
+    poén hangzik el, majd IGEN-re kihúzza."""
+    st = {"n": 0}
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "hány szelvényre" in kl:
+            return "1"
+        if "hagyományos" in kl:
+            return "1"
+        if "mondhatom" in kl:
+            st["n"] += 1
+            return {1: "n", 2: "x"}.get(st["n"], "i")   # nem, más, majd igen
+        if "megismételjem" in kl:
+            return "n"
+        return ""
+    ki = _fut("lotto", bot)
+    assert any("LAJHÁRT" in p for _, p in ki)
+    assert any("CSESZEGETNI" in p for _, p in ki)
+
+
+def test_lotto_hatos():
+    """Hatos lottó (6/45): a hatodik szám is elhangzik."""
+    def bot(k, ki):
         kl = k.lower()
         if "hány szelvényre" in kl:
             return "1"
         if "hagyományos" in kl:
             return "2"                      # hatos lottó
+        if "mondhatom" in kl:
+            return "i"
+        if "megismételjem" in kl:
+            return "n"
         return ""
-    ki = _fut("lotto", bot6)
+    ki = _fut("lotto", bot)
     assert any(p.startswith("A HATODIK SZÁM") for _, p in ki)
 
 
