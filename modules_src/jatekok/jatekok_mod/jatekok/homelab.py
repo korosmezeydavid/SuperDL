@@ -2183,3 +2183,94 @@ def jatek_felkaru(ctx):
             yield ctx.mond(f"Két egyforma! Nyertél {nyeremeny} forintot!")
         else:
             yield ctx.mond("Nincs két egyforma tárcsa. Ezúttal nincs nyeremény.")
+
+
+# ================================================================== TELERANDI
+# Forrás: RANDI.bas – Készítette: Kisvarga Zsolt.
+# Flörtös számkitaláló: a gép egy 5–6 jegyű „telefonszámot" választ, te
+# számjegyenként, BALRÓL JOBBRA tippelsz (számjegyenként 4 próba, „nagyobbat/
+# kisebbet" segítséggel). Ha az egészet megfejted, jön a randi – és a klasszikus
+# Homelab-csattanó. Minden üzenet a forrásból; a szerző-intro a katalógusból.
+
+def jatek_randi(ctx):
+    yield ctx.mond("Telerandi! Haló! Haló!")
+    v = yield ctx.kerdez("Kéred az ismertetőt? (i/n)")
+    if igen(v, False):
+        yield ctx.mond(
+            "A játék szabály nagyon egyszerű. Én kiválasztok egy telefonszámot. "
+            "Természetesen én tudom, hogy melyik ez a telefonszám, de neked ezt "
+            "számonként ki kell találni. Én mindig öt vagy hat számjegyből álló "
+            "telefonszámot választok. Nagyon fontos, hogy egy számra csak "
+            "négyszer tippelhetsz! Ha kitalálod a telefonszámot, elnyered méltó "
+            "jutalmad, vagyis egy randit beszélhetsz meg szíved választottjával. "
+            "Jó szórakozást kíván a program készítője, Kisvarga Zsolt.")
+    while True:
+        v = yield ctx.kerdez("Ha fiú vagy, F, ha lány vagy, L betűt nyomj le.")
+        d = (v or "").strip().lower()[:1]
+        if d == "f":
+            yield ctx.mond(
+                "Jaj de jó! Én mindig a fikkal szerettem játszani. Egy gyönyörű "
+                "szőke, hosszú hajú és kék szemű angyal várja a telefonodat. "
+                "Minden áron találkozni szeretne veled. Ezért a telefonja mellé "
+                "ült, és várja, hogy kitaláld a telefonszámát, és fölhívd "
+                "megbeszélni vele a randit.")
+            break
+        if d == "l":
+            yield ctx.mond(
+                "Jaj de jó! Én mindig a lányokkal szerettem játszani. Egy nagyon "
+                "szép, ízig-vérig férfi várja a telefonodat. Minden áron "
+                "találkozni szeretne veled. Ezért a telefonja mellé ült, és "
+                "várja, hogy kitaláld a telefonszámát, és fölhívd megbeszélni "
+                "vele a randit.")
+            break
+    yield ctx.mond("Én természetesen majd azon leszek, hogy te minél könnyebben "
+                   "kitaláld a számot, és elérhesd a szíved vágyát.")
+
+    ts = random.randint(10000, 999999)
+    szamjegyek = [int(c) for c in str(ts)]
+    sz = len(szamjegyek)
+    yield ctx.mond(f"Egy {sz} számjegyből álló telefonszámot kell megfejtened.")
+
+    bevezeto = {
+        1: "Jöjjön az első szám. De ügyes legyél ám!",
+        2: "Ügyesen megfejtetted az első számot! Lássuk a másodikat, hogy megy. "
+           "Ne kapkodd el! Én ráérek s várok.",
+        3: "Most jön a harmadik számjegy, barátom! El ne puskázd a randid! Ajánlom.",
+        4: "Kitaláltad a harmadik számot! Következzen a negyedik. Nem izgulsz egy "
+           "kicsit? Én nagyon. Hogy nézhet ki a partnered?",
+        5: "Tippelhetsz máris az ötödik számra! El ne rontsd nekem! Kíváncsi "
+           "vagyok a mátkádra!",
+        6: "Tippelhetsz a mindent eldöntő utolsó számra! De ne felejtsd el, mi a "
+           "tét! Elhamarkodott lépést tenni? A randit elrontani? Könnyelműség lenne!",
+    }
+    for i, helyes in enumerate(szamjegyek, start=1):
+        yield ctx.mond(bevezeto.get(i, f"Jöjjön a(z) {i}. számjegy."))
+        probak = 0
+        while True:
+            v = yield ctx.kerdez(f"{i}. számjegy tipped (0–9):")
+            m = szam(v, 0, 9)
+            if m is None:                 # rossz billentyű: a forrásban nem próba
+                yield ctx.mond("Egy 0 és 9 közötti számjegyet kérek.")
+                continue
+            probak += 1
+            if m == helyes:
+                break
+            if probak < 4:                # 1–3. rossz próba: segítség
+                if m > helyes:
+                    yield ctx.mond("Szerintem kisebb számot keress!")
+                else:
+                    yield ctx.mond("Szerintem nagyobb számot keress!")
+            else:                         # 4. rossz próba: vége
+                yield ctx.mond("Hát ennek már annyi! Ugrott ez a randi!")
+                yield ctx.vege("Egy másik alkalommal talán több szerencséd lesz!")
+                return
+
+    yield ctx.mond(f"Gratulálok! Megfejtetted a telefonszámot! A telefonszám "
+                   f"{ts}. Tárcsázom!")
+    yield ctx.mond("Hát ezt nem értem! Mi történt vele? Nem tudom! Nem értem! "
+                   "Csodálkozom! Ó, egy levél az asztalon! Ezt biztosan ő írta. "
+                   "Olvasom.")
+    yield ctx.mond("Hát ez nem jött össze neked! Azt írja, hogy elutazott. "
+                   "Sajnálom. Sajnálom! De ez pech.")
+    yield ctx.vege(f"{ts}. Jegyezd meg e telefonszámot, ha ráérsz! Próbáld meg "
+                   "felhívni. Ezt ajánlom!")

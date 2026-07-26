@@ -77,6 +77,7 @@ REGISZTER = {
     "reszeg": homelab.jatek_reszeg,
     "betpoker": homelab.jatek_betpoker,
     "felkaru": homelab.jatek_felkaru,
+    "randi": homelab.jatek_randi,
 }
 
 

@@ -232,6 +232,12 @@ RETRO: tuple[Jatek, ...] = (
           "Add meg, hányszor pörögjön a három tárcsa – két egyforma 5, három "
           "egyforma 25 forintot fizet. Addig játszol, míg el nem fogy a pénzed.",
           szerzo="Sédi Gábor", ev="1985"),
+    Jatek("randi", "Telerandi",
+          "Flörtös számkitaláló: a gép egy öt-hat jegyű telefonszámot választ, "
+          "te számjegyenként tippelsz (négy próba, nagyobbat-kisebbet "
+          "segítséggel). Fejtsd meg az egészet, és jöhet a randi – a Homelab "
+          "klasszikus csattanójával a végén.",
+          szerzo="Kisvarga Zsolt"),
 )
 
 

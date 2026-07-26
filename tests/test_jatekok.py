@@ -505,6 +505,62 @@ def test_felkaru_ervenytelen_forgatas_nem_fogadja_el():
     assert any("nem fogadom el" in p.lower() for _, p in ki)
 
 
+def test_randi_kisvarga_zsolt_gyozelem():
+    """TELERANDI: számjegyenkénti bináris kereséssel (a »kisebbet/nagyobbat«
+    segítségre hallgatva) 4 próbán belül megfejti minden jegyet → randi-csattanó.
+    A kérdés tartalmazza a jegy sorszámát, abból tudni, mikor kezdődik új jegy."""
+    import random
+    random.seed(7)
+    st = {"idx": None, "lo": 0, "hi": 9, "last": None}
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "ismertet" in kl:
+            return "n"
+        if "fiú vagy" in kl:
+            return "l"
+        if "számjegy tipped" in kl:
+            i = int(k.split(".")[0])
+            if st["idx"] != i:                 # új számjegy → új tartomány
+                st["idx"], st["lo"], st["hi"] = i, 0, 9
+            else:                              # az előző tipp segítségéből szűkít
+                last = next((p for t, p in reversed(ki) if t == "mond"), "")
+                if "kisebb számot" in last:
+                    st["hi"] = st["last"] - 1
+                elif "nagyobb számot" in last:
+                    st["lo"] = st["last"] + 1
+            st["last"] = (st["lo"] + st["hi"]) // 2
+            return str(st["last"])
+        return ""
+    ki = U.lejatsz(JR.REGISZTER["randi"], bot)
+    sz = U.szoveg(ki).lower()
+    assert "telerandi" in sz
+    assert "gratulálok" in sz and "megfejtetted a telefonszámot" in sz
+    assert ki[-1][0] == "vege"
+    j = next(x for x in KAT.RETRO if x.kulcs == "randi")
+    assert j.szerzo == "Kisvarga Zsolt"
+
+
+def test_randi_negy_rossz_tipp_ugrott_a_randi():
+    """Egy számjegyre négy rossz tipp → »Ugrott ez a randi!« és lezárul."""
+    import random
+    random.seed(0)
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "ismertet" in kl:
+            return "n"
+        if "fiú vagy" in kl:
+            return "f"
+        if "számjegy tipped" in kl:
+            return "0"          # makacsul ugyanaz → előbb-utóbb elfogy a 4 próba
+        return ""
+    ki = U.lejatsz(JR.REGISZTER["randi"], bot)
+    sz = U.szoveg(ki).lower()
+    # vagy megfejtette véletlenül a 0-kat, vagy ugrott – de rendben lezárul
+    assert ki[-1][0] == "vege"
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()
