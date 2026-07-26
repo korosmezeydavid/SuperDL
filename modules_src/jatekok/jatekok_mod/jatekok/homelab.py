@@ -2131,3 +2131,55 @@ def jatek_betpoker(ctx):
             continue
         yield ctx.vege("Remélem, nemsokára találkozunk! Köszönöm a játékot!")
         return
+
+
+# ============================================================ FÉLKARÚ BANDITA
+# Forrás: FELKARU.bas – Készítette: Sédi Gábor, 1985.
+# Pénznyerő automata: 10 forinttal indulsz, egy pénzbedobás 2 forint. Megadod a
+# fordulatok számát (1–99), a gép pörgeti a három tárcsát (1–9). Két egyforma
+# tárcsa +5 forint, három egyforma +25 forint (a forrás 5+20-a). A játék addig
+# tart, míg el nem fogy a pénzed – akkor „Ön elvesztette a pénzét!", és
+# folytathatod elölről. Az üzenetek a forrásból.
+
+def jatek_felkaru(ctx):
+    s = 10
+    yield ctx.mond(
+        "FÉLKARÚ BANDITA. Ez egy szerencsejáték! 2 forintért annyit nyerhetsz, "
+        "amennyit tudsz! Add meg a fordulatok számát, a többi a gép dolga! Jó "
+        "szórakozást kívánok!")
+    while True:
+        yield ctx.mond(f"Nyeremény: {s} forint.")
+        s -= 2                                   # pénzbedobás
+        yield ctx.mond("Pénzbedobás: 2 forint.")
+        if s <= 0:
+            yield ctx.mond("Ön elvesztette a pénzét!")
+            v = yield ctx.kerdez("Folytassuk? (i/n)")
+            if igen(v, False):
+                s = 10
+                continue
+            yield ctx.vege("Viszlát, és jobb szerencsét legközelebb!")
+            return
+        v = yield ctx.kerdez("Forgatás: hányszor pörögjön? (1–99)")
+        c = szam(v, 1, 99)
+        if c is None:                            # a forrás: goto 100 (a 2 Ft bent marad)
+            yield ctx.mond("Ezt nem fogadom el, 1 és 99 közötti számot kérek.")
+            continue
+        # a gép c-szer pörget; minden pörgetés felülírja a tárcsákat, a végállás
+        # dönt (mint a forrásban), a tárcsák 1 és 9 közöttiek
+        b = [random.randint(1, 9) for _ in range(3)]
+        for _ in range(c - 1):
+            b = [random.randint(1, 9) for _ in range(3)]
+        yield ctx.mond(f"A három tárcsa: {b[0]}, {b[1]}, {b[2]}.")
+        nyeremeny = 0
+        if b[0] == b[1] or b[0] == b[2] or b[1] == b[2]:
+            nyeremeny += 5
+        if b[0] == b[1] and b[0] == b[2]:
+            nyeremeny += 20
+        if nyeremeny >= 25:
+            s += nyeremeny
+            yield ctx.mond(f"Három egyforma! Nyertél {nyeremeny} forintot!")
+        elif nyeremeny:
+            s += nyeremeny
+            yield ctx.mond(f"Két egyforma! Nyertél {nyeremeny} forintot!")
+        else:
+            yield ctx.mond("Nincs két egyforma tárcsa. Ezúttal nincs nyeremény.")

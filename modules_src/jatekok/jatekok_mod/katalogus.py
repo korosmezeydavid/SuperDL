@@ -227,6 +227,11 @@ RETRO: tuple[Jatek, ...] = (
           "Szó-mastermind pontozással: a gép egy szóra gondol, megmondja a "
           "hosszát, te azonos hosszú szavakat tippelsz, és megtudod, hány betű "
           "van a helyén – 200 pontból gazdálkodsz a rossz tippekért."),
+    Jatek("felkaru", "Félkarú bandita",
+          "Pénznyerő automata: 10 forinttal indulsz, egy pénzbedobás 2 forint. "
+          "Add meg, hányszor pörögjön a három tárcsa – két egyforma 5, három "
+          "egyforma 25 forintot fizet. Addig játszol, míg el nem fogy a pénzed.",
+          szerzo="Sédi Gábor", ev="1985"),
 )
 
 

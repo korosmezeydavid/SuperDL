@@ -465,6 +465,46 @@ def test_betpoker_pontallas_es_feladas():
     assert any("A szó" in p and "tipped volt" in p for _, p in ki)  # * feladás
 
 
+def test_felkaru_sedi_gabor_lejatszik():
+    """FÉLKARÚ BANDITA (Sédi Gábor 1985): pörget, a pénz elfogy, majd lezárul;
+    a nyeremény átlagosan csökken, ezért véges kör alatt véget ér."""
+    import random
+    random.seed(20260726)
+
+    def bot(k, ki):
+        if "Forgatás" in k:
+            return "3"
+        if "Folytassuk" in k:
+            return "n"           # a pénz elfogytakor kilépünk
+        return ""
+    ki = _fut("felkaru", bot)
+    sz = U.szoveg(ki).lower()
+    assert "félkarú bandita" in sz
+    assert "pénzbedobás" in sz
+    assert "a három tárcsa" in sz
+    assert "elvesztette a pénzét" in sz          # eljut a pénz elfogyásáig
+    # katalógus: az eredeti szerző megjelölve
+    j = next(x for x in KAT.RETRO if x.kulcs == "felkaru")
+    assert j.szerzo == "Sédi Gábor" and j.ev == "1985"
+
+
+def test_felkaru_ervenytelen_forgatas_nem_fogadja_el():
+    """Érvénytelen fordulatszámra a forrás szerint nem pörget, hanem szól."""
+    import random
+    random.seed(1)
+    st = {"n": 0}
+
+    def bot(k, ki):
+        if "Forgatás" in k:
+            st["n"] += 1
+            return "0" if st["n"] == 1 else "2"   # előbb rossz, majd jó
+        if "Folytassuk" in k:
+            return "n"
+        return ""
+    ki = _fut("felkaru", bot)
+    assert any("nem fogadom el" in p.lower() for _, p in ki)
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()
