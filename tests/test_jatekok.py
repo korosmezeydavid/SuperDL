@@ -1818,3 +1818,36 @@ def test_milliomos_saját_es_nem_a_musorbol():
     src = inspect.getsource(M).lower()
     for tilt in ("vago", "vág", ".wav", "assets", "loim", "takfej"):
         assert tilt not in src, f"tiltott hivatkozás a forrásban: {tilt}"
+
+
+def test_milliomos_hangok_letezo_effektek():
+    """A játék minden effekt-neve tényleg létező, saját szintézisű hang (nincs
+    néma elgépelés), és a kulcshangok meg is szólalnak egy nyertes partiban."""
+    import random
+    hangok = importlib.import_module(BASE + ".hangok")
+    ervenyes = set(hangok.nevek())
+    random.seed(1)
+    by_q = _milliomos_valaszkereso()
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "végleges" in kl:
+            return "i"
+        if "a válaszod" in kl:
+            for t, p in reversed(ki):
+                if t == "mond" and p in by_q:
+                    return by_q[p]
+            return "A"
+        return ""
+    ki = U.lejatsz(JR.REGISZTER["milliomos"], bot)
+    effektek = {p for t, p in ki if t == "effekt"}
+    assert effektek, "a játék nem ad hangot"
+    for nev in effektek:
+        assert nev in ervenyes, f"nem létező hang: {nev}"
+    # a lényegi hangok tényleg elhangzanak
+    assert {"mil_start", "mil_kerdes", "mil_helyes", "mil_fonyeremeny"} <= effektek
+    # és minden mil_ hang valóban legenerálódik hibátlanul
+    for nev in ervenyes:
+        if nev.startswith("mil_"):
+            x, fs = hangok.keszit(nev)
+            assert x is not None and len(x) > 0

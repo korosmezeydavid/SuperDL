@@ -149,6 +149,164 @@ def _dobas():
     return _norm(x, 0.35)
 
 
+# ---- MILLIOMOS kvíz – saját, EREDETI drámai hangvilág ---------------------
+# Nem másol semmilyen műsorzenét: minden hang itt, numpy-val készül. A cél a
+# hangulat (feszültség, „végleges" súlya, győzelem, bukás), nem a reprodukció.
+
+def _mil_saw(fr, n, det=0.0):
+    ph = np.cumsum(np.full(n, fr * (1 + det) / FS))
+    return 2.0 * (ph - np.floor(0.5 + ph))
+
+
+def _mil_pad(freqk, n, cutoff=1500, det=0.008):
+    y = np.zeros(n)
+    for fr in freqk:
+        y += _mil_saw(fr, n, det) + _mil_saw(fr, n, -det) + 0.6 * np.sin(
+            2 * np.pi * fr * np.arange(n) / FS)
+    return _savszuro(y, 40, cutoff)
+
+
+def _mil_start():
+    """Indító szignál: rövid, felkúszó feszültség → fényes dúr feloldás."""
+    n1 = int(FS * 1.0)
+    t1 = np.arange(n1) / FS
+    glide = 196.0 * 2 ** (5 * (t1 / (n1 / FS)) / 12.0)
+    ph = np.cumsum(glide / FS)
+    fesz = _savszuro(2 * (ph - np.floor(0.5 + ph)), 60, 1100) * np.linspace(0.2, 1, n1)
+    n2 = int(FS * 1.3)
+    akkord = _mil_pad([261.63, 329.63, 392.0, 523.25], n2, 2400) * _env(n2, 0.02, 0.6)
+    return _norm(np.concatenate([fesz, akkord]), 0.42)
+
+
+def _mil_kerdes():
+    """Kérdés előtti finom, kétlépcsős jelzés (feszültséget indít)."""
+    n = int(FS * 0.5)
+    x = _mil_pad([220.0, 277.18], n, 1200) * _env(n, 0.02, 0.35)
+    return _norm(x, 0.3)
+
+
+def _mil_vegleges():
+    """„Végleges válasz" – mély boom + rövid, feszült függő akkord."""
+    n = int(FS * 1.3)
+    t = np.arange(n) / FS
+    boom = (np.sin(2 * np.pi * 48 * t) * np.exp(-t / 0.5)
+            + 0.5 * np.sin(2 * np.pi * 120 * t) * np.exp(-t / 0.05))
+    fesz = _mil_pad([220.0, 261.63, 311.13], n, 1300) * _env(n, 0.02, 0.5) * 0.7
+    swell = _savszuro(_zaj(n), 300, 2000) * (t / (n / FS)) ** 2 * 0.3
+    return _norm(boom + fesz + swell, 0.5)
+
+
+def _mil_helyes():
+    """Helyes válasz – fényes, felfutó csengő arpeggio + dúr csengés."""
+    notes = [523.25, 659.25, 783.99, 1046.5, 1318.5]
+    parts = []
+    for i, fr in enumerate(notes):
+        n = int(FS * 0.11)
+        t = np.arange(n) / FS
+        y = (np.sin(2 * np.pi * fr * t) + 0.5 * np.sin(2 * np.pi * 2 * fr * t)
+             + 0.25 * np.sin(2 * np.pi * 3 * fr * t)) * np.exp(-t / 0.09)
+        parts.append(y)
+    ring_n = int(FS * 0.9)
+    ring = _csengok([523.25, 659.25, 783.99, 1046.5], ring_n,
+                    [0.6, 0.5, 0.5, 0.7])
+    return _norm(np.concatenate(parts + [ring]), 0.44)
+
+
+def _mil_rossz():
+    """Rossz válasz – tritónuszos, lefelé csúszó gyomorütés + tompa boom."""
+    n = int(FS * 1.6)
+    t = np.arange(n) / FS
+    f1 = 150 * 2 ** (-1.2 * (t / (n / FS)))
+    f2 = f1 * 2 ** (6 / 12.0)                         # tritónusz
+    ph1 = np.cumsum(f1 / FS); ph2 = np.cumsum(f2 / FS)
+    y = 2 * (ph1 - np.floor(0.5 + ph1)) + 2 * (ph2 - np.floor(0.5 + ph2))
+    y = _savszuro(y, 40, 1200) * _env(n, 0.01, 0.9)
+    wob = 1.0 - 0.4 * (0.5 - 0.5 * np.cos(2 * np.pi * 7 * t))
+    boom = np.sin(2 * np.pi * 42 * t) * np.exp(-t / 0.4) * 0.6
+    return _norm(y * wob + boom, 0.46)
+
+
+def _mil_garantalt():
+    """Garantált pont – ünnepélyes mérföldkő: három csengő + meleg dúr akkord."""
+    parts = []
+    for fr in (659.25, 880.0, 1174.66):
+        n = int(FS * 0.18)
+        t = np.arange(n) / FS
+        parts.append((np.sin(2 * np.pi * fr * t)
+                      + 0.5 * np.sin(2 * np.pi * 2 * fr * t)) * np.exp(-t / 0.12))
+    n2 = int(FS * 1.4)
+    akkord = _mil_pad([261.63, 329.63, 392.0, 523.25], n2, 2600) * _env(n2, 0.02, 0.7)
+    return _norm(np.concatenate(parts + [akkord]), 0.45)
+
+
+def _mil_fonyeremeny():
+    """Főnyeremény – nagy ünnep: felfutó arpeggiók + csillám + tartott dúr."""
+    seq = [523.25, 659.25, 783.99, 1046.5, 1318.5, 1567.98, 2093.0]
+    parts = []
+    for fr in seq:
+        n = int(FS * 0.10)
+        t = np.arange(n) / FS
+        parts.append((np.sin(2 * np.pi * fr * t)
+                      + 0.5 * np.sin(2 * np.pi * 2 * fr * t)) * np.exp(-t / 0.08))
+    n2 = int(FS * 2.0)
+    t2 = np.arange(n2) / FS
+    akkord = _mil_pad([261.63, 329.63, 392.0, 523.25, 659.25], n2, 3000) \
+        * _env(n2, 0.02, 1.0)
+    csillam = (np.sin(2 * np.pi * 1568 * t2) + np.sin(2 * np.pi * 2093 * t2)) \
+        * np.exp(-t2 / 0.8) * 0.12
+    e = _erme()
+    return _norm(np.concatenate([np.concatenate(parts), akkord + csillam, e]), 0.5)
+
+
+def _mil_felezo():
+    """Felezés – rövid felszálló whoosh + két tompa koppanás (2 opció eltűnik)."""
+    n = int(FS * 0.55)
+    t = np.arange(n) / FS
+    whoosh = _savszuro(_zaj(n), 500, 5000) * (t / (n / FS)) ** 2
+    x = whoosh * 0.5
+    for pos in (0.32, 0.46):
+        i = int(pos * FS)
+        L = int(FS * 0.08)
+        seg = np.sin(2 * np.pi * 150 * np.arange(L) / FS) * np.exp(
+            -np.arange(L) / (FS * 0.03))
+        x[i:i + L] += seg[:max(0, min(L, n - i))][:len(x[i:i + L])]
+    return _norm(x, 0.4)
+
+
+def _mil_telefon():
+    """Telefonos segítség – két rövid, klasszikus csengetés (kb. 425 Hz)."""
+    n = int(FS * 1.4)
+    t = np.arange(n) / FS
+    ring = np.sin(2 * np.pi * 425 * t)
+    kapu = ((t % 0.5) < 0.25).astype(float)              # ütemes ki-be
+    ablak = ((t < 0.5) | ((t > 0.7) & (t < 1.2))).astype(float)   # két csengetés
+    return _norm(ring * kapu * ablak * _env(n, 0.01, 0.1), 0.35)
+
+
+def _mil_kozonseg():
+    """Közönség – halk tömeg-morajlás (szűrt zaj) + indító csilingelés."""
+    n = int(FS * 1.1)
+    t = np.arange(n) / FS
+    tomeg = _savszuro(_zaj(n), 200, 1500) * (0.4 + 0.3 * np.sin(2 * np.pi * 5 * t)) \
+        * _env(n, 0.05, 0.4) * 0.5
+    n2 = int(FS * 0.18)
+    csing = _csengok([1046.5, 1318.5], n2, [0.12, 0.1])
+    x = tomeg.copy()
+    x[:n2] += csing[:min(n2, n)]
+    return _norm(x, 0.34)
+
+
+def _mil_kiszallas():
+    """Kiszállás – meleg, megnyugtató dúr zárlat (viszed a pénzed)."""
+    parts = []
+    for freqk, dur in (([392.0, 493.88, 587.33], 0.5),
+                       ([349.23, 440.0, 523.25], 0.5),
+                       ([261.63, 329.63, 392.0, 523.25], 1.2)):
+        n = int(FS * dur)
+        parts.append(_mil_pad(freqk, n, 2000) * _env(n, 0.03, dur * 0.5))
+    return _norm(np.concatenate(parts), 0.4)
+
+
 _EPITOK = {
     "kartya": _kartya,
     "erme": _erme,
@@ -159,6 +317,18 @@ _EPITOK = {
     "veszit": _veszit,
     "blip": _blip,
     "dobas": _dobas,
+    # Milliomos kvíz – saját, eredeti hangvilág
+    "mil_start": _mil_start,
+    "mil_kerdes": _mil_kerdes,
+    "mil_vegleges": _mil_vegleges,
+    "mil_helyes": _mil_helyes,
+    "mil_rossz": _mil_rossz,
+    "mil_garantalt": _mil_garantalt,
+    "mil_fonyeremeny": _mil_fonyeremeny,
+    "mil_felezo": _mil_felezo,
+    "mil_telefon": _mil_telefon,
+    "mil_kozonseg": _mil_kozonseg,
+    "mil_kiszallas": _mil_kiszallas,
 }
 
 

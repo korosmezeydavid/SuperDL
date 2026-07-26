@@ -91,6 +91,7 @@ def jatek_milliomos(ctx):
         "eljutsz, azt a pénzt biztosan hazaviszed. Három segítséged van – "
         "felezés, telefonos segítség és közönségszavazás –, mindegyik egyszer "
         "használható. Bármikor megállhatsz a megszerzett pénzzel. Sok sikert!")
+    yield ctx.effekt("mil_start")
     hasznalt = set()
     garantalt = 0
     seged = {"F": True, "T": True, "K": True}
@@ -105,6 +106,7 @@ def jatek_milliomos(ctx):
         opciok = {"A": k["a"], "B": k["b"], "C": k["c"], "D": k["d"]}
         aktiv = ["A", "B", "C", "D"]
 
+        yield ctx.effekt("mil_kerdes")
         yield ctx.mond(f"{szint + 1}. kérdés, {_ft(tet)}. Kategória: "
                        f"{k['kategoria']}.")
         yield ctx.mond(k["kerdes"])
@@ -119,6 +121,7 @@ def jatek_milliomos(ctx):
 
             if d == "M":
                 nyeremeny = _LETRA[szint - 1] if szint > 0 else 0
+                yield ctx.effekt("mil_kiszallas")
                 yield ctx.vege(f"Megálltál, és hazaviszel {_ft(nyeremeny)}. "
                                "Bölcs döntés lehet – gratulálok!")
                 return
@@ -134,6 +137,8 @@ def jatek_milliomos(ctx):
                     yield ctx.mond("Ezt a segítséget már elhasználtad.")
                     continue
                 seged[d] = False
+                yield ctx.effekt({"F": "mil_felezo", "T": "mil_telefon",
+                                  "K": "mil_kozonseg"}[d])
                 if d == "F":
                     rosszak = [b for b in aktiv if b != k["helyes"]]
                     marad = random.choice(rosszak)
@@ -150,12 +155,20 @@ def jatek_milliomos(ctx):
 
             if d in aktiv:
                 if szint + 1 >= 6:                 # a 6. kérdéstől: Végleges?
+                    yield ctx.effekt("mil_vegleges")   # a zár feszültsége szól,
                     ve = yield ctx.kerdez(f"A {d} választ jelölted meg. "
-                                          "Végleges? (i/n)")
+                                          "Végleges? (i/n)")   # míg döntesz
                     if not igen(ve, False):
                         yield ctx.mond("Rendben, gondold át nyugodtan.")
                         continue
                 if d == k["helyes"]:
+                    utolso = (szint == 14)
+                    if utolso:
+                        yield ctx.effekt("mil_fonyeremeny")
+                    elif szint in _GARANTALT:
+                        yield ctx.effekt("mil_garantalt")
+                    else:
+                        yield ctx.effekt("mil_helyes")
                     yield ctx.mond(f"Helyes! A {d} a jó válasz. Megnyerted: "
                                    f"{_ft(tet)}.")
                     if szint in _GARANTALT:
@@ -171,6 +184,7 @@ def jatek_milliomos(ctx):
                         return
                     break
                 else:
+                    yield ctx.effekt("mil_rossz")
                     jo = k["helyes"]
                     yield ctx.vege(f"Sajnos a {d} nem jó. A helyes válasz a {jo}: "
                                    f"{opciok[jo]}. Hazaviszel {_ft(garantalt)}. "
