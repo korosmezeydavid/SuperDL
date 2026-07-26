@@ -75,13 +75,13 @@
       "id": "iptv",
       "name": "Internetes TV",
       "category": "Média",
-      "description": "Akadálymentes internetes TV (legális IPTV): saját m3u/Xtream forrás csatornái, felolvasott műsorújság (EPG), felvétel és emlékeztető, hangalámondás-sáv és élő felirat-felolvasás. Csak legális, saját előfizetésű forrásokhoz.",
+      "description": "Akadálymentes internetes TV (legális IPTV): saját m3u/Xtream forrás csatornái, felolvasott műsorújság (EPG), felvétel és emlékeztető, hangalámondás-sáv és élő felirat-felolvasás. ÚJ: ha nincs internet, akadálymentes felugró jelzi, újratesztelés-gombbal. Csak legális, saját előfizetésű forrásokhoz.",
       "latest": {
-        "version": "1.0.5",
+        "version": "1.0.6",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iptv-1.0.5/iptv-1.0.5.zip",
-        "sha256": "141ca889e11bac5fe33d394b90e68ae7e7610ae0237be89d3f2b81fda4965810",
-        "size": 17119
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iptv-1.0.6/iptv-1.0.6.zip",
+        "sha256": "18444243a19314cb8dd98500f2ae08e2183074ed2b58eceea61e16294918ff4d",
+        "size": 17316
       }
     },
     {
@@ -102,27 +102,28 @@
       "id": "felolvaso",
       "name": "Felirat-felolvasó lejátszó",
       "category": "Média",
-      "description": "Idegen nyelvű film (vagy hangfájl) lejátszása úgy, hogy a magyar (vagy bármely szöveges) feliratot SZINKRONBAN, választható hanggal (helyi SAPI, Edge neurális online, vagy beépített eSpeak) felolvassa – így vakon is követhető az idegen nyelvű film. A film mellé tett .srt/.vtt feliratot magától megtalálja, a fájlba ágyazott szöveges feliratsávot is kezeli. A YouTube-link is beilleszthető – a videó hangját streameli, a feliratot (kézi, vagy a YouTube automatikus, magyarra fordított feliratát) letölti és felolvassa. A felolvasás TEMPÓJA állítható (alapból gyors, hogy tartsa a lépést a filmfelirattal), és a következő sort előre legyártja, így a neurális hang sem csúszik.",
+      "description": "Idegen nyelvű film (vagy hangfájl) lejátszása úgy, hogy a magyar (vagy bármely szöveges) feliratot SZINKRONBAN, választható hanggal (helyi SAPI, Edge neurális online, vagy beépített eSpeak) felolvassa – így vakon is követhető az idegen nyelvű film. A film mellé tett .srt/.vtt feliratot magától megtalálja, a fájlba ágyazott szöveges feliratsávot is kezeli. A YouTube-link is beilleszthető – a videó hangját streameli, a feliratot (kézi, vagy a YouTube automatikus, magyarra fordított feliratát) letölti és felolvassa. A felolvasás TEMPÓJA állítható (alapból gyors, hogy tartsa a lépést a filmfelirattal), és a következő sort előre legyártja, így a neurális hang sem csúszik. ÚJ: ha nincs internet, akadálymentes felugró jelzi, újratesztelés-gombbal.",
       "latest": {
-        "version": "1.4.3",
+        "version": "1.4.4",
         "min_core_api": "1.0",
         "min_core_version": "3.29.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-felolvaso-1.4.3/felolvaso-1.4.3.zip",
-        "sha256": "c612ff7691eae24a258ee5d0ade50fc9444c0df353817be89b8dc2861f6ade98",
-        "size": 21977
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-felolvaso-1.4.4/felolvaso-1.4.4.zip",
+        "sha256": "8156cc7ba42a90f684ff4aa1f0d6b1d5328f5185c731ffd38c6e37123a88d715",
+        "size": 22224
       }
     },
     {
       "id": "radio",
       "name": "Internetes rádió",
       "category": "Média",
-      "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: némítás (Ctrl+M) – a hallgatott hang elnémítható, miközben a felvétel zavartalanul tovább megy. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
+      "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: az időzített felvételnél megadhatod, hogy EGYSZERI legyen (utána magától törlődik), MEGADOTT SZÁMÚ alkalommal fusson (pl. egy sorozat hátralévő részei, majd törlődik), vagy KIKAPCSOLÁSIG ismételjen. Némítás (Ctrl+M) – a hallgatott hang elnémítható, miközben a felvétel zavartalanul tovább megy. Ha nincs internet, akadálymentes felugró jelzi újratesztelés-gombbal. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
       "latest": {
-        "version": "1.1.6",
+        "version": "1.1.7",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.6/radio-1.1.6.zip",
-        "sha256": "2cc735c7fb7a6d00dcac425e04ece3b6f375d633eae145f91fc88228e40c7b63",
-        "size": 18355
+        "min_core_version": "4.2.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.7/radio-1.1.7.zip",
+        "sha256": "fe0424dcc8e03b991c03afe46267c1fbeccd3eae0b8c25d5768785f30f4e9459",
+        "size": 19060
       }
     },
     {
