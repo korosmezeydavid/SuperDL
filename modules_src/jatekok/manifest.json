@@ -1,10 +1,10 @@
 {
   "id": "jatekok",
   "name": "Játékok",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "entry": "jatekok_mod",
   "category": "Játékok",
-  "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód.",
+  "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód. ÚJ: 10 további hű port a hivatalos Homelab-gyűjteményből – Félkarú bandita, Telerandi, Lóverseny, Nurmi futóverseny, Pénzfeldobó, Elásott kincs, Apolló holdraszállás, Szájmon 15, Játssz velem és Betűpöker –, mind az eredeti szerzővel és szöveggel.",
   "min_core_api": "1.0",
   "min_core_version": "4.1.0",
   "requires_tools": [],
