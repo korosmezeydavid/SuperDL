@@ -138,3 +138,80 @@ def test_start_manual_last_error_a_valodi_okot_adja(tmp_path, monkeypatch):
     r = mgr.start_manual("Teszt", "http://x/stream")
     assert r is None
     assert "ffmpeg" in mgr.last_error
+
+
+# ---- időzítés-módok: egyszeri / N alkalom / kikapcsolásig ----------------
+
+def _sched(**kw):
+    base = dict(id="s1", station_name="Rádió", url="http://x/s",
+                start_h=20, start_m=0, end_h=21, end_m=0)
+    base.update(kw)
+    return rr.Schedule(**base)
+
+
+def test_schedule_describe_haromfele_mod():
+    # egyszeri → „utána törlődik”
+    assert "utána törlődik" in _sched(repeat="once", date="2026-08-01").describe()
+    # naponta + N alkalom → „még N alkalom”
+    d = _sched(repeat="daily", count=5).describe()
+    assert "minden nap" in d and "még 5 alkalom" in d
+    # hetente + kikapcsolásig → „kikapcsolásig”
+    w = _sched(repeat="weekly", weekdays=[0], count=0).describe()
+    assert "kikapcsolásig" in w
+
+
+def test_schedule_count_koroundtrip_fields():
+    """A count mező benne van a FIELDS-ben és túléli a mentés/betöltés kört."""
+    from dataclasses import asdict
+    assert "count" in rr.RecordManager.FIELDS
+    d = asdict(_sched(repeat="daily", count=3))
+    s2 = rr.Schedule(**{k: v for k, v in d.items()
+                        if k in rr.RecordManager.FIELDS})
+    assert s2.count == 3
+
+
+class _FakeRec:
+    """Sikeres felvételt színlelő minimál-ActiveRecording a _fire teszteléséhez."""
+    def __init__(self, station_name, url, base_dir, **kw):
+        from pathlib import Path
+        self.station_name = station_name
+        self.path = Path(base_dir) / "fake.mp3"
+        self.error = ""
+        self.status = "kész"
+
+    def start(self):
+        return True
+
+
+def _fire_mgr(tmp_path, monkeypatch, s):
+    monkeypatch.setattr(rr, "ActiveRecording", _FakeRec)
+    # a VALÓDI mentett időzítéseket ne írja/olvassa felül a teszt
+    monkeypatch.setattr(rr.store, "load_radio_schedule", lambda: [])
+    monkeypatch.setattr(rr.store, "save_radio_schedule", lambda *a, **k: None)
+    mgr = rr.RecordManager(lambda: str(tmp_path))
+    mgr._stop.set()
+    mgr.schedules = [s]
+    mgr._fire(s, 60, "2026-08-01")
+    return mgr
+
+
+def test_fire_egyszeri_torli_az_idozitot(tmp_path, monkeypatch):
+    s = _sched(repeat="once", date="2026-08-01")
+    mgr = _fire_mgr(tmp_path, monkeypatch, s)
+    assert mgr.schedules == []                       # felvette és eltűnt
+
+
+def test_fire_n_alkalom_visszaszamol_majd_torol(tmp_path, monkeypatch):
+    s = _sched(repeat="daily", count=2)
+    mgr = _fire_mgr(tmp_path, monkeypatch, s)
+    assert len(mgr.schedules) == 1 and mgr.schedules[0].count == 1
+    # a következő nap: még egy tüzelés → most már törlődik
+    s.last_run_date = ""
+    mgr._fire(s, 60, "2026-08-02")
+    assert mgr.schedules == []
+
+
+def test_fire_kikapcsolasig_marad(tmp_path, monkeypatch):
+    s = _sched(repeat="daily", count=0)
+    mgr = _fire_mgr(tmp_path, monkeypatch, s)
+    assert len(mgr.schedules) == 1 and mgr.schedules[0].count == 0

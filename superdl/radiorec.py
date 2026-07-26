@@ -335,6 +335,7 @@ class Schedule:
     date: str = ""                     # once: a tervezett dátum (ÉÉÉÉ-HH-NN)
     enabled: bool = True
     last_run_date: str = ""
+    count: int = 0                     # hátralévő alkalmak; 0 = kikapcsolásig (végtelen)
 
     def duration_s(self) -> int:
         s = self.start_h * 60 + self.start_m
@@ -353,8 +354,16 @@ class Schedule:
             rep = ", ".join(days) if days else "(nincs nap kijelölve)"
         else:
             rep = f"egyszeri – {self.date or 'következő alkalom'}"
+        # Hányszor: egyszeri (auto-törlés) / még N alkalom / kikapcsolásig
+        if self.repeat == "once":
+            hany = " (utána törlődik)"
+        elif self.count > 0:
+            hany = (f" – még {self.count} alkalom" if self.count > 1
+                    else " – még 1 alkalom (utána törlődik)")
+        else:
+            hany = " – kikapcsolásig"
         állapot = "" if self.enabled else " [kikapcsolva]"
-        return f"{self.station_name} – {rng} – {rep}{állapot}"
+        return f"{self.station_name} – {rng} – {rep}{hany}{állapot}"
 
 
 class RecordManager:
@@ -364,7 +373,7 @@ class RecordManager:
 
     FIELDS = {"id", "station_name", "url", "start_h", "start_m", "end_h",
               "end_m", "repeat", "weekdays", "date", "enabled",
-              "last_run_date"}
+              "last_run_date", "count"}
 
     def __init__(self, base_dir_getter, on_event=None, options_getter=None):
         self._base_dir_getter = base_dir_getter      # hívható -> str
@@ -495,9 +504,10 @@ class RecordManager:
             if s.repeat == "weekly" and now.weekday() not in (s.weekdays or []):
                 continue
             if s.repeat == "once" and s.date and s.date != today:
-                if s.date < today:                 # lejárt, sosem futott
-                    s.enabled = False
-                    self.save()
+                if s.date < today:                 # lejárt, sosem futott → ne gyűljön
+                    self.remove_schedule(s.id)
+                    self._emit(f"Lejárt egyszeri időzítés törölve: "
+                               f"{s.station_name} ({s.date})", "info")
                 continue
             start_dt = now.replace(hour=s.start_h, minute=s.start_m,
                                    second=0, microsecond=0)
@@ -516,14 +526,27 @@ class RecordManager:
                               on_done=self._on_done, options=self.options())
         if rec.start():
             s.last_run_date = today
+            # Hányszor-kezelés: egyszeri VAGY az utolsó hátralévő alkalom → törlés.
+            # Korlátos (count>0) → visszaszámlálás; 0 (kikapcsolásig) → érintetlen.
+            hatra = ""
+            torol = False
             if s.repeat == "once":
-                s.enabled = False
+                torol = True
+            elif s.count > 0:
+                s.count -= 1
+                if s.count <= 0:
+                    torol = True
+                else:
+                    hatra = f" Még {s.count} alkalom van hátra."
             self.save()
             with self._lock:
                 self.active.append(rec)
+            if torol:
+                self.remove_schedule(s.id)
+                hatra = " Ez volt az utolsó alkalom, az időzítőt törlöm."
             self._emit(f"Időzített felvétel elindult: {s.station_name} "
-                       f"(kb. {max(1, duration // 60)} perc) → {rec.path.name}",
-                       "start")
+                       f"(kb. {max(1, duration // 60)} perc) → "
+                       f"{rec.path.name}.{hatra}", "start")
         else:
             self._emit(f"Az időzített felvétel nem indult el: "
                        f"{s.station_name} – {rec.error}", "error")

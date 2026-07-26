@@ -867,14 +867,14 @@ class MainFrame(wx.Frame):
             pass
 
     def _require_net(self, what: str) -> bool:
-        """Elő-ellenőrzés egy net-igényes művelet előtt (GUI-szálon). Ha nincs
-        net, HANGOSAN jelez és False-t ad. Figyelem: offline esetben ez pár
-        másodpercig tarthat – lehetőleg háttérszálból hívd (lásd `require_online`
-        a workerben)."""
-        ok, msg = netcheck.require_online(what)
-        if not ok:
-            self._net_warn(msg)
-        return ok
+        """Elő-ellenőrzés egy net-igényes művelet előtt. Ha van net, azonnal
+        továbbenged. Ha nincs, egy AKADÁLYMENTES, kétgombos felugrót nyit
+        (Újratesztelés / OK); True-t ad, ha a teszt végül sikerült. Bárhonnan
+        hívható (a modálist szükség esetén a GUI-szálra marsallja)."""
+        from superdl import netdialog
+        return netdialog.ensure_online(
+            self, mihez=what,
+            speak=lambda t: self.selfvoice.speak(t, force=True))
 
     def _seed_ratio(self) -> float:
         try:
@@ -976,9 +976,8 @@ class MainFrame(wx.Frame):
         self.SetStatusText("URL vizsgálata...")
 
         def detect():
-            ok, msg = netcheck.require_online("a letöltéshez")
-            if not ok:                       # nincs net → azonnal, hangosan jelez
-                wx.CallAfter(self._net_warn, msg)
+            if not self._require_net("a letöltéshez"):  # kétgombos felugró, ha nincs net
+                wx.CallAfter(self.SetStatusText, "")
                 return
             if is_torrent_url(url):
                 kind = "torrent"

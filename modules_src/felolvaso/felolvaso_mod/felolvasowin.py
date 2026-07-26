@@ -17,6 +17,24 @@ import wx
 from . import narrator, subtitles, ytsource
 from superdl.audioengine import Player
 
+
+def _ensure_net(win, what):
+    """Internet-elő-ellenőrzés VÉDETTEN, AKADÁLYMENTES kétgombos felugróval
+    (Újratesztelés / OK). Ha van net, True; ha nincs, a felugró dönt. Régebbi
+    Core-on (nincs netdialog) átengedjük. Bárhonnan hívható (a modálist a
+    GUI-szálra marsallja)."""
+    try:
+        from superdl import netdialog
+    except Exception:
+        return True
+    try:
+        say = getattr(win, "_announce", None)
+        return netdialog.ensure_online(
+            win, what, speak=(lambda t: say(t)) if say else None)
+    except Exception:
+        return True
+
+
 HELP = """FELIRAT-FELOLVASÓ LEJÁTSZÓ
 
 MIRE VALÓ
@@ -304,14 +322,8 @@ class FelolvasoFrame(wx.Frame):
         self._announce("Link feloldása és felirat letöltése… (kis türelem)")
 
         def work():
-            try:                             # net-elő-ellenőrzés VÉDETTEN
-                from superdl import netcheck
-                ok, netmsg = netcheck.require_online("a videó-link megnyitásához")
-            except Exception:
-                ok, netmsg = True, ""
-            if not ok:                       # nincs net → hangosan jelez
-                wx.CallAfter(self._announce, netmsg)
-                return
+            if not _ensure_net(self, "a videó-link megnyitásához"):
+                return                       # nincs net / a felhasználó lemondta
             try:
                 stream, cues, lang, title = ytsource.load_from_url(url)
             except Exception as e:

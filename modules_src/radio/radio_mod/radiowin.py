@@ -16,14 +16,21 @@ from superdl.audioengine import Player          # megosztott lejátszó a Core-b
 from .radiorecwin import RecordingsDialog, ScheduleDialog   # a modulban
 
 
-def _net_ok(what):
-    """Internet-elő-ellenőrzés VÉDETTEN: ha a Core-ban nincs netcheck (régebbi
-    verzió), egyszerűen átengedjük (True) – a modul így régi Core-on is működik."""
+def _ensure_net(win, what):
+    """Internet-elő-ellenőrzés VÉDETTEN, AKADÁLYMENTES kétgombos felugróval
+    (Újratesztelés / OK). Ha van net, True. Ha nincs, a felugró dönt. Régebbi
+    Core-on (nincs netdialog) egyszerűen átengedjük (True), hogy a modul akkor is
+    működjön. Bárhonnan hívható (a modálist a GUI-szálra marsallja)."""
     try:
-        from superdl import netcheck
-        return netcheck.require_online(what)
+        from superdl import netdialog
     except Exception:
-        return True, ""
+        return True
+    try:
+        say = getattr(win, "_announce", None)
+        return netdialog.ensure_online(
+            win, what, speak=(lambda t: say(t)) if say else None)
+    except Exception:
+        return True
 
 HELP = """INTERNETES RÁDIÓ
 
@@ -470,9 +477,7 @@ class RadioFrame(wx.Frame):
         self.SetStatusText(f"Keresés: {label} …")
 
         def work():
-            ok, netmsg = _net_ok("a rádióállomások kereséséhez")
-            if not ok:                       # nincs net → hangosan jelez
-                wx.CallAfter(self._announce, netmsg)
+            if not _ensure_net(self, "a rádióállomások kereséséhez"):
                 return
             try:
                 res = fn()
@@ -508,9 +513,7 @@ class RadioFrame(wx.Frame):
         self._announce(f"Csatlakozás: {st.name} …")
 
         def go():                            # a net-ellenőrzés ne fagyassza a GUI-t
-            ok, msg = _net_ok("a rádió hallgatásához")
-            if not ok:                       # nincs net → hangosan jelez
-                wx.CallAfter(self._announce, msg)
+            if not _ensure_net(self, "a rádió hallgatásához"):
                 return
             wx.CallAfter(self.player.play, st.url, title=st.name)
 
@@ -600,9 +603,7 @@ class RadioFrame(wx.Frame):
                 self._announce(f"Felvétel leállítva és elmentve: {st.name}. "
                                f"A fájl helye: {hova}", focus=True)
                 return
-            ok, netmsg = _net_ok("a rádiófelvételhez")   # felvételhez net kell
-            if not ok:
-                self._announce(netmsg, focus=True)
+            if not _ensure_net(self, "a rádiófelvételhez"):   # felvételhez net kell
                 return
             r = self.rec.start_manual(st.name, st.url)
         except Exception as e:

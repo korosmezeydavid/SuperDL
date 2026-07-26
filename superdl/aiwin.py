@@ -109,6 +109,10 @@ def run_ai(main, title: str, worker, busy: str = "AI feldolgozás folyamatban…
     frame.Show()
 
     def work():
+        gate = getattr(main, "_require_net", None)   # kétgombos felugró, ha nincs net
+        if gate is not None and not gate("az MI-funkciókhoz"):
+            wx.CallAfter(frame.set_error, "Nincs internetkapcsolat.")
+            return
         try:
             result = worker()
         except Exception as e:
@@ -131,6 +135,10 @@ def run_ai_progress(main, title: str, worker,
         wx.CallAfter(frame.status.SetLabel, msg)
 
     def work():
+        gate = getattr(main, "_require_net", None)   # kétgombos felugró, ha nincs net
+        if gate is not None and not gate("az MI-funkciókhoz"):
+            wx.CallAfter(frame.set_error, "Nincs internetkapcsolat.")
+            return
         try:
             result = worker(report)
         except Exception as e:

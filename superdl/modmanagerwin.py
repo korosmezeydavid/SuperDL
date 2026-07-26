@@ -178,10 +178,11 @@ class ModuleManagerFrame(wx.Frame):
         installed = self._installed_map()
 
         def work():
-            from . import netcheck
-            ok, msg = netcheck.require_online("a modullista frissítéséhez")
-            if not ok:                       # nincs net → hangosan jelez
-                wx.CallAfter(self._refresh_offline, msg)
+            from . import netdialog
+            if not netdialog.ensure_online(self, "a modullista frissítéséhez",
+                                           speak=self._announce):
+                wx.CallAfter(self._refresh_offline,
+                             "Nincs internetkapcsolat.")
                 return
             entries = coremod.fetch_index()
             wx.CallAfter(self._populate, entries, installed)
@@ -243,10 +244,11 @@ class ModuleManagerFrame(wx.Frame):
             wx.CallAfter(self.gauge.SetValue, int(max(0, min(1, frac)) * 100))
 
         def work():
-            from . import netcheck
-            ok, netmsg = netcheck.require_online("a modul telepítéséhez")
-            if not ok:                       # nincs net → hangosan jelez
-                wx.CallAfter(self._install_done, False, netmsg)
+            from . import netdialog
+            if not netdialog.ensure_online(self, "a modul telepítéséhez",
+                                           speak=self._announce):
+                wx.CallAfter(self._install_done, False,
+                             "Nincs internetkapcsolat.")
                 return
             try:
                 man = coremod.install_entry(self.loader, r["entry"], prog, self.root)

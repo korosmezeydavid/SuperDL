@@ -20,14 +20,21 @@ from superdl import store                   # megosztott tároló a Core-ból
 from superdl.audioengine import Player      # megosztott lejátszó a Core-ból
 
 
-def _net_ok(what):
-    """Internet-elő-ellenőrzés VÉDETTEN: régebbi Core-ban (nincs netcheck)
-    egyszerűen átengedjük, hogy a modul akkor is működjön."""
+def _ensure_net(win, what):
+    """Internet-elő-ellenőrzés VÉDETTEN, AKADÁLYMENTES kétgombos felugróval
+    (Újratesztelés / OK). Ha van net, True; ha nincs, a felugró dönt. Régebbi
+    Core-ban (nincs netdialog) egyszerűen átengedjük, hogy a modul akkor is
+    működjön. Bárhonnan hívható (a modálist a GUI-szálra marsallja)."""
     try:
-        from superdl import netcheck
-        return netcheck.require_online(what)
+        from superdl import netdialog
     except Exception:
-        return True, ""
+        return True
+    try:
+        say = getattr(win, "_announce", None)
+        return netdialog.ensure_online(
+            win, what, speak=(lambda t: say(t)) if say else None)
+    except Exception:
+        return True
 
 
 HELP = """INTERNETES TV (IPTV)
@@ -332,9 +339,9 @@ class IPTVFrame(wx.Frame):
 
         def work():
             if net_what:                     # net-igényes forrás → előbb ellenőriz
-                ok, netmsg = _net_ok(net_what)
-                if not ok:
-                    wx.CallAfter(self._load_offline, netmsg)
+                if not _ensure_net(self, net_what):
+                    wx.CallAfter(self._load_offline,
+                                 "Nincs internetkapcsolat.")
                     return
             try:
                 res = fn()
@@ -492,9 +499,7 @@ class IPTVFrame(wx.Frame):
         track = self._selected_audio_track()
 
         def go():                            # net-ellenőrzés a GUI fagyasztása nélkül
-            ok, msg = _net_ok("a csatorna megtekintéséhez")
-            if not ok:
-                wx.CallAfter(self._announce, msg)
+            if not _ensure_net(self, "a csatorna megtekintéséhez"):
                 return
             wx.CallAfter(self.player.play, c.url, c.name, audio_track=track)
 

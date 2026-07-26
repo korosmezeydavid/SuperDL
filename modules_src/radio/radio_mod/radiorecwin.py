@@ -91,6 +91,26 @@ class ScheduleDialog(wx.Dialog):
             dsz.Add(c, 0, wx.RIGHT, 6)
         v.Add(dsz, 0, wx.ALL | wx.EXPAND, 8)
 
+        # --- hányszor (csak ismétlődőnél; egyszerinél a felvétel után törlődik) ---
+        v.Add(wx.StaticText(p, label="&Hányszor:"), 0, wx.LEFT | wx.TOP, 10)
+        self.times = wx.Choice(p, choices=[
+            "Kikapcsolásig (folyamatosan)",
+            "Megadott számú alkalommal"])
+        self.times.SetSelection(0)
+        self.times.SetName("Hány alkalommal ismétlődjön")
+        self.times.Enable(False)          # egyszeri az alap → nincs értelme
+        self.times.Bind(wx.EVT_CHOICE, self._on_times)
+        v.Add(self.times, 0, wx.ALL | wx.EXPAND, 8)
+
+        tr = wx.BoxSizer(wx.HORIZONTAL)
+        tr.Add(wx.StaticText(p, label="Alka&lmak száma:"), 0,
+               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
+        self.times_n = wx.SpinCtrl(p, min=2, max=100, initial=8)
+        self.times_n.SetName("Alkalmak száma")
+        self.times_n.Enable(False)
+        tr.Add(self.times_n, 0)
+        v.Add(tr, 0, wx.ALL, 8)
+
         # --- gombok ---
         btns = wx.StdDialogButtonSizer()
         ok = wx.Button(p, wx.ID_OK, "&Mentés")
@@ -113,9 +133,19 @@ class ScheduleDialog(wx.Dialog):
         self.station_choice.SetFocus()
 
     def _on_rep(self, _evt):
-        weekly = self.rep.GetSelection() == 2
+        sel = self.rep.GetSelection()
+        weekly = sel == 2
+        recurring = sel in (1, 2)         # naponta / hetente
         for c in self.day_chk:
             c.Enable(weekly)
+        # A „Hányszor?" csak ismétlődőnél értelmes; egyszerinél törlődik magától.
+        self.times.Enable(recurring)
+        self.times_n.Enable(recurring and self.times.GetSelection() == 1)
+
+    def _on_times(self, _evt):
+        # „Megadott számú alkalommal” esetén engedjük a darabszám-mezőt
+        self.times_n.Enable(self.times.IsEnabled()
+                            and self.times.GetSelection() == 1)
 
     def _on_ok(self, evt):
         sh, sm = self.sh.GetValue(), self.sm.GetValue()
@@ -143,10 +173,15 @@ class ScheduleDialog(wx.Dialog):
             if start <= now:
                 start += timedelta(days=1)      # ma már elmúlt → holnap
             date = start.strftime("%Y-%m-%d")
+        # Hányszor: egyszeri → törlődik magától (count nem számít);
+        # ismétlődő + „megadott számú alkalom” → count=N; egyébként 0 = kikapcsolásig
+        count = 0
+        if rep in ("daily", "weekly") and self.times.GetSelection() == 1:
+            count = self.times_n.GetValue()
         self.result = Schedule(
             id=self.manager.new_id(), station_name=station_name,
             url=url, start_h=sh, start_m=sm, end_h=eh, end_m=em,
-            repeat=rep, weekdays=weekdays, date=date)
+            repeat=rep, weekdays=weekdays, date=date, count=count)
         evt.Skip()        # bezárja a párbeszédet ID_OK-kal
 
 

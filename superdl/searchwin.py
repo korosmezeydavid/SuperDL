@@ -221,11 +221,11 @@ class MediaSearchFrame(wx.Frame):
         kind = ("video", "playlist", "channel")[self.kind_choice.GetSelection()]
 
         def work():
-            from . import netcheck
-            ok, msg = netcheck.require_online("a kereséshez")
-            if not ok:                       # nincs net → hangosan jelez
-                wx.CallAfter(self._net_fail, msg)
-                return
+            gate = getattr(self.main, "_require_net", None)
+            if gate is not None:             # kétgombos felugró, ha nincs net
+                if not gate("a kereséshez"):
+                    wx.CallAfter(self.btn_more.Enable)
+                    return
             try:
                 res = S.search(q, count=count, kind=kind)
             except Exception as e:
