@@ -2465,3 +2465,189 @@ def jatek_loverseny(ctx):
                            "Játszunk máskor is, ha jónak látod!")
             return
         jatekosok = folytatok
+
+
+# ====================================================================== NURMI
+# Forrás: NURMI.bas – Készítette: Schuck Antalné.
+# Futóverseny Murmi, a híres futó ellen: felváltva sprinteltek, minden sprint
+# 5–30 méter (véletlen), aki előbb eléri az 1000 métert, győz. Az üzenetek a
+# forrásból; a SPACE-lendület akadálymentes megfelelője a sprint ismételgetése.
+
+def jatek_nurmi(ctx):
+    yield ctx.mond("Nurmi. Ez egy futóverseny.")
+    v = yield ctx.kerdez("Benevezel? (i/n)")
+    if not igen(v, False):
+        yield ctx.vege("Nurmi jó pihenést kíván! A mielőbbi viszontlátásra, "
+                       "sporttárs!")
+        return
+    yield ctx.mond(
+        "Ez egy futóverseny. Nurmival, a híres futóval kell megküzdened. Ő "
+        "rendületlenül fut a körülbelül 1 kilométerre lévő cél felé. Győzd le, "
+        "ha tudod! Lendületedet a sprint ismételgetésével szabályozhatod. "
+        "Sikeres célba érkezést kíván a játék készítője, Schuck Antalné.")
+    v = yield ctx.kerdez("Ki az ellenfél? (a neved)")
+    nev = (v or "").strip() or "A kihívó"
+    while True:
+        b = d = 0
+        yield ctx.mond("Elkészülni! Vigyázz! Kész! Start!")
+        te_jossz = random.randint(1, 2) == 1        # a forrás Z-je: ki kezd
+        while b < 1000 and d < 1000:
+            if te_jossz:
+                yield ctx.kerdez(f"{nev}, sprint! (nyomj Entert)")
+                b += random.randint(1, 6) * 5
+                yield ctx.mond(f"{b} méter!")
+            else:
+                d += random.randint(1, 6) * 5
+                yield ctx.mond(f"Murmi: {d} méter!")
+            te_jossz = not te_jossz
+        if b >= 1000:
+            yield ctx.mond(f"{nev} győzött! {b} métert futott összesen. Murmi "
+                           f"{b - d} méterrel maradt mögötte. Vigaszdíjként "
+                           "szeretne még egy kört futni, ha nem fáradtál el.")
+        else:
+            yield ctx.mond(f"Murmi győzött! {d} métert futott összesen. {nev} "
+                           f"{d - b} méterrel maradt mögötte. Vigaszdíjként Nurmi "
+                           "felajánl még egy kört futni, ha nem fáradtál el.")
+        v = yield ctx.kerdez("Starthoz állsz újra? (i/n)")
+        if igen(v, False):
+            continue
+        yield ctx.vege("Nurmi jó pihenést kíván! A mielőbbi viszontlátásra, "
+                       "sporttárs!")
+        return
+
+
+# ============================================================== PÉNZFELDOBÓ
+# Forrás: PENZFEL.bas. Kétszemélyes érme-fogadás: mindketten fej vagy írás
+# mellett tesztek (különbözőnek kell lennie), majd a pénz feldobása dönt (1/3
+# eséllyel egy madár elkapja → újradobás). Az üzenetek a forrásból.
+
+def jatek_penzfel(ctx):
+    v = yield ctx.kerdez("Kéred a tájékoztatót? (i/n)")
+    if igen(v, False):
+        yield ctx.mond(
+            "Ez egy kétszemélyes fogadóprogram. Arra kell tippelnetek, hogy a "
+            "feldobott, majd földre hullt pénzdarabnak a fej vagy írásos fele "
+            "lesz-e felül. Miután beírtátok neveteket, azt is beírhatjátok, hogy "
+            "mibe fogadtatok. Ha konkrétan semmibe nem fogadtatok, csak a "
+            "sorrendet szeretnétek egymás közt eldönteni, akkor üresen hagyva "
+            "nyomjatok Entert. A pénzt egy kívülálló harmadik személy dobja fel. "
+            "Beleszólni azonban semmiképpen nem kívánok! Így csináljátok, ahogy "
+            "akarjátok.")
+    nevek = []
+    for _ in range(2):
+        while True:
+            v = yield ctx.kerdez("Kérem a nevedet:")
+            n = (v or "").strip()
+            if n:
+                nevek.append(n)
+                break
+            yield ctx.mond("Névtelen emberekkel nem szoktam szóba állni. Vagy "
+                           "mutatkozz be illően, vagy menj el, és ne zavard "
+                           "áramköreimet!")
+    v = yield ctx.kerdez("Most pedig írjátok be, hogy mibe fogadtatok "
+                         "(üresen is hagyható):")
+    tet = (v or "").strip()
+    if not tet:
+        yield ctx.mond("Tehát konkrétan semmibe nem fogadtatok, csak a sorrendet "
+                       "szeretnétek egymás közt eldönteni. Ám legyen!")
+    tippek = []
+    for i in range(2):
+        while True:
+            v = yield ctx.kerdez(f"Felkérem {nevek[i]} fogadónkat, hogy "
+                                 "tippeljen. Ha írás, az I, ha fej, az F betűt "
+                                 "add meg:")
+            dd = (v or "").strip().lower()[:1]
+            pick = "FEJ" if dd == "f" else "ÍRÁS" if dd == "i" else None
+            if pick is None:
+                continue
+            if i == 1 and pick == tippek[0]:
+                yield ctx.mond("Erre már fogadott ellenfeled!")
+                continue
+            tippek.append(pick)
+            yield ctx.mond(f"Tehát {pick}.")
+            break
+    yield ctx.mond("Most pedig felkérem a dobni kívánó játékosunkat, hogy dobja "
+                   "fel a pénzt!")
+    while True:
+        c = random.randint(0, 2)
+        if c == 0:
+            yield ctx.mond("Egy madár erre szállt, és csőrével elkapta a "
+                           "pénzdarabot! Meg kell ismételni a dobást.")
+            continue
+        dobott = "FEJ" if c == 1 else "ÍRÁS"
+        break
+    yield ctx.mond(f"{dobott}.")
+    gyoztes = nevek[0] if tippek[0] == dobott else nevek[1]
+    if not tet:
+        yield ctx.vege(f"Gratulálok, {gyoztes}! Tiéd az elsőbbség joga. Máskor "
+                       "is legyen szerencsénk egymáshoz. Sziasztok!")
+    else:
+        vesztes = nevek[1] if gyoztes == nevek[0] else nevek[0]
+        yield ctx.vege(f"Gratulálok, {gyoztes}! Te nyerted meg a fogadást. "
+                       f"Remélem, {vesztes} nem feledkezel meg {tet} "
+                       "megadásáról. Máskor is legyen szerencsénk egymáshoz. "
+                       "Sziasztok!")
+
+
+# ============================================================= ELÁSOTT KINCS
+# Forrás: KINCS.bas – Készítette: Sűdi Gábor, 1985.
+# Egy 15×15-ös hálón a gép egy négy négyzet hosszú (vízszintes vagy függőleges)
+# kincset ás el; gödrökkel keresed, égtáj-segítséggel (a kincs első négyzetéhez
+# képest), tíz próbálkozásból. Az üzenetek a forrásból.
+
+def jatek_kincs(ctx):
+    yield ctx.mond("Elásott kincs.")
+    v = yield ctx.kerdez("Kéred a játékszabályt? (i/n)")
+    if igen(v, False):
+        yield ctx.mond(
+            "A játék egy 15-ször 15-ös négyzethálón folyik. A gép egy láda "
+            "kincset ásott el egy négy négyzetet magába foglaló, téglalap alakú "
+            "területen. Ezt a helyet kell megtalálni gödrök ásásával. Készítette "
+            "Sűdi Gábor, 1985.")
+    while True:
+        if random.randint(1, 2) == 1:               # vízszintes: X nő
+            x0, y0 = random.randint(1, 12), random.randint(1, 15)
+            kincs = [(x0 + i, y0) for i in range(4)]
+        else:                                       # függőleges: Y nő
+            x0, y0 = random.randint(1, 15), random.randint(1, 12)
+            kincs = [(x0, y0 + i) for i in range(4)]
+        fx, fy = kincs[0]
+        s = 10
+        talalt = False
+        while s > 0:
+            while True:
+                vx = yield ctx.kerdez("A gödör helye – X koordináta (1–15):")
+                x = szam(vx, 1, 15)
+                vy = yield ctx.kerdez("A gödör helye – Y koordináta (1–15):")
+                y = szam(vy, 1, 15)
+                if x is None or y is None:
+                    yield ctx.mond("Hibás koordináta!")
+                    continue
+                break
+            if (x, y) in kincs:
+                yield ctx.mond("Hurrá, megtaláltad a kincset!")
+                talalt = True
+                break
+            iranyok = []
+            if x > fx:
+                iranyok.append("észak")
+            elif x < fx:
+                iranyok.append("dél")
+            if y > fy:
+                iranyok.append("nyugat")
+            elif y < fy:
+                iranyok.append("kelet")
+            s -= 1
+            irany = " és ".join(iranyok).capitalize() if iranyok else "Közel"
+            if s == 0:
+                break
+            yield ctx.mond(f"A kincs nem itt van. {irany} felé keresd. Még {s} "
+                           "próbálkozásod van.")
+        if not talalt:
+            hely = ", ".join(f"({cx},{cy})" for cx, cy in kincs)
+            yield ctx.mond(f"A játék befejeződött. A kincs helye: {hely}.")
+        v = yield ctx.kerdez("Akarsz még játszani? (i/n)")
+        if igen(v, False):
+            continue
+        yield ctx.vege("Viszlát, kincsvadász!")
+        return

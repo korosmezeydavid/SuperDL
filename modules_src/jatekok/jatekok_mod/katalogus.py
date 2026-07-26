@@ -243,6 +243,21 @@ RETRO: tuple[Jatek, ...] = (
           "fejenként 2000 forint. Fogadj egy rajtszámra és egy tétre – a "
           "győztesre 100, a másodikra 50, a harmadikra 25 százalék jár, "
           "egyébként a tét bánja. Aki elfogy, kiesik."),
+    Jatek("nurmi", "Nurmi – futóverseny",
+          "Fussál versenyt Murmival, a híres futóval! Felváltva sprinteltek, "
+          "minden sprint öt-harminc méter; aki előbb eléri az ezer métert, "
+          "győz. A vesztes vigaszdíjként visszavágót kérhet.",
+          szerzo="Schuck Antalné"),
+    Jatek("penzfel", "Pénzfeldobó",
+          "Kétszemélyes érme-fogadás: mindketten fej vagy írás mellett tesztek "
+          "(nem tippelhettek ugyanarra), és a feldobott pénz dönt – néha egy "
+          "madár is beleszól. Fogadhattok konkrét tétbe, vagy csak a sorrendet "
+          "döntitek el."),
+    Jatek("kincs", "Elásott kincs",
+          "Egy 15-ször 15-ös hálón a gép elás egy négy négyzet hosszú kincset; "
+          "gödrökkel keresed, égtáj-segítséggel, tíz próbálkozásból. Találd meg, "
+          "mielőtt elfogynak az ásásaid!",
+          szerzo="Sűdi Gábor", ev="1985"),
 )
 
 

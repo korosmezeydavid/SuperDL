@@ -611,6 +611,75 @@ def test_loverseny_ket_jatekos_es_folytatas():
     assert "anna" in sz and "béla" in sz
 
 
+def test_nurmi_schuck_antalne_lefut():
+    """NURMI: végigfut a verseny (felváltva sprint), valaki eléri az 1000 m-t."""
+    import random
+    random.seed(2)
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "benevezel" in kl:
+            return "i"
+        if "ki az ellenfél" in kl:
+            return "Feri"
+        if "starthoz állsz" in kl:
+            return "n"
+        return ""                         # sprint: Enter
+    ki = _fut("nurmi", bot)
+    sz = U.szoveg(ki).lower()
+    assert "futóverseny" in sz and "győzött" in sz
+    j = next(x for x in KAT.RETRO if x.kulcs == "nurmi")
+    assert j.szerzo == "Schuck Antalné"
+
+
+def test_penzfel_ket_jatekos_ermefeldobas():
+    """PÉNZFELDOBÓ: két különböző tipp, a pénz dönt, egy győztes lesz."""
+    import random
+    random.seed(4)
+    st = {"nev": 0, "tip": 0}
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "tájékoztatót" in kl:
+            return "n"
+        if "nevedet" in kl:
+            st["nev"] += 1
+            return "Anna" if st["nev"] == 1 else "Béla"
+        if "mibe fogadtatok" in kl:
+            return ""                     # csak a sorrendet döntik el
+        if "tippeljen" in kl:
+            st["tip"] += 1
+            return "f" if st["tip"] == 1 else "i"
+        return ""
+    ki = _fut("penzfel", bot)
+    sz = U.szoveg(ki).lower()
+    assert "gratulálok" in sz and "elsőbbség joga" in sz
+
+
+def test_kincs_sudi_gabor_lejatszik():
+    """ELÁSOTT KINCS: (1,1)-et ásva vagy megtalálja, vagy elfogy a 10 próba."""
+    import random
+    random.seed(1)
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "játékszabályt" in kl:
+            return "n"
+        if "x koordináta" in kl:
+            return "1"
+        if "y koordináta" in kl:
+            return "1"
+        if "akarsz még" in kl:
+            return "n"
+        return ""
+    ki = _fut("kincs", bot)
+    sz = U.szoveg(ki).lower()
+    assert "elásott kincs" in sz
+    assert "megtaláltad" in sz or "befejeződött" in sz
+    j = next(x for x in KAT.RETRO if x.kulcs == "kincs")
+    assert j.szerzo == "Sűdi Gábor" and j.ev == "1985"
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()

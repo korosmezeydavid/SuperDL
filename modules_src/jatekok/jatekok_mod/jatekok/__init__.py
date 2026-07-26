@@ -79,6 +79,9 @@ REGISZTER = {
     "felkaru": homelab.jatek_felkaru,
     "randi": homelab.jatek_randi,
     "loverseny": homelab.jatek_loverseny,
+    "nurmi": homelab.jatek_nurmi,
+    "penzfel": homelab.jatek_penzfel,
+    "kincs": homelab.jatek_kincs,
 }
 
 
