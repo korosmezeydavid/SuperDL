@@ -288,6 +288,12 @@ RETRO: tuple[Jatek, ...] = (
           "10-es tengeren. Bombázz egy pontra, telepíts aknát, indíts torpedót, "
           "vagy derítsd fel radarral az irányt és távolságot. Öt találat, és a "
           "hajó a mélybe süllyed!"),
+    Jatek("kastely", "Az elvarázsolt kastély",
+          "Veszedelmekkel teli szöveges kaland: bolyongj a nyolc égtáj mentén a "
+          "kastély 45 termében, gyűjts tárgyakat, és győzd le a hét szörnyet – "
+          "mindegyikhez más eszköz kell! A cél megtalálni a kék madarat, "
+          "kalitkába zárni, és a bázisra vinni, mielőtt letelik a 12 óra.",
+          szerzo="Csapó Endre"),
 )
 
 

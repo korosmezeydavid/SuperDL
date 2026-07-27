@@ -969,6 +969,62 @@ def test_hajocsata_akna_es_torpedo():
     assert ki[-1][0] == "vege"
 
 
+def test_kastely_csapo_endre_feladas():
+    """KASTÉLY: a szabály, majd a FELADÁS lezárja; a szerző Csapó Endre."""
+    import random
+    random.seed(1)
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "szabályokat" in kl:
+            return "n"
+        if "merre?" in kl:
+            return "feladás"
+        return ""
+    ki = _fut("kastely", bot)
+    sz = U.szoveg(ki).lower()
+    assert "elvarázsolt kastély" in sz and "feladtad" in sz
+    j = next(x for x in KAT.RETRO if x.kulcs == "kastely")
+    assert j.szerzo == "Csapó Endre"
+
+
+def test_kastely_mozgas_kerdojel_es_targy():
+    """KASTÉLY: mozgás égtájjal, a ? lekérdezi a pontot/időt, majd feladás."""
+    import random
+    random.seed(7)
+    st = {"n": 0}
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "szabályokat" in kl:
+            return "n"
+        if "mit teszel" in kl:                 # ha szörny jönne, ÖLj
+            return "ÖL"
+        if "merre?" in kl:
+            st["n"] += 1
+            return {1: "K", 2: "?", 3: "D"}.get(st["n"], "feladás")
+        return ""
+    ki = _fut("kastely", bot)
+    sz = U.szoveg(ki).lower()
+    assert "pontod van" in sz                  # a ? lekérdezés
+    assert ki[-1][0] == "vege"
+
+
+def test_kastely_szorny_gyemantkessel_gyoz():
+    """A nyirkoskezű gyilkost a gyémántkéssel + ÖL szóval le lehet győzni."""
+    H = importlib.import_module(BASE + ".jatekok.homelab")
+    st = {"szoba": 5, "elozo": 5, "pont": 0, "ido": 0}
+    targy = {i: 0 for i in range(1, 11)}
+    targy[3] = 51                              # gyémántkés nálunk
+
+    def jat(ctx):
+        yield from H._kast_szorny(ctx, 1, targy, st)
+        yield ctx.vege("vége")
+    ki = U.lejatsz(jat, iter(["ÖL"]))
+    sz = U.szoveg(ki).lower()
+    assert "megölted" in sz and st["pont"] == 1000
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()

@@ -3220,3 +3220,304 @@ def jatek_hajocsata(ctx):
             if tx < 1 or tx > 15 or ty < 1 or ty > 10:
                 tx = 0
                 yield ctx.mond("A torpedó elment.")
+
+
+# ============================================================ ELVARÁZSOLT KASTÉLY
+# Forrás: KASTELY.bas – Készítette: Csapó Endre.
+# Teljes szöveges kaland: 45 szoba (véletlen labirintus, 8 égtáj) + 5 csapda,
+# 10 tárgy, 7 szörny. A cél a KÉK MADARAT megtalálni (a KALITKA kell hozzá) és a
+# BÁZISra visszavinni, 12 óra játékidőn belül. Minden szörnyet egy-egy tárgy
+# győz le az „ÖL" szóval. Az összes szöveg, tárgy, szoba és pontérték a forrásból;
+# akadálymentességből egy FELADÁS opció (az eredetiben nincs kilépés).
+
+_KAST_SZOBAK = (
+    "Bázis", "Pince", "Kamra", "Kínzókamra", "Jégverem", "Dohos szoba",
+    "Nyirkos szoba", "Penészes szoba", "Mocskos szoba", "Páncélterem",
+    "Fegyvertár", "Lőporraktár", "Kincstár", "Lovagterem", "Trónterem",
+    "Tanácsterem", "Bálterem", "Királyi ebédlő", "Királyi öltözőszoba",
+    "Királyi hálószoba", "Könyvtárterem", "A borzalmak szobája",
+    "A katonák szállása", "A szolgák szállása", "A személyzet konyhája",
+    "A királyi konyha", "Kápolna", "A lenyakazógép terme",
+    "Az udvarhölgyek szobája", "A hóhér koponyagyűjteménye",
+    "A hullaégető szoba", "A megnevezhetetlen borzalom szobája",
+    "A fekete kígyó szobája", "A gyilkos cápa medencéje",
+    "A velőtrázó sikoly szobája", "A szemkikaparó nőstény őslény terme",
+    "A kéjenc szűzzabáló bérenc oduja", "A lófog csontropogtató oduja",
+    "A nyirkoskezű gyilkos tanyája", "Ahová a király is gyalog jár",
+    "A kaporszakáll fűzfánfütyülő barlangja", "A jövendőmondó terme",
+    "A királyi istálló", "Márványterem", "A királyi ódon kripta",
+    # 46–50: csapdák
+    "Süllyesztőajtóra léptél, lezuhantál", "Megmart egy kígyó, meghaltál",
+    "Lezuhantál", "Megcsípett egy skorpió", "Megharapott egy véreb",
+)
+_KAST_TARGYAK = (
+    "pisztoly", "tölténytáska", "gyémántkés", "varázsgyűrű", "kalitka",
+    "zenedoboz", "méregpohár", "kötél", "pénzesládikó", "kék madár",
+)
+_KAST_IRANYOK = {"É": 0, "E": 0, "ÉK": 1, "EK": 1, "K": 2, "DK": 3, "D": 4,
+                 "DNY": 5, "NY": 6, "ÉNY": 7, "ENY": 7}
+
+
+def _kast_szorny(ctx, sid, targy, st):
+    """Egy szörny-találkozó (sid 1–7). Az `st` szótárt módosítja
+    (pont, ido, szoba). Yield-el; a végén visszatér a fő ciklusba."""
+    IR = set("É ÉK K DK D DNY NY ÉNY".split())
+
+    def menekul(v):
+        return (v or "").strip().upper() in IR
+
+    while True:
+        if sid == 1:
+            yield ctx.mond("A sarokban rejtőzött a nyirkoskezű gyilkos, és rád "
+                           "támadt!")
+        elif sid == 2:
+            yield ctx.mond("Üldöz a gülüszemű szörny!")
+        elif sid == 3:
+            yield ctx.mond("Kerget a vérvedelő vasvámpír!")
+        elif sid == 4:
+            yield ctx.mond("Támad a csendbenölő fogcsikorgató!")
+        elif sid == 5:
+            yield ctx.mond("Jaj! Az ezercsáp húsmarcangoló kerget!")
+        elif sid == 6:
+            yield ctx.mond("Utadba áll a pénztarháló kunyera!")
+        else:
+            yield ctx.mond("Én vagyok a gácsányak gölyvás gödény! Adj innom "
+                           "valamit!")
+
+        # a 2., 6., 7. szörnynél van esély a puszta megmenekülésre
+        if sid in (2, 7) and random.randint(1, 4) == 3:
+            st["pont"] += 1600
+            yield ctx.mond("Megmenekültél! Plusz 1600 pont.")
+            return
+        if sid == 6 and random.randint(1, 4) == 3:
+            st["ido"] += 15
+            yield ctx.mond("Sikerült meglógnod előle.")
+            return
+
+        v = yield ctx.kerdez("Mit teszel? (ÖL – ha van hozzá tárgyad, vagy egy "
+                             "égtáj a meneküléshez)")
+        ol = (v or "").strip().upper() in ("ÖL", "OL")
+
+        if sid == 1:
+            if menekul(v):
+                st["ido"] += 2
+                yield ctx.mond("Üldöz, és nem menekülhetsz el!")
+                continue
+            if ol and targy[3] == 51:
+                st["pont"] += 1000
+                yield ctx.mond("Megölted. Plusz 1000 pont.")
+                return
+            if ol:
+                st["pont"] -= 5000
+                st["szoba"] = 1
+                yield ctx.mond("Nincs nálad a gyémántkés! A gyilkos beléd vágta "
+                               "a kését, meghaltál! Mínusz 5000 pont. Vissza a "
+                               "bázisra.")
+                return
+        elif sid == 2:
+            if ol and targy[4] == 51:
+                st["pont"] += 3000
+                yield ctx.mond("A varázsgyűrű elvakította a gülüszemét. "
+                               "Megmenekültél! Plusz 3000 pont.")
+                return
+            if ol:
+                st["ido"] += 60
+                yield ctx.mond("Rád nézett a gülüszemeivel, és mozdulatlanná "
+                               "dermedtél egy órára!")
+                return
+            st["ido"] += 3
+            yield ctx.mond("Üldöz!")
+            continue
+        elif sid == 3:
+            if ol and targy[1] == 51 and targy[2] == 51:
+                st["pont"] += 6000
+                yield ctx.mond("A nálad lévő pisztollyal agyonlőtted a vámpírt! "
+                               "Plusz 6000 pont.")
+                return
+            if ol:
+                yield ctx.mond("Töltött lőfegyver nélkül felelőtlenség volt "
+                               "rátámadnod.")
+            st["pont"] -= 2500
+            yield ctx.mond("Elkapott és kiszívta a véred! Mínusz 2500 pont.")
+            return
+        elif sid == 4:
+            if ol and targy[6] == 51:
+                st["pont"] += 1500
+                yield ctx.mond("A zenélő doboz megmentette az életed. Plusz "
+                               "1500 pont.")
+                return
+            st["pont"] -= 4000
+            yield ctx.mond("Elharapta a torkod! Mínusz 4000 pont.")
+            return
+        elif sid == 5:
+            if ol and targy[8] == 51:
+                st["pont"] += 4000
+                yield ctx.mond("A kötéllel sikerült megkötözni és elmenekülni. "
+                               "Plusz 4000 pont.")
+                return
+            st["pont"] -= 2000
+            st["ido"] += 25
+            yield ctx.mond("Rád tekerte a csápjait és széttépett! Mínusz 2000 "
+                           "pont.")
+            return
+        elif sid == 6:
+            if ol and targy[9] == 51:
+                st["pont"] += 7000
+                yield ctx.mond("Egy arany árán békében hagyott. Plusz 7000 pont.")
+                return
+            if ol:
+                yield ctx.mond("Pénzadomány nélkül nem lehet lerázni.")
+                continue
+            st["ido"] += 5
+            yield ctx.mond("Még mindig a sarkadban van, és pénzt követel!")
+            continue
+        else:                               # 7. gödény
+            if ol and targy[7] == 51:
+                st["pont"] += 8000
+                yield ctx.mond("Glugy glugy, nyekk! Ivott a méregből és "
+                               "elpatkolt. Plusz 8000 pont!")
+                return
+            if ol:
+                st["pont"] -= 1300
+                yield ctx.mond("Méreggel kellett volna leitatnod ezt a részeges "
+                               "gödényt! Agyonvert a szárnyaival. Mínusz 1300 pont.")
+                return
+            st["ido"] += 3
+            yield ctx.mond("Üldöz!")
+            continue
+
+
+def jatek_kastely(ctx):
+    yield ctx.mond("Az elvarázsolt kastély!")
+    v = yield ctx.kerdez("Kéred a szabályokat? (i/n)")
+    if igen(v, False):
+        yield ctx.mond(
+            "Ez egy veszedelmekkel teli kastély! A játék célja megtalálni a kék "
+            "madarat, és a bázisra vinni. A játékra 12 óra idő áll "
+            "rendelkezésre; az idő és a pontszám a kérdőjellel bármikor "
+            "lekérdezhető. A kastélyban különféle szörnyek vannak, akiket az ÖL "
+            "szó beírásával vagy meneküléssel lehet elpusztítani – de mindegyik "
+            "szörnyhöz más-más tárgy kell! A kék madarat és a többi tárgyat a "
+            "FELVESZ és a LETESZ szavakkal, plusz a tárgy nevével kezelheted. A "
+            "kalandozáshoz a nyolc égtáj betűjelét használd: É, ÉK, K, DK, D, "
+            "DNY, NY, ÉNY. Jó szórakozást kíván a játék készítője, Csapó Endre.")
+
+    # a labirintus: minden szobának (1–45) 8 véletlen kijárata (1–50)
+    kijarat = {sz: [random.randint(1, 50) for _ in range(8)]
+               for sz in range(1, 46)}
+    # a 10 tárgy elhelyezése véletlen szobákban (1–45); 51 = nálad van
+    targy = {i: random.randint(1, 45) for i in range(1, 11)}
+    st = {"szoba": 1, "elozo": 1, "pont": 0, "ido": 0}
+    latogatott = {1}
+
+    while True:
+        sz = st["szoba"]
+        yield ctx.mond(_KAST_SZOBAK[sz - 1] + ".")
+        itt = [i for i in range(1, 11) if targy[i] == sz]
+        for i in itt:
+            yield ctx.mond(f"Itt van a(z) {_KAST_TARGYAK[i - 1]}!")
+
+        if sz == 1 and targy[10] == 51 and targy[5] == 51:
+            yield ctx.vege("Teljesítetted a feladatot, megnyerted a játékot! "
+                           f"Gratulálok, {max(0, st['pont'])} pontot szereztél. "
+                           "Nagyon jól játszottál!")
+            return
+        if sz == 1:
+            yield ctx.mond(f"Pontszámod {st['pont']}, az idő {st['ido'] // 60} "
+                           f"óra {st['ido'] % 60} perc.")
+
+        v = yield ctx.kerdez("Merre? (égtáj: É ÉK K DK D DNY NY ÉNY; vagy "
+                             "FELVESZ tárgy / LETESZ tárgy / ? / FELADÁS)")
+        p = (v or "").strip()
+        pf = p.upper()
+
+        if pf in ("FELADÁS", "FELADAS", "KILÉPÉS", "KILEPES"):
+            yield ctx.vege(f"Feladtad a kalandot. {st['pont']} ponttal távozol. "
+                           "Legközelebb megtalálod a kék madarat!")
+            return
+        if p == "?":
+            yield ctx.mond(f"{st['pont']} pontod van. Idő: {st['ido'] // 60} óra "
+                           f"{st['ido'] % 60} perc.")
+            continue
+        if pf.startswith("FELVESZ"):
+            nev = p[7:].strip().lower()
+            idx = next((i for i in range(1, 11)
+                        if _KAST_TARGYAK[i - 1] == nev), None)
+            if idx is None:
+                yield ctx.mond("Nem értem, hogy mit akarsz felvenni.")
+            elif targy[idx] == 51:
+                yield ctx.mond("Már felvetted!")
+            elif targy[idx] != sz:
+                yield ctx.mond(f"Itt nincs semmiféle {nev}!")
+            elif idx == 10 and targy[5] != 51:
+                targy[10] = random.randint(1, 45)
+                yield ctx.mond("Nincs nálad a kalitka! A kék madár kirepült a "
+                               "szobából, keresheted tovább!")
+            else:
+                targy[idx] = 51
+                st["pont"] += 1000
+                yield ctx.mond("Felvetted. Plusz 1000 pont.")
+            continue
+        if pf.startswith("LETESZ"):
+            nev = p[6:].strip().lower()
+            idx = next((i for i in range(1, 11)
+                        if _KAST_TARGYAK[i - 1] == nev), None)
+            if idx is None:
+                yield ctx.mond("Nem értem, hogy mit akarsz letenni.")
+            elif targy[idx] != 51:
+                yield ctx.mond(f"Nincs is nálad a(z) {nev}!")
+            else:
+                targy[idx] = sz
+                yield ctx.mond("Letetted.")
+            continue
+
+        irany = _KAST_IRANYOK.get(pf)
+        if irany is None:
+            yield ctx.mond("Nem értem!")
+            continue
+
+        # lépés
+        st["elozo"] = sz
+        uj = kijarat[sz][irany]
+        st["szoba"] = uj
+        st["ido"] += 1
+
+        if uj <= 45 and uj not in latogatott:
+            latogatott.add(uj)
+            st["pont"] += 500
+            yield ctx.mond("Új terembe értél! Plusz 500 pont.")
+
+        if uj >= 46:                        # csapda-szoba
+            yield ctx.mond(_KAST_SZOBAK[uj - 1] + "!")
+            if uj == 46:
+                st["pont"] -= 1000
+                st["ido"] += 45
+                st["szoba"] = random.randint(1, 45)
+            elif uj == 47:
+                st["pont"] -= 10550
+                st["ido"] += 60
+                st["szoba"] = 1
+            elif uj == 48:
+                st["pont"] -= 1000
+                st["ido"] += 20
+                st["szoba"] = random.randint(1, 45)
+            elif uj == 49:
+                st["pont"] -= 1250
+                st["ido"] += 20
+                st["szoba"] = st["elozo"]
+            else:
+                st["pont"] -= 3000
+                st["ido"] += 40
+                st["szoba"] = st["elozo"]
+
+        if st["ido"] >= 720:
+            yield ctx.vege("Sajnálom, de letelt a játékidő! Viszontlátásra a "
+                           "következő játékban.")
+            return
+
+        # ~1/8 eséllyel szörny-találkozó
+        if random.randint(1, 8) == 5:
+            yield from _kast_szorny(ctx, random.randint(1, 7), targy, st)
+            if st["ido"] >= 720:
+                yield ctx.vege("Letelt a játékidő! Viszontlátásra!")
+                return
