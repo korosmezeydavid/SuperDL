@@ -267,6 +267,7 @@ class MediaDownloader:
         self.progress = progress or Progress()
         self.limit_bps = limit_bps
         self._stop = threading.Event()
+        self._finished = False        # a letöltés VALÓBAN befejeződött-e (hook)
 
     def stop(self) -> None:
         self._stop.set()
@@ -320,8 +321,26 @@ class MediaDownloader:
             p.speed = d.get("speed") or 0.0
             p.filename = d.get("info_dict", {}).get("title", "") or p.filename
         elif d["status"] == "finished":
+            self._finished = True        # a fájl VALÓBAN elkészült (nem hamis)
             with p._lock:
                 p.downloaded = p.total or p.downloaded
+
+    def _letoltes_kesz(self, info) -> bool:
+        """Igaz, ha a letöltés VALÓBAN befejeződött: a progress-hook 'finished'-t
+        jelzett, vagy létezik (és nem üres) a yt-dlp által jelzett végső fájl.
+        `ignoreerrors` mellett a megszakadt letöltés is visszaad info-szótárt
+        fájl nélkül – ezt NEM szabad sikernek venni (ez volt a hamis-siker bug)."""
+        if getattr(self, "_finished", False):
+            return True
+        import os
+        try:
+            for rd in (info.get("requested_downloads") or []):
+                fp = rd.get("filepath") or rd.get("_filename")
+                if fp and os.path.exists(fp) and os.path.getsize(fp) > 0:
+                    return True
+        except Exception:
+            pass
+        return False
 
     def _ffmpeg_progress(self, done: int, total: int) -> None:
         p = self.progress
@@ -433,6 +452,7 @@ class MediaDownloader:
 
         def _download(o):
             errlog.errors.clear()
+            self._finished = False            # minden próba friss „befejezett" jelzővel
             with yt_dlp.YoutubeDL(o) as ydl:
                 info = ydl.extract_info(self.url, download=True)
             # ignoreerrors módban a TELJES bukás nem dob kivételt (None vagy
@@ -481,6 +501,15 @@ class MediaDownloader:
                 else:
                     raise
             ok, failed = _count_entries(info)
+            # HAMIS SIKER ELLEN: egyedi videónál (nem lejátszási lista) a letöltés
+            # CSAK akkor „kész", ha a fájl VALÓBAN elkészült. `ignoreerrors` mellett
+            # a megszakadt letöltés (pl. a szerver ejti a kapcsolatot egy nagy
+            # fájlnál) info-szótárt ad vissza kivétel nélkül, fájl nélkül – ezt
+            # eddig sikernek vettük. Mostantól ilyenkor ÉRTHETŐ hibát adunk.
+            is_lista = isinstance(info, dict) and "entries" in info
+            if not is_lista and not self._letoltes_kesz(info):
+                raise RuntimeError("a letöltés megszakadt, a fájl nem készült "
+                                   "el teljesen – próbáld újra")
             self.progress.status = "kész"
             if isinstance(info, dict) and "entries" in info:
                 # lejátszási lista: hallható összegzés (hány jött le, mennyi maradt)
