@@ -89,6 +89,7 @@ REGISZTER = {
     "jvelem": homelab.jatek_jvelem,
     "atlantisz": homelab.jatek_atlantisz,
     "szammem": homelab.jatek_szammem,
+    "hajocsata": homelab.jatek_hajocsata,
 }
 
 

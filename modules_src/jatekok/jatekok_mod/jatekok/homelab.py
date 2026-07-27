@@ -3056,3 +3056,167 @@ def jatek_szammem(ctx):
         zaro = ("Prímák a tranzisztoraid és a csipjeid! Kiváló eredményt értél "
                 "el! Puszi puszi!")
     yield ctx.vege(zaro)
+
+
+# ================================================================= HAJÓCSATA
+# Forrás: HAJO.bas. Tengeri csata: egy rejtett, mozgó ellenséges hajót kell
+# elsüllyesztened egy 15×10-es tengeren. Fegyverek: bomba (pontra), akna
+# (kihelyezve), torpedó (irányba indítva), radar (irány + távolság). Öt találat
+# után a hajó elsüllyed. A hajó minden körben lép, a faltól visszapattan. Az
+# üzenetek a forrásból; akadálymentességből egy K = kilépés opcióval.
+
+def jatek_hajocsata(ctx):
+    yield ctx.mond(
+        "Hajócsata! Egy rejtett, mozgó ellenséges hajót kell elsüllyesztened a "
+        "tengeren, ami vízszintesen 1-től 15-ig, függőlegesen 1-től 10-ig terjed. "
+        "Öt találat kell az elsüllyesztéshez. Fegyvereid: bomba egy pontra, akna "
+        "kihelyezve, torpedó egy irányba indítva, és radar, ami elárulja a hajó "
+        "irányát és távolságát. A hajó minden körben lép.")
+    hx, hy = random.randint(1, 15), random.randint(1, 10)
+    i = random.choice((-1, 1))
+    j = random.choice((-1, 1))
+    t = 0                                   # találatok (5 = elsüllyed)
+    aknak = []                              # kihelyezett aknák (max 20)
+    tx = ty = 0                             # torpedó pozíció (0 = nincs úton)
+    lm = mm = 0                             # torpedó iránya
+    rd = False                              # radar használva (találatig)
+
+    def szam_be(v, lo, hi):
+        return szam(v, lo, hi)
+
+    while True:
+        f = False                           # volt-e bomba-találat ebben a körben
+        v = yield ctx.kerdez("Parancs? Bomba = B, Akna = A, Torpedó = T, "
+                             "Radar = R, Kilépés = K")
+        p = (v or "").strip().upper()[:1]
+
+        if p == "K":
+            yield ctx.vege(f"Feladtad a csatát. Eddig {t} találatod volt. "
+                           "Legközelebb elsüllyed!")
+            return
+
+        if p == "B":
+            vx = yield ctx.kerdez("Bomba vízszintes koordináta (1–15):")
+            bx = szam_be(vx, 1, 15)
+            vy = yield ctx.kerdez("Bomba függőleges koordináta (1–10):")
+            by = szam_be(vy, 1, 10)
+            if bx is None or by is None:
+                yield ctx.mond("Érvényes koordinátát kérek.")
+                continue
+            if bx == hx and by == hy:
+                rd = False
+                t += 1
+                f = True
+                yield ctx.mond("A bomba eltalálta a hajót!")
+            else:
+                d = ((hx - bx) ** 2 + (hy - by) ** 2) ** 0.5
+                yield ctx.mond(f"A távolság {d:.1f} kilométer.")
+            if tx and bx == tx and by == ty:            # a saját torpedót lelőtted
+                tx = 0
+                yield ctx.mond("Lebombáztad a torpedódat!")
+            if (bx, by) in aknak:
+                aknak.remove((bx, by))
+                yield ctx.mond("Lebombáztál egy aknát!")
+
+        elif p == "A":
+            if len(aknak) >= 20:
+                yield ctx.mond("Elfogyott az akna!")
+            else:
+                vx = yield ctx.kerdez("Akna vízszintes koordináta (1–15):")
+                ax = szam_be(vx, 1, 15)
+                vy = yield ctx.kerdez("Akna függőleges koordináta (1–10):")
+                ay = szam_be(vy, 1, 10)
+                if ax is None or ay is None:
+                    yield ctx.mond("Érvényes koordinátát kérek.")
+                    continue
+                aknak.append((ax, ay))
+                yield ctx.mond("Aknát telepítettél.")
+
+        elif p == "T":
+            if tx:
+                yield ctx.mond("Úton van egy torpedó!")
+            else:
+                vx = yield ctx.kerdez("Torpedó indító vízszintes (előjellel, "
+                                      "pl. 5 vagy -5):")
+                sx = szam_be(vx, -15, 15)
+                vy = yield ctx.kerdez("Torpedó indító függőleges (előjellel):")
+                sy = szam_be(vy, -10, 10)
+                if sx is None or sy is None or sx == 0 or sy == 0:
+                    yield ctx.mond("Nem nulla, előjeles koordinátát kérek.")
+                    continue
+                lm = 1 if sx > 0 else -1
+                mm = 1 if sy > 0 else -1
+                tx, ty = abs(sx), abs(sy)
+                yield ctx.mond("Torpedó kilőve!")
+
+        elif p == "R":
+            if rd:
+                yield ctx.mond("Előbb találd el a hajót!")
+            else:
+                rd = True
+                vx = yield ctx.kerdez("Radar vízszintes koordináta (1–15):")
+                rx = szam_be(vx, 1, 15)
+                vy = yield ctx.kerdez("Radar függőleges koordináta (1–10):")
+                ry = szam_be(vy, 1, 10)
+                if rx is None or ry is None:
+                    yield ctx.mond("Érvényes koordinátát kérek.")
+                    continue
+                if rx == hx and ry == hy:
+                    yield ctx.mond("Pont itt tartózkodik a hajó!")
+                else:
+                    if rx == hx:
+                        yield ctx.mond("A kelet-nyugati irány egyezik.")
+                    else:
+                        ie = "keletre" if rx < hx else "nyugatra"
+                        yield ctx.mond(f"A hajó {ie}, {abs(rx - hx)} kilométerre.")
+                    if ry == hy:
+                        yield ctx.mond("Az észak-déli irány egyezik.")
+                    else:
+                        ie = "északra" if ry < hy else "délre"
+                        yield ctx.mond(f"A hajó {ie}, {abs(ry - hy)} kilométerre.")
+            continue                         # a radar-kör után a hajó nem lép
+
+        else:
+            yield ctx.mond("B, A, T, R vagy K betűt kérek.")
+            continue
+
+        # --- a körvégi ellenőrzések (torpedó/akna találat) ---
+        if tx and tx == hx and ty == hy:
+            t += 1
+            tx = 0
+            yield ctx.mond("A torpedó eltalálta a hajót!")
+        if (hx, hy) in aknak:
+            aknak.remove((hx, hy))
+            t += 1
+            yield ctx.mond("A hajó aknára futott!")
+        if tx and (tx, ty) in aknak:
+            aknak.remove((tx, ty))
+            tx = 0
+            yield ctx.mond("A torpedó aknára futott!")
+
+        if t >= 5:
+            yield ctx.vege("A hajó elsüllyedt! Győztél, kapitány! Kiváló "
+                           "célzás volt!")
+            return
+
+        if f:                                # találat után a hajó irányt vált
+            i = random.choice((-1, 1))
+            j = random.choice((-1, 1))
+        # a hajó lép (a faltól visszapattan)
+        if hx <= 1:
+            i = 1
+        elif hx >= 15:
+            i = -1
+        if hy <= 1:
+            j = 1
+        elif hy >= 10:
+            j = -1
+        hx += i
+        hy += j
+        # a torpedó lép
+        if tx:
+            tx += lm
+            ty += mm
+            if tx < 1 or tx > 15 or ty < 1 or ty > 10:
+                tx = 0
+                yield ctx.mond("A torpedó elment.")

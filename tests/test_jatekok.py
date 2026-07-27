@@ -919,6 +919,56 @@ def test_enektanito_beepitett_pelda():
     assert enekek and len(enekek[0][0]) == 8             # a skála 8 hang
 
 
+def test_hajocsata_radar_bomba_kilepes():
+    """HAJÓCSATA: a radar irányt/távolságot ad, a bomba távolságot/találatot,
+    a K kilépés lezárja."""
+    import random
+    random.seed(1)
+    st = {"n": 0}
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "parancs?" in kl:
+            st["n"] += 1
+            return {1: "R", 2: "B"}.get(st["n"], "K")
+        if "radar vízszintes" in kl or "bomba vízszintes" in kl:
+            return "8"
+        if "radar függőleges" in kl or "bomba függőleges" in kl:
+            return "5"
+        return ""
+    ki = _fut("hajocsata", bot)
+    sz = U.szoveg(ki).lower()
+    assert "hajócsata" in sz
+    assert ("kilométer" in sz) or ("irány egyezik" in sz) or ("pont itt" in sz)
+    assert "feladtad" in sz                          # a K kilépés
+
+
+def test_hajocsata_akna_es_torpedo():
+    """HAJÓCSATA: akna telepítése és torpedó kilövése is működik."""
+    import random
+    random.seed(2)
+    st = {"n": 0}
+
+    def bot(k, ki):
+        kl = k.lower()
+        if "parancs?" in kl:
+            st["n"] += 1
+            return {1: "A", 2: "T"}.get(st["n"], "K")
+        if "akna vízszintes" in kl:
+            return "3"
+        if "akna függőleges" in kl:
+            return "4"
+        if "torpedó indító vízszintes" in kl:
+            return "5"
+        if "torpedó indító függőleges" in kl:
+            return "6"
+        return ""
+    ki = _fut("hajocsata", bot)
+    sz = U.szoveg(ki).lower()
+    assert "aknát telepítettél" in sz and "torpedó kilőve" in sz
+    assert ki[-1][0] == "vege"
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()

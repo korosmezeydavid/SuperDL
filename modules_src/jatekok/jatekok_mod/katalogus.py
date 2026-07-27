@@ -283,6 +283,11 @@ RETRO: tuple[Jatek, ...] = (
           "hosszabb, és neked sorban vissza kell írnod. Minden hibás számjegy "
           "egy hibapont; tíznél több hiba a vég. Meddig jutsz a fejben?",
           szerzo="Kisvarga Zsolt"),
+    Jatek("hajocsata", "Hajócsata",
+          "Egy rejtett, mozgó ellenséges hajót kell elsüllyesztened a 15-ször "
+          "10-es tengeren. Bombázz egy pontra, telepíts aknát, indíts torpedót, "
+          "vagy derítsd fel radarral az irányt és távolságot. Öt találat, és a "
+          "hajó a mélybe süllyed!"),
 )
 
 
