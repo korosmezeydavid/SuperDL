@@ -145,12 +145,12 @@
       "category": "Játékok",
       "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód. ÚJ: Gépi ének – a saját formáns-szintetizátorunk DALLAMRA énekli, amit beírsz (súgóval); és négy új hű port: Atlantisz, Számemória, Hajócsata és Az elvarázsolt kastély (Csapó Endre). Korábbról a Milliomos kvíz is elérhető.",
       "latest": {
-        "version": "1.4.0",
+        "version": "1.4.1",
         "min_core_api": "1.0",
         "min_core_version": "4.1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.4.0/jatekok-1.4.0.zip",
-        "sha256": "556530e0a09e5c00bf4f589aa0acd44f6cbd8cdca7a2815057b1b2c6c54e7000",
-        "size": 10962743
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.4.1/jatekok-1.4.1.zip",
+        "sha256": "3c7cdb4ed006c49aa3de4252c2395c3de3933e15cb0f4bf1c3066bf8e3dfa21b",
+        "size": 10963479
       }
     }
   ]
