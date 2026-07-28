@@ -59,6 +59,7 @@ class JatekokFrame(wx.Frame):
         if not 50 <= self._tempo_szazalek <= 160:
             self._tempo_szazalek = 100
         self._tempo = 100.0 / self._tempo_szazalek   # a beszéd időtartam-szorzója
+        self._retro_hang = bool(cfg.get("retro_hang", False))   # ALAPBÓL KI
         self._sapi = None            # rendszer-TTS tartalék (lusta)
 
         self._build()
@@ -122,6 +123,15 @@ class JatekokFrame(wx.Frame):
         v.Add(wx.StaticText(p, label=
               "Itt választhatod ki, milyen hangon szóljanak a retró játékok."),
               0, wx.ALL, 8)
+        # A retró hang ALAPBÓL KIKAPCSOLVA; itt (vagy magában a játékban)
+        # bekapcsolható, és a választás megmarad. Aki képernyőolvasót használ,
+        # az alaphelyzetben azzal hallgatja a játékokat.
+        self.retro_be = wx.CheckBox(
+            p, label="&Retró hang beszéljen a retró játékokban "
+                     "(alapból kikapcsolva)")
+        self.retro_be.SetValue(bool(self._retro_hang))
+        self.retro_be.Bind(wx.EVT_CHECKBOX, lambda e: self._retro_be_valt())
+        v.Add(self.retro_be, 0, wx.ALL, 8)
         v.Add(wx.StaticText(p, label="&Hangkarakter (fel/le nyíl):"), 0,
               wx.LEFT, 8)
         self.hang_lst = wx.ListBox(
@@ -253,12 +263,26 @@ class JatekokFrame(wx.Frame):
         self._announce(f"Beszédtempó: {szazalek} százalék.", beszel=True)
 
     def _save_hang_cfg(self):
-        """A választott hang + tempó megőrzése a következő indításig (Laci)."""
+        """A választott hang + tempó + retró-hang kapcsoló megőrzése a következő
+        indításig. MERGE (nem felülírás), hogy a játékban állított retró-hang
+        választás se vesszen el."""
         try:
-            store.save_json(store.CONFIG_DIR / _HANG_CFG,
-                            {"hang": self._hang, "tempo": self._tempo_szazalek})
+            p = store.CONFIG_DIR / _HANG_CFG
+            cfg = store.load_json(p, {})
+            cfg["hang"] = self._hang
+            cfg["tempo"] = self._tempo_szazalek
+            cfg["retro_hang"] = bool(self._retro_hang)
+            store.save_json(p, cfg)
         except Exception:
             pass
+
+    def _retro_be_valt(self):
+        self._retro_hang = self.retro_be.GetValue()
+        self._save_hang_cfg()
+        self._announce("A retró hang mostantól "
+                       + ("bekapcsolva." if self._retro_hang
+                          else "kikapcsolva; a képernyőolvasó beszél."),
+                       beszel=True)
 
     def _hangproba(self):
         szoveg = self.proba_txt.GetValue().strip()

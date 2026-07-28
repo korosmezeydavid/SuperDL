@@ -1025,6 +1025,30 @@ def test_kastely_szorny_gyemantkessel_gyoz():
     assert "megölted" in sz and st["pont"] == 1000
 
 
+def test_retro_hang_megorzes_alapbol_ki(tmp_path, monkeypatch):
+    """A retró hang ALAPBÓL kikapcsolva, a választás MEGŐRZŐDIK, és a mentés
+    NEM törli a többi beállítást (hang/tempó). Ez volt a bug: minden játéknál
+    újra bekapcsolt."""
+    pytest.importorskip("wx")
+    jk = importlib.import_module(BASE + ".jatekkonzol")
+    from superdl import store
+    monkeypatch.setattr(store, "CONFIG_DIR", tmp_path)
+
+    assert jk._retro_hang_be() is False                 # alapból KI
+    jk._retro_hang_ment(True)
+    assert jk._retro_hang_be() is True                  # bekapcsolás megmarad
+    jk._retro_hang_ment(False)
+    assert jk._retro_hang_be() is False                 # kikapcsolás megmarad
+
+    # MERGE: a mentés nem törli a meglévő hang/tempó választást
+    store.save_json(tmp_path / "jatekok.json",
+                    {"hang": "gep_melv", "tempo": 120})
+    jk._retro_hang_ment(True)
+    cfg = store.load_json(tmp_path / "jatekok.json", {})
+    assert cfg["hang"] == "gep_melv" and cfg["tempo"] == 120
+    assert cfg["retro_hang"] is True
+
+
 def test_hazard_lejatszik():
     def bot(k, ki):
         kl = k.lower()

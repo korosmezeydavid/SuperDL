@@ -18,6 +18,32 @@ import threading
 import wx
 
 from superdl import retrospeech as RS
+
+_HANG_CFG = "jatekok.json"                 # közös a Hangbeállítással
+
+
+def _retro_hang_be() -> bool:
+    """A MEGŐRZÖTT „retró hang beszéljen" beállítás. ALAPBÓL KIKAPCSOLVA –
+    akinek kell, a játékban vagy a Hangbeállításban bekapcsolja, és a választás
+    megmarad a következő játékokra is."""
+    try:
+        from superdl import store
+        cfg = store.load_json(store.CONFIG_DIR / _HANG_CFG, {})
+        return bool(cfg.get("retro_hang", False))
+    except Exception:
+        return False
+
+
+def _retro_hang_ment(be: bool) -> None:
+    """A választás megőrzése (a jatekok.json-ban), hogy ne kapcsoljon vissza."""
+    try:
+        from superdl import store
+        p = store.CONFIG_DIR / _HANG_CFG
+        cfg = store.load_json(p, {})
+        cfg["retro_hang"] = bool(be)
+        store.save_json(p, cfg)
+    except Exception:
+        pass
 from . import katalogus
 from . import jatekok as JR
 
@@ -154,7 +180,10 @@ class JatekKonzol(wx.Dialog):
         b_ujra.Bind(wx.EVT_BUTTON, lambda e: self._indul())
         sor.Add(b_ujra, 0, wx.RIGHT, 6)
         self.hang_kapcs = wx.CheckBox(self, label="&Retró hang beszéljen")
-        self.hang_kapcs.SetValue(bool(self.jatek.retro))
+        # A retró hang ALAPBÓL KIKAPCSOLVA; a felhasználó választását MEGŐRIZZÜK
+        # (nem kapcsol vissza magától minden játéknál – korábbi bosszúság).
+        self.hang_kapcs.SetValue(bool(self.jatek.retro) and _retro_hang_be())
+        self._hang.enabled = self.hang_kapcs.GetValue()
         self.hang_kapcs.Bind(wx.EVT_CHECKBOX, self._hang_kapcsol)
         sor.Add(self.hang_kapcs, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         if not self.jatek.retro:
@@ -413,6 +442,7 @@ class JatekKonzol(wx.Dialog):
         self._hang.enabled = self.hang_kapcs.GetValue()
         if not self._hang.enabled:
             self._hang.nema()
+        _retro_hang_ment(self._hang.enabled)   # a választás MEGŐRZÉSE
 
     # ---- billentyűk / zárás -------------------------------------------
 
