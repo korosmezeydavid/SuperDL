@@ -1368,8 +1368,15 @@ class MainFrame(wx.Frame):
                           audio_only=sub.audio_only)
             job.progress.filename = ep.title
             self._row_for(job)
+            # LÁTOTTNAK jelöljük MÁR INDÍTÁSKOR (nem csak sikeres letöltéskor):
+            # ha az epizód hibára fut (pl. törlöd, vagy elérhetetlen), NE próbálja
+            # a feliratkozás-figyelő újra meg újra végtelenszer leszedni. A
+            # felhasználó a listából kézzel bármikor újraindíthatja.
+            self.fm.mark_seen(sub, ep)
             self._feed_pending[job.id] = (sub, ep)
             media_db += 1
+        if media_db or cikk:
+            self.fm.save()               # a „látott" (seen) halmaz megőrzése
         if media_db:
             self._announce(f"{media_db} új epizód letöltése elindult.",
                            toast=True)
