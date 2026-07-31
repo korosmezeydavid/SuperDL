@@ -250,7 +250,11 @@ class MediaDownloader:
                  cookies_file: str | None = None,
                  playlist_folders: bool = True):
         self.url = url
-        self.out_dir = out_dir
+        # A célmappa VEZETŐ/ZÁRÓ szóközét levágjuk: Windowson a „ C:\\…" (vezető
+        # szóközzel) érvénytelen útvonal → WinError 123, és minden letöltés
+        # elhasal (pl. a podcast-epizódoké, ha a beállított mappában bennragadt
+        # egy szóköz). Így a mentett/begépelt szóköz sem tör el semmit.
+        self.out_dir = str(out_dir).strip()
         self.connections = connections
         self.audio_only = audio_only
         self.fmt = fmt

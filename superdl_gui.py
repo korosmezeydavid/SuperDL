@@ -803,7 +803,10 @@ class MainFrame(wx.Frame):
         # a fő ablakon csak a célmappa él; a többi beállítás a self.settings
         # szótárban van, amit a „Beállítások…” ablak szerkeszt
         s = self.settings
-        self.dir_entry.SetValue(s["out_dir"])
+        # A célmappa vezető/záró szóközét kimossuk (öngyógyítás): egy bennragadt
+        # „ C:\\…" szóköz Windowson WinError 123-at okoz, és minden letöltés
+        # elhasal. A Downloader is véd ellene, de a beállítást is kitisztítjuk.
+        self.dir_entry.SetValue(str(s.get("out_dir", "")).strip())
         # „Csak hang" ALAPBÓL: induláskor a mentett állapotot állítjuk vissza,
         # így nem kell minden indításkor újra bepipálni (Maxi jelezte)
         self.audio_chk.SetValue(bool(s.get("audio_only", False)))
@@ -830,7 +833,7 @@ class MainFrame(wx.Frame):
     def _save_settings(self):
         # a fő ablak által birtokolt értékek; a többit a Beállítások-ablak
         # már beleírta a self.settings-be
-        self.settings["out_dir"] = self.dir_entry.GetValue()
+        self.settings["out_dir"] = self.dir_entry.GetValue().strip()
         self.settings["tts"] = self.mi_tts.IsChecked()
         self.settings["sounds"] = self.mi_sounds.IsChecked()
         self.settings["audio_only"] = self.audio_chk.GetValue()   # „csak hang" megjegyzése
@@ -2819,6 +2822,16 @@ def main():
         frame._enter_background()  # REJTVE indul a tálcán (Windows-indításból)
     else:
         frame.Show()
+        # Ha a „Windows-szal, háttérben" kapcsoló BE van kapcsolva, akkor ASZTALRÓL
+        # indítva is legyen tálca-ikon és close-to-tray – különben a tálcáról
+        # kilépés + asztali újraindítás után a bezárás teljesen kilépne, nem a
+        # tálcára minimalizálna (Laci jelezte). A háttér-mód a kapcsolót kövesse,
+        # ne azt, HOGYAN indítottuk.
+        try:
+            if autostart.is_enabled():
+                frame._ensure_tray()
+        except Exception:
+            pass
     # fájltársítás: ha egy MÉDIAFÁJL útvonalával indultunk (dupla kattintás),
     # a megfelelő modul-ablak nyissa meg (hang → Super M, videó → felolvasó).
     if media_arg:

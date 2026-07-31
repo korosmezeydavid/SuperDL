@@ -3521,3 +3521,399 @@ def jatek_kastely(ctx):
             if st["ido"] >= 720:
                 yield ctx.vege("Letelt a játékidő! Viszontlátásra!")
                 return
+
+
+# ==================================================================== MOZAIK
+# Forrás: MOZAIK.HTP (Homelab 4). A gép egy szóra gondol; egyenként kérheted a
+# betűit (pozíció szerint), de minél több betűt kérsz, annál kevesebb pont jár.
+# Tíz szó után értékel. A szólista és az üzenetek a forrásból. A feladás (V)
+# visszafelé elbetűzi a szót, két pont büntetéssel. A szerző egyelőre ismeretlen.
+_MOZAIK_SZAVAK = (
+    "ANIKÓ", "ÁLMOS", "BERNÁT", "CECIL", "DEZSŐ", "FERENC", "HELÉN", "ÍRISZ",
+    "KÁROLY", "LAJOS", "MARGIT", "NORBERT", "ÓVATOS", "PÉTER", "RÓZSA",
+    "SÁNDOR", "TÍMEA", "ŰRHAJÓ", "VALÉRIA", "XERXÉSZ", "IPSZILON",
+)
+
+_MOZAIK_ISMERTETO = (
+    "Ebben a játékban szavakat kell kitalálnod.",
+    "Megmondom, hány betűből áll a szó, te pedig egyenként kérheted a betűit – "
+    "de vigyázz: minél több betűt kérsz, annál kevesebb pont jár a szóért!",
+    "Ha megvan, tippelj. Tíz szó után értékelem a teljesítményedet.",
+)
+
+
+def jatek_mozaik(ctx):
+    yield ctx.mond("MOZAIK!")
+    v = yield ctx.kerdez("Kéred az ismertetőt? (I vagy N)")
+    if igen(v, False):
+        for sor in _MOZAIK_ISMERTETO:
+            yield ctx.mond(sor)
+
+    szavak = random.sample(_MOZAIK_SZAVAK, min(10, len(_MOZAIK_SZAVAK)))
+    ossz = 0                       # összegyűjtött pont
+    elerheto = 0                   # a szóhosszak összege (a maximum)
+    for szo in szavak:
+        n = len(szo)
+        elerheto += n
+        yield ctx.mond(f"{n} betűből áll a szó.")
+        kert = set()               # már lekért pozíciók
+        q = 0                      # eddig kért betűk száma
+        feladta = False
+        while q < n - 1:           # a legutolsó betűt már nem adja ki
+            v = yield ctx.kerdez(f"Hányadik betűt kéred? (1–{n})")
+            x = szam(v, 1, n)
+            if x is None:
+                yield ctx.mond(f"Egy és {n} közötti számot kérek.")
+                continue
+            if x in kert:
+                yield ctx.mond("Ezt a betűt már kérted.")
+                continue
+            kert.add(x)
+            q += 1
+            yield ctx.mond(f"A(z) {x}. betű: {szo[x - 1]}.")
+            yield ctx.mond(f"{q} betűt kértél. Ha most eltalálod, "
+                           f"{max(0, n - (q - 1))} pont a tiéd.")
+            v = yield ctx.kerdez(
+                "Kérsz még betűt? (I = igen, N = tippelek, V = feladom, −2 pont)")
+            valasz = (v or "").strip().lower()
+            if valasz.startswith("v"):
+                feladta = True
+                yield ctx.mond("Figyelj! Elbetűzöm visszafelé. De elveszek 2 pontot!")
+                yield ctx.mond(", ".join(szo[::-1]) + ".")
+                break
+            if valasz.startswith("n"):
+                break
+            # bármi más (I) → újabb betűt kér
+        else:
+            yield ctx.mond("Ebből a szóból nem kapsz több betűt!")
+
+        yield ctx.mond("No! Lássuk a medvét!")
+        tipp = ((yield ctx.kerdez("Mi a szó?")) or "").strip()
+        if ekezet_nelkul(tipp) == ekezet_nelkul(szo):
+            pont = max(0, n - (q + 1)) if feladta else max(0, n - (q - 1))
+            ossz += pont
+            yield ctx.mond(f"Erre a szóra gondoltam: {szo}. Kapsz {pont} pontot.")
+        else:
+            yield ctx.mond(f"Így nem kapsz semmit. Erre a szóra gondoltam: {szo}.")
+        yield ctx.mond(f"Az eddig gyűjtött pontszámod: {ossz}.")
+
+    yield ctx.mond("Kiválasztottam mind a tíz szót. Lássuk az eredményt!")
+    if ossz > elerheto / 1.5:
+        yield ctx.vege("Ez bizony szuper teljesítmény volt! Gratulálok!")
+    elif ossz > elerheto / 2:
+        yield ctx.vege("Ez elég jó teljesítmény volt! Gratulálok!")
+    elif ossz > elerheto / 3:
+        yield ctx.vege("Ez bizony gyengécske teljesítmény volt! "
+                       "Legközelebb jobban figyelj oda!")
+    else:
+        yield ctx.vege("Ilyen pocsék teljesítményt! Talán nem használod a fejed?")
+
+
+# ===================================================================== MALOM
+# Forrás: MALOM.HTP – Brátán Ferenc. Klasszikus malom (Nine Men's Morris):
+# 24 pont három gyűrűben, 9–9 bábú. Fázisok: LERAKÁS, majd TOLÁS szomszédos
+# üres mezőre; három bábú egy vonalban = MALOM → az ellenfél egy (lehetőleg
+# malmon kívüli) bábuját leütöd. Aki kettőre fogy vagy nem tud lépni, veszít.
+# Ha valakinek már csak három bábuja van, bárhová REPÜLHET. A mezőket 1–24-ig
+# számozzuk (1–8 külső, 9–16 középső, 17–24 belső gyűrű). Üzenetek a forrásból.
+
+# szomszédság (0-alapú indexek)
+_MALOM_SZOMSZED = {
+    0: (1, 7), 1: (0, 2, 9), 2: (1, 3), 3: (2, 4, 11), 4: (3, 5),
+    5: (4, 6, 13), 6: (5, 7), 7: (0, 6, 15),
+    8: (9, 15), 9: (1, 8, 10, 17), 10: (9, 11), 11: (3, 10, 12, 19),
+    12: (11, 13), 13: (5, 12, 14, 21), 14: (13, 15), 15: (7, 8, 14, 23),
+    16: (17, 23), 17: (9, 16, 18), 18: (17, 19), 19: (11, 18, 20),
+    20: (19, 21), 21: (13, 20, 22), 22: (21, 23), 23: (15, 16, 22),
+}
+
+# a 16 malom-vonal
+_MALOM_MALMOK = (
+    (0, 1, 2), (2, 3, 4), (4, 5, 6), (6, 7, 0),
+    (8, 9, 10), (10, 11, 12), (12, 13, 14), (14, 15, 8),
+    (16, 17, 18), (18, 19, 20), (20, 21, 22), (22, 23, 16),
+    (1, 9, 17), (3, 11, 19), (5, 13, 21), (7, 15, 23),
+)
+
+_MALOM_ISMERTETO = (
+    "MALOM. A táblán 24 mező van, három gyűrűben: 1-től 8-ig a külső, 9-től "
+    "16-ig a középső, 17-től 24-ig a belső gyűrű; mindegyik nyolc mező, óramutató "
+    "járása szerint, és a nyolcadik után visszaugrik az elsőre.",
+    "A gyűrűket a 2., 4., 6. és 8. mezőjüknél kötő küllők kapcsolják össze.",
+    "Előbb mindketten leraktok kilenc-kilenc bábut üres mezőkre, majd felváltva "
+    "egy-egy bábut toltok egy SZOMSZÉDOS üres mezőre.",
+    "Ha három bábud kerül egy vonalba, az MALOM: leütheted az ellenfél egy "
+    "bábuját – lehetőleg olyat, amelyik nincs malomban.",
+    "Aki kettőre fogy, vagy nem tud lépni, veszít. Ha már csak három bábud van, "
+    "bármelyik üres mezőre REPÜLHETSZ.",
+)
+
+
+def _malom_zar_e(tabla, cell, jatekos):
+    """A `cell` mezőn álló bábu része-e egy teljes `jatekos`-malomnak."""
+    return any(cell in m and all(tabla[c] == jatekos for c in m)
+               for m in _MALOM_MALMOK)
+
+
+def _malom_malmai(tabla, jatekos):
+    """A `jatekos` összes (teljes) malma."""
+    return [m for m in _MALOM_MALMOK if all(tabla[c] == jatekos for c in m)]
+
+
+def _malom_uthetok(tabla, ellen):
+    """Az `ellen` leüthető bábui: elsőként a malmon KÍVÜLiek; ha mind malomban
+    van, akkor bármelyik (a forrás: „malomból nem vehetsz le", kivéve ha muszáj)."""
+    mind = [c for c in range(24) if tabla[c] == ellen]
+    szabad = [c for c in mind if not _malom_zar_e(tabla, c, ellen)]
+    return szabad or mind
+
+
+def _malom_lepesek(tabla, jatekos, repul):
+    """A `jatekos` legális (honnan, hova) tolásai. `repul`=True: bárhová."""
+    sajat = [c for c in range(24) if tabla[c] == jatekos]
+    ures = [c for c in range(24) if tabla[c] == 0]
+    lep = []
+    for f in sajat:
+        celok = ures if repul else [t for t in _MALOM_SZOMSZED[f] if tabla[t] == 0]
+        for t in celok:
+            lep.append((f, t))
+    return lep
+
+
+def _malom_gep_lerak(tabla, gep, ember, szint):
+    """A gép lerakó lépése (0-alapú mező)."""
+    ures = [c for c in range(24) if tabla[c] == 0]
+    # 1) saját malom bezárása
+    for c in ures:
+        tabla[c] = gep
+        zar = _malom_zar_e(tabla, c, gep)
+        tabla[c] = 0
+        if zar:
+            return c
+    # 2) az ember küszöbön álló malmának blokkolása (2. szinttől)
+    if szint >= 2:
+        for c in ures:
+            tabla[c] = ember
+            zar = _malom_zar_e(tabla, c, ember)
+            tabla[c] = 0
+            if zar:
+                return c
+    # 3) heurisztika: a legtöbb, ember-mentes saját vonalban részt vevő mező
+    best, bestc = -1, None
+    for c in ures:
+        pont = 0
+        for m in _MALOM_MALMOK:
+            if c in m:
+                sor = [tabla[x] for x in m]
+                if ember not in sor:
+                    pont += 1 + sor.count(gep)
+        if pont > best:
+            best, bestc = pont, c
+    return bestc if bestc is not None else random.choice(ures)
+
+
+def _malom_gep_lep(tabla, gep, ember, szint, repul):
+    """A gép tolása mozgás-fázisban: (honnan, hova) vagy None, ha nincs lépés."""
+    lep = _malom_lepesek(tabla, gep, repul)
+    if not lep:
+        return None
+    # 1) malmot záró lépés
+    zaro = []
+    for f, t in lep:
+        tabla[f], tabla[t] = 0, gep
+        if _malom_zar_e(tabla, t, gep):
+            zaro.append((f, t))
+        tabla[f], tabla[t] = gep, 0
+    if zaro:
+        return random.choice(zaro)
+    # 2) az ember malmát bezáró üres mező elfoglalása (2. szinttől)
+    if szint >= 2:
+        veszely = set()
+        for c in range(24):
+            if tabla[c] == 0:
+                tabla[c] = ember
+                if _malom_zar_e(tabla, c, ember):
+                    veszely.add(c)
+                tabla[c] = 0
+        blokk = [(f, t) for f, t in lep if t in veszely]
+        if blokk:
+            return random.choice(blokk)
+    return random.choice(lep)
+
+
+def _malom_gep_uthet(tabla, ember):
+    """A gép melyik ember-bábut üsse le: lehetőleg fenyegetőt, malmon kívülit."""
+    uth = _malom_uthetok(tabla, ember)
+    for c in uth:
+        for m in _MALOM_MALMOK:
+            if c in m:
+                sor = [tabla[x] for x in m]
+                if sor.count(ember) == 2 and sor.count(0) == 1:
+                    return c
+    return random.choice(uth)
+
+
+def _malom_allas(tabla, ember, gep):
+    te = [str(c + 1) for c in range(24) if tabla[c] == ember]
+    ge = [str(c + 1) for c in range(24) if tabla[c] == gep]
+    return ("Állás – a te bábuid: " + (", ".join(te) if te else "nincs") +
+            "; a gép bábui: " + (", ".join(ge) if ge else "nincs") + ".")
+
+
+def jatek_malom(ctx):
+    yield ctx.mond("MALOM!")
+    v = yield ctx.kerdez("Melyik színnel leszel? Fehér = 1 (a fehér kezd), fekete = 2.")
+    ember = 1 if (szam(v, 1, 2) or 1) == 1 else 2
+    gep = 2 if ember == 1 else 1
+    v = yield ctx.kerdez("Játék színvonal 1-től 3-ig?")
+    szint = szam(v, 1, 3) or 2
+    v = yield ctx.kerdez("Kéred az ismertetőt? (I vagy N)")
+    if igen(v, False):
+        for sor in _MALOM_ISMERTETO:
+            yield ctx.mond(sor)
+    yield ctx.mond("Kezdheted!" if ember == 1 else "Kezdek!")
+
+    tabla = [0] * 24
+    lerakva = {ember: 0, gep: 0}
+    tort = {ember: set(), gep: set()}      # az előző lépésben tört malmok (csiki-csuki)
+    aktiv = 1                              # a fehér kezd
+    MAX_KOR = 400
+
+    def db(j):
+        return sum(1 for c in tabla if c == j)
+
+    def szinnev(j):
+        return "fehér" if j == 1 else "fekete"
+
+    def gyozelem(vesztes):
+        gyoztes = ember if vesztes == gep else gep
+        return ("Győztél! Gratulálok!" if gyoztes == ember
+                else "Győztem! Gratulálok magamnak!")
+
+    kor = 0
+    while True:
+        kor += 1
+        if kor > MAX_KOR:
+            yield ctx.mond("Sajnos az idő véges.")
+            yield ctx.vege("Ez döntetlen! Jó játék volt.")
+            return
+
+        lerako = lerakva[aktiv] < 9
+        repul = (not lerako) and db(aktiv) == 3
+
+        # mozgás-fázisban: veszített-e az aktív (kettőre fogyott / nem tud lépni)
+        if not lerako:
+            if db(aktiv) < 3:
+                yield ctx.mond(f"A {szinnev(aktiv)} kettőre fogyott.")
+                yield ctx.vege(gyozelem(aktiv))
+                return
+            if not _malom_lepesek(tabla, aktiv, repul):
+                yield ctx.mond(f"A {szinnev(aktiv)} nem tud lépni.")
+                yield ctx.vege(gyozelem(aktiv))
+                return
+
+        if aktiv == ember:
+            yield ctx.mond(_malom_allas(tabla, ember, gep))
+            if lerako:
+                cell = None
+                while cell is None:
+                    v = yield ctx.kerdez(
+                        f"Hová teszed a bábut? (még {9 - lerakva[ember]} van hátra, 1–24)")
+                    x = szam(v, 1, 24)
+                    if x is None:
+                        yield ctx.mond("Ne szórakozz! Egy és 24 közötti számot kérek.")
+                        continue
+                    if tabla[x - 1] != 0:
+                        yield ctx.mond("Foglalt mező.")
+                        continue
+                    cell = x - 1
+                tabla[cell] = ember
+                lerakva[ember] += 1
+                hova, malom = cell, _malom_zar_e(tabla, cell, ember)
+                tort[ember] = set()
+            else:
+                honnan = hova = None
+                while hova is None:
+                    v = yield ctx.kerdez("Melyik bábut tolod? (1–24)")
+                    x = szam(v, 1, 24)
+                    if x is None:
+                        yield ctx.mond("Egy és 24 közötti számot kérek.")
+                        continue
+                    if tabla[x - 1] != ember:
+                        yield ctx.mond("A mezőn nincs bábud.")
+                        continue
+                    f = x - 1
+                    v = yield ctx.kerdez("Hová told? (1–24)")
+                    y = szam(v, 1, 24)
+                    if y is None:
+                        yield ctx.mond("Egy és 24 közötti számot kérek.")
+                        continue
+                    t = y - 1
+                    if tabla[t] != 0:
+                        yield ctx.mond("Foglalt mező.")
+                        continue
+                    if not repul and t not in _MALOM_SZOMSZED[f]:
+                        yield ctx.mond("Csak szomszédos mezőre tolhatsz.")
+                        continue
+                    honnan, hova = f, t
+                elozo_tort = {m for m in _malom_malmai(tabla, ember) if honnan in m}
+                tabla[honnan] = 0
+                tabla[hova] = ember
+                malom = _malom_zar_e(tabla, hova, ember)
+                csuki = any(hova in m for m in tort[ember])
+                tort[ember] = elozo_tort
+            if malom:
+                yield ctx.mond("Csiki csuki!" if (not lerako and csuki)
+                               else f"A {szinnev(ember)}nek malma keletkezett! Malom!")
+                uthetok = _malom_uthetok(tabla, gep)
+                le = None
+                while le is None:
+                    v = yield ctx.kerdez("Melyik figurát veszed le? (1–24)")
+                    z = szam(v, 1, 24)
+                    if z is None:
+                        yield ctx.mond("Egy és 24 közötti számot kérek.")
+                        continue
+                    c = z - 1
+                    if tabla[c] == 0:
+                        yield ctx.mond("Ez semmi.")
+                        continue
+                    if tabla[c] == ember:
+                        yield ctx.mond("Ez a te bábud.")
+                        continue
+                    if c not in uthetok:
+                        yield ctx.mond("Malomból nem vehetsz le.")
+                        continue
+                    le = c
+                tabla[le] = 0
+                yield ctx.mond(f"A {le + 1}. mező levéve.")
+        else:
+            # a gép köre
+            if lerako:
+                cell = _malom_gep_lerak(tabla, gep, ember, szint)
+                tabla[cell] = gep
+                lerakva[gep] += 1
+                yield ctx.mond(f"A gép a {cell + 1}. mezőre rakott.")
+                hova, malom = cell, _malom_zar_e(tabla, cell, gep)
+                tort[gep] = set()
+            else:
+                lep = _malom_gep_lep(tabla, gep, ember, szint, repul)
+                if lep is None:
+                    yield ctx.vege("Nem tudok lépni. Győztél! Gratulálok!")
+                    return
+                honnan, hova = lep
+                elozo_tort = {m for m in _malom_malmai(tabla, gep) if honnan in m}
+                tabla[honnan] = 0
+                tabla[hova] = gep
+                malom = _malom_zar_e(tabla, hova, gep)
+                csuki = any(hova in m for m in tort[gep])
+                tort[gep] = elozo_tort
+                yield ctx.mond(f"A gép a {honnan + 1}. mezőről a {hova + 1}. mezőre tolt.")
+            if malom:
+                yield ctx.mond("Csiki csuki! A gépnek malma van!"
+                               if (not lerako and csuki)
+                               else "A gépnek malma keletkezett! Malom!")
+                c = _malom_gep_uthet(tabla, ember)
+                tabla[c] = 0
+                yield ctx.mond(f"A gép leveszi a {c + 1}. bábudat.")
+
+        aktiv = ember if aktiv == gep else gep

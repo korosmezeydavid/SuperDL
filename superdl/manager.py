@@ -167,7 +167,11 @@ class DownloadManager:
     def _run_job(self, job: Job) -> None:
         if job.progress.status == "leállítva":
             return
-        out_dir = job.out_dir or self.out_dir
+        # A célmappa vezető/záró szóközét levágjuk: Windowson a „ C:\\…" (vezető
+        # szóközzel) érvénytelen útvonal → WinError 123, és MINDEN letöltő
+        # (torrent/média/szegmens) elhasal (így a podcast-epizódoké is, ha a
+        # mentett mappában bennragadt egy szóköz). Egy közös csomópont véd.
+        out_dir = str(job.out_dir or self.out_dir).strip()
         audio = self.audio_only if job.audio_only is None else job.audio_only
         try:
             if job.kind == "torrent":

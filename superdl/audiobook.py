@@ -23,7 +23,8 @@ class AudiobookCancelled(RuntimeError):
 
 INTRO = ("{title}. Ezt a hangoskönyvet a SuperDL program készítette, "
          "kizárólag egyéni, személyes használatra.")
-OUTRO = ("A hangoskönyv vége. Ezt a felvételt a SuperDL program olvasta fel, "
+OUTRO = ("A hangoskönyv végéhez értünk. Ezt a felvételt a SuperDL program "
+         "olvasta fel, "
          "kizárólag egyéni célú hallgatásra. A felvétel terjesztése vagy "
          "megosztása a szerző engedélye nélkül tilos.")
 

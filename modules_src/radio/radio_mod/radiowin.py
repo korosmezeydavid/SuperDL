@@ -62,7 +62,12 @@ Ctrl+Shift+F – felvételek és időzítések kezelése.  A listákban Delete �
 
 SAJÁT ÁLLOMÁS ÉS MEGOSZTÁS
 - „Saját állomás hozzáadása”: ha egy rádió nincs a listában, itt megadhatod a
-  nevét és a stream-URL-jét – a kedvencek közé kerül, és rögtön hallgathatod.
+  nevét és a stream-URL-jét – a KEDVENCEK közé kerül (a hozzáadás után a fókusz
+  automatikusan oda ugrik, kijelölve az új állomást), és rögtön hallgathatod.
+- „Jobb minőségű forrás”: jelölj ki egy állomást (a keresésből vagy a
+  Kedvencekből), és add meg hozzá egy JOBB MINŐSÉGŰ stream-címét (pl. a Kossuth
+  64 kbps helyett magasabb bitrátásat). Külön kedvencként mentődik, és onnan már
+  jobb minőségben vehetsz fel.
 - „Megosztás a közösséggel”: a kijelölt (saját) állomást beküldheted a
   radio-browser.info NYILVÁNOS közösségi adatbázisába – így más SuperDL-esek is
   megtalálják kereséssel. A beküldés nyilvános, kérdés után történik; csak
@@ -77,9 +82,10 @@ class CustomStationDialog(wx.Dialog):
     """Saját rádióállomás megadása (név + stream-URL, opcionális ország/címke).
     Akadálymentes: minden mező címkézve, a Hozzáadás az alapértelmezett gomb."""
 
-    def __init__(self, parent):
-        super().__init__(parent, title="Saját rádióállomás hozzáadása",
-                         size=(560, 340))
+    def __init__(self, parent, preset=None):
+        cim = ("Jobb minőségű forrás megadása" if preset is not None
+               else "Saját rádióállomás hozzáadása")
+        super().__init__(parent, title=cim, size=(560, 340))
         self.station = None
         p = wx.Panel(self)
         v = wx.BoxSizer(wx.VERTICAL)
@@ -109,11 +115,24 @@ class CustomStationDialog(wx.Dialog):
         btns = wx.StdDialogButtonSizer()
         ok = wx.Button(p, wx.ID_OK, "&Hozzáadás")
         ok.SetDefault()
+        # FONTOS: a „Hozzáadás" gombot BE KELL kötni a validáló _on_ok-ra –
+        # e nélkül a párbeszéd ID_OK-kal zárult, de a station None maradt, így az
+        # _add_custom SEMMIT nem adott hozzá (ezért „nem látszott sehol").
+        ok.Bind(wx.EVT_BUTTON, self._on_ok)
         btns.AddButton(ok)
         btns.AddButton(wx.Button(p, wx.ID_CANCEL, "Mé&gse"))
         btns.Realize()
         v.Add(btns, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
         p.SetSizer(v)
+        # „Jobb minőségű forrás": egy meglévő állomásból ELŐRE KITÖLTVE indulunk
+        # (a nevet megkülönböztetjük, az URL-t a felhasználó a jobb streamre írja).
+        if preset is not None:
+            self.c_name.SetValue((preset.name or "") + " (jó minőség)")
+            self.c_url.SetValue(preset.url or "")
+            self.c_country.SetValue(preset.country or "")
+            self.c_tags.SetValue(preset.tags or "")
+            self.c_url.SetFocus()
+            self.c_url.SelectAll()
         from superdl.uihelp import bind_help
         bind_help(self, "Súgó – Saját állomás",
                   "SAJÁT RÁDIÓÁLLOMÁS\n\nEgy nem listázott rádió hozzáadása a "
@@ -279,13 +298,16 @@ class RadioFrame(wx.Frame):
             rec.Add(b, 0, wx.RIGHT, 6)
         v.Add(rec, 0, wx.LEFT | wx.BOTTOM, 8)
 
-        # saját állomás + közösségi megosztás
+        # saját állomás + jobb minőségű forrás + közösségi megosztás
         own = wx.BoxSizer(wx.HORIZONTAL)
         b_own = wx.Button(p, label="Saját á&llomás hozzáadása…")
         b_own.Bind(wx.EVT_BUTTON, lambda e: self._add_custom())
+        b_better = wx.Button(p, label="&Jobb minőségű forrás…")
+        b_better.Bind(wx.EVT_BUTTON, lambda e: self._add_better_source())
         b_share = wx.Button(p, label="Meg&osztás a közösséggel…")
         b_share.Bind(wx.EVT_BUTTON, lambda e: self._share_selected())
         own.Add(b_own, 0, wx.RIGHT, 6)
+        own.Add(b_better, 0, wx.RIGHT, 6)
         own.Add(b_share, 0)
         v.Add(own, 0, wx.LEFT | wx.BOTTOM, 8)
 
@@ -707,13 +729,27 @@ class RadioFrame(wx.Frame):
         self.favorites.append(st)
         self._save_fav()
         self._refresh_fav()
-        self._announce(f"Kedvencekhez adva: {st.name}")
+        self._announce(f"Kedvencekhez adva: {st.name}. Megtalálod a Kedvencek "
+                       "listában.")
+        self._select_fav(st)
 
     def _refresh_fav(self):
         self.fav_list.DeleteAllItems()
         for s in self.favorites:
             row = self.fav_list.InsertItem(self.fav_list.GetItemCount(), s.name)
             self.fav_list.SetItem(row, 1, s.country)
+
+    def _select_fav(self, st):
+        """A Kedvencek listában kijelöli, fókuszálja és ODAVISZI a fókuszt az
+        adott állomásra – hogy vakon RÖGTÖN tudd, hova került (a felhasználó
+        jelezte: hozzáadás után „nem látszott, hol keressem")."""
+        for i, f in enumerate(self.favorites):
+            if f.url == st.url and f.name == st.name:
+                self.fav_list.Select(i)
+                self.fav_list.Focus(i)
+                self.fav_list.EnsureVisible(i)
+                self.fav_list.SetFocus()
+                break
 
     # ---- saját állomás + közösségi megosztás --------------------------
 
@@ -727,16 +763,49 @@ class RadioFrame(wx.Frame):
             st = dlg.station
         finally:
             dlg.Destroy()
+        added = False
         if any(f.url == st.url for f in self.favorites):
-            self._announce("Ez az URL már a kedvencek között van.")
+            self._announce("Ez az URL már a Kedvencek között van.")
         else:
             self.favorites.append(st)
             self._save_fav()
             self._refresh_fav()
-            self._announce(f"Saját állomás a kedvencekhez adva: {st.name}")
+            self._announce(f"Saját állomás a Kedvencek közé adva: {st.name}. "
+                           "Megtalálod a Kedvencek listában.")
+            added = True
         if wx.MessageBox(f"Lejátsszam most: {st.name}?", "Saját állomás",
                          wx.YES_NO | wx.ICON_QUESTION, self) == wx.YES:
             self._play(st)
+        if added:
+            self._select_fav(st)      # a végén a Kedvencekre visz, kijelölve
+
+    def _add_better_source(self):
+        """Egy MEGLÉVŐ állomáshoz jobb minőségű forrás (stream-URL) megadása: a
+        párbeszéd a kijelölt állomás nevével + URL-jével ELŐRE KITÖLTVE nyílik,
+        te a jobb minőségű streamre írod az URL-t, és külön kedvencként mentődik.
+        Így pl. a Kossuth 64 kbps helyett magasabb bitrátás forrásból vehetsz fel
+        (felhasználói kérés)."""
+        st = self._fav_selected_station() or self._selected()
+        if not st:
+            self._announce("Előbb jelölj ki egy állomást (a keresésből vagy a "
+                           "Kedvencekből), amelyhez jobb minőségű forrást adnál.")
+            return
+        dlg = CustomStationDialog(self, preset=st)
+        try:
+            if dlg.ShowModal() != wx.ID_OK or not dlg.station:
+                return
+            new = dlg.station
+        finally:
+            dlg.Destroy()
+        if any(f.url == new.url for f in self.favorites):
+            self._announce("Ez az URL már a Kedvencek között van.")
+            return
+        self.favorites.append(new)
+        self._save_fav()
+        self._refresh_fav()
+        self._announce(f"Jobb minőségű forrás a Kedvencek közé adva: {new.name}. "
+                       "Megtalálod a Kedvencek listában; onnan veheted fel.")
+        self._select_fav(new)
 
     def _share_source(self) -> R.Station | None:
         """A megosztandó állomás: a kedvencek kijelöltje elsőbbséggel (ide

@@ -94,7 +94,15 @@ DEFAULT_RATE = 7
 
 # a modul verziója – a felhasználó HALLJA (indításkor és F8-ra), hogy tényleg a
 # friss változat fut-e (a manifest.json-nal kézzel szinkronban tartva)
-MOD_VERSION = "1.4.3"
+MOD_VERSION = "1.4.5"
+
+
+def _rovid_hiba(err: str) -> str:
+    """A hangmotor-hiba RÖVID, felolvasható változata a bemondáshoz – hogy a
+    felhasználó F8 nélkül is HALLJA, MIÉRT nem szólt a választott hang (nem csak
+    annyit, hogy „részletek: F8"). A teljes hiba F8-ra és a diagnosztikában marad."""
+    e = " ".join((err or "").split())
+    return (e[:140] + "…") if len(e) > 140 else e
 
 
 class FelolvasoFrame(wx.Frame):
@@ -153,6 +161,7 @@ class FelolvasoFrame(wx.Frame):
         self.Bind(wx.EVT_TIMER, lambda e: self._tick(), self.timer)
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self.Bind(wx.EVT_CHAR_HOOK, self._on_key)
+        self._setup_accelerators()          # F1/F6/F7/F8, Ctrl+fel/le, Esc – MINDEN vezérlőn
         self._announce(f"Felirat-felolvasó {MOD_VERSION}. Tölts be egy filmet "
                        "vagy hangfájlt; a magyar feliratot szinkronban "
                        "felolvasom. Súgó: F1. Állapot: F8.")
@@ -251,9 +260,20 @@ class FelolvasoFrame(wx.Frame):
         # fel magától – ezért a program SAJÁT hangján (SAPI/eSpeak) is bemondjuk.
         # (force=True: akkor is szól, ha a self-voice alapból ki van kapcsolva.)
         sv = getattr(self.main, "selfvoice", None)
-        if sv:
+        spoke = False
+        if sv and not getattr(sv, "muted", False):
             try:
                 sv.speak(text, force=True)
+                spoke = True
+            except Exception:
+                pass
+        # Ha a selfvoice NÉMÍTVA van (pl. képernyőolvasó-mód: a `muted` a force-ot
+        # is felülírja) vagy hiányzik, akkor a FUTÓ képernyőolvasónak (NVDA/JAWS)
+        # szólunk – különben az F8/állapot néma marad (Laci jelezte: „F8 csendben").
+        if not spoke:
+            try:
+                from superdl import screenreader
+                screenreader.speak(text, interrupt=True)
             except Exception:
                 pass
 
@@ -660,8 +680,9 @@ class FelolvasoFrame(wx.Frame):
             self._last_tts_err = err
             if not getattr(self, "_fallback_said", False):
                 self._fallback_said = True
-                self._announce("A választott hang nem működött, átváltottam a "
-                               "beépített magyar eSpeak hangra. Részletek: F8.")
+                self._announce("A választott hang nem működött (" +
+                               _rovid_hiba(err) + "), átváltottam a beépített "
+                               "magyar eSpeak hangra. Részletek: F8.")
         self._play_narration(path)
 
     def _narration_failed(self, eng, err):
@@ -743,21 +764,39 @@ class FelolvasoFrame(wx.Frame):
 
     # ---- billentyűk / súgó / zárás ------------------------------------
 
+    def _setup_accelerators(self):
+        """GLOBÁLIS gyorsbillentyűk AcceleratorTable-lel, hogy MINDEN vezérlőn
+        (a gombokon is!) elsüljenek. A CHAR_HOOK a gombokon (wxMSW) nem mindig
+        sül el, ezért a hangerő „kiszökött" a modulból a főablakra (Laci jelezte).
+        A Space és a bal/jobb nyíl a CHAR_HOOK-ban marad, mert azoknál a fókusz
+        (szövegmező/legördülő) számít."""
+        self._acc = {k: wx.NewIdRef() for k in
+                     ("help", "f6", "f7", "f8", "volup", "voldn", "stop")}
+        tbl = [
+            (wx.ACCEL_NORMAL, wx.WXK_F1, self._acc["help"]),
+            (wx.ACCEL_NORMAL, wx.WXK_F6, self._acc["f6"]),
+            (wx.ACCEL_NORMAL, wx.WXK_F7, self._acc["f7"]),
+            (wx.ACCEL_NORMAL, wx.WXK_F8, self._acc["f8"]),
+            (wx.ACCEL_CTRL, wx.WXK_UP, self._acc["volup"]),
+            (wx.ACCEL_CTRL, wx.WXK_DOWN, self._acc["voldn"]),
+            (wx.ACCEL_NORMAL, wx.WXK_ESCAPE, self._acc["stop"]),
+        ]
+        self.SetAcceleratorTable(
+            wx.AcceleratorTable([wx.AcceleratorEntry(*e) for e in tbl]))
+        for key, fn in (("help", lambda e: self._help()),
+                        ("f6", lambda e: self._reroute_audio(auto=False)),
+                        ("f7", lambda e: self._test_voice()),
+                        ("f8", lambda e: self._diag()),
+                        ("volup", lambda e: self._vol(0.1)),
+                        ("voldn", lambda e: self._vol(-0.1)),
+                        ("stop", lambda e: self._stop())):
+            self.Bind(wx.EVT_MENU, fn, id=self._acc[key])
+
     def _on_key(self, e):
         code = e.GetKeyCode()
-        if code == wx.WXK_F1:
-            self._help()
-        elif code == wx.WXK_F6:
-            self._reroute_audio(auto=False)
-        elif code == wx.WXK_F7:
-            self._test_voice()
-        elif code == wx.WXK_F8:
-            self._diag()
-        elif code == wx.WXK_UP and e.ControlDown():
-            self._vol(0.1)               # a HELP-ben ígért hangerő fel volt hiányzik
-        elif code == wx.WXK_DOWN and e.ControlDown():
-            self._vol(-0.1)              # hangerő le
-        elif code == wx.WXK_SPACE and not isinstance(
+        # a globális gyorsbillentyűket (F1/F6/F7/F8, Ctrl+fel/le, Esc) az
+        # AcceleratorTable kezeli – itt CSAK a fókuszfüggő Space/nyíl marad
+        if code == wx.WXK_SPACE and not isinstance(
                 self.FindFocus(), (wx.TextCtrl,)):
             self._toggle()
         elif code == wx.WXK_LEFT and e.ControlDown() is False \
@@ -766,8 +805,6 @@ class FelolvasoFrame(wx.Frame):
         elif code == wx.WXK_RIGHT and isinstance(self.FindFocus(),
                                                  wx.Choice) is False:
             self._seek(10)
-        elif code == wx.WXK_ESCAPE:
-            self._stop()
         else:
             e.Skip()
 
@@ -837,8 +874,9 @@ class FelolvasoFrame(wx.Frame):
         if err and not getattr(self, "_fallback_said", False):
             self._fallback_said = True
             self._last_tts_err = err
-            self._announce("A választott hang nem működött, a beépített magyar "
-                           "eSpeak hanggal próbálom. Részletek: F8.")
+            self._announce("A választott hang nem működött (" + _rovid_hiba(err) +
+                           "), a beépített magyar eSpeak hanggal próbálom. "
+                           "Részletek: F8.")
         self._cur_temp = path             # a narr „vége" majd törli
         self.narr.play(path)
 

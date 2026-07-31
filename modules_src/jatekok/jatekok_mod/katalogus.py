@@ -294,6 +294,18 @@ RETRO: tuple[Jatek, ...] = (
           "mindegyikhez más eszköz kell! A cél megtalálni a kék madarat, "
           "kalitkába zárni, és a bázisra vinni, mielőtt letelik a 12 óra.",
           szerzo="Csapó Endre"),
+    Jatek("malom", "Malom",
+          "A klasszikus malom (Nine Men's Morris) a gép ellen, három nehézségi "
+          "szinten: 24 mező három gyűrűben, 9–9 bábú. Előbb leraktok, majd "
+          "szomszédos mezőre toltok; három bábú egy vonalban MALOM, és leüthetsz "
+          "egy ellenfél-bábut. Aki kettőre fogy vagy nem tud lépni, veszít – "
+          "három bábuval már bárhová repülhetsz.",
+          szerzo="Brátán Ferenc"),
+    Jatek("mozaik", "Mozaik",
+          "Szó-kitaláló betűvásárlással: a gép egy szóra gondol, megmondja hány "
+          "betűből áll, te pedig egyenként kérheted a betűit – de minél több "
+          "betűt kérsz, annál kevesebb pont jár. Tíz szó után értékel. Aki "
+          "kevés betűből is kitalálja, sok pontot gyűjt!"),
 )
 
 

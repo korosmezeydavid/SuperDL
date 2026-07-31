@@ -102,28 +102,28 @@
       "id": "felolvaso",
       "name": "Felirat-felolvasó lejátszó",
       "category": "Média",
-      "description": "Idegen nyelvű film (vagy hangfájl) lejátszása úgy, hogy a magyar (vagy bármely szöveges) feliratot SZINKRONBAN, választható hanggal (helyi SAPI, Edge neurális online, vagy beépített eSpeak) felolvassa – így vakon is követhető az idegen nyelvű film. A film mellé tett .srt/.vtt feliratot magától megtalálja, a fájlba ágyazott szöveges feliratsávot is kezeli. A YouTube-link is beilleszthető – a videó hangját streameli, a feliratot (kézi, vagy a YouTube automatikus, magyarra fordított feliratát) letölti és felolvassa. A felolvasás TEMPÓJA állítható (alapból gyors, hogy tartsa a lépést a filmfelirattal), és a következő sort előre legyártja, így a neurális hang sem csúszik. ÚJ: ha nincs internet, akadálymentes felugró jelzi, újratesztelés-gombbal.",
+      "description": "Idegen nyelvű film (vagy hangfájl) lejátszása úgy, hogy a magyar (vagy bármely szöveges) feliratot SZINKRONBAN, választható hanggal (helyi SAPI, Edge neurális online, vagy beépített eSpeak) felolvassa – így vakon is követhető az idegen nyelvű film. A film mellé tett .srt/.vtt feliratot magától megtalálja, a fájlba ágyazott szöveges feliratsávot is kezeli. A YouTube-link is beilleszthető – a videó hangját streameli, a feliratot (kézi, vagy a YouTube automatikus, magyarra fordított feliratát) letölti és felolvassa. A felolvasás TEMPÓJA állítható (alapból gyors, hogy tartsa a lépést a filmfelirattal), és a következő sort előre legyártja, így a neurális hang sem csúszik. ÚJ: a hangerő (Ctrl+fel/le) és az F-billentyűk (F1/F6/F7/F8) most MINDEN vezérlőn működnek, az F8 állapot-bemondás képernyőolvasó-módban is hallható, és ha a választott hang hibázik, HALLOD az okát (nem csak eSpeak-re vált némán).",
       "latest": {
-        "version": "1.4.4",
+        "version": "1.4.5",
         "min_core_api": "1.0",
         "min_core_version": "3.29.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-felolvaso-1.4.4/felolvaso-1.4.4.zip",
-        "sha256": "8156cc7ba42a90f684ff4aa1f0d6b1d5328f5185c731ffd38c6e37123a88d715",
-        "size": 22224
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-felolvaso-1.4.5/felolvaso-1.4.5.zip",
+        "sha256": "5a5984d32abf1b6b9cdf7983ca20cd98581c3d047a81175ed74f92a8c2760587",
+        "size": 23198
       }
     },
     {
       "id": "radio",
       "name": "Internetes rádió",
       "category": "Média",
-      "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: az időzített felvételnél megadhatod, hogy EGYSZERI legyen (utána magától törlődik), MEGADOTT SZÁMÚ alkalommal fusson (pl. egy sorozat hátralévő részei, majd törlődik), vagy KIKAPCSOLÁSIG ismételjen. Némítás (Ctrl+M) – a hallgatott hang elnémítható, miközben a felvétel zavartalanul tovább megy. Ha nincs internet, akadálymentes felugró jelzi újratesztelés-gombbal. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
+      "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: JAVÍTVA a saját állomás hozzáadása (eddig a „Hozzáadás” gomb nem mentett – most valóban a Kedvencek közé kerül, és a fókusz oda is ugrik, kijelölve az új állomást). ÚJ: „Jobb minőségű forrás” gomb – egy meglévő állomáshoz (pl. Kossuth) magasabb bitrátás stream-cím adható, előre kitöltött párbeszéddel, így jobb minőségben vehetsz fel. Az időzített felvételnél megadhatod, hogy EGYSZERI legyen, MEGADOTT SZÁMÚ alkalommal fusson, vagy KIKAPCSOLÁSIG ismételjen. Némítás (Ctrl+M). Ha nincs internet, akadálymentes felugró jelzi újratesztelés-gombbal.",
       "latest": {
-        "version": "1.1.7",
+        "version": "1.1.8",
         "min_core_api": "1.0",
         "min_core_version": "4.2.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.7/radio-1.1.7.zip",
-        "sha256": "fe0424dcc8e03b991c03afe46267c1fbeccd3eae0b8c25d5768785f30f4e9459",
-        "size": 19060
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.8/radio-1.1.8.zip",
+        "sha256": "49fbb653d29a0b3391a9400d353f5b0f95482ea00eaa8c8d8bff45a90f3ae6c9",
+        "size": 20200
       }
     },
     {
@@ -143,14 +143,14 @@
       "id": "jatekok",
       "name": "Játékok",
       "category": "Játékok",
-      "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód. ÚJ: Gépi ének – a saját formáns-szintetizátorunk DALLAMRA énekli, amit beírsz (súgóval); és négy új hű port: Atlantisz, Számemória, Hajócsata és Az elvarázsolt kastély (Csapó Endre). Korábbról a Milliomos kvíz is elérhető.",
+      "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód. ÚJ: két klasszikus hű port – MALOM (Nine Men's Morris, Brátán Ferenc; malom-alkotás, bábuütés, három nehézségi szint, repülés) és MOZAIK (szó-kitaláló betűvásárlással: minél kevesebb betűt kérsz, annál több pont). Korábbról: Gépi ének, Milliomos kvíz, Atlantisz, Számemória, Hajócsata, Az elvarázsolt kastély.",
       "latest": {
-        "version": "1.4.1",
+        "version": "1.4.2",
         "min_core_api": "1.0",
         "min_core_version": "4.1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.4.1/jatekok-1.4.1.zip",
-        "sha256": "3c7cdb4ed006c49aa3de4252c2395c3de3933e15cb0f4bf1c3066bf8e3dfa21b",
-        "size": 10963479
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.4.2/jatekok-1.4.2.zip",
+        "sha256": "7c586e827ed12466f09e3898d5f09bf1e066db42e63a1580d28ebcd38f75b1f3",
+        "size": 10968509
       }
     }
   ]

@@ -91,6 +91,8 @@ REGISZTER = {
     "szammem": homelab.jatek_szammem,
     "hajocsata": homelab.jatek_hajocsata,
     "kastely": homelab.jatek_kastely,
+    "malom": homelab.jatek_malom,        # Brátán Ferenc – klasszikus malom
+    "mozaik": homelab.jatek_mozaik,      # szó-kitaláló betűvásárlással
 }
 
 

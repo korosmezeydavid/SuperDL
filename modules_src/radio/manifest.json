@@ -1,10 +1,10 @@
 {
   "id": "radio",
   "name": "Internetes rádió",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "entry": "radio_mod",
   "category": "Média",
-  "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: az időzített felvételnél megadhatod, hogy EGYSZERI legyen (utána magától törlődik), MEGADOTT SZÁMÚ alkalommal fusson (pl. egy sorozat hátralévő részei, majd törlődik), vagy KIKAPCSOLÁSIG ismételjen. Némítás (Ctrl+M) – a hallgatott hang elnémítható, miközben a felvétel zavartalanul tovább megy. Ha nincs internet, akadálymentes felugró jelzi újratesztelés-gombbal. Az időzített felvételek a Core háttér-felvevőjén keresztül ütemeződnek.",
+  "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: JAVÍTVA a saját állomás hozzáadása (eddig a „Hozzáadás” gomb nem mentett – most valóban a Kedvencek közé kerül, és a fókusz oda is ugrik, kijelölve az új állomást). ÚJ: „Jobb minőségű forrás” gomb – egy meglévő állomáshoz (pl. Kossuth) magasabb bitrátás stream-cím adható, előre kitöltött párbeszéddel, így jobb minőségben vehetsz fel. Az időzített felvételnél megadhatod, hogy EGYSZERI legyen, MEGADOTT SZÁMÚ alkalommal fusson, vagy KIKAPCSOLÁSIG ismételjen. Némítás (Ctrl+M). Ha nincs internet, akadálymentes felugró jelzi újratesztelés-gombbal.",
   "min_core_api": "1.0",
   "min_core_version": "4.2.0",
   "requires_tools": [],

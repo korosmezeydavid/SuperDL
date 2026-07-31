@@ -103,9 +103,11 @@ def test_hiba_eseten_felirat_film_hang_nelkul():
 
 
 def test_f8_diagnosztika_letezik():
-    """Az F8 mondja be az állapotot (hibakereséshez)."""
+    """Az F8 mondja be az állapotot (hibakereséshez). A gyorsbillentyűk MOSTANTÓL
+    AcceleratorTable-ben vannak (hogy a gombokon is elsüljenek – Laci jelezte)."""
     assert hasattr(W.FelolvasoFrame, "_diag")
-    assert "WXK_F8" in inspect.getsource(W.FelolvasoFrame._on_key)
+    src = inspect.getsource(W.FelolvasoFrame._setup_accelerators)
+    assert "WXK_F8" in src and "self._diag()" in src
 
 
 def test_announce_hangosan_is_beszel():
@@ -177,7 +179,7 @@ def test_hangeszkoz_kovetes_es_f6():
     (pl. Bluetooth) át kell vezetni. Legyen automatikus követés a _tick-ben és
     kézi F6 is."""
     assert hasattr(W.FelolvasoFrame, "_reroute_audio")
-    ksrc = inspect.getsource(W.FelolvasoFrame._on_key)
+    ksrc = inspect.getsource(W.FelolvasoFrame._setup_accelerators)
     assert "WXK_F6" in ksrc
     tsrc = inspect.getsource(W.FelolvasoFrame._tick)
     assert "_cur_out_name" in tsrc and "_reroute_audio" in tsrc
@@ -192,10 +194,12 @@ def test_reroute_a_pozicion_ujranyit():
 
 
 def test_hangero_ctrl_fel_le():
-    """A HELP Ctrl+fel/le hangerőt ígér – legyen is bekötve (eddig hiányzott)."""
-    src = inspect.getsource(W.FelolvasoFrame._on_key)
+    """A HELP Ctrl+fel/le hangerőt ígér – MINDEN vezérlőn (gombokon is) süljön el:
+    ezért AcceleratorTable-ben (ACCEL_CTRL + WXK_UP/DOWN → _vol), nem a CHAR_HOOK-
+    ban, ami a gombokon nem mindig sül el (Laci jelezte)."""
+    src = inspect.getsource(W.FelolvasoFrame._setup_accelerators)
     assert "WXK_UP" in src and "WXK_DOWN" in src
-    assert "ControlDown" in src
+    assert "ACCEL_CTRL" in src
     assert "_vol(" in src
 
 

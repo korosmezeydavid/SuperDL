@@ -1,10 +1,10 @@
 {
   "id": "jatekok",
   "name": "Játékok",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "entry": "jatekok_mod",
   "category": "Játékok",
-  "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód. ÚJ: Gépi ének – a saját formáns-szintetizátorunk DALLAMRA énekli, amit beírsz (súgóval); és négy új hű port a Homelab-gyűjteményből: Atlantisz (tengeri navigáció), Számemória, Hajócsata és Az elvarázsolt kastély (Csapó Endre teljes szöveges kalandja). Korábbról a Milliomos kvíz is elérhető.",
+  "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód. ÚJ: két klasszikus hű port – MALOM (Nine Men's Morris, Brátán Ferenc; malom-alkotás, bábuütés, három nehézségi szint, repülés) és MOZAIK (szó-kitaláló betűvásárlással: minél kevesebb betűt kérsz, annál több pont). Korábbról: Gépi ének, Milliomos kvíz, Atlantisz, Számemória, Hajócsata, Az elvarázsolt kastély.",
   "min_core_api": "1.0",
   "min_core_version": "4.1.0",
   "requires_tools": [],
