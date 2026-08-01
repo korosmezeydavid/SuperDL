@@ -84,3 +84,19 @@ def test_radio_gomb_a_feluleten():
     s = _src("modules_src/radio/radio_mod/radiowin.py")
     assert "Jobb minőségű forrás" in s
     assert "b_better.Bind(wx.EVT_BUTTON, lambda e: self._add_better_source())" in s
+
+
+# ---- D) FRISSÍTÉS-ELLENŐRZÉS: periodikusan is, ne csak induláskor (Laci)
+
+def test_frissites_ellenorzes_periodikusan_is_fut():
+    """Eddig az _auto_update_check CSAK induláskor futott egyszer → aki a
+    programot a tálcán/háttérben futtatja (napokig nyitva), sosem kapott
+    automatikus frissítés-ajánlatot. Mostantól a 15 perces időzítő is meghívja
+    (napi zárral olcsó), így az always-on példány is újraellenőriz."""
+    s = _src("superdl_gui.py")
+    # a periodikus feed-időzítő kezelője meghívja a frissítés-ellenőrzést
+    i = s.index("def _on_feed_timer")
+    reszlet = s[i:i + 700]
+    assert "self._auto_update_check()" in reszlet
+    # és a napi zár a helyén van (naponta ténylegesen egyszer fut le)
+    assert "update_last_check" in s

@@ -1335,6 +1335,12 @@ class MainFrame(wx.Frame):
         # 15 percenként: podcast/RSS feliratkozások ÉS YouTube-csatornák
         self._check_feeds(quiet=True)
         self._check_channels(quiet=True)
+        # …és a FRISSÍTÉS-ellenőrzés is: eddig CSAK induláskor futott egyszer,
+        # ezért aki a programot a tálcán, HÁTTÉRBEN futtatja (napokig nyitva),
+        # sosem kapott automatikus frissítés-ajánlatot – csak kézi kereséssel
+        # (Ctrl+U). A napi zár (`update_last_check`) miatt ez ténylegesen naponta
+        # egyszer fut le; éjfél átlépésekor az always-on példány is újraellenőriz.
+        self._auto_update_check()
 
     def _check_feeds(self, quiet: bool = True):
         if not self.fm.subs:
