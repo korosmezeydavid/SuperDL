@@ -358,6 +358,12 @@ SAJAT: tuple[Jatek, ...] = (
           "Pörgesd a tárcsákat, és gyűjts minél több érmét a nyerőtáblázat "
           "szerint.",
           retro=False),
+    Jatek("szerencsekerek", "Szerencsekerék",
+          "Akadálymentes kerék-és-szó játék: találd ki a rejtett magyar "
+          "kifejezést! Pörgetsz (a mássalhangzókért pénz jár), magánhangzót "
+          "veszel, vagy megfejtesz. Egy vagy több játékos (a gép is beszáll), "
+          "három forduló, a legtöbb pénz nyer. Saját, jogtiszta hangvilággal.",
+          retro=False),
     # Mille Bornes: EGYELŐRE KIVÉVE a listáról, mert még nincs megírva (a
     # katalógusban lógott, de „nem indult el" – listás visszajelzés). Ha kész a
     # jatek_millebornes és bekerül a REGISZTER-be, ezt visszatesszük.

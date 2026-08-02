@@ -143,14 +143,14 @@
       "id": "jatekok",
       "name": "Játékok",
       "category": "Játékok",
-      "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód. ÚJ: KOCKAPÓKER (igazi dice-póker öt kockával, újradobással) és TOTÓ (klasszikus tizennégyes szelvény) – VISSZATÉRT a 8 bites hangvilág is: saját, jogtiszta hangeffektek (indulás, győzelem, vereség), amelyek a mai gépeken a hangkártyán szólalnak meg. Korábbról: Számfejtő, Szendvicsparti, Malom, Mozaik, Gépi ének, Milliomos kvíz és sok más.",
+      "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. ÚJ: SZERENCSEKERÉK – akadálymentes kerék-és-szó játék saját, jogtiszta hangvilággal (a fejlesztő Suno-főcíme és effektjei): találd ki a rejtett magyar kifejezést, pörgetéssel, magánhangzó-vásárlással vagy megfejtéssel; egy vagy több játékos, a gép is beszáll. Korábbról: Kockapóker, Totó, Számfejtő, Szendvicsparti, Malom, Mozaik, Gépi ének, Milliomos kvíz és sok más.",
       "latest": {
-        "version": "1.4.4",
+        "version": "1.4.5",
         "min_core_api": "1.0",
         "min_core_version": "4.1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.4.4/jatekok-1.4.4.zip",
-        "sha256": "8b8d8d95391d7969936f12d6d9416553597c5827381ff965fe44d92ba82fe739",
-        "size": 10974302
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.4.5/jatekok-1.4.5.zip",
+        "sha256": "627d94aecee326f7cdf0af6a749475ecff83e8da2e1bf9fa5e71c506914b8433",
+        "size": 13384035
       }
     }
   ]

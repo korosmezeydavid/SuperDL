@@ -360,16 +360,19 @@ class JatekKonzol(wx.Dialog):
             return
         try:
             import os
-            # 1) a modulba CSOMAGOLT hangfájl (pl. a Milliomos saját, jogtiszta
-            #    Suno-hangjai) – közvetlenül, változatlanul lejátszva
-            csomagolt = os.path.join(os.path.dirname(__file__), "milliomos_hang",
-                                     f"{nev}.wav")
-            if os.path.isfile(csomagolt):
-                if self._tone_player is None:
-                    from superdl.audioengine import Player
-                    self._tone_player = Player()
-                self._tone_player.play(csomagolt, "")
-                return
+            # 1) a modulba CSOMAGOLT hangfájl (pl. a Milliomos vagy a Szerencsekerék
+            #    saját, jogtiszta hangjai) – közvetlenül, változatlanul lejátszva.
+            #    Több hangmappát és WAV/MP3 kiterjesztést is nézünk.
+            for mappa in ("milliomos_hang", "szerencsekerek_hang"):
+                for kit in (".wav", ".mp3"):
+                    csomagolt = os.path.join(os.path.dirname(__file__), mappa,
+                                             f"{nev}{kit}")
+                    if os.path.isfile(csomagolt):
+                        if self._tone_player is None:
+                            from superdl.audioengine import Player
+                            self._tone_player = Player()
+                        self._tone_player.play(csomagolt, "")
+                        return
             # 2) különben SAJÁT SZINTÉZIS (a többi játék hangjai + a még nem
             #    lecserélt Milliomos-hangok)
             import tempfile

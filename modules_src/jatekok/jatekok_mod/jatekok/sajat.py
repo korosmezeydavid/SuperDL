@@ -353,3 +353,260 @@ def jatek_enektanito(ctx):
         yield ctx.mond(f"Felvéve: {szotag or 'dúdolás'}, a {hangnev} hangon, "
                        f"{hossz} másodperc. Eddig {len(dal)} hang a dalban. Ha "
                        "kész vagy, írd: énekeld.")
+
+
+# ================================================================ SZERENCSEKERÉK
+# SAJÁT, akadálymentes kerék-és-szó játék. A rejtett magyar kifejezést kell
+# kitalálni: pörgetsz (mássalhangzóért pénz), magánhangzót veszel, vagy megfejtesz.
+# Hangok: a fejlesztő saját anyaga (Suno / vállalt effektek) a szerencsekerek_hang
+# mappából; ahol nincs, ott csend. A rejtvénybank a szerencsekerek_rejtvenyek.json.
+_SZK_MGH = set("aáeéiíoóöőuúüű")
+_SZK_MEZOK = [100, 200, 300, 400, 500, 600, 800, 1000, 300, 500, "csod", "passz"]
+_SZK_GYAKORI = list("tlnsrkmzgbdhfvpjcy")     # gyakori magyar mássalhangzók sorrendje
+_SZK_MGH_AR = 250
+_SZK_FORDULO = 3
+_szk_cache = None
+
+
+def _szk_rejtvenyek():
+    """(kategória, megoldás) párok a bankból. Ha a fájl hiányzik, beépített kis lista."""
+    global _szk_cache
+    if _szk_cache is None:
+        import json
+        import os
+        p = os.path.join(os.path.dirname(__file__), "szerencsekerek_rejtvenyek.json")
+        try:
+            with open(p, encoding="utf-8") as f:
+                data = json.load(f)
+            _szk_cache = [(r["kategoria"], r["megoldas"]) for r in data
+                          if r.get("megoldas")]
+        except Exception:
+            _szk_cache = [("Közmondás", "Ki korán kel aranyat lel"),
+                          ("Szólás", "Zsákbamacska"),
+                          ("Étel és ital", "Gulyásleves")]
+    return _szk_cache
+
+
+def _szk_valaszt(rejtvenyek):
+    """A forduló rejtvénye (tesztben monkeypatchelhető)."""
+    return random.choice(rejtvenyek)
+
+
+def _szk_maganhangzo(ch):
+    return len(ch) == 1 and ch.lower() in _SZK_MGH
+
+
+def _szk_elofordul(megoldas, betu):
+    b = betu.lower()
+    return sum(1 for ch in megoldas if ch.lower() == b)
+
+
+def _szk_tabla(megoldas, felfedett):
+    """Akadálymentes tábla-felolvasás: szavanként a betűk, a rejtettek „üres"."""
+    reszek = []
+    for szo in megoldas.split(" "):
+        jelek = []
+        betuk = 0
+        for ch in szo:
+            if not ch.isalpha():
+                jelek.append(ch)
+            elif ch.lower() in felfedett:
+                jelek.append(ch.upper())
+                betuk += 1
+            else:
+                jelek.append("üres")
+                betuk += 1
+        reszek.append(f"{betuk} betű: " + ", ".join(jelek))
+    return "A rejtvény — " + " ; új szó — ".join(reszek) + "."
+
+
+def _szk_egyezik(tipp, megoldas):
+    import re
+    norm = lambda s: re.sub(r"[^a-z0-9]", "", ekezet_nelkul(s))
+    return bool(norm(tipp)) and norm(tipp) == norm(megoldas)
+
+
+def _szk_porget():
+    m = random.choice(_SZK_MEZOK)
+    if m in ("csod", "passz"):
+        return (m,)
+    return ("penz", m)
+
+
+def _szk_gep_massalhangzo(felfedett):
+    for c in _SZK_GYAKORI:
+        if c not in felfedett:
+            return c
+    return None
+
+
+def _szk_ember_kor(ctx, nev, megoldas, felfedett, korpenz):
+    """Egy emberi kör. Visszaad: megoldva (bool). Ha False, a kör átszáll."""
+    yield ctx.mond(f"{nev} következik. " + _szk_tabla(megoldas, felfedett))
+    while True:
+        v = ((yield ctx.kerdez(
+            f"{nev}, mit lépsz? (P = pörgetés, V = magánhangzót veszek "
+            f"{_SZK_MGH_AR}-ért, M = megfejtés, ? = tábla)")) or "").strip().lower()
+        if v.startswith("?"):
+            yield ctx.mond(_szk_tabla(megoldas, felfedett)
+                           + f" A fordulóban gyűjtött pénzed: {korpenz[nev]}.")
+            continue
+        if v.startswith("m"):
+            tipp = ((yield ctx.kerdez("Mondd a teljes megfejtést!")) or "").strip()
+            if _szk_egyezik(tipp, megoldas):
+                return True
+            yield ctx.effekt("sikertelen_tipp")
+            yield ctx.mond("Sajnos nem talált. A kör átszáll.")
+            return False
+        if v.startswith("v"):
+            if korpenz[nev] < _SZK_MGH_AR:
+                yield ctx.mond(f"Ehhez legalább {_SZK_MGH_AR} forint kell a "
+                               "fordulóban. Válassz mást.")
+                continue
+            mgh = ((yield ctx.kerdez("Melyik magánhangzót veszed meg?"))
+                   or "").strip().lower()
+            if not _szk_maganhangzo(mgh):
+                yield ctx.mond("Az nem magánhangzó. Válassz mást.")
+                continue
+            if mgh in felfedett:
+                yield ctx.mond("Ezt a betűt már megvették. Válassz mást.")
+                continue
+            korpenz[nev] -= _SZK_MGH_AR
+            yield ctx.effekt("maganhangzo_vasarlas")
+            db = _szk_elofordul(megoldas, mgh)
+            felfedett.add(mgh)
+            if db:
+                yield ctx.mond(f"Van benne {db} darab {mgh.upper()}! "
+                               + _szk_tabla(megoldas, felfedett))
+                continue
+            yield ctx.mond(f"Nincs benne {mgh.upper()}. A {_SZK_MGH_AR} forint "
+                           "elúszott, a kör átszáll.")
+            return False
+        # bármi más = pörgetés
+        yield ctx.effekt("kerekporges")
+        mezo = _szk_porget()
+        if mezo[0] == "csod":
+            yield ctx.effekt("csod")
+            korpenz[nev] = 0
+            yield ctx.mond("CSŐD! Elveszíted a fordulóban gyűjtött pénzed, a kör "
+                           "átszáll.")
+            return False
+        if mezo[0] == "passz":
+            yield ctx.effekt("passz")
+            yield ctx.mond("PASSZ! A pénzed marad, de a kör átszáll.")
+            return False
+        osszeg = mezo[1]
+        mssh = ((yield ctx.kerdez(f"A kerék megállt: {osszeg} forint. Mondj egy "
+                "mássalhangzót!")) or "").strip().lower()
+        if len(mssh) != 1 or not mssh.isalpha() or _szk_maganhangzo(mssh):
+            yield ctx.mond("Az nem érvényes mássalhangzó. A kör átszáll.")
+            return False
+        if mssh in felfedett:
+            yield ctx.mond("Ezt a betűt már mondták. A kör átszáll.")
+            return False
+        db = _szk_elofordul(megoldas, mssh)
+        felfedett.add(mssh)
+        if db:
+            korpenz[nev] += osszeg * db
+            yield ctx.effekt("sikeres_tipp")
+            yield ctx.mond(f"Van benne {db} darab {mssh.upper()}! Kaptál "
+                           f"{osszeg * db} forintot. " + _szk_tabla(megoldas, felfedett))
+            continue
+        yield ctx.effekt("sikertelen_tipp")
+        yield ctx.mond(f"Nincs benne {mssh.upper()}. A kör átszáll.")
+        return False
+
+
+def _szk_gep_kor(ctx, nev, megoldas, felfedett, korpenz):
+    """A gép köre. Visszaad: megoldva (bool)."""
+    yield ctx.mond(f"{nev} következik.")
+    while True:
+        rejtett = [ch for ch in megoldas if ch.isalpha() and ch.lower() not in felfedett]
+        if not rejtett or (len(rejtett) <= 3 and random.random() < 0.7) \
+                or random.random() < 0.08:
+            yield ctx.mond(f"{nev} megpróbálja megfejteni…")
+            return True
+        yield ctx.effekt("kerekporges")
+        mezo = _szk_porget()
+        if mezo[0] == "csod":
+            yield ctx.effekt("csod")
+            korpenz[nev] = 0
+            yield ctx.mond(f"{nev} Csődöt pörgetett! Elveszti a pénzét, a kör átszáll.")
+            return False
+        if mezo[0] == "passz":
+            yield ctx.effekt("passz")
+            yield ctx.mond(f"{nev} Passzt pörgetett, a kör átszáll.")
+            return False
+        osszeg = mezo[1]
+        jelolt = _szk_gep_massalhangzo(felfedett)
+        if jelolt is None:
+            yield ctx.mond(f"{nev} inkább megfejt.")
+            return True
+        db = _szk_elofordul(megoldas, jelolt)
+        felfedett.add(jelolt)
+        if db:
+            korpenz[nev] += osszeg * db
+            yield ctx.effekt("sikeres_tipp")
+            yield ctx.mond(f"{nev} a {jelolt.upper()} betűt mondta: {db} darab! "
+                           f"Kap {osszeg * db} forintot.")
+            continue
+        yield ctx.effekt("sikertelen_tipp")
+        yield ctx.mond(f"{nev} a {jelolt.upper()} betűt mondta, de nincs benne. "
+                       "A kör átszáll.")
+        return False
+
+
+def jatek_szerencsekerek(ctx):
+    yield ctx.mond("SZERENCSEKERÉK! A népszerű kerék-és-szó játék akadálymentes, "
+                   "saját változata.")
+    yield ctx.effekt("focim")
+    rejtvenyek = _szk_rejtvenyek()
+
+    v = yield ctx.kerdez("Hány játékos lesz? (1–4; egynél a gép is beszáll)")
+    n = szam(v, 1, 4) or 1
+    nevek = []
+    for i in range(n):
+        nv = ((yield ctx.kerdez(f"{i + 1}. játékos neve?")) or "").strip()
+        nevek.append(nv or f"{i + 1}. játékos")
+    gep = (n == 1)
+    if gep:
+        nevek.append("Gép")
+
+    bank = {nev: 0 for nev in nevek}
+    yield ctx.mond(f"Három forduló, a legtöbb pénzt gyűjtő nyer. Sok szerencsét!")
+
+    for fordulo in range(1, _SZK_FORDULO + 1):
+        kat, megoldas = _szk_valaszt(rejtvenyek)
+        felfedett = set()
+        korpenz = {nev: 0 for nev in nevek}
+        yield ctx.mond(f"{fordulo}. forduló! A kategória: {kat}.")
+        yield ctx.mond(_szk_tabla(megoldas, felfedett))
+        aktiv = 0
+        biztonsag = 0
+        while True:
+            biztonsag += 1
+            if biztonsag > 400:
+                yield ctx.mond(f"Lejárt az idő! A megfejtés: {megoldas}.")
+                break
+            nev = nevek[aktiv]
+            ember = not (gep and nev == "Gép")
+            if ember:
+                megoldva = yield from _szk_ember_kor(ctx, nev, megoldas, felfedett, korpenz)
+            else:
+                megoldva = yield from _szk_gep_kor(ctx, nev, megoldas, felfedett, korpenz)
+            if megoldva:
+                for ch in megoldas:
+                    felfedett.add(ch.lower())
+                bank[nev] += korpenz[nev]
+                yield ctx.effekt("megfejtes_siker")
+                yield ctx.mond(f"{nev} megfejtette a rejtvényt: {megoldas}! Ebben "
+                               f"a fordulóban {korpenz[nev]} forintot nyert.")
+                break
+            aktiv = (aktiv + 1) % len(nevek)
+        yield ctx.mond("Állás: "
+                       + ", ".join(f"{nev}: {bank[nev]}" for nev in nevek) + " forint.")
+
+    yield ctx.effekt("jatek_vege")
+    gyoztes = max(bank, key=bank.get)
+    yield ctx.vege(f"Vége a játéknak! A győztes: {gyoztes}, {bank[gyoztes]} "
+                   "forinttal. Gratulálok!")
