@@ -9,10 +9,12 @@ Csak legális tartalomhoz használd - seedeléskor te magad is terjesztő vagy!
 
 import base64
 import json
+import random
 import secrets
 import socket
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from pathlib import Path
@@ -44,6 +46,79 @@ def find_aria2c() -> str | None:
     return shutil.which("aria2c")
 
 
+_EXCLUDED_CACHE: "list[tuple[int, int]] | None" = None
+
+
+def _excluded_port_ranges() -> "list[tuple[int, int]]":
+    """A Windows által lefoglalt (kizárt) TCP-porttartományok.
+
+    Ezekre a portokra a helyi kötés/kapcsolódás WSAEACCES (WinError 10013)
+    hibát ad. A Hyper-V, a WSL, a Docker és a WinNAT rebootonként foglal le
+    blokkokat épp az alacsony dinamikus tartományból, ezért futásidőben
+    kérdezzük le (gyorsítótárazva). Nem Windows -> üres lista."""
+    global _EXCLUDED_CACHE
+    if _EXCLUDED_CACHE is not None:
+        return _EXCLUDED_CACHE
+    ranges: list[tuple[int, int]] = []
+    if sys.platform == "win32":
+        try:
+            out = subprocess.run(
+                ["netsh", "interface", "ipv4", "show",
+                 "excludedportrange", "protocol=tcp"],
+                capture_output=True, text=True, timeout=5,
+                creationflags=subprocess.CREATE_NO_WINDOW).stdout
+            for line in out.splitlines():
+                parts = line.split()
+                if (len(parts) == 2 and parts[0].isdigit()
+                        and parts[1].isdigit()):
+                    a, b = int(parts[0]), int(parts[1])
+                    if a <= b:
+                        ranges.append((a, b))
+        except Exception:
+            ranges = []
+    _EXCLUDED_CACHE = ranges
+    return ranges
+
+
+def _pick_safe_port() -> int:
+    """Szabad helyi TCP-port, ami EGYIK Windows-kizárt sávba sem esik.
+
+    Inkább a magas (20000-60000) tartományból választ, ahol ritkább az
+    ütközés és a lefoglalás; ha 60 próbából sem talál, az OS-adta portra
+    esik vissza (a kizárt sávokat az OS is kihagyja a bind(0)-nál)."""
+    ranges = _excluded_port_ranges()
+    for _ in range(60):
+        cand = random.randint(20000, 60000)
+        if any(a <= cand <= b for a, b in ranges):
+            continue
+        try:
+            with socket.socket() as s:
+                s.bind(("127.0.0.1", cand))
+            return cand
+        except OSError:
+            continue
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        return int(s.getsockname()[1])
+
+
+def _engine_error(detail: str = "") -> str:
+    """Akadálymentes, cselekvésre váltható üzenet, ha az aria2c a
+    port-letiltás (WinError 10013) miatt egyáltalán nem tud elindulni."""
+    return (
+        "A torrentmotor (aria2c) nem tudott elindulni, mert a Windows épp "
+        "minden kipróbált helyi hálózati portot letiltott a vezérléshez "
+        "(hozzáférés megtagadva, WinError 10013). Ezt szinte mindig a "
+        "Hyper-V, a WSL vagy a Docker, illetve egy vírusirtó vagy tűzfal "
+        "okozza, és gépújraindítás után változik. Mit tehetsz, sorrendben: "
+        "1. Indítsd újra a gépet, és próbáld újra a torrentet. "
+        "2. Vedd fel a SuperDL-t és az aria2c.exe-t a vírusirtó vagy a tűzfal "
+        "kivételei közé. "
+        "3. Ha makacs a hiba, a Windows lefoglalt porttartományai az okozók; "
+        "ezeket az újraindítás oldja fel a leggyorsabban."
+    )
+
+
 class Aria2Client:
     """Egyetlen közös aria2c folyamat az összes torrenthez."""
 
@@ -62,25 +137,65 @@ class Aria2Client:
         if not exe:
             raise RuntimeError(
                 "Az aria2c.exe nem található - torrentekhez szükséges.")
-        with socket.socket() as s:
-            s.bind(("127.0.0.1", 0))
-            self.port = s.getsockname()[1]
         self.secret = secrets.token_hex(16)
-        flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
-        self.proc = subprocess.Popen(
-            [exe, "--enable-rpc", f"--rpc-listen-port={self.port}",
-             f"--rpc-secret={self.secret}", "--rpc-listen-all=false",
-             "--quiet", "--bt-detach-seed-only=true",
-             "--summary-interval=0"],
-            creationflags=flags,
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self._rpc_lock = threading.Lock()
-        for _ in range(50):                       # várjuk, míg felel az RPC
+        self._errf = None
+        flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+        # Több portot is kipróbálunk: ha a Windows egy portot letiltott
+        # (WinError 10013), az aria2c nem tud rá ülni és kilép -> jön a
+        # következő, biztonságos (nem kizárt) port. Így a hiba önjavul.
+        last_detail = ""
+        for _ in range(8):
+            self.port = _pick_safe_port()
+            self._errf = tempfile.TemporaryFile()
+            self.proc = subprocess.Popen(
+                [exe, "--enable-rpc", f"--rpc-listen-port={self.port}",
+                 f"--rpc-secret={self.secret}", "--rpc-listen-all=false",
+                 "--quiet", "--bt-detach-seed-only=true",
+                 "--summary-interval=0"],
+                creationflags=flags,
+                stdout=subprocess.DEVNULL, stderr=self._errf)
+            if self._wait_ready():
+                return
+            last_detail = self._drain_and_kill() or last_detail
+        # Egyik port sem jött fel -> érthető, felolvasható hiba.
+        raise RuntimeError(_engine_error(last_detail))
+
+    def _wait_ready(self, tries: int = 40) -> bool:
+        """Igaz, ha az aria2c elindult ÉS felel az RPC-n. Ha a folyamat
+        közben meghal (pl. a port letiltva, WinError 10013), azonnal False -
+        nem várunk feleslegesen, jöhet a következő port."""
+        for _ in range(tries):
+            if self.proc.poll() is not None:      # az aria2c kilépett
+                return False
             try:
                 self.call("aria2.getVersion")
-                break
+                return True
             except requests.RequestException:
                 time.sleep(0.1)
+        return False
+
+    def _drain_and_kill(self) -> str:
+        """Leállítja a (feltehetően hibás) aria2c-t, és visszaadja a
+        stderr-jét diagnosztikához (temp fájlból, így nincs cső-holtpont)."""
+        try:
+            self.proc.kill()
+        except Exception:
+            pass
+        try:
+            self.proc.wait(timeout=3)
+        except Exception:
+            pass
+        txt = ""
+        try:
+            if self._errf is not None:
+                self._errf.seek(0)
+                txt = self._errf.read().decode("utf-8", "replace").strip()
+                self._errf.close()
+                self._errf = None
+        except Exception:
+            pass
+        return txt
 
     def alive(self) -> bool:
         return self.proc.poll() is None
@@ -114,6 +229,12 @@ class Aria2Client:
                 self.proc.wait(timeout=3)
             except Exception:
                 pass
+        try:
+            if getattr(self, "_errf", None) is not None:
+                self._errf.close()
+                self._errf = None
+        except Exception:
+            pass
 
 
 def shutdown_aria2() -> None:
