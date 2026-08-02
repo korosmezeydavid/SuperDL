@@ -206,6 +206,9 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
             raise AudiobookCancelled(
                 "A hangoskönyv készítését megszakítottad.")
 
+    # Ha eleve megszakították, semmilyen előkészületet ne végezzünk (ffmpeg-
+    # keresés, motor-betöltés) – azonnal, dolgavégezetlenül lépjünk ki.
+    _ellenoriz()
     eng = tts.ENGINES[engine_key]
     ff = _ffmpeg_exe()
     flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
