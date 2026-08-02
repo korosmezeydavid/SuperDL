@@ -95,6 +95,8 @@ REGISZTER = {
     "mozaik": homelab.jatek_mozaik,      # szó-kitaláló betűvásárlással
     "szamfejt": homelab.jatek_szamfejt,  # Kisvarga Zsolt – számvariáció-memória
     "szenvics": homelab.jatek_szenvics,  # Kisvarga Zsolt – ugró-versenyparti
+    "kockapoker": homelab.jatek_kockapoker,   # dice-poker, 8 bites jingle-kkel
+    "totozzon": homelab.jatek_totozzon,       # klasszikus tizennégyes totó
 }
 
 

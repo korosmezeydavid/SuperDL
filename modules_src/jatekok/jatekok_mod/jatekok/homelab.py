@@ -4090,3 +4090,194 @@ def jatek_szenvics(ctx):
         yield ctx.vege(f"Beértem a célba előbb, {nev} – most én nyertem! De ne "
                        "búslakodj, legközelebb sikerül. Jó szórakozást kívánt "
                        "Kisvarga Zsolt.")
+
+
+# ============================================================ 8 BITES JINGLE-K
+# A régi gépek BEEP-zenéjének hangulata – de a mai gépeken a HANGKÁRTYÁN szólnak
+# (a felület szinuszként megszólaltatja a `ctx.hang` tónusait), nem a rég kihalt
+# PC-speakeren. SAJÁT, rövid dallamok: egyetlen védett zenét sem másolunk.
+# Formátum: [(frekvencia_Hz, hossz_ms), …].
+_JINGLE_START = [(392, 80), (523, 80), (659, 80), (784, 170)]     # G-C-E-G, felfelé
+_JINGLE_GYOZ = [(523, 110), (659, 110), (784, 110), (1047, 280)]  # győzelmi tus
+_JINGLE_VESZT = [(392, 170), (330, 170), (262, 340)]              # lefelé, szomorkás
+_JINGLE_JO = [(784, 70), (1047, 130)]                            # rövid „ding"
+_JINGLE_ROSSZ = [(196, 240)]                                     # mély „buzz"
+
+
+# ================================================================= KOCKAPÓKER
+# Forrás: KOCPOKER.HTP. VALÓDI dice-poker (póker-kezek öt kockával), NEM összeg-
+# vagy verseny-kockajáték – ezért nem duplikálja a többi kockás játékot. Turnusod
+# legfeljebb három dobás (tartasz/újradobsz), majd a kéz értéke dönt; N menetből
+# áll az összecsapás. A szerző egyelőre ismeretlen. 8 bites jingle-kkel.
+_KOCPOKER_SZABALY = (
+    "Öt kockával játszunk, felváltva. Egy körben legfeljebb HÁROMSZOR dobhatsz: "
+    "a jó kockákat megtartod, a többit újradobod.",
+    "A kezek erőssorrendje: öt egyforma (póker), négy egyforma, nagy sor "
+    "(2-3-4-5-6), full (három meg egy pár), kis sor (1-2-3-4-5), három egyforma, "
+    "két pár, egy pár, végül a semmi.",
+    "Menetenként az erősebb kéz nyer. A több menetgyőzelem viszi a partit!",
+)
+
+
+def _kockapoker_ertek(kockak):
+    """(pontszám, kéznév) az öt kocka alapján – minél nagyobb a pont, annál erősebb."""
+    from collections import Counter
+    c = Counter(kockak)
+    parosok = sorted(c.values(), reverse=True)
+    egyedi = set(kockak)
+    if parosok[0] == 5:
+        return 100, "öt egyforma, azaz PÓKER"
+    if parosok[0] == 4:
+        return 80, "négy egyforma"
+    if egyedi == {2, 3, 4, 5, 6}:
+        return 70, "nagy sor"
+    if parosok[0] == 3 and len(parosok) > 1 and parosok[1] == 2:
+        return 60, "full"
+    if egyedi == {1, 2, 3, 4, 5}:
+        return 50, "kis sor"
+    if parosok[0] == 3:
+        return 40, "három egyforma"
+    if parosok[0] == 2 and len(parosok) > 1 and parosok[1] == 2:
+        return 30, "két pár"
+    if parosok[0] == 2:
+        return 20, "egy pár"
+    return 5, f"semmi, a legnagyobb kocka a {max(kockak)}"
+
+
+def _kp_gep_tart(kockak):
+    """A gép melyik kockákat tartsa meg (indexek): a leggyakoribb értéket."""
+    from collections import Counter
+    if _kockapoker_ertek(kockak)[0] >= 60:      # már erős → tarts mindent
+        return list(range(5))
+    leggyak = Counter(kockak).most_common(1)[0][0]
+    return [i for i, k in enumerate(kockak) if k == leggyak]
+
+
+def _kockapoker_kor_ember(ctx):
+    kockak = [random.randint(1, 6) for _ in range(5)]
+    for dobas in range(3):
+        yield ctx.mond("Dobásod: " + ", ".join(
+            f"a {k}" for k in kockak) + ".")
+        if dobas == 2:
+            break
+        v = ((yield ctx.kerdez("Melyeket dobod újra? Add meg a pozíciókat 1-től "
+             "5-ig szóközzel; a mind szóra mindet újradobom, üres bevitelre vagy "
+             "az állok szóra megtartod a dobást.")) or "").strip().lower()
+        if v in ("", "állok", "allok", "megtartom", "tartom", "semmit"):
+            break
+        if v in ("mind", "mindet", "összes", "osszes", "mindegyiket"):
+            ujra = list(range(5))
+        else:
+            ujra = [int(t) - 1 for t in v.split() if t.isdigit() and 1 <= int(t) <= 5]
+        if not ujra:
+            yield ctx.mond("Nem értettem – megtartom ezt a dobást.")
+            break
+        for i in ujra:
+            kockak[i] = random.randint(1, 6)
+    return kockak
+
+
+def _kockapoker_kor_gep(ctx):
+    kockak = [random.randint(1, 6) for _ in range(5)]
+    yield ctx.mond("Engedelmeddel én dobok! Dobásaim: "
+                   + ", ".join(map(str, kockak)) + ".")
+    for _ in range(2):
+        if _kockapoker_ertek(kockak)[0] >= 60:
+            yield ctx.mond("Ez elég erős, ezt megtartom!")
+            break
+        tart = _kp_gep_tart(kockak)
+        if len(tart) == 5:
+            break
+        for i in range(5):
+            if i not in tart:
+                kockak[i] = random.randint(1, 6)
+        yield ctx.mond("A többit újradobom. Dobásaim: "
+                       + ", ".join(map(str, kockak)) + ".")
+    return kockak
+
+
+def jatek_kockapoker(ctx):
+    yield ctx.mond("KOCKAPÓKER!")
+    yield ctx.hang(_JINGLE_START)
+    v = yield ctx.kerdez("Kéred a szabályokat? (I vagy N)")
+    if igen(v, False):
+        for s in _KOCPOKER_SZABALY:
+            yield ctx.mond(s)
+    while True:
+        v = yield ctx.kerdez("Hány menetből álljon az összecsapás? (1–20)")
+        menet = szam(v, 1, 20)
+        if menet:
+            break
+        yield ctx.mond("Egy és húsz között válassz!")
+
+    te = gep = 0
+    for m in range(1, menet + 1):
+        yield ctx.mond(f"{m}. menet! Te dobsz.")
+        e_kockak = yield from _kockapoker_kor_ember(ctx)
+        e_pont, e_nev = _kockapoker_ertek(e_kockak)
+        yield ctx.mond(f"A kezed: {e_nev}.")
+        g_kockak = yield from _kockapoker_kor_gep(ctx)
+        g_pont, g_nev = _kockapoker_ertek(g_kockak)
+        yield ctx.mond(f"Az én kezem: {g_nev}.")
+        if e_pont > g_pont:
+            te += 1
+            yield ctx.hang(_JINGLE_JO)
+            yield ctx.mond("Ezt a menetet TE nyerted!")
+        elif g_pont > e_pont:
+            gep += 1
+            yield ctx.hang(_JINGLE_ROSSZ)
+            yield ctx.mond("Ezt a menetet én nyertem.")
+        else:
+            yield ctx.mond("Döntetlen menet!")
+        yield ctx.mond(f"Állás: te {te}, én {gep}.")
+
+    if te > gep:
+        yield ctx.hang(_JINGLE_GYOZ)
+        yield ctx.vege(f"Megnyerted a partit {te}:{gep} arányban! Gratulálok!")
+    elif gep > te:
+        yield ctx.hang(_JINGLE_VESZT)
+        yield ctx.vege(f"Én nyertem a partit {gep}:{te} arányban! Majd legközelebb!")
+    else:
+        yield ctx.vege(f"Döntetlen a parti, {te}:{gep}! Jó volt játszani.")
+
+
+# ======================================================================= TOTÓ
+# Forrás: TOTOZZON.HTP. A klasszikus tizennégyes totó: minden mérkőzésre tippelsz
+# – 1 (hazai), X (döntetlen), 2 (vendég) –, majd a gép „lejátssza" a fordulót, és
+# megszámolja a találataidat. 8 bites jingle-kkel. A szerző egyelőre ismeretlen.
+def jatek_totozzon(ctx):
+    yield ctx.mond("TOTÓ! Tippeld meg a tizennégy mérkőzés végeredményét: "
+                   "1 a hazai, X a döntetlen, 2 a vendég győzelme.")
+    yield ctx.hang(_JINGLE_START)
+    v = yield ctx.kerdez("Kéred a heti tipposzlopot beírni? Nyomj Entert a kezdéshez.")
+    tippek = []
+    _NEV = ("első", "második", "harmadik", "negyedik", "ötödik", "hatodik",
+            "hetedik", "nyolcadik", "kilencedik", "tizedik", "tizenegyedik",
+            "tizenkettedik", "tizenharmadik", "tizennegyedik")
+    for i in range(14):
+        while True:
+            v = ((yield ctx.kerdez(f"A(z) {_NEV[i]} mérkőzés tippje? (1, X vagy 2)"))
+                 or "").strip().lower()
+            if v in ("1", "x", "2"):
+                tippek.append(v)
+                break
+            yield ctx.mond("Egyértelmű választ kérek: 1, X vagy 2!")
+
+    yield ctx.mond("Megvan a szelvényed! Lejátszom a fordulót…")
+    eredmeny = [random.choice(["1", "x", "2"]) for _ in range(14)]
+    talalat = sum(1 for t, e in zip(tippek, eredmeny) if t == e)
+    yield ctx.mond("A hivatalos végeredmények: " + ", ".join(
+        f"{i + 1}. {e.upper()}" for i, e in enumerate(eredmeny)) + ".")
+    yield ctx.mond(f"A találataid száma: {talalat} a tizennégyből.")
+    if talalat >= 13:
+        yield ctx.hang(_JINGLE_GYOZ)
+        yield ctx.vege("Ez bizony TELITALÁLAT környéki – főnyeremény, gratulálok!")
+    elif talalat >= 10:
+        yield ctx.hang(_JINGLE_JO)
+        yield ctx.vege("Szép szelvény, ez már fizet a Totón! Gratulálok!")
+    elif talalat >= 7:
+        yield ctx.vege("Nem rossz, de a nyereményhez ennél több kell. Jövő héten "
+                       "új szelvény!")
+    else:
+        yield ctx.hang(_JINGLE_VESZT)
+        yield ctx.vege("Ezúttal nem jött össze. Sebaj, jövő héten új forduló!")

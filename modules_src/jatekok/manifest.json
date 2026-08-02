@@ -1,10 +1,10 @@
 {
   "id": "jatekok",
   "name": "Játékok",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "entry": "jatekok_mod",
   "category": "Játékok",
-  "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód. ÚJ: két hű port Kisvarga Zsolttól – SZÁMFEJTŐ (számvariáció-memóriajáték: négy számból háromjegyű, ismétlés nélküli variációk) és SZENDVICSPARTI (ugró-versenyparti a gép ellen, állítható távval és nehézséggel). Korábbról: MALOM, MOZAIK, Gépi ének, Milliomos kvíz, Atlantisz, Számemória, Hajócsata, Az elvarázsolt kastély.",
+  "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód. ÚJ: KOCKAPÓKER (igazi dice-póker öt kockával, újradobással) és TOTÓ (klasszikus tizennégyes szelvény) – VISSZATÉRT a 8 bites hangvilág is: saját, jogtiszta hangeffektek (indulás, győzelem, vereség), amelyek a mai gépeken a hangkártyán szólalnak meg. Korábbról: Számfejtő, Szendvicsparti, Malom, Mozaik, Gépi ének, Milliomos kvíz és sok más.",
   "min_core_api": "1.0",
   "min_core_version": "4.1.0",
   "requires_tools": [],

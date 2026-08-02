@@ -318,6 +318,15 @@ RETRO: tuple[Jatek, ...] = (
           "Aki előbb célba ér, nyer – a szendvicsek száma az ugrások számával "
           "arányos. Az U betűvel ugrasz, a kérdőjel az állást mondja.",
           szerzo="Kisvarga Zsolt"),
+    Jatek("kockapoker", "Kockapóker",
+          "Igazi dice-póker öt kockával a gép ellen: körönként legfeljebb "
+          "háromszor dobsz, a jó kockákat megtartod, a többit újradobod, majd a "
+          "kéz értéke dönt (póker, sor, full, három egyforma, pár…). A több "
+          "menetgyőzelem viszi a partit. Nyolc bites hangeffektekkel!"),
+    Jatek("totozzon", "Totó",
+          "A klasszikus tizennégyes totó: minden mérkőzésre tippelsz – 1 a "
+          "hazai, X a döntetlen, 2 a vendég –, majd a gép lejátssza a fordulót, "
+          "és megszámolja a találataidat. Nyolc bites hangeffektekkel!"),
 )
 
 
