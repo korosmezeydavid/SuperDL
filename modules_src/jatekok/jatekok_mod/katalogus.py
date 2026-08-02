@@ -306,6 +306,18 @@ RETRO: tuple[Jatek, ...] = (
           "betűből áll, te pedig egyenként kérheted a betűit – de minél több "
           "betűt kérsz, annál kevesebb pont jár. Tíz szó után értékel. Aki "
           "kevés betűből is kitalálja, sok pontot gyűjt!"),
+    Jatek("szamfejt", "Számfejtő",
+          "Számvariáció-memóriajáték: a gép négy különböző számjegyet ad (1–9), "
+          "neked pedig háromjegyű, ismétlés nélküli variációkat kell beírnod "
+          "belőlük. Minden új jó variáció három pont, a megismételt egy hibapont "
+          "– a végén a hibapontok hatszorosát levonja. Segítség: kérdőjel.",
+          szerzo="Kisvarga Zsolt"),
+    Jatek("szenvics", "Szendvicsparti",
+          "Ugró-versenyparti a gép ellen: megadod a táv hosszát (50–1000 méter) "
+          "és a nehézségi fokozatot (1–10), majd felváltva ugrotok 1–10 métert. "
+          "Aki előbb célba ér, nyer – a szendvicsek száma az ugrások számával "
+          "arányos. Az U betűvel ugrasz, a kérdőjel az állást mondja.",
+          szerzo="Kisvarga Zsolt"),
 )
 
 

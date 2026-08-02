@@ -143,14 +143,14 @@
       "id": "jatekok",
       "name": "Játékok",
       "category": "Játékok",
-      "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód. ÚJ: két klasszikus hű port – MALOM (Nine Men's Morris, Brátán Ferenc; malom-alkotás, bábuütés, három nehézségi szint, repülés) és MOZAIK (szó-kitaláló betűvásárlással: minél kevesebb betűt kérsz, annál több pont). Korábbról: Gépi ének, Milliomos kvíz, Atlantisz, Számemória, Hajócsata, Az elvarázsolt kastély.",
+      "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. A retró hangot a Core saját formáns-alapú motorja adja – nincs benne semmilyen idegen ROM vagy kód. ÚJ: két hű port Kisvarga Zsolttól – SZÁMFEJTŐ (számvariáció-memóriajáték: négy számból háromjegyű, ismétlés nélküli variációk) és SZENDVICSPARTI (ugró-versenyparti a gép ellen, állítható távval és nehézséggel). Korábbról: MALOM, MOZAIK, Gépi ének, Milliomos kvíz, Atlantisz, Számemória, Hajócsata, Az elvarázsolt kastély.",
       "latest": {
-        "version": "1.4.2",
+        "version": "1.4.3",
         "min_core_api": "1.0",
         "min_core_version": "4.1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.4.2/jatekok-1.4.2.zip",
-        "sha256": "7c586e827ed12466f09e3898d5f09bf1e066db42e63a1580d28ebcd38f75b1f3",
-        "size": 10968509
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.4.3/jatekok-1.4.3.zip",
+        "sha256": "63cfccd731a920575694072a412b3187c4c9e94c89c8f0b6fb3148418c3b6a98",
+        "size": 10971337
       }
     }
   ]

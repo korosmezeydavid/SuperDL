@@ -3917,3 +3917,176 @@ def jatek_malom(ctx):
                 yield ctx.mond(f"A gép leveszi a {c + 1}. bábudat.")
 
         aktiv = ember if aktiv == gep else gep
+
+
+# ================================================================== SZÁMFEJTŐ
+# Forrás: SZAMFEJT.HTP – Kisvarga Zsolt. A gép négy KÜLÖNBÖZŐ számjegyet ad
+# (1–9); neked háromjegyű, ISMÉTLÉS NÉLKÜLI variációkat kell beírnod belőlük.
+# Minden ÚJ jó variáció 3 pont; a már beírt ismétlése 1 hibapont. A kérdőjel a
+# segítség (állás). A végén a hibapontok hatszorosát levonja. (Az eredetiben egy
+# Omega-dallam szólt a számválasztás alatt – ezt JOGTISZTASÁGBÓL kihagyjuk.)
+_SZAMFEJT_SZABALY = (
+    "A játékban négy számot adok meg neked.",
+    "A négy számból háromjegyű számvariációkat kell kitalálnod – három "
+    "KÜLÖNBÖZŐ számjegy a négyből.",
+    "Minden jó variációért három pont dukál.",
+    "Ha a beírt variáció szerepelt már, egy hibapont jár.",
+    "Ha segítségért áhítoznál, szám helyett a kérdőjelet üsd le.",
+    "Kisvarga Zsolt a program készítője. Jó szórakozást és fejtörést kíván!",
+)
+
+
+def jatek_szamfejt(ctx):
+    from itertools import permutations
+    yield ctx.mond("SZÁMFEJTŐ! Memóriajáték a számítógéppel.")
+    v = yield ctx.kerdez("Kéred a játékszabályt? (I vagy N)")
+    if igen(v, False):
+        for s in _SZAMFEJT_SZABALY:
+            yield ctx.mond(s)
+
+    szamok = random.sample(range(1, 10), 4)
+    osszes = {"".join(map(str, p)) for p in permutations(szamok, 3)}   # 4·3·2 = 24
+    yield ctx.mond(
+        f"Megvan a négy számod! A négy szám: {szamok[0]}, {szamok[1]}, "
+        f"{szamok[2]} és {szamok[3]}. Ezt a négy számot kell variálnod! Írj be "
+        "háromjegyű, ismétlés nélküli variációkat. Segítség: kérdőjel. "
+        "Befejezés: kész.")
+
+    tar: list[str] = []
+    pont = hiba = 0
+    while True:
+        v = ((yield ctx.kerdez("Kérem a variációt (vagy ? = állás, kész = vége):"))
+             or "").strip()
+        low = v.lower()
+        if low in ("kész", "kesz", "vége", "vege", "feladom", "feladás", "feladas"):
+            break
+        if v.startswith("?"):
+            yield ctx.mond(
+                f"A tárban {len(tar)} variáció van, még {len(osszes) - len(tar)} "
+                f"lehetséges. Pontod: {pont}. Hibapontod: {hiba}. A négy "
+                f"használható szám: {', '.join(map(str, szamok))}.")
+            continue
+        if not v.isdigit() or len(v) != 3:
+            yield ctx.mond("Ebben a programrészben háromjegyű számot vagy a "
+                           "kérdőjelet használhatod!")
+            continue
+        jegyek = [int(c) for c in v]
+        if any(j not in szamok for j in jegyek) or len(set(jegyek)) != 3:
+            yield ctx.mond("Csak a négy számot használhatod, és három KÜLÖNBÖZŐT! "
+                           f"A négy használható szám: {', '.join(map(str, szamok))}.")
+            continue
+        if v in tar:
+            hiba += 1
+            yield ctx.mond("Ezt a variációt használtad már! Ezért egy hibapont jár!")
+        else:
+            tar.append(v)
+            pont += 3
+            yield ctx.mond(f"Rendben van, mehetünk tovább! Már {len(tar)} variáció "
+                           "van a tárban.")
+        if len(tar) == len(osszes):
+            yield ctx.mond("Megtaláltad az ÖSSZES lehetséges variációt! Bravó!")
+            break
+
+    vegso = max(0, pont - 6 * hiba)
+    yield ctx.mond(f"Eredményhirdetés! {len(tar)} jó variáció, ez {pont} pont "
+                   f"levonás nélkül. Hibapontod: {hiba}.")
+    if hiba:
+        yield ctx.mond("A hibapontok hatszorosát levontam már.")
+    yield ctx.vege(f"A végső pontszámod: {vegso}. Jó szórakozást és fejtörést "
+                   "kívánt Kisvarga Zsolt!")
+
+
+# =============================================================== SZENDVICSPARTI
+# Forrás: SZENVICS.HTP – Kisvarga Zsolt. Ugró-verseny a gép ellen a megadott
+# távon (50–1000 m): felváltva ugrotok (1–10 m), aki előbb célba ér, nyer. A
+# nehézségi fokozat (1–10, alap 4) a gépet erősíti. A szendvicsek száma az
+# ugrások számával arányos; a kérdőjel az állást mondja.
+_SZENVICS_ISMERTETO = (
+    "A játékot egy személy játszhatja.",
+    "Beállíthatod, milyen nehéz legyen: 1-től 10-ig. Ha nem állítod, négyes "
+    "fokozaton megyek.",
+    "A beírható legrövidebb táv 50, a leghosszabb 1000 méter.",
+    "A megadott távra kiszámítom, hány szendvicset kapsz te és én – a "
+    "szendvicsek száma az ugrások számával arányos.",
+    "Ha ugranod lehet, csak az U betűt üsd le. A legrövidebb ugrásod 1, a "
+    "leghosszabb 10 méter.",
+    "Az ugrás előtt a kérdőjellel megtudhatod, hány szendvicsed van és hány "
+    "méter van hátra a célig.",
+    "Aki győz, elnyeri méltó jutalmát. Jó szórakozást kíván a program készítője, "
+    "Kisvarga Zsolt!",
+)
+
+
+def jatek_szenvics(ctx):
+    yield ctx.mond("SZENDVICSPARTI!")
+    nev = ((yield ctx.kerdez("Szeretném, ha bemutatkoznál. Mi az utóneved?"))
+           or "").strip() or "Barátom"
+    v = yield ctx.kerdez(f"{nev}, kéred az ismertetőt? (I vagy N)")
+    if igen(v, False):
+        for s in _SZENVICS_ISMERTETO:
+            yield ctx.mond(s)
+
+    fokozat = 4
+    v = yield ctx.kerdez("Akarsz a játék nehézségi fokozatán állítani? (I vagy N)")
+    if igen(v, False):
+        while True:
+            v = yield ctx.kerdez("Hányas legyen a fokozat? (1–10)")
+            f = szam(v, 1, 10)
+            if f is None:
+                yield ctx.mond("Egy és tíz között válassz számot! Én addig várok.")
+                continue
+            fokozat = f
+            break
+
+    while True:
+        v = yield ctx.kerdez("Hány méter hosszú legyen a táv? (50–1000)")
+        t = szam(v)
+        if t is None or t < 50:
+            yield ctx.mond("Ilyen rövid távon nem érdemes sportolni, barátom! "
+                           "Válassz hosszabb távot (legalább 50 méter).")
+            continue
+        if t > 1000:
+            yield ctx.mond("Ugye ezt te sem gondoltad komolyan?! Válassz "
+                           "rövidebb távot (legfeljebb 1000 méter).")
+            continue
+        tav = t
+        break
+
+    yield ctx.mond(f"A táv, melyen megmérkőzünk, {tav} méter hosszú, {nev}! Ugorj "
+                   "az U betűvel. A kérdőjel megmondja az állást. Kezdődjön hát a "
+                   "parti!")
+    te = gep = 0
+    te_ugras = gep_ugras = 0
+    gyoztes = None
+    while gyoztes is None:
+        v = ((yield ctx.kerdez(f"{nev}, ugrasz? (U = ugrás, ? = állás)"))
+             or "").strip().lower()
+        if v.startswith("?"):
+            yield ctx.mond(f"Eddig {te_ugras} szendvicsed van, és "
+                           f"{max(0, tav - te)} méter van hátra a célig.")
+            continue
+        u = random.randint(1, 10)
+        te += u
+        te_ugras += 1
+        yield ctx.mond(f"Ugrottál {u} métert, {min(te, tav)} méternél jársz.")
+        if te >= tav:
+            gyoztes = "te"
+            break
+        g = min(10, random.randint(1, 10) + fokozat // 3)   # a fokozat a gépet erősíti
+        gep += g
+        gep_ugras += 1
+        yield ctx.mond(f"Én ugrottam {g} métert, {min(gep, tav)} méternél járok.")
+        if gep >= tav:
+            gyoztes = "gep"
+            break
+
+    yield ctx.mond(f"Összesítés: neked {te_ugras} szendvicsed, nekem {gep_ugras} "
+                   "szendvicsem lett.")
+    if gyoztes == "te":
+        yield ctx.vege(f"Célba értél, {nev} – GYŐZTÉL! Elnyerted méltó jutalmadat: "
+                       f"{te_ugras} szendvics a tiéd! Jó szórakozást kívánt "
+                       "Kisvarga Zsolt.")
+    else:
+        yield ctx.vege(f"Beértem a célba előbb, {nev} – most én nyertem! De ne "
+                       "búslakodj, legközelebb sikerül. Jó szórakozást kívánt "
+                       "Kisvarga Zsolt.")

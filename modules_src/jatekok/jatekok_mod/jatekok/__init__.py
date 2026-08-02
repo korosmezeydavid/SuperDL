@@ -93,6 +93,8 @@ REGISZTER = {
     "kastely": homelab.jatek_kastely,
     "malom": homelab.jatek_malom,        # Brátán Ferenc – klasszikus malom
     "mozaik": homelab.jatek_mozaik,      # szó-kitaláló betűvásárlással
+    "szamfejt": homelab.jatek_szamfejt,  # Kisvarga Zsolt – számvariáció-memória
+    "szenvics": homelab.jatek_szenvics,  # Kisvarga Zsolt – ugró-versenyparti
 }
 
 
