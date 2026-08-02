@@ -44,6 +44,16 @@ class Ctx:
         felület szintetizálja és lejátssza; a teszt-hajtó átugorja."""
         return ("effekt", str(nev))
 
+    def effekt_var(self, nev):
+        """Effekt lejátszása ÉS a végének kivárása (a hangok ne olvadjanak össze).
+        A felület méri a hosszt és kivárja; a teszt-hajtó átugorja (nem vár)."""
+        return ("effekt_var", str(nev))
+
+    def szunet(self, ms):
+        """NEM-BLOKKOLÓ várakozás `ms` ezredmásodpercig (pl. amíg egy hang
+        lejátszódik). A felület wx.CallLater-rel várja ki; a teszt-hajtó átugorja."""
+        return ("szunet", int(ms))
+
     def enek(self, sorok, gep="brailab"):
         """A gép ELÉNEKEL egy dalt a saját formáns-hangján. `sorok`: a dal
         [(szótag, hangnév, hossz), …] listája (lásd az `enek` modult). A felület

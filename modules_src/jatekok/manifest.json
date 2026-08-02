@@ -1,10 +1,10 @@
 {
   "id": "jatekok",
   "name": "Játékok",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "entry": "jatekok_mod",
   "category": "Játékok",
-  "description": "Akadálymentes játékok két menüben: Retró játékok (a 80-as/90-es évek magyar beszélő gépeinek hangulatában, korhű RETRÓ BESZÉDHANGGAL) és SuperDL saját játékok. ÚJ: SZERENCSEKERÉK – akadálymentes kerék-és-szó játék saját, jogtiszta hangvilággal (a fejlesztő Suno-főcíme és effektjei): találd ki a rejtett magyar kifejezést, pörgetéssel, magánhangzó-vásárlással vagy megfejtéssel; egy vagy több játékos, a gép is beszáll. Korábbról: Kockapóker, Totó, Számfejtő, Szendvicsparti, Malom, Mozaik, Gépi ének, Milliomos kvíz és sok más.",
+  "description": "Akadálymentes játékok két menüben: Retró játékok és SuperDL saját játékok. A SZERENCSEKERÉK (kerék-és-szó játék) most még élőbb: BÁRMILYEN betűt mondhatsz vagy vehetsz (magánhangzót is), a NEVES gép-ellenfelek OKOSSÁGA választható (kezdő/közepes/profi), a gépek beszólnak a játékosoknak és egymásnak is, és teljes közönség-hangvilág szól (nevetés a poénokra, csalódott közönség csődnél, tapsvihar a győztesnek) – minden hang tisztán, egymásra nem folyva. 104 rejtvény 8 kategóriában, sok beszólással; a hangok a fejlesztő saját, jogtiszta anyaga. Korábbról: Kockapóker, Totó, Számfejtő, Szendvicsparti, Malom, Mozaik, Gépi ének, Milliomos kvíz és sok más.",
   "min_core_api": "1.0",
   "min_core_version": "4.1.0",
   "requires_tools": [],

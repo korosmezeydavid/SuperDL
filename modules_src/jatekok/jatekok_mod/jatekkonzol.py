@@ -242,6 +242,24 @@ class JatekKonzol(wx.Dialog):
             if typ == "effekt":
                 self._effekt(payload)
                 continue
+            if typ == "effekt_var":
+                # lejátssza a hangot, majd MEGVÁRJA a végét (max 8 mp), hogy a
+                # hangok NE olvadjanak össze; a hosszt a felület méri.
+                self._effekt(payload)
+                ms = min(self._hang_hossz_ms(payload), 8000)
+                if ms > 0 and not self._closing:
+                    wx.CallLater(ms, lambda: self._pump(None))
+                    return
+                continue
+            if typ == "szunet":
+                # NEM-BLOKKOLÓ várakozás (pl. amíg a kerékpörgés-hang lejátszódik):
+                # ütemezzük a folytatást, és kilépünk a hurokból, hogy a felület ne
+                # fagyjon be. A várakozás után a _pump(None) folytatja a generátort.
+                ms = int(payload) if payload else 0
+                if ms > 0 and not self._closing:
+                    wx.CallLater(ms, lambda: self._pump(None))
+                    return
+                continue
             if typ == "enek":
                 self._enek(payload)
                 continue
@@ -352,6 +370,65 @@ class JatekKonzol(wx.Dialog):
         except Exception:
             pass
 
+    _hang_hossz_cache = {}
+
+    def _hang_fajl(self, nev):
+        """A megnevezett hanghoz tartozó, modulba CSOMAGOLT fájl útvonala (WAV vagy
+        MP3) a hangmappákból; vagy None, ha nincs ilyen."""
+        import os
+        for mappa in ("milliomos_hang", "szerencsekerek_hang"):
+            for kit in (".wav", ".mp3"):
+                p = os.path.join(os.path.dirname(__file__), mappa, f"{nev}{kit}")
+                if os.path.isfile(p):
+                    return p
+        return None
+
+    def _hang_hossz_ms(self, nev):
+        """A csomagolt hangeffekt hossza ms-ban (mérve, gyorsítótárazva) – ennyit
+        vár az `effekt_var`, hogy a hang ne olvadjon a következőbe. WAV-nál a wave
+        modul, egyébként a Core ffmpeg-je (Duration). Ha nem mérhető: 0."""
+        if nev in self._hang_hossz_cache:
+            return self._hang_hossz_cache[nev]
+        ms = 0
+        p = self._hang_fajl(nev)
+        try:
+            if p and p.lower().endswith(".wav"):
+                import wave
+                with wave.open(p) as w:
+                    ms = int(w.getnframes() / float(w.getframerate()) * 1000)
+            elif p:
+                ms = self._ffmpeg_hossz_ms(p)
+        except Exception:
+            ms = 0
+        self._hang_hossz_cache[nev] = max(0, ms)
+        return self._hang_hossz_cache[nev]
+
+    @staticmethod
+    def _ffmpeg_hossz_ms(path):
+        """Egy hangfájl hossza ms-ban a Core ffmpeg-jével (a Duration sort olvassuk
+        ki az ffmpeg stderr-jéből). Ha nem érhető el: 0."""
+        import re
+        import subprocess
+        try:
+            from superdl.ffmpeg import find_ffmpeg
+            ff = find_ffmpeg()
+        except Exception:
+            ff = None
+        if not ff:
+            return 0
+        try:
+            flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+            r = subprocess.run([ff, "-i", path], stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE, creationflags=flags, timeout=15)
+            txt = (r.stderr or b"").decode("utf-8", "replace")
+            m = re.search(r"Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)", txt)
+            if m:
+                h, mi, s = int(m.group(1)), int(m.group(2)), float(m.group(3))
+                return int((h * 3600 + mi * 60 + s) * 1000)
+        except Exception:
+            pass
+        return 0
+
     def _effekt(self, nev):
         """Egy megnevezett játékhang (swish, érme, pörgetés…) lejátszása. A
         hullámformát a `hangok` modul szintetizálja (numpy), a beszédtől külön
@@ -359,20 +436,16 @@ class JatekKonzol(wx.Dialog):
         if self._closing or not nev:
             return
         try:
-            import os
             # 1) a modulba CSOMAGOLT hangfájl (pl. a Milliomos vagy a Szerencsekerék
             #    saját, jogtiszta hangjai) – közvetlenül, változatlanul lejátszva.
-            #    Több hangmappát és WAV/MP3 kiterjesztést is nézünk.
-            for mappa in ("milliomos_hang", "szerencsekerek_hang"):
-                for kit in (".wav", ".mp3"):
-                    csomagolt = os.path.join(os.path.dirname(__file__), mappa,
-                                             f"{nev}{kit}")
-                    if os.path.isfile(csomagolt):
-                        if self._tone_player is None:
-                            from superdl.audioengine import Player
-                            self._tone_player = Player()
-                        self._tone_player.play(csomagolt, "")
-                        return
+            csomagolt = self._hang_fajl(nev)
+            if csomagolt:
+                if self._tone_player is None:
+                    from superdl.audioengine import Player
+                    self._tone_player = Player()
+                self._tone_player.play(csomagolt, "")
+                return
+            import os
             # 2) különben SAJÁT SZINTÉZIS (a többi játék hangjai + a még nem
             #    lecserélt Milliomos-hangok)
             import tempfile
@@ -505,6 +578,14 @@ class _KonzolCtx:
 
     def effekt(self, nev):
         return ("effekt", str(nev))
+
+    def effekt_var(self, nev):
+        """Effekt lejátszása ÉS a végének kivárása (a hangok ne olvadjanak össze).
+        A hossz mérését és a várakozást a felület intézi."""
+        return ("effekt_var", str(nev))
+
+    def szunet(self, ms):
+        return ("szunet", int(ms))
 
     def enek(self, sorok, gep="brailab"):
         return ("enek", (list(sorok), str(gep)))
