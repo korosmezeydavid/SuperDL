@@ -159,6 +159,76 @@ _BUILTIN_NYERS = {
     "targy": _TARGYAK_NYERS, "noveny": _NOVENYEK_NYERS, "marka": _MARKAK_NYERS,
     "hegy": _HEGYEK_NYERS, "folyo": _FOLYOK_NYERS,
 }
+
+# --- BŐVÍTÉS: további szavak minden kategóriához (gazdagabb szótár; a Tanítás
+#     fülön tovább bővíthető) ---
+_TOBB = {
+    "varos": (
+        "Ajka", "Baja", "Békéscsaba", "Csongrád", "Dombóvár", "Érd",
+        "Gödöllő", "Gyöngyös", "Hatvan", "Kazincbarcika", "Keszthely",
+        "Komárom", "Mohács", "Nagykanizsa", "Ózd", "Orosháza", "Paks",
+        "Siófok", "Szekszárd", "Szentendre", "Szombathely", "Tata", "Zirc",
+        "Peking", "Szöul", "Delhi", "Dubaj", "Kijev", "Lima", "Manila",
+        "Ottawa", "Havanna", "Nairobi", "Bangkok", "Brüsszel", "Nizza",
+        "Marseille",
+    ),
+    "fiu": (
+        "Adorján", "Ágoston", "Benedek", "Botond", "Csongor", "Dominik",
+        "Emil", "Frigyes", "Gáspár", "Gellért", "Henrik", "Hugó", "Ince",
+        "Jákob", "Kornél", "Kázmér", "Lehel", "Manó", "Noel", "Oszkár",
+        "Pongrác", "Rajmund", "Rudolf", "Soma", "Szilveszter", "Tobiás",
+        "Vendel", "Zalán", "Zsombor", "Bendegúz", "Csanád",
+    ),
+    "lany": (
+        "Abigél", "Amália", "Boglárka", "Bella", "Csenge", "Dorina", "Enikő",
+        "Etelka", "Fruzsina", "Gréta", "Hédi", "Hortenzia", "Ilka", "Jolán",
+        "Kamilla", "Karolina", "Kitti", "Lea", "Lenke", "Nelli", "Olga",
+        "Panna", "Rebeka", "Regina", "Szonja", "Tekla", "Vivien", "Zsuzsa",
+        "Emőke", "Villő",
+    ),
+    "hiresember": (
+        "Bach", "Camus", "Dosztojevszkij", "Galilei", "Goethe", "Kafka",
+        "Kepler", "Lincoln", "Marx", "Mendel", "Nobel", "Pasteur", "Picasso",
+        "Raffaello", "Rubik", "Tesla", "Verdi", "Wagner", "Zola", "Cervantes",
+        "Puskin", "Semmelweis", "Munkácsy", "Bolyai",
+    ),
+    "allat": (
+        "bagoly", "béka", "denevér", "egér", "fecske", "gólya", "gorilla",
+        "hiúz", "kacsa", "koala", "leopárd", "lepke", "mókus", "ökör", "panda",
+        "pillangó", "sün", "szúnyog", "tehén", "ürge", "vaddisznó", "varjú",
+        "zerge", "kígyó", "tücsök", "holló",
+    ),
+    "targy": (
+        "ágy", "bicikli", "csésze", "esernyő", "gomb", "hátizsák", "kanál",
+        "kefe", "kés", "könyv", "kulcs", "mérleg", "párna", "rádió",
+        "szemüveg", "szőnyeg", "tükör", "tál", "vödör", "óra", "telefon",
+        "cipő", "gyűrű",
+    ),
+    "noveny": (
+        "boróka", "bükk", "ciprus", "csalán", "dohány", "gyömbér", "hanga",
+        "komló", "len", "moha", "nefelejcs", "nyírfa", "páfrány", "petúnia",
+        "repce", "som", "tölgy", "zab", "búza", "kökény", "mák", "szegfű",
+    ),
+    "marka": (
+        "Apple", "Audi", "Bosch", "Chevrolet", "Dell", "Electrolux", "Fiat",
+        "Gucci", "Hyundai", "Intel", "Lenovo", "Mercedes", "Nokia", "Oracle",
+        "Philips", "Sony", "Suzuki", "Visa", "Xerox", "Yamaha", "Puma",
+        "Reebok", "Siemens",
+    ),
+    "hegy": (
+        "Andok", "Börzsöny", "Cserhát", "Dolomitok", "Everest", "Kaukázus",
+        "Kárpátok", "Kilimandzsáró", "Pireneusok", "Sínai", "Ararát", "Bakony",
+        "Mecsek", "Vértes",
+    ),
+    "folyo": (
+        "Colorado", "Dráva", "Elba", "Ganga", "Indus", "Jordán", "Körös",
+        "Léna", "Mississippi", "Mura", "Ob", "Pó", "Rába", "Szajna", "Temze",
+        "Zambézi", "Séd", "Bega", "Kraszna",
+    ),
+}
+for _k, _tpl in _TOBB.items():
+    _BUILTIN_NYERS[_k] = tuple(_BUILTIN_NYERS[_k]) + _tpl
+
 ALAP_KULCSOK = ("orszag", "varos", "fiu", "lany")
 EXTRA_KULCSOK = ("hiresember", "allat", "targy", "noveny", "marka", "hegy",
                  "folyo")
