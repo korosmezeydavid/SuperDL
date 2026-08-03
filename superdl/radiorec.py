@@ -18,6 +18,7 @@ Csak olyan adást vegyél fel, amelyhez jogod van! Az internetes rádiók élő,
 szabadon foghatók – a felvétel egyéni, személyes használatra készül.
 """
 
+import logging
 import re
 import subprocess
 import threading
@@ -25,8 +26,10 @@ import time
 import uuid as _uuid
 from collections import deque
 from dataclasses import dataclass, field, asdict
-from datetime import datetime, timedelta
+from datetime import date as _date, datetime, time as dtime, timedelta
 from pathlib import Path
+
+_log = logging.getLogger("superdl.radiorec")
 
 from . import store
 from .audioengine import _ffmpeg_exe
@@ -75,10 +78,17 @@ def _norm_opts(options) -> dict:
             "chunk_seconds": chunk_min * 60, "sample_rate": sr}
 
 
-def _rec_folder(base_dir: str, when: datetime) -> Path:
+def _rec_folder_path(base_dir: str, when: datetime) -> Path:
+    """A felvételi mappa ÚTVONALA – I/O NÉLKÜL (nem hoz létre semmit).
+    Így a konstruktor nem végez fájlrendszer-műveletet; a tényleges létrehozás
+    a start()-ban történik, ahol a hibát el tudjuk kapni és jelezni."""
     # a vezető/záró szóköz Windowson WinError 123-at okoz (' C:\\...' érvénytelen)
     base = str(base_dir or "").strip() or str(Path.home() / "Downloads")
-    folder = Path(base) / "Rádiófelvételek" / when.strftime("%Y-%m-%d")
+    return Path(base) / "Rádiófelvételek" / when.strftime("%Y-%m-%d")
+
+
+def _rec_folder(base_dir: str, when: datetime) -> Path:
+    folder = _rec_folder_path(base_dir, when)
     folder.mkdir(parents=True, exist_ok=True)
     return folder
 
@@ -88,6 +98,37 @@ def _out_path(base_dir: str, station_name: str, when: datetime,
     folder = _rec_folder(base_dir, when)
     fname = f"{_safe(station_name)} {when.strftime('%Y-%m-%d %H-%M-%S')}.{ext}"
     return folder / fname
+
+
+def _runs_on(s: "Schedule", start_date: _date) -> bool:
+    """Igaz, ha az s időzítés az adott KEZDŐNAPON futhat (a repeat szerint).
+    A hét napját és az egyszeri dátumot MINDIG az ablak kezdőnapjához mérjük –
+    így az éjfélen átnyúló ablak a tegnapi kezdőnaphoz is illeszkedhet."""
+    if s.repeat == "once":
+        return bool(s.date) and s.date == start_date.strftime("%Y-%m-%d")
+    if s.repeat == "weekly":
+        return start_date.weekday() in (s.weekdays or [])
+    return True                          # napi / egyéb: minden nap
+
+
+def _active_window(s: "Schedule", now: datetime):
+    """Az s időzítés ÉPP AKTÍV felvételi ablaka (start_dt, end_dt, kezdőnap-
+    kulcs), vagy None. Kezeli az ÉJFÉLEN ÁTNYÚLÓ ablakot [RAD-P0-01]: a MA és
+    (átnyúlásnál) a TEGNAP induló változatot is megvizsgálja."""
+    overnight = (s.end_h * 60 + s.end_m) <= (s.start_h * 60 + s.start_m)
+    starts = [now.date()]
+    if overnight:
+        starts.append(now.date() - timedelta(days=1))
+    for d in starts:
+        if not _runs_on(s, d):
+            continue
+        start_dt = datetime.combine(d, dtime(s.start_h, s.start_m))
+        end_dt = datetime.combine(d, dtime(s.end_h, s.end_m))
+        if overnight:
+            end_dt += timedelta(days=1)
+        if start_dt <= now < end_dt:
+            return start_dt, end_dt, d.strftime("%Y-%m-%d")
+    return None
 
 
 class ActiveRecording:
@@ -104,7 +145,9 @@ class ActiveRecording:
         self.ext = self.opts["ext"]
         self.chunk_seconds = self.opts["chunk_seconds"]
         self.start_time = datetime.now()
-        self._folder = _rec_folder(base_dir, self.start_time)
+        # I/O NÉLKÜL: a mappát a start() hozza létre (elkapható hibával), hogy
+        # időzített felvételnél a mappahiba ne maradjon néma [RAD-P0-03]
+        self._folder = _rec_folder_path(base_dir, self.start_time)
         self._stem = (f"{_safe(station_name)} "
                       f"{self.start_time.strftime('%Y-%m-%d %H-%M-%S')}")
         # darabolt módban self.path REPREZENTATÍV (a .parent a mappa); a valódi
@@ -122,6 +165,15 @@ class ActiveRecording:
         ff = _ffmpeg_exe()
         if not ff:
             self.status, self.error = "hiba", "az ffmpeg nem érhető el"
+            return False
+        # a célmappa létrehozása ITT (nem a konstruktorban): ha nem hozható
+        # létre (jogosultság, csak-olvasható, hálózati/törölt hely), a hiba
+        # NEM marad néma – a start() False-t ad és az ok bemondható [RAD-P0-03]
+        try:
+            self._folder.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            self.status, self.error = "hiba", (
+                f"a célmappa nem hozható létre ({self._folder}): {e}")
             return False
         flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
         cmd = [ff, "-hide_banner", "-loglevel", "error"]
@@ -381,6 +433,9 @@ class RecordManager:
         self.on_event = on_event                     # hívható(szöveg, szint)
         self.last_error = ""                         # az utolsó indítási hiba
         self.active: list[ActiveRecording] = []
+        # az időzítő-ciklus egészsége (RAD-P0-02): ne nyeljünk el némán hibát
+        self._scheduler_errors = 0
+        self._last_scheduler_error = ""
         self._lock = threading.Lock()
         self.schedules: list[Schedule] = []
         for r in store.load_radio_schedule():
@@ -492,40 +547,54 @@ class RecordManager:
         while not self._stop.wait(20):
             try:
                 self._tick()
-            except Exception:
-                pass
+            except Exception as e:
+                # RAD-P0-02: NE nyeljük el némán – naplózzuk, számoljuk, és
+                # (ritkítva) jelezzük a felhasználónak, hogy az időzített
+                # felvétel figyelője hibázik, de tovább fut
+                self._scheduler_errors += 1
+                self._last_scheduler_error = str(e)
+                _log.exception("Az időzítő-ciklus hibája")
+                if self._scheduler_errors == 1 or self._scheduler_errors % 30 == 0:
+                    self._emit(
+                        "Az időzített felvétel figyelője hibába ütközött, de "
+                        f"tovább fut. Ok: {e}", "error")
+
+    def scheduler_health(self) -> dict:
+        """Az időzítő-ciklus egészsége (diagnosztikához)."""
+        return {"errors": self._scheduler_errors,
+                "last_error": self._last_scheduler_error}
 
     def _tick(self):
         now = datetime.now()
         today = now.strftime("%Y-%m-%d")
         for s in self.list_schedules():
-            if not s.enabled or s.last_run_date == today:
+            if not s.enabled:
                 continue
-            if s.repeat == "weekly" and now.weekday() not in (s.weekdays or []):
-                continue
-            if s.repeat == "once" and s.date and s.date != today:
-                if s.date < today:                 # lejárt, sosem futott → ne gyűljön
+            win = _active_window(s, now)
+            if win is None:
+                # lejárt egyszeri (sosem futott) törlése – csak ha MÁR nincs
+                # aktív ablaka (az éjfélen átnyúló tegnapi ablak még élhet)
+                if s.repeat == "once" and s.date and s.date < today:
                     self.remove_schedule(s.id)
                     self._emit(f"Lejárt egyszeri időzítés törölve: "
                                f"{s.station_name} ({s.date})", "info")
                 continue
-            start_dt = now.replace(hour=s.start_h, minute=s.start_m,
-                                   second=0, microsecond=0)
-            end_dt = now.replace(hour=s.end_h, minute=s.end_m,
-                                 second=0, microsecond=0)
-            if (s.end_h * 60 + s.end_m) <= (s.start_h * 60 + s.start_m):
-                end_dt += timedelta(days=1)
-            if start_dt <= now < end_dt:
-                duration = int((end_dt - now).total_seconds())
-                if duration >= 5:
-                    self._fire(s, duration, today)
+            start_dt, end_dt, start_key = win
+            # erre a KONKRÉT ablakra (a kezdőnapja szerint) már futott?
+            if s.last_run_date == start_key:
+                continue
+            duration = int((end_dt - now).total_seconds())
+            if duration >= 5:
+                self._fire(s, duration, start_key)
 
-    def _fire(self, s: Schedule, duration: int, today: str):
+    def _fire(self, s: Schedule, duration: int, run_key: str):
+        # run_key = az AKTÍV ablak kezdőnapja (nem feltétlenül a mai nap, ha az
+        # ablak éjfélen átnyúlik) – erre jegyezzük fel a futást [RAD-P0-01]
         rec = ActiveRecording(s.station_name, s.url, self.base_dir(),
                               duration_s=duration, scheduled=True,
                               on_done=self._on_done, options=self.options())
         if rec.start():
-            s.last_run_date = today
+            s.last_run_date = run_key
             # Hányszor-kezelés: egyszeri VAGY az utolsó hátralévő alkalom → törlés.
             # Korlátos (count>0) → visszaszámlálás; 0 (kikapcsolásig) → érintetlen.
             hatra = ""

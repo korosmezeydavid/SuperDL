@@ -52,6 +52,7 @@ class Caster:
         self._henc = 0          # az aktív enkóder-handle
         self.is_live = False
         self.last_error = ""
+        self._live_query_fails = 0   # egymás utáni sikertelen állapot-lekérdezés
 
     # ---- DLL-ek betöltése + deklarációk ----
     def _libs(self):
@@ -162,8 +163,19 @@ class Caster:
             return False
         try:
             active = self._enc.BASS_Encode_IsActive(self._henc)
-        except Exception:
-            return True          # ha nem tudjuk lekérdezni, ne riasszunk hamisan
+        except Exception as ex:
+            # SM-P1-10: egyetlen sikertelen lekérdezés lehet átmeneti, ne
+            # riasszunk hamisan – DE ne is tartsunk fenn korlátlan hamis „ÉLŐ"
+            # állapotot. Néhány EGYMÁS UTÁNI hiba után megszakadtnak vesszük.
+            self._live_query_fails += 1
+            if self._live_query_fails < 5:
+                return True
+            self.is_live = False
+            self._henc = 0
+            self.last_error = ("Az adás állapota tartósan nem lekérdezhető "
+                               f"(a hangmotor nem válaszol): {ex}")
+            return False
+        self._live_query_fails = 0   # sikeres lekérdezés → nullázzuk
         if int(active) == 0:     # BASS_ACTIVE_STOPPED → az adás megszakadt
             self.is_live = False
             self._henc = 0

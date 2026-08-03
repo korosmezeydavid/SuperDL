@@ -47,7 +47,9 @@ def _ffprobe() -> str | None:
 
 _NOWIN = 0x08000000    # CREATE_NO_WINDOW (Windows)
 
-_TS = re.compile(r"(\d+):([0-5]?\d):([0-5]?\d)[,.](\d{1,3})")
+# óra:perc:mp,ezred VAGY (WebVTT rövid alak) perc:mp.ezred – az óra opcionális
+# [SUB-P1-05]: enélkül a 00:12.500 típusú VTT-cue-kból nem lett felirat
+_TS = re.compile(r"(?:(\d+):)?([0-5]?\d):([0-5]?\d)[,.](\d{1,3})")
 _ARROW = re.compile(r"-->")
 # felirat-formázás, amit a FELOLVASÁSHOZ eltávolítunk
 _TAG = re.compile(r"<[^>]+>|\{\\[^}]*\}|\{[^}]*\}")
@@ -56,7 +58,7 @@ _TAG = re.compile(r"<[^>]+>|\{\\[^}]*\}|\{[^}]*\}")
 def _to_seconds(m: re.Match) -> float:
     h, mi, s, ms = m.groups()
     ms = (ms + "000")[:3]              # tized/század/ezred → ezredre
-    return int(h) * 3600 + int(mi) * 60 + int(s) + int(ms) / 1000.0
+    return (int(h) if h else 0) * 3600 + int(mi) * 60 + int(s) + int(ms) / 1000.0
 
 
 def _clean_line(s: str) -> str:

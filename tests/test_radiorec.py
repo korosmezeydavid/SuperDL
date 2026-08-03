@@ -121,6 +121,9 @@ def test_darabolt_felvetel_szegmens_parancs(tmp_path):
 def test_output_files_es_hely_szoveg_darabolt(tmp_path):
     r = rr.ActiveRecording("T", "http://x/s", tmp_path,
                            options={"chunk_minutes": 1})
+    # a konstruktor már NEM hoz létre mappát (RAD-P0-03: az I/O a start()-ban
+    # van, elkapható hibával) – a listázás teszteléséhez itt hozzuk létre
+    r._folder.mkdir(parents=True, exist_ok=True)
     (r._folder / f"{r._stem} - 000.mp3").write_bytes(b"x" * 20000)
     (r._folder / f"{r._stem} - 001.mp3").write_bytes(b"x" * 20000)
     assert len(r._output_files()) == 2
