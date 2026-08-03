@@ -1,10 +1,10 @@
 {
   "id": "felolvaso",
   "name": "Felirat-felolvasó lejátszó",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "entry": "felolvaso_mod",
   "category": "Média",
-  "description": "Idegen nyelvű film (vagy hangfájl) lejátszása úgy, hogy a magyar (vagy bármely szöveges) feliratot SZINKRONBAN, választható hanggal (helyi SAPI, Edge neurális online, vagy beépített eSpeak) felolvassa – így vakon is követhető az idegen nyelvű film. A film mellé tett .srt/.vtt feliratot magától megtalálja, a fájlba ágyazott szöveges feliratsávot is kezeli. A YouTube-link is beilleszthető – a videó hangját streameli, a feliratot (kézi, vagy a YouTube automatikus, magyarra fordított feliratát) letölti és felolvassa. A felolvasás TEMPÓJA állítható (alapból gyors, hogy tartsa a lépést a filmfelirattal), és a következő sort előre legyártja, így a neurális hang sem csúszik. ÚJ: a hangerő (Ctrl+fel/le) és az F-billentyűk (F1/F6/F7/F8) most MINDEN vezérlőn működnek, az F8 állapot-bemondás képernyőolvasó-módban is hallható, és ha a választott hang hibázik, HALLOD az okát (nem csak eSpeak-re vált némán).",
+  "description": "Idegen nyelvű film (vagy hangfájl) lejátszása úgy, hogy a magyar (vagy bármely szöveges) feliratot SZINKRONBAN, választható hanggal (helyi SAPI, Edge neurális online, vagy beépített eSpeak) felolvassa – így vakon is követhető az idegen nyelvű film. A film mellé tett .srt/.vtt feliratot magától megtalálja, a fájlba ágyazott szöveges feliratsávot is kezeli. A YouTube-link is beilleszthető – a videó hangját streameli, a feliratot (kézi, vagy a YouTube automatikus, magyarra fordított feliratát) letölti és felolvassa. A felolvasás TEMPÓJA állítható (alapból gyors, hogy tartsa a lépést a filmfelirattal), és a következő sort előre legyártja, így a neurális hang sem csúszik. ÚJ: a hangerő (Ctrl+fel/le) és az F-billentyűk (F1/F6/F7/F8) most MINDEN vezérlőn működnek, az F8 állapot-bemondás képernyőolvasó-módban is hallható, és ha a választott hang hibázik, HALLOD az okát (nem csak eSpeak-re vált némán). ÚJ: a WebVTT feliratok óra nélküli (perc:mp.ezred, pl. 00:12.500) időbélyegeit is helyesen kezeli – eddig egyes VTT-fájlokból nem készült felirat.",
   "min_core_api": "1.0",
   "min_core_version": "3.29.0",
   "requires_tools": [],
