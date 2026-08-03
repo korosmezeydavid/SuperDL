@@ -365,6 +365,16 @@ SAJAT: tuple[Jatek, ...] = (
           "megfejtesz. Egy vagy több játékos (a gép is beszáll), három forduló, "
           "a legtöbb pénz nyer. Saját, jogtiszta hangvilággal.",
           retro=False),
+    Jatek("orszagvaros", "Ország-Város-Fiú-Lány",
+          "Mezei Géza ötlete alapján készült akadálymentes szójáték: a gép "
+          "megpörgeti az ábécét, te Enterrel megállítod egy betűn, és arra a "
+          "betűre mondasz egy országot, egy várost, egy fiú- és egy lánynevet. "
+          "Amit a gép a szótárában is ismer, két pont; amit nem talál, de a jó "
+          "betűvel kezdődik, azt elhiszi neked: egy pont – így érvényes szót "
+          "sosem utasít el. Egy vagy több játékos felváltva, tetszőleges "
+          "körszám, pörgés-hanggal, csalódott közönséggel és tapsviharral. "
+          "Társszerző: Mezei Géza.",
+          retro=False, szerzo="Mezei Géza (ötlet) és Kőrösmezey Dávid"),
     # Mille Bornes: EGYELŐRE KIVÉVE a listáról, mert még nincs megírva (a
     # katalógusban lógott, de „nem indult el" – listás visszajelzés). Ha kész a
     # jatek_millebornes és bekerül a REGISZTER-be, ezt visszatesszük.

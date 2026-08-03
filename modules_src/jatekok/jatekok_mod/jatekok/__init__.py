@@ -8,7 +8,8 @@ közli, hogy „még készül" – SOHA nincs hamis siker.
 Új játék bekötése: írd meg a generátort a megfelelő modulban, majd vedd fel
 ide egy sorral.
 """
-from . import homelab, kaland, kartya, kviz, logika, milliomos, mini, sajat, terkep
+from . import (homelab, kaland, kartya, kviz, logika, milliomos, mini,
+               orszagvaros, sajat, terkep)
 
 REGISZTER = {
     # logika / stratégia
@@ -59,6 +60,7 @@ REGISZTER = {
     "milliomos": milliomos.jatek_milliomos,   # LOIM-inspirált kvíz, saját, jogtiszta
     "enektanito": sajat.jatek_enektanito,     # a gép a saját hangján énekel
     "szerencsekerek": sajat.jatek_szerencsekerek,   # kerék-és-szó, saját hangokkal
+    "orszagvaros": orszagvaros.jatek_orszagvaros,   # Mezei Géza ötlete – saját szójáték
     # HITELES portok a hivatalos Homelab/Brailab gyűjteményből
     "blackjack": homelab.jatek_blackjack,
     "szamkit1": homelab.jatek_szamkit1,
