@@ -89,6 +89,49 @@ _LANYOK_NYERS = (
 )
 
 
+# --- PLUSZ (bővített módú) kategóriák seed-listái ---------------------------
+# (a szótár bővíthető a „Tanítás" fülön; ami nincs a listában, azt a jó betű
+#  esetén a gép elhiszi – 1 pont)
+_HIRESEK_NYERS = (
+    "Ady", "Arany", "Beethoven", "Bartók", "Chaplin", "Curie", "Darwin",
+    "Deák", "Edison", "Einstein", "Freud", "Gagarin", "Gandhi", "Hemingway",
+    "Homérosz", "Ibsen", "Jókai", "Kolumbusz", "Kossuth", "Leonardo", "Liszt",
+    "Madách", "Mozart", "Napóleon", "Newton", "Orwell", "Petőfi", "Puskás",
+    "Rembrandt", "Shakespeare", "Széchenyi", "Tolsztoj", "Verne", "Washington",
+    "Zrínyi",
+)
+_ALLATOK_NYERS = (
+    "antilop", "birka", "cica", "csiga", "delfin", "elefánt", "farkas",
+    "galamb", "hangya", "iguána", "jaguár", "kutya", "lajhár", "majom",
+    "medve", "nyúl", "oroszlán", "párduc", "róka", "sas", "strucc", "teve",
+    "tigris", "veréb", "vidra", "zebra", "zsiráf",
+)
+_TARGYAK_NYERS = (
+    "asztal", "bögre", "ceruza", "doboz", "ernyő", "fésű", "gyertya", "izzó",
+    "kalapács", "lámpa", "mécses", "nadrág", "olló", "pohár", "radír", "seprű",
+    "szék", "tányér", "toll", "üveg", "váza", "villa",
+)
+_NOVENYEK_NYERS = (
+    "akác", "babér", "cédrus", "dália", "eperfa", "fenyő", "gyöngyvirág",
+    "hárs", "ibolya", "jázmin", "kaktusz", "liliom", "muskátli", "nárcisz",
+    "orgona", "pipacs", "rózsa", "sás", "tulipán", "uborka", "viola", "zsálya",
+)
+_MARKAK_NYERS = (
+    "Adidas", "BMW", "Coca-Cola", "Danone", "Ford", "Google", "Honda", "IBM",
+    "Jaguar", "Kodak", "Lego", "Microsoft", "Nike", "Opel", "Peugeot",
+    "Renault", "Samsung", "Toyota", "Volvo", "Zara",
+)
+_HEGYEK_NYERS = (
+    "Alpok", "Bükk", "Csóványos", "Etna", "Fuji", "Gerecse", "Himalája",
+    "Kékes", "Mátra", "Olimposz", "Pilis", "Tátra", "Urál", "Vezúv", "Zengő",
+)
+_FOLYOK_NYERS = (
+    "Amazonas", "Bodrog", "Duna", "Garam", "Hernád", "Ipoly", "Jangce",
+    "Kongó", "Maros", "Nílus", "Ohio", "Rajna", "Sió", "Tisza", "Volga",
+    "Zala", "Zagyva",
+)
+
+
 def _norm_keszlet(nyers):
     return frozenset(ekezet_nelkul(x) for x in nyers)
 
@@ -98,12 +141,57 @@ _VAROSOK = _norm_keszlet(_VAROSOK_NYERS)
 _FIUK = _norm_keszlet(_FIUK_NYERS)
 _LANYOK = _norm_keszlet(_LANYOK_NYERS)
 
-_KATEGORIAK = (
-    ("egy ORSZÁGOT", _ORSZAGOK),
-    ("egy VÁROST", _VAROSOK),
-    ("egy FIÚ nevet", _FIUK),
-    ("egy LÁNY nevet", _LANYOK),
-)
+# --- kategória-regiszter: klasszikus 4 + bővíthető extrák -------------------
+KATEGORIA_NEVEK = {
+    "orszag": "Ország", "varos": "Város", "fiu": "Fiú név", "lany": "Lány név",
+    "hiresember": "Híres ember", "allat": "Állat", "targy": "Tárgy",
+    "noveny": "Növény", "marka": "Márka", "hegy": "Hegy", "folyo": "Folyó",
+}
+_CIMKE = {
+    "orszag": "egy ORSZÁGOT", "varos": "egy VÁROST", "fiu": "egy FIÚ nevet",
+    "lany": "egy LÁNY nevet", "hiresember": "egy HÍRES EMBERT",
+    "allat": "egy ÁLLATOT", "targy": "egy TÁRGYAT", "noveny": "egy NÖVÉNYT",
+    "marka": "egy MÁRKÁT", "hegy": "egy HEGYET", "folyo": "egy FOLYÓT",
+}
+_BUILTIN_NYERS = {
+    "orszag": _ORSZAGOK_NYERS, "varos": _VAROSOK_NYERS, "fiu": _FIUK_NYERS,
+    "lany": _LANYOK_NYERS, "hiresember": _HIRESEK_NYERS, "allat": _ALLATOK_NYERS,
+    "targy": _TARGYAK_NYERS, "noveny": _NOVENYEK_NYERS, "marka": _MARKAK_NYERS,
+    "hegy": _HEGYEK_NYERS, "folyo": _FOLYOK_NYERS,
+}
+ALAP_KULCSOK = ("orszag", "varos", "fiu", "lany")
+EXTRA_KULCSOK = ("hiresember", "allat", "targy", "noveny", "marka", "hegy",
+                 "folyo")
+
+
+def custom_path():
+    from superdl import store
+    return store.CONFIG_DIR / "orszagvaros_szotar.json"
+
+
+def load_custom():
+    """A felhasználó által TANÍTOTT szavak: {kategória-kulcs: [szavak]}.
+    Nem tartalmaz személyes adatot – csak szavak/nevek, közkinccsé tehető."""
+    try:
+        from superdl import store
+        d = store.load_json(custom_path(), {})
+        return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def save_custom(d):
+    from superdl import store
+    store.save_json(custom_path(), d)
+
+
+def keszlet(kulcs, custom=None):
+    """Egy kategória normalizált szó-halmaza: BEÉPÍTETT + a TANÍTOTT szavak."""
+    if custom is None:
+        custom = load_custom()
+    szavak = (list(_BUILTIN_NYERS.get(kulcs, ()))
+              + list(custom.get(kulcs, []) or []))
+    return frozenset(ekezet_nelkul(w) for w in szavak if str(w).strip())
 
 
 def _elso_betuk(keszlet):
@@ -156,12 +244,14 @@ def _porget(ctx):
 
 def jatek_orszagvaros(ctx):
     yield ctx.mond(
-        "ORSZÁG, VÁROS, FIÚ, LÁNY! Ezt a játékot Mezei Géza álmodta meg – "
-        "köszönjük az ötletet! A gép megpörgeti az ábécét, te pedig Enterrel "
-        "megállítod egy betűn. Arra a betűre mondasz egy országot, egy várost, "
-        "egy fiú- és egy lánynevet. Amit a szótáramban is ismerek, két pont; "
-        "amit nem találok, de a jó betűvel kezdődik, azt elhiszem neked: egy "
-        "pont. Aki a végén a legtöbb pontot gyűjti, nyer!")
+        "ORSZÁG, VÁROS, FIÚ, LÁNY! Ezt a játékot Mezei Géza álmodta meg, a "
+        "bővített kategóriák ötlete pedig Kőrösmezey Anita, Wildcath érdeme – "
+        "köszönjük! A gép másodpercenként sorolja az ábécét, te megállítod egy "
+        "betűn, és arra a betűre mondasz szavakat. Amit a szótáramban ismerek, "
+        "két pont; amit nem találok, de a jó betűvel kezdődik, azt elhiszem "
+        "neked: egy pont. A legtöbb pont nyer!")
+
+    custom = load_custom()
 
     v = yield ctx.kerdez("Hányan játszotok? (1-4)")
     n = szam(v, 1, 4) or 1
@@ -170,6 +260,25 @@ def jatek_orszagvaros(ctx):
         nv = yield ctx.kerdez(f"A(z) {i + 1}. játékos neve? "
                               f"(Enter = Játékos {i + 1})")
         nevek.append((nv or "").strip() or f"Játékos {i + 1}")
+
+    # klasszikus 4 vagy bővített kategóriák (Kőrösmezey Anita, Wildcath ötlete)
+    aktiv_kulcsok = list(ALAP_KULCSOK)
+    v = yield ctx.kerdez("Maradjunk a klasszikus 4 kategóriánál, vagy bővítsük "
+                         "a lehetőségeket? (Enter = klasszikus, i = bővített)")
+    if igen(v, False) is True:
+        yield ctx.mond("Bővített mód! Kérdezem a plusz kategóriákat – i = benne "
+                       "van, Enter vagy n = kimarad.")
+        for kulcs in EXTRA_KULCSOK:
+            vv = yield ctx.kerdez(f"{KATEGORIA_NEVEK[kulcs]} mehet? (i/n)")
+            if igen(vv, False) is True:
+                aktiv_kulcsok.append(kulcs)
+        yield ctx.mond("A kategóriák: "
+                       + ", ".join(KATEGORIA_NEVEK[k] for k in aktiv_kulcsok)
+                       + ". A szótárt a Tanítás fülön bővítheted!")
+
+    aktiv = [(_CIMKE[k], keszlet(k, custom)) for k in aktiv_kulcsok]
+    max_kor = 2 * len(aktiv)
+
     v = yield ctx.kerdez("Hány kört játsszunk? (1-10, Enter = 3)")
     korok = szam(v, 1, 10) or 3
     pontok = [0] * n
@@ -181,11 +290,12 @@ def jatek_orszagvaros(ctx):
             betu = yield from _porget(ctx)
             norm = ekezet_nelkul(betu) or "a"      # elbíráláshoz: 'á' → 'a'
             nagy = betu.upper()
-            yield ctx.mond(f"Megállt a(z) {nagy} betűn! Most jöhet a négy szó.")
+            yield ctx.mond(f"Megállt a(z) {nagy} betűn! Most jöhet {len(aktiv)} "
+                           "szó.")
             korpont = 0
-            for cimke, keszlet in _KATEGORIAK:
+            for cimke, kesz in aktiv:
                 valasz = yield ctx.kerdez(f"{nagy} betűvel mondj {cimke}:")
-                allapot, pont = _ertekel(valasz, norm, keszlet)
+                allapot, pont = _ertekel(valasz, norm, kesz)
                 korpont += pont
                 if allapot == "ismer":
                     yield ctx.mond(f"Ismerem! Két pont. ({valasz.strip()})")
@@ -200,8 +310,8 @@ def jatek_orszagvaros(ctx):
             pontok[i] += korpont
             if korpont == 0:
                 yield ctx.effekt(_csalodas())        # csalódott közönség
-            elif korpont == 8:
-                yield ctx.mond("Telitalálat – mind a négy szó ült!")
+            elif korpont == max_kor:
+                yield ctx.mond("Telitalálat – minden szó ült!")
             yield ctx.mond(f"{nevek[i]} ebben a körben {korpont} pontot "
                            f"szerzett, összesen {pontok[i]}.")
 
@@ -210,9 +320,9 @@ def jatek_orszagvaros(ctx):
     for hely, i in enumerate(sorrend, 1):
         yield ctx.mond(f"{hely}. hely: {nevek[i]} – {pontok[i]} pont.")
     yield ctx.effekt("taps")                          # tapsvihar a győztesnek
+    zaras = ("Köszönet az ötletért Mezei Gézának, a bővítés ötletéért pedig "
+             "Kőrösmezey Anita, Wildcathnek!")
     if n > 1 and pontok[sorrend[0]] == pontok[sorrend[1]]:
-        yield ctx.vege("Holtverseny az élen! Szép volt mindenkinek. "
-                       "Köszönjük az ötletet és a közös játékot, Mezei Géza!")
+        yield ctx.vege("Holtverseny az élen! Szép volt mindenkinek. " + zaras)
     else:
-        yield ctx.vege(f"A győztes: {nevek[sorrend[0]]}! Gratulálok! "
-                       "Köszönjük az ötletet és a közös játékot, Mezei Géza!")
+        yield ctx.vege(f"A győztes: {nevek[sorrend[0]]}! Gratulálok! " + zaras)

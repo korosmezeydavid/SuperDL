@@ -367,15 +367,21 @@ SAJAT: tuple[Jatek, ...] = (
           retro=False),
     Jatek("orszagvaros", "Ország-Város-Fiú-Lány",
           "Mezei Géza ötlete alapján készült akadálymentes szójáték: a gép "
-          "megpörgeti az ábécét, te Enterrel megállítod egy betűn, és arra a "
-          "betűre mondasz egy országot, egy várost, egy fiú- és egy lánynevet. "
-          "Amit a gép a szótárában is ismer, két pont; amit nem talál, de a jó "
-          "betűvel kezdődik, azt elhiszi neked: egy pont – így érvényes szót "
-          "sosem utasít el. Egy vagy több játékos felváltva, tetszőleges "
-          "körszám, rövid ábécé-pörgetéssel, csalódott közönséggel és "
-          "tapsviharral. "
-          "Társszerző: Mezei Géza.",
-          retro=False, szerzo="Mezei Géza (ötlet) és Kőrösmezey Dávid"),
+          "másodpercenként sorolja az ábécét, te a szóközzel vagy az Enterrel "
+          "megállítod egy betűn – SOHA nem a gép dönti el a betűt! –, és arra a "
+          "betűre mondasz szavakat. Klasszikus 4 kategória (ország, város, fiú, "
+          "lány), vagy BŐVÍTETT mód, ahol plusz kategóriákat is bekapcsolhatsz "
+          "(híres ember, állat, tárgy, növény, márka, hegy, folyó). Amit a gép "
+          "ismer, két pont; amit nem talál, de a jó betűvel kezdődik, azt "
+          "elhiszi neked: egy pont – érvényes szót sosem utasít el. A szótár "
+          "BŐVÍTHETŐ a Tanítás fülön, és JSON-ba menthető, importálható-"
+          "exportálható (közkinccsé tehető). Egy vagy több játékos "
+          "felváltva, tetszőleges körszám, csalódott közönséggel és "
+          "tapsviharral. Ötlet: Mezei Géza; a bővíthető kategóriák és szótár: "
+          "Kőrösmezey Anita, Wildcath.",
+          retro=False,
+          szerzo="Mezei Géza és Kőrösmezey Anita (Wildcath) ötlete, "
+                 "Kőrösmezey Dávid"),
     # Mille Bornes: EGYELŐRE KIVÉVE a listáról, mert még nincs megírva (a
     # katalógusban lógott, de „nem indult el" – listás visszajelzés). Ha kész a
     # jatek_millebornes és bekerül a REGISZTER-be, ezt visszatesszük.

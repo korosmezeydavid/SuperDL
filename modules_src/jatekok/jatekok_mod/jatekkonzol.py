@@ -689,7 +689,17 @@ def indithato(kulcs: str) -> bool:
 
 
 def indit_jatek(main, jatek, gep_getter):
-    """Létrehozza és megjeleníti a játékkonzolt (nem-modális)."""
+    """Létrehozza és megjeleníti a játék ablakát (nem-modális). Az Ország-Város
+    a saját, lapfüles indító/tanító ablakát kapja (Játszunk! + A játék
+    tanítása); minden más a közös JatekKonzolt."""
+    if jatek.kulcs == "orszagvaros":
+        try:
+            from .orszagvaroswin import OrszagVarosAblak
+            ablak = OrszagVarosAblak(main, jatek, gep_getter)
+            ablak.Show()
+            return ablak
+        except Exception:
+            pass                          # ha bármi gond van, essen vissza a konzolra
     kon = JatekKonzol(main, jatek, gep_getter)
     kon.Show()
     return kon

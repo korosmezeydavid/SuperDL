@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Ország-Város-Fiú-Lány (Mezei Géza ötlete, SAJÁT szójáték) tesztjei.
+"""Ország-Város-Fiú-Lány (Mezei Géza ötlete, bővítés: Kőrösmezey Anita Wildcath).
 
-A tiszta elbírálót közvetlenül, a teljes partit kényszerített betűvel (a
-véletlen pörgést 'g'-re rögzítve) és fix válaszokkal ellenőrizzük."""
+A tiszta elbírálót és a bővíthető szótárt közvetlenül, a teljes partikat a
+teszt-hajtóval (az abcstop a soron következő „választ", a megállított betűt
+adja vissza) ellenőrizzük."""
 import importlib
 
 import pytest
@@ -12,6 +13,11 @@ JR = pytest.importorskip(BASE + ".jatekok")
 U = importlib.import_module(BASE + ".jatekok._util")
 OV = importlib.import_module(BASE + ".jatekok.orszagvaros")
 KAT = importlib.import_module(BASE + ".katalogus")
+
+
+def _sztr(ki):
+    # a hang-parancsok payloadja LISTA – csak a szöveges kimenetet fűzzük össze
+    return "\n".join(p for _, p in ki if isinstance(p, str))
 
 
 # ---- tiszta elbíráló -----------------------------------------------------
@@ -24,19 +30,29 @@ def test_ertekel_negy_eset():
 
 
 def test_ertekel_ekezet_es_kisbetu_nem_szamit():
-    # a 'g' betűre az ismert városok közt ott a Genf; kisbetűvel/ékezet nélkül is
     assert OV._ertekel("genf", "g", OV._VAROSOK)[0] == "ismer"
 
 
-# ---- landolható betűk: mind a négy kategóriában van válasz ----------------
-
-def test_betuk_mindegyikere_van_negy_kategoria():
-    assert OV._BETUK, "üres a landolható betűk halmaza"
-    assert "g" in OV._BETUK
+def test_betuk_mind_a_negy_klasszikus_kategoriaban():
+    assert OV._BETUK and "g" in OV._BETUK
+    alap = (OV._ORSZAGOK, OV._VAROSOK, OV._FIUK, OV._LANYOK)
     for b in OV._BETUK:
-        for _, keszlet in OV._KATEGORIAK:
-            assert any(sz.startswith(b) for sz in keszlet), \
-                f"a(z) {b} betűre hiányzik válasz valamelyik kategóriában"
+        for kesz in alap:
+            assert any(sz.startswith(b) for sz in kesz)
+
+
+# ---- bővíthető (tanított) szótár -----------------------------------------
+
+def test_keszlet_beepitett_es_tanitott_szavakat_is_tartalmaz():
+    k = OV.keszlet("marka", {"marka": ["Xiaomi"]})
+    assert "adidas" in k                 # beépített (Adidas normalizálva)
+    assert "xiaomi" in k                 # tanított szó is bekerül
+
+
+def test_kategoria_regiszter_teljes():
+    assert set(OV.ALAP_KULCSOK) | set(OV.EXTRA_KULCSOK) == set(OV.KATEGORIA_NEVEK)
+    assert set(OV._CIMKE) == set(OV.KATEGORIA_NEVEK)
+    assert set(OV._BUILTIN_NYERS) == set(OV.KATEGORIA_NEVEK)
 
 
 # ---- regisztráció + katalógus --------------------------------------------
@@ -48,20 +64,14 @@ def test_regisztralva_es_katalogusban():
     assert "Mezei Géza" in j.leiras
 
 
-# ---- teljes parti: a JÁTÉKOS állítja meg a betűt (abcstop) ----------------
-#
-# A teszt-hajtóban az abcstop a soron következő „választ" (a megállított betűt)
-# adja vissza – így a betűt a teszt adja meg, nem a gép sorsolja. A hang-
-# parancsok payloadja LISTA, ezért csak a szöveges kimenetet fűzzük össze.
+# ---- teljes parti (klasszikus mód) ---------------------------------------
 
-def _sztr(ki):
-    return "\n".join(p for _, p in ki if isinstance(p, str))
-
-
-def test_teljes_parti_negy_talalattal_nyolc_pont():
-    valaszok = ["1", "", "1",                         # 1 játékos, név, 1 kör
-                "i",                                  # „i": indulhat az ábécé
-                "g",                                  # abcstop: a megállított betű
+def test_klasszikus_parti_negy_talalattal_nyolc_pont():
+    valaszok = ["1", "",              # 1 játékos, név
+                "n",                  # klasszikus (nem bővített)
+                "1",                  # 1 kör
+                "i",                  # abcstop indul
+                "g",                  # a megállított betű
                 "Görögország", "Genf", "Géza", "Gizella"]
     ki = U.lejatsz(OV.jatek_orszagvaros, valaszok)
     szov = _sztr(ki)
@@ -71,17 +81,33 @@ def test_teljes_parti_negy_talalattal_nyolc_pont():
 
 
 def test_ekezetes_betu_normalizalodik():
-    # a játékos az Á-nál áll meg; ez a-ként bírálódik, egy A-val kezdődő ország jó
-    valaszok = ["1", "", "1", "i", "á", "Ausztria", "", "", ""]
+    valaszok = ["1", "", "n", "1", "i", "á", "Ausztria", "", "", ""]
     ki = U.lejatsz(OV.jatek_orszagvaros, valaszok)
     szov = _sztr(ki)
     assert "Megállt a(z) Á betűn" in szov
     assert "Ismerem" in szov                # Ausztria az 'a' szótárban
 
 
-def test_teljes_parti_ures_valaszok_nulla_pont():
-    valaszok = ["1", "", "1", "i", "g", "", "", "", ""]
+def test_ures_valaszok_nulla_pont():
+    valaszok = ["1", "", "n", "1", "i", "g", "", "", "", ""]
     ki = U.lejatsz(OV.jatek_orszagvaros, valaszok)
     szov = _sztr(ki)
-    assert "0 pont" in szov                # a kör 0 pont
-    assert ki[-1][0] == "vege"             # rendben véget ér
+    assert "0 pont" in szov
+    assert ki[-1][0] == "vege"
+
+
+# ---- bővített mód: plusz kategóriák kérdezése és pontozása ----------------
+
+def test_bovitett_mod_allattal_tiz_pont():
+    valaszok = ["1", "",              # 1 játékos, név
+                "i",                  # BŐVÍTETT mód
+                "n", "i", "n", "n", "n", "n", "n",   # csak az Állat legyen benne
+                "1",                  # 1 kör
+                "i",                  # abcstop indul
+                "k",                  # a megállított betű
+                "Kanada", "Kairó", "Károly", "Katalin", "kutya"]
+    ki = U.lejatsz(OV.jatek_orszagvaros, valaszok)
+    szov = _sztr(ki)
+    assert "Állat mehet?" in szov           # a plusz kategóriát megkérdezte
+    assert "5 szó" in szov                  # 4 klasszikus + Állat
+    assert "10 pont" in szov                # 5 ismert válasz, egyenként 2 pont
