@@ -12,7 +12,7 @@ válasz – így a játékos mindig tud érvényeset mondani.
 """
 import random
 
-from ._util import ekezet_nelkul, szam
+from ._util import ekezet_nelkul, igen, szam
 
 
 # --- ORSZÁGOK -------------------------------------------------------------
@@ -138,11 +138,18 @@ def _csalodas():
 
 def _porget(ctx):
     """A gép SOROLJA az ábécét (másodpercenként egy betű), a játékos a
-    szóközzel/Enterrel megállítja – ott áll meg, SOHA nem a gép dönt. A
-    megállított (recitált) betűt adja vissza."""
-    yield ctx.mond("Sorolom az ábécét, másodpercenként egy betűt. Nyomd meg a "
-                   "SZÓKÖZT vagy az Entert, amikor meg akarod állítani egy "
-                   "betűn – az lesz a te betűd!")
+    szóközzel/Enterrel megállítja – ott áll meg, SOHA nem a gép dönt.
+
+    FONTOS: közvetlenül a sorolás ELŐTT NINCS hosszú kommentár – különben a
+    képernyőolvasó a kommentárt és az első betűket egymásra torlasztaná
+    (kezdő „kapkodás"). Helyette egy rövid i/n kérdés; „i" (vagy Enter) után
+    AZONNAL, kommentár nélkül indul a sorolás."""
+    while True:
+        v = yield ctx.kerdez("Elindítsam az ábécét? (i vagy Enter = igen; utána "
+                             "a SZÓKÖZ vagy az ENTER állítja meg)")
+        if igen(v, True) is not False:       # üres/„i"/igen → indul; csak „n" vár
+            break
+        yield ctx.mond("Rendben, várok – szólj, ha kezdhetjük.")
     betu = yield ctx.abcstop(1000)
     return (betu or "a")
 

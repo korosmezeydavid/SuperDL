@@ -60,6 +60,7 @@ def _sztr(ki):
 
 def test_teljes_parti_negy_talalattal_nyolc_pont():
     valaszok = ["1", "", "1",                         # 1 játékos, név, 1 kör
+                "i",                                  # „i": indulhat az ábécé
                 "g",                                  # abcstop: a megállított betű
                 "Görögország", "Genf", "Géza", "Gizella"]
     ki = U.lejatsz(OV.jatek_orszagvaros, valaszok)
@@ -71,7 +72,7 @@ def test_teljes_parti_negy_talalattal_nyolc_pont():
 
 def test_ekezetes_betu_normalizalodik():
     # a játékos az Á-nál áll meg; ez a-ként bírálódik, egy A-val kezdődő ország jó
-    valaszok = ["1", "", "1", "á", "Ausztria", "", "", ""]
+    valaszok = ["1", "", "1", "i", "á", "Ausztria", "", "", ""]
     ki = U.lejatsz(OV.jatek_orszagvaros, valaszok)
     szov = _sztr(ki)
     assert "Megállt a(z) Á betűn" in szov
@@ -79,7 +80,7 @@ def test_ekezetes_betu_normalizalodik():
 
 
 def test_teljes_parti_ures_valaszok_nulla_pont():
-    valaszok = ["1", "", "1", "g", "", "", "", ""]
+    valaszok = ["1", "", "1", "i", "g", "", "", "", ""]
     ki = U.lejatsz(OV.jatek_orszagvaros, valaszok)
     szov = _sztr(ki)
     assert "0 pont" in szov                # a kör 0 pont

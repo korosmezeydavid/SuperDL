@@ -560,7 +560,10 @@ class JatekKonzol(wx.Dialog):
             pass
         if not self._closing:
             self.allj_gomb.SetFocus()     # ide jön a szóköz/Enter
-        self._abc_tick()
+        # kis kezdő-késleltetés: a kérdés/echo hangja csengjen le, mielőtt az
+        # első betű megszólal – így az eleje nem „kapkod" (felhasználói jelzés)
+        if not self._closing:
+            wx.CallLater(600, self._abc_tick)
 
     def _abc_tick(self):
         if not self._abc_active or self._closing:
