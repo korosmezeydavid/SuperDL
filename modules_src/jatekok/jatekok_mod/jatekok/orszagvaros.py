@@ -137,15 +137,14 @@ def _csalodas():
 
 
 def _porget(ctx):
-    """A gép „végigpörgeti" az ábécét, és megáll egy betűn. Visszaadja a betűt.
-    Kis, egyszerű SZINTETIZÁLT tick-hang kíséri (nincs hozzá külön hangfájl; a
-    teszt-hajtó a hangokat átugorja)."""
-    betu = random.choice(_BETUK)
-    for hz in (520, 620, 720):            # rövid, felfutó pörgetés-tick
-        yield ctx.hang([(hz, 40)])
-        yield ctx.szunet(90)
-    yield ctx.hang([(880, 110)])         # „megállt" koppanás
-    return betu
+    """A gép SOROLJA az ábécét (másodpercenként egy betű), a játékos a
+    szóközzel/Enterrel megállítja – ott áll meg, SOHA nem a gép dönt. A
+    megállított (recitált) betűt adja vissza."""
+    yield ctx.mond("Sorolom az ábécét, másodpercenként egy betűt. Nyomd meg a "
+                   "SZÓKÖZT vagy az Entert, amikor meg akarod állítani egy "
+                   "betűn – az lesz a te betűd!")
+    betu = yield ctx.abcstop(1000)
+    return (betu or "a")
 
 
 def jatek_orszagvaros(ctx):
@@ -171,15 +170,15 @@ def jatek_orszagvaros(ctx):
     for kor in range(1, korok + 1):
         yield ctx.mond(f"--- {kor}. kör a {korok}-ből ---")
         for i in range(n):
-            yield ctx.kerdez(f"{nevek[i]} jön. Nyomj Entert, és megpörgetem "
-                             "az ábécét!")
+            yield ctx.mond(f"{nevek[i]} következik!")
             betu = yield from _porget(ctx)
+            norm = ekezet_nelkul(betu) or "a"      # elbíráláshoz: 'á' → 'a'
             nagy = betu.upper()
             yield ctx.mond(f"Megállt a(z) {nagy} betűn! Most jöhet a négy szó.")
             korpont = 0
             for cimke, keszlet in _KATEGORIAK:
                 valasz = yield ctx.kerdez(f"{nagy} betűvel mondj {cimke}:")
-                allapot, pont = _ertekel(valasz, betu, keszlet)
+                allapot, pont = _ertekel(valasz, norm, keszlet)
                 korpont += pont
                 if allapot == "ismer":
                     yield ctx.mond(f"Ismerem! Két pont. ({valasz.strip()})")

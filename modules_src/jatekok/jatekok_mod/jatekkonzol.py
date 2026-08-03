@@ -47,6 +47,12 @@ def _retro_hang_ment(be: bool) -> None:
 from . import katalogus
 from . import jatekok as JR
 
+# a magyar ábécé, amit az `abcstop` parancs másodpercenként sorol (a játékos a
+# szóközzel/Enterrel állítja meg – SOHA nem a gép dönti el a betűt)
+_ABC = ("a", "á", "b", "c", "d", "e", "é", "f", "g", "h", "i", "í", "j", "k",
+        "l", "m", "n", "o", "ó", "ö", "ő", "p", "r", "s", "t", "u", "ú", "ü",
+        "ű", "v", "z")
+
 
 class RetroHang:
     """A retró hang SORBA ÁLLÍTOTT lejátszója: minden bemondott szöveget a
@@ -147,6 +153,11 @@ class JatekKonzol(wx.Dialog):
         self._closing = False
         self._gen = None
         self._var = False               # épp bemenetre várunk-e
+        # az „ábécé-megállítás" (abcstop) valós idejű állapota
+        self._abc_active = False
+        self._abc_betuk = []
+        self._abc_idx = 0
+        self._abc_koz = 1000
         self._hang = RetroHang(gep_getter)
         self._tone_player = None
         self._sapi = None            # rendszer-TTS tartalék (lusta)
@@ -190,6 +201,12 @@ class JatekKonzol(wx.Dialog):
             # a Saját játékok NEM a retró géphangon szólnak, hanem normál
             # rendszerhangon – a retró kapcsoló itt nem értelmes
             self.hang_kapcs.Hide()
+        # az ábécé-megállító gomb (csak pörgetés közben látszik); a szóköz/Enter
+        # is megállítja, de a gombot a képernyőolvasó is bemondja
+        self.allj_gomb = wx.Button(self, label="&ÁLLJ! (szóköz vagy Enter)")
+        self.allj_gomb.Bind(wx.EVT_BUTTON, lambda e: self._abcstop_stop())
+        self.allj_gomb.Hide()
+        sor.Add(self.allj_gomb, 0, wx.RIGHT, 6)
         b_ki = wx.Button(self, label="&Kilépés a játékból")
         b_ki.Bind(wx.EVT_BUTTON, lambda e: self.Close())
         sor.Add(b_ki, 0)
@@ -263,6 +280,11 @@ class JatekKonzol(wx.Dialog):
             if typ == "enek":
                 self._enek(payload)
                 continue
+            if typ == "abcstop":
+                # a gép SOROLJA az ábécét (másodpercenként), a játékos a
+                # szóközzel/Enterrel megállítja – a megállított betű megy vissza
+                self._abcstop_start(payload)
+                return
             if typ == "kerdez":
                 self._ki(payload)
                 self._var_bemenet(True)
@@ -514,6 +536,54 @@ class JatekKonzol(wx.Dialog):
         if van and not self._closing:
             self.bemenet.SetFocus()
 
+    # ---- ábécé-megállítás (abcstop): a JÁTÉKOS dönti el a betűt --------
+
+    def _mond_csak(self, szoveg):
+        """Felolvasás átiratba írás NÉLKÜL (az ábécé-sorolás betűihez)."""
+        if self._closing:
+            return
+        if self.hang_kapcs.GetValue():
+            self._hang.mond(szoveg)
+        else:
+            self._beszel_rendszer(szoveg)
+
+    def _abcstop_start(self, koz_ms):
+        self._abc_betuk = list(_ABC)
+        self._abc_idx = -1
+        self._abc_koz = max(250, int(koz_ms) if koz_ms else 1000)
+        self._abc_active = True
+        self._var_bemenet(False)          # bevitel tiltva a pörgetés alatt
+        self.allj_gomb.Show()
+        try:
+            self.Layout()
+        except Exception:
+            pass
+        if not self._closing:
+            self.allj_gomb.SetFocus()     # ide jön a szóköz/Enter
+        self._abc_tick()
+
+    def _abc_tick(self):
+        if not self._abc_active or self._closing:
+            return
+        self._abc_idx = (self._abc_idx + 1) % len(self._abc_betuk)
+        self._mond_csak(self._abc_betuk[self._abc_idx])
+        if self._abc_active and not self._closing:
+            wx.CallLater(self._abc_koz, self._abc_tick)
+
+    def _abcstop_stop(self):
+        if not self._abc_active:
+            return
+        self._abc_active = False
+        self.allj_gomb.Hide()
+        try:
+            self.Layout()
+        except Exception:
+            pass
+        betu = ""
+        if 0 <= self._abc_idx < len(self._abc_betuk):
+            betu = self._abc_betuk[self._abc_idx]
+        self._pump(betu)
+
     def _hang_kapcsol(self, e):
         self._hang.enabled = self.hang_kapcs.GetValue()
         if not self._hang.enabled:
@@ -524,6 +594,18 @@ class JatekKonzol(wx.Dialog):
 
     def _on_key(self, e):
         k = e.GetKeyCode()
+        if self._abc_active:
+            # pörgetés közben: szóköz/Enter = ÁLLJ; Escape = megszakítás
+            if k in (wx.WXK_SPACE, wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER):
+                self._abcstop_stop()
+                return
+            if k == wx.WXK_ESCAPE:
+                self._abc_active = False
+                self.allj_gomb.Hide()
+                self._hang.nema()
+                self.Close()
+                return
+            return                     # egyéb billentyűt nyeljünk el pörgetés alatt
         if k == wx.WXK_ESCAPE:
             # először némít; ha már néma, bezár
             self._hang.nema()
@@ -586,6 +668,12 @@ class _KonzolCtx:
 
     def szunet(self, ms):
         return ("szunet", int(ms))
+
+    def abcstop(self, koz_ms=1000):
+        """A gép SOROLJA az ábécét (koz_ms-enként egy betű), a játékos a
+        szóközzel/Enterrel megállítja. A megállított betűt kapja vissza a játék –
+        SOHA nem a gép dönti el, melyik betű."""
+        return ("abcstop", int(koz_ms))
 
     def enek(self, sorok, gep="brailab"):
         return ("enek", (list(sorok), str(gep)))

@@ -48,29 +48,39 @@ def test_regisztralva_es_katalogusban():
     assert "Mezei Géza" in j.leiras
 
 
-# ---- teljes parti kényszerített 'g' betűvel -------------------------------
+# ---- teljes parti: a JÁTÉKOS állítja meg a betűt (abcstop) ----------------
+#
+# A teszt-hajtóban az abcstop a soron következő „választ" (a megállított betűt)
+# adja vissza – így a betűt a teszt adja meg, nem a gép sorsolja. A hang-
+# parancsok payloadja LISTA, ezért csak a szöveges kimenetet fűzzük össze.
 
-def _forced_g(monkeypatch):
-    monkeypatch.setattr(OV.random, "choice", lambda seq: "g")
+def _sztr(ki):
+    return "\n".join(p for _, p in ki if isinstance(p, str))
 
 
-def test_teljes_parti_negy_talalattal_nyolc_pont(monkeypatch):
-    _forced_g(monkeypatch)
-    valaszok = ["1", "", "1", "",                     # 1 játékos, 1 kör, pörgetés
+def test_teljes_parti_negy_talalattal_nyolc_pont():
+    valaszok = ["1", "", "1",                         # 1 játékos, név, 1 kör
+                "g",                                  # abcstop: a megállított betű
                 "Görögország", "Genf", "Géza", "Gizella"]
     ki = U.lejatsz(OV.jatek_orszagvaros, valaszok)
-    # a hang-parancsok payloadja LISTA, ezért csak a szöveges (str) kimenetet fűzzük
-    szov = "\n".join(p for t, p in ki if isinstance(p, str))
+    szov = _sztr(ki)
     assert "Megállt a(z) G betűn" in szov
     assert "8 pont" in szov
     assert "győztes" in szov.lower()
 
 
-def test_teljes_parti_ures_valaszok_nulla_pont(monkeypatch):
-    _forced_g(monkeypatch)
-    valaszok = ["1", "", "1", "", "", "", "", ""]
+def test_ekezetes_betu_normalizalodik():
+    # a játékos az Á-nál áll meg; ez a-ként bírálódik, egy A-val kezdődő ország jó
+    valaszok = ["1", "", "1", "á", "Ausztria", "", "", ""]
     ki = U.lejatsz(OV.jatek_orszagvaros, valaszok)
-    # a hang-parancsok payloadja LISTA, ezért csak a szöveges (str) kimenetet fűzzük
-    szov = "\n".join(p for t, p in ki if isinstance(p, str))
+    szov = _sztr(ki)
+    assert "Megállt a(z) Á betűn" in szov
+    assert "Ismerem" in szov                # Ausztria az 'a' szótárban
+
+
+def test_teljes_parti_ures_valaszok_nulla_pont():
+    valaszok = ["1", "", "1", "g", "", "", "", ""]
+    ki = U.lejatsz(OV.jatek_orszagvaros, valaszok)
+    szov = _sztr(ki)
     assert "0 pont" in szov                # a kör 0 pont
     assert ki[-1][0] == "vege"             # rendben véget ér

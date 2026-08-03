@@ -54,6 +54,13 @@ class Ctx:
         lejátszódik). A felület wx.CallLater-rel várja ki; a teszt-hajtó átugorja."""
         return ("szunet", int(ms))
 
+    def abcstop(self, koz_ms=1000):
+        """A gép SOROLJA az ábécét (koz_ms-enként egy betű), a játékos a
+        szóközzel/Enterrel megállítja – a megállított betűt kapja vissza a játék.
+        A felület valós időben sorol; a teszt-hajtó a soron következő „választ"
+        adja vissza (a megállított betűt)."""
+        return ("abcstop", int(koz_ms))
+
     def enek(self, sorok, gep="brailab"):
         """A gép ELÉNEKEL egy dalt a saját formáns-hangján. `sorok`: a dal
         [(szótag, hangnév, hossz), …] listája (lásd az `enek` modult). A felület
@@ -154,7 +161,9 @@ def lejatsz(jatek_fugg, valaszok, max_lepes=10000):
         typ = cmd[0]
         payload = cmd[1] if len(cmd) > 1 else ""
         ki.append((typ, payload))
-        if typ == "kerdez":
+        if typ in ("kerdez", "abcstop"):
+            # az abcstop élesben valós idejű megállítás; a teszt-hajtó a soron
+            # következő választ (a megállított betűt) adja vissza
             if bot is not None:
                 send = bot(payload, ki)
             else:
