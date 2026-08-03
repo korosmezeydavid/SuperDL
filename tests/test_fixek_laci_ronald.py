@@ -31,9 +31,16 @@ def test_tálca_asztali_inditasnal_visszaallitja_a_tray_modot():
 # ---- B) FELOLVASÓ: AcceleratorTable + F8 hallhatóság + verzió + hallható hiba
 
 def test_felolvaso_verzio_es_rovid_hiba():
+    import json
+    import pathlib
     m = importlib.import_module(
         "modules_src.felolvaso.felolvaso_mod.felolvasowin")
-    assert m.MOD_VERSION == "1.4.5"
+    # a futásidejű MOD_VERSION egyezzen a manifesttel (SUB-P2-29: ne csússzon
+    # szét a kézi konstans és a manifest – így a teszt magától követi a bumpot)
+    manifest = json.loads((pathlib.Path(__file__).parent.parent
+                           / "modules_src" / "felolvaso" / "manifest.json"
+                           ).read_text(encoding="utf-8"))
+    assert m.MOD_VERSION == manifest["version"]
     # a hiba rövidítve, felolvashatóan jön vissza
     assert m._rovid_hiba("  sapi:   valami   hiba ") == "sapi: valami hiba"
     hosszu = m._rovid_hiba("x" * 300)
