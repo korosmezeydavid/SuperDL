@@ -1486,7 +1486,12 @@ class MainFrame(wx.Frame):
     # ---- torrent: a fájl már létezik ----------------------------------
 
     def _ask_conflict(self, job):
-        self._conflict_showing.discard(job.id)
+        # FONTOS: a job.id VÉGIG maradjon a _conflict_showing halmazban, amíg a
+        # modális párbeszéd nyitva van. Ha már itt az elején kivennénk, a
+        # frissítő-időzítő a modális ablak alatt újra és újra észlelné a
+        # p.conflict-ot, és ÚJABB párbeszédeket sorakoztatna föl → az ablak nem
+        # tűnik el, és a „már létezik" hurokban visszajön. A levételt ezért a
+        # végére (finally) tesszük.
         name = job.progress.filename or job.url
         choices = ["Kihagyom – nem töltöm le újra",
                    "Felülírom – újra letöltöm az elejéről",
@@ -1495,25 +1500,28 @@ class MainFrame(wx.Frame):
             self, f"A torrent cél fájlja már létezik a mappában:\n\n{name}\n\n"
             "Mit tegyek?", "A fájl már létezik", choices)
         dlg.SetSelection(2)
-        if dlg.ShowModal() == wx.ID_OK:
-            self._conflict_asked.add(job.id)
-            i = dlg.GetSelection()
-            if i == 0:
-                self.mgr.remove(job)
-                self._remove_row(job)
-                self._announce("A torrent kihagyva – a meglévő fájl megmarad.")
-            elif i == 1:
-                self.mgr.resolve_conflict(job, "overwrite")
-                self._announce("Felülírás: a torrent letöltése elölről indul.")
+        try:
+            if dlg.ShowModal() == wx.ID_OK:
+                self._conflict_asked.add(job.id)
+                i = dlg.GetSelection()
+                if i == 0:
+                    self.mgr.remove(job)
+                    self._remove_row(job)
+                    self._announce("A torrent kihagyva – a meglévő fájl megmarad.")
+                elif i == 1:
+                    self.mgr.resolve_conflict(job, "overwrite")
+                    self._announce("Felülírás: a torrent letöltése elölről indul.")
+                else:
+                    self.mgr.resolve_conflict(job, "verify")
+                    self._announce("Ellenőrzés és megosztás: a meglévő fájlt "
+                                   "ellenőrzöm, majd seedelem.")
             else:
-                self.mgr.resolve_conflict(job, "verify")
-                self._announce("Ellenőrzés és megosztás: a meglévő fájlt "
-                               "ellenőrzöm, majd seedelem.")
-        else:
-            self._announce(
-                "A torrent várakozik: döntsd el, mit tegyek a meglévő fájllal. "
-                "A kérdés hamarosan újra felajánlódik.", ok=False)
-        dlg.Destroy()
+                self._announce(
+                    "A torrent várakozik: döntsd el, mit tegyek a meglévő "
+                    "fájllal. A kérdés hamarosan újra felajánlódik.", ok=False)
+        finally:
+            dlg.Destroy()
+            self._conflict_showing.discard(job.id)
 
     def _remove_row(self, job):
         row = self._known_rows.pop(job.id, None)

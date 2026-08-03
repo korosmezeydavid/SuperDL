@@ -260,12 +260,20 @@ class DownloadManager:
             # a leállított elemeket NEM indítjuk újra magától (autostart=False);
             # a többi (letöltés/várakozik) folytatható, az ütemezett az idejére vár
             autostart = status != "leállítva"
+            # SEEDELŐ torrent: az adat már kész a lemezen, de a .aria2 vezérlő-
+            # fájl a befejezéskor eltűnt. Újra hozzáadva az aria2 „a fájl már
+            # létezik"-et dobna, és a seedelés némán megszakadna – ami akár
+            # tracker-kizárást is okozhat. Ezért induláskor AUTOMATIKUSAN
+            # ellenőrzés+seed (verify) módban tesszük vissza: az aria2 leellenőrzi
+            # a meglévő fájlt és MAGÁTÓL folytatja a seedelést, kérdés nélkül.
+            verify = bool(r.get("verify", False)) or (
+                r.get("kind") == "torrent" and status == "seedelés")
             job = self.add(
                 url, kind=r.get("kind"), out_dir=r.get("out_dir"),
                 audio_only=r.get("audio_only"),
                 start_at=r.get("start_at"),
                 overwrite=bool(r.get("overwrite", False)),
-                verify=bool(r.get("verify", False)),
+                verify=verify,
                 autostart=autostart)
             if r.get("filename"):
                 job.progress.filename = r["filename"]

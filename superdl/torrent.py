@@ -284,6 +284,12 @@ class TorrentDownloader:
             # a meglévő fájlt ellenőrzi a torrent hash-ei alapján: a jó
             # részeket megtartja, a hiányzókat letölti, majd seedel
             opts["check-integrity"] = "true"
+            # a kész adatnál a .aria2 vezérlőfájl már nincs meg; e nélkül az
+            # aria2 „a fájl már létezik"-et dobna a check-integrity ELŐTT. Az
+            # allow-overwrite engedi továbblépni: a check-integrity előbb
+            # validál, és CSAK a sérült/hiányzó darabokat tölti újra (a kész
+            # torrent így kérdés nélkül seedel tovább, nem indul elölről).
+            opts["allow-overwrite"] = "true"
         path = Path(self.url)
         if not self.url.lower().startswith("magnet:") and path.is_file():
             blob = base64.b64encode(path.read_bytes()).decode()
