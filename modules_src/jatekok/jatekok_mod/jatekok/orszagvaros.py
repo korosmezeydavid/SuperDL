@@ -137,10 +137,14 @@ def _csalodas():
 
 
 def _porget(ctx):
-    """A gép megpörgeti az ábécét, és megáll egy betűn. Visszaadja a betűt.
-    A pörgés a közös kerékpörgés-hang (a hangot a teszt-hajtó átugorja)."""
+    """A gép „végigpörgeti" az ábécét, és megáll egy betűn. Visszaadja a betűt.
+    Kis, egyszerű SZINTETIZÁLT tick-hang kíséri (nincs hozzá külön hangfájl; a
+    teszt-hajtó a hangokat átugorja)."""
     betu = random.choice(_BETUK)
-    yield ctx.effekt_var("kerekporges")   # a pörgés-hang TELJESEN leszól
+    for hz in (520, 620, 720):            # rövid, felfutó pörgetés-tick
+        yield ctx.hang([(hz, 40)])
+        yield ctx.szunet(90)
+    yield ctx.hang([(880, 110)])         # „megállt" koppanás
     return betu
 
 

@@ -372,7 +372,8 @@ SAJAT: tuple[Jatek, ...] = (
           "Amit a gép a szótárában is ismer, két pont; amit nem talál, de a jó "
           "betűvel kezdődik, azt elhiszi neked: egy pont – így érvényes szót "
           "sosem utasít el. Egy vagy több játékos felváltva, tetszőleges "
-          "körszám, pörgés-hanggal, csalódott közönséggel és tapsviharral. "
+          "körszám, rövid ábécé-pörgetéssel, csalódott közönséggel és "
+          "tapsviharral. "
           "Társszerző: Mezei Géza.",
           retro=False, szerzo="Mezei Géza (ötlet) és Kőrösmezey Dávid"),
     # Mille Bornes: EGYELŐRE KIVÉVE a listáról, mert még nincs megírva (a

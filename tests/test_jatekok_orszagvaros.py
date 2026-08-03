@@ -59,7 +59,8 @@ def test_teljes_parti_negy_talalattal_nyolc_pont(monkeypatch):
     valaszok = ["1", "", "1", "",                     # 1 játékos, 1 kör, pörgetés
                 "Görögország", "Genf", "Géza", "Gizella"]
     ki = U.lejatsz(OV.jatek_orszagvaros, valaszok)
-    szov = U.szoveg(ki)
+    # a hang-parancsok payloadja LISTA, ezért csak a szöveges (str) kimenetet fűzzük
+    szov = "\n".join(p for t, p in ki if isinstance(p, str))
     assert "Megállt a(z) G betűn" in szov
     assert "8 pont" in szov
     assert "győztes" in szov.lower()
@@ -69,6 +70,7 @@ def test_teljes_parti_ures_valaszok_nulla_pont(monkeypatch):
     _forced_g(monkeypatch)
     valaszok = ["1", "", "1", "", "", "", "", ""]
     ki = U.lejatsz(OV.jatek_orszagvaros, valaszok)
-    szov = U.szoveg(ki)
+    # a hang-parancsok payloadja LISTA, ezért csak a szöveges (str) kimenetet fűzzük
+    szov = "\n".join(p for t, p in ki if isinstance(p, str))
     assert "0 pont" in szov                # a kör 0 pont
     assert ki[-1][0] == "vege"             # rendben véget ér
