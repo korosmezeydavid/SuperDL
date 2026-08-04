@@ -363,14 +363,12 @@ SAJAT: tuple[Jatek, ...] = (
           "kifejezést! Pörgetsz és mondasz egy BÁRMILYEN betűt (a találatért "
           "pénz jár – magánhangzó is), vagy megveszel egy betűt, vagy "
           "megfejtesz. Egy vagy több játékos (a gép is beszáll), három forduló, "
-          "a legtöbb pénz nyer. Saját, jogtiszta hangvilággal.",
-          retro=False),
-    Jatek("szerencsekerek_online", "Szerencsekerék – online (több gépről)",
-          "A Szerencsekerék TÖBB GÉPRŐL, egymástól távol! Az egyik játékos nyit "
-          "egy szobát (kap egy bemondható kódot), a többiek a kóddal "
-          "csatlakoznak, és felváltva játszotok – minden lépés minden gépen "
-          "felolvasva. A rejtvény csak a szoba gazdájánál van, így nem lehet "
-          "csalni. Internet és beállított online kulcs (Ably) kell hozzá.",
+          "a legtöbb pénz nyer. ÚJ: két fül – Játszd itt helyben, VAGY Játszd "
+          "ONLINE több gépről (nyiss egy szobát egy bemondható/másolható "
+          "kóddal, a többiek a kóddal csatlakoznak, és felváltva játszotok, "
+          "minden gépen felolvasva; a rejtvény csak a szervezőnél van, nem "
+          "lehet csalni – internet és beállított online kulcs kell hozzá). "
+          "Saját, jogtiszta hangvilággal.",
           retro=False),
     Jatek("orszagvaros", "Ország-Város-Fiú-Lány",
           "Mezei Géza ötlete alapján készült akadálymentes szójáték: a gép "

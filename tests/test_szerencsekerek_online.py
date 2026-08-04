@@ -76,10 +76,10 @@ def test_megfejtes_nyer_es_vege(monkeypatch):
     assert "győztes" in a["uzenet"].lower()
 
 
-def test_katalogusban_es_indithato():
-    JR = importlib.import_module(BASE + ".jatekok")   # nem kötelező benne lennie
-    KAT = importlib.import_module(BASE + ".katalogus")
-    j = KAT.keres("szerencsekerek_online")
-    assert j is not None and j.retro is False
+def test_ablak_es_indithato():
+    # az online a Szerencsekeréken BELÜL van (lapfül), nincs külön játék
+    assert hasattr(OL, "SzerencseAblak") and hasattr(OL, "OnlinePanel")
     KON = importlib.import_module(BASE + ".jatekkonzol")
-    assert KON.indithato("szerencsekerek_online") is True
+    assert KON.indithato("szerencsekerek") is True
+    KAT = importlib.import_module(BASE + ".katalogus")
+    assert KAT.keres("szerencsekerek_online") is None      # már nincs külön
