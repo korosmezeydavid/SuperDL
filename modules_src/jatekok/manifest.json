@@ -1,10 +1,10 @@
 {
   "id": "jatekok",
   "name": "Játékok",
-  "version": "1.4.7",
+  "version": "1.4.8",
   "entry": "jatekok_mod",
   "category": "Játékok",
-  "description": "Akadálymentes játékok két menüben: Retró játékok és SuperDL saját játékok. ÚJ SAJÁT JÁTÉK: ORSZÁG-VÁROS-FIÚ-LÁNY (Mezei Géza ötlete; a bővíthető kategóriák Kőrösmezey Anita, Wildcath ötlete) – a gép másodpercenként sorolja az ábécét, te a szóközzel/Enterrel megállítod egy betűn (SOHA nem a gép dönt!), és arra a betűre szavakat mondasz. Klasszikus 4 kategória vagy BŐVÍTETT mód (híres ember, állat, tárgy, növény, márka, hegy, folyó); a szótár a Tanítás fülön BŐVÍTHETŐ és JSON-ba menthető/megosztható. A SZERENCSEKERÉK (kerék-és-szó játék): BÁRMILYEN betűt mondhatsz vagy vehetsz (magánhangzót is), a NEVES gép-ellenfelek OKOSSÁGA választható (kezdő/közepes/profi), a gépek beszólnak a játékosoknak és egymásnak is, és teljes közönség-hangvilág szól (nevetés, csalódott közönség, tapsvihar). 104 rejtvény 8 kategóriában; a hangok a fejlesztő saját, jogtiszta anyaga. Korábbról: Kockapóker, Totó, Számfejtő, Szendvicsparti, Malom, Mozaik, Gépi ének, Milliomos kvíz és sok más.",
+  "description": "Akadálymentes játékok két menüben: Retró játékok és SuperDL saját játékok. ÚJ: ONLINE SZERENCSEKERÉK – játssz TÖBB GÉPRŐL, egymástól távol! Nyiss egy szobát egy bemondható és MÁSOLHATÓ kóddal, a többiek a kóddal csatlakoznak, és felváltva pörgettek – minden lépés minden gépen felolvasva. A felhasználónak csak internet kell, semmit nem kell beállítani. A Szerencsekerék mostantól LAPFÜLES: Játszd itt helyben, vagy Játszd online, F1-súgóval. Az ORSZÁG-VÁROS-FIÚ-LÁNY (Mezei Géza ötlete; a bővíthető kategóriák Kőrösmezey Anita, Wildcath ötlete) klasszikus vagy bővített módban, tanítható és menthető szótárral. A Szerencsekerék helyi módja: bármilyen betű, választható gép-okosság, teljes közönség-hangvilág. 104 rejtvény; a hangok a fejlesztő saját, jogtiszta anyaga. Korábbról: Kockapóker, Totó, Számfejtő, Szendvicsparti, Malom, Mozaik, Gépi ének, Milliomos kvíz és sok más.",
   "min_core_api": "1.0",
   "min_core_version": "4.1.0",
   "requires_tools": [],

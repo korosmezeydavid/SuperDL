@@ -145,12 +145,12 @@
       "category": "Játékok",
       "description": "Akadálymentes játékok két menüben: Retró játékok és SuperDL saját játékok. A SZERENCSEKERÉK (kerék-és-szó játék) most még élőbb: BÁRMILYEN betűt mondhatsz vagy vehetsz (magánhangzót is), a NEVES gép-ellenfelek OKOSSÁGA választható (kezdő/közepes/profi), a gépek beszólnak a játékosoknak és egymásnak is, és teljes közönség-hangvilág szól (nevetés a poénokra, csalódott közönség csődnél, tapsvihar a győztesnek) – minden hang tisztán, egymásra nem folyva. 104 rejtvény 8 kategóriában, sok beszólással; a hangok a fejlesztő saját, jogtiszta anyaga. Korábbról: Kockapóker, Totó, Számfejtő, Szendvicsparti, Malom, Mozaik, Gépi ének, Milliomos kvíz és sok más.",
       "latest": {
-        "version": "1.4.7",
+        "version": "1.4.8",
         "min_core_api": "1.0",
         "min_core_version": "4.1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.4.7/jatekok-1.4.7.zip",
-        "sha256": "d0bd8042a4394753c2076f652ede05b2df1b3d37675d132738524f5568e45507",
-        "size": 14666183
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.4.8/jatekok-1.4.8.zip",
+        "sha256": "8dcd7d7f4d79f8ccf74a38fd5e560827d9aa6750c7ea79cab244ad402db49fa3",
+        "size": 14675171
       }
     }
   ]
