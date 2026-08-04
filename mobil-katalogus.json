@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "platform": "android",
+  "megjegyzes": "A SuperDL mobil (Android) katalógusa – a Windows modules.json mobil megfelelője. A mobil beszélgetés tölti fel a tényleges modul-/játék-bejegyzésekkel.",
+  "modules": []
+}
