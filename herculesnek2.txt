@@ -1,0 +1,201 @@
+SUPER DIGITAL LAUNCHER (SuperDL) — TELJES PROJEKTDOKUMENTÁCIÓ
+================================================================================
+Készült a Hercules oldalépítőhöz, hogy pontosan megismerje, mi is a SuperDL
+Androidos verziója, mit tud, és miért rendkívüli.
+Verzió: 1.54.9 | Csomag: com.superdl.launcher | Android 8.0+ (minSdk 26)
+================================================================================
+
+
+1. MI EZ EGY MONDATBAN
+--------------------------------------------------------------------------------
+A Super Digital Launcher egy teljes értékű, akadálymentes Android-kezelőfelület
+(launcher) vakok és gyengénlátók számára, amely négy egyszerű ujjmozdulattal és
+hangvezérléssel az egész telefont használhatóvá teszi — hívástól a
+pénzfelismerésig, rádiótól a navigációig.
+
+
+2. A KONCEPCIÓ, AMITŐL MÁS
+--------------------------------------------------------------------------------
+A legtöbb akadálymentes megoldás egy meglévő, látóknak tervezett felületre
+próbál "ráakasztani" egy képernyőolvasót. A SuperDL fordítva gondolkodik: az
+egész felület alapból a nem látó felhasználóra épül.
+
+Négy mozdulat mindent vezérel:
+  - Söprés FEL: előző elem / ismétlés
+  - Söprés LE: következő elem
+  - Söprés JOBBRA: belépés / megerősítés
+  - Söprés BALRA: vissza / mégse
+
+Nincs szükség a képernyő pontos megérintésére, nincsenek apró gombok, amiket
+"meg kell találni". Minden lineáris, kimondott, és következetes. A visszajelzés
+hangzó: beszéd (TTS) és jellegzetes hangjelzések vezetik a felhasználót.
+
+Ezt a filozófiát egy nem látó fejlesztő alakította ki, aki maga is nap mint nap
+képernyőolvasóval használja a telefont — vagyis a felület nem elmélet, hanem
+megélt tapasztalat terméke.
+
+
+3. A PROJEKT MÉRETE ÉS ÉRETTSÉGE
+--------------------------------------------------------------------------------
+  - Több mint 400 forráskódfájl (413 Kotlin-fájl)
+  - Több mint 270 külön funkció-belépő a menürendszerben
+  - Aktív, folyamatos fejlesztés alatt, valós felhasználói igények mentén
+  - Teljesen magyar nyelvű felület és hangkimenet
+
+Ez nem egy kísérleti alkalmazás, hanem egy kiterjedt, mindennapi használatra
+szánt digitális ökoszisztéma egyetlen telefonon.
+
+
+4. MIT TUD — A FŐ FUNKCIÓTERÜLETEK
+--------------------------------------------------------------------------------
+
+TELEFON ÉS HÍVÁSOK
+  Hívásnapló felolvasása, hívás a névjegyzékből diktálással, számtárcsázás,
+  névjegyzék böngészése és szinkronizálása. S.O.S. gyorshívás akár négy
+  beállított számra vészhelyzet esetén.
+
+ÜZENETEK ÉS E-MAIL
+  SMS olvasása (bejövő és kimenő) és írása diktálással. Teljes e-mail kezelés:
+  küldés és fogadás közvetlenül az appból (saját SMTP/IMAP beállítással),
+  címtár kezelése, importálás.
+
+IDŐ ÉS SZERVEZÉS
+  Ébresztők diktálással, naptár (mai, holnapi, heti program, új esemény),
+  pontos idő, jegyzetek diktálással, bevásárlólista, számológép hanggal.
+
+ZENE ÉS MÉDIA
+  Zenelejátszó a telefonon lévő fájlokhoz — hangszínprofilokkal, lejátszási
+  módokkal, és pozíció-mentéssel (egy hosszú film vagy hangoskönyv ott
+  folytatódik, ahol abbahagytad). Podcast-kezelő (népszerű műsorok, keresés,
+  feliratkozás, letöltés, OPML import/export). YouTube hangos keresés és
+  lejátszás. Internetes rádió (magyar állomások, keresés, kedvencek, és
+  valós idejű felvétel a rádióadásról).
+
+KÖNYVEK
+  Beépített könyvolvasó a telefonon lévő könyvekhez: könyvtár, keresés,
+  könyvjelzők, folytatás az utoljára olvasott ponttól, egyéni könyvmappák.
+
+KÖZLEKEDÉS ÉS NAVIGÁCIÓ
+  "Hol vagyok?" helymeghatározás, gyalogos és tömegközlekedési útvonaltervezés
+  diktálással, közeli megállók és vasútállomások indulási időkkel, kedvenc
+  megállók. GPS Kitekintő (közeli érdekes pontok radarja), és a Hang-iránytű,
+  amely forgatás közben élőben, hanggal tájékoztat az égtájakról és irányokról.
+  Helyszín-felismerő: a felhasználó saját fotói alapján ismeri fel a visszatérő
+  helyeket.
+
+INFORMÁCIÓ
+  Hírek felolvasása (RSS), internetes keresés felolvasott találatokkal, napi
+  üdvözlés (dátum, névnap, időjárás), napi összefoglaló, és egy offline
+  gyors helyzetjelentés (idő, akku, térerő, hívások, üzenetek, ébresztő,
+  naptár — internet nélkül is).
+
+ESZKÖZÖK (KAMERA-ALAPÚ FELISMERŐK)
+  A telefon kameráját a nem látó felhasználó szemévé alakítja:
+    - Szöveg-olvasó (általános OCR), folyamatos OCR (automatikus
+      szövegváltozás-felismerés), gyógyszerdoboz-olvasó, címke-olvasó
+    - Fénydetektor (világos van-e a szobában?), színfelismerő
+    - Környezeti Kitekintő (mi van körülöttem?), "Mi van előttem?"
+      egygombos jelenetleírás
+    - QR-kód olvasó
+    - Pénzfelismerő (magyar forint bankjegyek — lásd lentebb)
+    - Kártya-rendszerező, profi diktafon
+
+MINDENNAPI SEGÉDESZKÖZÖK
+  Zseblámpa, akkumulátor-állapot, hangerő- és beszédsebesség-vezérlés,
+  fájlkezelő, WiFi fájlportál (a telefon fájljai böngészőből elérhetők a
+  gépről), gyors kapcsolók (WiFi, Bluetooth, hotspot).
+
+ELENA — A HANGOS ASSZISZTENS
+  Beépített, helyben futó hangasszisztens ("Elena"), amely hangparancsokat ért,
+  és akár saját, betanított felébresztő mondattal is aktiválható.
+
+ŐRSÉG (PATROL) — A HÁTTÉRFIGYELŐ
+  Egy folyamatos háttérszolgáltatás, amely diszkréten figyel és hangjelez:
+  akkumulátor-állapot, bejövő hívások és üzenetek, egyéb értesítések, és
+  periodikus időbemondás (beállítható gyakorisággal). Van éjszakai csendes mód
+  (adott órák között nem szólal meg), és a bekapcsoló gombra is bemondhatja az
+  időt.
+
+HOZZÁFÉRHETŐSÉG ÉS TANÍTÁS
+  A program megtanítja magát: van egy Tanuló mód, amely bemutatja a funkciókat,
+  egy Beállítás varázsló, amely végigvezet a szükséges engedélyeken, egy
+  Diagnosztika, amely elmondja, mi nem működik és miért, és a program
+  hangjainak megismerése, hogy a felhasználó megtanulja a jelzéseket.
+
+
+5. TESTRESZABHATÓSÁG
+--------------------------------------------------------------------------------
+  - HANGTÉMÁK: több választható hangkészlet a visszajelzésekhez
+    (alap, kattanós, gombnyomás, és egy sci-fi téma), külön hangokkal a
+    gesztusokhoz, indításhoz, sikerhez, hibához.
+  - Testreszabott zár-, feloldás- és fényképezés-hangok.
+  - Több TTS (beszédmotor) közül lehet választani, állítható sebességgel.
+  - PIN-zárolás a magánszféra védelmére.
+  - Kedvenc alkalmazások gyorsindítása, külső appok kezelése.
+  - Beszéd-visszajelzés finomhangolása (pl. a zenelejátszó mennyit beszéljen).
+
+
+6. ADATVÉDELEM ÉS FÜGGETLENSÉG
+--------------------------------------------------------------------------------
+  - Sok funkció OFFLINE is működik (helyzetjelentés, felismerők egy része,
+    őrség), így térerő nélkül is használható.
+  - A saját adatok a telefonon maradnak; a felismerőkhöz nincs szükség felhőbe
+    küldeni a képet.
+  - A projekt alapelve: SOHA, SEMMIÉRT nem kér pénzt a felhasználótól. Nincs
+    fizetős funkció, nincs előfizetés. Legfeljebb önkéntes támogatás fogadható
+    el — de minden funkció mindenki számára ingyenes.
+
+
+7. FEJLESZTÉS ALATT ÁLLÓ, ÚJ IRÁNYOK
+--------------------------------------------------------------------------------
+Ezek a részek aktívan épülnek — érdemes tudni róluk, mert a projekt élő és
+folyamatosan bővül:
+
+PÉNZFELISMERŐ — ÚJ, SZÍN-ALAPÚ MEGKÖZELÍTÉS
+  A magyar forint bankjegyek felismerése egy új, rugalmas stratégiára épül. A
+  korábbi, gépi tanuló modellt (amely nehezen kezelte a valós, gyűrött, rossz
+  fényben készült képeket) egy fény-tűrő SZÍN-alapú felismerés váltja. Mivel a
+  magyar címletek alapszíne jellegzetesen eltér (az 500 barnás, az 1000 kékes,
+  az 5000 zöld, a 10000 rózsaszín-lila stb.), a rendszer a domináns színből
+  ismeri fel a címletet — akkor is, ha a bankjegy gyűrött, ferde vagy részben
+  takart. Ez azonnal működik betanítás nélkül is.
+  Emellett a felhasználó SAJÁT fotóival taníthatja a rendszert (a
+  helyszín-felismerő mintájára), így az a saját pénztárcájához, kamerájához és
+  fényeihez igazodik. Egy opcionális szövegfelismerő (OCR) megerősíti a
+  döntést, ha a bankjegyen olvasható a címletszám. A rendszer nem "hallucinál":
+  ha nincs bankjegy a képen (üres asztal, kéz), egyszerűen hallgat.
+
+INTERNETES RÁDIÓ FELVÉTELLEL
+  A rádió már játszik, kedvencek menthetők, és az adás valós időben rögzíthető.
+  Fejlesztés alatt az időzített felvétel (pl. "vedd fel este 8 és 10 között ezt
+  az állomást", akár több beállított idősávban).
+
+FOLYAMATOS BŐVÜLÉS
+  A menürendszer több mint 270 belépője folyamatosan gazdagodik a felhasználói
+  visszajelzések alapján.
+
+
+8. KIKNEK KÉSZÜLT
+--------------------------------------------------------------------------------
+  - Vakok és súlyosan gyengénlátók, akiknek a hagyományos érintőképernyős
+    kezelés nehézkes vagy lehetetlen.
+  - Idősebb felhasználók, akiknek az egyszerű, hangos, lineáris kezelés
+    biztonságot ad.
+  - Bárki, akinek egy letisztult, hang-központú telefonkezelésre van szüksége.
+
+
+9. ÖSSZEFOGLALVA — MIÉRT RENDKÍVÜLI
+--------------------------------------------------------------------------------
+  - Nem ráépített kisegítő funkció, hanem egy teljes, alapjaiban akadálymentes
+    telefonos univerzum.
+  - Egy nem látó fejlesztő valós tapasztalatából született — nem elmélet.
+  - Négy mozdulattal az egész telefon: hívás, üzenet, média, navigáció,
+    felismerés, szervezés.
+  - A kamerát a felhasználó szemévé teszi (szöveg, szín, pénz, környezet).
+  - Offline is életképes, adatvédő, és minden funkciója örökre ingyenes.
+  - Élő, folyamatosan fejlődő projekt, magyar nyelven, magyar felhasználókért.
+
+================================================================================
+Ez a dokumentum a SuperDL Androidos verziójának 1.54.9-es állapotát tükrözi.
+A projekt aktív fejlesztés alatt áll, így a funkciók köre folyamatosan bővül.
+================================================================================

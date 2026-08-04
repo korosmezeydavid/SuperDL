@@ -1,0 +1,1699 @@
+================================================================================
+  SUPER DL (Super Digital Launcher) — FEJLESZTÉSI NAPLÓ / MEMÓRIA TÉR
+================================================================================
+
+  Utolsó frissítés: 2026-07-17
+  Fejlesztő:        Kőrösmezey Dávid
+  Kapcsolat:        korosmezey.david.richard@gmail.com
+  Projekt mappa:    C:\Users\msn\Documents\SuperDL-Android
+  Csomagnév:        com.superdl.launcher (release) / com.superdl.launcher.debug (debug)
+  Aktuális verzió:  1.54.9 (versionCode 100)
+  Tesztkészülék:    Ulefone Armor 24 (USB, serial: 3116TF1010002416)
+
+  Ez a fájl a fejlesztés állandó hivatkozási pontja. Minden fejlesztési kör
+  után frissítendő. Kapcsolódó fájlok:
+    - CHANGELOG.md              — verzió-változások részletesen
+    - dokumentumok/osszefoglalom.txt — korábbi összefoglalók (1.36.x–1.37.x)
+    - dokumentumok/javitas.txt       — pénzfelismerő javítás napló (1.42.0)
+    - app/src/main/assets/elena_tudas_superdl.txt — Elena tudásbázis
+    - C:\Users\msn\superdlosszefog.txt — 2026-06-20 összefoglaló (diktálás, asszisztens)
+
+
+================================================================================
+  1. PROJEKT RÖVID LEÍRÁS
+================================================================================
+
+  A Super DL egy magyar nyelvű Android launcher vak és gyengénlátó
+  felhasználóknak. Gesztusokkal (fel/le/jobbra/balra swipe) és hanggal
+  (TTS + diktálás) vezérelhető. Nem webes felület — natív Android app.
+
+  Fő technológiák:
+    - Kotlin, Android SDK 34, minSdk 26
+    - Gradle build (gradlew.bat assembleRelease / assembleDebug)
+    - TTS, SpeechRecognizer, CameraX, ML Kit, saját bankjegy-modell
+    - Elena hangos asszisztens (korábban „Hangos asszisztens")
+
+  ADB útvonal:
+    C:\Users\msn\AppData\Local\Android\Sdk\platform-tools\adb.exe
+
+
+================================================================================
+  2. AKTUÁLIS ÁLLAPOT (2026-07-17)
+================================================================================
+
+  Legfrissebb forráskód verzió:  1.54.9 (versionCode 100)
+  Telefonon telepített verzió:   1.54.9 (100) DEBUG variáns — naprakész
+
+  !! FONTOS — MELYIK VARIÁNS VAN A TELEFONON !!
+  A telefonon a DEBUG variáns fut (com.superdl.launcher.debug), NEM a release.
+  A release (com.superdl.launcher) NINCS telepítve. A kettő külön csomagnév,
+  külön SharedPrefs-szel:
+    - Release APK telepítése NEM frissítené a debugot, hanem MÁSODIK appot
+      tenne fel, üres beállításokkal, és két launcher közül kellene választani.
+    - A napi használatban lévő, beállításokkal teli app a DEBUG.
+  => Fejlesztés után: .\gradlew.bat assembleDebug + adb install -r (debug APK).
+     Az install -r megtartja az összes beállítást (SharedPrefs).
+
+  Utolsó jelentős fejlesztések (1.48.0 – 1.54.9):
+
+  [✓] Névjegyenkénti egyéni csengőhang (1.54.9) — lásd 10. szakasz
+  [✓] Alarm 2.0 (foreground service, szundi, ismétlés, lock screen)
+  [✓] Csengőhang-választó, ébresztőnkénti hang
+  [✓] Prémium zenelejátszó (equalizer, lejátszási módok)
+  [✓] YouTube beágyazott lejátszó újraírva
+  [✓] Hallókészülék mikrofonforrás-választás
+  [✓] Gyógyszer Őrző (napszakos ütemezés, hangos időtartam-bevitel)
+  [✓] Közelség-vezérelt hangos emlékeztetők
+  [✓] „Mi van előttem?" + Környezeti kitekintő összevonva
+  [✓] Vonat menetrend javítások, menüpozíció megőrzése
+
+  Korábbi fejlesztések (1.43.0 – 1.45.4):
+
+  [✓] Elena asszisztens (átnevezés, felébresztő tanítás, háttérfigyelő)
+  [✓] Elena tudásbázis (elena_tudas_superdl.txt beépítve, szekció-kereső)
+  [✓] Hotspot kapcsoló (Ulefone-specifikus javítások, sysfs ellenőrzés)
+  [✓] GPS kitekintő közeledési bemondások (50/20/10/5/2 m)
+  [✓] Pénzfelismerő (Wikimedia fotók + szigorúbb felismerés, YOLO pipeline)
+  [✓] Helyszín felismerő, GPS útvonal, OCR folyamatos olvasó
+  [✓] Névjegyzék szinkron, hívásnapló SMS, kedvencek a Telefon menüben
+  [✓] Új névjegy létrehozás (számbillentyűzet + diktálás)
+  [✓] Diktálás megszakítása minden funkcióra (balra swipe)
+  [✓] Hangos asszisztens parancsértelmezés javítva (ékezet-normalizálás)
+
+
+================================================================================
+  3. VERZIÓTÖRTÉNET — RÖVID ÁTTEKINTÉS
+================================================================================
+
+  1.45.4 — GPS közeledési küszöbök, Elena figyelő csendes mód, hotspot Ulefone
+  1.45.3 — Hotspot ki-be villogás javítás, debounce
+  1.45.2 — Hotspot sysfs (ap0) ellenőrzés Android 13-on
+  1.45.1 — Hotspot státusz pontosítás
+  1.45.0 — Elena tudásbázis SUPERDL.TXT import
+  1.44.0 — Elena helyi tudásbázis + hotspot menü
+  1.43.0 — Elena átnevezés, felébresztő, háttérfigyelő
+  1.42.0 — Pénzfelismerő Wikimedia fotókkal, szigorúbb küszöb
+  1.41.0 — Pénzfelismerő munkajelző, kamera mentés/megosztás
+  1.40.0 — Helyszín felismerő, GPS útvonal, OCR, hívás javítás
+  1.39.0 — Asszisztens ASR finomhangolás
+  1.38.0 — Névjegyzék böngészés, szinkron, hívásnapló SMS
+  1.37.x — Stabilitás javítások, új funkciók
+  1.36.x — Pénzfelismerő, kamera, DTMF, számbevitel egységesítés
+
+  Részletes changelog: CHANGELOG.md
+
+
+================================================================================
+  4. FŐMENÜ STRUKTÚRA (aktuális)
+================================================================================
+
+  1.  Telefon és Hívások (kedvencek, új névjegy, hívásnapló, tárcsázás)
+  2.  Üzenetek és E-mail
+  3.  Idő és Szervezés (ébresztő, időzítő, naptár, stopper)
+  4.  Média (zene, YouTube, rádió, podcast)
+  5.  Olvasás (könyvek, hírek, RSS)
+  6.  Navigáció és Hely (GPS kitekintő, tömegközlekedés, helykeresés)
+  7.  Környezet (környezeti kitekintő, helyszín felismerő, pénzfelismerő)
+  8.  Eszközök (kamera, diktafon, zseblámpa, számológép, bevásárlólista)
+  9.  Elena (hangos asszisztens, felébresztő tanítás, figyelő)
+  10. Beállítások (TTS, hangok, hotspot, PIN, engedélyek, stb.)
+  11. S.O.S. (azonnali aktiválás)
+  12. Program hangjainak megismerése
+
+
+================================================================================
+  5. GESZTUS ALAPELVEK (emlékeztető)
+================================================================================
+
+  Fel:    előző elem / ismétlés
+  Le:     következő elem
+  Jobbra: megerősítés / belépés / aktiválás
+  Balra:  vissza / megszakítás / kilépés (diktálás is leáll!)
+
+  Diktálás: mikrofon engedély kell. Balra swipe = megszakítás mindenhol.
+  Megerősítés: swipe jobbra elég, „mondj igent" felhívás eltávolítva.
+
+
+================================================================================
+  6. ELENA (HANGOS ASSZISZTENS)
+================================================================================
+
+  Név: Elena (korábban Hangos asszisztens)
+  Felébresztők: „Szia Elena", „Kérlek Elena" + egyéni tanítható
+  Háttérfigyelő: opcionális, értesítéssel; kikapcsolható menüből vagy hanggal
+  Tudásbázis: assets/elena_tudas_superdl.txt + ElenaKnowledgeBase.kt
+  Parancsok: idő, hívás, üzenet, navigáció, hotspot, könyv, YouTube, segítség stb.
+  ASR: ékezet-normalizálás, 5 hipotézis, kontextus-hintek (Android 14+)
+
+
+================================================================================
+  7. PÉNZFELISMERŐ — FONTOS TUDNIVALÓK
+================================================================================
+
+  Filozófia: inkább „nem felismerhető", mint téves címlet.
+  Küszöbök: ~52% bizalom, 3/4 egyező képkortex, 10% különbség 1.-2. között
+  Tanítási adatok: tools/banknote_dataset/, Wikimedia Commons fotók
+  YOLO pipeline: tools/train_banknote_yolo.py, tools/prepare_banknote_yolo_dataset.py
+  Hangerő gomb: azonnali manuális ellenőrzés
+  Saját fotók hozzáadása: tools/banknote_dataset/huf_XXX/ mappákba → újratanítás
+
+
+================================================================================
+  8. BUILD ÉS TELEPÍTÉS
+================================================================================
+
+  ELŐFELTÉTEL — JAVA_HOME (különben a gradlew nem indul):
+    $env:JAVA_HOME='C:\Program Files\Android\Android Studio\jbr'
+
+  ADB — NINCS a PATH-on, teljes útvonallal kell hívni:
+    $adb = "C:\Users\msn\AppData\Local\Android\Sdk\platform-tools\adb.exe"
+
+  SZOKÁSOS KÖR (debug — EZ a telefonon futó variáns, lásd 2. szakasz):
+    cd C:\Users\msn\Documents\SuperDL-Android
+    $env:JAVA_HOME='C:\Program Files\Android\Android Studio\jbr'
+    .\gradlew.bat assembleDebug *> build_log_debug.txt; "EXIT=$LASTEXITCODE"
+    & $adb -s 3116TF1010002416 install -r `
+        app\build\outputs\apk\debug\SuperDL-<verzió>-debug.apk
+
+  Release build (csak ha tényleg release kell):
+    .\gradlew.bat assembleRelease
+
+  Verzió ellenőrzés telefonon (debug csomagnév!):
+    & $adb -s 3116TF1010002416 shell `
+        "dumpsys package com.superdl.launcher.debug | grep -E 'versionName|versionCode'"
+
+  Frissítés vagy újratelepítés? — ellenőrzés:
+    A dumpsys firstInstallTime / lastUpdateTime mezői elárulják. Ha a
+    firstInstallTime régi és csak a lastUpdateTime friss => valódi frissítés
+    történt, az adatok megmaradtak.
+
+  BUILD IDŐ / MCP TIMEOUT (fontos Claude/AI számára):
+    A teljes release build ~6 perc, ami TÚLLÉPI az MCP hívás időkorlátját.
+    A start_process ilyenkor timeout hibát ad, DE A BUILD TOVÁBB FUT.
+    Teendő: list_sessions -> read_process_output a PID-del, ne indíts újat.
+    Tipp: a kimenetet fájlba irányítsd (*> build_log.txt), mert a
+    "| Select-Object -Last 40" a pipeline végéig pufferel, így közben
+    nem látszik semmi.
+
+  ISMERT BUILD BUKTATÓ — R8 / ProGuard:
+    Release buildnél az R8 elhasal a hiányzó opcionális osztályokon.
+    A megoldás mindig ugyanaz: az R8 maga legenerálja a szükséges sorokat ide:
+      app\build\outputs\mapping\release\missing_rules.txt
+    Ezeket kell bemásolni az app\proguard-rules.pro végére (-dontwarn).
+    Eddig így kezelt esetek: PDFBox JPEG2000, BouncyCastle LDAP,
+    Tink KeysDownloader (Google HTTP kliens).
+
+
+================================================================================
+  9. NYITOTT / JÖVŐBENI TERVEK
+================================================================================
+
+  --- KÖVETKEZŐ LÉPÉS (itt folytatjuk) ---
+  [ ] Névjegy csengőhang: TESZTELÉS a telefonon (1.54.9 debug fenn van).
+        Útvonal: Névjegyzék -> névjegy -> context menü -> „Egyéni csengőhang"
+        Ellenőrizni: (1) hang kiválasztása és mentése, (2) bejövő híváskor
+        tényleg az egyéni hang szól-e, (3) „Alapértelmezett" választása törli-e.
+  [ ] Névjegy csengőhang: a WifiPortalServer ringtones/ mappájába feltöltött
+        saját MP3-ak megjelennek-e a RingtonePickerActivity listájában.
+        (A markAudioKind() már kész, de a picker oldali beolvasás nincs
+        végigtesztelve.)
+
+  --- WIFI PORTÁL — NÉVJEGY-KEZELÉS (eredeti 4 mérföldkőből a 3. és 4.) ---
+  Háttér: a csengőhang-munka egy 4 lépéses tervvel indult:
+    1. Portál: hangmappák (csengőhangok/értesítések/ébresztők) — KÉSZ
+    2. Telefon: névjegyenkénti egyéni csengőhang — KÉSZ (1.54.9)
+    3. Portál: névjegy-szerkesztés — NINCS MEG, el sem kezdődött
+    4. Portál: checkbox + tömeges névjegy-törlés — KÉSZ (2026-07-17, 2. kör)
+
+  [ ] Portál: névjegy-szerkesztés (/contacts oldal) — az egyetlen, ami a
+        négyesből még hiányzik. (A ContactHelper-ben van updateContact-szerű
+        művelet — ellenőrizni kell, mielőtt nekiállunk.)
+  [x] Portál: checkbox + tömeges névjegy-törlés — kész, megerősítő oldallal
+  [x] Portál: Patika Őrangyal (gyógyszer-emlékeztetők) — kész, tömeges
+        törléssel és megerősítéssel
+
+  --- PÉNZFELISMERŐ (kritikus funkció) ---
+  [ ] Saját bankjegyfotók begyűjtése és újratanítás (ez adja a legjobb pontosságot)
+  [ ] huf_banknote_detector.tflite HIÁNYZIK az assets-ből! A YOLO training
+        lefutott (tools/runs/banknote/huf_detect-2/best.pt létezik), de a
+        TFLite export nincs bemásolva. Emiatt a two-stage pipeline KI VAN
+        kapcsolva, csak ROI + full-frame fallback fut.
+  [ ] YOLO pipeline finomhangolás
+
+  --- YOLO ÁLTALÁNOS TÁRGYFELISMERÉS („jajdejolo") ---
+  [ ] Saját YOLO tanítási pipeline, Google Colab + Drive alapon, a meglévő
+        bankjegy-pipeline mintájára. Első cél: ajtó-felismerés.
+
+  --- DOKUMENTÁCIÓ / KARBANTARTÁS ---
+  [ ] Elena tudásbázis: elena_tudas_superdl.txt verziószáma elavult (1.10.0)
+  [ ] README.md verziószáma elavult (1.36.5)
+  [ ] SuperDL_Project_State.md 2026-07-03-i, azóta változott a kód
+  [ ] MainActivity.kt 13000+ sor — hosszú távon szétbontásra érett
+        (jelenleg 1 db ViewModel van az egész projektben, DI nincs)
+
+  --- PÁRHUZAMOS PROJEKT ---
+  [ ] Windows SuperDL asztali verzió: külön projekt
+        (Documents\Audacity\SuperDownloader) — Android és Windows verzió
+        párhuzamosan fejlődik
+
+
+================================================================================
+  10. FEJLESZTÉSI KÖRÖK NAPLÓJA
+================================================================================
+
+  ============================================================================
+  >>> ELŐHÍVÓ JELSZAVAK (bármelyik beszélgetésben működnek) <<<
+  ============================================================================
+    "naplócska"     -> dokumentumok/teszt-naplozas-terv.txt
+                       Nyilvános teszt naplózása és hibajelentése. MEGTERVEZVE.
+    "metanetta"     -> dokumentumok/meta-szemuveg-terv.txt
+                       Meta okosszemüveg kamerája a felismerőkhöz. FELMÉRVE.
+    "screenreader"  -> dokumentumok/screenreader-terv.txt
+                       Képernyőolvasó terve. MEGVALÓSÍTVA (2026-07-31).
+    "braille"       -> dokumentumok/braille-billentyuzet-terv.txt
+                       Braille billentyűzet TELJES terve. A kód 2026-07-31-én
+                       TÖRÖLVE lett (lásd lentebb), de A TERV MEGMARADT —
+                       ha egyszer előkerül egy készülék, ami bírja a hat
+                       egyidejű érintést, ebből lehet újraépíteni.
+    "jajdejolo"     -> egyedi YOLO tárgyfelismerő betanítás (ajtók). TERVEZETT.
+    "tuning"        -> dokumentumok/screenreader-tuning-terv.txt
+                       Képernyőolvasó tuning: navigációs módok (címsor/link/
+                       gomb/mező) két ujjal, olvasási részletesség (elem/mondat/
+                       szó/karakter) három ujjal. MEGVALÓSÍTVA.
+    "nagytakaritas" -> dokumentumok/hibakereses-terv.txt
+                       TELJESKÖRŰ hibakeresés és javítás 16 mérföldben, a
+                       kiadásra kész csomagig. Ez a KÖVETKEZŐ nagy feladat.
+  ============================================================================
+
+  --- 2026-07-31 (34. kör) — BRAILLE BILLENTYŰZET ELTÁVOLÍTVA ---
+
+  DÖNTÉS (felhasználói kérés): a Braille billentyűzet TÖRÖLVE, marad a mátrix.
+
+  MIÉRT: a Braille bevitel a készüléken nem reagált. A kalibráció "sikeresnek"
+  mondta magát, de más betűket írt, majd egyáltalán nem válaszolt. Közben
+  "csapdába" is ejtette a felhasználót: alapértelmezetté vált, a választóból nem
+  engedte a mátrixot választani, és mivel maga sem reagált, nem volt mivel
+  visszaváltani.
+  VALÓSZÍNŰ GYÖKÉROK (nem bizonyított, mert a felhasználó itt lezárta):
+  a készülék nem érzékel megbízhatóan HAT EGYIDEJŰ érintést, vagy összevonja a
+  közeli érintéseket. Az utolsó verzióba bekerült egy diagnosztika, ami
+  megmondta volna, hány ujjat lát a telefon — ezt már nem teszteltük.
+
+  TÖRÖLVE: BrailleKeyboardService, BrailleKeypadView, BrailleCalibration,
+  BrailleTable, BrailleSounds, BrailleKeyboardPrefs, res/xml/braille_keyboard.xml,
+  res/raw/snd_br_*.wav (13 hang), a manifest service-bejegyzés, a menüpontok
+  (KEYBOARD_BRAILLE_HELP/SWAP/HOLD) és a hozzájuk tartozó kezelők.
+
+  MEGTARTVA a mátrixban: HÁROM UJJAL most a RENDSZER billentyűzet-választója jön
+  elő (korábban a Braille-re váltott) — így soha nem lehet beragadni egyetlen
+  billentyűzetbe sem.
+
+  ADB-vel visszaállítva az alapértelmezett billentyűzet:
+    ime set com.superdl.launcher.debug/com.superdl.launcher.keyboard.MatrixKeyboardService
+
+  A MÁTRIX BILLENTYŰZET VÁLTOZATLANUL TUD: egyujjas írás (leteszed = 5-ös gomb,
+  csúsztatsz, felengeded = beír), csípés = bezárás, SZÉTHÚZÁS = diktálás (a
+  SuperDL saját, központozást értő hangbevitelével), két ujjal balra = törlés,
+  jobbra = új sor, felfelé = súgó, négyfokozatú gombtávolság és pörgetési
+  sebesség.
+
+  --- 2026-07-31 (33. kör) — Képernyőolvasó: HANGOK + átnézés/javítások ---
+
+  1) HANGVISSZAJELZÉSEK (17 hang, felhasználói hangfájlból vágva):
+     ScreenReaderSounds.kt (ÚJ) — SoundPool (előre betöltve, késleltetés nélkül;
+     a MediaPlayer minden lejátszásnál újranyitná a fájlt, ami navigálásnál
+     érezhetően késne). Hangerő 0.7, AUDIO usage=ACCESSIBILITY.
+     HOZZÁRENDELÉS ELVE: a hang HOSSZA a művelet GYAKORISÁGÁHOZ igazodik —
+     a legtöbbet használt lépkedés a legrövidebb (55/67 ms), az állapotváltozás
+     (be/ki) a leghosszabb és legjellegzetesebb (287/411 ms).
+       snd_sr_next (55) / prev (67) / edge (80) / error (105) / back (141) /
+       scroll_up (160) / scroll_down (167) / first (172) / last (186) /
+       field (196) / longpress (199) / activate (214) / notifications (215) /
+       recents (244) / home (250) / on (287) / off (411)
+     Minden művelethez be van kötve, a hibákhoz is (ERROR, EDGE).
+
+  2) ÁTNÉZÉS — NÉGY HIBA JAVÍTVA:
+     a) ELAVULT ELEMEK: az alkalmazások menet közben átrajzolják a képernyőt,
+        és a begyűjtött AccessibilityNodeInfo elavul -> hibás adat vagy kivétel.
+        FIX: ScreenReaderNavigator.refresh(node) a describe() és az activate()
+        elején; a move() pedig ÚJRAOLVASSA a listát, ha az elem eltűnt
+        (enélkül "eltűnt elemeken" lépkedne).
+     b) SOUNDPOOL ASZINKRON BETÖLTÉS: az első pár hang némán elmaradt volna.
+        FIX: loadedCount + ready ellenőrzés a play()-ben.
+     c) MEMÓRIA-SZIVÁRGÁS (32. körből): a nodes lista sosem lett elengedve.
+        FIX: clearNodes() + recycleAll minden ürítésnél és leállításkor.
+     d) KILÉPÉS-ÉRZÉKELÉS: az esemény csomagneve kilépéskor hiányzik ->
+        az olvasó bekapcsolva maradt. FIX: rootInActiveWindow a megbízható
+        forrás, az esemény csak tartalék. + rendszer-UI csomagok kizárása
+        (systemui, permissioncontroller) — ott marad a megszokott kezelés.
+
+  --- 2026-07-31 (32. kör) — KÉPERNYŐOLVASÓ első változat + Hol a telóm megerősítés ---
+
+  1) SUPERDL KÉPERNYŐOLVASÓ (screenreader/ csomag, ÚJ):
+     CÉL: a négy megszokott gesztussal külső alkalmazások is kezelhetők legyenek.
+
+     KULCS-ELV (felhasználói kikötés): CSAK KÜLSŐ ALKALMAZÁSBAN AKTÍV.
+     A SuperDL saját felületén kikapcsol, hogy ne ütközzön a launcher saját
+     beszédével és gesztusaival — és hogy a MENÜ MINDIG ELÉRHETŐ MARADJON,
+     beleértve a vészleállítást.
+
+     FÁJLOK:
+      - ScreenReaderPrefs.kt: HÁROMSZINTŰ BIZTONSÁGI RETESZ
+          enabled          — felhasználói kapcsoló
+          emergencyDisable — vészleállítás (menüből VAGY automatikusan)
+          failureCount     — 3 egymást követő hiba után MAGÁTÓL vészleállítás
+      - ScreenReaderNavigator.kt: elemfa bejárás (max 300 elem), "értelmes"
+        elemek szűrése (van szövege VAGY megnyomható), emberi leírás
+        (szöveg + típus + állapot: gomb/szövegmező/kapcsoló, be-kikapcsolva,
+        letiltva), aktiválás szülő-kereséssel (a szöveg gyakran nem kattintható,
+        a sor viszont igen)
+      - ScreenReaderService.kt: az AccessibilityService.
+        A TOUCH EXPLORATION MODE-ot FUTÁSIDŐBEN kéri/engedi el (serviceInfo.flags),
+        az előtérben lévő csomagnév alapján -> kikapcsolt állapotban és a SuperDL
+        felületén SEMMIT nem változtat a telefon érintés-kezelésén.
+        Gesztusok: le=következő, fel=előző, jobbra=aktiválás, balra=vissza.
+      - res/xml/screen_reader_service.xml + manifest bejegyzés
+      - Menü: Beállítások > Haladó és technikai > Képernyőolvasó
+        (ki/be, engedélyezés a rendszerben, állapot, AZONNALI leállítás)
+
+     TUDOTT KORLÁTOK: ez KEZDETI változat. Nem kezel görgetést, szövegbevitelt,
+     WebView-t, élő régiókat. Rosszul címkézett appoknál ("Gomb 3") nem tud
+     csodát tenni.
+
+  2) "HOL A TELÓM?" — megerősítés a KÉSZÜLÉKEN:
+     FindPhoneStopActivity (ÚJ): a csörgetés indításakor felugrik a telefonon is,
+     zárolt képernyőn is (showWhenLocked + turnScreenOn). KÉT jobbra söprés kell
+     a leállításhoz (az első jelzi a szándékot, a második megerősíti), hogy egy
+     véletlen mozdulat zsebben/táskában ne hallgattassa el. Bármely más gesztus
+     nullázza a számlálót.
+
+  3) PIN SEGÉD diagnosztika bővítve: a napló most kiírja, megtalálta-e a
+     keyguard ablakot (root), mit ismert fel (analyzed), van-e PIN-mező, és
+     védett-e a készülék. A korábbi napló szerint a szolgáltatás FUT és
+     felismeri a zárolást (funkcio=true zarolva=true), tehát a hiba a képernyő
+     ELEMZÉSÉNÉL van — ezt a következő teszt naplója mutatja meg.
+
+  --- 2026-07-29 (31. kör) — TTS-BLOKKOLÁS: teljeskörű felmérés + új eszköz ---
+
+  PROBLÉMA: sok helyen a parancs CSAK a TTS befejezése után futott le
+  (tts.speakThen(szöveg) { művelet }), ezért a felhasználó pöccintett, és a
+  művelet csak másodpercekkel később indult el.
+
+  TELJESKÖRŰ FELMÉRÉS (222 speakThen a projektben, ebből 150 a MainActivity-ben):
+     48 db  MIKROFON/FELVÉTEL indul utána        -> INDOKOLT, NEM javítjuk
+            (a beszéd belemondana a felvételbe — lásd a hangjegyzet-hibát!)
+     ~53 db speakFirst = { tts.speakThen(...) }  -> INDOKOLT (diktálás előtti kérdés)
+     46 db  resumeVoiceAssistantListening        -> a 30. körben javítva 1 ponton
+     32 db  képernyő-bezárás                     -> a hívásnál watchdoggal javítva
+     49 db  egyéb, ebből a többség HIBAÜZENET    -> a felhasználó KIVÉTELNEK kérte
+
+  ÚJ ESZKÖZ: TtsManager.speakAndRun(text, action)
+     Kimondja a szöveget ÉS AZONNAL elvégzi a műveletet (handler.post), nem várja
+     meg a beszéd végét. A dokumentációja kimondja, MIKOR NEM szabad használni:
+     ha mikrofon indul utána, vagy ha a figyelmeztetést feltétlenül hallani kell.
+
+  ÁTÁLLÍTVA (művelet-indítók, ahol a várakozás fölösleges volt):
+     - kedvenc SuperDL funkció indítása (handleAction)
+     - kedvenc KÜLSŐ alkalmazás indítása
+     - külső alkalmazás indítása a listából
+     - értesítés-olvasás indítása engedélyezés után
+
+  ELV A JÖVŐRE: új kódnál MŰVELET-INDÍTÁSHOZ speakAndRun, DIKTÁLÁS/FELVÉTEL
+  előtt speakThen. Hibaüzenetnél maradhat a speakThen (a felhasználó hallja végig).
+
+  --- 2026-07-29 (30. kör) — E-mail fejléc MEGOLDVA + asszisztens + zárt hívás ---
+
+  1) E-MAIL FEJLÉC (feladó/tárgy/dátum) — VÉGRE MŰKÖDIK.
+     MÉLYKUTATÁS (naplózás a nyers válaszra) derítette ki a valódi okot:
+     a Gmail a kért BODY.PEEK[HEADER.FIELDS (...)] szekciót EGYSZERŰEN NEM
+     KÜLDTE VISSZA — minden válasz "BODY[TEXT]" volt, fejlec_hossz=0.
+     Ezért volt hiába minden korábbi javítás (besorolás, regex).
+     FIX: "BODY.PEEK[]<0.N>" — a NYERS levél első N bájtja, amiben a fejléc
+     MINDIG elöl van; a szétválasztást az első üres sornál MI végezzük
+     (EmailBodyExtractor.headerPartOf / bodyPartOf).
+     MÁSODIK HIBA UGYANITT: a mai levelek fejléce 4-6 KB (hitelesítés,
+     továbbítási láncok), néha 8 KB fölött -> a 8192 bájtos korlátnál a fejléc
+     VÉGE nem fért bele, ezért maradt üres minden mező.
+     RAW_FETCH_BYTES 8192 -> 20480.
+     + ImapMail.speakFrom(): a feladó NEVÉT mondja ("Géza", "TikTok"), nem a
+       betűzött címet ("kukac ... pont ...").
+
+  2) ASSZISZTENS BERAGADÁS JAVÍTVA:
+     OK: minden válasz után automatikusan újraindult a figyelés
+     (resumeVoiceAssistantListening 80+ helyről hívva) -> a feladat kész volt,
+     Elena mégis tovább várt utasításra.
+     FIX EGYETLEN PONTON: a resumeVoiceAssistantListening() elején
+     AssistantPrefs.isContinuousMode ellenőrzés; ha KI (alapértelmezés),
+     exitVoiceAssistantAfterCommand() -> csendben vissza a menübe.
+     + ÚJ AssistantPrefs.kt (folyamatos beszélgetés kapcsoló, alapból KI)
+     + Menü: Asszisztens > "Folyamatos beszélgetés" (MenuAction.ASSISTANT_CONTINUOUS)
+
+  3) ZÁRT KÉPERNYŐS HÍVÁS — nincs többé megerősítő gesztus:
+     A zárt képernyős parancs lényege, hogy NE kelljen elővenni a telefont, de
+     eddig a hívás indításához jobbra kellett söpörni (enterCallConfirm).
+     FIX (resolveAssistantCallContact): ha assistantLockedMode, egy találatnál
+     bemondja "Hívom: X" és AZONNAL tárcsáz. Több találatnál nem hív vaktában,
+     hanem pontosítást kér ("Mondd a teljes nevet").
+
+  --- 2026-07-29 (29. kör) — E-mail fejléc-javítás + ÉBRESZTÉS-KIHAGYÁS (új) ---
+
+  1) E-MAIL: a levél megnyitásakor nem hangzott el a feladó és a tárgy.
+     OK: a FETCH válaszban a fejléc és a törzs SORREND SZERINT lett szétosztva
+     (literals[0]=fejléc, [1]=törzs), de a szerver NEM garantáltan a kért
+     sorrendben küldi -> a törzs kerülhetett a fejléc helyére (üres feladó/tárgy).
+     FIX: a literál-blokk BESOROLÁSA a SORBÓL derül ki ("BODY[HEADER..." vagy
+     "BODY[TEXT..."), nem a sorrendből. + ImapMail.speakBodyPreview most
+     "Feladó: X. Tárgy: Y." fejlécet mond a tartalom előtt (a régi
+     "Levél 1 a 1 közül" szöveg helyett).
+
+  2) ÚJ FUNKCIÓ — ÉBRESZTÉSEK KIHAGYÁSA (felhasználói ötlet, hiánypótló):
+     PROBLÉMA: ha pár napig nem kell felkelni (pl. főnök: "pénteken és hétfőn ne
+     gyere"), minden ébresztőt kézzel ki kell kapcsolni, majd VISSZAkapcsolni.
+     Ezt senki nem csinálja meg kétszer.
+     MEGOLDÁS: nem NAPOKAT, hanem ÉBRESZTÉSEKET számol. Beállítod, hogy a
+     kijelölt ébresztők a következő N alkalmat hagyják ki — utána MAGUKTÓL
+     visszatérnek. Közbeeső hétvége nem számít, mert csak a tényleges
+     ébresztéseket fogyasztja.
+
+     MEGVALÓSÍTÁS:
+       - AlarmEntry: új skipRemaining mező (+ isSkipping segédtulajdonság)
+       - AlarmStore: skipRemaining mentése/betöltése; setSkip(ids, count),
+         consumeSkip(id) -> hátralévő, clearAllSkips()
+       - AlarmReceiver.onReceive: a riasztás ELŐTT ellenőrzi a kihagyást —
+         ha van, NEM szólal meg, csak fogyaszt egyet és ütemezi a következőt
+         (napló: SDL_ALARM "Ebreszto KIHAGYVA ... hatralevo: N")
+       - Menü: Óra és ébresztés > "Ébresztések kihagyása" (MenuAction.ALARM_SKIP)
+       - AppFlow.AlarmSkipPick (kijelölés) és AlarmSkipCount (darabszám)
+       - Kezelés a 4 gesztussal: fel-le navigálás/szám, JOBBRA kijelölés ill.
+         mentés, BALRA tovább ill. vissza. A 0 darabszám = kihagyás kikapcsolása.
+       - A lista bemondja, ha egy ébresztőn már van érvényben kihagyás.
+
+  --- 2026-07-28 (28. kör) — M2 bevásárlólista, M4 SMS, pénzfelismerő lazítás ---
+
+  M2 — BEVÁSÁRLÓLISTA RENDEZVE:
+    Volt: EGYETLEN menüpont, ami rögtön a lista-választóba dobott, és ott egy
+    NÉGYRÉSZES mondat hangzott el HÁROMFÉLE vezérlésről (söprés + pöccintés +
+    hangparancs keverve) -> több listánál áttekinthetetlen.
+    Most: "Bevásárlólista" ALMENÜ (Listáim megnyitása / Új lista létrehozása),
+    új MenuAction.SHOPPING_NEW_LIST. A bemondás RÖVID:
+      "3 listád van. Fel-le válogatás, jobbra megnyitás." + a lista neve
+    A tétel-listánál: "<listanév>. N tétel." (a gesztus-felsorolás elhagyva).
+    A művelet-menü (lefelé pöccintés) változatlanul elérhető.
+
+  M4 — SMS KÜLDÉS JAVÍTVA (a hosszú üzenetek némán elvesztek!):
+    GYÖKÉROK (SmsHelper.send): egyetlen sendTextMessage hívás, DARABOLÁS NÉLKÜL,
+    és sentIntent NÉLKÜL. Egy SMS-be 160 karakter fér, DE ÉKEZETES MAGYAR
+    SZÖVEGNÉL CSAK 70 (UCS-2 kódolás). Egy diktált mondat ezt könnyen túllépi ->
+    az üzenet a kimenő mappába bekerült (storeMessage), de a hálózatra NEM ment.
+    Innen a tünet: "látszik a kimenőben, mégsem ment el", és a "nem mindig".
+    FIX:
+      - manager.divideMessage(...) + sendMultipartTextMessage(...) ha több rész
+      - MINDEN résznél sentIntent (PendingIntent, FLAG_IMMUTABLE)
+      - ÚJ SmsSendReceiver: fogadja a küldés TÉNYLEGES eredményét, naplóz
+        (SDL_SMS), és lastError-ban tárolja az okot (nincs hálózat, rádió ki,
+        stb.). Manifestben regisztrálva (exported=false, saját action).
+      - Naplózás: "SMS küldés: N karakter, M rész"
+
+  PÉNZFELISMERŐ LAZÍTÁSA (felhasználói kérés: "olyan lazán mint a Lookout"):
+    A felismerés eddig pontos fókuszt igényelt. LAZÍTVA (BanknoteCascadeConfig):
+      TEMPORAL_REQUIRED       5    -> 4     (egy bizonytalan képkocka ne nullázzon)
+      COLOR_MIN_SCORE         0.55 -> 0.48
+      COLOR_STRONG_SCORE      0.68 -> 0.62
+      COLOR_MIN_COLORFUL_FRAC 0.18 -> 0.12  (kartávolságból is elég)
+      ASPECT_MIN/MAX     1.15-3.40 -> 1.05-4.20 (ferde tartás, részleges takarás)
+      EDGE_DENSITY_MIN       0.012 -> 0.007 (elmosódott kép)
+    !!! A SZÍN-SÁVOK ÉRINTETLENEK (átfedésmentesek) — a téves címlet ellen AZOK
+    védenek, nem a szigorú fókusz. A lazítás NEM növeli a téves bemondás esélyét.
+
+  --- 2026-07-28 (27. kör) — Üzenetek menü + E-MAIL OLVASÁS MEGJAVÍTVA ---
+
+  MÉRFÖLDKÖVEK: M1 üzenetek menü (KÉSZ), M2 bevásárlólista (HÁTRAVAN),
+  M3 e-mail diagnosztika + javítás (KÉSZ), M4 SMS küldés (HÁTRAVAN).
+
+  M1 — ÜZENETEK MENÜ RENDEZVE (volt: 13 elemű lapos lista, SMS és e-mail keverve):
+    Üzenetek és E-mail
+      > SMS üzenetek: bejövő, kimenő, diktálás, + "SMS beállítások" almenü
+      > E-mail: olvasás, diktálás, + "E-mail címjegyzék" almenü,
+                + "E-mail fiók beállítása" almenü (benne az ÚJ diagnosztika)
+
+  M3 — E-MAIL DIAGNOSZTIKA (EmailDiagnostics.kt, ÚJ):
+    Lépésenkénti kapcsolat-vizsgálat FÁJLBA, időméréssel:
+    beállítás > névfeloldás > TCP > TLS > köszönés > LOGIN > SELECT > levélszám.
+    Fájl: /sdcard/Android/data/<pkg>/files/email_diagnosztika.txt (ADB-vel olvasható).
+    Jelszót és levél-tartalmat SOHA nem naplóz. Figyelmeztet, ha a jelszóban
+    SZÓKÖZ van (Gmail app-jelszót egybeírva kell megadni).
+    Menü: E-mail > E-mail fiók beállítása > "E-mail kapcsolat naplózása".
+
+  !!! A VALÓDI OK, amit a diagnosztika kimutatott !!!
+    A kapcsolat TÖKÉLETES volt (LOGIN 610 ms, SELECT 2243 ms), DE:
+       "Levelek száma a beérkezőben: 15653"
+    A régi ImapReader ezt csinálta:
+      1) UID SEARCH ALL  -> MIND A 15653 azonosító EGYETLEN sorban (~100 KB)
+      2) minden levélhez KÜLÖN "UID FETCH ... BODY.PEEK[TEXT]" -> a TELJES
+         levéltörzs letöltése 20 levélre (HTML, base64, több MB)
+    -> 15 mp-es socket-timeout -> "várakozz", majd visszalépés.
+
+  JAVÍTÁS (ImapReader):
+    - selectInbox(): a SELECT válaszából kiolvassa az EXISTS-t (a postafiók
+      méretét). Ebből számoljuk a legutolsó N levél SORSZÁM-tartományát ->
+      SEARCH-re NINCS SZÜKSÉG.
+    - fetchHeaderRange(from, to): EGYETLEN "FETCH n:m (UID BODY.PEEK[HEADER.
+      FIELDS (FROM SUBJECT DATE)])" — CSAK FEJLÉCEK, egy parancsban.
+    - fetchBody(config, uid): ÚJ — a levéltörzs KÜLÖN, csak amikor a felhasználó
+      MEGNYIT egy levelet (MainActivity.openEmailBody lusta betöltéssel).
+    - ImapSession: lastSelectExists mező + publikus readLiteral().
+    Eredmény: 15653 azonosító + 20 teljes levél helyett -> 20 fejléc 1 paranccsal.
+
+  TANULSÁG: nagy postafióknál (10k+ levél) SOHA ne "SEARCH ALL" + teljes törzs.
+  Sorszám-tartomány + csak fejléc a listához, törzs csak megnyitáskor.
+
+  --- FÉLRETÉVE: NYILVÁNOS TESZT NAPLÓZÁSA — jelszó: "naplócska" ---
+
+  A 2026 augusztusi nyilvános teszthez készült egy teljes terv:
+      dokumentumok/teszt-naplozas-terv.txt
+  Ha a felhasználó a "naplócska" jelszót mondja, AZT a fájlt kell elővenni.
+
+  RÖVIDEN: eszköz-profil (gyártó/típus/Android/TTS/RAM) + összeomlás-napló +
+  körkörös eseménynapló; a jelentés a telefonról az Android megosztás-ablakán át
+  megy (NEM beépített e-mail-jelszóval!), másodlagos út a WiFi portál letöltés,
+  és mellé egy 30 mp-es HANGÜZENET a tesztelőtől ("mit vártam volna").
+  SOHA nem naplózunk: telefonszám, névjegy, üzenet-szöveg, pontos GPS, jelszó.
+  A "30 nap hiba nélkül" számláló a super-dl.com oldalon fut, súlyozott hibákkal
+  (összeomlás és TÉVES CÍMLET = súlyos, nullázza; kozmetikai = nem nullázza).
+
+  ÁLLAPOT: megtervezve, megvalósítás MÉG NEM kezdődött el.
+  Következő lépés: eszköz-profil + verzió gyűjtő.
+
+  --- 2026-07-27 (26. kör) — Zene: beszéd-főkapcsoló ---
+
+  Új MUSIC_SPEECH_ENABLED kapcsoló (Média > Zene beállítások > Beszéd-visszajelzés
+  > "Beszéd a lejátszás alatt"). Kikapcsolva a lejátszó NEM mond semmit magától:
+  szám címe váltáskor, "Szünet", "Folytatás", "A szám elejéről" — mind néma.
+  MEGMARAD viszont: a vezérlők bemondása (amikor a felhasználó lépked), a KÉRT
+  pozíció-információ, és MINDEN hibaüzenet — enélkül a lejátszó vakon
+  kezelhetetlen lenne.
+  Megvalósítás: MusicPlayerPrefs.isSpeechEnabled/setSpeechEnabled; a meglévő
+  getSpeakOnSkip/Stop/Seek MOST a főkapcsolóval ÉS-elve ad értéket (így a
+  lejátszó régi hívási helyeit nem kellett egyenként átírni). A beállítás-menü a
+  NYERS állapotot mutatja (getSpeakOn*Raw), hogy a visszajelzés ne legyen
+  félrevezető; ha a főkapcsoló ki van, a részletes kapcsoló bekapcsolásakor
+  figyelmeztet, hogy az most nem hallatszik.
+  MusicPlayerActivity: új speakIfEnabled(text) az automatikus bemondásokhoz.
+
+  --- 2026-07-27 (25. kör) — Hívás-képernyő beragadás javítva ---
+
+  TÜNET: a hívás letétele után az InCallActivity NEM zárult be magától, ott
+  ragadt; csak balra söpréssel lehetett kilépni.
+
+  GYÖKÉROK: a bezárás KIZÁRÓLAG a TTS befejezés-visszajelzésére várt:
+     tts.speakThen("Hívás vége. Időtartam: ...") { finishCallUi() }
+  Ha a callback elmaradt (megszakadt beszéd, néma/leállított TTS, elveszett
+  utterance-jelzés), a finishCallUi() SOHA nem futott le.
+  Ez UGYANAZ a hibaosztály, mint a naplóban már rögzített TTS LOOP-BUG:
+  a képernyő-lezárást NEM szabad kizárólag TTS-callbackre bízni.
+
+  JAVÍTÁS: új speakAndFinishCall(message, timeoutMs=4000) az InCallActivity-ben.
+  Bemondja az üzenetet ÉS indít egy időzítőt; amelyik előbb lefut, az zár, de a
+  bezárás CSAK EGYSZER történik (closed flag). TTS-kivételnél azonnal zár.
+  Mind az 5 érintett hely átírva: "Hívás vége", "A hívás nem jött létre",
+  "Érvénytelen telefonszám", "Hívás engedély szükséges", "Hívás indítása
+  sikertelen".
+
+  MINTA A JÖVŐRE: ha egy képernyő bezárása/kilépése TTS-callbacktől függ, MINDIG
+  kell mellé időzítő-védőháló (watchdog), különben beragadhat.
+
+  --- 2026-07-27 (24. kör) — Kaszkád átvétel + SZÍN-SÁV ÁTFEDÉS javítva ---
+
+  !!! VERZIÓ VÁLTOZÁS: 1.54.9 -> 1.55.0 !!!
+  Az APK neve MOST: SuperDL-1.55.0-debug.apk — a telepítő parancsot frissíteni
+  kell, különben "No such file or directory".
+
+  ELŐZMÉNY: a felhasználó a Grok-kal is dolgozott a pénzfelismerőn (07-27 hajnal,
+  05:50-06:25). ELLENŐRIZVE (git + időbélyeg): a Grok KIZÁRÓLAG a currency
+  csomagot érintette (15 fájl) + egy strings.xml javítást ("swipe" -> "söprés"
+  a face_camera_intro-ban). SEMMI kéretlen változtatás máshol.
+
+  A GROK MUNKÁJA (jó, megtartva) — cascade/ csomag:
+   - BanknoteCascadeConfig: YOLO_FALLBACK_ENABLED=false (alapból KI!),
+     TEMPORAL_WINDOW=5, TEMPORAL_REQUIRED=5, szín/OCR küszöbök.
+   - BanknoteColorGeometryStage (Stage1): domináns Hue + geometria (aspect
+     1.15-3.40, élsűrűség), a mi BanknoteBuiltinColorReference.REFERENCES
+     tábláját használja a pontozáshoz.
+   - BanknoteOcrStage (Stage2): ML Kit (helyi, offline), a mi
+     BanknoteOcrAnalyzer-ünkkel nyeri ki a címletszámot. Aszinkron + cache.
+   - BanknoteCascadeUseCase: fúzió — A) szín+OCR egyezik -> magas bizalom,
+     B) OCR a szín-jelöltek közt -> OCR nyer, C) csak erős szín -> szín dönt,
+     D) gyenge szín + nincs OCR -> VÁR, E) ellentmondás -> ABSZTINENCIA (hallgat).
+   - BanknoteConsensusFilter: szigorú temporal — az utolsó 5 eredmény MIND
+     ugyanaz a címlet, null nélkül, különben nincs bemondás.
+  A ViewModel MÁR a cascade-et hívja (a régi TFLite csak fallback, kikapcsolva).
+
+  AMIT ÉN JAVÍTOTTAM (ez hiányzott): SZÍN-SÁV ÁTFEDÉS.
+  A régi REFERENCES két helyen ÁTFEDETT, ami téves címletet okozhatott:
+     500 (358..26) és 2000 (18..54)     -> 8 fokos közös zóna
+     20000 (55..95) és 5000 (78..138)   -> 17 fokos közös zóna  <- NÉGYSZERES tévedés!
+  ÚJ, ÁTFEDÉSMENTES sávok (a felhasználó VALÓS mért értékei mind beleférnek):
+     500:   13° ±11  ->   2..24
+     2000:  37° ±11  ->  26..48   (2 fok rés az 500-tól)
+     20000: 72° ±12  ->  60..84
+     5000: 110° ±18  ->  92..128  (8 fok rés a 20000-től)
+     1000: 200° ±20  -> 180..220
+     10000:316° ±26  -> 290..342
+  A RÉSEK SZÁNDÉKOSAK: ha a mért szín oda esik, egyik címlet sem kap pontot ->
+  a rendszer HALLGAT és megvárja az OCR-t. Inkább néma, mint téves.
+  + validateNoOverlap(): fejlesztői védőháló, naplóz (SDL_CASH), ha valaki a
+    jövőben átfedő sávokat állítana be.
+
+  ONLINE OCR (felhasználói ötlet) — MEGVIZSGÁLVA, NEM JAVASOLT: a helyi ML Kit
+  ugyanolyan pontos a nagy nyomtatott számokra, de offline és ~10x gyorsabb;
+  egy felhős OCR 1-3 mp késleltetést, API-kulcs-függőséget és adatvédelmi
+  kockázatot (bankjegy képe külső szerverre) hozna. Nyereség nincs.
+
+  --- 2026-07-26 (23. kör) — !!! PIN SEGÉD MŰKÖDIK DIRECT BOOT-BAN IS !!! ---
+
+  ELŐZMÉNY: a 22. körben tévesen azt állapítottam meg, hogy BFU-ban (első
+  bekapcsolás, feloldás előtt) elvi korlát miatt nem futhat külső
+  AccessibilityService. A FELHASZNÁLÓNAK VOLT IGAZA: a Commentary Screen Reader
+  (com.prudence.reader) ezt megoldja, és NEM rendszeralkalmazás (/data/app).
+
+  BIZONYÍTÓ MÉRÉS: a Commentary-t ideiglenesen a mienk MELLÉ engedélyeztem
+  (settings put secure enabled_accessibility_services "<mienk>:<commentary>"),
+  reboot, majd feloldás ELŐTT mérve:
+     Bound services: {Prudence Screen Reader}   <- A COMMENTARY FUTOTT!
+     Binding services: {<a mi service-unk>}     <- a mienk BERAGADT "binding"-ban
+  => Tehát LEHETSÉGES, és a rendszer a mi service-ünket is EL AKARTA indítani.
+
+  A VALÓDI OK (logcat -b crash, BFU alatt):
+     FATAL: Unable to create application com.superdl.launcher.SuperDlApplication:
+     IllegalStateException: SharedPreferences in credential encrypted storage
+     are not available until after user is unlocked
+  Az Application.onCreate CE-tárolóhoz nyúlt -> az egész folyamat összeomlott,
+  ezért a service sosem jött létre. A directBootAware jelölés VÉGIG MŰKÖDÖTT.
+
+  JAVÍTÁSOK (mind kell):
+   1) SuperDlApplication.onCreate: BFU-ban CSAK a tároló-mentes rész fut
+      (ensureHiddenApiAccess). A CrashLogHandler.install és a
+      QuietModeHelper.reconcileOnStartup a FELOLDÁSKOR pótlódik — az onCreate
+      ACTION_USER_UNLOCKED receivert regisztrál, és initAfterUnlock()-ot hív.
+   2) KeyguardPinOverlayController.ensureResources: a TtsManager/SoundFeedback
+      létrehozása try-catch, hibánál createDeviceProtectedStorageContext()-tel
+      újrapróbálva; ha az sem megy, a billentyűzet HANG NÉLKÜL, de MEGJELENIK
+      (korábban itt is FATAL volt -> a rendszer 30 PERCRE felfüggesztette a
+      service újraindítását!).
+   3) TtsEngineStore.getSelectedPackage/getSelectedVoiceName: try-catch, hibánál
+      null -> az ALAPÉRTELMEZETT beszédmotor indul. FONTOS FELISMERÉS: a
+      TtsManager a context.applicationContext-et használja, ami MINDIG a CE-alapú
+      Application, akkor is, ha device-protected contextet adunk át! Ezért a
+      javítást a STORE szintjén kellett elvégezni.
+   4) KeyguardPinSettings: a funkció-kapcsoló MINDKÉT tárolóba íródik, olvasásnál
+      először az eszköz-védettből (DE) próbálja.
+   5) AndroidManifest: a service megkapta a android:directBootAware="true"-t.
+
+  EREDMÉNY (felhasználói teszttel igazolva):
+   - BFU (első bekapcsolás): a segéd ELINDUL és a PIN-billentyűzet MEGJELENIK.
+     Hang: a 3) javítás előtt néma volt; utána az alapértelmezett motorral szól.
+   - AFU (menet közbeni véletlenszerű PIN-kérés): MŰKÖDIK, a segéd jön elő a
+     rendszer billentyűzete helyett. Kis késleltetéssel indul (a felismerés
+     350 ms-os pollinggal + több kör kell a képernyőtípus azonosításához).
+
+  DIAGNOSZTIKA: az evaluateKeyguardState CSAK ÁLLAPOTVÁLTOZÁSKOR naplóz
+  (SDL_PINASSIST, "allapot valtozas: funkcio=... zarolva=..."), mert 350 ms-onként
+  logolni fölösleges terhelés.
+
+  TANULSÁG: ha egy AccessibilityService "Binding services"-ben ragad, az NEM
+  jogosultsági kérdés — a folyamat omlik össze induláskor. Nézd a
+  logcat -b crash naplót! És Direct Boot alatt SEMMILYEN kódútvonal nem érhet
+  CE-tárolóhoz (SharedPreferences), beleértve a közvetve hívott segédosztályokat
+  (TTS, hangok, beállítás-tárak) is.
+
+  --- 2026-07-26 (22. kör) — PIN segéd az ELSŐ bekapcsoláskor: MÉRÉSSEL LEZÁRVA ---
+
+  !!! FIGYELEM: EZ A KÖR TÉVES KÖVETKEZTETÉSRE JUTOTT — LÁSD A 23. KÖRT !!!
+  Az alábbi "nem lehetséges" megállapítás HIBÁS. A valódi ok az volt, hogy az
+  alkalmazás összeomlott induláskor (CE-tároló hozzáférés), nem pedig valamilyen
+  Android-korlát. A 23. körben MŰKÖDÉSRE BÍRTUK. A lenti mérési adatok
+  önmagukban helyesek, csak a belőlük levont következtetés volt elhamarkodott.
+
+  KÉRDÉS: működhet-e a Rendszer PIN segéd az első bekapcsolás utáni (BFU,
+  Before First Unlock / Direct Boot) zárolási képernyőn?
+
+  ELVÉGZETT FELKÉSZÍTÉS (helyes, maradjon is bent):
+   - AndroidManifest: a KeyguardPinAccessibilityService megkapta a
+     android:directBootAware="true" jelölést.
+   - KeyguardPinSettings: a kapcsoló MINDKÉT tárolóba íródik, és olvasáskor
+     ELŐSZÖR az eszköz-védett (device protected) tárolóból olvas
+     (createDeviceProtectedStorageContext), mert BFU alatt a szokásos
+     SharedPreferences (CE tároló) TITKOSÍTVA van, nem elérhető.
+   - onServiceConnected naplóz (SDL_PINASSIST): userUnlocked állapot + funkció-kapcsoló.
+
+  VALÓS MÉRÉS (adb reboot, majd feloldás ELŐTT mérve, uptime 45 mp):
+     settings get secure enabled_accessibility_services -> a mi szolgáltatásunk BENNE VAN
+     ps -A | grep superdl            -> ÜRES (a folyamat el sem indult)
+     logcat -s SDL_PINASSIST         -> ÜRES (onServiceConnected NEM futott)
+     ls /data/data/<pkg>             -> "No such file or directory" (CE tároló zárva = BFU)
+
+  KÖVETKEZTETÉS: az Android BFU fázisban NEM indít el külső (nem rendszer-)
+  AccessibilityService-t. Oka: az ENABLED_ACCESSIBILITY_SERVICES beállítás maga is
+  a felhasználó CE tárolójában van, amit a rendszer feloldás előtt nem tud
+  beolvasni -> nincs mit elindítania. A directBootAware ehhez SZÜKSÉGES, de NEM
+  ELÉGSÉGES. Ez Android biztonsági korlát, NEM a mi kódunk hibája.
+  => NE PRÓBÁLKOZZUNK ÚJRA ezzel az iránnyal.
+
+  MŰKÖDŐ ALTERNATÍVA a felhasználónak (a készüléken MÁR BE VAN ÁLLÍTVA):
+     accessibility_shortcut_target_service = TalkBack
+     accessibility_shortcut_on_lock_screen = 1
+   -> a két hangerőgomb együttes, ~3 mp-es lenyomva tartása elindítja a TalkBack-et
+      a bekapcsolás utáni zárolási képernyőn is, azzal beírható a PIN.
+
+  AHOL A SAJÁT SEGÉD TOVÁBBRA IS HASZNOS: az első feloldás UTÁNI (AFU) állapotban,
+  amikor a rendszer időnként újra PIN-t kér (ujjlenyomat/arcfelismerés mellett is).
+  Ott a szolgáltatás fut, és a 21. körben javított állapot-felismeréssel már
+  helyesen "aktív"-ként is jelenik meg.
+
+  --- 2026-07-26 (21. kör) — Portál bevásárlólista + IMAP javítás + PIN segéd ---
+
+  1) PORTÁL BEVÁSÁRLÓLISTA (új "Bevásárlólista" fül, /shopping):
+     shoppingPage + handleShoppingSelect/NewList/DeleteList/Add/Toggle/Delete.
+     Több lista (a store getListNames/getActiveListName/setActiveListName alapján),
+     tétel név + opcionális ár, kipipálás (Megvan/Vissza), tétel- és listatörlés,
+     összesített ár + "hány van meg". A meglévő ShoppingListStore-t használja,
+     tehát a telefonon UGYANAZ jelenik meg. Fül MINDKÉT tab bar-ba felvéve.
+
+  2) E-MAIL (IMAP) OLVASÁS JAVÍTVA — a levéllista némán üres maradt.
+     GYÖKÉROK (ImapReader): a fetchMessage a command()-dal küldte a UID FETCH-et,
+     DE a command() a záró tag-ig VÉGIGOLVASSA a választ. Utána a
+     collectFetchLines() már üres adatfolyamra várt -> 15 mp socket-timeout ->
+     kivétel -> fetchInbox csendben emptyList()-et adott. (UGYANAZ a hibaosztály,
+     mint a portál-feltöltésnél: elfogyasztott adat / desync!)
+     FIX: új ImapSession.send(cmd,args): String — csak elküld, visszaadja a tag-et;
+     collectFetchLines(tag) olvassa a teljes választ a tag záró soráig (a literal
+     blokkokat {n} alapján). A command() maradt a rövid válaszú parancsokra.
+     + ImapReader.lastError: emberi nyelvű hibaok (bejelentkezés / időtúllépés /
+       nem található host / IMAP tiltva) + SDL_IMAP naplózás minden lépésnél.
+       A MainActivity ezt mondja be a régi általános üzenet helyett.
+
+  3) RENDSZER PIN SEGÉD: "nincs engedélyezve" hamis állapot JAVÍTVA.
+     GYÖKÉROK (KeyguardPinSettings.isServiceEnabled): a keresett azonosító
+     packageName + "/.lock.keyguard.KeyguardPinAccessibilityService" volt, de a
+     rendszer TELJES osztálynévvel tárolja. ADB-vel igazolva a készüléken:
+       valódi:   com.superdl.launcher.debug/com.superdl.launcher.lock.keyguard.KeyguardPinAccessibilityService
+       keresett: com.superdl.launcher.debug/.lock.keyguard.KeyguardPinAccessibilityService
+     Ráadásul debug változatban a csomagnév "…launcher.debug", az osztály viszont
+     a "…launcher" csomagban van -> a rövid forma nem létező névre mutatott.
+     FIX: SERVICE_CLASS_NAME = KeyguardPinAccessibilityService::class.java.name,
+     és KÉT úton ellenőrzünk: (a) getEnabledAccessibilityServiceList — resolveInfo
+     serviceInfo.name VAGY id.endsWith("/$expected"); (b) tartalék: közvetlen
+     Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES olvasás (gyártói ROM-okon a
+     lista késve frissülhet). Naplózás: SDL_PINASSIST.
+     MEGJEGYZÉS: a manifest-regisztráció rendben volt; a szolgáltatás végig FUTOTT,
+     csak az app nem ismerte fel. Az install -r NEM kapcsolta ki (ellenőrizve).
+
+  TANULSÁG (ismét): accessibility-service detektálásnál SOHA ne fűzz rövidített
+  osztálynevet a csomagnévhez — használd a class.java.name-et, és nézd meg
+  ADB-vel, mit tárol a rendszer: settings get secure enabled_accessibility_services
+
+  --- 2026-07-26 (20. kör) — PORTÁL NAPTÁR: teljes szerkesztés a gépről ---
+
+  CÉL (felhasználói kérés): a portálon a naptár ne csak olvasható legyen —
+  a segítő a gépről gyorsan felvehessen programot az újonc felhasználónak,
+  a haladó pedig sokkal gyorsabban "összepattinthassa", mint diktálva.
+
+  RÉGI ÁLLAPOT: PortalControlPages.calendarPage(context) CSAK OLVASOTT
+  (ma/holnap lista), a végén: "új eseményt a telefonon tudsz felvenni".
+  A /calendar GET route is csak ezt szolgálta ki. MINDKETTŐ TÖRÖLVE.
+
+  ÚJ: teljes CRUD a portálon (PortalControlPages):
+   - calendarPage(context, msg, error, editId): 60 napra előre listáz
+     (getInstancesBetween, tegnaptól), soronként "Szerkesztés" link
+     (/calendar?edit=<id>) és "Törlés" gomb (JS confirm-mal).
+     Az űrlap HTML date/time mezőkkel (böngészőben natív dátumválasztó),
+     ismétlődés legördülővel (CalendarRecurrence.selectable).
+     Szerkesztésnél az űrlap ELŐRE KITÖLTVE a meglévő programmal + "Mégse".
+     Ha nincs WRITE_CALENDAR engedély -> figyelmeztetés az oldal tetején
+     (különben a mentés érthetetlenül bukna).
+   - handleCalendarAdd / handleCalendarUpdate / handleCalendarDelete
+   - calParseDateTime("yyyy-MM-dd","HH:mm") -> millis (isLenient=false).
+     Ha a vég <= kezdés, +24 óra (pl. 23:00-01:00 éjszakába nyúló program).
+   - calRecurrenceOf: enum-név -> CalendarRecurrence (ismeretlen -> NONE).
+  Motor: a MEGLÉVŐ CalendarHelper.insertEvent/updateEvent/deleteEvent —
+  ezek a CalendarReminderScheduler-t is kezelik, tehát a portálról felvett
+  programra a telefon UGYANÚGY emlékeztet.
+
+  ÚJ ROUTE-OK (WifiPortalServer): GET /calendar (edit= query kezeléssel),
+  POST /calendar/add, /calendar/update, /calendar/delete.
+
+  PITFALL EMLÉKEZTETŐ: a "Naptár" fül MÁR LÉTEZETT mindkét tab bar-ban
+  (header() és buildIndexPage()), ezért NEM kellett új fület adni — véletlenül
+  duplikáltam, majd töröltem. ÚJ oldalnál viszont MINDKETTŐBE kell!
+  Szintén figyelni: a route-sorrend számít — a régi /calendar route ELŐBB volt,
+  mint az új, ezért az futott volna (az edit= nem működött volna) -> törölni kellett.
+
+  TESZTHEZ: a portál szerver TÚLÉLI a telepítést -> WiFi portál KI/BE a telefonon!
+
+  --- 2026-07-26 (19. kör) — Menü-átrendezés + naptár szerkesztés/törlés belépők ---
+
+  1) FELFEDEZÉS: a naptár SZERKESZTÉS és TÖRLÉS logika MÁR KÉSZ VOLT!
+     CalendarHelper: insertEvent/updateEvent/deleteEvent/getEventById mind megvan.
+     MainActivity: CalendarContextMenu (READ/EDIT/DELETE) + CalendarDeleteConfirm
+     + startCalendarEditFlow + enterCalendarDeleteConfirm — bekötve.
+     A CalendarBrowse-ban JOBBRA söpréssel jött elő a művelet-menü. A felhasználó
+     azért hitte hiányzónak, mert NEM VOLT KÖZVETLEN MENÜPONT rá (felfedezhetőség).
+
+  2) ÚJ: közvetlen belépők — CALENDAR_EDIT_PICK és CALENDAR_DELETE_PICK
+     (MenuAction enum + MenuTree). MainActivity: startCalendarPickFlow(purpose),
+     navigateCalendarPick, onCalendarPickActivate. Új AppFlow.CalendarPick
+     (events, index, purpose) + új CalendarPickPurpose.kt enum (EDIT/DELETE).
+     A mai programlistát nyitja; jobbra söprés EGYBŐL a kért műveletet indítja
+     (szerkesztés flow VAGY törlés-megerősítés), nem a teljes művelet-menüt.
+     Gesztus-bekötés 4 helyen (fel/le/jobbra/balra) + updateFlowDisplay ág.
+     PITFALL: a updateFlowDisplay when-je EXHAUSTIVE -> új AppFlow-hoz KÖTELEZŐ
+     kijelző-ág, különben "when expression must be exhaustive" fordítási hiba.
+
+  3) "IDŐ ÉS SZERVEZÉS" ÁTRENDEZVE (volt: 18 elemű lapos lista) -> 3 almenü:
+     - "Óra és ébresztés": pontos idő, 4 ébresztő-pont, 6 időzítő-pont
+     - "Program (naptár)": létrehozás, SZERKESZTÉS, TÖRLÉS, napi/holnapi/heti
+       áttekintő (a felhasználó által kért sorrendben)
+     - "Jegyzetek": lista, új, törlés (külön almenü, felhasználói kérés)
+
+  4) BEÁLLÍTÁSOK: új "Haladó és technikai" almenü — Beállítás varázsló,
+     Beállítás állapota, Diagnosztika, Korlátlan háttérfutás, Automatikus indítás.
+     Ezek eddig ömlesztve voltak a Beállítások tetején. A gyakori dolgok
+     (hangerő, TTS, WiFi, BT) maradtak közvetlenül elérhetők.
+
+  MEGJEGYZÉS: a Desktop Commander MCP ebben a körben többször timeoutolt/leállt
+  (hosszú buildeknél). A build ilyenkor FUT TOVÁBB a háttérben — nem kell újra
+  indítani, elég külön hívásban lekérdezni az eredményt (Get-Content build_log).
+  Végül: EXIT=0, telepítés Success.
+
+  TESZTELENDŐ: Idő és Szervezés > Program (naptár) > Program szerkesztése /
+  Program törlése; a 3 almenü navigációja; Beállítások > Haladó és technikai.
+
+  --- 2026-07-21 (18. kör) — PORTÁL FELTÖLTÉS JAVÍTVA (megakadás + duplikáció) ---
+
+  TÜNET: a WiFi portál feltöltése elindult, majd "záros határidőn belül" megakadt,
+  és rengeteg duplikátum (fajl (1).mp3, (2).mp3 ...) keletkezett.
+
+  GYÖKÉROK (WifiPortalServer.writePartToFile): amikor a 64 KB-os pufferben
+  megtalálta a rész végét jelző "\r\n--boundary" határolót, kiírta a fájlt idx-ig,
+  majd BREAK — és a pufferben lévő, a határoló UTÁNI, MÁR BEOLVASOTT bájtokat
+  ELDOBTA. Ezzel a handleUpload elvesztette a szinkront az adatfolyammal:
+  a következő readLine() olyan adatra várt, amit már elfogyasztottunk, miközben
+  a böngésző a HTTP-válaszra várt -> KÖLCSÖNÖS VÁRAKOZÁS (beállás időtúllépésig).
+  Az újrapróbálkozásokat az uniqueFile() új néven mentette -> DUPLIKÁCIÓ.
+  Többfájlos feltöltésnél ugyanez a desync a további részeket is elrontotta.
+
+  JAVÍTÁS:
+   - handleUpload(rawInput...) most java.io.PushbackInputStream-be csomagolja a
+     bemenetet (UPLOAD_PUSHBACK_BYTES = 128 KB konstans a companion objectben).
+   - writePartToFile(input: PushbackInputStream, ...): a határoló megtalálásakor
+     a "\r\n" átugrása után (idx + 2) a maradékot input.unread(...)-del
+     VISSZATOLJA. Így a hívó pontosan a "--boundary" sornál folytat, és a
+     meglévő ciklus-logika (delimiter / delimiter-- vizsgálat) helyesen működik.
+
+  TAKARÍTÁS (a hiba által okozott kár helyreállítása):
+   - tools/dedup.sh + tools/rename_lone.sh (a TELEFONON futnak, hogy az ékezetes
+     fájlnevek ne sérüljenek a PowerShell-en át; a készüléken van sed/awk/stat).
+   - Logika: csoportonként (zárójeles sorszám nélküli név) a LEGNAGYOBB fájl
+     marad, a többi törlődik, a megtartott visszakapja a tiszta nevet.
+   - Eredmény: 65 -> 44 fájl, 21 törlés, ~300 MB felszabadult.
+   - FONTOS TANULSÁG: a méret-elemzés 3 CSONKA "eredetit" leplezett le (a megakadt
+     feltöltés hagyta hátra) — pl. Most.Wanted S01E01: a csonka 66 MB-os volt az
+     "eredeti", a teljes 115 MB-os a (2). Vak törlés esetén ezek csonkák
+     maradtak volna! Ezért kell MINDIG méret alapján dönteni, nem név alapján.
+   - Végül: MediaStore újraolvasás
+     (content call --uri content://media --method scan_volume --arg external_primary).
+
+  TESZTHEZ: a portál szerver TÚLÉLI a telepítést -> a WiFi portált KI/BE kell
+  kapcsolni a telefonon, hogy az új feltöltés-kód betöltődjön!
+
+  !!! FONTOS UTÓLAGOS TANULSÁG A TAKARÍTÁSRÓL !!!
+  A felhasználó figyelmeztetett: nála a " (1)" / " (2)" végződés NEM feltétlenül
+  másolatot jelent — gyakran KÜLÖN VERZIÓ (a böngésző így nevezi el az azonos
+  nevű letöltéseket). Ellenőrizve: a gépen "Vadul Nyomom (1).mp3" = 3 740 789 B
+  és "(2).mp3" = 3 933 764 B — KÉT KÜLÖNBÖZŐ FELVÉTEL.
+  Az elvégzett takarítás utólag igazolva: mind a 3 eltérő méretű törölt fájl
+  CSONKA feltöltés volt (a PC-s eredetikkel összevetve), valódi verzió NEM
+  veszett el. DE a régi dedup.sh logikája (mindig a legnagyobbat tartsd meg)
+  VESZÉLYES volt — külön verziókat is törölt volna.
+  ÚJ SZABÁLY (tools/dedup2.sh): CSAK AZONOS MÉRETŰ fájlokat szabad
+  duplikátumnak tekinteni és törölni. Eltérő méret esetén a szkript NEM NYÚL
+  hozzá, csak jelenti — a döntés a felhasználóé. A régi dedup.sh TÖRÖLVE.
+
+  --- 2026-07-21 (17. kör) — WiFi portál "svájcibicska": média, rádió, csörgetés ---
+
+  1) MÉDIA-KIMENTÉS (2.1) KÉSZ: új "Fotók és hangok" fül a portálon.
+     - PortalMediaHelper.kt: hangfájlok az app-mappákból (ProfiDiktafon,
+       radio_recordings, voice_notes) + fotók a MediaStore-ból (SuperDL_ előtag).
+       Token-alapú letöltés: "f:"+base64(útvonal) VAGY "ms:"+MediaStore id.
+       resolveToken biztonsági ellenőrzéssel (csak engedélyezett mappák).
+     - PortalControlPages.mediaPage() + WifiPortalServer /media és
+       /media/download route + serveMediaDownload (bináris, Content-Disposition).
+
+  2) SAJÁT RÁDIÓÁLLOMÁSOK (2.2) KÉSZ: új "Rádió" fül a portálon.
+     - radioPage() + handleRadioAdd/handleRadioDelete; /radio, /radio/add,
+       /radio/delete route-ok. Bármilyen URL felvehető (direkt stream VAGY
+       .m3u/.pls lista — a RadioPlaylistResolver oldja fel lejátszáskor).
+     - A felvett állomások a RadioStore-ba mennek -> a telefonon a "Kedvenc
+       állomásaim" menüben jelennek meg.
+
+  3) "HOL A TELÓM?" KÉSZ: FindPhoneHelper.kt + gomb az Állapot oldalon.
+     Maximumra állítja a CSENGŐ hangerőt, lejátssza a csengőhangot loopban +
+     rezgés (waveform). 30 mp után MAGÁTÓL leáll ÉS VISSZAÁLLÍTJA az eredeti
+     hangerőt. /find-phone/start és /find-phone/stop route-ok. A statusPage
+     kapott egy findPhoneMsg paramétert a visszajelzéshez.
+
+  FONTOS PITFALL (ismét igazolódott): a fül KÉT tab bar-ba kell —
+  PortalControlPages.header() ÉS WifiPortalServer.buildIndexPage(). Mindkettőbe
+  bekerült a "Fotók és hangok" és a "Rádió". Továbbá: a portál szerver TÚLÉLI a
+  telepítést — a WiFi portált KI/BE kell kapcsolni a telefonon, hogy az új
+  oldalak/route-ok betöltődjenek.
+
+  --- 2026-07-21 (16. kör) — Rádió MŰKÖDIK + GPS-fix + több javítás ---
+
+  RÁDIÓ MEGOLDVA (a gyökérok): a MediaPlayer what=1 hibával, 30 mp timeout után
+  halt el. OK: a legtöbb rádió-stream http:// (NEM https), és Android 9 óta a
+  cleartext HTTP alapból TILTOTT. Fix: AndroidManifest <application>
+  android:usesCleartextTraffic="true". EZ VOLT A LÉNYEG (a playlist-feloldás
+  önmagában nem elég volt). Diagnózist a RadioPlayerActivity ideiglenes
+  SDL_RADIO logja adta (már KIVÉVE).
+  + RadioPlaylistResolver.kt (ÚJ): .pls/.m3u/.m3u8 listák feloldása a valódi
+    stream-URL-re (File1=... ill. első http-sor); tartalom-típus alapján is.
+    A playCurrent HÁTTÉRSZÁLON old fel, majd startStream().
+  + Rádió UX átírva: a 3 belépő (Magyar/Kedvencek/Keresés) MÁR NEM indít rögtön,
+    hanem AppFlow.RadioBrowse listát ad (fel-le válogatás, jobbra indít, balra
+    vissza) — navigateRadioList/openRadioBrowse a MainActivity-ben, a MusicBrowse
+    mintájára. A hungarian flow beépített állomásokra esik, ha nincs net.
+
+  GPS-BERAGADÁS (kilépés után is beszélt): a hálózati lekérdezés utáni bemondás
+  nem ellenőrizte, hogy még aktív-e a szolgáltatás. Fix: CompassScanService és
+  GpsSurroundingsService a bemondás ELŐTT ellenőrzi az isActive/
+  surroundingsMonitoringActive flaget, és stopSelf ha kiléptek. + GpsNetworkClient
+  Thread.sleep megszakíthatóvá téve (rövid darabokban, isInterrupted figyeléssel).
+
+  EGYÉB: (1) hangjegyzet-felvétel: nincs több "mondd az eligazítást" TTS a
+  felvételre — egyetlen bleep + a felvétel a bleep UTÁN indul (MainActivity
+  startSavedPoiVoiceRecording + playRecordingStartBleep). (2) Zene: "Utoljára
+  játszott folytatása" menüpont a Média menü TETEJÉN (MUSIC_RESUME_LAST +
+  resumeLastMusic + MusicPlayerPrefs.getLastTrackId) — a mentett pozíciótól
+  folytat, keresgélés nélkül.
+
+  FÉLBEN (WiFi portál média-kimentés, 2.1): PortalMediaHelper.kt (KÉSZ: hang-
+  fájlok app-mappákból + fotók MediaStore-ból, token-alapú letöltés) és
+  PortalControlPages.mediaPage() + "Fotók és hangok" tab (KÉSZ). MÉG KELL: a
+  WifiPortalServer route-jai (/media és /media/download a serveDownload
+  mintájára, PortalMediaHelper.resolveToken-nel) — EZ HIÁNYZIK, a route nélkül
+  a tab 404. Következő kör: bekötni a 2 route-ot. Utána 2.2 (saját m3u/pls
+  állomás hozzáadása — a RadioPlaylistResolver már kész hozzá) és a "hol a
+  telóm" csörgető gomb.
+
+  --- 2026-07-20 (15. kör) — Szín-pénzfelismerő ÉLESBEN + OCR előkészítve ---
+
+  A szín-alapú pénzfelismerő (14. kör magja) BE VAN KÖTVE a valódi
+  pénzfelismerőbe és MŰKÖDIK. Éles teszt igazolta: a domináns Hue szinte minden
+  címletre pontosan mér.
+
+  BEKÖTÉS: CurrencyRecognizerViewModel.processFrame() — a régi TFLite classify()
+  ELÉ beszúrva a BanknoteHybridRecognizer.recognizeByColor(). Ha az ad eredményt,
+  abból BanknoteClassificationResult készül (BanknoteDenomination.fromValue), és
+  a meglévő consensusFilter/debouncer/bemondás csővezetéken megy tovább. Ha null,
+  a régi TFLite a tartalék. (Ideiglenes SDL_CASH diagnosztikai logok bent vannak
+  a processFrame-ben és a BanknoteBuiltinColorReference.recognize-ben — KIVENNI,
+  ha kész.)
+
+  HANGOLT Hue-referenciák (BanknoteBuiltinColorReference.REFERENCES) a felhasználó
+  VALÓS mért értékeire (éles teszt naplója): 500=12°±14, 1000=200°±26,
+  2000=36°±20, 5000=108°±32, 10000=318°±40, 20000=75°±22. Min. pontszám 0.5 alatt
+  eldobva (a szélső, ugráló mérések ellen). A 10000 (rózsaszín-lila, ~320°) szélső
+  pixelei átcsúszhatnak a piros 500 (12°) tartományba a Hue körkörössége miatt —
+  ezért szűkítettük az 500-at és tágítottuk a 10000-et.
+
+  KÖVETKEZŐ KÖR — OCR-MEGERŐSÍTÉS BEKÖTÉSE (a motor KÉSZ, csak bekötni kell):
+    - BanknoteOcrAnalyzer.kt (KÉSZ) — a nagy címletszámot olvassa ki OCR-szövegből
+      (500..20000, évszám-kizárás, hosszabb szám előnyben: 5000 > 500).
+    - BanknoteHybridRecognizer.refineWithOcr(colorOutcome, ocrText) (KÉSZ) — ha az
+      OCR számot lát: egyezésnél megerősít (magasabb bizalom), eltérésnél az OCR
+      nyer. Ha nem lát, marad a szín.
+    - BEKÖTÉS TERVE: a ViewModelbe egy TextRecognitionEngine példány (mint a
+      LocationTrainerActivity-ben: recognitionEngine = TextRecognitionEngine()).
+      Az OCR ASZINKRON (callback), a processFrame gyors ciklus — NEM szabad minden
+      képkockán OCR-t futtatni (lassít). Terv: csak akkor hívd az OCR-t, amikor a
+      szín már STABIL találatot ad (pl. a debouncer announce előtt), és a
+      refineWithOcr-rel pontosítsd a bemondandó címletet. Vagy: külön ritkított
+      ütemben (pl. 1-2 mp-enként) OCR a háttérben, az eredményt cache-eld, és a
+      refineWithOcr abból dolgozzon. A cél a "dupla varrás": szín + szám együtt.
+
+  MÉG HÁTRAVAN (14. körből): tanító Activity (fotó-UI a saját bankjegyekhez) +
+  menü belépő. A tár (BanknoteTrainerStore) és a matcher (BanknoteTrainedMatcher)
+  KÉSZ, csak a kamera-UI hiányzik. A tanítás pontosítja a beépített színeket.
+
+  --- 2026-07-19 (14. kör) — Saját bankjegy-tanító: a FELISMERŐ MAG kész ---
+
+  ÚJ STRATÉGIA a bankjegyekre (a YOLO helyett): fény-tűrő SZÍN-alapú felismerés
+  a felhasználó SAJÁT fotóiból, a helyszín-felismerő (locationwatch) mintájára.
+  Nincs YOLO, nincs Colab, nincs újratanítás — minden a telefonon, OpenCV nélkül.
+
+  MIÉRT: a YOLO szintetikus képeken tanult, valós kamerán ugrált. A magyar
+  forint címletei erősen eltérő ALAPSZÍNŰEK (500 barnás, 1000 kékes, 2000 drapp,
+  5000 zöld, 10000 rózsaszín-lila, 20000 zöldes) -> a domináns szín szinte
+  önmagában azonosít, gyűrötten/ferdén/takarva is. Dizájnváltás esetén csak pár
+  új fotó kell, nem ezres adathalmaz.
+
+  KÉSZ ÉS FORDUL (a mag, currency/trainer/ csomag):
+    - BanknoteColorFingerprint.kt — HSV Hue-hisztogram (24 vödör). A Hue
+      fény-FÜGGETLEN (a Value hordozza a fényt, azt eldobjuk). Hisztogram-metszet
+      hasonlóság. colorfulFraction() = HALLUCINÁCIÓ-KAPU (fakó kép -> nincs
+      bankjegy -> hallgat). encode/decode a mentéshez. JAVÍTVA: hist[i] /= Int
+      "No set method providing array access" -> explicit .toFloat().
+    - BanknoteTrainedProfile.kt — adatmodell (címlet + színhisztogramok +
+      vizuális hash-ek + fotó-utak). BanknoteCaptureDraft = egy fotó nyers
+      eredménye mentés előtt.
+    - BanknoteTrainerStore.kt — SharedPrefs+JSON tár (LocationProfileStore
+      mintára). appendCaptures = munkamenetenként bővíthető (max 40 minta/címlet).
+      DENOMINATIONS lista (500..20000). removeDenomination.
+    - BanknoteTrainedMatcher.kt — a felismerő. Rétegek: (1) szín-kapu
+      MIN_COLORFUL_FRACTION=0.25, (2) szín-egyezés MIN_COLOR_SIMILARITY=0.55,
+      (3) hash-megerősítés. Pontszám = szín 75% + hash 25%. MIN_MARGIN=0.08
+      a "holtverseny" ellen. Null = hallgat (nincs hallucináció).
+    A VisualFingerprint-et (locationwatch) újrahasználja a perceptuális hash-hez.
+
+  HÁTRAVAN (KÜLÖN KÖR, mert élő teszteléshez a felhasználó fotói kellenek):
+    - Tanító Activity (kamera + fotózás + címlet-választás gesztus-UI, a
+      FaceCameraActivity + LocationTrainerActivity mintára). Munkamenetenként
+      ~10 fotó, kimondja hányadik, bővíthető.
+    - Pénzfelismerő bekötés: a felismerő ág használja a tanított profilokat
+      (elsőbbség vagy külön mód — a felhasználóval egyeztetni).
+    - Menü: "Saját bankjegyek tanítása" belépő.
+    - KÜSZÖB-HANGOLÁS a valóság alapján (MIN_COLOR_SIMILARITY, MIN_MARGIN) —
+      ehhez kell a felhasználó valódi bankjegy-fotóival tesztelni.
+
+  --- 2026-07-19 (13. kör) — Internetes rádió (1-2. rész kész, 3. hátravan) ---
+
+  Az internetrádió egy KORÁBBI körben nagyrészt elkészült; ez a kör
+  megerősítette, kiegészítette és stabilizálta. Fájlok a radio/ csomagban:
+    - RadioStation.kt — adatmodell (id, name, streamUrl, builtin)
+    - RadioBrowserClient.kt — Radio Browser API (api.radio-browser.info),
+      ingyenes/nyílt, 45000+ állomás. url_resolved = már feloldott stream.
+      3 szerveres tartalék (de1/nl1/at1). MEGTARTVA (a duplikált RadioHelper-t,
+      amit tévedésből újraírtam, TÖRÖLTEM).
+    - RadioStore.kt — kedvencek (JsonPrefsHelper) + ÚJ: BUILTIN lista valódi
+      magyar stream-URL-ekkel (Kossuth mr1, Petőfi mr2, Klubrádió, Dance Wave),
+      hogy net nélkül is legyen mit hallgatni.
+    - RadioPlayerActivity.kt — élő lejátszó (play/szünet, állomásváltás,
+      kedvencbe mentés, FELVÉTEL). Nincs pozíció/tekerés (élő adás).
+      JAVÍTVA: onTouchEvent -> gestureListener.detector.onTouchEvent (a rossz
+      gestureListener.onTouchEvent nem fordult).
+    - RadioRecorder.kt — VALÓS IDEJŰ FELVÉTEL: külön HTTP-kapcsolat ugyanarra a
+      streamre, nyers bájtok fájlba (radio_recordings/ mappa, időbélyeg).
+      A lejátszó közben zavartalanul szól.
+    - RadioPlaylistHolder.kt — állomás-lista átadó (holder minta).
+  Menü: Média > Internetes rádió (Magyar állomások / Kedvencek / Keresés /
+    Felvételeim / Időzített felvételek). MainActivity: startRadio*Flow + a
+    hungarian flow MOST beépített állomásokra esik vissza, ha nincs net.
+
+  KÉSZ: 1. rész (állomások, keresés, lejátszó) + 2. rész (kedvencek, valós idejű
+  felvétel). HÁTRAVAN a 3. rész: IDŐZÍTETT FELVÉTEL (slot: este 8-10 X rádió,
+  több slot). Elkezdve: RadioScheduleSlot.kt adatmodell kész (id, állomás,
+  start/end perc, repeatDaily, enabled, durationMinutes). MÉG KELL: slot-tár,
+  AlarmManager időzítés, ForegroundService (háttér-felvétel), Android 13+
+  értesítés + pontos-ébresztő engedélyek, manifest. A startRadioScheduleFlow
+  jelenleg placeholder ("hamarosan érkezik"). Ez KÜLÖN kör, mert valódi
+  teszteléshez ki kell várni egy időzített felvételt.
+
+  --- 2026-07-19 (12. kör) — Zenelejátszó: pozíció-mentés + beszéd-kapcsolók ---
+
+  A felhasználó gyakori fájdalma: egy 2 órás film hanganyagát hallgatta, ki
+  kellett lépnie, és utána elölről kellett keresnie. Megoldás 3 részből:
+
+  M1 — POZÍCIÓ-MENTÉS (folytatás):
+    - MusicPlayerPrefs: savePosition(trackId, ms) / getSavedPosition(trackId) /
+      clearPosition. Fájl-id + ms tárolása (3000 ms alatt nem ment, nem érdemes).
+    - stopAndFinish() MOST elmenti a pozíciót MÉG a releasePlayer() ELŐTT.
+    - playCurrent() setOnPreparedListener: ha erre a számra van mentett pozíció,
+      oda ugrik (seekTo) és bemondja "Folytatás innen: X". Fogyasztás után törli
+      a mentést (ne ugorjon oda újra legközelebb magától).
+
+  M3 — BESZÉD-VISSZAJELZÉS KAPCSOLÓK:
+    - MusicPlayerPrefs: getSpeakOnSkip/Stop/Seek (alapból mind BE).
+    - Menü: Média > Zene beállítások > Beszéd-visszajelzés almenü, 3 kapcsoló
+      (Számváltásnál / Leállításnál / Tekerésnél beszéljen). MainActivity:
+      toggleMusicSpeak(). MenuAction: MUSIC_SPEAK_SKIP/STOP/SEEK.
+    - stopAndFinish a getSpeakOnStop-ot, seekBy a getSpeakOnSeek-et figyeli.
+
+  M2 (részleges): a stop-beszéd kapcsoló kész; a "kilépsz vagy háttérbe?" kérdés
+    későbbre maradt (a pozíció-mentés önmagában megoldja a film-veszteséget).
+
+  Build EXIT=0, telepítve. FONTOS: a podcast-lejátszó már régóta ment pozíciót
+  (savePosition), ez volt a minta a zenéhez.
+
+  --- 2026-07-19 (11. kör) — Bankjegy-YOLO bekötés (5 hiba megoldva) ---
+  A saját betanított YOLO-detektor bekötése a pénzfelismerőbe. ÖT külön hiba:
+  (1) NCHW helyett NHWC export kellett; (2) hiányzó normalizálás (pixel/255);
+  (3) a régi classifier felülírta a YOLO címletét (reconcileStages átírva);
+  (4) NNAPI-delegate összeomlás az Ulefone-on -> setUseNNAPI(false); (5) a 3D
+  kimeneti buffer [1,10,8400] alakhelyesen kell (lapos buffer crashelt).
+  A bekötés KÉSZ, a modell fut, nem omlik össze. A felismerés PONTOSSÁGA gyenge
+  (szintetikus képeken tanult, valós kamerán ugrál) — ez KÜLÖN, jövőbeli feladat:
+  valódi bankjegyfotókkal újratanítás. NEM a bekötés hibája.
+
+  --- 2026-07-18 (9. kör) — Összes névjegy mentése vCard-ba ---
+
+  Kérés: a névjegyzékben (vagy bárhol relevánsan) legyen "minden névjegy mentése".
+  Elv: "a Google állítólag mindent ment, de a dupla varrás jobban tart."
+
+  FORMÁTUM: vCard (.vcf), NEM CSV. Miért:
+    - a vCard a névjegyek szabványos formátuma — minden telefon, Google
+      Kapcsolatok, iPhone visszaimportálja
+    - MINDENT visz: több szám, több e-mail, cím, cég, jegyzet. A CSV ezeknél
+      elbukik (a névjegy nem sima táblázatsor).
+
+  ÚJ FÁJL: contacts/export/VCardExporter.kt
+    - exportAll(): az összevont Contacts-on megy végig (nem RawContacts, hogy a
+      duplikátumok ne kétszereződjenek), minden névjegyhez összeszedi az ÖSSZES
+      adatsort (TEL/EMAIL/ADR/ORG/NOTE) a CommonDataKinds típusok alapján
+    - vCard 3.0 (ezt minden importáló érti), helyes escape (\, ; , újsor)
+    - MIÉRT KÜLÖN A BackupManager-től: a névjegyek NEM a mi SharedPrefs-ünkben
+      vannak, hanem az Android névjegy-adatbázisában. Két külön igény, két fájl.
+
+  PORTÁL: Névjegyek fül tetején "Összes névjegy letöltése (vCard)" gomb
+    - /contacts/export GET -> serveTextDownload(..., "text/vcard")
+    - fájlnév: superdl-nevjegyek-ÉÉÉÉHHNN-ÓÓPP.vcf
+    - a serveJsonDownload átnevezve serveTextDownload-ra, content-type paraméterrel
+      (JSON a beállítás-mentéshez, vCard a névjegyekhez) — a backup hívása is frissítve
+
+  Build: EXIT=0, BUILD SUCCESSFUL.
+  Telepítés + éles teszt: HÁTRA VAN (a telefon lecsatlakozott).
+
+  --- 2026-07-18 (8. kör) — Portál letöltés javítás (route) + mojibake mentés ---
+  A /backup/download "visszaugrott a főoldalra" a letöltés helyett. Ok: a routing
+  path == "/x" PONTOS egyezést várt, de a GET-form a PIN-t a query-be teszi
+  (?pin=1234), így a path nem egyezett, 404 -> főoldal. Javítás: route =
+  path.substringBefore("?") a routinghoz, az auth marad a nyers path-on.
+  KÖZBEN: PowerShell Get-Content/WriteAllLines TÖNKRETETTE a fájl ékezeteit
+  (mojibake, 160+ hely). Helyreállítva CP1250 Python-dekódolással. TANULSÁG:
+  soha ne szerkeszd a .kt-t PowerShell-lel, csak Desktop Commander edit_block-kal.
+  (Részletek az AI_START_HERE.md 5. szakaszában.)
+
+  --- 2026-07-17 (7. kör) — Akku-felmentés a varázslóba + gyártói autostart ---
+
+  Kérés: az akku-optimalizálás engedélyezése is legyen beépítve, illetve a
+  "mindig felül" (overlay) rész is.
+
+  DÖNTÉS AZ OVERLAY-RŐL: NEM építettük be. Indoklás:
+    A SYSTEM_ALERT_WINDOW-ra a SuperDL-nek NINCS szüksége. Az ébresztő, a
+    gyógyszer emlékeztető és a hívásképernyő MÁR MOST megjelenik zárolt
+    képernyőn (showWhenLocked + turnScreenOn + USE_FULL_SCREEN_INTENT) — ez a
+    HELYES Android-módszer, és megbízhatóbb, mint az overlay. Az overlay ehhez
+    képest: Play Store külön indokolást kér, több gyártó elrejti, és ha
+    meghibásodik, a felhasználó BERAGADHAT (vakon katasztrófa). Vagyis egy
+    működő megoldás gyengébb duplikátuma lenne.
+
+  === A) Akku-felmentés BEKERÜLT A VARÁZSLÓBA (ESSENTIAL) ===
+    Eddig csak külön menüpont volt (6. kör) — egy friss telefonon KI LEHET
+    HAGYNI. Márpedig ez a némaság első számú oka, tehát a varázslóban a helye,
+    ahol nem lehet átsiklani rajta.
+    - SetupRequirements: új "battery_optimization" tétel, ESSENTIAL,
+      SYSTEM_SCREEN, isIgnoringBatteryOptimizations() + systemIntentFor()
+    - MANIFEST: hozzáadva a REQUEST_IGNORE_BATTERY_OPTIMIZATIONS engedély.
+      HIÁNYZOTT! Enélkül a rendszerpárbeszéd ActivityNotFoundException-nel
+      elszállt volna. Telepítés után ellenőrizve: granted=true.
+    Így a SetupRequirements már 17 tételt mér (8 ESSENTIAL).
+
+  === B) Gyártói autostart (setup/AutostartHelper.kt) ===
+    MIÉRT KELL KÜLÖN: több gyártó (Xiaomi, Huawei, Oppo, Vivo...) SAJÁT
+    háttérvédelmet futtat az Android FÖLÖTT. Attól, hogy az Android akku-
+    optimalizálása alól felmentetted az appot, a GYÁRTÓ még megölheti.
+
+    11 gyártó, 20+ ismert Activity (xiaomi/redmi/poco, huawei/honor,
+    oppo/realme, vivo, oneplus, asus, letv, meizu).
+
+    ŐSZINTESÉG (ez a lényeg):
+      - Erre NINCS szabványos API, csak nem dokumentált Activity-nevek, amik
+        verzióról verzióra változhatnak. Ezért MINDIG resolveActivity-vel
+        ellenőrizzük, megnyitható-e — vakon indítva ActivityNotFoundException
+        lenne, amit a felhasználó "a SuperDL összeomlott"-ként élne meg.
+      - NEM tudjuk lekérdezni, hogy be van-e kapcsolva. Semmilyen API nincs rá.
+        Ezért a diagnosztikában ez SOHA nem FAIL, csak WARN: hazugság lenne
+        hibát jelenteni valamire, amit nem tudunk megmérni.
+      - Ha nincs ismert képernyő, NEM hallgatunk: elmondjuk, hol keresse, vagy
+        hogy valószínűleg nincs is ilyen ezen a telefonon.
+
+    ELLENŐRIZVE A VALÓS TELEFONON (Ulefone Armor 24):
+      A gyártói app: com.dobest.securitycenter. Megnézve a dumpsys-szel:
+      CSAK takarító/memória funkciók vannak benne (CleanRubbish,
+      MemorySpeedActivity) — NINCS klasszikus autostart-kezelő, mint a
+      Xiaominál. Az Ulefone az Android saját akku-optimalizálására hagyatkozik,
+      amit már kezelünk. => Ezen a telefonon az autostart menüpont helyesen azt
+      fogja mondani, hogy nincs ilyen, és elég a korlátlan háttérfutás.
+
+    Menü: Beállítások > "Automatikus indítás a gyártónál"
+    (a menüfa statikus val, ezért a menüpont mindig ott van; a FUNKCIÓ mondja
+     meg, van-e mit tenni — így őszintébb is)
+    Diagnosztika: új "Gyártói automatikus indítás" ellenőrzés (WARN vagy OK).
+
+  Build: EXIT=0, BUILD SUCCESSFUL. Telepítés: Success, engedély granted=true.
+  Tesztelés: hátra van.
+
+  --- 2026-07-17 (6. kör) — DIAGNOSZTIKA (setup/DiagnosticsReport.kt) ---
+
+  MIÉRT KELL, HA MÁR VAN SetupRequirements: a kettő NEM ugyanaz!
+    - SetupRequirements: MI HIÁNYZIK (engedély)
+    - DiagnosticsReport: MI NEM FOG MŰKÖDNI — akkor is, ha minden engedély megvan
+  Egy gyógyszer-emlékeztetőnél lehet engedély, lehet felvéve az emlékeztető, és
+  MÉGSEM szólal meg. Ez a projekt legveszélyesebb hibatípusa: a néma hiba.
+
+  *** FŐ LELET: AZ AKKU-OPTIMALIZÁLÁST A PROJEKT SEHOL NEM ELLENŐRIZTE ***
+  Az isIgnoringBatteryOptimizations hívás NULLA találat volt az egész kódbázisban.
+  Pedig ez a némaság LEGGYAKORIBB oka: a gyártók (Ulefone is!) agresszíven
+  altatják a háttérappokat => a gyógyszer emlékeztető és az ébresztő KÉSHET vagy
+  ELMARADHAT, hiába van meg minden engedély.
+
+  ELLENŐRIZVE A VALÓS TELEFONON (adb dumpsys deviceidle whitelist):
+    A SuperDL NINCS a felmentési listán! A whitelist tele van rendszerappokkal
+    (calendar provider, downloads, gms, vending...), de a SuperDL nem szerepel.
+    => A fejlesztő SAJÁT telefonján is fennáll a kockázat. Eddig semmi nem szólt.
+
+  AZ 5 ELLENŐRZÉS:
+    1. batteryOptimization() — altatja-e a rendszer az appot (FAIL, ha igen)
+    2. exactAlarm() — van-e pontos időzítés engedély
+    3. medicationHealth() — a LÉNYEG: nem az, hogy LÉTEZIK-e emlékeztető, hanem
+       hogy EL FOG-E SÜLNI. Végigmegy a bekapcsolt emlékeztetőkön, és a
+       MedicationScheduler.nextTriggerMillis()-szel megnézi, van-e ÉRVÉNYES
+       következő időpont (-1L = nem ütemezhető, pl. lejárt kúra). Megmondja a
+       legközelebbi riasztás nevét és időpontját is.
+    4. backgroundRestriction() — ActivityManager.isBackgroundRestricted
+    5. storageSpace() — betelt tárhelynél a mentés és a felvétel csendben bukhat
+
+  HÁROM SZINT: OK / WARN / FAIL. A FAIL-ek elöl (a sorrend maga is információ).
+  Minden ellenőrzés megmondja, MIT TEGYÉL — nem csak azt, hogy baj van.
+
+  ÚJ MENÜPONTOK (Beállítások almenü):
+    - "Diagnosztika" — háttérszálon fut (a tárhely/akku lekérdezés lassú lehet),
+      utána felolvassa az összefoglalót. NEM flow: itt nincs mit választani.
+    - "Korlátlan háttérfutás engedélyezése" — egy kattintásos rendszerpárbeszéd
+      (ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS). Külön menüpont, mert ez a
+      némaság leggyakoribb oka, és nem kell hozzá varázsló.
+
+  PORTÁL: /diagnostics oldal (fül MINDKÉT fülsávban).
+
+  Build: EXIT=0, BUILD SUCCESSFUL. Telepítés: Success.
+  MÉG NEM TESZTELVE a telefonon (a diagnosztika felolvasása).
+
+  --- 2026-07-17 (5. kör) — /setup portál-oldal + MENTÉS/VISSZAÁLLÍTÁS ---
+
+  === A) /setup portál-oldal ===
+  A SetupRequirements motorja már készen volt (4. kör), csak a HTTP-réteg kellett.
+
+  FONTOS KORLÁT, AMIT KI KELL MONDANI: az oldalon NINCS és NEM IS LEHET kapcsoló.
+  Az Android SZÁNDÉKOSAN tiltja, hogy engedélyt távolról, felhasználói érintés
+  nélkül meg lehessen adni — egy weboldal nem kattinthat a rendszer engedély-
+  kérésére. Ez biztonsági alapelv, nem hiányosság. Kapcsolót tenni ide hazugság
+  lenne.
+  AMIRE JÓ: a SEGÍTŐ (családtag) LÁTJA, mi hiányzik, és el tudja mondani
+  telefonon, mit nyomjon meg. A telefonon a Beállítás varázsló vezet végig —
+  ez az oldal ahhoz ad térképet. Minden hiányzó tételnél ott a PermissionGuide
+  részletes magyar útmutatója <details> elemben (natívan akadálymentes).
+
+  === B) Mentés és visszaállítás (backup/BackupManager.kt + /backup oldal) ===
+
+  MIÉRT: 44 Store, mind SharedPreferences. Telefon elveszik/elromlik => MINDEN
+  elveszik: névjegy-csengőhangok, gyógyszerek, kedvencek, GPS útvonalak,
+  könyvjelzők, hangbeállítások. Vakon ezt újra felépíteni napok munkája.
+  Ez teszi a SuperDL-t HORDOZHATÓVÁ (és ez kell a "SuperDL Mobil" termékhez).
+
+  FELDERÍTÉS (adb-vel, a VALÓS telefonon — nem feltételezés):
+    A shared_prefs-ben csak 11 fájl van, NEM 44. A "superdl.xml" a GYŰJTŐ:
+    ébresztők, gyógyszerek, jegyzetek, kedvencek, útvonalak, könyvpozíciók,
+    hangbeállítások, őrség — mind ott, saját kulcsokkal, _schema verziókkal.
+    Idegen fájlok is vannak (WebViewChromiumPrefs, mlkit, AwOriginVisitLogger).
+
+  MIÉRT MŰKÖDIK ÁLTALÁNOSAN: minden Store ugyanazt a mintát követi
+  (JsonPrefsHelper: prefs-fájl + JSON + séma-verzió), ezért nem kell a 44 Store-t
+  egyenként ismerni — elég a prefs-fájlokat kiolvasni. Egy ÚJ Store magától
+  bekerül a mentésbe, külön munka nélkül.
+
+  TERVEZÉSI DÖNTÉSEK:
+    - INCLUDED_PREFS fehérlista, NEM automatikus felderítés: az idegen fájlokat
+      (WebView, mlkit) másik telefonra átvinni káros lenne.
+    - EXCLUDED_KEYS: pin_hash/pin_salt (biztonsági hiba lenne átvinni),
+      hotspot_last_known, battery_full_announced, day_greeting_last_date,
+      phone_ringer_fixup (pillanatnyi/eszközfüggő állapot, nem beállítás).
+    - AZ E-MAIL JELSZÓ ELEVE NINCS BENNE: EncryptedSharedPreferences, a kulcs a
+      telefon HARDVERÉBEN (Keystore). Másik telefonon értelmezhetetlen. Ezt a
+      visszaállítás KIMONDJA, nem hallgatja el.
+    - TÍPUSOK MEGŐRZÉSE (t/v párok): a SharedPreferences típusos. Egy Int-et
+      String-ként visszaírni ClassCastException-t okozna, vagy ami rosszabb,
+      csendben alapértékre esne vissza.
+    - Visszaállításnál csak a SAJÁT fájljainkba írunk (a fájlban lévő prefs-nevet
+      ellenőrizzük az INCLUDED_PREFS ellen) — egy manipulált mentés nem tehet
+      kárt más app vagy a rendszer beállításaiban.
+    - KÉT LÉPÉS: a restore-confirm megmutatja, MI van a fájlban (mikor, melyik
+      készülékről, hány beállítás), és csak utána ír. Nincs visszavonás.
+    - A visszaállítás után KIMONDJUK: e-mail jelszó újra kell, engedélyek újra
+      kellenek (Beállítás varázsló), és indítsd újra az appot.
+    - readSmallTextUpload(): a mentés-fájl MEMÓRIÁBA olvasva, nem lemezre —
+      nem akarjuk a telefonra írni, mielőtt kiderül, érvényes-e egyáltalán.
+      (A handleUpload lemezre streamel, az nagy fájlokra való.)
+
+  Formátum: egyszerű, olvasható JSON (format=1), ha baj van, kézzel is
+  megnézhető. A letöltött fájl neve dátumos: superdl-mentes-ÉÉÉÉHHNN-ÓÓPP.json
+
+  ÚJ FÜLEK (MINDKÉT fülsávban): "Beállítás" (/setup) és "Mentés" (/backup)
+
+  Build: EXIT=0, BUILD SUCCESSFUL. Telepítés: Success.
+  Tesztelés: hátra van (a backup export/import ÉLES adatokon még nem futott).
+
+  --- 2026-07-17 (4. kör) — Beállítás varázsló (setup wizard) ---
+  Kérés: a launcher legyen a legtöbbet lefedő, legprofibb — kezdve azzal, ami
+  nélkül át sem lehet adni valakinek.
+
+  MIÉRT EZ ELŐSZÖR: 24 service, mindegyik MÁS rendszerképernyőn kér jogot.
+  Aki most kapja kézbe a telefont, egyedül nem jut át rajta — és ha egy engedély
+  hiányzik, a funkció CSENDBEN nem megy (ez a projekt visszatérő hibatípusa).
+  Az engedély-ellenőrzés eddig kb. 30 helyen, ad-hoc módon szórva volt; NEM volt
+  egy hely, ami megmondja: "ez hiányzik, és emiatt ez nem fog menni".
+
+  ÚJ FÁJL: setup/SetupRequirements.kt
+    16 követelmény, három súlyossági szinten:
+      ALAPVETŐ (7): telefonálás, névjegyek, üzenetek, mikrofon, értesítés-
+        megjelenítés, alapértelmezett SMS app, PONTOS ÉBRESZTŐ
+      FONTOS (7): telefon-szerep, asszisztens-szerep, GPS, kamera, naptár,
+        értesítés-olvasó, hangfájlok
+      KIEGÉSZÍTŐ (3): hívásszűrő, hívásnapló, Bluetooth
+    API: all(), missing(), missingEssential(), isReady(), speakSummary(),
+         systemIntentFor(), appSettingsIntent()
+
+  TERVEZÉSI DÖNTÉSEK:
+    - NEM a technikai nevet mondja, hanem a KÖVETKEZMÉNYT. Nem "RECORD_AUDIO
+      hiányzik", hanem "Mikrofon: hiányzik. Nem működik a diktálás és Elena.
+      Enélkül mindent gesztussal kell vezérelni." Vakon ez az, ami számít.
+    - A PONTOS ÉBRESZTŐ szándékosan ALAPVETŐ, nem fontos: a szövege kimondja,
+      hogy "Ez egészségügyi kockázat" — egy elmaradt gyógyszer-emlékeztető nem
+      kényelmi kérdés.
+    - Három súlyossági szint, mert nem minden engedély egyenlő: telefonálás
+      nélkül a SuperDL nem az, aminek szánták; kamera nélkül csak pár funkció
+      esik ki. Ne riogassunk ugyanúgy mindkettőért.
+    - A státusz-lekérdezés SOHA nem dobhat kivételt (safe{} wrapper): OEM-
+      eltérésnél inkább "hiányzik", mint összeomlás a setup képernyőn.
+    - A varázsló NEM áll meg elutasításnál — később bármikor visszatérhet.
+
+  ÉPÍT A MEGLÉVŐRE:
+    - settings/PermissionGuide.kt: 10 magyar útmutató szöveg (már megvolt)
+    - A három role-helper (Sms/Dialer/Assistant/CallFilter) EGYSÉGES mintát
+      követ: isXHeld() / createRoleRequestIntent() / guideSections() — erre
+      lehetett építeni.
+
+  MAINACTIVITY BEKÖTÉS (ÖT pont — ez a projekt tipikus buktatója):
+    1. menü-akció when      (~1759)  SETUP_WIZARD, SETUP_STATUS
+    2. fel-söprés when      (~853)   navigateSetupWizard(flow, -1)
+    3. le-söprés when       (~1002)  navigateSetupWizard(flow, +1)
+    4. jobbra-söprés when   (~1143)  activateSetupRequirement(flow)
+    5. balra-söprés when    (~1302)  exitFlow / returnToSetupWizard
+    + updateFlowDisplay()   (~12107) a kijelző szövege
+    Ha bármelyik kimarad, a menüpont látszik, de némán nem csinál semmit.
+
+  ÚJ FLOW-ÁLLAPOTOK (flow/AppFlow.kt):
+    - SetupWizardBrowse(requirements, index) — a HIÁNYZÓ tételek listája
+    - SetupWizardAwaitReturn(requirement) — várakozás a rendszerképernyőről
+      való visszatérésre. MIÉRT KELL: a felmérés pillanatfelvétel; visszatéréskor
+      ÚJRA kell mérni, különben a varázsló azt hinné, még mindig hiányzik.
+
+  MENÜ: Beállítások > Beállítás varázsló + Beállítás állapota (a lista ELEJÉN,
+  mert aki bajban van, ott keresi).
+
+  BUKTATÓ: a MainActivity EGYÁLTALÁN nem használ Log-ot (nincs android.util.Log
+  import). Egyetlen sor kedvéért nem hoztam be — a hibát úgyis kimondjuk a
+  felhasználónak, ami itt többet ér, mint egy naplóbejegyzés.
+
+  Build: EXIT=0, BUILD SUCCESSFUL, nulla warning az új kódra.
+  Telepítés: Success (2026-07-17).
+  Tesztelés: hátra van.
+
+  KÖVETKEZŐ LÉPÉS ehhez: /setup portál-oldal (a SetupRequirements már kész,
+  csak HTTP-réteg kell) — hogy a segítő is lássa, mi hiányzik.
+
+  --- 2026-07-17 (3. kör) — Portál: E-mail beállítások + IMAP javítás ---
+  Kérés: az e-mail beállítások megadása a portálról.
+
+  MIÉRT: a 16 karakteres Gmail alkalmazásjelszót lehetetlen bediktálni — ez a
+  portál eredeti létjogosultsága. Ráadásul a telefonos flow CSAK Gmailt tud.
+
+  MOTOR-VÁLTOZÁS (nem csak portál!):
+    A régi ImapReader-be az "imap.gmail.com:993" volt BEDRÓTOZVA, miközben az
+    SmtpConfig tetszőleges SMTP hostot enged. Következmény: nem-Gmail fiókkal
+    a KÜLDÉS működött, az OLVASÁS viszont CSENDBEN üres listát adott.
+    => Ezt megjavítottuk, nem megkerültük:
+    - SmtpConfig: új mezők imapHost + imapPort, resolvedImapHost()
+      (üres host esetén smtp.X -> imap.X tipp), resolvedImapPort(), canReadInbox()
+    - SmtpConfigStore: az új mezők mentése/olvasása; RÉGI mentés = üres imapHost
+      => a meglévő beállítás változatlanul működik (visszafelé kompatibilis)
+    - SmtpConfigStore.gmailPreset: explicit imap.gmail.com:993
+    - ImapReader.withSession: a hostot a configból veszi
+
+  ÚJ FÁJL: email/SmtpTester.kt
+    MIÉRT KELL: a SmtpSender.send() elnyeli a kivételt és csak false-t ad.
+    Beállításkor viszont az a kérdés, hogy MIÉRT nem megy. A SmtpTester
+    kapcsolódik + bejelentkezik (levélküldés NÉLKÜL), és beszédes magyar
+    hibaüzenetet ad: rossz jelszó / ismeretlen host / időtúllépés / nincs net.
+    testSmtp(), testImap(), testAll(). A testAll félsikert is megkülönböztet:
+    "a küldés működik, de az olvasás nem".
+
+  PORTÁL (/email oldal):
+    - PortalControlPages: emailPage() + handleEmailSaveGmail() +
+      handleEmailSaveAdvanced() + saveAndTest() + handleEmailTest() +
+      handleEmailDeleteConfirm() + handleEmailDelete()
+    - Gyors beállítás (Gmail): cím + alkalmazásjelszó + név, gmailPreset-tel
+    - Haladó beállítás: host, port, TLS, IMAP host, IMAP port, user, jelszó,
+      feladó cím, feladó név => TÖBBET TUD, MINT A TELEFON
+    - Mentés után AZONNALI teszt, az eredmény kimondva
+    - WifiPortalServer: 6 új útvonal (/email GET ?advanced=1-gyel,
+      /email/save-gmail, /email/save-advanced, /email/test,
+      /email/delete-confirm, /email/delete)
+
+  BIZTONSÁGI DÖNTÉSEK (tudatosak):
+    - A JELSZÓ SOHA nem íródik vissza az oldalra, még csillagozva sem.
+      Az állapot csak annyit mond: "a jelszó mentve van".
+    - Az oldalon FIGYELMEZTETÉS: a portál nem HTTPS, a jelszó nyílt szövegben
+      utazik a helyi WiFi-n. Otthon vállalható, nyilvános WiFi-n nem.
+      (A telefonra érve viszont titkosítva tárolódik — ez eddig is így volt.)
+    - Haladó mentésnél ÜRES jelszó = "ne változtass" — így egy feladónév-
+      módosításhoz nem kell újra beírni a 16 karaktert.
+    - A Gmail alkalmazásjelszóból csendben kiszedjük a szóközöket (a Google
+      4-es csoportokban mutatja) — különben egy láthatatlan szóköz miatt bukna.
+    - Törlés megerősítéssel: a jelszó nem visszaszerezhető.
+    - Mentés a teszt ELŐTT: ha a teszt hibát talál, a beállítás megmarad és
+      javítható, nem kell mindent újra beírni.
+
+  ELLENŐRZÉS: a portál szálpoolon fut (pool.execute { handleClient }), így a
+  12 másodperces SMTP-teszt NEM blokkolja sem a UI-t, sem a többi kérést.
+
+  MINDKÉT FÜLSÁVBA bekerült az "E-mail" fül (lásd a 2. kör tanulságát).
+
+  Build: EXIT=0, BUILD SUCCESSFUL. Az új fájlokra nulla warning.
+  Telepítés: Success (2026-07-17).
+  Tesztelés: hátra van.
+
+  --- 2026-07-17 (2. kör) — Portál: névjegy tömeges törlés + Patika Őrangyal ---
+  Kérés:
+    1. WiFi portál: névjegyek tömeges törlése (checkbox).
+    2. WiFi portál: Patika Őrangyal oldal (gyógyszer-emlékeztetők kezelése).
+
+  MIÉRT (a Patika portál-oldal lényege):
+    A diktálás sok gyógyszernevet nem ismer fel (Dedaxin, Anti-pukitin,
+    Fosadin...), mert nem köznyelvi szavak. Gépről begépelve pontosan
+    felvehetők. Az oldal NEM váltja ki a telefonos flow-t, csak kisegíti ott,
+    ahol az elakad.
+
+  Kiinduló állapot: a motorok készen álltak, csak a portál nem nyúlt hozzájuk.
+    - ContactHelper.deleteContact(context, contactId) — kész
+    - MedicationStore (getAll/add/addMultipleTimes/delete/setEnabled) — kész
+    - MedicationScheduler (scheduleAndReport/cancel) — kész
+    Új üzleti logika NEM kellett, csak HTTP-réteg.
+
+  Változások:
+    - PortalControlPages.kt: parseFormMulti() új segéd
+    - PortalControlPages.kt: contactsPage() — checkboxos tömeges törlő űrlap +
+        névjegyenkénti törlés gomb
+    - PortalControlPages.kt: handleContactDeleteConfirm() + handleContactDelete()
+    - PortalControlPages.kt: medicationPage() + handleMedicationAdd() +
+        handleMedicationToggle() + handleMedicationDeleteConfirm() +
+        handleMedicationDelete() + parseCourseEndMillis()
+    - PortalControlPages.kt: „Patika Őrangyal" fül a navigációban, CSS a
+        checkboxokhoz és a megerősítő listához
+    - WifiPortalServer.kt: 7 új útvonal (/contacts/delete-confirm,
+        /contacts/delete, /medication, /medication/add, /medication/toggle,
+        /medication/delete-confirm, /medication/delete)
+
+  BUKTATÓK, amiket a kód átnézése hozott elő (mind kezelve):
+
+    1. parseForm().toMap() ELNYELI a többszörös checkboxot!
+       A .toMap() azonos kulcsnál csak az UTOLSÓT tartja meg. A tömeges
+       törlésnél id=12&id=15&id=31 érkezik → a kijelölt húsz helyett EGYET
+       törölt volna. Megoldás: parseFormMulti(), ami listát ad kulcsonként.
+       A régi parseForm érintetlen (a többi oldal használja).
+
+    2. GYÓGYSZER TÖRLÉS SORRENDJE kötelező:
+         MedicationScheduler.cancel()  ELŐBB
+         MedicationStore.delete()      UTÁNA
+       (Így csinálja a MainActivity is.) Fordítva a bejegyzés eltűnik, de a
+       beütemezett riasztás megmarad → kísértet-emlékeztető egy nem létező
+       gyógyszerre. Ugyanez a kikapcsolásnál (toggle) is: cancel kell.
+
+    3. MedicationStore.add() NEM ÜTEMEZ magától!
+       A mentés után külön MedicationScheduler.scheduleAndReport() kell minden
+       felvett elemre — enélkül a bejegyzés létezik, de sosem szólal meg.
+
+    4. Egy névjegy TÖBB SZÁMMAL több sorként jelenik meg.
+       A listAllWithPhone kulcsa "id|phone", a törlés viszont a TELJES
+       névjegyet törli. Ha két sorát is kipipálod, kétszer futna ugyanarra az
+       ID-ra, és a második hamis hibaként számolódna. Megoldás: .distinct() az
+       ID-kon + .distinctBy { it.id } a felsorolásban.
+
+    5. Kúra-vég dátum a NAP VÉGÉRE (23:59:59), nem éjfélre.
+       A scheduler a következő riasztást hasonlítja ehhez; éjfélnél az aznapi
+       utolsó adag kimaradna.
+
+  Tervezési döntések:
+    - KÉTLÉPCSŐS TÖRLÉS mindkét helyen: a megerősítő oldal NÉV SZERINT
+      felsorolja, mi fog törlődni (role="alert"). Az SMS-nél egy üzenet vész
+      el, itt a fél telefonkönyv — vagy egy kimaradt gyógyszeradag.
+    - Napszakok ÉS egyéni időpont: a kettő ÖSSZEADÓDIK, együtt is használható.
+      Az azonos időpontok kiszűrve (nincs két egyforma emlékeztető).
+    - Részleges siker külön jelentve („7 törölve, 1 nem sikerült") — a néma
+      részleges siker itt rosszabb, mint a hiba.
+    - Szerkesztés nincs (a Store-ban sincs update) — törlés + újrafelvétel.
+    - A pontos ébresztő engedély hiánya figyelmeztetésként megjelenik az oldal
+      tetején.
+
+  Build: EXIT=0, BUILD SUCCESSFUL, nulla warning. SuperDL-1.54.9-debug.apk kész.
+  TELEPÍTÉS: Success (2026-07-17 21:11). firstInstallTime=2026-07-02 változatlan,
+  lastUpdateTime friss => valódi frissítés, a beállítások megmaradtak.
+  Tesztelés a telefonon: még hátra.
+
+  --- 2026-07-17 — Névjegyenkénti egyéni csengőhang (1.54.9) ---
+  Kérés:
+    A névjegy egyéni csengőhang funkció befejezése: MainActivity bekötés,
+    build, telepítés.
+
+  MIÉRT (a funkció lényege):
+    Vakon a hívó azonosítása a hangból a leggyorsabb — meg sem kell érinteni
+    a telefont ahhoz, hogy tudd, ki keres. Látóknak kényelem, itt információ.
+
+  Kiinduló állapot (a funkció egy korábbi Claude-beszélgetésben indult, ami
+  betelt kontextusablak miatt megszakadt épp a bekötés előtt — a kód
+  dokumentálatlanul állt a lemezen):
+    - contacts/ContactRingtoneStore.kt — kész (SharedPrefs + JSON tároló)
+    - call/IncomingCallRinger.kt — már kereste az egyéni hangot
+    - contacts/ContactContextAction.kt — RINGTONE("Egyéni csengőhang") benne
+    - files/WifiPortalServer.kt — ringtones/notifications/alarms mappák
+    Hiányzott: a MainActivity bekötés (a menüpont látszott, de nem csinált semmit).
+
+  Változások (1.54.9):
+    - MainActivity.kt: import ContactRingtoneStore (hiányzott)
+    - MainActivity.kt: contactRingtoneEditPhone/-Name mezők +
+        contactRingtonePickerLauncher (az alarmTonePickerLauncher mintájára —
+        a launcher-eredmény önmagában nem tudja, melyik névjegyhez szól,
+        ezért kell a mező)
+    - MainActivity.kt: openContactRingtonePicker(contact) — bemondja a
+        jelenlegi hangot, TONE_RINGTONE típussal indítja a pickert
+    - MainActivity.kt: ContactContextAction.RINGTONE -> openContactRingtonePicker
+        ág a névjegy context-menü when-jében
+    - proguard-rules.pro: -dontwarn a Tink KeysDownloader Google HTTP
+        osztályaira (RÉGI hiba volt, nem ez a funkció okozta — az R8 minden
+        release buildnél elhasalt volna)
+
+  Tervezési döntések (miért így):
+    - A hang a TELEFONSZÁMHOZ kötődik, nem a névjegy ID-hoz: a szám akkor is
+      megvan, ha a névjegy nincs elmentve, és bejövő híváskor ez az, amit
+      biztosan tudunk. A szám normalizálva (utolsó 9 számjegy), így a
+      +36301234567 és a 06301234567 ugyanaz.
+    - A picker „Alapértelmezett" opciója (üres URI) = az egyéni hang TÖRLÉSE.
+      Így egy menüponton belül lehet beállítani és visszavonni, nincs külön
+      „törlés" művelet, amit meg kellene találni.
+    - Telefonszám nélküli névjegynél a funkció kimondja, hogy nem megy.
+
+  Build és telepítés:
+    - Release build először ELBUKOTT: R8 / Tink (lásd fent + 8. szakasz)
+    - Javítás után release build OK: SuperDL-1.54.9-release.apk
+    - DE: a telefonon a DEBUG variáns van fenn, a release NINCS telepítve!
+      A release telepítése második appot tett volna fel üres beállításokkal.
+      => assembleDebug + adb install -r a debug APK-val.
+    - Telepítés: Success. firstInstallTime=2026-07-02 változatlan,
+      lastUpdateTime=2026-07-17 => valódi frissítés, beállítások megmaradtak.
+
+  Nyitva maradt:
+    - Tesztelés a telefonon (lásd 9. szakasz, „következő lépés")
+
+  --- 2026-06-30 — GPS utcabemondás / Voice Vista-szerű környezeti figyelő ---
+  Kérés:
+    GPS kitekintő utcabemondás javítása; Voice Vista (Soundscape) élmény Androidra
+
+  Változások (1.48.0):
+    - GpsSurroundingsService: folyamatos G P S + háttérszálon futó utca/kereszteződés bemondás
+    - GpsStreetAnnouncer: utcaváltás, közeledő kereszteződés (80/50/25/12 m), áthaladás
+    - OSM: úthálózat-alapú kereszteződés-felismerés (nem csak közlekedési lámpa)
+    - Nominatim + Overpass fallback utcanévhez
+    - Hálózati lekérdezés háttérszálon (korábban főszálon csendben elbukott)
+
+  Build: app\build\outputs\apk\release\SuperDL-1.48.0-release.apk
+
+  --- 2026-06-30 — Telefon frissítése legújabb verzióra ---
+  Kérés:
+    Fejlesztés folytatása, telefon frissítése a legújabb verzióra
+
+  Állapot:
+    - Telefon: Ulefone Armor 24 csatlakoztatva (3116TF1010002416)
+    - Telefonon volt: 1.47.0 (83) → frissítve: 1.47.1 (84) ✓
+    - Release build sikeres: app\build\outputs\apk\release\SuperDL-1.47.1-release.apk
+    - Telepítés sikeres (adb install -r)
+
+  --- 2026-06-27 — Fejlesztés folytatása, napló létrehozása ---
+  Kérés:
+    1. Fejlesztési napló / memória tér létrehozása a dokumentumokba
+    2. Telefon ellenőrzése USB-n, legfrissebb verzió telepítése
+
+  Állapot:
+    - Telefon: Ulefone Armor 24 csatlakoztatva (3116TF1010002416)
+    - Telefonon volt: 1.45.3 (76) → frissítve: 1.45.4 (77) ✓
+    - Release build sikeres: app\build\outputs\apk\release\SuperDL-1.45.4-release.apk
+    - Telepítés sikeres (adb install -r)
+    - Ez a naplófájl létrehozva: dokumentumok/fejlesztesi-naplo.txt
+
+  --- 2026-06-26 — 1.45.x sorozat (Elena, hotspot, GPS) ---
+  - Elena átnevezés, tudásbázis, háttérfigyelő
+  - Hotspot Ulefone javítások (sysfs, debounce, provisioning UI)
+  - GPS közeledési bemondások finomítva
+
+  --- 2026-06-25 — 1.36.x – 1.42.x sorozat ---
+  - Stabilitás javítások (kamera, DTMF, főmenü dupla gesztus)
+  - Pénzfelismerő, helyszín felismerő, névjegyzék, asszisztens ASR
+  - Részletek: dokumentumok/osszefoglalom.txt, dokumentumok/javitas.txt
+
+  --- 2026-06-20 — Diktálás, asszisztens, névjegy, kedvencek ---
+  - Diktálás megszakítás minden funkcióra
+  - Asszisztens ékezet-normalizálás, „hívd fel XY", segítség szöveg
+  - Kedvencek → Telefon és Hívások alá
+  - Új névjegy létrehozás (számbillentyűzet logika)
+  - Részletek: C:\Users\msn\superdlosszefog.txt
+
+
+================================================================================
+  11. GYORS PARANCSOK (fejlesztői)
+================================================================================
+
+  Előkészítés (minden PowerShell munkamenet elején):
+    cd C:\Users\msn\Documents\SuperDL-Android
+    $env:JAVA_HOME='C:\Program Files\Android\Android Studio\jbr'
+    $adb = "C:\Users\msn\AppData\Local\Android\Sdk\platform-tools\adb.exe"
+
+  Eszköz lista:      & $adb devices -l
+  Telepített verzió: & $adb -s 3116TF1010002416 shell "dumpsys package com.superdl.launcher.debug | grep versionName"
+  Build debug:       .\gradlew.bat assembleDebug *> build_log_debug.txt; "EXIT=$LASTEXITCODE"
+  Build release:     .\gradlew.bat assembleRelease *> build_log.txt; "EXIT=$LASTEXITCODE"
+  Telepítés:         & $adb -s 3116TF1010002416 install -r <apk-útvonal>
+  Logcat:            & $adb -s 3116TF1010002416 logcat -s SuperDL
+  Gradle clean:      .\gradlew.bat clean
+
+
+================================================================================
+  VÉGE — következő frissítésnél a 2., 9. és 10. szakaszt kell bővíteni
+================================================================================

@@ -1,0 +1,88 @@
+SUPERDL KÉPERNYŐOLVASÓ MÓD — MEGVALÓSÍTHATÓSÁGI TERV
+================================================================================
+  >>> ELŐHÍVÓ JELSZÓ: "screenreader" <<<
+  Ha a felhasználó ezt mondja, ezt a tervet kell elővenni és folytatni.
+  Állapot: FELMÉRVE (2026-07-29), megvalósítás még NEM kezdődött el.
+================================================================================
+
+
+1. AZ ÖTLET
+--------------------------------------------------------------------------------
+A SuperDL jelenleg csak a SAJÁT felületét olvassa fel. Külső alkalmazás
+indításakor figyelmeztet, hogy annak tartalmát nem tudja felolvasni.
+CÉL: a SuperDL a MEGSZOKOTT NÉGY GESZTUSSAL a külső alkalmazások képernyőjét is
+felolvassa és kezelhetővé tegye — vagyis egy egyszerű, saját képernyőolvasó.
+
+
+2. MEGVALÓSÍTHATÓ? — IGEN, ÉS VAN HOZZÁ ALAPUNK
+--------------------------------------------------------------------------------
+Ugyanaz a mechanizmus kell hozzá, amin a TalkBack is működik: egy
+AccessibilityService, ami olvassa a képernyő elemfáját.
+
+A SuperDL-NEK MÁR VAN ILYEN SZOLGÁLTATÁSA:
+  KeyguardPinAccessibilityService (a rendszer PIN segédhez)
+  - már directBootAware, már működik zárolt képernyőn is
+  - már használ AccessibilityNodeInfo-t (KeyguardPinDetector, KeyguardPinInjector)
+  => a technikai alapok (engedélykezelés, node-olvasás, injektálás) MEGVANNAK.
+
+Amit egy AccessibilityService tud:
+  - getRootInActiveWindow()          -> a képernyő teljes elemfája
+  - AccessibilityNodeInfo bejárása   -> szöveg, leírás, típus, állapot
+  - performAction(ACTION_CLICK)      -> elem aktiválása
+  - performGlobalAction(BACK/HOME)   -> rendszer-gombok
+  - dispatchGesture()                -> görgetés, csúsztatás
+  - TYPE_WINDOW_CONTENT_CHANGED      -> értesítés, ha változik a képernyő
+
+
+3. HOGYAN ILLESZKEDNE A SUPERDL LOGIKÁJÁHOZ
+--------------------------------------------------------------------------------
+A négy gesztus MARAD, csak más a tartalom:
+  fel / le  -> lépkedés a képernyő elemei között (a fa bejárási sorrendjében),
+               és a rendszer felolvassa, amin épp állsz
+  jobbra    -> az adott elem aktiválása (kattintás)
+  balra     -> vissza (rendszer BACK)
+Kiegészítők:
+  - lefelé pöccintés: elem-részletek (típus, állapot: bejelölve / letiltva)
+  - hangerőgombok: görgetés fel/le hosszú listákban
+
+
+4. REÁLIS KORLÁTOK — ŐSZINTÉN
+--------------------------------------------------------------------------------
+  - A TalkBack ÉVEK fejlesztése. Egy TELJES értékű képernyőolvasó megírása
+    hatalmas munka: WebView-k, egyedi rajzolt felületek, listák, űrlapok,
+    görgetés, fókuszkezelés, élő régiók...
+  - Sok alkalmazás ROSSZUL CÍMKÉZETT: gomb felirat nélkül ("Gomb 3"),
+    képek leírás nélkül. Ezt a képernyőolvasó nem tudja kitalálni.
+  - Két képernyőolvasó EGYSZERRE zavarhatja egymást (ha a TalkBack is fut).
+    Kell egy tiszta ki/be kapcsolás és állapotjelzés.
+  - Akkumulátor: a folyamatos képernyő-figyelés terhel.
+
+  EZÉRT A JAVASLAT: NE teljes TalkBack-pótlék legyen a cél, hanem egy
+  EGYSZERŰ, MEGBÍZHATÓ olvasó, ami a gyakori appoknál működik. Az is óriási
+  nyereség, ha a felhasználó a megszokott gesztusaival tud egy bankalkalmazást
+  vagy egy üzenetküldőt kezelni.
+
+
+5. JAVASOLT LÉPÉSEK (ha nekiállunk)
+--------------------------------------------------------------------------------
+  1. ÚJ AccessibilityService (külön a PIN segédtől), saját ki/be kapcsolóval
+     a menüben, és egyértelmű hangjelzéssel, hogy most bekapcsolt.
+  2. ELEMFA-BEJÁRÓ: a látható, értelmes elemek listája (szöveg vagy leírás
+     alapján), a képernyő logikai sorrendjében.
+  3. FELOLVASÓ: az elem szövege + típusa ("gomb", "szövegmező", "bejelölve").
+  4. GESZTUS-KEZELÉS: fel/le lépkedés, jobbra aktiválás, balra vissza.
+  5. GÖRGETÉS: ha a lista végére érünk, automatikus görgetés.
+  6. TESZTELÉS konkrét, gyakori appokkal (üzenetküldő, böngésző, bank).
+  7. Későbbi finomítás: szövegmezők beolvasása, űrlapok, élő régiók.
+
+  MEGJEGYZÉS: az 1-4. lépés már önmagában használható eredményt ad.
+
+
+6. KAPCSOLÓDÁS MÁS TERVEKHEZ
+--------------------------------------------------------------------------------
+  - A "metanetta" (Meta szemüveg) tervvel: ha a szemüveg kamerája elérhető,
+    a képernyőolvasó és a kamerás felismerés KIEGÉSZÍTIK egymást.
+  - A meglévő ExternalAppHelper figyelmeztetése ("a Super DL nem olvassa fel a
+    tartalmát") ÁTÍRANDÓ lesz, ha ez elkészül.
+
+================================================================================

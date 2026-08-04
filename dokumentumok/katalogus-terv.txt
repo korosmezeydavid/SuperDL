@@ -1,0 +1,61 @@
+SUPERDL KATALÓGUS — TERVEZÉSI DÖNTÉS ÉS FELÉPÍTÉS
+================================================================================
+  >>> ELŐHÍVÓ JELSZÓ: "katalogus" <<<
+  Készült: 2026-08-01
+================================================================================
+
+
+1. A PROBLÉMA
+--------------------------------------------------------------------------------
+A SuperDL már most 280+ funkciót tud. Ha minden új modul, játék és program
+BELEKERÜL az alkalmazásba:
+ - az APK egyre nagyobb lesz (letöltés, tárhely, frissítés lassul),
+ - a menü áttekinthetetlenné válik,
+ - egyetlen hiba az egész alkalmazást döntheti be,
+ - és minden apró javításhoz az EGÉSZET újra ki kell adni.
+
+Kell tehát egy KATALÓGUS: a felhasználó letölti, amit akar, és csak azt.
+
+
+2. A DÖNTÉS: MILYEN MODULOKAT TÖLTÜNK LE?
+--------------------------------------------------------------------------------
+Három út volt, ebből EGYET választunk:
+
+  A) FUTTATHATÓ KÓD letöltése (APK vagy dex)
+     ELŐNY: bármit meg lehet vele oldani.
+     HÁTRÁNY: a Google Play SZABÁLYZATA TILTJA a futásidejű kód-letöltést.
+     Ha egyszer Play-re akarunk menni, ez azonnal elbuktatja.
+     Ráadásul biztonsági kockázat, és minden telepítés rendszer-párbeszéddel jár.
+     >>> ELVETVE.
+
+  B) KÜLÖN ALKALMAZÁSOK, amiket a katalógus csak AJÁNL
+     A katalógus felsorolja, a SuperDL megnyitja a Play-en vagy letöltésre.
+     ELŐNY: szabályos, bármilyen összetett program lehet.
+     HÁTRÁNY: külön alkalmazás, külön telepítés, külön frissítés.
+     >>> MEGTARTVA, de csak NAGY programokhoz.
+
+  C) ADAT-MODULOK, amiket a SuperDL SAJÁT motorjai értelmeznek
+     A letöltött fájl NEM kód, hanem adat: kérdéssor, szólista, hangkészlet,
+     rádióállomás-csomag, súgó, receptgyűjtemény.
+     A játék "motorja" (pl. kvíz-motor) a SuperDL-ben van, a TARTALOM jön kívülről.
+     ELŐNY: szabályos, biztonságos, kicsi, gyors, azonnal frissíthető.
+     Egy új kvízhez NEM kell új alkalmazás-verzió!
+     HÁTRÁNY: csak olyasmi készíthető, amire van motor.
+     >>> EZ LESZ AZ ALAP.
+
+  ÖSSZEGZÉS: a katalógus ADAT-MODULOKAT ad (C), és emellett AJÁNLHAT külön
+  alkalmazásokat is (B). Futtatható kódot SOHA nem tölt le.
+
+
+3. MILYEN MODUL-TÍPUSOK LESZNEK?
+--------------------------------------------------------------------------------
+  quiz          — kérdés-válasz játék (kvíz, vetélkedő, tanuló-kártyák)
+  wordgame      — szójáték (szólisták: akasztófa, szólánc, anagramma)
+  soundtheme    — hangkészlet (gesztus-hangok, jelzések)
+  radiopack     — rádióállomás-csomag (ország, műfaj szerint)
+  guide         — felolvasható útmutató, oktatóanyag
+  recipes       — receptgyűjtemény
+  textbank      — előre elkészített szövegtár-készlet (pl. hivatalos ügyintézés)
+  externalapp   — külön alkalmazás AJÁNLÁSA (nem letöltés, csak megnyitás)
+
+  Új típushoz a SuperDL-ben kell motor — de a TARTALOM utána már szabadon bővül.

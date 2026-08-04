@@ -1,0 +1,72 @@
+SUPER DL – Android alkalmazás
+Fejlesztési napló – legutóbbi javítások
+
+================================================================================
+FÁJL HELYE:
+  C:\Users\msn\Documents\SuperDL-Android\dokumentumok\javitas.txt
+================================================================================
+
+Dátum: 2026-06-25
+Telefon: Ulefone Armor 24 (USB)
+Telepített verzió: 1.42.0 (versionCode 70)  ✓ TELEPÍTVE
+
+
+================================================================================
+MIT CSINÁLTAM? (1.42.0 – PÉNZFELISMERŐ KRITIKUS JAVÍTÁS)
+================================================================================
+
+Ez az app nem tévedhet – a téves címlet felismerés szinte végzetes lehet.
+Ezért két irányban erősítettem:
+
+A) VALÓDI BANKJEGY FOTÓKKAL TANÍTOTT MODELL
+   - 61 db Wikimedia Commons referencia fotó letöltve (minden címlet):
+     500 Ft: 10 kép   |  1000 Ft: 9 kép  |  2000 Ft: 12 kép
+     5000 Ft: 8 kép   |  10000 Ft: 11 kép |  20000 Ft: 11 kép
+   - Több évjárat (1998, 2009, 2014, 2017, 2018 sorozat)
+   - Előlap + hátlap, régi és új dizájn
+   - Forrás: Wikimedia Commons (nyilvános referencia szkenek)
+   - Tanítás: valódi fotók 3× súlyozva + erős augmentáció
+
+B) SZIGORÚBB FELISMERÉS (kevesebb téves találat)
+   - Magasabb bizalmi küszöb (52% vs régi 42%)
+   - Nagyobb különbség kell a 1. és 2. találat között (10%)
+   - 3 egyező képkocka kell 4-ből a bemondáshoz (régi: 2/3)
+   - Ha bizonytalan → „nem felismerhető” (nem talál ki címletet)
+
+   Filozófia: inkább azt mondja „nem tudom”, mint hogy rossz címletet mond.
+
+
+================================================================================
+KORÁBBI VERZIÓK (összefoglalva)
+================================================================================
+
+  1.41.0 – munkajelző kattintás, kamera mentés + megosztás
+  1.40.0 – helyszín felismerő, GPS, névjegyzék, asszisztens
+  1.37.2 – csengőhangok javítva (néma emlékeztetők)
+
+
+================================================================================
+MIT ÉRDEMES KIPRÓBÁLNI
+================================================================================
+
+  [ ] 500, 1000, 2000, 5000, 10000, 20000 Ft – mindegyiket
+  [ ] Gyenge fényben (vaku bekapcsol?)
+  [ ] Üres asztal → NEM mond címletet
+  [ ] Hangerő gomb → manuális ellenőrzés
+  [ ] Ha bizonytalan → „nem felismerhető” (ez jó, nem hiba!)
+
+
+================================================================================
+TOVÁBBI JAVÍTÁS – SAJÁT FOTÓK (a legjobb eredmény)
+================================================================================
+
+  Ha van lehetőség, fotózd le a SAJÁT bankjegyeidet a telefonoddal:
+  - különböző fény, szög, távolság
+  - 15–20 kép címletenként
+  - mentsd ide: tools\banknote_dataset\huf_500\ stb.
+  - Utána újratanítom – ez lesz a legpontosabb.
+
+  Letöltő script (Wikimedia frissítéshez):
+    python tools/download_banknote_dataset.py
+  Tanítás:
+    python tools/build_huf_banknote_model.py --augment-factor 12 --epochs 16

@@ -1,6 +1,48 @@
 {
   "schema_version": 1,
   "platform": "android",
-  "megjegyzes": "A SuperDL mobil (Android) katalógusa – a Windows modules.json mobil megfelelője. A mobil beszélgetés tölti fel a tényleges modul-/játék-bejegyzésekkel.",
-  "modules": []
+  "frissitve": "2026-08-04",
+  "megjegyzes": "A SuperDL mobil (Android) katalógusa. A modulok ADATOK (kérdéssor, szólista, állomáslista, útmutató) — NEM futtatható kód. A motorjuk a SuperDL alkalmazásban van, így új tartalomhoz nem kell új alkalmazás-verzió.",
+  "modules": [
+    {
+      "id": "kviz-magyarorszag",
+      "nev": "Magyarország kvíz",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Kérdések Magyarország földrajzáról, történelméről és kultúrájáról.",
+      "meret": 18400,
+      "fajl": "modulok/kviz/magyarorszag.json",
+      "minAlkalmazasVerzio": "1.55.0"
+    },
+    {
+      "id": "szojatek-alap",
+      "nev": "Akasztófa - alap szókészlet",
+      "tipus": "wordgame",
+      "verzio": 1,
+      "leiras": "Gyakori magyar szavak az akasztófához és a szóláncjátékhoz.",
+      "meret": 24000,
+      "fajl": "modulok/szojatek/alap.json",
+      "minAlkalmazasVerzio": "1.55.0"
+    },
+    {
+      "id": "radio-magyar",
+      "nev": "Magyar rádiók csomag",
+      "tipus": "radiopack",
+      "verzio": 1,
+      "leiras": "Válogatott magyar rádióállomások, közszolgálati és kereskedelmi adók.",
+      "meret": 4200,
+      "fajl": "modulok/radio/magyar.json",
+      "minAlkalmazasVerzio": "1.55.0"
+    },
+    {
+      "id": "utmutato-kezdo",
+      "nev": "Kezdő útmutató",
+      "tipus": "guide",
+      "verzio": 1,
+      "leiras": "Lépésről lépésre bemutatja a SuperDL kezelését, felolvasva.",
+      "meret": 12800,
+      "fajl": "modulok/utmutato/kezdo.json",
+      "minAlkalmazasVerzio": "1.55.0"
+    }
+  ]
 }

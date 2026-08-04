@@ -1,0 +1,187 @@
+SUPERDL KÉPERNYŐOLVASÓ — TUNING TERVEZET
+================================================================================
+  >>> ELŐHÍVÓ JELSZÓ: "tuning" <<<
+  Állapot: MEGTERVEZVE (2026-07-31), megvalósítás még NEM kezdődött el.
+  Alap: a működő képernyőolvasó (screenreader/ csomag).
+================================================================================
+
+
+1. MIÉRT EZ A KÖVETKEZŐ LÉPÉS
+--------------------------------------------------------------------------------
+A jelenlegi olvasó SORBAN lépked az elemeken. Ez rövid képernyőn jó, DE:
+ - egy weboldalon vagy hosszú listán 50-100 elemen kell átrágni magad,
+ - nem lehet "csak a gombokat" vagy "csak a címsorokat" végigvenni,
+ - a felolvasás mindig EGÉSZ elemet mond — nem lehet betűzni vagy szavanként
+   visszahallgatni, pedig egy jelszónál vagy hibás szónál pont az kell.
+
+A megoldás két, egymástól FÜGGETLEN tengely:
+   A) MIT lépkedünk végig  -> NAVIGÁCIÓS MÓD (két ujjal váltható)
+   B) MEKKORA egységet mond -> OLVASÁSI RÉSZLETESSÉG (három ujjal váltható)
+
+
+2. NAVIGÁCIÓS MÓDOK (két ujjas váltás)
+--------------------------------------------------------------------------------
+KÉT UJJAL JOBBRA  -> következő mód
+KÉT UJJAL BALRA   -> előző mód
+Váltáskor a rendszer BEMONDJA a módot és azt, hány elem van benne
+("Gombok. 7 darab."). Ha egy módban nincs elem, azt is megmondja, és NEM
+vált oda vakon.
+
+A MÓDOK (sorrendben):
+ 1. MINDEN          — a mostani működés (alapértelmezett)
+ 2. CÍMSOROK        — a szerkezet gyors átfutása ("hol vagyok az oldalon")
+ 3. HIVATKOZÁSOK    — weboldalon a linkek
+ 4. GOMBOK          — megnyomható vezérlők
+ 5. BEVITELI MEZŐK  — szövegmezők, kapcsolók, jelölőnégyzetek
+ 6. SZÖVEG          — a tényleges olvasnivaló, vezérlők nélkül
+
+MŰKÖDÉS: a mód csak SZŰRŐ az összegyűjtött elemlistán — a fel-le söprés
+ugyanúgy lépked, csak a szűrt listán. Ez egyszerű és gyors.
+
+HOGYAN ISMERJÜK FEL AZ EGYES TÍPUSOKAT:
+ - GOMB:        isClickable, vagy a className Button/ImageButton
+ - BEVITELI:    isEditable, isCheckable, SeekBar, Spinner
+ - HIVATKOZÁS:  a node "link" jellege — böngészőben a className gyakran
+                android.widget.TextView, de a WebView-ben van
+                AccessibilityNodeInfo.isClickable + a szülő WebView.
+                MEGBÍZHATÓBB: a CollectionInfo és a "role" leírás vizsgálata,
+                illetve a node.extras "AccessibilityNodeInfo.roleDescription"
+                kulcsa, amit a Chrome kitölt ("link", "heading", "button").
+ - CÍMSOR:      isHeading (API 28+), VAGY a roleDescription "heading",
+                VAGY a CollectionItemInfo.isHeading
+
+ŐSZINTE KORLÁT: natív (nem böngészős) alkalmazásokban a "címsor" és a
+"hivatkozás" fogalom gyakran NEM létezik — ott ezek a módok üresek lesznek.
+Ezért fontos, hogy a rendszer MEGMONDJA, ha egy mód üres, és ne engedjen
+"vakon" beleragadni.
+
+
+3. OLVASÁSI RÉSZLETESSÉG (három ujjas váltás)
+--------------------------------------------------------------------------------
+HÁROM UJJAL JOBBRA -> részletesebb (nagyobb nagyítás)
+HÁROM UJJAL BALRA  -> durvább
+
+A FOKOZATOK:
+ 1. ELEM        — az egész elemet mondja (alapértelmezett, a mostani működés)
+ 2. MONDAT      — mondatonként lépked a fókuszban lévő elem szövegében
+ 3. SZÓ         — szavanként
+ 4. KARAKTER    — betűzve (jelszó, hibás szó, rendszám ellenőrzésére)
+
+MŰKÖDÉS: a részletesség NEM az elemek közti lépkedést változtatja meg, hanem
+a FÓKUSZBAN LÉVŐ elem szövegén belüli mozgást. Vagyis:
+ - ELEM módban  : fel-le = előző/következő ELEM
+ - MONDAT módban: fel-le = előző/következő MONDAT az aktuális elemen belül;
+                  ha a végére érünk, automatikusan a KÖVETKEZŐ elemre lépünk
+ - ugyanez SZÓ és KARAKTER módban
+
+EZ A LÉNYEG: a felhasználó ugyanazzal a két mozdulattal navigál, csak más a
+"nagyítás". Nem kell új gesztust tanulni.
+
+KARAKTER módban a betűket ÉRTHETŐEN kell mondani:
+ - a magyar ábécé betűit önmagukban (a, bé, cé...)
+ - a nagybetűt jelezni ("nagy á")
+ - a számokat és írásjeleket néven ("pont", "kötőjel")
+ - opcionálisan BETŰZŐ ÁBÉCÉ ("Aladár, Béla, Cecil") — külön kapcsolóval,
+   mert telefonszám- vagy kódfelolvasásnál életmentő, egyébként lassít
+
+
+4. AMIT ÉN TENNÉK MÉG HOZZÁ (javaslatok)
+--------------------------------------------------------------------------------
+
+4.1 "HOL VAGYOK?" — egy ujjal lefelé, majd hosszan
+    Bemondja: az alkalmazás nevét, a képernyő címét (ha van), és hogy hányadik
+    elemen állsz hány közül. Egy mozdulat, és újra tájékozódtál.
+
+4.2 FOLYAMATOS OLVASÁS ("olvasd fel az egészet")
+    Az aktuális elemtől végigolvassa a képernyőt, elemről elemre, magától.
+    Bármely érintés MEGÁLLÍTJA. Cikkeknél, üzeneteknél ez a leggyakoribb igény.
+    Javasolt gesztus: két ujjal LEFELÉ.
+
+4.3 GYORS KERESÉS SZÖVEG SZERINT
+    Diktálsz egy szót, és a rendszer az ELSŐ olyan elemre ugrik, ami tartalmazza.
+    Hosszú listákban (névjegy, beállítás) sokkal gyorsabb, mint végiglépkedni.
+    A diktáláshoz a SuperDL saját, központozást értő hangbevitelét használjuk.
+
+4.4 UTOLSÓ MONDAT ISMÉTLÉSE
+    Ha nem értetted, ne kelljen visszalépni: egy mozdulat, és újra elmondja.
+    Javasolt: két ujjal FELFELÉ (a mostani súgó átkerülhet máshova).
+
+4.5 ÉRTESÍTÉS-FELOLVASÁS KÉRÉSRE
+    A legutóbbi értesítés tartalmának bemondása anélkül, hogy lehúznánk a sávot.
+
+4.6 "MI VÁLTOZOTT?" — élő régiók kezelése
+    Néhány alkalmazás jelzi, ha egy szövege magától frissül (töltés állapota,
+    eredményjelző). Ezeket érdemes bemondani — de CSAK ha a felhasználó
+    engedélyezte, különben zavaró.
+
+4.7 SEBESSÉG-GYORSGOMB
+    A felolvasás sebességének gyors változtatása a hangerőgombokkal, amíg az
+    olvasó aktív. Hosszú szöveget gyorsan, nehezet lassan.
+
+4.8 ELEM-SZÁMLÁLÓ ELHAGYÁSA
+    A mostani "3 / 47" bemondás tanuláskor jó, de gyakorlott használatnál
+    lassít. Legyen KIKAPCSOLHATÓ (mint a zenelejátszó beszéd-főkapcsolója).
+
+
+5. A TELJES GESZTUS-TÉRKÉP (a tuning után)
+--------------------------------------------------------------------------------
+EGY UJJAL (a megszokott négy — VÁLTOZATLAN):
+  le / fel        navigálás az aktuális módban és részletességgel
+  jobbra          megnyomás / szövegmezőbe állás
+  balra           vissza
+
+EGY UJJAL, ÖSSZETETT (marad, ami már van):
+  le majd fel     görgetés lefelé
+  fel majd le     görgetés felfelé
+  balra-jobbra    ugrás az első elemre
+  jobbra-balra    ugrás az utolsóra
+  fel majd balra  kezdőképernyő
+  fel majd jobbra legutóbbi alkalmazások
+  le majd balra   értesítések
+  le majd jobbra  hosszan nyomás
+
+KÉT UJJAL (ÚJ — navigációs mód és olvasás):
+  jobbra          következő navigációs mód (minden > címsor > link > gomb > mező > szöveg)
+  balra           előző navigációs mód
+  lefelé          FOLYAMATOS OLVASÁS indítása
+  felfelé         az utolsó mondat ISMÉTLÉSE
+
+HÁROM UJJAL (ÚJ — részletesség és extrák):
+  jobbra          részletesebb (elem > mondat > szó > karakter)
+  balra           durvább
+  lefelé          "Hol vagyok?" tájékoztató
+  felfelé         SÚGÓ (a mostani helyéről ide kerül)
+
+ELV: egy ujj = mozgás, két ujj = MIT olvasunk, három ujj = HOGYAN olvassuk.
+Ez könnyen megjegyezhető, és nem ütközik a mátrix billentyűzet gesztusaival,
+mert az olvasó billentyűzet megjelenésekor amúgy is szünetel.
+
+
+6. MEGVALÓSÍTÁSI SORREND
+--------------------------------------------------------------------------------
+ 1. NavigationMode enum + szűrés a meglévő elemlistán (MINDEN/GOMB/MEZŐ/SZÖVEG)
+    >>> INNENTŐL MÁR HASZNÁLHATÓ: a gombok közti ugrálás azonnal nagy nyereség
+ 2. Két ujjas módváltás + bemondás ("Gombok. 7 darab.")
+ 3. CÍMSOR és HIVATKOZÁS felismerés (isHeading, roleDescription, WebView)
+ 4. ReadingGranularity enum + szövegen belüli mozgás (mondat > szó > karakter)
+ 5. Három ujjas részletesség-váltás
+ 6. Folyamatos olvasás (bármely érintés megállítja)
+ 7. "Hol vagyok?" és utolsó mondat ismétlése
+ 8. Beállítások: elem-számláló ki/be, betűző ábécé ki/be, élő régiók ki/be
+ 9. A súgó frissítése az összes új mozdulattal
+
+
+7. KOCKÁZATOK, AMIKRE FIGYELNI KELL
+--------------------------------------------------------------------------------
+ - A KÉT- ÉS HÁROMUJJAS gesztusokat a rendszer felismeri-e megbízhatóan?
+   Az AccessibilityService kap ilyen eseményeket (GESTURE_2_FINGER_SWIPE_*,
+   GESTURE_3_FINGER_SWIPE_* — Android 11 / API 30 felett). RÉGEBBI Androidon
+   NINCSENEK — ott tartalék kell (pl. a módváltás menüből, vagy hosszabb
+   összetett egyujjas gesztus). A minSdk 26, tehát ez VALÓS kérdés.
+ - Címsor/link felismerés natív appokban gyakran hiányzik -> üres mód.
+   A rendszer MONDJA MEG, hogy üres, és ne engedjen beleragadni.
+ - A folyamatos olvasást KÖNNYEN meg kell tudni állítani — bármely érintéssel.
+ - Minden új funkció a meglévő BIZTONSÁGI RETESZ alatt marad: hiba esetén a
+   hibaszámláló nő, három hiba után vészleállítás.
+
+================================================================================

@@ -1,0 +1,173 @@
+SUPERDL BRAILLE BILLENTYŰZET — RÉSZLETES TERV
+================================================================================
+  >>> ELŐHÍVÓ JELSZÓ: "braille" <<<
+  Állapot: MEGTERVEZVE (2026-07-31), megvalósítás még NEM kezdődött el.
+================================================================================
+
+1. A CÉL ÉS A MINTA
+--------------------------------------------------------------------------------
+Saját Braille beviteli billentyűzet, ami az IPHONE "Braille Screen Input"
+élményét adja. A felhasználó az iPhone-osat megszokta, a TalkBack Braille
+billentyűzetét NEM — a különbség nem ízlés kérdése, hanem szerkezeti:
+
+  - Az iPhone A KÉZHEZ IGAZÍTJA a pontokat (oda kerülnek, ahová leteszed
+    a hat ujjadat), a TalkBacknél inkább neked kell megtalálnod őket.
+  - A beütés a FELENGEDÉS pillanatában történik, nem lenyomáskor — így nem
+    kell időzíteni, és közben nyugodtan igazíthatsz az ujjaidon.
+  - Kevés, egyszerű gesztus.
+
+Ez a három dolog adja a folyékonyságot, tehát MINDHÁRMAT át kell vennünk.
+
+
+2. ARCHITEKTÚRA — KÜLÖN BILLENTYŰZET, NEM OVERLAY
+--------------------------------------------------------------------------------
+DÖNTÉS: android.inputmethodservice.InputMethodService (saját billentyűzet).
+
+INDOKLÁS:
+ a) ÉRINTÉS-ÜTKÖZÉS: ha a képernyőolvasó aktív, a rendszer ELFOGJA az
+    érintéseket (touch exploration) — a multi-touch nem érne el tisztán egy
+    overlayhez. Billentyűzetként KÖZVETLENÜL kapjuk az eseményeket.
+ b) SZÖVEGBEÍRÁS: billentyűzetként a rendszer beviteli csatornáján írunk
+    (InputConnection.commitText), karakterenként, kurzorkezeléssel. Kívülről
+    (ACTION_SET_TEXT) a mező TELJES tartalmát kellene újraírni minden betűnél.
+ c) MINDENHOL MŰKÖDIK: bármely alkalmazásban, bármely képernyőolvasó mellett.
+ d) A TalkBack Braille billentyűzete is így épül fel.
+
+KAPCSOLÓDÁS: a képernyőolvasóban szövegmezőn LEFELÉ söprés -> váltás erre a
+billentyűzetre.
+
+
+3. BEVITELI MÓDOK (mindkettő kell)
+--------------------------------------------------------------------------------
+ A) "KÉPERNYŐ ELFELÉ" (iPhone: screen away) — ELSŐDLEGES
+    Telefon fekvő helyzetben, a kijelző a felhasználótól ELFELÉ néz, két kézzel
+    fogja, az ujjak hátulról nyúlnak a kijelzőre.
+      Bal oszlop fentről le:  1, 2, 3
+      Jobb oszlop fentről le: 4, 5, 6
+ B) "ASZTALI" (iPhone: tabletop) — Perkins-szerű
+    A telefon az asztalon fekszik, a hat ujj felülről érinti. Ugyanaz a
+    pont-elrendezés, csak más a fogás.
+
+ Váltás: három ujjal söprés. A rendszer BEMONDJA, melyik módban van.
+
+
+4. KALIBRÁCIÓ — EZ A LÉNYEG
+--------------------------------------------------------------------------------
+CÉL: a pontok oda kerüljenek, ahová a felhasználó a kezét teszi.
+
+MENET:
+ 1. Megnyitáskor: "Tedd rá a hat ujjadat."
+ 2. Az első HAT egyidejű érintés koordinátáit elmentjük.
+ 3. X szerint rendezzük -> az első három a BAL oszlop, a második három a JOBB.
+    (Ferdén letett kéznél is helyes marad.)
+ 4. Oszlopon belül Y szerint rendezünk: felül 1 (ill. 4), közép 2 (5), alul 3 (6).
+ 5. Minden ponthoz TARTOMÁNYT rendelünk, nem pontot: a szomszédok közti
+    felezővonalak határolják, plusz ráhagyás.
+ 6. Visszajelzés: rövid hang + "Kalibrálva."
+
+ÚJRAKALIBRÁLÁS: hat ujj lehelyezve, 1 másodpercig egyik sem emelkedik fel.
+A kalibráció ELMENTHETŐ, hogy ne kelljen minden megnyitáskor megismételni.
+
+
+5. MULTI-TOUCH KEZELÉS (a technikai mag)
+--------------------------------------------------------------------------------
+A billentyűzet nézetének onTouchEvent-je, esemény szerint:
+
+ ACTION_DOWN / ACTION_POINTER_DOWN  (új ujj érkezett)
+   - pointerId -> (x, y) eltárolása
+   - a kalibrált tartományok alapján a legközelebbi Braille-ponthoz rendeljük
+   - a ponthoz tartozó BITET beállítjuk a maszkban
+   - rövid, halk koppanás visszajelzésként
+   - A BIT BENT MARAD akkor is, ha az ujj később elmozdul!
+
+ ACTION_MOVE
+   - SZÁNDÉKOSAN nem változtat a maszkon (az ujjak természetesen mozognak)
+   - kivétel: ha egy ujj MESSZE csúszik -> gesztusnak vesszük (7. pont)
+
+ ACTION_POINTER_UP  (egy ujj felemelkedett, de van még a képernyőn)
+   - NEM ütünk be, csak jelöljük, hogy ez az ujj elengedett
+
+ ACTION_UP  (az UTOLSÓ ujj is felemelkedett)
+   - EKKOR ÜTÜNK BE: maszkból karakter, beírás, maszk nullázása
+   - ez a "release-based typing" — ettől lesz kényelmes
+
+ ACTION_CANCEL
+   - maszk eldobása némán
+
+ÁLLAPOT: a maszk egy 6 bites Int (1..6 pont = 0..5 bit).
+
+FONTOS RÉSZLET: az ujjak lehelyezése NEM egyszerre történik (10-50 ms szórás),
+ezért a kalibrációnál rövid gyűjtőablakot kell hagyni (kb. 300 ms), és csak
+utána dönteni a pont-hozzárendelésről.
+
+
+6. BRAILLE-DEKÓDOLÁS
+--------------------------------------------------------------------------------
+ - 6 pont = 64 kombináció, adat-táblázatban (Map<Int, Char>), NEM elágazásokkal.
+ - MAGYAR tábla: az ékezetes betűk (á, é, í, ó, ö, ő, ú, ü, ű) külön
+   pontkombinációk — ezeket be kell építeni, nem elég az angol alaptábla.
+ - Számmód: a számjel (3-4-5-6) után a betűk számokká válnak a következő
+   szóközig vagy betűjelig -> ehhez ÁLLAPOTGÉP kell.
+ - Nagybetű: nagybetűjel (6) után egy betű nagy; kétszer = teljes szó.
+ - Írásjelek: külön kombinációk.
+ - A tábla KÜLÖN fájlba kerül, hogy bővíthető legyen (8 pontos Braille,
+   rövidírás később).
+
+
+7. GESZTUSOK (iPhone-szerűen: kevés és egyszerű)
+--------------------------------------------------------------------------------
+  1 ujjal JOBBRA   -> szóköz
+  1 ujjal BALRA    -> törlés (backspace)
+  2 ujjal JOBBRA   -> sortörés / küldés (a mező típusától függ)
+  2 ujjal BALRA    -> az utolsó SZÓ törlése
+  3 ujjal söprés   -> beviteli mód váltása
+  6 ujj hosszan    -> újrakalibrálás
+
+  Minden gesztusnak SAJÁT HANGJA van, a fontosabbaknak beszédes visszajelzése is
+  ("szóköz", "törölve"). A képernyőolvasónál bevált SoundPool-os megoldást
+  használjuk.
+
+
+8. SZÖVEG BEÍRÁSA
+--------------------------------------------------------------------------------
+Billentyűzetként EGYSZERŰ:
+   betű:     currentInputConnection?.commitText(karakter.toString(), 1)
+   törlés:   currentInputConnection?.deleteSurroundingText(1, 0)
+   sortörés: commitText("\n", 1) vagy sendKeyEvent(KEYCODE_ENTER)
+   szótörlés: a kurzor előtti szöveg lekérése (getTextBeforeCursor), az utolsó
+              szó hosszának meghatározása, deleteSurroundingText azzal a hosszal
+
+
+9. HANG- ÉS BESZÉD-VISSZAJELZÉS
+--------------------------------------------------------------------------------
+ - Pont lenyomása: rövid, halk koppanás (pontonként eltérő magasság is lehet)
+ - Karakter beütése: a betű KIMONDÁSA — állítható: betűnként / szavanként / néma
+ - Ismeretlen kombináció: hibahang
+ - Szóköz, törlés, sorvég: külön hang
+
+
+10. MEGVALÓSÍTÁSI SORREND
+--------------------------------------------------------------------------------
+ 1. InputMethodService váz + regisztráció (megjelenik a billentyűzet-listában)
+ 2. Teljes képernyős beviteli nézet + multi-touch eseménykezelés
+ 3. KALIBRÁCIÓ (6 ujj -> pontok) + hangvisszajelzés
+ 4. Maszk-gyűjtés és RELEASE-alapú beütés
+    >>> INNENTŐL MÁR HASZNÁLHATÓ: lehet vele betűket írni <<<
+ 5. Magyar Braille tábla + dekóder (betűk, majd számok, nagybetű, írásjelek)
+ 6. Alap gesztusok (szóköz, törlés, sorvég)
+ 7. Beviteli módok + váltás
+ 8. Kalibráció mentése + újrakalibrálás
+ 9. Beállítások (beszédmennyiség, hangerő, mód)
+10. A képernyőolvasóból lefelé söprés -> váltás erre a billentyűzetre
+
+
+11. KOCKÁZATOK, ŐSZINTÉN
+--------------------------------------------------------------------------------
+ - A MULTI-TOUCH KÉSZÜLÉKFÜGGŐ: olcsóbb kijelzők összevonhatják a közeli
+   érintéseket, és egyes készülékeken korlátozott az egyidejű érintések száma.
+   Ha 6 nem megy, ezt JELEZNI kell a felhasználónak (és a nyilvános teszt jó
+   alkalom lesz több készüléken mérni).
+ - A billentyűzetet a felhasználónak ENGEDÉLYEZNIE kell a rendszerben és
+   kiválasztania — ezt a SuperDL-ből kényelmesen elérhetővé kell tenni.
+
+================================================================================

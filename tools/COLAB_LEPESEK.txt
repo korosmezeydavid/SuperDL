@@ -1,0 +1,60 @@
+========================================================
+  SuperDL bankjegy-tréning Colabban — LÉPÉSRŐL LÉPÉSRE
+========================================================
+
+MIELŐTT ELKEZDED — EGYSZER:
+  1. Colab menü: Futtatókörnyezet → Futtatókörnyezet típusának módosítása
+  2. Hardveres gyorsító: válaszd a "T4 GPU"-t → Mentés
+     (GPU nélkül a tréning napokig tartana; ez a fontos!)
+  3. Ellenőrizd, hogy a Drive gyökerében ott van:
+        banknote_yolo_dataset.zip
+     (ha más a neve, a 8. cellában írd át a ZIP_PATH sort)
+
+A CELLÁK — FENTRŐL LEFELÉ, EGYESÉVEL:
+Minden cella bal oldalán egy ▶ gomb. Nyomd meg, VÁRD MEG, amíg
+zöld pipa lesz mellette, és csak AZUTÁN a következőt.
+
+  [1] GPU ellenőrzés (!nvidia-smi)
+      → Táblázatot ír ki a GPU-ról. Ha hibát ír, nincs GPU:
+        állítsd be a fenti "T4 GPU"-t, és futtasd újra.
+
+  [2] Google Drive csatolása
+      → FELUGRIK egy ablak: engedélyezned kell a Drive elérését.
+        Válaszd ki a fiókod, és nyomj "Engedélyezés"-t.
+        EZT CSAK TE TUDOD MEGCSINÁLNI (bejelentkezés).
+
+  [3] Ultralytics telepítése (pip install)
+      → Kis várakozás, sok szöveg. A végén megáll = kész.
+
+  [4] Adathalmaz kicsomagolása a Drive-ról
+      → Ha "NEM TALALHATO" hibát ír: a ZIP nincs a Drive
+        gyökerében, vagy más a neve. Nézd meg a 8. cella ZIP_PATH-t.
+
+  [5] data.yaml igazítása → gyors, csak egy sort ír ki.
+
+  [6] TRÉNING — EZ A HOSSZÚ (kb. 1-3 óra GPU-n)
+      → Sok sor, minden "epoch" egy kör a 150-ből. Hagyd futni.
+        NE zárd be a lapot, NE altasd el a gépet.
+        A Colab kb. 90 perc tétlenség után lecsatol — néha
+        kattints a lapra, hogy ébren maradjon.
+
+  [7] Validálás → kiírja a pontosságot (mAP). Ez a MÉRŐSZÁM:
+        mAP50 legyen 0.7 felett. Ha 0.9 közeli, nagyon jó.
+        Ha 0.1 alatti, valami baj van az adattal — szólj.
+
+  [8] Export TFLite (FLOAT32) → legyártja a .tflite fájlt.
+        (Ezt már FLOAT32-re állítottuk, az app ezt várja.)
+
+  [9] Mentés a Drive-ra
+      → A kész fájlok ide kerülnek a Drive-odon:
+            MyDrive / SuperDL_model /
+        Ebben lesz: best.pt és egy .tflite fájl.
+
+AMIKOR KÉSZ:
+  Töltsd le a Drive-ról a SuperDL_model mappa .tflite fájlját
+  a géped Letöltések mappájába. Utána szólj Claude-nak —
+  ő beteszi az appba és letelepíti (a finish szkripttel).
+
+HA ELAKADSZ BÁRMELYIK CELLÁNÁL:
+  Írd meg Claude-nak, melyik szám a cella, és mit ír ki.
+========================================================

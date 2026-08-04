@@ -1,0 +1,42 @@
+SUPERDL — HIBALISTA
+================================================================================
+A "nagytakaritas" hibakeresés találatai. Formátum:
+
+  [mérföld/lépés] SÚLYOSSÁG | terület | leírás
+       Reprodukció: ...
+       Javítva: igen / nem / részben (dátum)
+
+SÚLYOSSÁG:
+  SÚLYOS  = összeomlás, adatvesztés, téves pénzcímlet, beragadás
+  KÖZEPES = a funkció nem működik, de van kerülőút
+  KISEBB  = szöveghiba, kényelmetlenség
+================================================================================
+
+
+1. MÉRFÖLD — ALAPOZÁS (2026-08-01)
+--------------------------------------------------------------------------------
+
+[M1a] RENDBEN | build | Tiszta build (clean + assembleDebug) SIKERES, 8 perc 33
+      másodperc, 46 feladat. Fordítási HIBA nincs.
+
+[M1b] KISEBB | fordítási figyelmeztetések | Összesen 80 darab. Megoszlás:
+      - 19 db  elavult AccessibilityNodeInfo.obtain hívás
+      - 12 db  fölösleges biztonságos hívás (?.) nem-null értéken
+      - 8 db   soha nem használt paraméter
+      - 3 db   névárnyékolás (SwipeGestureListener, KeyguardPinDetector,
+               YoutubeStreamResolver) — ÁTNÉZVE, egyik sem okoz hibás működést
+      - 2 db   soha nem olvasott értékadás (UnoGame, NewsFeedStore) — ÁTNÉZVE,
+               csak fölösleges sor, nem logikai hiba
+      - a többi elavult rendszerhívás (systemUiVisibility stb.)
+      ÉRTÉKELÉS: egyik sem jelent működési kockázatot. A takarításuk KOZMETIKAI,
+      a kiadás NEM függ tőle. A 16. mérföldnél érdemes rájuk visszatérni.
+      Javítva: nem (nem szükséges)
+
+[M1c] FÜGGŐBEN | összeomlás-napló | A telefon lecsatlakozott az ellenőrzés
+      közben. Pótolandó: run-as com.superdl.launcher.debug cat files/crash_log.txt
+      Javítva: —
+
+[M1d] RENDBEN | naplózás | Egységes naplózó szűrő elkészítve:
+      tools/naplo.ps1 — minden SDL_ címkét figyel egyszerre.
+
+[M1e] RENDBEN | hibalista | Ez a fájl létrejött.

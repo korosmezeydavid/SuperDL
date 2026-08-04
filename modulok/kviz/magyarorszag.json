@@ -1,0 +1,39 @@
+{
+  "id": "kviz-magyarorszag",
+  "nev": "Magyarország kvíz",
+  "tipus": "quiz",
+  "verzio": 1,
+  "keszito": "SuperDL",
+  "kerdesek": [
+    {
+      "kerdes": "Melyik Magyarország legnagyobb tava?",
+      "valaszok": ["Balaton", "Velencei-tó", "Fertő tó", "Tisza-tó"],
+      "helyes": 0,
+      "magyarazat": "A Balaton Közép-Európa legnagyobb tava, körülbelül 594 négyzetkilométer."
+    },
+    {
+      "kerdes": "Melyik folyó szeli ketté Budapestet?",
+      "valaszok": ["Tisza", "Duna", "Dráva", "Rába"],
+      "helyes": 1,
+      "magyarazat": "A Duna választja el Budát és Pestet."
+    },
+    {
+      "kerdes": "Hány megyéje van Magyarországnak?",
+      "valaszok": ["tizenhét", "tizenkilenc", "huszonegy", "huszonhárom"],
+      "helyes": 1,
+      "magyarazat": "Tizenkilenc megye van, plusz a főváros."
+    },
+    {
+      "kerdes": "Ki írta a Himnuszt?",
+      "valaszok": ["Vörösmarty Mihály", "Petőfi Sándor", "Kölcsey Ferenc", "Arany János"],
+      "helyes": 2,
+      "magyarazat": "Kölcsey Ferenc írta 1823-ban, a zenéjét Erkel Ferenc szerezte."
+    },
+    {
+      "kerdes": "Melyik város Magyarország második legnépesebb települése?",
+      "valaszok": ["Szeged", "Debrecen", "Miskolc", "Pécs"],
+      "helyes": 1,
+      "magyarazat": "Debrecen a második legnépesebb, körülbelül kétszázezer lakossal."
+    }
+  ]
+}

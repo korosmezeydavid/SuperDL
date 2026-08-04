@@ -1,0 +1,244 @@
+SUPERDL — TELJESKÖRŰ HIBAKERESÉSI ÉS JAVÍTÁSI TERV
+================================================================================
+  >>> ELŐHÍVÓ JELSZÓ: "nagytakaritas" <<<
+  Készült: 2026-08-01 | Cél: kiadásra kész állapot a nyilvános teszthez
+  Állapot: MEGTERVEZVE, a végrehajtás még NEM kezdődött el.
+================================================================================
+
+
+ALAPELVEK (ezek végig érvényesek)
+--------------------------------------------------------------------------------
+ 1. EGY KÖR = EGY MÉRFÖLD. Nem lépünk tovább, amíg az aktuális mérföld le nem
+    zárult. Nem sietünk.
+ 2. MINDEN TALÁLAT ÍRÁSBA KERÜL a dokumentumok/hibalista.txt fájlba, ebben a
+    formában:
+       [M3b] SÚLYOS | Naptár | Ismétlődő esemény törlésekor az összes példány
+             törlődik | Reprodukció: ... | Javítva: igen/nem
+ 3. SÚLYOSSÁG:
+       SÚLYOS   = összeomlás, adatvesztés, téves pénzcímlet, beragadás
+       KÖZEPES  = a funkció nem működik, de van kerülőút
+       KISEBB   = szöveghiba, kényelmetlenség
+ 4. MINDEN JAVÍTÁS UTÁN visszateszteljük az ADOTT mérföldet, nem csak a hibát.
+ 5. Ami nem javítható ésszerű időn belül, az a "TUDOTT KORLÁTOK" listára kerül,
+    és a tesztelők tájékoztatót kapnak róla.
+
+
+================================================================================
+1. MÉRFÖLD — ALAPOZÁS: A MÉRÉS ESZKÖZEI
+================================================================================
+ a) Tiszta build ellenőrzés: gradlew clean assembleDebug — nulla figyelmeztetés
+    célja nem reális, de a HIBÁK és a "deprecated" listája legyen ismert.
+ b) A projekt fordítási figyelmeztetéseinek összegyűjtése egy listába, és
+    eldöntése, melyik jelent valódi kockázatot.
+ c) Összeomlás-napló ellenőrzése: van-e régi, feldolgozatlan crash a
+    CrashLogHandler tárolójában.
+ d) Egy egységes NAPLÓZÁSI szűrő összeállítása a teszteléshez (minden SDL_
+    címke egyszerre), hogy minden kör alatt fusson a háttérben.
+ e) A hibalista.txt létrehozása a fenti formátummal.
+
+================================================================================
+2. MÉRFÖLD — INDULÁS ÉS ÉLETCIKLUS
+================================================================================
+ a) Első indítás FRISS telepítés után: minden engedélykérés végigjátszása.
+ b) Indulás engedélyek NÉLKÜL: nem omlik-e össze, érthetően kér-e.
+ c) Újraindítás utáni állapot: minden szolgáltatás magától elindul-e (Őrség,
+    portál, PIN segéd, képernyőolvasó).
+ d) DIRECT BOOT: első bekapcsolás utáni állapot, feloldás előtt — a PIN segéd
+    megjelenik és beszél-e (a 23. körben javított terület visszamérése).
+ e) Alkalmazás-váltás, háttérbe kerülés, visszatérés: elveszik-e állapot.
+ f) Kis memóriájú helyzet szimulálása (a rendszer kilövi a folyamatot):
+    visszatéréskor helyreáll-e.
+
+
+================================================================================
+3. MÉRFÖLD — KÉPERNYŐOLVASÓ (a legfrissebb, ezért a legkockázatosabb)
+================================================================================
+ a) Be- és kikapcsolás minden úton: menü, külső app indítása, vészleállítás.
+ b) A NÉGY alapgesztus minden módban és részletességen.
+ c) NAVIGÁCIÓS MÓDOK: mind a hat mód, weboldalon ÉS natív alkalmazásban.
+    Külön ellenőrzés: üres módnál tényleg szól-e, és nem ragad-e be.
+ d) RÉSZLETESSÉG: elem/mondat/szó/betű váltás, a szöveg végén átlép-e a
+    következő elemre, visszafelé is helyes-e.
+ e) GÖRGETÉS hosszú listában, a lista végének felismerése.
+ f) FOLYAMATOS OLVASÁS: elindul, megáll bármely gesztusra, a végén jelez.
+ g) KERESÉS hanggal: találat, nincs találat, módváltás találatnál.
+ h) KÉPFELOLVASÁS: feliratos kép, felirat nélküli kép, apró ikon, teljes
+    képernyő. Android 11 alatti eszközön a jelzés helyes-e.
+ i) SAJÁT ELNEVEZÉS: mentés, felülírás, megmarad-e alkalmazás-újraindítás után,
+    és NEM keveredik-e össze két alkalmazás elnevezése.
+ j) BILLENTYŰZET-ÜTKÖZÉS: külső appban beviteli mezőbe állás — a mátrix
+    billentyűzet kap-e érintést (a legutóbb javított terület).
+ k) ÉRTESÍTÉSI SÁV felolvasása, majd visszatérés.
+ l) MEMÓRIA: hosszú (30+ perces) használat után nem lassul-e, nem nő-e a
+    memóriahasználat folyamatosan.
+
+================================================================================
+4. MÉRFÖLD — BILLENTYŰZET ÉS SZÖVEGBEVITEL
+================================================================================
+ a) Mátrix billentyűzet: kalibráció a képernyő minden részén (sarkok is).
+ b) Minden gomb minden karaktere, nagybetű-mód, írásjelek.
+ c) Két ujjas parancsok: törlés, új sor, bezárás (csípés), súgó.
+ d) Diktálás: központozás, ékezetek, hosszú mondat, szóköz-illesztés a
+    meglévő szöveghez.
+ e) Négy fokozat mindkét beállításban, és hogy a változás AZONNAL érvényes-e.
+ f) Váltás másik billentyűzetre és vissza (három ujj).
+ g) Bevitel különböző mezőtípusokba: keresőmező, jelszómező, szám-mező,
+    üzenet-mező. (Jelszómezőnél NE olvassa vissza hangosan a beírt szöveget!)
+
+
+================================================================================
+5. MÉRFÖLD — KOMMUNIKÁCIÓ (hívás, SMS, e-mail)
+================================================================================
+ a) Hívás: indítás névjegyből, számból, zárt képernyőről; fogadás, elutasítás.
+ b) Hívás vége: a képernyő magától bezárul-e MINDEN úton (a 25. körben
+    javított terület visszamérése).
+ c) SMS: rövid, hosszú, ékezetes üzenet; a kézbesítési visszajelzés megjön-e.
+ d) SMS olvasás: bejövő, kimenő, hosszú üzenetek.
+ e) E-mail: lista betöltése nagy postafiókkal, levél megnyitása, feladó/tárgy/
+    dátum helyessége, ékezetes tárgy, HTML-levél olvashatósága.
+ f) E-mail küldés diktálva, címzett kiválasztása.
+ g) E-mail diagnosztika lefuttatása és a napló ellenőrzése.
+
+
+================================================================================
+6. MÉRFÖLD — IDŐ, NAPTÁR, EMLÉKEZTETŐK
+================================================================================
+ a) Ébresztő: létrehozás, ismétlődés, törlés, szundi.
+ b) ÉBRESZTÉS-KIHAGYÁS: kijelölés, darabszám, tényleges kihagyás, magától
+    visszatérés (a 29. kör visszamérése).
+ c) Időzítők: indítás, leállítás, lejárat háttérben.
+ d) Naptár: felvétel, szerkesztés, törlés, ismétlődő esemény kezelése.
+ e) NAPTÁR-SZINKRON: a felvett program megjelenik-e a Google Naptárban;
+    a webről bevitt esemény megjelenik-e a telefonon (a legutóbbi javítás).
+ f) Naptár-választó és állapot-jelentés helyessége több fiókkal.
+ g) Emlékeztetők: megszólalnak-e időben, lezárt képernyőnél is.
+ h) Patika Őrangyal: gyógyszer-emlékeztető ütemezés és jelzés.
+
+================================================================================
+7. MÉRFÖLD — FELISMERŐK (a legkényesebb terület)
+================================================================================
+ a) PÉNZFELISMERŐ: mind a hat címlet, egyenként legalább 20 próba.
+    Rögzítjük: hányszor mondott helyeset, hányszor hallgatott, és
+    HÁNYSZOR MONDOTT ROSSZAT (ez utóbbi célértéke NULLA).
+ b) Pénzfelismerő nehéz körülmények közt: gyűrött bankjegy, félig takart,
+    rossz fény, mozgó kéz, kartávolság.
+ c) Szövegolvasó (OCR): nyomtatott lap, gyógyszerdoboz, képernyő.
+ d) Színfelismerő, fénydetektor.
+ e) Környezeti Kitekintő, "mi van előttem".
+ f) QR-kód olvasó.
+ g) Helyszín-felismerő: tanítás és felismerés.
+ h) Minden felismerőnél: mi történik, ha a kamera FOGLALT (pl. másik app
+    használja), és mi történik engedély nélkül.
+
+
+================================================================================
+8. MÉRFÖLD — MÉDIA ÉS TARTALOM
+================================================================================
+ a) Zenelejátszó: lejátszás, módok, EQ, pozíció-mentés és folytatás.
+ b) Zene beszéd-főkapcsoló: némán tényleg néma-e, de a hibák hallhatók-e.
+ c) Rádió: állomáslista, lejátszás, kedvencek, saját URL, felvétel.
+ d) Podcast: keresés, feliratkozás, letöltés, lejátszás.
+ e) Könyvolvasó: megnyitás, folytatás, könyvjelző.
+ f) Profi Diktafon: felvétel minden formátumban, nyers mód, mikrofon-vizsgálat.
+ g) Fülhallgatóról / autórádióról vezérlés.
+ h) Hívás érkezik lejátszás közben: elhalkul, majd folytatódik-e.
+
+
+================================================================================
+9. MÉRFÖLD — NAVIGÁCIÓ ÉS HELYMEGHATÁROZÁS
+================================================================================
+ a) "Hol vagyok", utcanév.
+ b) Útvonaltervezés gyalog és tömegközlekedéssel.
+ c) Közeli megállók, indulási idők, kedvencek.
+ d) GPS Kitekintő és hang-iránytű.
+ e) Mentett helyek: felvétel hangjegyzettel, visszatalálás.
+ f) OFFLINE viselkedés: mi történik internet nélkül — érthető üzenet-e.
+ g) A GPS-szolgáltatások kilépéskor tényleg leállnak-e (a korábbi
+    "beragadás" visszamérése), és nem eszik-e az akkumulátort a háttérben.
+
+================================================================================
+10. MÉRFÖLD — WIFI PORTÁL
+================================================================================
+ a) Portál indítása, leállítása, PIN-védelem.
+ b) Minden fül végigjárása: fájlok, SMS, névjegyek, jegyzetek, naptár,
+    bevásárlólista, fotók és hangok, rádió, állapot, diagnosztika.
+ c) NAGY fájl feltöltése (500 MB felett) — a korábbi javítások visszamérése.
+ d) Több fájl egyszerre, köztük olyan is, amit a rendszer tilt (desktop.ini).
+ e) Letöltés, mappa-választás, ékezetes fájlnevek.
+ f) "Hol a telóm?" és a telefonon megjelenő megerősítő képernyő.
+ g) Böngésző-kompatibilitás: legalább két különböző böngészővel.
+ h) Mi történik, ha közben megszakad a WiFi.
+
+
+================================================================================
+11. MÉRFÖLD — ASSZISZTENS ÉS HANGVEZÉRLÉS
+================================================================================
+ a) Elena indítása minden úton (menü, ébresztő szó, gomb, zárt képernyő).
+ b) A parancs után tényleg kilép-e (a 30. kör visszamérése).
+ c) Folyamatos beszélgetés mód működése.
+ d) A leggyakoribb 20 parancs végigpróbálása.
+ e) Zárt képernyős hívás megerősítés nélkül (a 30. kör visszamérése).
+ f) Mi történik, ha nem érti, vagy ha nincs internet.
+
+
+================================================================================
+12. MÉRFÖLD — RENDSZERSZINTŰ VISELKEDÉS
+================================================================================
+ a) Sötét mód: be, ki, más alkalmazás fölött, újraindítás után.
+ b) Őrség: időbemondás, töltő jelzés, éjszakai csend, képernyő-hangok.
+ c) PIN segéd használat közben (nem csak Direct Bootban).
+ d) Hangtémák váltása, minden hang megszólal-e.
+ e) Biztonsági mentés és visszaállítás: tényleg minden visszajön-e.
+ f) AKKUMULÁTOR: 1 órás vegyes használat mellett mennyit fogyaszt; van-e
+    olyan szolgáltatás, ami feleslegesen ébren tart.
+ g) Ellenőrzés, hogy semmilyen szolgáltatás nem marad futva, amikor nem kell.
+
+================================================================================
+13. MÉRFÖLD — ADATVÉDELMI ÁTVIZSGÁLÁS (KÖTELEZŐ A TESZT ELŐTT)
+================================================================================
+ a) Végigmenni MINDEN naplózáson: nem kerül-e bele telefonszám, névjegynév,
+    üzenet-szöveg, e-mail tartalom, jelszó, pontos GPS-koordináta.
+ b) A hibajelentés tartalmának ellenőrzése ugyanezekre.
+ c) Ellenőrzés, hogy a felismerők tényleg NEM küldenek képet a hálózatra.
+ d) A tárolt adatok átnézése: mi marad a telefonon, és hol.
+ e) Írásos összefoglaló a tesztelőknek: mit gyűjtünk és mit nem.
+
+
+================================================================================
+14. MÉRFÖLD — SZÖVEGEK ÉS KÖVETKEZETESSÉG
+================================================================================
+ a) Minden menüpont felolvasásának ellenőrzése: érthető, rövid, egységes-e.
+ b) A gesztus-leírások egységesek-e (mindenhol "söprés", nem "swipe").
+ c) A hibaüzenetek MEGMONDJÁK-E, mit tegyen a felhasználó — ne csak azt,
+    hogy valami nem sikerült.
+ d) Nincs-e "fejlesztői" szöveg a felületen (angol szó, kód-részlet).
+ e) A menü mélysége: nincs-e olyan pont, ami háromnál mélyebben van, pedig
+    gyakran kell.
+
+
+================================================================================
+15. MÉRFÖLD — TÖBB KÉSZÜLÉKEN
+================================================================================
+ a) A fejlesztői telefonon (Ulefone Armor 24, Android 13) minden mérföld
+    visszamérése.
+ b) Legalább egy MÁSIK Android-verzió (lehetőleg 11 alatti ÉS 14 feletti).
+ c) Legalább egy OLCSÓ készülék: lassabb-e, elfogy-e a memória, bírja-e a
+    több ujjas gesztusokat.
+ d) Az eltérések rögzítése: mi működik, mi nem, és melyik funkciónál kell
+    tartalék megoldás.
+
+
+================================================================================
+16. MÉRFÖLD — A CSOMAG ÖSSZEÁLLÍTÁSA
+================================================================================
+ a) Verziószám véglegesítése és a fejlesztési napló lezárása.
+ b) KIADÁSI (release) build készítése, aláírással — nem a mostani debug!
+ c) A release változat ÚJRATESZTELÉSE: a kódtömörítés (ProGuard/R8) miatt
+    előfordulhat, hogy valami csak a release verzióban romlik el —
+    KÜLÖN figyelni a felismerőkre és a naplózásra.
+ d) A tesztelői naplózó és hibajelentő rendszer beépítése (jelszó: "naplócska").
+ e) Rövid, felolvasható HASZNÁLATI ÚTMUTATÓ a tesztelőknek.
+ f) A TUDOTT KORLÁTOK listájának véglegesítése.
+ g) A telepítő fájl és a leírás felkészítése a super-dl.com-ra.
+
+================================================================================

@@ -1,0 +1,729 @@
+================================================================================
+  SUPER DIGITAL LAUNCHER (SUPER DL) — TÉTELES KÉPESSÉGJEGYZÉK
+================================================================================
+
+  Verzió:        1.10.0  (versionCode: 14)
+  Fejlesztő:     Kőrösmezey Dávid
+  Kapcsolat:     korosmezey.david.richard@gmail.com
+  Platform:      Android (minSdk 26 / Android 8.0, targetSdk 34)
+  Típus:         Launcher (helyettesíti a telefon kezdőképernyőjét)
+  Célcsoport:    Vak és gyengénlátó felhasználók
+  Nyelv:         Magyar (TTS, menü, hangos visszajelzések, parancsok)
+
+  A Super DL egy teljes értékű Android launcher, amelyet kifejezetten úgy
+  terveztek, hogy a telefon használata gesztusokkal és hanggal vezérelhető
+  legyen, minimális vagy nulla látásigény mellett. A program nem webes
+  felületet használ, hanem egy nagy, kontrasztos képernyőt, amely minden
+  lépésnél hangosan felolvassa, hol tartasz, és rövid rezgéssel / hanggal
+  visszajelzést ad minden gesztusról.
+
+
+================================================================================
+  1. VEZÉRLÉSI ALAPELVEK
+================================================================================
+
+1.1  NÉGY IRÁNYÚ GESZTUSRENDSZER
+─────────────────────────────────
+  A teljes képernyő érintésre reagál. Nincs kis gomb — minden ujjmozdulattal
+  irányítható.
+
+  FELFELÉ SWIPE (⬆)
+    • Főmenüben:     előző menüpont
+    • Folyamatban:   előző elem a listában, vagy az aktuális rész ismétlése
+    • Könyvolvasás:  aktuális szövegrész újrafelolvasása
+
+  LEFELÉ SWIPE (⬇)
+    • Főmenüben:     következő menüpont
+    • Folyamatban:   következő elem a listában
+    • Könyvolvasás:  következő szövegrész
+
+  JOBBRA SWIPE (➡)
+    • Főmenüben:     menüpont aktiválása (belépés, indítás)
+    • Folyamatban:   megerősítés, végrehajtás, részletes felolvasás
+    • Helykeresés:   kiválasztott hely megnyitása térképen (Google Maps / geo)
+    • Könyvolvasás:  könyvjelző mentése az aktuális pozíciónál
+
+  BALRA SWIPE (⬅)
+    • Főmenüben:     vissza az előző menüszintre
+    • Folyamatban:   megszakítás, visszalépés, kilépés
+    • S.O.S. alatt:  visszaszámlálás leállítása
+
+1.2  HANGOS VISSZAJELZÉS (TTS)
+──────────────────────────────
+  • Minden menüpont nevét felolvassa, amikor ráállsz.
+  • Minden művelet eredményét hangosan közli (siker, hiba, adat).
+  • A beszéd sebessége állítható (gyorsabb / lassabb).
+  • A TTS motor (beszédszintetizátor) választható a telefonon telepített
+    motorok közül (pl. Google TTS magyar hang).
+  • A program „T T S"-ként ejti ki a rövidítést, hogy érthető legyen.
+
+1.3  PROGRAMHANGOK ÉS REZGÉS
+────────────────────────────
+  Minden gesztushoz külön hang tartozik:
+    • Indítás hang        — program betöltésekor
+    • Swipe fel hang      — felfelé húzás
+    • Swipe le hang       — lefelé húzás
+    • Swipe balra hang    — balra húzás (vissza)
+    • Swipe jobbra hang   — jobbra húzás (megerősítés)
+    • Sikeres művelet     — ha valami jól lefutott
+    • Hibás művelet       — ha valami nem sikerült
+    • Menü navigáció      — finom kattanás menüpontok között
+
+  A „Program hangjainak megismerése" menüpontban mindegyik hang kipróbálható
+  és felolvasható magyarázattal.
+
+  Rövid rezgés (vibráció) kíséri a gesztusokat.
+
+1.4  DIKTÁLÁS (HANGFELISMERÉS)
+──────────────────────────────
+  Számos funkció mikrofonon keresztül diktálható:
+    • Név, szám, üzenet, e-mail, ébresztő idő, naptárbejegyzés
+    • Hely/cím keresés, gyalogos útvonal célja
+    • Megálló keresés, tömegközlekedési útvonal
+    • YouTube keresés, könyvkeresés, számológép
+    • Hangos asszisztens szabad szöveges parancsai
+
+  A diktáláshoz mikrofon engedély szükséges.
+
+1.5  INDULÁSKORI ÜDVÖZLÉS
+─────────────────────────
+  Programindításkor:
+    1. Indító hang + „Super Digital Launcher, Super DL betöltve" + aktuális
+       menüpont neve.
+    2. Naponta egyszer (első indításkor aznap): napi üdvözlés — dátum, idő,
+       magyar névnap, aktuális időjárás (internet kell hozzá).
+
+
+================================================================================
+  2. FŐMENÜ — TELJES STRUKTÚRA RÉSZLETESEN
+================================================================================
+
+A főmenü 12 főcsoportból áll. Minden csoport almenüvel rendelkezik (kivéve
+az S.O.S.-t, ami azonnal aktiválódik).
+
+
+──────────────────────────────────────────────────────────────────────────────
+2.1  TELEFON ÉS HÍVÁSOK
+──────────────────────────────────────────────────────────────────────────────
+
+  Névjegyből hívás
+    • Diktáld a keresett nevet (pl. „Anna").
+    • A program a telefon névjegyzékében keres, több találatnál listát ad.
+    • Swipe fel/le: találatok között váltás.
+    • Swipe jobbra: megerősítés, hívás indítása.
+    • A hívás saját hívásképernyőn fut (InCallActivity): felolvassa a nevet,
+      számot, hívás állapotát (csörög, fogadva, időtartam).
+    • Swipe balra a hívásképernyőn: hívás bontása.
+
+  Hívásnapló felolvasása
+    • A telefon hívásnaplóját listázza hangosan.
+    • Minden bejegyzésnél: név/szám, irány (bejövő/kimenő), időpont.
+    • Swipe fel/le: bejegyzések között.
+    • Swipe jobbra: részletes felolvasás.
+
+  Szám tárcsázása
+    • Diktáld a telefonszámot.
+    • Megerősítés után közvetlen hívás.
+
+──────────────────────────────────────────────────────────────────────────────
+2.2  ÜZENETEK ÉS E-MAIL
+──────────────────────────────────────────────────────────────────────────────
+
+  Üzenetek olvasása (SMS)
+    • Bejövő SMS-ek listázása hangosan.
+    • Swipe fel/le: üzenetek között.
+    • Swipe jobbra: teljes üzenet felolvasása.
+
+  Üzenet diktálása és küldése (SMS)
+    • 1. lépés: címzett diktálása (név vagy szám).
+    • 2. lépés: címzett megerősítése (igen/nem hanggal).
+    • 3. lépés: üzenet diktálása.
+    • 4. lépés: küldés megerősítése.
+    • Swipe balra bármely lépésnél: megszakítás.
+
+  E-mail diktálása és küldése
+    • Hasonló többlépcsős folyamat: címzett → tárgy → szöveg → megerősítés.
+    • Címzett választható mentett e-mail címek közül is.
+    • Küldés SMTP protokollon keresztül (nem a Gmail appot nyitja meg).
+    • Előfeltétel: e-mail küldő beállítása (lásd alább).
+
+  E-mail címek importálása
+    • A telefon névjegyzékéből importál e-mail címeket a program saját
+      címjegyzékébe.
+
+  E-mail cím hozzáadása
+    • Új e-mail cím mentése diktálással (név + cím).
+
+  Mentett e-mail címek
+    • A programban tárolt e-mail címek listája, hangos felolvasással.
+
+  E-mail küldő beállítása
+    • SMTP szerver adatok diktálása: felhasználónév, jelszó, küldő neve.
+    • Gmail-re optimalizált (smtp.gmail.com, port 587, TLS).
+    • Egyszer beállítva, utána minden e-mail innen megy.
+
+  E-mail küldő felolvasása
+    • Az aktuális SMTP beállítások összefoglalója hangosan.
+
+  E-mail küldő törlése
+    • Mentett SMTP konfiguráció törlése.
+
+──────────────────────────────────────────────────────────────────────────────
+2.3  S.O.S. VÉSZJELZÉS
+──────────────────────────────────────────────────────────────────────────────
+
+  Azonnali vészhelyzeti funkció — a főmenüből egy swipe jobbra aktiválódik.
+
+  Működés:
+    • 5 másodperces visszaszámlálás indul (hangosan számol).
+    • Swipe balra: megszakítható a visszaszámlálás.
+    • Lejárat után: sorban hívja a beállított S.O.S. számokat (max. 4 db).
+    • Számonként max. 20 másodperc várakozás, majd következő szám.
+    • Háttérszolgáltatás (foreground service) fut közben értesítéssel.
+
+  S.O.S. számok beállítása:
+    • Beállítások → S.O.S. szám 1–4: diktálással állíthatók.
+    • Beállítások → S.O.S. számok felolvasása: aktuális lista hangosan.
+    • ADB-vel is állítható:
+      adb shell am broadcast -a com.superdl.launcher.SET_SOS --es sos_1 "+36..."
+
+──────────────────────────────────────────────────────────────────────────────
+2.4  IDŐ ÉS SZERVEZÉS
+──────────────────────────────────────────────────────────────────────────────
+
+  Pontos idő felolvasása
+    • Azonnal felolvassa a mai dátumot (év, hónap, nap, hét napja) és az
+      aktuális időt (óra:perc). Pl.: „Ma 2026. június 19., csütörtök.
+      Az idő 14:30."
+
+  Új ébresztő beállítása
+    • Diktáld az ébresztés idejét (pl. „hét óra harminc").
+    • Opcionális címke diktálása (pl. „orvos").
+    • Megerősítés után beállítja a rendszer ébresztőjét.
+    • Maximum 12 ébresztő tárolható.
+
+  Következő ébresztő
+    • A legközelebbi aktív ébresztő idejét és címkéjét felolvassa.
+
+  Ébresztők listája
+    • Összes ébresztő listázása. Swipe fel/le navigálás, jobbra részletek.
+
+  Ébresztő törlése
+    • Lista megjelenítése törlés módban.
+    • Swipe jobbra: törlés megerősítése.
+
+  Mai program felolvasása
+    • A telefon naptárából a mai eseményeket olvassa fel.
+    • Swipe fel/le: események között, jobbra: részletes felolvasás.
+
+  Holnapi program felolvasása
+    • Ugyanaz, de holnapi eseményekre.
+
+  Heti program áttekintése
+    • A következő 7 nap eseményei napokra csoportosítva.
+
+  Új program beállítása
+    • Többlépcsős diktálás: cím → dátum → kezdő idő → befejező idő → megerősítés.
+    • A rendszer naptárába írja az eseményt.
+
+──────────────────────────────────────────────────────────────────────────────
+2.5  ZENE ÉS MÉDIA
+──────────────────────────────────────────────────────────────────────────────
+
+  Zene a telefonon
+    • A telefonon tárolt zenefájlok keresése (MediaStore / READ_MEDIA_AUDIO).
+    • Listázás cím és előadó szerint.
+    • Swipe fel/le: számok között.
+    • Swipe jobbra: lejátszás indítása (MusicPlayerActivity).
+    • Támogatott: a telefonon elérhető audio fájlok (mp3, flac, stb.).
+
+  YouTube hangos keresés
+    • Diktáld a keresett videó címét vagy témáját.
+    • Találatok listázása (cím, csatorna).
+    • Swipe fel/le: videók között.
+    • Swipe jobbra: lejátszás megerősítése.
+    • Megerősítés után: saját YouTube lejátszó (YoutubePlayerActivity).
+    • Internetkapcsolat és külső stream-szolgáltató szükséges.
+
+──────────────────────────────────────────────────────────────────────────────
+2.6  KÖNYVEK
+──────────────────────────────────────────────────────────────────────────────
+
+  A Super DL beépített könyvolvasóval rendelkezik — nem külső appot nyit.
+
+  Támogatott formátumok:
+    • Szöveges:  TXT, MD, RTF, HTML, HTM
+    • E-könyv:   EPUB, FB2, MOBI, AZW, AZW3, PRC
+    • Dokumentum: PDF, DOC, DOCX, ODT
+
+  Könyvek keresési helyei:
+    • Letöltések mappa, Dokumentumok mappa, Books mappa
+    • Az app saját mappái
+    • Egyéni beállított könyvmappák
+    • Android 10+: MediaStore index
+
+  Könyvtár
+    • Összes talált könyv listázása cím szerint rendezve.
+    • Swipe jobbra: könyv megnyitása és olvasás indítása.
+
+  Könyv keresése felolvasással
+    • Diktáld a könyv címét vagy szerzőjét.
+    • Találatok közül választhatsz.
+
+  Nem rég olvasott könyvek
+    • Az utoljára megnyitott könyvek listája.
+
+  Könyvjelzők
+    • Mentett könyvjelzők listája (könyv + pozíció).
+    • Swipe jobbra: olvasás folytatása a könyvjelzőnél.
+
+  Könyvjelző törlése
+    • Törlés mód: swipe jobbra törli a kijelölt könyvjelzőt.
+
+  Olvasás folytatása
+    • Az utoljára olvasott könyv ott folytatódik, ahol abbahagytad.
+
+  Könyvmappa beállítása
+    • Egyéni mappa útvonal diktálása/bevitele, ahonnan a program könyveket keres.
+
+  Könyvmappa felolvasása
+    • A beállított egyéni mappák listája.
+
+  Könyvmappa törlése
+    • Egyéni mappák törlése a beállításokból.
+
+  Olvasás közbeni gesztusok:
+    • Fel:    aktuális rész ismétlése
+    • Le:     következő rész
+    • Jobbra: könyvjelző mentése
+    • Balra:  olvasás leállítása
+    • A képernyőn látható: cím, olvasási százalék, rész száma.
+
+──────────────────────────────────────────────────────────────────────────────
+2.7  INFORMÁCIÓ
+──────────────────────────────────────────────────────────────────────────────
+
+  Napi üdvözlés
+    • Dátum és idő magyarul.
+    • Magyar névnap (beépített offline adatbázis, mind a 366 napra).
+    • Aktuális időjárás (wttr.in szolgáltatás, magyar nyelven).
+    • Internet kell az időjáráshoz; névnap és dátum offline is működik.
+    • Induláskor naponta egyszer automatikusan is lefut.
+
+  Időjárás most
+    • Automatikus helymeghatározás alapján (vagy legközelebbi város).
+    • Felolvassa: hely, időjárási viszony, hőmérséklet (°C), páratartalom (%),
+      szélsebesség (km/h).
+
+  Időjárás város szerint
+    • Diktáld a város nevét (pl. „Debrecen").
+    • Ugyanazok az adatok, mint fent.
+
+  Hírek felolvasása
+    • Először forrásválasztó jelenik meg (18 forrás).
+    • Kategóriák: Általános, Politika, Gazdaság, Sport, Tech, Kultúra.
+    • Források:
+        - Összes hír (vegyes, több forrásból)
+        - Telex, 444, Index, HVG, 24.hu, Origo, RTL
+        - Hírstart, Magyarorszag.hu
+        - Portfolio (Gazdaság)
+        - Népszava, Magyar Nemzet (Politika)
+        - Nemzeti Sport, Index Sport (Sport)
+        - HWSW, IT Business (Tech)
+        - Kultúra.hu (Kultúra)
+    • Swipe fel/le: forrás választása.
+    • Swipe jobbra: hírek betöltése a kiválasztott forrásból.
+    • Swipe balra: vissza a forrásokhoz / kilépés.
+    • Hírek listájában: fel/le navigálás, jobbra teljes cikk felolvasása.
+    • RSS feedek internetről töltődnek; offline nem működik.
+
+  Akkumulátor állapot
+    • Azonnal felolvassa a töltöttségi szintet százalékban.
+
+──────────────────────────────────────────────────────────────────────────────
+2.8  KÖZÖSSÉG (NAVIGÁCIÓ ÉS TÖMEGKÖZLEKEDÉS)
+──────────────────────────────────────────────────────────────────────────────
+
+  Hol vagyok?
+    • GPS alapú helymeghatározás.
+    • Reverse geocoding (OSM): cím felolvasása.
+    • Pontosság tájékoztatás (méterben).
+
+  Gyalogos útvonal diktálással
+    • Diktáld a célállomást (pl. „Deák Ferenc tér").
+    • OSM alapú gyalogos útvonaltervezés.
+    • Felolvassa: távolság, becsült idő, lépések száma.
+
+  Cím vagy hely keresése
+    • Diktáld a keresett címet vagy helynevet.
+    • Találatok listázása távolsággal.
+    • Swipe fel/le: találatok között.
+    • Swipe jobbra: kiválasztott hely megnyitása térképen (geo: intent).
+      Megnyílik a telefon térképalkalmazása (Google Maps vagy más).
+    • Swipe balra: vissza / kilépés.
+
+  Közeli megállók felolvasása
+    • GPS pozíció alapján keresi a közeli busz/villamos/tramvaj megállókat.
+    • Budapesten: BKK FUTÁR API elsődlegesen, OSM fallback.
+    • Budapesten kívül: OSM (OpenStreetMap) adatok.
+    • Felolvassa a megálló nevét, távolságát, közelgő járatokat.
+
+  Megálló keresése felolvasással
+    • Diktáld a megálló nevét.
+    • Találatok listázása, részletes felolvasás.
+
+  Útvonal tömegközlekedéssel felolvasással
+    • Diktáld a célállomást.
+    • Útvonal lépései hangosan: séta, felszállás, leszállás, átszállás.
+    • Swipe fel/le: lépések között navigálás.
+
+──────────────────────────────────────────────────────────────────────────────
+2.9  ESZKÖZÖK
+──────────────────────────────────────────────────────────────────────────────
+
+  Zseblámpa
+    • A telefon vakuja (LED) be/ki kapcsolása.
+    • Kamera engedély szükséges.
+    • Ismételt aktiválás kikapcsolja.
+
+  Q R kód olvasó
+    • Beépített kamera-alapú QR/vonalkód olvasó (ML Kit).
+    • A beolvasott tartalom felolvasása.
+    • Automatikus műveletek a tartalom alapján:
+        - Telefonszám (tel:): hívás vagy SMS indítása
+        - SMS link: üzenet küldés
+        - E-mail (mailto:): e-mail írás
+        - Földrajzi (geo:): gyalogos útvonal
+        - Sima szám: hívás / SMS
+        - E-mail cím: e-mail írás
+    • Swipe fel/le: műveletek között, jobbra: végrehajtás.
+
+  Fénydetektor kamerával
+    • Külön képernyő (LightDetectorActivity).
+    • A kamera képéből méri a fényerősséget.
+    • Sípoló hang: minél világosabb, annál magasabb hang.
+    • Segít a vak felhasználónak megállapítani, van-e fény a környezetben.
+
+  Számológép diktálással
+    • Mondj egy matematikai kifejezést hangosan.
+    • Érti a magyar számneveket is (pl. „húsz meg tíz").
+    • Műveletek: összeadás, kivonás, szorzás, osztás, zárójelezés.
+    • Eredmény hangos felolvasása.
+
+──────────────────────────────────────────────────────────────────────────────
+2.10  ASSZISZTENS
+──────────────────────────────────────────────────────────────────────────────
+
+  Hangos asszisztens
+    • Helyi kulcsszó-alapú parancsfelismerés (NEM felhő AI, NEM Gemini API).
+    • Folyamatos beszélgetés mód: parancs → végrehajtás → újra figyel.
+    • A legtöbb menüfunkció elérhető hangos parancsból.
+    • „Segítség" / „mit tudsz" parancsra felsorolja a példákat.
+    • Alművelet után visszatér az asszisztenshez (pl. hírek után).
+
+  Hangos asszisztens parancsok (teljes lista):
+
+    Vészhelyzet:
+      „S O S", „vészhelyzet"
+
+    Idő és üdvözlés:
+      „hány óra", „pontos idő", „mennyi az idő"
+      „napi üdvözlés", „névnap", „üdvözlés"
+
+    Akkumulátor:
+      „akkumulátor", „töltöttség"
+      „akkumulátor őrség", „őrség"
+
+    Hírek és időjárás:
+      „hírek", „hír"
+      „időjárás", „időjárás város"
+
+    Ébresztő:
+      „ébresztő", „ébresztés"
+      „ébresztők", „ébresztő lista"
+      „ébresztő törlés"
+      „következő ébresztő"
+
+    Kommunikáció:
+      „hívás", „telefonálj", „hívj"
+      „tárcsáz", „számot hív"
+      „hívásnapló", „hívások"
+      „üzenet küld", „írj üzenet", „SMS"
+      „üzenet olvas", „SMS olvas"
+      „e-mail", „email", „írj e-mail"
+
+    Navigáció:
+      „hol vagyok"
+      „hely keres", „cím keres"
+      „közeli megálló", „busz megálló"
+      „megálló keres"
+      „útvonal a [cél]" (pl. „útvonal a Deák térre")
+      „gyalogos útvonal a [cél]"
+
+    Naptár:
+      „naptár", „mai program"
+      „holnapi program"
+      „heti program"
+      „új program", „program beállít"
+
+    Média:
+      „zene", „zeneszám"
+      „YouTube [keresés]" (pl. „YouTube jazz")
+
+    Könyvek:
+      „könyvtár", „könyvek"
+      „könyv keres [cím]"
+      „könyvjelzők"
+      „olvasás folytat", „folytasd a könyvet"
+
+    Eszközök:
+      „zseblámpa", „lámpa be"
+      „fénydetektor"
+      „számológép", „számolj"
+      „Q R", „QR", „kód olvas"
+
+    Rendszer:
+      „WiFi", „Bluetooth"
+      „értesítések"
+      „hangerő fel/le"
+      „beszéd gyorsabb/lassabb"
+      „hangok", „program hangjai"
+
+    Súgó:
+      „segítség", „mit tudsz", „parancsok"
+
+──────────────────────────────────────────────────────────────────────────────
+2.11  BEÁLLÍTÁSOK
+──────────────────────────────────────────────────────────────────────────────
+
+  S.O.S. szám 1–4 beállítása
+    • Diktálással menthető vészhelyzeti telefonszámok.
+
+  S.O.S. számok felolvasása
+    • Az összes beállított S.O.S. szám hangos listázása.
+
+  Hangerő növelése / csökkentése
+    • A telefon médiahangerőjének állítása.
+
+  Beszéd gyorsítása / lassítása
+    • A TTS felolvasási sebességének módosítása.
+
+  T T S motor választása
+    • A telefonon telepített beszédszintetizátorok listája.
+    • Swipe fel/le: motorok között, jobbra: kiválasztás.
+
+  Aktuális T T S motor felolvasása
+    • Melyik beszédszintetizátort használja a program.
+
+  Értesítések olvasása
+    • A telefon értesítéseinek hangos felolvasása.
+    • ELŐFELTÉTEL: Notification Listener engedély a rendszerbeállításokban
+      (külön, nem a normál engedélykérés része).
+    • Swipe fel/le: értesítések között, jobbra: teljes szöveg.
+
+  WiFi be- és kikapcsolás
+    • A telefon WiFi kapcsolójának állítása.
+
+  Bluetooth be- és kikapcsolás
+    • A telefon Bluetooth kapcsolójának állítása.
+
+  Akkumulátor őrség ki-be
+    • Háttérszolgáltatás, amely sípoló hanggal figyelmeztet:
+        - Alacsony töltöttségnél (15% alatt)
+        - Tele töltésnél (100%)
+    • Alapból bekapcsolva. Ki-be kapcsolható.
+
+  Kilépés a Super DL launcherből
+    • Visszalépés az Android alapértelmezett launcherjébe.
+    • A program nem távolítja el magát, csak átadja a vezérlést.
+
+──────────────────────────────────────────────────────────────────────────────
+2.12  NÉVJEGY ÉS JOGI INFORMÁCIÓK
+──────────────────────────────────────────────────────────────────────────────
+
+  Program hangjainak megismerése
+    • Az összes programhang (8 db) kipróbálható és magyarázattal felolvasható.
+    • Segít a vak felhasználónak megjegyezni, melyik hang mit jelent.
+
+  Az alkalmazásról
+    • Program neve, verzió, rövid leírás.
+
+  Fejlesztő: Kőrösmezey Dávid
+    • Fejlesztői információ hangos felolvasása.
+
+  Kapcsolat e-mailben
+    • Fejlesztői e-mail cím felolvasása és megnyitása.
+
+  Adatvédelmi tájékoztató
+    • Teljes szöveg hangos felolvasással, szakaszokra bontva.
+
+  Felhasználási feltételek
+    • Teljes szöveg hangos felolvasással.
+
+  Jogi nyilatkozat
+    • Teljes szöveg hangos felolvasással.
+
+
+================================================================================
+  3. HÁTTÉRBEN FUTÓ SZOLGÁLTATÁSOK
+================================================================================
+
+  S.O.S. szolgáltatás (SosService)
+    • Vészhelyzeti hívások sorozatos indítása.
+    • Foreground service értesítéssel.
+
+  Akkumulátor őrség (DeviceStateSoundService)
+    • Folyamatos töltöttség-figyelés.
+    • Hangjelzés alacsony/tele töltöttségnél.
+
+  Ébresztő fogadó (AlarmReceiver)
+    • Beállított ébresztők lejáratának kezelése.
+    • Hangos ébresztés TTS-sel.
+
+  Híváskezelő (InCallActivity)
+    • Aktív hívás képernyő gesztusvezérléssel.
+    • Hívás állapot követése (csörög, fogadva, bontva).
+    • Hívásidő számlálás hangos bejelentéssel.
+
+  Boot receiver
+    • Ébresztők újraütemezése telefon újraindítás után.
+
+
+================================================================================
+  4. ENGEDÉLYEK
+================================================================================
+
+  Az alkalmazás induláskor kéri az alábbi engedélyeket:
+
+  Telefon és hívások:
+    • CALL_PHONE          — telefonhívás indítása
+    • READ_PHONE_STATE    — hívás állapot figyelése
+    • MANAGE_OWN_CALLS    — saját híváskezelő képernyő
+    • READ_CONTACTS       — névjegyzék olvasása
+    • READ_CALL_LOG       — hívásnapló olvasása
+    • GET_ACCOUNTS        — fiókok (Android 9 és alatt)
+
+  Üzenetek:
+    • SEND_SMS            — SMS küldés
+    • READ_SMS            — SMS olvasás
+    • RECEIVE_SMS         — SMS fogadás
+
+  Helyzet:
+    • ACCESS_FINE_LOCATION   — GPS helymeghatározás
+    • ACCESS_COARSE_LOCATION   — hozzávetőleges hely
+
+  Média és fájlok:
+    • READ_MEDIA_AUDIO       — zene (Android 13+)
+    • READ_EXTERNAL_STORAGE  — fájlok (Android 12 és alatt)
+
+  Kamera és mikrofon:
+    • CAMERA              — QR olvasó, fénydetektor, zseblámpa
+    • RECORD_AUDIO        — diktálás, hangos asszisztens
+    • FLASHLIGHT          — zseblámpa
+
+  Naptár:
+    • READ_CALENDAR       — naptár olvasás
+    • WRITE_CALENDAR      — naptár írás
+
+  Rendszer:
+    • INTERNET            — hírek, időjárás, navigáció, YouTube
+    • ACCESS_NETWORK_STATE — hálózat ellenőrzés
+    • POST_NOTIFICATIONS  — értesítések (Android 13+)
+    • VIBRATE             — rezgés
+    • BLUETOOTH_CONNECT   — Bluetooth (Android 12+)
+    • SCHEDULE_EXACT_ALARM / USE_EXACT_ALARM — pontos ébresztő
+    • RECEIVE_BOOT_COMPLETED — ébresztő újraütemezés
+    • FOREGROUND_SERVICE  — háttérszolgáltatások
+    • WAKE_LOCK           — ébresztő, őrség
+
+  Külön engedély (nem automatikus):
+    • Notification Listener Service — értesítések olvasásához
+      (Beállítások → Kisegítő lehetőségek → Értesítés-hozzáférés)
+
+
+================================================================================
+  5. MÉRFÖLDKÖvek — TELJESÍTETT FEJLESZTÉSI FÁZISOK
+================================================================================
+
+  [KÉSZ] M1  — Alapváz: gesztusrendszer, TTS, menüstruktúra, S.O.S.
+  [KÉSZ] M2  — Telefon és kommunikáció: névjegyek, SMS, e-mail SMTP, hívásnapló
+  [KÉSZ] M3  — Idő és szervezés: ébresztő, naptár
+  [KÉSZ] M4  — Média: zenelejátszó, YouTube hangos keresés
+  [KÉSZ] M5  — Információ: időjárás, hírek, QR olvasó, akkumulátor
+  [KÉSZ] M6  — Rendszer: értesítés olvasó, WiFi/BT, akkumulátor őrség
+  [KÉSZ] M7  — Közösség: tömegközlekedés BKK, gyalogos útvonal, helykeresés
+  [KÉSZ] M8  — Hírek bővítés (18 forrás) + térkép megnyitás helykeresésnél
+  [KÉSZ] M9  — Napi üdvözlés (dátum, névnap, időjárás, induláskori opció)
+
+  Terven túli, szintén kész funkciók:
+    • Könyvolvasó (14+ formátum) könyvjelzőkkel
+    • Hangos asszisztens (helyi parancsfelismerés, 50+ parancs)
+    • Zseblámpa, fénydetektor, számológép
+    • Jogi/névjegy szekció, hangok betanítása
+    • Hívás közbeni képernyő, rendszerállapot hangok
+
+
+================================================================================
+  6. ISMERT KORLÁTOK
+================================================================================
+
+  • A hangos asszisztens helyi kulcsszó-felismerés — nem mesterséges intelligencia,
+    nem érti a szabad beszédet, csak az előre definiált magyar kifejezéseket.
+
+  • Az e-mail küldés SMTP-n keresztül működik; Gmail App Password szükséges.
+    Más szolgáltatóknál egyedi SMTP beállítás kell.
+
+  • A YouTube lejátszás külső stream-feloldótól függ; nem minden videó érhető el.
+
+  • A tömegközlekedés elsősorban Budapest (BKK FUTÁR API); máshol OSM adatok.
+
+  • A hírek RSS feedekből töltődnek; ha egy forrás nem elérhető, az adott
+    forrás üres listát ad vissza.
+
+  • A PDF/DOCX könyvolvasás szövegkinyerésen alapul; képalapú PDF-ekben
+    előfordulhat, hogy nem olvasható szöveg.
+
+  • A program launcher — ha másik launchert állítasz alapértelmezettnek,
+    a Super DL csak appként érhető el.
+
+  • Az értesítések olvasásához külön rendszerengedély szükséges.
+
+
+================================================================================
+  7. TECHNIKAI ÖSSZEFOGLALÓ
+================================================================================
+
+  Forráskód helye:
+    C:\Users\msn\Downloads\SuperDL_M1 (1)\SuperDL
+
+  APK build:
+    gradlew.bat assembleDebug
+    Kimenet: app\build\outputs\apk\debug\app-debug.apk
+
+  Fő technológiák:
+    • Kotlin, Android SDK 34
+    • CameraX + ML Kit (QR olvasó)
+    • PDFBox Android (PDF olvasás)
+    • BKK FUTÁR API (Budapest tömegközlekedés)
+    • OpenStreetMap / Nominatim (geokódolás, útvonal)
+    • wttr.in (időjárás)
+    • RSS/XML (hírek)
+    • SMTP (e-mail küldés)
+
+  Fő forrásfájlok:
+    • MainActivity.kt       — fő vezérlő, menü, flow-k (~3500 sor)
+    • menu/MenuTree.kt      — magyar menüstruktúra
+    • flow/AppFlow.kt       — belső UI állapotok
+    • assistant/            — hangos asszisztens
+    • news/RssHelper.kt     — 18 hírforrás
+    • info/NamedayHelper.kt — magyar névnap (offline)
+    • info/DayInfoHelper.kt — napi üdvözlés
+    • navigation/           — helykeresés, térkép
+    • book/                 — könyvtár és olvasó
+    • transit/              — BKK + OSM tömegközlekedés
+
+
+================================================================================
+  Dokumentum generálva: 2026. június 19.
+  Super Digital Launcher v1.10.0 — Kőrösmezey Dávid
+================================================================================

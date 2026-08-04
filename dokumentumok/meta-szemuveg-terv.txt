@@ -1,0 +1,67 @@
+SUPERDL + META OKOSSZEMÜVEG — MEGVALÓSÍTHATÓSÁGI ÖSSZEGZÉS
+================================================================================
+  >>> ELŐHÍVÓ JELSZÓ: "metanetta" <<<
+  Ha a felhasználó ezt mondja, ezt a tervet kell elővenni és folytatni.
+  Állapot: FELMÉRVE (2026-07-29), megvalósítás még NEM kezdődött el.
+================================================================================
+
+
+1. A KÉRDÉS
+--------------------------------------------------------------------------------
+Használhatják-e a SuperDL kamera-alapú felismerői (pénzfelismerő, "mi van
+előttem", szövegolvasó, színfelismerő, QR stb.) a Meta okosszemüveg kameráját,
+hogy ne kelljen a telefont előkapni és célozgatni vele?
+
+
+2. A VÁLASZ: IGEN, TECHNIKAILAG LEHETSÉGES
+--------------------------------------------------------------------------------
+Eszköz: META WEARABLES DEVICE ACCESS TOOLKIT
+  - Fejlesztői előzetes 2025 DECEMBERE óta elérhető
+  - Android SDK: KOTLIN (ugyanaz a nyelv, amiben a SuperDL íródott)
+  - Hozzáférést ad a szemüveg KAMERÁJÁHOZ, mikrofonjához és hangszórójához
+
+MŰKÖDÉSI MODELL (ez a kulcs, és pont illik a SuperDL-hez):
+  A szemüvegen NEM FUT alkalmazás. A szemüveg csak ÉRZÉKELŐ: a kamera képét
+  átküldi a TELEFONON futó appnak, az feldolgozza, majd a választ visszaküldi
+  a szemüveg hangszórójára.
+  => A szemüveg a SZEM, a telefon marad az AGY.
+  => A SuperDL felismerői ott futnak, ahol most; csak a kép forrása változik.
+
+MIÉRT ILLIK IDE KÜLÖNÖSEN JÓL:
+  - A SuperDL felismerői már most is bitmap-et dolgoznak fel -> elvileg mindegy,
+    honnan jön a kép (telefon kamera vagy szemüveg kamera)
+  - A Meta KIFEJEZETTEN említi a vak és gyengénlátó felhasználóknak szóló
+    alkalmazásokat a példák között (valós idejű vizuális segítség, jelenetleírás,
+    szövegfelolvasás, tárgyfelismerés)
+  - Kézmentes: nincs célozgatás, nincs "hol a bankjegy a képen" probléma
+
+
+3. KORLÁTOK, AMIKET ELŐRE TUDNI KELL
+--------------------------------------------------------------------------------
+  - FEJLESZTŐI ELŐZETES: az SDK letölthető, prototípus építhető, SAJÁT
+    szemüvegen tesztelhető, és a SAJÁT SZERVEZETEN BELÜLI tesztelőknek
+    terjeszthető.
+  - NYILVÁNOS PUBLIKÁLÁS egyelőre KIVÁLASZTOTT PARTNEREKRE korlátozott;
+    a szélesebb elérhetőség 2026 folyamán várható.
+    (A 2026 augusztusi ZÁRT teszthez ez akár elég is lehet!)
+  - Meta fejlesztői fiók (Meta Managed Account) szükséges a hozzáféréshez.
+  - AKKUMULÁTOR: a folyamatos kamera-stream meríti a szemüveget ->
+    "kérésre fotózunk" mód javasolt, nem folyamatos videó.
+  - A Meta AI integráció NEM része a toolkitnek: a képet a saját feldolgozásunkba
+    kell vinni (ami nálunk amúgy is helyben, offline fut — ez előny).
+
+
+4. JAVASOLT ELSŐ LÉPÉSEK (ha nekiállunk)
+--------------------------------------------------------------------------------
+  1. Meta fejlesztői fiók létrehozása, SDK letöltése
+  2. A dokumentáció áttekintése: kamera-kép formátum, felbontás, késleltetés
+  3. Egy KÖZÖS KÉPFORRÁS-RÉTEG a SuperDL-be: a felismerők ne közvetlenül a
+     telefon kamerájából dolgozzanak, hanem egy absztrakt "képforrásból"
+     (telefon VAGY szemüveg) — így minden felismerő egyszerre nyer vele
+  4. Első próba a legegyszerűbb felismerővel (pl. fénydetektor vagy színfelismerő)
+  5. Utána a pénzfelismerő és a jelenetleírás
+
+  MEGJEGYZÉS: a 3. pont (közös képforrás-réteg) akkor is hasznos, ha a szemüveg
+  végül nem valósul meg — tisztább architektúrát ad.
+
+================================================================================

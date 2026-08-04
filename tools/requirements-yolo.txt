@@ -1,0 +1,7 @@
+# Super DL – YOLO banknote training dependencies
+# Install: pip install -r tools/requirements-yolo.txt
+
+ultralytics>=8.3.0
+pillow>=10.0.0
+opencv-python-headless>=4.8.0
+pyyaml>=6.0

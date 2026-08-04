@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/envScannerRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/envPreview"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:importantForAccessibility="no" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvEnvScannerStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:accessibilityLiveRegion="assertive"
+            android:gravity="center"
+            android:minHeight="48dp"
+            android:text="@string/env_scanner_status_ready"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnEnvExit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/env_scanner_exit_desc"
+            android:minHeight="48dp"
+            android:text="@string/env_scanner_exit_button"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnEnvScanToggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:contentDescription="@string/env_scanner_stop_desc"
+        android:minHeight="56dp"
+        android:text="@string/env_scanner_stop"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="@string/env_scanner_categories_title"
+        android:textColor="#CCCCCC"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btnMuteDoor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/env_scanner_mute_door_desc"
+        android:minHeight="56dp"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btnMuteChair"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/env_scanner_mute_chair_desc"
+        android:minHeight="56dp"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btnMuteTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/env_scanner_mute_table_desc"
+        android:minHeight="56dp"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btnMutePerson"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/env_scanner_mute_person_desc"
+        android:minHeight="56dp"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btnMuteFloor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/env_scanner_mute_floor_desc"
+        android:minHeight="56dp"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btnMutePhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/env_scanner_mute_phone_desc"
+        android:minHeight="56dp"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvEnvLastDetection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:accessibilityLiveRegion="polite"
+        android:gravity="center"
+        android:minHeight="48dp"
+        android:text="@string/env_scanner_no_objects"
+        android:textColor="#AAAAAA"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:text="@string/env_scanner_hint"
+        android:textColor="#777777"
+        android:textSize="14sp" />
+
+</LinearLayout>

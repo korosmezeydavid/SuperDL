@@ -1,0 +1,132 @@
+SUPERDL — NYILVÁNOS TESZT: NAPLÓZÁSI ÉS HIBAJELENTÉSI TERV
+================================================================================
+Készült: 2026-07-27 | Cél: a 2026 augusztusi nyilvános teszt előkészítése
+
+  >>> ELŐHÍVÓ JELSZÓ: "naplócska" <<<
+  Ha a felhasználó ezt mondja, ezt a tervet kell elővenni és folytatni.
+  Állapot: MEGTERVEZVE, megvalósítás még NEM kezdődött el.
+  Következő lépés: 1. pont — eszköz-profil + verzió gyűjtő (kis munka, azonnali haszon).
+================================================================================
+
+
+1. MIT AKARUNK ELÉRNI
+--------------------------------------------------------------------------------
+  a) Kiderüljön, MELYIK TELEFONON hogyan működik az app (sok gyártó, sok Android).
+  b) A tesztelő a LEHETŐ LEGKEVESEBB lépéssel tudjon hibát jelenteni.
+  c) A beérkező jelentés ÖNMAGÁBAN érthető legyen a fejlesztőnek (és az AI-nak),
+     utólagos kérdezgetés nélkül.
+  d) Mérhető legyen a "30 nap hiba nélkül" kritérium.
+
+  ALAPSZABÁLY: a naplózás SOHA ne legyen maga is hibaforrás. Ha lassítja a gyenge
+  készüléket, pont ott torzítja a mérést, ahol a legfontosabb lenne.
+
+
+2. MIT NAPLÓZUNK — ÉRTÉK SZERINTI SORRENDBEN
+--------------------------------------------------------------------------------
+  (1) ESZKÖZ-PROFIL — a legfontosabb, mégis a legolcsóbb
+      gyártó, pontos típus, Android-verzió és API-szint, RAM, képernyő,
+      telepített beszédmotor(ok) és az aktív motor, SuperDL verzió + build,
+      a készülék nyelve, akku-optimalizálás állapota.
+      -> Ebből azonnal látszik: "ez a hiba csak Xiaomin / csak Android 11 alatt van".
+
+  (2) ÖSSZEOMLÁS-JELENTÉS (stacktrace)
+      Egy crash-napló többet ér, mint tízezer sor mozdulat.
+      A projektben MÁR VAN CrashLogHandler — ezt kell a jelentésbe fűzni.
+
+  (3) ELKAPOTT HIBÁK (nem összeomlás, de nem várt)
+      Hálózati hibák, engedély-megtagadás, fájl-hozzáférés, TTS-hiba,
+      kamera/mikrofon foglalt, IMAP/SMTP hiba stb.
+
+  (4) FUNKCIÓ-NYOMVONAL (körkörösen!)
+      Melyik menübe lépett, melyik funkció indult, milyen gesztus, mennyi ideig
+      tartott. NEM kell minden ujjmozdulat — a belépési pontok és a kimenetek
+      számítanak. Körkörös fájl: adott méret fölött a legrégebbi felülíródik.
+
+  (5) TELJESÍTMÉNY-JELEK
+      Lassú műveletek (pl. "GPS lekérdezés 8 mp"), memória-figyelmeztetés,
+      szolgáltatás-újraindulás. Ezek jelzik a gyenge készülékek gondjait.
+
+
+3. AMIT SOHA NEM NAPLÓZUNK
+--------------------------------------------------------------------------------
+  - telefonszám, névjegy-név, hívásnapló-tartalom
+  - SMS/e-mail szövege, címzettje, tárgya
+  - pontos GPS-koordináta (legfeljebb "helymeghatározás sikeres/sikertelen")
+  - jelszó, alkalmazás-jelszó, PIN, fiókazonosító
+  - fájlnevek a felhasználó mappáiból (legfeljebb kiterjesztés és méret)
+  - jegyzetek, bevásárlólista, naptár-esemény szövege
+
+  ELV: a napló azt rögzítse, hogy "hívás indult", NE azt, hogy KIT hívtak.
+  Ezt ELŐRE kell beépíteni, nem utólag szűrni. Egyetlen kiszivárgott
+  tesztelői adat tönkreteszi a bizalmat.
+
+
+4. HOGYAN JUT EL A FEJLESZTŐHÖZ — HÁROM ÚT
+--------------------------------------------------------------------------------
+  A) TELEFONRÓL, MEGOSZTÁSSAL  (ELSŐDLEGES)
+     Beállítások > Haladó > "Hibajelentés küldése"
+     -> elkészül a napló-fájl, majd az Android saját megosztás-ablaka nyílik meg.
+     A tesztelő e-mailben, Telegramon, ahogy neki kényelmes, elküldi.
+     ELŐNY: nincs beépített jelszó, nem függ a levelező beállításától,
+     képernyőolvasóval jól kezelhető, 2 lépés.
+
+     MIÉRT NEM automatikus e-mail-küldés: ahhoz a fejlesztő postafiók-jelszavát
+     bele kellene égetni az appba (bárki kiszedheti), és a szolgáltató letiltaná
+     a fiókot ötven készülékről érkező levél után.
+
+  B) WIFI PORTÁLRÓL, LETÖLTÉSSEL  (MÁSODLAGOS)
+     A portál "Állapot" (vagy új "Hibajelentés") oldalán egy letöltés-gomb.
+     Akinek gép van kéznél, annak ez kényelmesebb. NE ez legyen az egyetlen út:
+     sok tesztelőnél nem lesz számítógép.
+
+  C) HANGÜZENET A NAPLÓ MELLÉ  (ez teszi igazán használhatóvá)
+     A jelentés-készítés felajánlja: "Mondd el 30 másodpercben, mit csináltál és
+     mit vártál." A felvétel a naplóval EGYÜTT megy.
+     A napló megmutatja, MI TÖRTÉNT; a hang elmondja, MIT SZERETETT VOLNA.
+     Vak tesztelőnek a beszéd sokkal természetesebb, mint a gépelés.
+
+
+5. A JELENTÉS FELÉPÍTÉSE (amit a fejlesztő/AI kap)
+--------------------------------------------------------------------------------
+  Egyetlen ZIP vagy mappa:
+    - jelentes-azonosito.txt   (fejléc: eszköz-profil, verzió, időbélyeg, azonosító)
+    - esemenyek.txt            (körkörös nyomvonal, az utolsó N esemény)
+    - osszeomlasok.txt         (ha volt)
+    - uzenet.m4a               (a tesztelő hangüzenete, ha felvette)
+
+  AZONOSÍTÓ: verzió + eszköz-rövidítés + időbélyeg (pl. "1.55.0-XIAOMI-0727-1432").
+  Ez kell a duplikátumok kiszűréséhez és a hibamentes napok számolásához.
+
+
+6. MEGVALÓSÍTÁSI SORREND (javasolt)
+--------------------------------------------------------------------------------
+  1. lépés: ESZKÖZ-PROFIL + VERZIÓ gyűjtő   [kis munka, azonnali haszon]
+  2. lépés: KÖRKÖRÖS ESEMÉNYNAPLÓ fájlba    [közepes]
+  3. lépés: JELENTÉS-ÖSSZEÁLLÍTÓ + MEGOSZTÁS gomb  [közepes]
+  4. lépés: HANGÜZENET a jelentéshez        [kicsi, nagy haszon]
+  5. lépés: PORTÁL letöltés-gomb            [kicsi]
+  6. lépés: adatvédelmi ÁTVIZSGÁLÁS a teszt előtt — végigmenni a naplózott
+            szövegeken, hogy tényleg nincs bennük személyes adat  [KÖTELEZŐ]
+
+
+7. A "30 NAP HIBA NÉLKÜL" MÉRÉSE
+--------------------------------------------------------------------------------
+  - A számláló a FEJLESZTŐ oldalán (super-dl.com) fut, nem az appban.
+  - Egy hiba akkor "számít", ha: összeomlás VAGY olyan működési hiba, ami a
+    funkciót használhatatlanná teszi. A kozmetikai észrevétel NE nullázza a
+    számlálót — különben soha nem érünk a végére.
+  - Érdemes súlyozni: SÚLYOS (összeomlás, adatvesztés, hibás pénzfelismerés)
+    -> nullázza; KÖZEPES (funkció nem indul) -> nullázza; KISEBB (szöveghiba,
+    kényelmetlenség) -> nem nullázza, csak listára kerül.
+  - A pénzfelismerő TÉVES CÍMLET-BEMONDÁSA mindig SÚLYOS.
+
+
+8. AMIT A TESZTELŐKNEK EL KELL MONDANI (rövid útmutató nekik)
+--------------------------------------------------------------------------------
+  - Hol a hibajelentés gomb, és hogy 2 lépés.
+  - Hogy a napló NEM tartalmaz személyes adatot (ezt írásban is le kell szögezni).
+  - Hogy a hangüzenet a leghasznosabb: mondja el, mit csinált és mit várt.
+  - Hogy melyik telefonja van (ezt a napló automatikusan tudja, de jó, ha ő is
+    említi a hangüzenetben).
+
+================================================================================

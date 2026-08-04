@@ -1,0 +1,19 @@
+*.iml
+.gradle/
+/local.properties
+/.idea/
+/build/
+/app/build/
+keystore.properties
+*.keystore
+# Alairo kulcsok es jelszavak - SOHA nem kerulhetnek fel
+keystore.properties
+*.jks
+*.keystore
+
+# Tanito adatok es modellek (tul nagyok a tarolohoz)
+tools/banknote_*/
+tools/runs/
+*.zip
+*.pt
+app/libs/framework.jar

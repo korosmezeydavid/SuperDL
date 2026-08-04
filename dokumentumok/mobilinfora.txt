@@ -1,0 +1,551 @@
+================================================================================
+  SUPER DL (Super Digital Launcher) — TELEPÍTÉSI ÉS ENGEDÉLYEZÉSI SPECIFIKÁCIÓ
+  Mobilinfo csapatnak — részletes technikai tájékoztató
+================================================================================
+
+  Dokumentum dátuma:     2026. július 12.
+  Alkalmazás neve:       Super DL (Super Digital Launcher)
+  Csomagnév:             com.superdl.launcher
+  Aktuális verzió:       1.54.9 (versionCode 100)
+  Fejlesztő:             Kőrösmezey Dávid
+  Kapcsolat:             korosmezey.david.richard@gmail.com
+  Projekt mappa:         C:\Users\msn\Documents\SuperDL-Android
+  APK fájlnév minta:     SuperDL-1.54.9-release.apk / SuperDL-1.54.9-debug.apk
+
+  Ez a dokumentum a Mobilinfo csapat számára készült. Célja, hogy telepítés
+  előtt és használat közben egyértelmű legyen: milyen Android verzió szükséges,
+  milyen engedélyeket kérhet az alkalmazás, és mely beállítások opcionálisak
+  vagy kötelezőek az egyes funkciókhoz.
+
+
+================================================================================
+  1. RÖVID ALKALMAZÁSLEÍRÁS
+================================================================================
+
+  A Super DL egy magyar nyelvű Android launcher (kezdőképernyő alkalmazás),
+  vak és gyengénlátó felhasználók számára. Gesztusokkal (fel / le / jobbra /
+  balra swipe) és hanggal (felolvasás, diktálás, Elena hangos asszisztens)
+  vezérelhető.
+
+  Fő funkciók:
+    - Telefonálás, SMS, e-mail, névjegyek, hívásnapló
+    - Ébresztő, időzítő, naptár, gyógyszer-emlékeztető (Patika Őrangyal)
+    - GPS kitekintő, tömegközlekedés, helykeresés, útvonal
+    - Kamera alapú eszközök: pénzfelismerő, szövegolvasó, környezeti kitekintő,
+      helyszín felismerő, szín- és fénydetektor, QR olvasó, arcfelismerő kamera
+    - Zenelejátszó, YouTube, könyvolvasó, hírek, időjárás
+    - Profi diktafon, hallás erősítő, S.O.S., PIN zárolás, akkumulátor őrség
+    - Elena hangos asszisztens (helyi kulcsszó-felismerés, nem felhő AI)
+
+  Fontos: a Super DL nem csak „egy alkalmazás”, hanem a telefon fő
+  kezelőfelülete (launcher) is lehet. Teljes élményhez ajánlott alapértelmezett
+  kezdőképernyőként beállítani.
+
+
+================================================================================
+  2. ANDROID VERZIÓ — MINIMUM, AJÁNLOTT, CÉLVERZIÓ
+================================================================================
+
+  ┌────────────────────┬──────────────────────────────────────────────────────┐
+  │ Kategória          │ Érték                                                │
+  ├────────────────────┼──────────────────────────────────────────────────────┤
+  │ Minimum (telepíthető)│ Android 8.0 — Oreo (API 26)                        │
+  │ Ajánlott           │ Android 12 — Snow Cone (API 31) vagy újabb           │
+  │ Optimális          │ Android 13–14 (API 33–34)                            │
+  │ Cél SDK (targetSdk)│ Android 14 (API 34)                                  │
+  │ Fordítási SDK      │ Android 14 (API 34)                                  │
+  └────────────────────┴──────────────────────────────────────────────────────┘
+
+  MINIMUM — Android 8.0 (API 26):
+    - Az alkalmazás technikailag telepíthető és elindítható.
+    - Egyes modern funkciók (szerepkör-alapú telefon/SMS, pontos ébresztő,
+      közeli WiFi eszközök engedélye) korlátozottan vagy másképp működnek.
+    - Nem ajánlott hosszú távú használatra.
+
+  AJÁNLOTT — Android 12+ (API 31+):
+    - A legtöbb engedély és rendszer-szerepkör (telefon app, SMS app, hívás
+      szűrő, pontos ébresztő) megbízhatóan elérhető.
+    - A fejlesztés és tesztelés fő célkészüléke is ilyen rendszeren fut
+      (pl. Ulefone Armor 24, Android 13).
+
+  OPTIMÁLIS — Android 13–14 (API 33–34):
+    - Teljes médiáengedély-modell (READ_MEDIA_AUDIO).
+    - Értesítés engedély (POST_NOTIFICATIONS) natív kérés.
+    - Közeli WiFi eszközök engedély (NEARBY_WIFI_DEVICES).
+    - Elena asszisztens fejlett beszédfelismerési kontextus (Android 14+).
+
+  NEM TÁMOGATOTT:
+    - Android 7.1 és régebbi (API 25 alatt) — telepítés sikertelen.
+
+
+================================================================================
+  3. HARDVER ÉS EGYÉB TELEPÍTÉSI KÖVETELMÉNYEK
+================================================================================
+
+  Kötelező / erősen ajánlott:
+    - Legalább 100 MB szabad belső tárhely (alkalmazás + modellek + felvételek)
+    - Érintőképernyő (gesztus navigáció)
+    - Hangszóró vagy fülhallgató (TTS, hangos visszajelzés)
+    - Mikrofon (diktálás, Elena, diktafon, hallás erősítő)
+
+  Opcionális, de funkciókhoz szükséges:
+    - SIM-kártya és mobilhálózat — telefonálás, SMS, S.O.S.
+    - GPS — helymeghatározás, GPS kitekintő, tömegközlekedés, útvonal
+    - Kamera — pénzfelismerő, szövegolvasó, QR, környezeti kitekintő stb.
+    - Zseblámpa (vaku) — zseblámpa funkció
+    - Bluetooth — BT eszközök (engedély külön kérhető Android 12+-on)
+
+  Nem kötelező hardver (az app telepíthető nélkülük is):
+    - Telefon modul (android.hardware.telephony = nem kötelező)
+    - Kamera hardver (android.hardware.camera = nem kötelező)
+
+  Telepítési mód:
+    - Belső teszt / közvetlen APK telepítés (nem Play Store kiadás).
+    - Szükség lehet „Ismeretlen forrásból” / „Telepítés ismeretlen alkalmazásokból”
+      engedélyre a telefon beállításaiban.
+    - Release APK aláírt; debug build csomagnév: com.superdl.launcher.debug
+
+
+================================================================================
+  4. ENGEDÉLYEK — ÁTTEKINTŐ TÁBLÁZAT
+================================================================================
+
+  Az alábbi engedélyek az AndroidManifest.xml-ben szerepelnek. A „Mikor kéri”
+  oszlop mutatja, hogy induláskor, funkcióhasználatkor vagy rendszerbeállításban
+  jelenik meg a kérés.
+
+  Jelölések:
+    [K] = Kötelező az alapfunkciókhoz (induláskor kéri)
+    [F] = Funkcióhasználatkor kéri (ha még nincs meg)
+    [R] = Rendszerbeállításban / speciális hozzáférés (nem hagyományos popup)
+    [O] = Opcionális — csak ha a felhasználó az adott funkciót használja
+    [A] = Automatikus / háttér (nem felhasználói popup, de manifestben szerepel)
+
+
+================================================================================
+  4/A. TELEFON ÉS HÍVÁSOK
+================================================================================
+
+  Engedély                          Szint   Mikor kéri    Mire kell
+  ─────────────────────────────────────────────────────────────────────────────
+  CALL_PHONE                        [K]     Induláskor    Hívás indítása
+  ANSWER_PHONE_CALLS                [K]     Induláskor    Bejövő hívás fogadása / elutasítása
+  READ_PHONE_STATE                  [K]     Induláskor    Hívás állapot figyelés, hívás közbeni képernyő
+  MANAGE_OWN_CALLS                  [A]     —             Saját hívások kezelése (Telecom API)
+  READ_PHONE_NUMBERS                [K]     Induláskor    Saját telefonszám olvasása (Android 8+)
+  READ_CONTACTS                     [K]     Induláskor    Névjegyek listázása, kedvencek, hívás
+  WRITE_CONTACTS                    [K]     Induláskor    Új névjegy, szerkesztés, törlés
+  GET_ACCOUNTS                      [K]*    Induláskor    E-mail fiókok olvasása (*csak Android 9-ig)
+  READ_CALL_LOG                     [K]     Induláskor    Hívásnapló megjelenítése
+  READ_PHONE_NUMBERS                [K]     Induláskor    Telefonszámok azonosítása
+
+  Rendszer-szerepkörök (nem sima engedély popup):
+    - Alapértelmezett telefon alkalmazás (ROLE_DIALER) [R]
+      → Beállítások → Biztonság → Alapértelmezett telefon beállítása
+      → Szükséges ahhoz, hogy bejövő hívásnál látszódjon a hívó neve és száma
+    - Hívás szűrő / Call Screening (ROLE_CALL_SCREENING) [R]
+      → Beállítások → Speciális hozzáférés → Hívás szűrés és azonosítás
+      → Letiltott és rejtett számok automatikus elutasításához
+    - InCallService (BIND_INCALL_SERVICE) [R] — rendszer automatikusan kezeli,
+      ha a Super DL az alapértelmezett telefon app
+
+
+================================================================================
+  4/B. SMS ÉS ÜZENETEK
+================================================================================
+
+  Engedély                          Szint   Mikor kéri    Mire kell
+  ─────────────────────────────────────────────────────────────────────────────
+  SEND_SMS                          [K]     Induláskor    SMS küldés
+  RECEIVE_SMS                       [K]     Induláskor    Bejövő SMS fogadás
+  READ_SMS                          [K]     Induláskor    SMS olvasás, üzenetlista
+  WRITE_SMS                         [A]     —             SMS tároló írás (alapértelmezett SMS app)
+  RECEIVE_MMS                       [A]     —             MMS fogadás
+  RECEIVE_WAP_PUSH                  [A]     —             MMS/WAP push üzenetek
+
+  Rendszer-szerepkör:
+    - Alapértelmezett SMS / üzenet alkalmazás (ROLE_SMS) [R]
+      → Beállítások → Alapértelmezett alkalmazások → SMS / Üzenet alkalmazás
+      → Teljes SMS küldés-fogadás a Super DL-ből; enélkül korlátozott lehet
+
+
+================================================================================
+  4/C. HELYMEGHATÁROZÁS ÉS NAVIGÁCIÓ
+================================================================================
+
+  Engedély                          Szint   Mikor kéri    Mire kell
+  ─────────────────────────────────────────────────────────────────────────────
+  ACCESS_FINE_LOCATION              [K]     Induláskor    GPS pontos hely (GPS kitekintő, útvonal,
+                                                          tömegközlekedés, időjárás, helykeresés)
+  ACCESS_COARSE_LOCATION            [A]     —             Hálózati hely (durva pozíció)
+
+  Háttérszolgáltatások hely engedéllyel:
+    - GpsSurroundingsService (FOREGROUND_SERVICE_LOCATION)
+    - GPS útvonal rögzítés és követés
+
+
+================================================================================
+  4/D. INTERNET, HÁLÓZAT, WIFI, BLUETOOTH
+================================================================================
+
+  Engedély                          Szint   Mikor kéri    Mire kell
+  ─────────────────────────────────────────────────────────────────────────────
+  INTERNET                          [A]     —             Időjárás, hírek, YouTube, e-mail, API hívások
+  ACCESS_NETWORK_STATE              [A]     —             Hálózati állapot ellenőrzés
+  CHANGE_NETWORK_STATE              [A]     —             Hotspot kapcsoló (OEM-függő)
+  ACCESS_WIFI_STATE                 [A]     —             WiFi állapot lekérdezés
+  CHANGE_WIFI_STATE                 [A]     —             WiFi be/ki (ahol az OS engedi)
+  NEARBY_WIFI_DEVICES               [K]*    Induláskor    WiFi állapot Android 13+-on
+                                    (*Android 13+, neverForLocation flag)
+  ACCESS_NOTIFICATION_POLICY        [A]     —             Ne zavarj mód (DND) kezelés
+
+  Megjegyzés:
+    - Android 10+ egyes készülékeken a WiFi közvetlen ki-be kapcsolása nem
+      elérhető az appból → a felhasználót a gyorsbeállítások panelre irányítja.
+    - Bluetooth közvetlen kapcsoló: Android 12+-on BLUETOOTH_CONNECT [K] induláskor;
+      egyes funkcióknál a rendszer BT beállításokra irányít.
+
+
+================================================================================
+  4/E. ÉBRESZTŐ, NAPTÁR, ÉRTESÍTÉSEK
+================================================================================
+
+  Engedély                          Szint   Mikor kéri    Mire kell
+  ─────────────────────────────────────────────────────────────────────────────
+  SCHEDULE_EXACT_ALARM              [A/R]   Beállításban  Pontos ébresztő, gyógyszer-emlékeztető
+  USE_EXACT_ALARM                   [A]     —             Pontos ébresztő (engedélyezett app kategória)
+  READ_CALENDAR                     [K]     Induláskor    Naptár bejegyzések olvasása
+  WRITE_CALENDAR                    [K]     Induláskor    Új naptári program, emlékeztető
+  POST_NOTIFICATIONS                [K]*    Induláskor    Saját értesítések megjelenítése (*Android 13+)
+  USE_FULL_SCREEN_INTENT            [A]     —             Teljes képernyős riasztás (ébresztő, S.O.S.,
+                                                          gyógyszer figyelmeztetés zárolt képernyőn)
+  VIBRATE                           [A]     —             Rezgés visszajelzés
+  MODIFY_AUDIO_SETTINGS             [A]     —             Hangerő, csatornák kezelése
+  RECEIVE_BOOT_COMPLETED            [A]     —             Ébresztők újraindítás után
+
+  Speciális hozzáférés:
+    - Pontos ébresztő engedély [R] — Android 12+: Beállítások → Alkalmazások →
+      Super DL → Ébresztők és emlékeztetők → engedélyezés
+    - Értesítés hozzáférés (Notification Listener) [R]:
+      Beállítások → Speciális hozzáférés → Értesítés hozzáférés → Super DL be
+      → Külső app értesítéseinek felolvasása a Super DL Értesítések olvasása menüjében
+
+
+================================================================================
+  4/F. MÉDIA ÉS TÁROLÓ
+================================================================================
+
+  Engedély                          Szint   Mikor kéri    Mire kell
+  ─────────────────────────────────────────────────────────────────────────────
+  READ_MEDIA_AUDIO                  [K]*    Induláskor    Zenelejátszó — hangfájlok olvasása (*Android 13+)
+  READ_EXTERNAL_STORAGE             [K]*    Induláskor    Könyvek, média (*Android 12 és régebbi, max API 32)
+
+  Megjegyzés:
+    - A diktafon és könyvolvasó saját app mappákat használ; külső tároló olvasás
+      a felhasználó által beállított könyvmappához / zenefájlokhoz kell.
+
+
+================================================================================
+  4/G. KAMERA, MIKROFON, VAKU
+================================================================================
+
+  Engedély                          Szint   Mikor kéri    Mire kell
+  ─────────────────────────────────────────────────────────────────────────────
+  CAMERA                            [K]     Induláskor    Kamera funkciók (lásd listát lent)
+  FLASHLIGHT                        [A]     —             Zseblámpa
+  RECORD_AUDIO                      [K]     Induláskor    Diktálás, Elena, diktafon, hallás erősítő,
+                                                          hang alapú hely mentés
+
+  Kamera engedélyt használó funkciók (első használatkor is ellenőrzi):
+    - Pénzfelismerő (forint bankjegy)
+    - Szövegolvasó (OCR)
+    - Környezeti kitekintő (objektumfelismerés)
+    - Helyszín felismerő (tanítás + figyelés)
+    - Színfelismerő, fénydetektor
+    - QR kód olvasó
+    - Arcfelismerő kamera
+    - Kártya rendező (tanítás + felismerés)
+    - Kamera felvétel / videó (FaceCameraActivity — kamera + mikrofon)
+
+
+================================================================================
+  4/H. BLUETOOTH
+================================================================================
+
+  Engedély                          Szint   Mikor kéri    Mire kell
+  ─────────────────────────────────────────────────────────────────────────────
+  BLUETOOTH                         [A]     —             Régi API (max Android 11 / API 30)
+  BLUETOOTH_ADMIN                   [A]     —             Régi API (max Android 11 / API 30)
+  BLUETOOTH_CONNECT                 [K]*    Induláskor    BT eszközök Android 12+ (*API 31+)
+
+
+================================================================================
+  4/I. HÁTTÉRSZOLGÁLTATÁSOK ÉS EGYÉB RENDSZER ENGEDÉLYEK
+================================================================================
+
+  Engedély                          Szint   Mire kell
+  ─────────────────────────────────────────────────────────────────────────────
+  FOREGROUND_SERVICE                [A]     Háttérben futó szolgáltatások alapja
+  FOREGROUND_SERVICE_PHONE_CALL     [A]     S.O.S. szolgáltatás
+  FOREGROUND_SERVICE_MICROPHONE     [A]     Diktafon, hallás erősítő, Elena figyelő
+  FOREGROUND_SERVICE_SPECIAL_USE    [A]     GPS radar, időzítő, akkumulátor őrség, gyógyszer riasztó stb.
+  FOREGROUND_SERVICE_LOCATION       [A]     GPS környezeti figyelő
+  WAKE_LOCK                         [A]     Képernyő / CPU ébren tartás riasztásoknál
+  QUERY_ALL_PACKAGES                [A]     Külső appok felderítése (Maps, YouTube, telepített appok listája)
+
+  Saját védett engedély (nem felhasználói):
+    - com.superdl.launcher.permission.SET_SOS (signature szint)
+      → Csak ADB / rendszer telepítő használhatja S.O.S. számok távoli beállítására
+
+
+================================================================================
+  5. INDULÁSKOR AUTOMATIKUSAN KÉRT ENGEDÉLYEK (REQUIRED_PERMISSIONS)
+================================================================================
+
+  Az első indításkor (és amíg nincs meg mind) a Super DL egyszerre kérheti az
+  alábbi engedélyeket. A rendszer dialógusban egyenként vagy csoportban jelennek meg
+  (gyártótól függően):
+
+  Minden támogatott Android verzión:
+    1.  Telefonhívás (CALL_PHONE)
+    2.  Hívások fogadása (ANSWER_PHONE_CALLS)
+    3.  Telefon állapot olvasása (READ_PHONE_STATE)
+    4.  Névjegyek olvasása (READ_CONTACTS)
+    5.  Névjegyek írása (WRITE_CONTACTS)
+    6.  Hívásnapló (READ_CALL_LOG)
+    7.  SMS küldés (SEND_SMS)
+    8.  SMS olvasás (READ_SMS)
+    9.  SMS fogadás (RECEIVE_SMS)
+    10. Pontos hely (ACCESS_FINE_LOCATION)
+    11. Kamera (CAMERA)
+    12. Mikrofon (RECORD_AUDIO)
+    13. Naptár olvasás (READ_CALENDAR)
+    14. Naptár írás (WRITE_CALENDAR)
+
+  Android 8.0+ (API 26+):
+    15. Telefonszámok olvasása (READ_PHONE_NUMBERS)
+
+  Android 9 és régebbi (API 28-):
+    16. Fiókok olvasása (GET_ACCOUNTS) — e-mail import
+
+  Android 12+ (API 31+):
+    17. Bluetooth csatlakozás (BLUETOOTH_CONNECT)
+
+  Android 12 és régebbi (API 32-):
+    18. Külső tárhely olvasás (READ_EXTERNAL_STORAGE)
+
+  Android 13+ (API 33+):
+    19. Értesítések küldése (POST_NOTIFICATIONS)
+    20. Hangfájlok olvasása (READ_MEDIA_AUDIO)
+    21. Közeli WiFi eszközök (NEARBY_WIFI_DEVICES)
+
+
+================================================================================
+  6. RENDSZERBEÁLLÍTÁSOKBAN ENGEDÉLYEZENDŐ — NEM POPUP ENGEDÉLYEK
+================================================================================
+
+  Ezeket a Super DL menüjéből (Beállítások) lehet elindítani; hangos útmutató
+  is elérhető mindegyikhez.
+
+  6.1  Alapértelmezett kezdőképernyő (LAUNCHER) — erősen ajánlott
+       Útvonal: Home gomb → „Super DL” → „Mindig”
+       Vagy: Beállítások → Alapértelmezett alkalmazások → Kezdőképernyő alkalmazás
+       Nélküle: az app fut, de nem helyettesíti a telefon fő kezelőfelületét.
+
+  6.2  Alapértelmezett telefon alkalmazás (ROLE_DIALER) — ajánlott
+       Menü: Beállítások → Biztonság → Alapértelmezett telefon beállítása
+       Nélküle: bejövő hívó száma gyakran „ismeretlen”.
+
+  6.3  Alapértelmezett SMS alkalmazás (ROLE_SMS) — ajánlott üzenetkezeléshez
+       Menü: Üzenetek és E-mail → Alapértelmezett üzenet app beállítása
+
+  6.4  Értesítés hozzáférés (Notification Listener) — opcionális
+       Menü: Beállítások → Értesítések olvasása engedély
+       Útvonal: Beállítások → Speciális hozzáférés → Értesítés hozzáférés
+
+  6.5  Hívás szűrő (ROLE_CALL_SCREENING) — opcionális
+       Menü: Beállítások → Biztonság → Hívás szűrő engedély
+       Rejtett / letiltott számok automatikus elutasításához.
+
+  6.6  Pontos ébresztő — ajánlott (Android 12+)
+       Menü: Beállítások → Pontos ébresztő engedély
+       A Super DL saját ébresztőt használ, nem a gyári Óra appot.
+
+  6.7  Alapértelmezett digitális asszisztens (ROLE_ASSISTANT) — opcionális
+       Menü: Elena → Digitális asszisztens beállítása
+       Oldalsó gomb hosszú nyomására Elena indul. Android 10+ szükséges.
+
+  6.8  Akadálymentesség — Rendszer PIN segéd — opcionális
+       Szolgáltatás neve: „Super DL rendszer PIN segéd”
+       Menü: Beállítások → Rendszer PIN segéd engedélyezése
+       Útvonal: Beállítások → Akadálymentesség → Super DL rendszer PIN segéd → Be
+       Cél: hangvezérelt függőleges számbillentyűzet a rendszer zárolási PIN képernyőjén.
+       Megjegyzés: ez NEM helyettesíti a TalkBackot; önálló, választható kiegészítő.
+
+
+================================================================================
+  7. FUNKCIÓ — ENGEDÉLY ÖSSZERENDELÉS (GYORS REFERENCIA)
+================================================================================
+
+  Telefon, kedvencek, névjegyek, hívásnapló
+    → CALL_PHONE, READ/WRITE_CONTACTS, READ_CALL_LOG, READ_PHONE_STATE,
+      ANSWER_PHONE_CALLS, ROLE_DIALER
+
+  SMS küldés / fogadás / olvasás
+    → SEND/READ/RECEIVE_SMS, ROLE_SMS
+
+  E-mail küldés (SMTP)
+    → INTERNET (+ GET_ACCOUNTS Android 9-ig, ha fiók import kell)
+
+  Ébresztő, Patika Őrangyal, időzítő
+    → SCHEDULE_EXACT_ALARM, USE_EXACT_ALARM, POST_NOTIFICATIONS,
+      USE_FULL_SCREEN_INTENT, RECEIVE_BOOT_COMPLETED
+
+  Naptár
+    → READ/WRITE_CALENDAR
+
+  GPS kitekintő, útvonal, tömegközlekedés, helykeresés, időjárás
+    → ACCESS_FINE_LOCATION, FOREGROUND_SERVICE_LOCATION (háttér)
+
+  Értesítések felolvasása (más appokból)
+    → Notification Listener [R]
+
+  Hívás szűrő (rejtett számok)
+    → ROLE_CALL_SCREENING
+
+  Zenelejátszó
+    → READ_MEDIA_AUDIO (Android 13+) / READ_EXTERNAL_STORAGE (régebbi)
+
+  Könyvolvasó
+    → READ_EXTERNAL_STORAGE vagy saját mappa (Storage Access Framework)
+
+  Diktafon, hangjegyzet
+    → RECORD_AUDIO, FOREGROUND_SERVICE_MICROPHONE
+
+  Elena asszisztens, diktálás
+    → RECORD_AUDIO; ROLE_ASSISTANT (opcionális, oldalsó gombhoz)
+
+  Elena háttérfigyelő (felébresztő mondatok)
+    → RECORD_AUDIO, FOREGROUND_SERVICE_MICROPHONE, POST_NOTIFICATIONS
+
+  Pénzfelismerő, szövegolvasó, QR, környezeti kitekintő
+    → CAMERA
+
+  S.O.S.
+    → CALL_PHONE, FOREGROUND_SERVICE_PHONE_CALL; zárolt képernyő: USE_FULL_SCREEN_INTENT
+
+  PIN zárolás (saját app zárolás)
+    → Nem kér külön engedélyt (belső funkció)
+
+  Rendszer PIN segéd (zárolási képernyő)
+    → Akadálymentesség szolgáltatás [R]
+
+  WiFi / Hotspot
+    → ACCESS/CHANGE_WIFI_STATE, NEARBY_WIFI_DEVICES; hotspot OEM-függő
+
+  Akkumulátor őrség
+    → POST_NOTIFICATIONS, FOREGROUND_SERVICE_SPECIAL_USE (nincs extra felhasználói engedély)
+
+  Külső appok indítása (YouTube, Maps, telepített appok)
+    → QUERY_ALL_PACKAGES + intent queries (manifest)
+
+
+================================================================================
+  8. ADATVÉDELEM ÉS BIZTONSÁGI MEGJEGYZÉSEK
+================================================================================
+
+  - Az alkalmazás allowBackup=false — a rendszer automatikus biztonsági mentés
+    ki van kapcsolva.
+  - directBootAware=true — egyes funkciók (SMS fogadás, S.O.S.) közvetlenül
+    indulás után is működhetnek, mielőtt a felhasználó feloldaná a telefont.
+  - Elena hangos asszisztens helyi beszédfelismerést használ — a hangot nem
+    küldi felhő AI szolgáltatásnak a parancsértelmezéshez.
+  - Az e-mail küldés SMTP-n keresztül történik (felhasználó által beállított
+    fiókkal, alapértelmezetten Gmail-kompatibilis).
+  - A Notification Listener hozzáférés érzékeny: más alkalmazások értesítési
+    tartalmát olvassa fel — csak megbízható környezetben ajánlott engedélyezni.
+
+
+================================================================================
+  9. ISMERT KORLÁTOK ANDROID VERZIÓ SZERINT
+================================================================================
+
+  Android 8–9 (API 26–28):
+    - Szerepkörök (telefon, SMS, asszisztens) korlátozottabb API-kkal működnek.
+    - GET_ACCOUNTS engedély kéri az e-mail fiók importot.
+
+  Android 10–11 (API 29–30):
+    - WiFi ki-be kapcsolás egyre korlátozottabb; gyakran kézi beállítás kell.
+    - SMS szerepkör Android 10+-tól natív RoleManager-rel.
+
+  Android 12 (API 31):
+    - Pontos ébresztő engedély külön kérhető a rendszerbeállításokban.
+    - BLUETOOTH_CONNECT runtime engedély szükséges.
+
+  Android 13 (API 33):
+    - POST_NOTIFICATIONS runtime engedély kötelező saját értesítésekhez.
+    - READ_MEDIA_AUDIO váltja fel a tárhely olvasást zenéhez.
+    - NEARBY_WIFI_DEVICES külön engedély.
+
+  Android 14 (API 34) — célverzió:
+    - Teljes kompatibilitás a jelenlegi builddel.
+    - Elena ASR kontextus-hintek Android 14+-on.
+
+
+================================================================================
+  10. TELEPÍTÉSI JAVASLAT A MOBILINFO CSAPATNAK
+================================================================================
+
+  Ajánlott telepítési profil (teljes funkcionalitás):
+
+    1. Készülék: Android 12 vagy újabb (ideálisan 13–14)
+    2. Telepítsd a SuperDL-x.x.x-release.apk-t
+    3. Állítsd be alapértelmezett kezdőképernyőnek (launcher)
+    4. Indítsd el — fogadd el az induláskori engedélykéréseket
+    5. Menj végig a Beállítások → Engedélyek / Szerepkörök menüpontjain:
+       - Alapértelmezett telefon
+       - Alapértelmezett SMS (ha üzenetek kellenek)
+       - Pontos ébresztő (Android 12+)
+       - Értesítés hozzáférés (ha értesítés olvasás kell)
+       - Hívás szűrő (ha spam/rejtett szám szűrés kell)
+       - Digitális asszisztens (ha Elena oldalsó gombbal kell)
+    6. Opcionálisan: Rendszer PIN segéd az akadálymentesség beállításokban
+
+  Minimális telepítési profil (csak launcher + TTS navigáció, SIM nélkül):
+    - Android 8.0+, WiFi, engedélyek közül: hely + mikrofon + kamera elutasítható
+      (de sok funkció nem lesz elérhető)
+
+  Tesztelt referencia készülék:
+    - Ulefone Armor 24 (Android 13, rugged telefon)
+
+
+================================================================================
+  11. ÖSSZEFOGLALÓ — EGY OLDALON
+================================================================================
+
+  TELEPÍTÉS:     Android 8.0-tól lehetséges, Android 12+-tól ajánlott
+  CSOMAG:        com.superdl.launcher
+  VERZIÓ:        1.54.9 (100)
+  TÁRHELY:       min. 100 MB
+  LAUNCHER:      Igen — ajánlott alapértelmezett kezdőképernyő
+
+  INDULÁSKORI ENGEDÉLYEK (~14–21 db, verziótól függően):
+    Telefon, hívás, névjegyek, hívásnapló, SMS, hely, kamera, mikrofon,
+    naptár + Android 13+-on: értesítés, média hang, közeli WiFi
+
+  KÜLÖN BEÁLLÍTANDÓ (rendszer):
+    Launcher, telefon app, SMS app, pontos ébresztő, értesítés olvasó,
+    hívás szűrő, digitális asszisztens, akadálymentesség (PIN segéd)
+
+  ÉRZÉKENY ENGEDÉLYEK:
+    Hely, kamera, mikrofon, SMS, telefon, névjegyek, hívásnapló,
+    értesítés hozzáférés, akadálymentesség (PIN segéd)
+
+  KAPCSOLAT:
+    Kőrösmezey Dávid — korosmezey.david.richard@gmail.com
+
+
+================================================================================
+  Dokumentum vége — Super DL Mobilinfo specifikáció
+  Következő frissítés: új verzió vagy engedély-változás esetén
+================================================================================

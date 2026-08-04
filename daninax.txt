@@ -1,0 +1,338 @@
+================================================================================
+  SUPER DL – YOLO MODELL TANÍTÁS: OPTIMÁLIS GÉPI KÖVETELMÉNYEK
+================================================================================
+
+  Projekt:     SuperDL-Android (HUF bankjegy felismerő)
+  Mappa:       C:\Users\msn\Documents\SuperDL-Android
+  Dátum:       2026-07-13
+  Cél:         A YOLO11 detektor (és a teljes bankjegy-pipeline) hatékony,
+               megbízható tanítása lokálisan vagy felhőben.
+
+  Kapcsolódó fájlok:
+    - tools/train_banknote_yolo.py          — YOLO tanítás (Ultralytics)
+    - tools/train_banknote_full_pipeline.py — YOLO + osztályozó + TFLite export
+    - tools/SuperDL_YOLO_Colab.ipynb        — Google Colab GPU workflow
+    - tools/banknote_yolo/data.yaml         — adathalmaz konfiguráció
+
+
+================================================================================
+  1. MIT TANÍTUNK? (KONTEXTUS)
+================================================================================
+
+  A Super DL pénzfelismerője kétlépcsős:
+
+    1) YOLO11 objektumdetektor
+       - 6 osztály: huf_500, huf_1000, huf_2000, huf_5000, huf_10000, huf_20000
+       - Alapértelmezett modell: yolo11n.pt (gyors prototípus)
+       - Produkciós modell:       yolo11s.pt (jelenlegi ajánlott)
+       - Kép méret:               640×640 px
+       - Batch méret:             16
+       - Epoch:                   150–200
+       - Kimenet:                 huf_banknote_detector.tflite (Android asset)
+
+    2) Keras osztályozó (második lépés)
+       - 224×224 px, 7 osztály (none + 6 címlet)
+       - tools/build_huf_banknote_model.py
+       - Kimenet: huf_banknote_classifier.tflite
+
+  Jelenlegi adathalmaz (banknote_yolo):
+    - Train:  6 741 kép  (~742 MB)
+    - Val:      397 kép  (~56 MB)
+    - Test:     396 kép  (~55 MB)
+    - Összesen: ~7 500 kép, ~850 MB (csak képek)
+    - Train felosztás: 1 736 pozitív + 5 005 hard negative
+    - Erős augmentáció: mosaic 0.8, mixup, copy-paste, erasing
+
+  A tanítás GPU-ra van optimalizálva. CPU-n is fut, de 10–50× lassabb.
+
+
+================================================================================
+  2. GPU – A LEGFONTOSABB KOMPONENS
+================================================================================
+
+  A YOLO tanítás számításigénye 95%-ban a GPU-n (CUDA) fut. NVIDIA GPU
+  kötelező a reális, hatékony lokális tanításhoz.
+
+  --- VRAM (videómemória) igény ---
+
+  A projekt alapértelmezett beállításai: imgsz=640, batch=16, mosaic=0.8.
+  A mosaic augmentáció egyszerre több képet tölt be → magasabb VRAM.
+
+  Modell          batch=8    batch=16 (alapért.)   batch=32
+  ─────────────────────────────────────────────────────────────
+  yolo11n.pt      4–6 GB     6–8 GB               12+ GB
+  yolo11s.pt      6–8 GB     10–14 GB             20+ GB (ritkán kell)
+  yolo11m.pt      10–12 GB   16–20 GB             32+ GB
+
+  Ha kevés a VRAM, csökkentsd a batch-et:
+    python tools/train_banknote_yolo.py --batch 8
+    python tools/train_banknote_yolo.py --batch 4 --model yolo11n.pt
+
+  --- Ajánlott GPU-k (2026) ---
+
+  KATEGÓRIA          GPU                    VRAM     Megjegyzés
+  ─────────────────────────────────────────────────────────────────────
+  Minimum            GTX 1660 Super         6 GB     yolo11n, batch 4–8
+  Használható        RTX 3060 / 4060        8–12 GB  yolo11s, batch 8–16
+  Ajánlott           RTX 3070 / 4070        8–12 GB  yolo11s, batch 16, stabil
+  Optimális          RTX 3080/4080          10–16 GB yolo11s/m, batch 16–32
+  Profi              RTX 4090 / A5000       24 GB    gyors iteráció, nagy batch
+
+  Laptop GPU-k (RTX 4060/4070 Mobile): működnek, de hőterhelés miatt
+  hosszabb tanításnál érdemes hűtőpad + tápellátás bedugva.
+
+  --- AMD GPU (ROCm) ---
+
+  Ultralytics PyTorch alapú; AMD támogatás (ROCm) korlátozott és instabil
+  Windows-on. NVIDIA CUDA az ajánlott, különösen TFLite exportnál.
+
+  --- CUDA / illesztőprogram ---
+
+    - NVIDIA Driver: legfrissebb stabil (≥ 535.x)
+    - CUDA Toolkit:  11.8 vagy 12.x (PyTorch kompatibilitás szerint)
+    - cuDNN:         PyTorch/Ultralytics telepítéskor automatikusan jön
+
+  Ellenőrzés tanítás előtt:
+    python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"
+
+
+================================================================================
+  3. CPU
+================================================================================
+
+  A GPU végzi a neurális háló számításait. A CPU feladata:
+    - adatbetöltés (DataLoader workers)
+    - kép augmentáció előkészítés
+    - validáció, metrika számítás
+    - TFLite export (TensorFlow konverzió)
+
+  --- Ajánlott ---
+
+    Minimum:     6 mag / 12 szál (pl. Intel i5-10400, Ryzen 5 3600)
+    Ajánlott:    8 mag / 16 szál (pl. Ryzen 7 5700X, Intel i7-12700)
+    Optimális:   12+ mag (pl. Ryzen 9, Intel i9) — gyorsabb adatbetöltés
+
+  A train_banknote_yolo.py alapértelmezett --workers 4 értéket használ.
+  Erősebb CPU-n növelhető:
+    python tools/train_banknote_yolo.py --workers 8
+
+  Szabály: workers ≈ CPU magok száma / 2 (ne legyen több, mint a magok).
+
+  CPU-only tanítás:
+    python tools/train_banknote_yolo.py --device cpu --batch 4 --model yolo11n.pt
+  Becsült idő yolo11s, 200 epoch, 6741 kép: 3–7 nap (GPU-n: 1–4 óra).
+
+
+================================================================================
+  4. RENDSZERMEMÓRIA (RAM)
+================================================================================
+
+    Minimum:     16 GB
+    Ajánlott:    32 GB
+    Optimális:   64 GB (nagy adathalmaz bővítésnél, szintetikus generálásnál)
+
+  Miért kell?
+    - 6 700+ train kép cache-elése és augmentálása
+    - PyTorch + Ultralytics + OpenCV + Pillow
+    - TensorFlow (osztályozó tanítás és TFLite export párhuzamosan)
+    - Windows háttérfolyamatok
+
+  Ha „out of memory” (RAM, nem VRAM) hibát kapsz:
+    - csökkentsd: --workers 2
+    - zárd be a böngészőt és egyéb nagy memóriát használó appokat
+
+
+================================================================================
+  5. TÁROLÓ (SSD / HDD)
+================================================================================
+
+    Minimum:     50 GB szabad (projekt + dataset + 1–2 tanítási run)
+    Ajánlott:    100–200 GB szabad SSD
+    Optimális:   500 GB+ NVMe SSD
+
+  Tárhely felhasználás:
+    - banknote_yolo dataset:        ~1 GB (képek + label-ek)
+    - banknote_dataset forrás:      változó (saját fotók + szintetikus)
+    - Egy YOLO tanítási run:        0.5–3 GB (weights, plots, checkpoints)
+    - Több kísérlet / epoch:        10–30 GB összesen
+    - PyTorch cache (yolo11s.pt):   ~20 MB
+    - Python környezet:             5–10 GB
+
+  SSD (NVMe) erősen ajánlott:
+    - gyorsabb képbetöltés → kevesebb GPU várakozás
+    - checkpoint mentés nem lassítja a tanítást
+
+  Backup:
+    - tools/runs/banknote/huf_detect/weights/best.pt  ← legértékesebb fájl
+    - tools/banknote_yolo/                            ← teljes dataset
+
+
+================================================================================
+  6. OPERÁCIÓS RENDSZER ÉS SZOFTVER
+================================================================================
+
+  --- Operációs rendszer ---
+
+    Elsődleges:  Windows 10/11 (a fejlesztői környezet jelenleg Windows)
+    Alternatíva: Ubuntu 22.04/24.04 LTS (stabilabb CUDA, gyorsabb I/O)
+    Felhő:       Google Colab (T4 GPU) — tools/SuperDL_YOLO_Colab.ipynb
+
+  --- Python környezet ---
+
+    Python:      3.10 vagy 3.11 (3.12+ előzetesen tesztelendő)
+    Csomagok:
+      pip install ultralytics pillow opencv-python-headless
+      pip install tensorflow   # osztályozó + TFLite export
+
+    Ajánlott: dedikált virtuális környezet (venv)
+      cd C:\Users\msn\Documents\SuperDL-Android
+      python -m venv .venv-train
+      .venv-train\Scripts\activate
+      pip install ultralytics pillow opencv-python-headless tensorflow
+
+  --- Egyéb ---
+
+    - Git (verziókezelés, checkpoint mentés)
+    - 7-Zip vagy hasonló (dataset zip Colab-hoz)
+    - Opcionális: LabelImg / CVAT (kézi bbox javítás)
+
+
+================================================================================
+  7. AJÁNLOTT GÉPKONFIGURÁCIÓK (ÖSSZEFOGLALÓ)
+================================================================================
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ A) MINIMUM – „működik, de lassú”                                       │
+  │    GPU:  GTX 1660 Super 6 GB                                           │
+  │    CPU:  6 mag / 12 szál                                               │
+  │    RAM:  16 GB                                                         │
+  │    SSD:  50 GB szabad                                                  │
+  │    Modell: yolo11n.pt, batch=4–8, epochs=150                           │
+  │    Idő: ~2–4 óra / futás                                               │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ B) AJÁNLOTT – „Super DL produkciós tanítás” (LEGJOBB ÁR/ÉRTÉK)         │
+  │    GPU:  RTX 3060 12 GB vagy RTX 4060 Ti 16 GB                         │
+  │    CPU:  8 mag / 16 szál (Ryzen 7 / i7)                                │
+  │    RAM:  32 GB                                                         │
+  │    SSD:  256 GB NVMe, 100 GB szabad                                    │
+  │    Modell: yolo11s.pt, batch=16, epochs=200                            │
+  │    Idő: ~1–3 óra / futás (a Colab T4 notebook becslése)                │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ C) OPTIMÁLIS – „gyors iteráció, sok kísérlet”                        │
+  │    GPU:  RTX 4070 Ti Super 16 GB vagy RTX 4080/4090 16–24 GB          │
+  │    CPU:  12+ mag (Ryzen 9 / i9)                                        │
+  │    RAM:  64 GB                                                         │
+  │    SSD:  1 TB NVMe                                                     │
+  │    Modell: yolo11s.pt vagy yolo11m.pt, batch=16–32                     │
+  │    Idő: ~30–90 perc / futás                                            │
+  │    Előny: több párhuzamos hipersparaméter-kísérlet naponta             │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ D) FELHŐ (ha nincs NVIDIA GPU)                                         │
+  │    Google Colab Pro/Pro+: T4 (16 GB) vagy A100 (40 GB)                 │
+  │    Fájl: tools/SuperDL_YOLO_Colab.ipynb                                │
+  │    Dataset: banknote_yolo_dataset.zip → Google Drive                   │
+  │    Idő T4-en: ~1–3 óra (yolo11s, 150–200 epoch)                        │
+  │    Költség: ingyenes T4 korlátozott; Pro ~10 EUR/hó                    │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+  8. TANÍTÁSI IDŐ BECSLÉSEK (YOLO11S, 6741 TRAIN KÉP)
+================================================================================
+
+  GPU                    batch   epochs   Becsült idő
+  ───────────────────────────────────────────────────
+  GTX 1660 Super 6 GB    8       150      4–6 óra
+  RTX 3060 12 GB         16      200      1.5–3 óra
+  RTX 4070 12 GB         16      200      1–2 óra
+  RTX 4090 24 GB         16      200      30–60 perc
+  Google Colab T4        16      200      1–3 óra
+  CPU only (i7)          4       150      2–5 nap
+
+  A tanítás megszakítható és folytatható:
+    python tools/train_banknote_yolo.py --model yolo11s.pt --resume --export-tflite
+
+  TFLite export (INT8) a tanítás után: +5–20 perc GPU-n.
+
+
+================================================================================
+  9. HATÉKONYSÁGI TIPPEK (LEGJOBB GYAKORLAT)
+================================================================================
+
+  1) Mindig GPU-n taníts
+     --device 0   (első NVIDIA GPU)
+     Ellenőrizd: nvidia-smi futás közben (GPU kihasználás 80–100%)
+
+  2) Ne csökkentsd feleslegesen a batch-et
+     Ha VRAM engedi, batch=16 a legjobb kompromisszum (stabil gradiens).
+
+  3) Workers beállítás
+     --workers 4   (8 magos CPU-n)
+     --workers 8   (16 magos CPU-n)
+
+  4) Checkpoint mentés
+     A tools/runs/banknote/ mappa minden epoch végén ment.
+     Ne töröld futás közben.
+
+  5) Produkciós parancs (ajánlott teljes workflow)
+     cd C:\Users\msn\Documents\SuperDL-Android
+     python tools/train_banknote_yolo.py --prepare --bbox-mode opencv
+     python tools/train_banknote_yolo.py --model yolo11s.pt --epochs 200 --export-tflite
+
+  6) Teljes pipeline (detektor + osztályozó → Android assets)
+     python tools/train_banknote_full_pipeline.py
+
+  7) Hőkezelés
+     Hosszú tanításnál figyelj a GPU hőmérsékletre (< 85°C).
+     Szükség esetén csökkentsd a batch-et vagy növeld a szellőzést.
+
+  8) Reprodukálhatóság
+     --seed 42 (alapértelmezett a scriptben)
+
+
+================================================================================
+  10. OSZTÁLYOZÓ (MÁSODIK MODELL) – KÜLÖN IGÉNY
+================================================================================
+
+  A build_huf_banknote_model.py (TensorFlow/Keras) sokkal könnyebb:
+
+    GPU:  opcionális (GTX 1060+ elég), CPU-n is ~10–30 perc
+    RAM:  8 GB elég
+    CPU:  4 mag elég
+    Tárhely: +500 MB
+
+  Ezt a YOLO tanítás után futtasd; nem igényel erősebb gépet.
+
+
+================================================================================
+  11. GYORS DÖNTÉSI SEGÉD
+================================================================================
+
+  „Milyen gépet vegyek / használjak?”
+
+  → Van NVIDIA GPU 8+ GB VRAM?     → Lokális tanítás, RTX 3060/4060 szint
+  → Van NVIDIA GPU 12+ GB VRAM?   → yolo11s, batch 16, ideális
+  → Nincs NVIDIA GPU?             → Google Colab (SuperDL_YOLO_Colab.ipynb)
+  → Csak laptop, integrált GPU?   → Colab vagy külső GPU dokkoló
+  → Gyors kísérletezés kell?      → RTX 4070+ vagy Colab A100
+
+  A Super DL projekt jelenlegi beállításaihoz (yolo11s, batch 16, imgsz 640,
+  ~6700 train kép, erős augmentáció) a B) „Ajánlott” konfiguráció a
+  leghatékonyabb ár/érték arány: RTX 3060 12 GB + 32 GB RAM + NVMe SSD.
+
+
+================================================================================
+  KAPCSOLAT
+================================================================================
+
+  Fejlesztő: Kőrösmezey Dávid
+  Projekt:   SuperDL-Android
+  E-mail:    korosmezey.david.richard@gmail.com
+
+================================================================================

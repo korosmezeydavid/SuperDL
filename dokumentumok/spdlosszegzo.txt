@@ -1,0 +1,216 @@
+SUPERDL — TELJES FUNKCIONÁLIS ÖSSZEGZŐ
+================================================================================
+Ez a dokumentum arra készült, hogy egy MÁSIK MESTERSÉGES INTELLIGENCIA pontosan
+megértse, mit tud a SuperDL Android alkalmazás. Tömör leltár, nem marketing.
+
+Verzió: 1.55.0 | Csomag: com.superdl.launcher | Android 8.0+ (minSdk 26, target 34)
+Nyelv: Kotlin | ~420 forrásfájl | 280+ menübelépő | Felület: 100% magyar
+Utolsó frissítés: 2026-07-28
+================================================================================
+
+
+1. MI EZ
+--------------------------------------------------------------------------------
+Teljes értékű Android LAUNCHER (kezdőképernyő-helyettesítő) vak és gyengénlátó
+felhasználóknak. Nem kisegítő réteg egy látó felületen: az egész kezelés
+alapjaiban hangvezérelt és gesztusalapú.
+
+FONTOS: saját beszédmotor-kezelést használ (nem a TalkBack-re épül), és a
+TalkBack mellett is működik.
+
+
+2. KEZELÉSI MODELL
+--------------------------------------------------------------------------------
+NÉGY gesztus vezérel mindent:
+  fel     = előző elem / ismétlés
+  le      = következő elem
+  jobbra  = belépés / megerősítés
+  balra   = vissza / mégse
+Kiegészítők: lefelé pöccintés = művelet-menü egyes listákban; hangerőgombok
+egyes képernyőkön; hangdiktálás szövegbevitelhez.
+
+Minden lista lineáris és felolvasott. Nincs szükség pontos érintésre.
+
+
+3. FUNKCIÓK TERÜLETENKÉNT (TELJES LELTÁR)
+--------------------------------------------------------------------------------
+
+3.1 TELEFON ÉS HÍVÁSOK
+  - Hívásnapló felolvasása; hívás névjegyből diktálással; számtárcsázás
+  - Névjegyzék böngészése, keresés, szinkronizálás
+  - Hívásképernyő: hangosítás, némítás, billentyűzet, hívás vége
+  - Bejövő hívás fogadása/elutasítása gesztussal
+  - Hívásszűrő: letiltott és rejtett számok elutasítása
+  - Névjegyenkénti csengőhang
+  - S.O.S. gyorshívás max. 4 számra, visszaszámlálással
+
+3.2 ÜZENETEK ÉS E-MAIL
+  SMS: bejövő és kimenő üzenetek felolvasása; üzenet diktálása és küldése;
+       alapértelmezett üzenetkezelő beállítása és állapot-ellenőrzés.
+       Hosszú/ékezetes üzenet automatikus darabolással megy (UCS-2: 70 karakter/rész),
+       a küldés eredményét visszajelzés-fogadó ellenőrzi.
+  E-MAIL: IMAP-olvasás (fejléc + levélrészlet egy lekérésben, nagy postafiókra
+       optimalizálva: sorszám-tartomány, nem SEARCH ALL); SMTP-küldés diktálással;
+       e-mail címjegyzék (mentés, hozzáadás, importálás); fiókbeállítás;
+       LÉPÉSENKÉNTI KAPCSOLAT-DIAGNOSZTIKA fájlba (névfeloldás > TCP > TLS >
+       köszönés > LOGIN > SELECT > levélszám, időméréssel).
+       A levéltörzs MIME-kibontása: multipart szétbontás, quoted-printable és
+       base64 dekódolás, HTML->szöveg, fejléc encoded-word feloldás.
+
+3.3 IDŐ ÉS SZERVEZÉS
+  Óra és ébresztés: pontos idő; ébresztő diktálással; ébresztőlista; törlés;
+       időzítők (létrehozás, lista, indítás, leállítás, módosítás, törlés)
+  Program (naptár): esemény létrehozása diktálással; SZERKESZTÉS; TÖRLÉS;
+       napi / holnapi / heti áttekintő; ismétlődés (napi, heti, kétheti, havi,
+       éves); emlékeztető-ütemezés
+  Jegyzetek: lista, új jegyzet diktálással, törlés
+
+3.4 ZENE ÉS MÉDIA
+  - Zenelejátszó: telefonon lévő fájlok, hangszínprofilok (EQ), lejátszási módok
+    (sorban, egy szám ismétlése, teljes lista ismétlése, véletlen)
+  - POZÍCIÓ-MENTÉS: "Utoljára játszott folytatása" a mentett időponttól
+  - Beszéd-visszajelzés FŐKAPCSOLÓ + részletes kapcsolók (számváltás, leállítás,
+    tekerés) — némítva a zene zavartalanul szól, de a vezérlők és hibák hallhatók
+  - Podcast: népszerű műsorok, keresés, feliratkozás, letöltés, OPML import/export
+  - YouTube hangos keresés és lejátszás
+  - Internetes rádió: magyar állomások (Radio Browser API), keresés, kedvencek,
+    böngésző-lista (nem indít rögtön), .pls/.m3u/.m3u8 playlist-feloldás,
+    VALÓS IDEJŰ FELVÉTEL fájlba; időzített felvétel: TERVEZETT
+  - Média-lejátszás vezérlése fülhallgatóról / autórádióról (MediaSession)
+
+3.5 KÖNYVEK
+  Beépített olvasó: könyvtár, keresés, könyvjelzők, folytatás az utolsó pontról,
+  egyéni könyvmappák
+
+3.6 KÖZLEKEDÉS ÉS NAVIGÁCIÓ
+  - "Hol vagyok?" helymeghatározás, utcanév-felolvasás
+  - Gyalogos és tömegközlekedési útvonaltervezés diktálással
+  - Közeli megállók és vasútállomások indulási időkkel; kedvenc megállók
+  - GPS Kitekintő: közeli érdekes pontok radarja
+  - HANG-IRÁNYTŰ: forgatás közben élő égtáj- és irány-visszajelzés
+  - Mentett helyek (POI) hangjegyzettel
+  - Útvonal-rögzítés és -követés
+  - HELYSZÍN-FELISMERŐ: a felhasználó saját fotói alapján ismeri fel a visszatérő
+    helyeket (perceptuális hash + OCR-token egyezés)
+  - Hálózati stabilizálás: több tükör-szerver (Overpass, Nominatim) +
+    újrapróbálkozás, megszakítható várakozással
+
+3.7 KAMERA-ALAPÚ FELISMERŐK
+  - Szövegolvasó (OCR) + FOLYAMATOS OCR (automatikus szövegváltozás-felismerés)
+  - Gyógyszerdoboz-olvasó, címke-olvasó
+  - Fénydetektor, színfelismerő
+  - Környezeti Kitekintő ("mi van körülöttem"), "Mi van előttem?" jelenetleírás
+  - QR-kód olvasó
+  - Arcfelismerés / kamera hangjelzéssel, fotó és videó
+  - PÉNZFELISMERŐ (magyar forint) — részletek a 4. pontban
+  - Kártya-rendszerező
+
+3.8 MINDENNAPI ESZKÖZÖK
+  - Zseblámpa, akkumulátor-állapot, hangerő- és beszédsebesség-vezérlés
+  - Számológép hanggal
+  - Hallás erősítő
+  - Bevásárlólista: több lista, tétel + opcionális ár, kipipálás, összesítés
+  - Profi Diktafon: felvétel, minőség/formátum, mentett felvételek
+  - Patika Őrangyal: gyógyszer-emlékeztetők, gyógyszerkereső
+  - Fájlkezelő
+
+3.9 WIFI FÁJLPORTÁL (böngészőből, gépről)
+  A telefon egy helyi webkiszolgálót indít; a gépről böngészővel elérhető.
+  - Fájlok le- és feltöltése (célmappa-választással)
+  - SMS olvasása/küldése, névjegyek, jegyzetek
+  - NAPTÁR: esemény felvétele, SZERKESZTÉSE, TÖRLÉSE, 60 napos lista
+  - BEVÁSÁRLÓLISTA: több lista, tétel+ár, kipipálás, törlés, összesítés
+  - FOTÓK ÉS HANGOK kimentése (kamera-fotók + diktafon/hangjegyzet/rádiófelvétel)
+  - RÁDIÓ: saját állomás felvétele URL-lel (.m3u/.pls/direkt stream)
+  - "HOL A TELÓM?": maximális hangerővel csörget + rezget 30 mp-ig, majd
+    visszaállítja az eredeti hangerőt
+  - Állapot, beállítás, diagnosztika oldalak; PIN-védelem
+  Megjegyzés: a portál szerver túléli az újratelepítést — kód-módosítás után
+  a portált ki/be kell kapcsolni a telefonon.
+
+3.10 ELENA — HANGASSZISZTENS
+  Helyben futó parancsértelmező; saját, betanítható ébresztő mondat; a menü
+  funkcióinak jelentős része hanggal is indítható.
+
+3.11 ŐRSÉG (háttérfigyelő szolgáltatás)
+  - Akkumulátor-állapot, töltő csatlakoztatás/leválasztás hangjelzéssel
+  - Bejövő hívás/üzenet/értesítés jelzése
+  - PERIODIKUS IDŐBEMONDÁS (állítható gyakoriság, saját "kling" hanggal)
+  - Éjszakai csendes mód (megadott órák között néma)
+  - Képernyő zárás/feloldás saját hangokkal
+  - Bekapcsoló gombra időbemondás
+
+3.12 RENDSZER PIN SEGÉD (kisegítő szolgáltatás)
+  A rendszer zárolási képernyőjén függőleges, felolvasott számbillentyűzetet ad,
+  amivel a PIN gesztussal beírható.
+  MŰKÖDIK az ELSŐ BEKAPCSOLÁS UTÁN IS (Direct Boot / titkosított állapot):
+  a szolgáltatás directBootAware, a beállításai eszköz-védett tárolóban vannak,
+  és az alkalmazás indulása nem nyúl titkosított tárolóhoz.
+
+3.13 HOZZÁFÉRHETŐSÉG, TANULÁS, TESTRESZABÁS
+  - Tanuló mód (funkciók bemutatása), Beállítás varázsló, Diagnosztika
+  - A program hangjainak megismerése
+  - HANGTÉMÁK: több választható készlet (alap, kattanós, gombnyomás, sci-fi),
+    külön hangok gesztusokhoz, indításhoz, sikerhez, hibához
+  - Egyedi zár-, feloldás- és fényképezés-hangok
+  - Több beszédmotor közül választás, állítható sebesség
+  - PIN-zár a magánszféra védelmére
+  - Kedvenc alkalmazások gyorsindítása
+  - Biztonsági mentés / visszaállítás
+
+
+4. PÉNZFELISMERŐ — RÉSZLETES MŰKÖDÉS (fontos: külön figyelmet érdemel)
+--------------------------------------------------------------------------------
+CÉL: magyar forint bankjegy címletének megállapítása, ZÉRÓ hibatűréssel
+(a téves címlet súlyos hiba).
+
+ARCHITEKTÚRA — kaszkád, rögzített prioritással:
+  Stage 1: SZÍN + GEOMETRIA (domináns HSV Hue + alakarány + élsűrűség)
+  Stage 2: OCR a címletszámra (ML Kit, helyben, offline)
+  Stage 3: YOLO — CSAK végső tartalék, ALAPBÓL KIKAPCSOLVA
+           (a modell szintetikus adatokon tanult, valós képen megbízhatatlan)
+
+SZÍN-REFERENCIÁK (átfedésmentes Hue-sávok, valós mérésekre hangolva):
+    500:  13° ±11  ->   2..24
+   2000:  37° ±11  ->  26..48
+  20000:  72° ±12  ->  60..84
+   5000: 110° ±18  ->  92..128
+   1000: 200° ±20  -> 180..220
+  10000: 316° ±26  -> 290..342
+  A sávok közti RÉSEK szándékosak: oda eső szín esetén a rendszer HALLGAT.
+  validateNoOverlap(): fejlesztői védőháló az átfedés ellen.
+
+DÖNTÉSI LOGIKA (fúzió):
+  - szín és OCR egyetért        -> magas bizalom, bemondás
+  - OCR más, de szín-jelölt     -> az OCR nyer (a látható szám erősebb)
+  - csak erős szín, nincs OCR   -> a szín dönt
+  - gyenge szín, nincs OCR      -> VÁR
+  - teljes ellentmondás         -> ABSZTINENCIA (nem mond semmit)
+IDŐBELI MEGERŐSÍTÉS: 5-ös ablakból 4 egyező eredmény kell a bemondáshoz.
+
+SAJÁT BANKJEGY-TANÍTÁS (motor kész, kamera-UI még nincs):
+  A felhasználó saját fotóival bővíthető referencia (szín-hisztogram +
+  perceptuális hash), munkamenetenként bővítve, max 40 minta/címlet.
+
+TUDOTT KORLÁT: csak magyar forint; új sorozat esetén új szín-referencia kell.
+
+
+5. FEJLESZTÉS ALATT / TERVEZETT
+--------------------------------------------------------------------------------
+  - Bankjegy-tanító kamera-felület (a tár és a felismerő kész)
+  - Rádió időzített felvétel (slot-modell kész, ütemezés hiányzik)
+  - Nyilvános teszt naplózó és hibajelentő rendszer (terv kész:
+    eszköz-profil + körkörös eseménynapló + megosztás + hangüzenet)
+  - Egyedi YOLO tárgyfelismerő betanítás (első cél: ajtók)
+
+
+6. ELVEK, AMIK A KÓDBAN IS ÉRVÉNYESÜLNEK
+--------------------------------------------------------------------------------
+  - INGYENESSÉG: az alkalmazás soha, semmiért nem kér pénzt (adomány elfogadható)
+  - ADATVÉDELEM: a felismerők helyben futnak, a képek nem mennek felhőbe;
+    a naplók nem tartalmaznak jelszót, üzenet-szöveget, névjegyet, pontos GPS-t
+  - INKÁBB HALLGAT, MINT TÉVED (különösen a pénzfelismerőnél)
+  - OFFLINE ÉLETKÉPESSÉG: sok funkció internet nélkül is működik
+  - A hibaüzenet SOHA nem némítható el, még "néma módban" sem
+
+================================================================================

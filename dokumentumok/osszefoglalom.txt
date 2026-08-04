@@ -1,0 +1,217 @@
+SUPER DL – Android alkalmazás
+Fejlesztési összefoglaló
+
+Dátum: 2026-06-25
+Verzió a telefonon: 1.37.0
+Projekt mappa: C:\Users\msn\Documents\SuperDL-Android
+Fejlesztő: Kőrösmezey Dávid
+
+
+MIT KÉRTÉL
+
+- Folytassuk az alkalmazás fejlesztését
+- Adj javaslatokat, hogyan lehetne jobb
+- Keress hibákat és javítsd ki őket
+- Telepítsd a telefonra (USB-n csatlakoztatva)
+- Írd le az összefoglalóba, mit csináltam – egyszerűen, érthetően
+
+
+MIT CSINÁLTAM ÖSSZESEN
+
+
+1. verzió – 1.36.4
+
+   Pénzfelismerő
+   - A program túl szigorúan szűrte a képet, ezért gyakran azt mondta, nem ismeri fel a bankjegyet.
+   - Lazítottam a felismerési határokat, hogy gyengébb fényben is jobban működjön.
+   - A hangerő gombbal továbbra is azonnal lehet ellenőrizni.
+
+   Arc- és szelfi kamera
+   - A kamera lefagyasztotta a telefont, mert egyszerre futott túl sok feladat.
+   - Most egyszerre csak egy felismerés futhat, lassabban dolgozza fel a képet.
+   - A felolvasás nem halmozódik egymásra.
+
+   Hívás közbeni billentyűzet (DTMF)
+   - A billentyűzet módból nem lehetett kilépni, néha beragadt hívás után is.
+   - Balra húzással most vissza lehet lépni a billentyűzetből anélkül, hogy a hívás véget érne.
+   - A dupla gesztus-feldolgozást megszüntettem a hívás képernyőkön.
+
+   Számbevitel (tárcsázás, ébresztő, időzítő, naptár, S.O.S., számológép, bevásárlólista stb.)
+   - Új egységes rendszer: először diktálás ajánlott.
+   - Jobbra húzás = diktálás indul
+   - Lefelé húzás = offline számbillentyűzet
+   - Balra húzás = mégse
+   - A PIN zárolás szándékosan közvetlen billentyűzetet használ (gyors belépés miatt).
+
+
+2. verzió – 1.36.5
+
+   Főmenü
+   - A gesztusok két helyen is feldolgozódtak, ezért néha duplán lépett a menüben.
+   - Ezt kijavítottam.
+
+   YouTube lejátszó
+   - Ha gyorsan kiléptél videó betöltés közben, a program még próbálhatott lejátszani a bezárt képernyőn.
+   - Most ellenőrzi, hogy a képernyő még nyitva van-e.
+
+   Helyszín figyelő
+   - Bezáráskor a kamera szál nem állt le rendesen.
+   - Most biztonságosan leáll.
+
+   Hívás billentyűzet
+   - Kilépéskor balra húzásnál most hangjelzés is jön, mint a többi iránynál.
+
+
+3. verzió – 1.36.6
+
+   Arc- és szelfi kamera (kritikus hiba)
+   - Indításkor összeomlott az egész alkalmazás – túl sok memória kellett egyszerre.
+   - Egy menüpont lett belőle: „Kamera és szelfi”.
+   - Alacsonyabb képfelbontás, késleltetett arc-felismerés, memóriahiba esetén biztonságos leállás.
+   - Fel húzás = előlapi/hátoldali váltás, le húzás = kamera bemondás vagy videó leállítás.
+
+
+4. verzió – 1.36.7 (stabilitás, 1. kör)
+
+   Összes kamera modul
+   - Egységes, alacsony felbontású előnézet (320×240) – kevesebb memória.
+   - Bezáráskor a kamera szál mindenhol rendesen leáll (nem szivárog memória).
+
+   Helyszín tanító és szövegolvasó
+   - Ha elfogy a memória, leáll és hangban jelzi – nem omlik össze az app.
+
+   Főmenü háttérmunkák
+   - Könyv betöltés, könyvjelző ugrás, TTS hangválasztás: bezárt képernyőn nem frissít feleslegesen.
+
+
+5. verzió – 1.36.8 (stabilitás, 2. kör – rendbetétel)
+
+   Összeomlás napló
+   - Ha összeomlik az app, a hiba mentődik a telefon belső tárhelyére (crash_log.txt).
+
+   Mentett adatok védelme
+   - Ébresztők, időzítők, könyvek, e-mailek, bevásárlólisták: sérült mentés esetén nem crashel,
+     hanem üres listával indul tovább.
+
+   Főmenü hálózati funkciók
+   - Időjárás, hírek, GPS kitekintő, navigáció, BKK: bezárt képernyőn nem frissít feleslegesen.
+
+   Hívás képernyők
+   - Új telefonos API (Android 12+), régi telefonokon továbbra is működik.
+   - Bezáráskor minden időzített feladat leáll.
+
+   Környezeti kitekintő és pénzfelismerő
+   - Alacsonyabb előnézet, biztonságos UI frissítés bezárás után.
+
+
+6. verzió – 1.36.9 (stabilitás, 3. kör – teljes rendbetétel)
+
+   Maradék kamera modulok
+   - Szövegolvasó, helyszín figyelő és tanító, arc kamera: bezárt képernyőn nem frissít.
+
+   Értesítő képernyők
+   - Gyógyszer és naptár emlékeztető: bezáráskor minden időzített feladat leáll.
+
+   Zárolt képernyő
+   - PIN képernyő TTS indítás biztonságosan leáll bezáráskor.
+
+   Könyv betöltés
+   - Maximum 25 megabájt – nagyobb könyvnél hangban jelzi, nem omlik össze.
+
+   Git verziókövetés
+   - A projekt mostantól git-tel követhető (változások nyomon követése).
+
+
+7. verzió – 1.37.0 (új funkciók)
+
+   Naptár – tiszta diktálás
+   - Program neve, dátuma és kezdési ideje közvetlenül diktálható (nem számbillentyűzet-átmenet).
+   - Swipe lefelé: offline dátum/idő bevitel, ha a diktálás nem sikerül.
+
+   Saját jegyzetek (új modul)
+   - Menü: Idő és Szervezés → Saját jegyzetek / Új jegyzet / Jegyzet törlése.
+   - Diktálással cím + szöveg mentése, listázás, felolvasás, törlés.
+   - Maximum 200 jegyzet, JSON tárolás a telefonon.
+
+   Internet kereső → jegyzet
+   - Találatnál swipe lefelé: cikk mentése jegyzetként (teljes szöveg, ha elérhető).
+   - Cikk olvasás közben is menthető jegyzetként.
+
+   Hangos asszisztens
+   - „saját jegyzetek”, „új jegyzet”, „jegyzet törlése” parancsok.
+
+
+8. Telepítés a telefonra
+
+   - A telefon csatlakoztatva volt (Ulefone Armor 24).
+   - Release verziót építettem és azt telepítettem.
+   - Telepítés sikeres: 1.37.0 verzió fut a telefonon.
+
+
+9. Dokumentáció
+
+   - CHANGELOG.md frissítve
+   - README.md frissítve (verzió, APK elérési út, tesztelési lista)
+   - Ez az összefoglaló fájl
+
+
+MÓDOSÍTOTT FÁJLOK
+
+1.36.4:
+  - Pénzfelismerő modul (6 fájl)
+  - Arc kamera
+  - Hívás képernyők (bejövő + folyamatban)
+  - Számbevitel (fő program + új állapot + számsegéd)
+  - Verziószám, napló, readme
+
+1.36.5:
+  - Fő program (dupla gesztus)
+  - YouTube lejátszó
+  - Helyszín figyelő
+  - Hívás képernyő (hangjelzés)
+  - Verziószám, napló, readme, összefoglaló
+
+1.36.6:
+  - Arc/szelfi kamera (újraírva)
+  - Menü (egyesített kamera menüpont)
+  - Verziószám, napló
+
+1.36.7:
+  - CameraStabilityHelper (új közös segéd)
+  - Szín-, fény-, QR-, helyszín-, szövegolvasó, pénzfelismerő, arc kamera modulok
+  - Fő program (postWhenAlive háttérszálak)
+  - Verziószám, napló, összefoglaló
+
+
+APK HELYE A GÉPEN
+
+  Release (ez van a telefonon):
+          app\build\outputs\apk\release\SuperDL-1.37.0-release.apk
+
+
+MIT ÉRDEMES KIPRÓBÁLNI A TELEFONON
+
+  - Új program: diktáld a nevet, dátumot (ma/holnap), kezdési időt – swipe le = offline bevitel
+  - Saját jegyzetek: új jegyzet diktálás, lista, felolvasás, törlés
+  - Internet kereső: találatnál lefelé húzás = mentés jegyzetként
+  - Kamera és szelfi: induljon el összeomlás nélkül, fel/le húzás működjön
+  - Szövegolvasó, QR, szín/fény detektor: ne lassuljon/beessen hosszú használat után
+  - Könyvtár: nagy könyv betöltése közben gyors kilépés – ne crasheljen
+  - Főmenü: húzások ne lépjenek duplán
+  - Pénzfelismerő: bankjegy 2–3 mp a kamera előtt, hangerő gomb = ellenőrzés
+
+
+JAVASLATOK A JÖVŐRE (röviden)
+
+  - Pénzfelismerő: újra tanítani valódi bankjegy fotókkal (most mesterséges adaton tanult)
+  - Aláírt release APK tesztelőknek küldeni
+  - Git beállítása a projekthez (változások nyomon követése)
+  - Helyszín felismerő továbbfejlesztése
+  - PIN bevitel is átvihető a diktálás-először rendszerre (ha kéred)
+
+
+ISMERETLEN KORLÁTOK
+
+  - A pénzfelismerő modell még nem tökéletes valódi fotókon
+  - Nagyon gyenge telefonon a kamera továbbra is lassabb lehet
+  - A debug és a release verzió nem telepíthető egymás mellé ugyanarra a telefonra

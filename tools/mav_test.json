@@ -1,0 +1,1 @@
+<Fault xmlns="http://schemas.microsoft.com/ws/2005/05/envelope/none"><Code><Value xmlns:a="MAVI.ARCH.Exceptions.BaseExceptions.InternalExceptionCodes">a:InternalException</Value></Code><Reason><Text xml:lang="en-US">Belső hiba történt az alkalmazásban !</Text></Reason></Fault>

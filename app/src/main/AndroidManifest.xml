@@ -1,0 +1,819 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Android 11+: külső appok felderítése (Maps, YouTube, stb.) -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="vnd.youtube" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <data android:scheme="tel" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="mailto" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="message/rfc822" />
+        </intent>
+        <package android:name="com.google.android.youtube" />
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="android.speech.tts.engine.INTENT_ACTION_TTS_SERVICE" />
+        </intent>
+    </queries>
+
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <!-- Telefon & Hívások -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+
+    <!-- SMS -->
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.WRITE_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_MMS" />
+    <uses-permission android:name="android.permission.RECEIVE_WAP_PUSH" />
+
+    <!-- Helyzet -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Internet -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission
+        android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
+    <!-- Ébresztő & Értesítések -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <!--
+      Korlátlan háttérfutás kérése.
+      MIÉRT: enélkül a rendszer altathatja az appot, és a gyógyszer emlékeztető
+      és az ébresztő késhet vagy elmaradhat. A felmentést a felhasználó adja meg
+      a rendszer párbeszédében; ez az engedély csak ahhoz kell, hogy a párbeszédet
+      egyáltalán meg tudjuk nyitni.
+    -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Média -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <!-- Kamera / Zseblámpa -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
+    <!-- Bluetooth -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <!-- Sötét mód: fekete réteg minden fölé (a képernyő elfüggönyözése) -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <permission
+        android:name="com.superdl.launcher.permission.SET_SOS"
+        android:protectionLevel="signature" />
+
+    <application
+        android:name=".SuperDlApplication"
+        android:allowBackup="false"
+        android:directBootAware="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.SuperDL"
+        android:supportsRtl="false"
+        android:usesCleartextTraffic="true"
+        tools:replace="android:allowBackup,android:supportsRtl">
+
+        <!-- usesCleartextTraffic: sok internetes rádió-stream titkosítatlan
+             HTTP-t használ (nem HTTPS). Android 9 óta ez alapból tiltott, ezért
+             a rádió-streamek némán elhaltak (MediaPlayer what=1 hiba). Ez a
+             kapcsoló engedélyezi a HTTP-streameket. -->
+
+        <!-- FŐKÉPERNYŐ LAUNCHER -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
+            <intent-filter android:priority="999">
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VOICE_ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.superdl.launcher.action.LAUNCH_VOICE_ASSISTANT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Digitális asszisztens – alapértelmezett asszisztens listában megjelenik -->
+        <service
+            android:name=".assistant.SuperVoiceInteractionService"
+            android:exported="true"
+            android:label="@string/voice_interaction_service_label"
+            android:permission="android.permission.BIND_VOICE_INTERACTION">
+            <meta-data
+                android:name="android.voice_interaction"
+                android:resource="@xml/voice_interaction_service" />
+            <intent-filter>
+                <action android:name="android.service.voice.VoiceInteractionService" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".assistant.SuperVoiceInteractionSessionService"
+            android:exported="true"
+            android:permission="android.permission.BIND_VOICE_INTERACTION" />
+
+        <service
+            android:name=".assistant.SuperRecognitionService"
+            android:exported="true"
+            android:label="@string/voice_interaction_service_label"
+            android:permission="android.permission.BIND_SPEECH_RECOGNITION_SERVICE">
+            <intent-filter>
+                <action android:name="android.speech.RecognitionService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.speech"
+                android:resource="@xml/recognition_service" />
+        </service>
+
+        <activity
+            android:name=".qr.QrScanActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".light.LightDetectorActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".color.ColorDetectorActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".environment.EnvironmentScannerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".currency.CurrencyRecognizerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".hearingaid.HearingAidActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".games.uno.UnoActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".games.blackjack.BlackjackActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".games.poker.PokerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".games.slot.SlotActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".games.millebornes.MilleBornesActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".textreader.TextReaderActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".locationwatch.LocationTrainerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".locationwatch.LocationWatchActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".locationwatch.LocationProfilePhotosActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".cardorganizer.CardTrainerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".cardorganizer.CardRecognizerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".camera.FaceCameraActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <activity
+            android:name=".music.MusicPlayerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".sound.RingtonePickerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".files.FileManagerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <service
+            android:name=".files.WifiPortalService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <activity
+            android:name=".podcast.PodcastPlayerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".radio.RadioPlayerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".alarm.AlarmAlertActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:excludeFromRecents="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <service
+            android:name=".alarm.AlarmService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <activity
+            android:name=".youtube.YoutubePlayerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".call.DialActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SuperDL">
+            <intent-filter>
+                <action android:name="android.intent.action.DIAL" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.DIAL" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="tel" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.DIAL" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="tel" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".call.SuperInCallService"
+            android:exported="true"
+            android:permission="android.permission.BIND_INCALL_SERVICE">
+            <meta-data
+                android:name="android.telecom.IN_CALL_SERVICE_UI"
+                android:value="true" />
+            <meta-data
+                android:name="android.telecom.IN_CALL_SERVICE_RINGING"
+                android:value="true" />
+            <intent-filter>
+                <action android:name="android.telecom.InCallService" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name=".call.InCallActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:showWhenLocked="true"
+            android:taskAffinity="com.superdl.launcher.call"
+            android:turnScreenOn="true"
+            android:theme="@style/Theme.SuperDL" />
+
+        <activity
+            android:name=".call.IncomingCallActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:showWhenLocked="true"
+            android:taskAffinity="com.superdl.launcher.call"
+            android:turnScreenOn="true"
+            android:theme="@style/Theme.SuperDL" />
+
+        <!-- Rendszer zárolási PIN – akadálymentes AccessibilityService -->
+        <service
+            android:name=".lock.keyguard.KeyguardPinAccessibilityService"
+            android:exported="true"
+            android:directBootAware="true"
+            android:label="@string/keyguard_pin_accessibility_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <!-- Akadálymentes PIN zárolás – képernyő bekapcsoláskor -->
+        <activity
+            android:name=".lock.LockScreenActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:theme="@style/Theme.SuperDL" />
+
+        <!-- S.O.S. Service -->
+        <service
+            android:name=".sos.SosService"
+            android:exported="false"
+            android:foregroundServiceType="phoneCall" />
+
+        <!-- Profi Diktafon – stúdió minőségű hangfelvétel -->
+        <service
+            android:name=".dictaphone.DictaphoneService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
+        <!-- Hallás erősítő – valós idejű mikrofon → fülhallgató -->
+        <service
+            android:name=".hearingaid.HearingAidService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
+        <!-- Elena figyelő – felébresztő mondatok háttérben -->
+        <service
+            android:name=".assistant.ElenaWakeListenService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
+        <!-- GPS Kitekintő – térképi radar és célkövetés -->
+        <service
+            android:name=".gps.GpsRadarService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="gps_radar" />
+        </service>
+
+        <!-- Hang-iránytű – élő térbeli tájékozódás forgatással -->
+        <service
+            android:name=".gps.CompassScanService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="compass_scan" />
+        </service>
+
+        <!-- GPS Környezeti figyelő – Voice Vista / Soundscape-szerű utcabemondás -->
+        <service
+            android:name=".gps.GpsSurroundingsService"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+
+        <!-- GPS Útvonal – saját útvonal rögzítése -->
+        <service
+            android:name=".route.GpsRouteRecorderService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="gps_route_recording" />
+        </service>
+
+        <!-- GPS Útvonal – mentett útvonal hangos követése -->
+        <service
+            android:name=".route.GpsRouteGuideService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="gps_route_guidance" />
+        </service>
+
+        <!-- Mentett időzítők – háttérben jelzi az eltelt és hátralévő időt -->
+        <service
+            android:name=".timer.TimerService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="saved_timers" />
+        </service>
+
+        <!-- Akkumulátor őrség – háttérben figyel, zárolt képernyőn is jelez -->
+        <service
+            android:name=".battery.BatteryPatrolService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="battery_monitoring" />
+        </service>
+
+        <!-- Rendszerállapot hangok – képernyő és teljes töltés figyelés -->
+        <service
+            android:name=".feedback.DeviceStateSoundService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="device_state_sounds" />
+        </service>
+
+        <!-- Értesítés figyelő -->
+        <service
+            android:name=".notifications.SuperNotificationListener"
+            android:exported="true"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- Hívás szűrő – letiltott és rejtett számok elutasítása -->
+        <service
+            android:name=".callfilter.SuperCallScreeningService"
+            android:exported="true"
+            android:permission="android.permission.BIND_SCREENING_SERVICE">
+            <intent-filter>
+                <action android:name="android.telecom.CallScreeningService" />
+            </intent-filter>
+        </service>
+
+        <!-- Billentyűzet próbapad és váltó (a rendszer választója innen működik) -->
+        <activity
+            android:name=".keyboard.KeyboardTestActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
+            android:theme="@style/Theme.SuperDL" />
+
+        <!-- Mátrix billentyűzet: egyujjas, telefonszám-elrendezésű bevitel.
+             Tartalék a Braille-hez, ott is működik, ahol a multi-touch nem. -->
+        <service
+            android:name=".keyboard.MatrixKeyboardService"
+            android:exported="true"
+            android:label="@string/matrix_keyboard_label"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/matrix_keyboard" />
+        </service>
+
+        <!-- Super DL képernyőolvasó: külső alkalmazások kezelése a négy gesztussal.
+             Az érintés-kezelést futásidőben kéri, csak külső appnál. -->
+        <service
+            android:name=".screenreader.ScreenReaderService"
+            android:exported="true"
+            android:label="@string/screen_reader_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/screen_reader_service" />
+        </service>
+
+        <!-- "Hol a telóm?" csörgetés leállítása a készüléken (zárolt képernyőn is) -->
+        <activity
+            android:name=".files.FindPhoneStopActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.SuperDL" />
+
+        <!-- Az SMS-küldés tényleges eredményét fogadja (elment-e a hálózatra) -->
+        <receiver
+            android:name=".sms.SmsSendReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.superdl.launcher.SMS_SENT" />
+                <action android:name="com.superdl.launcher.SMS_DELIVERED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Hívás szűrő tartalék – ha a szűrő szerepkör nincs engedélyezve -->
+        <receiver
+            android:name=".callfilter.IncomingCallReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".contacts.ContactSyncReceiver"
+            android:exported="false" />
+
+        <!-- Boot receiver (ébresztő újraindítás után) -->
+        <receiver
+            android:name=".alarm.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Alarm receiver -->
+        <receiver
+            android:name=".alarm.AlarmReceiver"
+            android:exported="false" />
+
+        <!-- Patika Őrangyal – gyógyszer emlékeztető -->
+        <receiver
+            android:name=".medication.MedicationAlarmReceiver"
+            android:exported="false" />
+
+        <service
+            android:name=".medication.MedicationAlertService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="medication_alert" />
+        </service>
+
+        <activity
+            android:name=".medication.MedicationAlertActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.SuperDL.Alert" />
+
+        <!-- Naptár program emlékeztető -->
+        <receiver
+            android:name=".calendar.CalendarAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.superdl.launcher.CALENDAR_ALARM" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".calendar.CalendarAlarmService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="calendar_alarm" />
+        </service>
+
+        <activity
+            android:name=".calendar.CalendarAlertActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.SuperDL.Alert" />
+
+        <!-- Alapértelmezett SMS app – bejövő üzenetek -->
+        <receiver
+            android:name=".sms.SmsDeliverReceiver"
+            android:directBootAware="true"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_DELIVER" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Tartalék fogadó – OEM-eken, ahol az SMS_DELIVER nem megbízható -->
+        <receiver
+            android:name=".sms.SmsReceivedReceiver"
+            android:directBootAware="true"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS">
+            <intent-filter android:priority="999">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".sms.SmsInboundService"
+            android:directBootAware="true"
+            android:exported="false" />
+
+        <receiver
+            android:name=".sms.MmsWapPushReceiver"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_WAP_PUSH">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
+                <data android:mimeType="application/vnd.wap.mms-message" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".sms.SmsComposeActivity"
+            android:exported="true"
+            android:theme="@style/Theme.SuperDL">
+            <intent-filter>
+                <action android:name="android.intent.action.SENDTO" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="smsto" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="sms" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="mms" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.superdl.launcher.action.SMS_COMPOSE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".sms.HeadlessSmsSendService"
+            android:exported="true"
+            android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="smsto" />
+            </intent-filter>
+        </service>
+
+        <!-- S.O.S. számok beállítása ADB-ből -->
+        <receiver
+            android:name=".sos.SosConfigReceiver"
+            android:exported="true"
+            android:permission="com.superdl.launcher.permission.SET_SOS">
+            <intent-filter>
+                <action android:name="com.superdl.launcher.SET_SOS" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Töltő csatlakozás / leválasztás – manifest receiver, háttérben is -->
+        <receiver
+            android:name=".feedback.DevicePowerReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>
