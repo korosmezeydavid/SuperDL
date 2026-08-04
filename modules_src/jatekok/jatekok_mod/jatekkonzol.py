@@ -302,7 +302,11 @@ class JatekKonzol(wx.Dialog):
         self.bemenet.SetValue("")
         if szoveg:
             self._ki(f"➤ {szoveg}", felolvas=False)
-        self._var_bemenet(False)
+        # CSAK az őrt állítjuk (ne dolgozzon fel újabb Entert); a mezőt NEM
+        # tiltjuk le, mert az áthelyezné a fókuszt egy gombra, és a képernyő-
+        # olvasó felolvasná a nevét (ez okozta az ábécé-indítás előtti „kis
+        # kommentárt"). A következő lépés úgyis beállítja a helyes bevitel-állapotot.
+        self._var = False
         self._pump(szoveg)
 
     def _veget_er(self):
@@ -552,18 +556,20 @@ class JatekKonzol(wx.Dialog):
         self._abc_idx = -1
         self._abc_koz = max(250, int(koz_ms) if koz_ms else 1000)
         self._abc_active = True
-        self._var_bemenet(False)          # bevitel tiltva a pörgetés alatt
-        self.allj_gomb.Show()
+        self._var = False                 # ne dolgozzon fel Entert küldésként
+        # a bevitelt NEM tiltjuk le (az fókuszt ugratna + nevet mondatna); a
+        # leütéseket a pörgetés alatt az EVT_CHAR_HOOK nyeli el
+        self.allj_gomb.Show()             # látszik, de NEM kap fókuszt
         try:
             self.Layout()
         except Exception:
             pass
-        if not self._closing:
-            self.allj_gomb.SetFocus()     # ide jön a szóköz/Enter
-        # kis kezdő-késleltetés: a kérdés/echo hangja csengjen le, mielőtt az
-        # első betű megszólal – így az eleje nem „kapkod" (felhasználói jelzés)
-        if not self._closing:
-            wx.CallLater(600, self._abc_tick)
+        # SEMMI bemondás és SEMMI késleltetés indítás előtt (felhasználói kérés):
+        # nem fókuszáljuk a gombot (különben a képernyőolvasó felolvasná a
+        # nevét), és nincs kezdő-várakozás – a betűk AZONNAL indulnak. A
+        # szóköz/Enter az EVT_CHAR_HOOK-on át állítja meg (a fókusz bárhol lehet
+        # a párbeszéden belül).
+        self._abc_tick()
 
     def _abc_tick(self):
         if not self._abc_active or self._closing:
