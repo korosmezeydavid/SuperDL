@@ -23,7 +23,13 @@ _KOD_ABC = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 
 
 def ably_kulcs() -> str:
-    """Az Ably API-kulcs (appId.keyId:secret) vagy üres, ha nincs beállítva."""
+    """Az Ably API-kulcs (appId.keyId:secret) vagy üres, ha nincs beállítva.
+
+    Sorrend: env → a fejlesztő helyi kulcsa (~/.superdl/ably_key.txt) → a
+    modulba CSOMAGOLT közös kulcs. Ez utóbbi teszi lehetővé, hogy MINDEN
+    felhasználó beállítás nélkül, csak internettel játszhasson. A csomagolt
+    kulcs NEM kerül a nyilvános forráskódba (git-ignorált), csak a kiadott
+    csomagba – érdemes hozzá korlátozott (csak publish/subscribe) kulcsot adni."""
     k = (os.environ.get("SUPERDL_ABLY_KEY") or "").strip()
     if k:
         return k
@@ -32,6 +38,13 @@ def ably_kulcs() -> str:
         p = store.CONFIG_DIR / "ably_key.txt"
         if p.is_file():
             return p.read_text(encoding="utf-8").strip()
+    except Exception:
+        pass
+    try:
+        bp = os.path.join(os.path.dirname(__file__), "ably_kulcs_beepitett.txt")
+        if os.path.isfile(bp):
+            with open(bp, encoding="utf-8") as f:
+                return f.read().strip()
     except Exception:
         pass
     return ""

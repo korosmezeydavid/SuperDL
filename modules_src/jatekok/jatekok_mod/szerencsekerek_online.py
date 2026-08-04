@@ -228,9 +228,8 @@ class OnlinePanel(wx.Panel):
 
     def _start_ellenoriz(self):
         if not netroom.ably_kulcs():
-            self._mondd("Figyelem: nincs beállítva az online kulcs "
-                        "(~/.superdl/ably_key.txt), így az online játék most nem "
-                        "működik. A helyi Szerencsekerék a másik fülön megy.")
+            self._mondd("Az online játék ebben a verzióban még nem elérhető. A "
+                        "helyi Szerencsekerék a másik fülön viszont mindig megy!")
 
     # ---- lobbi ----
     def _uj_szoba(self, e):
@@ -402,7 +401,7 @@ _SUGO = (
     "Megfejtés.\n"
     "   • Minden lépés minden gépen felolvasva hangzik el. A körök közt pár "
     "másodperc a hálózati késés – ez normális.\n\n"
-    "Az online játékhoz internet és beállított online kulcs kell.\n"
+    "Az online játékhoz csak internet kell – semmit nem kell beállítanod.\n"
     "F1: ez a súgó. Escape: bezárás."
 )
 
