@@ -15,6 +15,16 @@
       "minAlkalmazasVerzio": "1.55.0"
     },
     {
+      "id": "kviz-zene",
+      "nev": "Zenei kvíz",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Kérdések hangszerekről, zeneszerzőkről és zenei alapismeretekről.",
+      "meret": 1500,
+      "fajl": "modulok/kviz/zene.json",
+      "minAlkalmazasVerzio": "1.55.0"
+    },
+    {
       "id": "szojatek-alap",
       "nev": "Akasztófa - alap szókészlet",
       "tipus": "wordgame",

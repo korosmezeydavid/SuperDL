@@ -1,0 +1,38 @@
+{
+  "id": "kviz-zene",
+  "nev": "Zenei kvíz",
+  "tipus": "quiz",
+  "verzio": 1,
+  "kerdesek": [
+    {
+      "kerdes": "Ki szerezte a Himnusz zenéjét?",
+      "valaszok": ["Erkel Ferenc", "Liszt Ferenc", "Bartók Béla", "Kodály Zoltán"],
+      "helyes": 0,
+      "magyarazat": "Erkel Ferenc 1844-ben, egy pályázatra írta."
+    },
+    {
+      "kerdes": "Hány húrja van egy klasszikus gitárnak?",
+      "valaszok": ["négy", "hat", "nyolc", "tizenkettő"],
+      "helyes": 1,
+      "magyarazat": "Hat húrja van, a legvastagabb a mély E."
+    },
+    {
+      "kerdes": "Melyik hangszer tartozik a fafúvósok közé?",
+      "valaszok": ["trombita", "hegedű", "klarinét", "dob"],
+      "helyes": 2,
+      "magyarazat": "A klarinét fafúvós, még akkor is, ha néha műanyagból készül."
+    },
+    {
+      "kerdes": "Ki komponálta a Kékszakállú herceg vára című operát?",
+      "valaszok": ["Kodály Zoltán", "Bartók Béla", "Dohnányi Ernő", "Liszt Ferenc"],
+      "helyes": 1,
+      "magyarazat": "Bartók Béla egyetlen operája, 1911-ben írta."
+    },
+    {
+      "kerdes": "Hány billentyű van egy szokásos zongorán?",
+      "valaszok": ["hatvanegy", "hetvenhat", "nyolcvannyolc", "százkettő"],
+      "helyes": 2,
+      "magyarazat": "Nyolcvannyolc billentyű: ötvenkét fehér és harminchat fekete."
+    }
+  ]
+}
