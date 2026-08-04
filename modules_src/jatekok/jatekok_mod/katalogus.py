@@ -365,6 +365,13 @@ SAJAT: tuple[Jatek, ...] = (
           "megfejtesz. Egy vagy több játékos (a gép is beszáll), három forduló, "
           "a legtöbb pénz nyer. Saját, jogtiszta hangvilággal.",
           retro=False),
+    Jatek("szerencsekerek_online", "Szerencsekerék – online (több gépről)",
+          "A Szerencsekerék TÖBB GÉPRŐL, egymástól távol! Az egyik játékos nyit "
+          "egy szobát (kap egy bemondható kódot), a többiek a kóddal "
+          "csatlakoznak, és felváltva játszotok – minden lépés minden gépen "
+          "felolvasva. A rejtvény csak a szoba gazdájánál van, így nem lehet "
+          "csalni. Internet és beállított online kulcs (Ably) kell hozzá.",
+          retro=False),
     Jatek("orszagvaros", "Ország-Város-Fiú-Lány",
           "Mezei Géza ötlete alapján készült akadálymentes szójáték: a gép "
           "másodpercenként sorolja az ábécét, te a szóközzel vagy az Enterrel "

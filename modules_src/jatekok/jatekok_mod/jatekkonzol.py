@@ -690,8 +690,12 @@ class _KonzolCtx:
 
 # ---- a felület által hívott indítók -------------------------------------
 
+# a saját (nem generátoros) ABLAKOS játékok – ezek külön wx-ablakot nyitnak
+_ABLAK_JATEKOK = {"orszagvaros", "szerencsekerek_online"}
+
+
 def indithato(kulcs: str) -> bool:
-    return JR.van(kulcs)
+    return JR.van(kulcs) or kulcs in _ABLAK_JATEKOK
 
 
 def indit_jatek(main, jatek, gep_getter):
@@ -706,6 +710,14 @@ def indit_jatek(main, jatek, gep_getter):
             return ablak
         except Exception:
             pass                          # ha bármi gond van, essen vissza a konzolra
+    if jatek.kulcs == "szerencsekerek_online":
+        try:
+            from .szerencsekerek_online import SzerencseOnlineAblak
+            ablak = SzerencseOnlineAblak(main, jatek, gep_getter)
+            ablak.Show()
+            return ablak
+        except Exception:
+            pass
     kon = JatekKonzol(main, jatek, gep_getter)
     kon.Show()
     return kon
