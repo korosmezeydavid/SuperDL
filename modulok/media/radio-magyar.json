@@ -1,0 +1,14 @@
+{
+  "id": "radio-magyar",
+  "nev": "Magyar rádiók csomag",
+  "tipus": "radiopack",
+  "verzio": 1,
+  "megjegyzes": "Válogatott magyar rádióállomások. A címek nyilvánosan meghirdetett élő adások.",
+  "allomasok": [
+    { "nev": "Kossuth Rádió", "url": "https://mr-stream.connectmedia.hu/4736/mr1.mp3", "mufaj": "közszolgálati" },
+    { "nev": "Petőfi Rádió", "url": "https://mr-stream.connectmedia.hu/4741/mr2.mp3", "mufaj": "könnyűzene" },
+    { "nev": "Bartók Rádió", "url": "https://mr-stream.connectmedia.hu/4756/mr3.mp3", "mufaj": "komolyzene" },
+    { "nev": "Dankó Rádió", "url": "https://mr-stream.connectmedia.hu/4761/mr6.mp3", "mufaj": "magyar nóta" },
+    { "nev": "Nemzetiségi Rádió", "url": "https://mr-stream.connectmedia.hu/4751/mr4.mp3", "mufaj": "nemzetiségi" }
+  ]
+}

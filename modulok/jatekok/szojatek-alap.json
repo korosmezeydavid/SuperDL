@@ -1,0 +1,31 @@
+{
+  "id": "szojatek-alap",
+  "nev": "Akasztófa - alap szókészlet",
+  "tipus": "wordgame",
+  "verzio": 1,
+  "megjegyzes": "Gyakori magyar szavak akasztófához és szólánchoz. A szavak ékezet nélkül is felismerhetők legyenek a motorban.",
+  "szavak": [
+    "alma", "asztal", "ablak", "autó", "angyal",
+    "barát", "bogár", "búza", "béka", "bicikli",
+    "cica", "cipő", "citrom", "csillag", "csónak",
+    "dallam", "delfin", "dinnye", "doboz", "dallam",
+    "elefánt", "erdő", "esernyő", "este", "ének",
+    "fecske", "felhő", "folyó", "fogas", "fürdő",
+    "galamb", "gomba", "gyertya", "gyümölcs", "gitár",
+    "hajó", "harang", "hegedű", "hóember", "híd",
+    "iskola", "ital", "irodalom", "illat", "ipar",
+    "jegenye", "játék", "jégkrém", "jármű", "jegyzet",
+    "kalap", "kenyér", "kerékpár", "könyv", "kutya",
+    "labda", "lámpa", "levél", "liget", "lovas",
+    "madár", "malom", "medve", "mókus", "muzsika",
+    "nadrág", "nap", "nyaraló", "nyuszi", "növény",
+    "olló", "orgona", "ország", "óra", "oroszlán",
+    "pillangó", "pohár", "postás", "puzzle", "párna",
+    "rajzoló", "repülő", "rózsa", "ruha", "rádió",
+    "sárkány", "sereg", "szekrény", "szőnyeg", "sütemény",
+    "tábla", "tenger", "tükör", "torony", "tulipán",
+    "újság", "utazás", "uborka", "üveg", "ünnep",
+    "vadász", "villamos", "virág", "vonat", "város",
+    "zászló", "zene", "zsiráf", "zongora", "zöldség"
+  ]
+}

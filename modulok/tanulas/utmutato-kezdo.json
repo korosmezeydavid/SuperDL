@@ -1,0 +1,29 @@
+{
+  "id": "utmutato-kezdo",
+  "nev": "Kezdő útmutató",
+  "tipus": "guide",
+  "verzio": 1,
+  "megjegyzes": "Felolvasható bevezető a SuperDL kezeléséhez. Fejezetenként hallgatható.",
+  "fejezetek": [
+    {
+      "cim": "A négy mozdulat",
+      "szoveg": "A Super DL egészét négy mozdulattal kezeled. Söprés lefelé: a következő elem. Söprés felfelé: az előző elem, vagy az aktuális megismétlése. Söprés jobbra: belépés, megnyitás, megerősítés. Söprés balra: vissza, vagy mégse. Nincs szükség pontos célzásra: bárhol a képernyőn söpörhetsz."
+    },
+    {
+      "cim": "A menü felépítése",
+      "szoveg": "A főmenüben csoportok vannak: Telefon és hívások, Üzenetek és e-mail, Idő és szervezés, Zene és média, Játékok, Könyvek, Információ, Közlekedés, Eszközök, Asszisztens, és Beállítások. Egy csoportba jobbra söpréssel lépsz be, és balra söpréssel jössz ki."
+    },
+    {
+      "cim": "Hívás indítása",
+      "szoveg": "Telefon és hívások, majd Névjegyből hívás. Mondd ki a nevet, a program megkeresi. Ha több találat van, fel és le söpréssel válogathatsz. Jobbra söpréssel indul a hívás. Zárt képernyőről az asszisztensnek is mondhatod: hívd fel, és a nevet."
+    },
+    {
+      "cim": "Pénz felismerése",
+      "szoveg": "Eszközök, majd Pénzfelismerő. Tartsd a bankjegyet a kamera elé, kartávolságból is elég. A program csak akkor mondja be az összeget, ha biztos benne. Ha hallgat, mozdíts egy kicsit a bankjegyen. Fontos: inkább hallgat, mint hogy tévedjen."
+    },
+    {
+      "cim": "Segítség a géptől",
+      "szoveg": "Zene és média, majd WiFi fájlportál be és ki. Bekapcsolás után a program bemondja a címet, amit a gép böngészőjébe kell beírni. Onnan a segítőd fájlokat tölthet fel, üzenetet írhat, naptárba vehet fel programot, és letöltheti a fényképeidet és felvételeidet."
+    }
+  ]
+}
