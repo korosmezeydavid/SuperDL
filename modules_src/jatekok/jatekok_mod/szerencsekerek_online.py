@@ -29,6 +29,7 @@ class OnlineHost:
         self.megoldas = ""
         self.kategoria = ""
         self.felfedett = set()
+        self.mondott = set()          # MINDEN kimondott mássalhangzó (jó és rossz)
         self.korpenz = {n: 0 for n in self.jatekosok}
         self.soron_idx = 0
         self.utolso_porgetes = None
@@ -40,9 +41,18 @@ class OnlineHost:
         kat, meg = self._valaszto(SZK._szk_rejtvenyek())
         self.kategoria, self.megoldas = kat, meg
         self.felfedett = set()
+        self.mondott = set()
         self.korpenz = {n: 0 for n in self.jatekosok}
         self.utolso_porgetes = None
         self.soron_idx = 0
+
+    def szoszam(self):
+        return len(self.megoldas.split())
+
+    def fordulo_intro(self):
+        """A forduló elején felolvasandó: kategória + a megfejtés szószáma."""
+        return (f"Kategória: {self.kategoria}. A megfejtés "
+                f"{self.szoszam()} szóból áll.")
 
     @property
     def soron(self):
@@ -55,7 +65,7 @@ class OnlineHost:
     def allapot(self, uzenet=""):
         return {
             "fazis": self.fazis, "kor": self.kor, "korok": self.korok,
-            "kategoria": self.kategoria,
+            "kategoria": self.kategoria, "szavak": self.szoszam(),
             "tabla": SZK._szk_tabla(self.megoldas, self.felfedett),
             "soron": self.soron if self.fazis == "jatek" else "",
             "jatekosok": list(self.jatekosok),
@@ -89,14 +99,22 @@ class OnlineHost:
             betu = (ertek or "").strip().lower()[:1]
             if not betu.isalpha():
                 return None
-            if betu in self.felfedett:
-                return self.allapot(f"A(z) {betu.upper()} már felfedve. "
-                                    f"{ki} jöhet újra.")
             if SZK._szk_maganhangzo(betu):
                 return self.allapot("Ez magánhangzó – azt VENNED kell, nem "
                                     "pörgetéssel.")
+            if betu in self.mondott:
+                # már elhangzott (jó vagy rossz) – NEM friss tévesztés, mint a
+                # gépi játékban. Ha volt függő pörgetés, a kör átszáll.
+                if self.utolso_porgetes is not None:
+                    self.utolso_porgetes = None
+                    self._kovetkezo()
+                    return self.allapot(f"A(z) {betu.upper()} betű már "
+                                        "elhangzott. Jön a következő.")
+                return self.allapot(f"A(z) {betu.upper()} betű már elhangzott. "
+                                    f"{ki} mondj másik betűt!")
             if self.utolso_porgetes is None:
                 return self.allapot("Előbb pörögj, aztán mondj mássalhangzót!")
+            self.mondott.add(betu)
             db = SZK._szk_elofordul(self.megoldas, betu)
             if db > 0:
                 self.felfedett.add(betu)
@@ -134,7 +152,8 @@ class OnlineHost:
                 if self.kor >= self.korok:
                     return self._veg(uz)
                 self._uj_fordulo()
-                return self.allapot(uz + f" Jön a(z) {self.kor}. forduló!")
+                return self.allapot(uz + f" Jön a(z) {self.kor}. forduló! "
+                                    + self.fordulo_intro())
             self._kovetkezo()
             return self.allapot(f"{ki} megfejtése nem jó. Jön a következő.")
         return None
@@ -200,8 +219,11 @@ class OnlinePanel(wx.Panel):
         akc = wx.BoxSizer(wx.HORIZONTAL)
         akc.Add(wx.StaticText(self, label="&Betű / megfejtés:"),
                 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
-        self.be = wx.TextCtrl(self, size=(170, -1))
+        self.be = wx.TextCtrl(self, size=(170, -1), style=wx.TE_PROCESS_ENTER)
         self.be.SetName("Betű vagy megfejtés")
+        # Enter a mezőben = a legvalószínűbb akció (egy betű → Betű/Magánhangzó,
+        # több karakter → Megfejtés) – így a gyakori eset gomb/hotkey nélkül megy.
+        self.be.Bind(wx.EVT_TEXT_ENTER, self._enter_akcio)
         akc.Add(self.be, 0, wx.RIGHT, 8)
         self.g_porget = wx.Button(self, label="&Pörgetés")
         self.g_porget.Bind(wx.EVT_BUTTON, lambda e: self._akcio("porget"))
@@ -216,8 +238,55 @@ class OnlinePanel(wx.Panel):
         self.g_megfejt.Bind(wx.EVT_BUTTON, lambda e: self._akcio("megfejt", self.be.GetValue()))
         akc.Add(self.g_megfejt, 0)
         v.Add(akc, 0, wx.ALL, 8)
+
+        # Kategória + megfejtendő sor – MINDIG a panel alján, külön, csak-olvasható
+        # mezőkben, hogy hallás után ne kelljen felfelé nyilazni és szavanként
+        # odaugrálni hozzájuk.
+        self.kat_mezo = wx.TextCtrl(self, style=wx.TE_READONLY)
+        self.kat_mezo.SetName("Kategória")
+        v.Add(self.kat_mezo, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+        self.tabla_mezo = wx.TextCtrl(
+            self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
+            size=(-1, 58))
+        self.tabla_mezo.SetName("Megfejtendő sor")
+        v.Add(self.tabla_mezo, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+
+        # Forró billentyűk, amelyek a fókusztól függetlenül működnek a panelen
+        # (a puszta Alt+betű mnemonikok nem mindig sülnek el a képernyőolvasóval).
+        self._ID_PORGET = wx.NewIdRef()
+        self._ID_BETU = wx.NewIdRef()
+        self._ID_MGH = wx.NewIdRef()
+        self._ID_MEGFEJT = wx.NewIdRef()
+        self.Bind(wx.EVT_MENU, lambda e: self._akcio("porget"),
+                  id=self._ID_PORGET)
+        self.Bind(wx.EVT_MENU,
+                  lambda e: self._akcio("betu", self.be.GetValue()),
+                  id=self._ID_BETU)
+        self.Bind(wx.EVT_MENU,
+                  lambda e: self._akcio("maganhangzo", self.be.GetValue()),
+                  id=self._ID_MGH)
+        self.Bind(wx.EVT_MENU,
+                  lambda e: self._akcio("megfejt", self.be.GetValue()),
+                  id=self._ID_MEGFEJT)
+        self.SetAcceleratorTable(wx.AcceleratorTable([
+            (wx.ACCEL_ALT, ord("P"), self._ID_PORGET),
+            (wx.ACCEL_ALT, ord("T"), self._ID_BETU),
+            (wx.ACCEL_ALT, ord("A"), self._ID_MGH),
+            (wx.ACCEL_ALT, ord("G"), self._ID_MEGFEJT),
+        ]))
+
         self._akciok_engedely(False)
         self.SetSizer(v)
+
+    def _enter_akcio(self, e):
+        t = (self.be.GetValue() or "").strip()
+        if len(t) == 1 and t.isalpha():
+            if SZK._szk_maganhangzo(t.lower()):
+                self._akcio("maganhangzo", t)
+            else:
+                self._akcio("betu", t)
+        elif t:
+            self._akcio("megfejt", t)
 
     def _alap_nev(self):
         try:
@@ -290,8 +359,8 @@ class OnlinePanel(wx.Panel):
         self.indit_gomb.Disable()
         self._szoba.kuld("start", {"jatekosok": self._jatekosok})
         self._szoba.kuld("allapot", self._onlinehost.allapot(
-            f"Kezdődik a játék {len(self._jatekosok)} játékossal! Kategória: "
-            f"{self._onlinehost.kategoria}."))
+            f"Kezdődik a játék {len(self._jatekosok)} játékossal! "
+            + self._onlinehost.fordulo_intro()))
 
     # ---- hálózat ----
     def _uzenet_jott(self, u):
@@ -330,11 +399,20 @@ class OnlinePanel(wx.Panel):
         pont = a.get("bank", {})
         pont_szoveg = ", ".join(f"{n}: {pont.get(n, 0)}"
                                 for n in a.get("jatekosok", []))
-        sorok = [a.get("uzenet", ""), a.get("tabla", "")]
+        tabla = a.get("tabla", "")
+        kat = a.get("kategoria", "")
+        szavak = a.get("szavak", 0)
+        # a kategória + szószám és a megfejtendő sor a KÜLÖN, ALSÓ mezőkbe kerül
         if self._fazis == "jatek":
-            sorok.append(f"Soron: {self._soron}. Bank – {pont_szoveg}.")
+            self.kat_mezo.SetValue(
+                f"Kategória: {kat} — a megfejtés {szavak} szóból áll.")
+            statsor = f"Soron: {self._soron}. Bank – {pont_szoveg}."
         else:
-            sorok.append(f"Végeredmény – {pont_szoveg}.")
+            self.kat_mezo.SetValue("")
+            statsor = f"Végeredmény – {pont_szoveg}."
+        self.tabla_mezo.SetValue(tabla)
+        # az átiratban a MEGFEJTENDŐ SOR legyen az UTOLSÓ (Ctrl+End odaér)
+        sorok = [a.get("uzenet", ""), statsor, tabla]
         self._mondd("  ".join(s for s in sorok if s))
         enyem = (self._fazis == "jatek" and self._soron == self._nev)
         self._akciok_engedely(enyem)

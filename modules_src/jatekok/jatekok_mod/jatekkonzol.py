@@ -211,6 +211,15 @@ class JatekKonzol(wx.Dialog):
         b_ki.Bind(wx.EVT_BUTTON, lambda e: self.Close())
         sor.Add(b_ki, 0)
         v.Add(sor, 0, wx.ALL, 8)
+        # A „megfejtendő sor" MINDIG a mező alján, külön csak-olvasható mezőben:
+        # így hallás után nem kell felfelé nyilazni és szavanként odaugrálni hozzá.
+        # Csak akkor jelenik meg, ha a játék használja (ctx.tabla).
+        self.tabla_mezo = wx.TextCtrl(
+            self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
+            size=(-1, 58))
+        self.tabla_mezo.SetName("Megfejtendő sor")
+        self.tabla_mezo.Hide()
+        v.Add(self.tabla_mezo, 0, wx.EXPAND | wx.ALL, 8)
         self.SetSizer(v)
 
     # ---- a játék hajtása ----------------------------------------------
@@ -252,6 +261,9 @@ class JatekKonzol(wx.Dialog):
             payload = cmd[1] if len(cmd) > 1 else ""
             if typ == "mond":
                 self._ki(payload)
+                continue
+            if typ == "tabla":
+                self._tabla(payload)
                 continue
             if typ == "hang":
                 self._hang_tone(payload)
@@ -316,6 +328,17 @@ class JatekKonzol(wx.Dialog):
         self._ki("A játéknak vége. Új játékhoz: Újra gomb. Kilépés: Escape.")
 
     # ---- kimenet / bemenet-állapot ------------------------------------
+
+    def _tabla(self, szoveg):
+        """A megfejtendő sort a MINDIG-ALUL lévő külön mezőbe teszi, és fel is
+        olvassa (az átiratba is bekerül, utolsó sorként)."""
+        if self._closing:
+            return
+        if not self.tabla_mezo.IsShown():
+            self.tabla_mezo.Show()
+            self.Layout()
+        self.tabla_mezo.SetValue(szoveg or "")
+        self._ki(szoveg)
 
     def _ki(self, szoveg, felolvas=True):
         """Egy sor az átiratba + (retró hang VAGY képernyőolvasó) felolvasás."""
@@ -657,6 +680,10 @@ class _KonzolCtx:
 
     def mond(self, szoveg):
         return ("mond", str(szoveg))
+
+    def tabla(self, szoveg):
+        """A megfejtendő sor a felület aljára, külön mezőbe (és felolvasva)."""
+        return ("tabla", str(szoveg))
 
     def kerdez(self, szoveg):
         return ("kerdez", str(szoveg))

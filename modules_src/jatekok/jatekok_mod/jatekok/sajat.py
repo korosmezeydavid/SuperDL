@@ -571,15 +571,16 @@ def _szk_csalodas():
 
 def _szk_ember_kor(ctx, nev, megoldas, felfedett, korpenz, bank, nevek):
     """Egy emberi kör. Visszaad: megoldva (bool). Ha False, a kör átszáll."""
-    yield ctx.mond(f"{nev} következik. " + _szk_tabla(megoldas, felfedett))
+    yield ctx.mond(f"{nev} következik.")
+    yield ctx.tabla(_szk_tabla(megoldas, felfedett))
     while True:
         v = ((yield ctx.kerdez(
             f"{nev}, mit lépsz? (P = pörgetés és betű, V = betűt veszek "
             f"{_SZK_MGH_AR}-ért, M = megfejtés, ? = tábla; pénzem = a pénzed; "
             "többiek = mindenki pénze)")) or "").strip().lower()
         if v.startswith("?"):
-            yield ctx.mond(_szk_tabla(megoldas, felfedett)
-                           + f" A fordulóban gyűjtött pénzed: {korpenz[nev]}.")
+            yield ctx.tabla(_szk_tabla(megoldas, felfedett))
+            yield ctx.mond(f"A fordulóban gyűjtött pénzed: {korpenz[nev]}.")
             continue
         if v.startswith("pénzem") or v == "pénz":
             yield ctx.mond(f"{nev}, a fordulóban {korpenz[nev]} forintot gyűjtöttél, "
@@ -617,8 +618,8 @@ def _szk_ember_kor(ctx, nev, megoldas, felfedett, korpenz, bank, nevek):
             db = _szk_elofordul(megoldas, betu)
             felfedett.add(betu)
             if db:
-                yield ctx.mond(f"Van benne {db} darab {betu.upper()}! "
-                               + _szk_tabla(megoldas, felfedett))
+                yield ctx.mond(f"Van benne {db} darab {betu.upper()}!")
+                yield ctx.tabla(_szk_tabla(megoldas, felfedett))
                 continue
             yield ctx.mond(f"Nincs benne {betu.upper()}. A {_SZK_MGH_AR} forint "
                            "elúszott, a kör átszáll.")
@@ -659,7 +660,8 @@ def _szk_ember_kor(ctx, nev, megoldas, felfedett, korpenz, bank, nevek):
                       f"{osszeg * db} forintot.")
             if random.random() < 0.5:
                 uzenet += " " + _szk_beszol(_SZK_JO)
-            yield ctx.mond(uzenet + " " + _szk_tabla(megoldas, felfedett))
+            yield ctx.mond(uzenet)
+            yield ctx.tabla(_szk_tabla(megoldas, felfedett))
             continue
         yield ctx.effekt_var("sikertelen_tipp")
         rossz = f"Nincs benne {betu.upper()}. A kör átszáll."
@@ -782,8 +784,10 @@ def jatek_szerencsekerek(ctx):
         kat, megoldas = _szk_valaszt(rejtvenyek)
         felfedett = set()
         korpenz = {nev: 0 for nev in nevek}
-        yield ctx.mond(f"{fordulo}. forduló! A kategória: {kat}.")
-        yield ctx.mond(_szk_tabla(megoldas, felfedett))
+        _szoszam = len(megoldas.split())
+        yield ctx.mond(f"{fordulo}. forduló! A kategória: {kat}. "
+                       f"A megfejtés {_szoszam} szóból áll.")
+        yield ctx.tabla(_szk_tabla(megoldas, felfedett))
         aktiv = 0
         biztonsag = 0
         while True:

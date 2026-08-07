@@ -8,8 +8,8 @@ közli, hogy „még készül" – SOHA nincs hamis siker.
 Új játék bekötése: írd meg a generátort a megfelelő modulban, majd vedd fel
 ide egy sorral.
 """
-from . import (homelab, kaland, kartya, kviz, logika, milliomos, mini,
-               orszagvaros, sajat, terkep)
+from . import (figyelem, homelab, kaland, kartya, kviz, logika, mancala,
+               milliomos, mini, orszagvaros, sajat, szojatek, tabla, terkep)
 
 REGISZTER = {
     # logika / stratégia
@@ -40,6 +40,7 @@ REGISZTER = {
     "szamtan": kviz.jatek_szamtan,
     "memoria": kviz.jatek_memoria,
     "memory": kviz.jatek_memory,
+    "varazsgomb": figyelem.jatek_varazsgomb,   # Schuck Antal – Varázsgömb
     "parver": kviz.jatek_parver,
     # kaland / egyéb
     "csata": kaland.jatek_csata,
@@ -79,6 +80,7 @@ REGISZTER = {
     "fogadas": homelab.jatek_fogadas,
     "szokita": homelab.jatek_szokita,
     "szofajok": homelab.jatek_szofajok,
+    "egyszo": szojatek.jatek_egyszo,     # Egy szó mint száz – szó-dedukció
     "reszeg": homelab.jatek_reszeg,
     "betpoker": homelab.jatek_betpoker,
     "felkaru": homelab.jatek_felkaru,
@@ -95,6 +97,9 @@ REGISZTER = {
     "hajocsata": homelab.jatek_hajocsata,
     "kastely": homelab.jatek_kastely,
     "malom": homelab.jatek_malom,        # Brátán Ferenc – klasszikus malom
+    "maja": mancala.jatek_maja,          # Márkus Norbert – Maya golyós játék
+    "awari": mancala.jatek_awari,        # Awari / Oware – ütős mancala
+    "kinevet": tabla.jatek_kinevet,      # Kisvarga Zsolt – Ki nevet a végén
     "mozaik": homelab.jatek_mozaik,      # szó-kitaláló betűvásárlással
     "szamfejt": homelab.jatek_szamfejt,  # Kisvarga Zsolt – számvariáció-memória
     "szenvics": homelab.jatek_szenvics,  # Kisvarga Zsolt – ugró-versenyparti

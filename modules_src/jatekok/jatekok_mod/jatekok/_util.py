@@ -28,6 +28,12 @@ class Ctx:
     def mond(self, szoveg):
         return ("mond", str(szoveg))
 
+    def tabla(self, szoveg):
+        """Egy „állandó állapot"-sor (pl. a Szerencsekerék megfejtendő sora),
+        amit a felület a szerkesztőmező ALJÁN lévő külön mezőben tart, és fel is
+        olvas – így hallás után nem kell felfelé nyilazni hozzá."""
+        return ("tabla", str(szoveg))
+
     def kerdez(self, szoveg):
         return ("kerdez", str(szoveg))
 

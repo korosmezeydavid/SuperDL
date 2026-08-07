@@ -180,6 +180,13 @@ RETRO: tuple[Jatek, ...] = (
     Jatek("memteszt", "Memóriateszt",
           "A gép szám–szó párokat mond; jegyezd meg, és mondd vissza sorban – "
           "egyre több párral, egészen húszig."),
+    Jatek("varazsgomb", "Varázsgömb",
+          "Figyelemjáték: tíz saját szót helyezel a varázsgömbbe, az véletlen "
+          "sorrendben felvillantja őket, neked pedig azt kell megjegyezned, "
+          "melyik szó HÁNYSZOR bukkant elő. A végén mindegyik szóról megkérdezi, "
+          "hányszor mondta – a helyes tippekért pont jár. Tisztán fül után "
+          "játszható.",
+          szerzo="Schuck Antal", ev="1988"),
     Jatek("lotto", "Lottó szerencse",
           "Lottószám-tipp generátor: hagyományos ötös lottó (5/90) vagy hatos "
           "lottó (6/45), akár 255 szelvényre."),
@@ -216,6 +223,12 @@ RETRO: tuple[Jatek, ...] = (
           "Szó-mastermind: a gép egy hárombetűs magyar szóra gondol, te "
           "hárombetűs szavakat tippelsz, és megmondja, hány betű egyezik a "
           "helyén – X-re elárulja a szót."),
+    Jatek("egyszo", "Egy szó mint száz",
+          "Szó-dedukció: a gép gondol egy szóra, és mond róla egy "
+          "meghatározást – ki kell találnod. Ha egyből eltalálod, nyolc "
+          "fortunát kapsz; ha nem, kérhetsz (vagy tévesztéskor kapsz) egy-egy "
+          "betűt, de a fortunád feleződik. Minden második fordulóban a szó "
+          "betűit ábécérendben kapod meg. Tisztán fül után játszható."),
     Jatek("szofajok", "Szófajok",
           "Nyelvtani gyorskvíz: a gép szót mond, te felismered a szófaját "
           "(névelő, számnév, főnév, ige, melléknév) – a végén osztályzattal."),
@@ -301,6 +314,26 @@ RETRO: tuple[Jatek, ...] = (
           "egy ellenfél-bábut. Aki kettőre fogy vagy nem tud lépni, veszít – "
           "három bábuval már bárhová repülhetsz.",
           szerzo="Brátán Ferenc"),
+    Jatek("maja", "Maya (golyós játék)",
+          "Klasszikus golyós maya a gép ellen: hat-hat tál hat-hat golyóval, "
+          "és egy-egy gyűjtő. Kiválasztod az egyik tálad, a golyókat elosztjuk "
+          "a gyűjtőd és a gép táljai felé; ha épp a gyűjtődbe érsz, újra te "
+          "jössz. Ütés nincs – az nyer, aki több golyót gyűjt. A szerző eleve "
+          "képernyő nélküli használatra tervezte, a gép mindig közli a lépéseit.",
+          szerzo="Márkus Norbert"),
+    Jatek("awari", "Awari (ütős mancala)",
+          "A hagyományos Awari (Oware) a gép ellen: két sor hat gödör, két "
+          "raktár. Vetsz óramutatóval szemben, és ha az utolsó mag a saját üres "
+          "gödrödbe kerül a szemközti gépgödör mellé, LEÜTÖD – a magok a "
+          "raktáradba kerülnek. Standard vagy véletlen kiosztás; a 36 magból a "
+          "többség, 19 mag a győzelem. Az állás bármikor felolvasható."),
+    Jatek("kinevet", "Ki nevet a végén",
+          "A klasszikus társas a gép ellen: négy-négy bábu, kockadobás, "
+          "körbe a negyven mezős pályán, majd haza a bázisra. Egyessel vagy "
+          "hatossal léphetsz ki, hatosnál újra dobsz; a gépbábura lépve leütöd, "
+          "az visszamegy a bázisára. Te döntöd el, melyik bábut lépteted. Aki "
+          "mind a négy bábuját hazajuttatja, nyer. Az állás bármikor felolvasható.",
+          szerzo="Kisvarga Zsolt"),
     Jatek("mozaik", "Mozaik",
           "Szó-kitaláló betűvásárlással: a gép egy szóra gondol, megmondja hány "
           "betűből áll, te pedig egyenként kérheted a betűit – de minél több "

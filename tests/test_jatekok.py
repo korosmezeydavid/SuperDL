@@ -1464,10 +1464,15 @@ def test_csata_veget_er():
 
 
 def test_harcos_vegigjatszhato():
+    # A teljes, elágazó kalandkönyv (Ian Livingstone nyomán, Dr. Földi János
+    # programja szerint) fusson le és érjen rendben véget bármilyen döntéssorral.
     def bot(k, ki):
         return "nem" if "újrajátszod" in k.lower() else "1"
     ki = _fut("harcos", bot)
-    assert any("HŐS lettél" in p for _, p in ki)
+    szoveg = " ".join(p for _, p in ki)
+    assert "Ian Livingstone" in szoveg
+    assert "Földi János" in szoveg
+    assert any("Köszönöm a játékot" in p for _, p in ki)
 
 
 def test_allah_veget_er():

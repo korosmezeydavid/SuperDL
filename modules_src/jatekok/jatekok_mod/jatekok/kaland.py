@@ -8,6 +8,7 @@ témát követi, tényszerű narrációval."""
 import random
 
 from ._util import igen, szam, kever
+from . import harcos_kaland
 
 
 # ====================================================================== CSATA
@@ -49,68 +50,11 @@ def jatek_csata(ctx):
 
 
 # ========================================================== ORSZÁGÚT HARCOSA
-_HARCOS = {
-    "start": {
-        "szoveg": "Új Remény városának tanácsa elé állsz. A világjárvány után "
-                  "a civilizáció romokban; a túlélők megerősített kisvárosokban "
-                  "élnek. A tanács rád bízza a küldetést: vigyél gabonát és "
-                  "vetőmagot San Angelóba, és hozz érte tízezer liter benzint. "
-                  "A járműved egy felfegyverzett Dodge Interceptor.",
-        "valasztasok": [("1", "Azonnal útnak indulsz", "orszagut"),
-                        ("2", "Előbb átvizsgálod a járművet", "atvizsgal")]},
-    "atvizsgal": {
-        "szoveg": "Alaposan ellenőrzöd a páncélzatot és a géppuskákat. "
-                  "Mindent rendben találsz, és tele tankkal vágsz neki.",
-        "valasztasok": [("1", "Irány az országút", "orszagut")]},
-    "orszagut": {
-        "szoveg": "A poros úton egy felborult teherautó torlaszolja el az "
-                  "utat. A romok mögött mozgást látsz – lehet csapda is.",
-        "valasztasok": [("1", "Áttörsz teljes sebességgel", "attores"),
-                        ("2", "Kikerülöd a homokdűnék felé", "dune")]},
-    "attores": {
-        "szoveg": "A motor felbőg, a páncél állja a lövéseket, és átszakítod a "
-                  "torlaszt! A banditák a porban maradnak mögötted.",
-        "valasztasok": [("1", "Tovább San Angelo felé", "celba")]},
-    "dune": {
-        "szoveg": "A dűnék között a homok megfogja a kerekeket, és időt "
-                  "veszítesz, de elkerülöd a tűzharcot.",
-        "valasztasok": [("1", "Visszakapaszkodsz az útra", "celba")]},
-    "celba": {
-        "szoveg": "Napnyugtára megérkezel San Angelóba. Leadod a gabonát és a "
-                  "vetőmagot, és cserébe megkapod a tízezer liter benzint. Új "
-                  "Remény városa átvészeli a telet – a küldetés sikerült. HŐS "
-                  "lettél az országúton!",
-        "valasztasok": []},
-}
-
-
-def jatek_harcos(ctx):
-    yield ctx.mond("ORSZÁGÚT HARCOSA. Választásos kalandkönyv a járvány utáni "
-                   "világban. A döntéseidet a felkínált számmal hozod meg.")
-    while True:
-        node = "start"
-        while True:
-            n = _HARCOS[node]
-            yield ctx.mond(n["szoveg"])
-            val = n["valasztasok"]
-            if not val:
-                break
-            keret = "Mit teszel? " + "  ".join(f"{k}: {szo}." for k, szo, _ in val)
-            v = yield ctx.kerdez(keret)
-            t = (v or "").strip().lower()
-            cel = None
-            for k, szo, c in val:
-                if t == k or (t and t == szo.lower()):
-                    cel = c
-                    break
-            if cel is None:
-                yield ctx.mond("Nem értem – az első utat választom helyetted.")
-                cel = val[0][2]
-            node = cel
-        v = yield ctx.kerdez("Újrajátszod a kalandot? (igen/nem)")
-        if not igen(v, False):
-            break
-    yield ctx.vege("Köszönöm a játékot!")
+# A teljes, elágazó kalandkönyv külön modulban él (harcos_kaland.py):
+# Ian Livingstone Freeway Fighter című műve nyomán, Dr. Földi János
+# homelabos programjának viselkedését újraértelmezve, tisztán felolvasható
+# magyar szöveggel. Itt csak a belépési pontot tartjuk meg a kompatibilitásért.
+jatek_harcos = harcos_kaland.jatek_harcos
 
 
 # =============================================================== ALLAH SZAKÁLLA
