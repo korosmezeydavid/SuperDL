@@ -1,0 +1,7 @@
+A CPython 3.14 szabvány könyvtárának pontos másolatai: imaplib.py, poplib.py,
+smtplib.py. Azért csomagoljuk a modul mellé, mert a fagyasztott (PyInstaller)
+SuperDL.exe nem tartalmazza ezeket (a Core sehol nem importálja őket, ezért a
+build kihagyta), a mail modulnak viszont kellenek (IMAP/POP3/SMTP). A
+mail_mod/__init__.py a betöltéskor a keresési út VÉGÉRE teszi ezt a mappát, így
+forrásból a rendszer sajátjai maradnak a mérvadók, a kész exe-ben pedig innen
+töltődnek be.

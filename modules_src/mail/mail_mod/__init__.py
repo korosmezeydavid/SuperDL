@@ -7,6 +7,22 @@ céljuk az e-mail működése. Az első indításkor hozzájárulást kérünk.
 
 register(core): „Super Mail" menüpont a Kommunikáció menü alatt + az ablak."""
 
+# --- beépített stdlib-pótlás a FAGYASZTOTT exe-hez -----------------------
+# A PyInstaller-rel csomagolt SuperDL.exe NEM tartalmazza az imaplib/poplib/
+# smtplib modulokat, mert a Core sehol nem importálja őket (a build csak az
+# importgráfban szereplőket gyűjti be). A mail modulnak viszont kellenek
+# (IMAP/POP3/SMTP), ezért a modul MELLÉ csomagoltuk a CPython 3.14 pontos
+# másolatait a `_stdlib/` mappában, és a keresési út VÉGÉRE tesszük őket: így
+# forrásból futva a rendszer sajátjai maradnak a mérvadók (nincs változás),
+# a fagyasztott exe-ben pedig innen töltődnek be. (Minden email-függőségük –
+# email.*, socket, ssl, binascii – megvan a exe-ben, csak e három hiányzott.)
+import os as _os
+import sys as _sys
+
+_bundled_stdlib = _os.path.join(_os.path.dirname(__file__), "_stdlib")
+if _os.path.isdir(_bundled_stdlib) and _bundled_stdlib not in _sys.path:
+    _sys.path.append(_bundled_stdlib)
+
 _state = {}
 
 

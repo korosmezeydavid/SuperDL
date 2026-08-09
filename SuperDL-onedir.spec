@@ -22,6 +22,12 @@ datas += [('bin\\espeak-ng-data', 'espeak-ng-data')]
 datas += [('superdl\\startup.wav', 'superdl')]     # induló szignál (Farkas kérése)
 datas += [('superdl\\tolk\\nvdaControllerClient64.dll', 'superdl\\tolk')]  # képernyőolvasó-kimenet (NVDA)
 hiddenimports = ['win32com.client', 'pythoncom', 'pywintypes', 'win32crypt']
+# A Super Mail modul e-mail-protokolljai. A Core sehol nem importálja ezeket,
+# ezért a PyInstaller egyébként KIHAGYNÁ őket a fagyasztott exe-ből, és a mail
+# modul betöltése csendben elbukna (nincs Kommunikáció menü). Kényszerítve
+# begyűjtjük. (Az `email`/`html.parser` transzitívan már bekerül az urllib-en át.)
+hiddenimports += ['imaplib', 'poplib', 'smtplib', 'email.mime.multipart',
+                  'email.mime.text', 'mailbox']
 datas += collect_data_files('docx')
 # IANA időzónák (ICS TZID) – Windowson nincs rendszer-tzdata
 datas += collect_data_files('tzdata')
