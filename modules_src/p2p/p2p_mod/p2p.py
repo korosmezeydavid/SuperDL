@@ -16,6 +16,7 @@ import re
 import subprocess
 import sys
 import threading
+from collections import deque
 from pathlib import Path
 
 _CODE_RE = re.compile(r"code is:\s*(\S+)", re.IGNORECASE)
@@ -32,6 +33,62 @@ def _human_size(n: int) -> str:
         if n >= hatar:
             return f"{n / hatar:.1f} {unit}".replace(".", ",")
     return f"{n} bájt"
+
+
+# ---- a wormhole-kimenetből olvasható VALÓDI ok kigyűjtése ----------------
+# A gyűjtő-hibaüzenet mögé a wormhole utolsó értelmes sorai alapján konkrét,
+# BARÁTSÁGOS okot fűzünk – hogy a felhasználó lássa, hol akadt el (időtúllépés,
+# tűzfal/hálózat, rossz kód…), ne csak az általánost.
+
+def _ertelmes_sor(seg: str) -> bool:
+    """Igaz, ha a sor a hibához hasznos (nem üres, nem a tqdm haladás-sora)."""
+    s = (seg or "").strip()
+    if not s:
+        return False
+    # a tqdm haladás-sor (pl. „ 12%|#### | 1.2M/10M, 00:03") a hibához felesleges
+    if _PCT_RE.search(s) and ("|" in s or "/s" in s or "ETA" in s
+                              or re.search(r"\d[BkKMG]?/\d", s)):
+        return False
+    return True
+
+
+_HIBA_MINTAK = [
+    (re.compile(r"key confirmation failed|wrongpassword|scary|corrupt", re.I),
+     "rossz vagy elgépelt kód – a fogadó pontosan a küldő kódját írja be."),
+    (re.compile(r"timed out|timeout|took too long|no response", re.I),
+     "időtúllépés – a másik gép nem kapcsolódott be időben; indítsátok "
+     "egyszerre, és a fogadó azonnal írja be a kódot (a kód lejár)."),
+    (re.compile(r"already (been )?(used|claimed)|nameplate.*claimed|crowded",
+                re.I),
+     "ezt a kódot már felhasználták vagy lejárt – kérj ÚJ kódot, és úgy próbáld."),
+    (re.compile(r"refused|unreachable|failed to connect|getaddrinfo|"
+                r"name or service|temporary failure|websocket|connection.?error|"
+                r"network is unreachable|ssl|certificate|handshake|"
+                r"could not connect|no route", re.I),
+     "nem érhető el a wormhole közvetítő-szerver – valószínűleg a tűzfal, a VPN "
+     "vagy a hálózat blokkolja. Próbáld telefonos hotspotról mindkét gépen."),
+    (re.compile(r"no such file|not found|permission denied|disk|no space|"
+                r"read-only", re.I),
+     "fájl- vagy lemezhiba – ellenőrizd a fájlt, a szabad helyet és a jogokat "
+     "(és a vírusirtót)."),
+]
+
+
+def friendly_error(sorok) -> str:
+    """A wormhole utolsó sorai alapján BARÁTSÁGOS ok. Üres string, ha semmi
+    értelmeset nem látunk."""
+    szoveg = "\n".join(s for s in (sorok or []) if s)
+    if not szoveg.strip():
+        return ""
+    for minta, uzenet in _HIBA_MINTAK:
+        if minta.search(szoveg):
+            return uzenet
+    # ha nincs ismerős minta, add vissza az utolsó értelmes sort nyersen (rövidítve)
+    for s in reversed(sorok or []):
+        s = (s or "").strip()
+        if s:
+            return "a hálózat jelzése: " + (s[:160])
+    return ""
 
 
 def _stop_proc(proc, timeout: float = 3.0) -> None:
@@ -135,9 +192,12 @@ class SendSession:
             return
         code_sent = False
         last_pct = -1
+        naplo = deque(maxlen=12)      # a wormhole utolsó értelmes sorai a hibához
         for seg in _iter_segments(self._proc.stdout):
             if self._stop:
                 break
+            if _ertelmes_sor(seg):
+                naplo.append(seg.strip())
             m = _CODE_RE.search(seg)
             if m and not code_sent:
                 code_sent = True
@@ -156,8 +216,12 @@ class SendSession:
         elif rc == 0:
             self._emit_done(True, "A fájl sikeresen átment a másik gépre.")
         else:
-            self._emit_done(False, "A küldés nem fejeződött be (a másik gép "
-                                   "nem csatlakozott, vagy megszakadt).")
+            uz = ("A küldés nem fejeződött be (a másik gép nem csatlakozott, "
+                  "vagy megszakadt).")
+            ok = friendly_error(list(naplo))
+            if ok:
+                uz += " Ok: " + ok
+            self._emit_done(False, uz)
 
     def _emit_done(self, ok, msg):
         if self.on_done:
@@ -201,9 +265,12 @@ class ReceiveSession:
             self._emit_done(False, f"A fogadás nem indult el: {e}")
             return
         last_pct = -1
+        naplo = deque(maxlen=12)      # a wormhole utolsó értelmes sorai a hibához
         for seg in _iter_segments(self._proc.stdout):
             if self._stop:
                 break
+            if _ertelmes_sor(seg):
+                naplo.append(seg.strip())
             m = _INTO_RE.search(seg)
             if m:
                 self.filename = m.group(1)
@@ -232,9 +299,12 @@ class ReceiveSession:
                            f"a célmappában ({self.out_dir}). Ellenőrizd a "
                            "vírusirtót és a szabad helyet, majd próbáld újra.")
         else:
-            self._emit_done(False, "A fogadás nem sikerült – ellenőrizd a "
-                                   "kódot (a küldőtől pontosan), és hogy a "
-                                   "küldő épp küld-e.")
+            uz = ("A fogadás nem sikerült – ellenőrizd a kódot (a küldőtől "
+                  "pontosan), és hogy a küldő épp küld-e.")
+            ok = friendly_error(list(naplo))
+            if ok:
+                uz += " Ok: " + ok
+            self._emit_done(False, uz)
 
     def _verify_received(self) -> tuple[bool, str, int]:
         """A fogadott fájl TÉNYLEGES ellenőrzése: létezik-e és nem üres-e.

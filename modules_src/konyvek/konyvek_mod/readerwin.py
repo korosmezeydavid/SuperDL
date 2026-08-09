@@ -44,6 +44,71 @@ A magyar Edge hang szép és ingyenes (internet kell); offline a SAPI magyar han
 megy."""
 
 
+class _BookmarkDialog(wx.Dialog):
+    """Egy könyv nevesített könyvjelzői: ugrás vagy törlés. A kiválasztott (ugrás)
+    a `valasztott` mezőben jön vissza, ha OK-val zárták."""
+
+    def __init__(self, parent, store, book_path):
+        super().__init__(parent, title="Könyvjelzők", size=(560, 420))
+        self._store = store
+        self._path = book_path
+        self.valasztott = None
+        p = wx.Panel(self)
+        v = wx.BoxSizer(wx.VERTICAL)
+        v.Add(wx.StaticText(p, label="&Könyvjelzők ehhez a könyvhöz (Enter: "
+                            "ugrás, Delete: törlés):"), 0, wx.ALL, 8)
+        self.lista = wx.ListBox(p)
+        self.lista.SetName("Könyvjelzők")
+        self.lista.Bind(wx.EVT_LISTBOX_DCLICK, lambda e: self._ugras())
+        self.lista.Bind(wx.EVT_KEY_DOWN, self._on_key)
+        v.Add(self.lista, 1, wx.EXPAND | wx.ALL, 8)
+        s = wx.BoxSizer(wx.HORIZONTAL)
+        b_ug = wx.Button(p, wx.ID_OK, label="&Ugrás ide")
+        b_ug.Bind(wx.EVT_BUTTON, lambda e: self._ugras())
+        b_tor = wx.Button(p, label="&Törlés")
+        b_tor.Bind(wx.EVT_BUTTON, lambda e: self._torol())
+        b_be = wx.Button(p, wx.ID_CANCEL, label="&Bezárás")
+        s.Add(b_ug, 0, wx.RIGHT, 6)
+        s.Add(b_tor, 0, wx.RIGHT, 6)
+        s.Add(b_be, 0)
+        v.Add(s, 0, wx.ALL, 8)
+        p.SetSizer(v)
+        self._frissit()
+        wx.CallAfter(self.lista.SetFocus)
+
+    def _frissit(self):
+        self._items = self._store.for_book(self._path)
+        self.lista.Clear()
+        for b in self._items:
+            cimke = (b.label + " – ") if b.label else ""
+            elozetes = (b.preview or "").strip()[:50] or "(nincs előnézet)"
+            self.lista.Append(f"{cimke}{elozetes}")
+        if self._items:
+            self.lista.SetSelection(0)
+
+    def _on_key(self, e):
+        kc = e.GetKeyCode()
+        if kc in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER):
+            self._ugras()
+        elif kc == wx.WXK_DELETE:
+            self._torol()
+        else:
+            e.Skip()
+
+    def _ugras(self):
+        i = self.lista.GetSelection()
+        if 0 <= i < len(self._items):
+            self.valasztott = self._items[i]
+            self.EndModal(wx.ID_OK)
+
+    def _torol(self):
+        i = self.lista.GetSelection()
+        if 0 <= i < len(self._items):
+            b = self._items[i]
+            self._store.remove(b.book, b.created)
+            self._frissit()
+
+
 class ReaderFrame(wx.Frame):
     def __init__(self, main, open_path: str = "", text: str = "", title=""):
         super().__init__(main, title="SuperDL – Könyvolvasó", size=(940, 720))
@@ -132,7 +197,10 @@ class ReaderFrame(wx.Frame):
                 ("&Szünet (Ctrl+szóköz)", lambda e: self._toggle()),
                 ("&Leállítás (Esc)", lambda e: self._stop()),
                 ("Előző &mondat", lambda e: self.engine.skip(-1)),
-                ("&Következő mondat", lambda e: self.engine.skip(1))):
+                ("&Következő mondat", lambda e: self.engine.skip(1)),
+                ("Köny&vjelző ide (Ctrl+B)", lambda e: self._add_bookmark()),
+                ("Könyvj&elzők… (Ctrl+Shift+B)",
+                 lambda e: self._show_bookmarks())):
             b = wx.Button(p, label=label)
             b.Bind(wx.EVT_BUTTON, fn)
             ctl.Add(b, 0, wx.RIGHT, 5)
@@ -182,13 +250,15 @@ class ReaderFrame(wx.Frame):
         p.SetSizer(v)
 
         ids = {k: wx.NewIdRef() for k in
-               ("play", "pause", "stop", "prev", "next", "help")}
+               ("play", "pause", "stop", "prev", "next", "help", "bm", "bmlist")}
         self.Bind(wx.EVT_MENU, lambda e: self._play_resume(), id=ids["play"])
         self.Bind(wx.EVT_MENU, lambda e: self._toggle(), id=ids["pause"])
         self.Bind(wx.EVT_MENU, lambda e: self._stop(), id=ids["stop"])
         self.Bind(wx.EVT_MENU, lambda e: self.engine.skip(-1), id=ids["prev"])
         self.Bind(wx.EVT_MENU, lambda e: self.engine.skip(1), id=ids["next"])
         self.Bind(wx.EVT_MENU, lambda e: self._help(), id=ids["help"])
+        self.Bind(wx.EVT_MENU, lambda e: self._add_bookmark(), id=ids["bm"])
+        self.Bind(wx.EVT_MENU, lambda e: self._show_bookmarks(), id=ids["bmlist"])
         self.SetAcceleratorTable(wx.AcceleratorTable([
             (wx.ACCEL_NORMAL, wx.WXK_F5, ids["play"]),
             (wx.ACCEL_CTRL, wx.WXK_SPACE, ids["pause"]),
@@ -196,6 +266,8 @@ class ReaderFrame(wx.Frame):
             (wx.ACCEL_CTRL, wx.WXK_LEFT, ids["prev"]),
             (wx.ACCEL_CTRL, wx.WXK_RIGHT, ids["next"]),
             (wx.ACCEL_NORMAL, wx.WXK_F1, ids["help"]),
+            (wx.ACCEL_CTRL, ord('B'), ids["bm"]),
+            (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('B'), ids["bmlist"]),
         ]))
 
     def _help(self):
@@ -280,6 +352,7 @@ class ReaderFrame(wx.Frame):
     def _set_book(self, path, text, title):
         if self._closing:
             return
+        elozo_ut = self._path                    # a prompt csak ÚJ könyvnél kell
         self.engine.stop()
         if self.sleep and self.sleep.active():   # új könyv → futó időzítő lemond
             self.sleep.cancel()
@@ -311,6 +384,8 @@ class ReaderFrame(wx.Frame):
             self.SetStatusText(f"„{title}” megnyitva, "
                                f"{self.engine.chunk_count()} mondat. "
                                "Lejátszás: F5.")
+        if path != elozo_ut:
+            wx.CallAfter(self._maybe_prompt_send_to_phone, path, title)
 
     # ---- vezérlés -----------------------------------------------------
 
@@ -460,6 +535,105 @@ class ReaderFrame(wx.Frame):
             pitch=self.pitch_spin.GetValue(),
             pos_char=self.engine.position_char(),
             total_chars=self.engine.total_chars)
+
+    # ---- nevesített, szinkronizálható könyvjelzők ---------------------
+
+    def _bm_store(self):
+        return getattr(self.main, "bookmarks", None)
+
+    def _aktualis_pozicio(self):
+        """A pillanatnyi olvasási hely (karakter). Ha még nem indult a felolvasás,
+        a korábbi folytatási pozíció."""
+        pos = self.engine.position_char() if self.engine.chunk_count() else 0
+        if not pos and self._path:
+            bm = self.lib.get(self._path)
+            if bm:
+                pos = bm.pos_char
+        return max(0, int(pos or 0))
+
+    def _preview_at(self, pos):
+        t = self.text.GetValue()
+        return t[pos:pos + 120].strip()
+
+    def _add_bookmark(self):
+        store = self._bm_store()
+        if store is None or not self._path:
+            self.SetStatusText("Nincs megnyitott könyv, vagy a könyvjelző-tár "
+                               "nem érhető el.")
+            return
+        pos = self._aktualis_pozicio()
+        prev = self._preview_at(pos)
+        store.add(self._path, title=self._title, char=pos, preview=prev)
+        total = max(1, self.engine.total_chars or len(self.text.GetValue()) or 1)
+        self.SetStatusText(
+            f"Könyvjelző elmentve kb. {round(pos / total * 100)}%-nál"
+            + (f": „{prev[:40]}…”" if prev else ".")
+            + " (Az Átjáróban szinkronizálhatod a telefonnal.)")
+
+    def _show_bookmarks(self):
+        store = self._bm_store()
+        if store is None or not self._path:
+            self.SetStatusText("Nincs megnyitott könyv.")
+            return
+        if not store.for_book(self._path):
+            self.SetStatusText("Ehhez a könyvhöz még nincs könyvjelző – tegyél le "
+                               "egyet a Ctrl+B-vel.")
+            return
+        dlg = _BookmarkDialog(self, store, self._path)
+        valasztott = dlg.ShowModal()
+        cel = dlg.valasztott
+        dlg.Destroy()
+        if valasztott == wx.ID_OK and cel is not None:
+            self._jump_bookmark(cel)
+
+    def _jump_bookmark(self, bm):
+        """A könyvjelzőhöz ugrás: ELSŐSORBAN a preview-szöveg alapján keresi meg a
+        helyet (ez eszközök közt is pontos), és csak végszükségből a char-offset."""
+        t = self.text.GetValue()
+        pos = -1
+        kulcs = (bm.preview or "").strip()[:60]
+        if kulcs:
+            pos = t.find(kulcs)
+        if pos < 0:
+            pos = min(max(0, int(bm.char or 0)), max(0, len(t) - 1))
+        self._play_from(pos)
+        total = max(1, len(t))
+        self.SetStatusText(f"Ugrás a könyvjelzőhöz, kb. {round(pos / total * 100)}%.")
+
+    def _maybe_prompt_send_to_phone(self, path, title):
+        """Ha az utolsó telefon-szinkron szerint ez a könyv NINCS a telefonon,
+        felajánlja az átküldést az Átjáróval. Ha még sose szinkronizáltunk
+        (üres a gyorsítótár), nem zavar."""
+        if not path or path.startswith("(beillesztett)"):
+            return
+        try:
+            from modules_src.atjaro.atjaro_mod import atjaro_core as AC
+            tel = AC.telefon_konyvek_betolt()
+        except Exception:
+            return
+        if not tel:                                    # még nem szinkronizáltunk
+            return
+        if os.path.basename(path).lower() in tel:      # már a telefonon van
+            return
+        valasz = wx.MessageBox(
+            f"Ez a könyv („{title}”) az utolsó szinkron szerint nincs a "
+            "telefonodon. Átküldjem az Átjáróval, hogy ott is olvashasd és a "
+            "könyvjelzők összeérjenek?",
+            "Átküldés a telefonra?", wx.YES_NO | wx.ICON_QUESTION, self)
+        if valasz == wx.YES:
+            self._open_atjaro_send(path)
+
+    def _open_atjaro_send(self, path):
+        host = getattr(self.main, "_module_host", None)
+        try:
+            win = host.open_window("atjaro_module") if host else None
+        except Exception:
+            win = None
+        if win is not None and hasattr(win, "konyv_kuldes_elokeszit"):
+            win.konyv_kuldes_elokeszit(path)
+        else:
+            self.SetStatusText("Nyisd meg az Átjárót (Eszközök → Átjáró), és a "
+                               "📖 Könyv küldése gombbal küldd át.")
 
     # ---- könyvtár -----------------------------------------------------
 

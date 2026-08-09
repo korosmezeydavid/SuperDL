@@ -63,6 +63,7 @@ from superdl.ytchannel import ChannelManager
 from superdl.freshvideoswin import FreshVideosDialog, ChannelsDialog
 # A Hírolvasó MOSTANTÓL a „Szervezés" MODULban.
 from superdl.library import Library
+from superdl.bookmarks import BookmarkStore
 # A Könyvolvasó MOSTANTÓL a „Könyvek" MODULban.
 
 try:
@@ -291,6 +292,7 @@ class MainFrame(wx.Frame):
         self.fm = FeedManager()
         self.cm = ChannelManager()
         self.library = Library()
+        self.bookmarks = BookmarkStore()      # nevesített, szinkronizálható könyvjelzők
         self.ai_config = store.load_ai_config()
         self.speaker = VoiceSpeaker()
         self.selfvoice = SelfVoice()        # művelet-bejelentő réteg (M12)

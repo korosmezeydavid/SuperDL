@@ -22,11 +22,11 @@
       "category": "Eszközök",
       "description": "Nagy fájl küldése egy másik gépre felhő nélkül, bemondható kóddal, végpontok közötti titkosítással (magic-wormhole). A küldő is jelzést kap, amikor a fájl megérkezett.",
       "latest": {
-        "version": "1.1.0",
+        "version": "1.1.1",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-p2p-1.1.0/p2p-1.1.0.zip",
-        "sha256": "5bd9225373cbd526c249921e25c1b430b2f9a18bf0fba2a8588a9f87c01461b1",
-        "size": 10217
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-p2p-1.1.1/p2p-1.1.1.zip",
+        "sha256": "a5cf16a3a7e5534ac24f8c0b5ea72bcd11759a1aec5abcd6d99a21c6b9345385",
+        "size": 11454
       }
     },
     {
@@ -63,12 +63,12 @@
       "category": "Könyvek",
       "description": "Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3, választható hanggal és sebességgel).",
       "latest": {
-        "version": "1.1.0",
+        "version": "1.2.0",
         "min_core_api": "1.0",
-        "min_core_version": "4.0.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-konyvek-1.1.0/konyvek-1.1.0.zip",
-        "sha256": "b51f938c5bf575013eecdf7e4b06a686047b6b08561b610573da756ab8eda3c2",
-        "size": 17953
+        "min_core_version": "4.3.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-konyvek-1.2.0/konyvek-1.2.0.zip",
+        "sha256": "1b3a48f3f9f9dc6ca37dd3df69592dcf89ac5e9cf6af6fc37a0a2c6216bd11a7",
+        "size": 29373
       }
     },
     {
@@ -151,6 +151,34 @@
         "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.5.0/jatekok-1.5.0.zip",
         "sha256": "13b209b533583d52e937ab50fc2184069028f2ed1b3c99fc1eb6feae561a0aa0",
         "size": 14711193
+      }
+    },
+    {
+      "id": "atjaro",
+      "name": "Átjáró (telefon)",
+      "category": "Eszközök",
+      "description": "Átjáró a PC és a SuperDL telefon (akadálymentes Android launcher) között, a HELYI WiFi-n. A telefon beépített WiFi-portáljához csatlakozik (a telefon bemond egy címet és egy 4 jegyű PIN-t), és zenét, illetve könyvet küld a telefonra – a zene a telefon Zene mappájába, a könyv a Dokumentumokba, azonnal használhatóan. Semmit nem továbbítunk sehová: a PC közvetlenül a telefonod portáljához kapcsolódik, minden a saját gépeid között marad. Csak a saját telefonodhoz, a saját hálózatodon. Beolvassa a telefon gyógyszer-emlékeztetőit és be is viszi őket a PC Szervezés (naptár) moduljába napi ismétléssel (a meglévőket nem duplázza), és megmutatja, mely könyveidhez van a telefonon olvasási pozíció (jelezve, melyik van meg a PC-n is). Kétirányú könyvjelző-szinkron a Könyvek modullal: a telefon és a PC könyvjelzői összeérnek (fájlnév szerint), és ha egy PC-n olvasott könyv nincs a telefonon, a Könyvolvasó felajánlja az átküldést. A naptár közös Google-fiókkal, a naptár titkos iCal-linkjével magától szinkronizálhat a telefonról a PC Szervezésébe.",
+      "latest": {
+        "version": "1.0.0",
+        "min_core_api": "1.0",
+        "min_core_version": "4.3.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-atjaro-1.0.0/atjaro-1.0.0.zip",
+        "sha256": "ac8cd4cba749e17315c6d7f6fa8f539383ac1ed6db93c3447f60af9290cea30f",
+        "size": 17784
+      }
+    },
+    {
+      "id": "mail",
+      "name": "Super Mail (e-mail)",
+      "category": "Kommunikáció",
+      "description": "Vak-first, teljesen akadálymentes e-mail kliens – kizárólag emailezés: leveleket olvasol, küldesz és keresel (IMAP, POP3, SMTP). Hitelesítés APP-JELSZÓVAL: a valódi fő-jelszavadat sosem adod meg, hanem egy dedikált, csak a Super Mailhez szóló app-jelszót, amit te hozol létre a saját fiókodban és bármikor visszavonhatsz – így az azonosságod és a fiókod végig a te kezedben marad. Bármilyen szolgáltató kézzel is beállítható (Freemail, Citromail, céges, saját domain): a szerver-nevek és a portok felülírhatók. Adatvédelem az első helyen: az első indításkor hozzájárulást kérünk, és világosan közöljük, hogy SEMMIT, DE SEMMIT nem továbbítunk sehová – a program közvetlenül a te e-mail-szolgáltatód szerveréhez csatlakozik, semmi máshoz, a fiók-adatok pedig a te gépeden, a Windows DPAPI-titkosításával élnek. Nincs naptár, nincs telemetria, nincs felhő, nincs külső belépés. A HTML-levelek távoli képei alapból nem töltődnek be (nyomkövetés ellen). Bármikor visszavonható: a fiók törlésével a tárolt app-jelszó véglegesen törlődik. Csak a saját fiókjaidhoz.",
+      "latest": {
+        "version": "1.0.0",
+        "min_core_api": "1.0",
+        "min_core_version": "4.2.7",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mail-1.0.0/mail-1.0.0.zip",
+        "sha256": "b0b5365186ff3a773e138d89bf1571435368e03010c492df79b19f635cb2b020",
+        "size": 33359
       }
     }
   ]

@@ -20,11 +20,16 @@ def _add(core, menu, key, frame_cls, label, help):
 def register(core):
     from .readerwin import ReaderFrame
     from .bookwin import BookFrame
+    from .audiobookwin import AudioBookFrame
 
     menu = core.add_menu("&Könyvek")
     _add(core, menu, "reader_module", ReaderFrame,
          "Könyv&olvasó (élő felolvasás)\tCtrl+Shift+O",
          "Könyv felolvasása a programban, könyvjelzővel (folytatható)")
+    _add(core, menu, "audiobook_player_module", AudioBookFrame,
+         "Hangoskönyv &lejátszó (MP3 / mappa)\tCtrl+Shift+H",
+         "Hangfájl vagy mappa lejátszása hangoskönyvként, idő-könyvjelzővel "
+         "(folytatható, a telefonnal szinkronizálható)")
     _add(core, menu, "audiobook_module", BookFrame,
          "&Hangoskönyv készítő\tCtrl+Shift+B",
          "Könyv (TXT/DOCX/EPUB/PDF) átalakítása MP3 hangoskönyvvé")
