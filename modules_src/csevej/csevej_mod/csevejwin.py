@@ -7,9 +7,55 @@ résztvevő-lista, kilépés). Az érkező üzeneteket és a be-/kilépéseket a
 képernyőolvasó azonnal felolvassa (core.voice), minden vezérlőnek olvasható
 neve van. A hálózati munka háttérszálon fut, a UI-t `wx.CallAfter` frissíti.
 """
+import os
+
 import wx
 
 from .csevejcenter import Csevejszoba, szobakod
+
+_HANG_DIR = os.path.join(os.path.dirname(__file__), "hang")
+
+
+class _Hangok:
+    """Rövid értesítő-hangok (WAV) lejátszása. Elsőként a natív, könnyű
+    `wx.adv.Sound` (nincs ffmpeg-folyamat); ha az nem elérhető, a Core
+    `audioengine.Player`-e a tartalék. Külön példány az érkező és a küldött
+    hangnak, hogy ne vágják el egymást; a Sound-referenciákat megtartjuk (az
+    aszinkron lejátszás alatt élniük kell)."""
+
+    def __init__(self):
+        self._sounds = {}
+        self._players = {}
+
+    def _ut(self, nev):
+        p = os.path.join(_HANG_DIR, nev + ".wav")
+        return p if os.path.isfile(p) else ""
+
+    def jatszd(self, nev):
+        ut = self._ut(nev)
+        if not ut:
+            return
+        try:
+            import wx.adv
+            snd = self._sounds.get(nev)
+            if snd is None:
+                snd = wx.adv.Sound(ut)
+                self._sounds[nev] = snd
+            if snd.IsOk():
+                snd.Play(wx.adv.SOUND_ASYNC)
+                return
+        except Exception:
+            pass
+        # tartalék: a Core audioengine-je (ffmpeg + sounddevice)
+        try:
+            from superdl.audioengine import Player
+            pl = self._players.get(nev)
+            if pl is None:
+                pl = Player()
+                self._players[nev] = pl
+            pl.play(ut, "")
+        except Exception:
+            pass
 
 
 class CsevejFrame(wx.Frame):
@@ -18,6 +64,7 @@ class CsevejFrame(wx.Frame):
         self.core = core
         self.szoba = None                 # aktív Csevejszoba vagy None
         self._kod = ""
+        self._hangok = _Hangok()          # incoming / outgoing értesítő-hangok
 
         self._menusav()
         root = wx.Panel(self)
@@ -297,6 +344,8 @@ class CsevejFrame(wx.Frame):
     def _on_uzenet(self, nev, szoveg, sajat):
         cimke = "Én" if sajat else nev
         self._naplo_sor("%s: %s" % (cimke, szoveg))
+        # értesítő-hang: saját küldés → outgoing, érkező üzenet → incoming
+        self._hangok.jatszd("outgoing" if sajat else "incoming")
         if not sajat:
             self._mond("%s: %s" % (nev, szoveg))
 
