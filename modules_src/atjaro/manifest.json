@@ -1,7 +1,7 @@
 {
   "id": "atjaro",
   "name": "Átjáró (telefon)",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "entry": "atjaro_mod",
   "category": "Eszközök",
   "description": "Átjáró a PC és a SuperDL telefon (akadálymentes Android launcher) között, a HELYI WiFi-n. A telefon beépített WiFi-portáljához csatlakozik (a telefon bemond egy címet és egy 4 jegyű PIN-t), és zenét, illetve könyvet küld a telefonra – a zene a telefon Zene mappájába, a könyv a Dokumentumokba, azonnal használhatóan. Semmit nem továbbítunk sehová: a PC közvetlenül a telefonod portáljához kapcsolódik, minden a saját gépeid között marad. Csak a saját telefonodhoz, a saját hálózatodon. Beolvassa a telefon gyógyszer-emlékeztetőit és be is viszi őket a PC Szervezés (naptár) moduljába napi ismétléssel (a meglévőket nem duplázza), és megmutatja, mely könyveidhez van a telefonon olvasási pozíció (jelezve, melyik van meg a PC-n is). Kétirányú könyvjelző-szinkron a Könyvek modullal: a telefon és a PC könyvjelzői összeérnek (fájlnév szerint), és ha egy PC-n olvasott könyv nincs a telefonon, a Könyvolvasó felajánlja az átküldést. A naptár közös Google-fiókkal, a naptár titkos iCal-linkjével magától szinkronizálhat a telefonról a PC Szervezésébe.",

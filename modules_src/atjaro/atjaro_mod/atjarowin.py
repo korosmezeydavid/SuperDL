@@ -643,9 +643,10 @@ class AtjaroFrame(wx.Frame):
             else:
                 self._kuldes(AC.DEST_KONYV, "", "", utak=[fuggo])
             return
-        # kinyíló választás: egyetlen fájl VAGY egy egész mappa (hangoskönyv)
+        # kinyíló választás: egyetlen fájl VAGY egy egész mappa (hangoskönyv
+        # kötetekkel VAGY több normál könyv együtt)
         valasztek = ["Egyetlen fájl (könyv vagy hangfájl)",
-                     "Egy egész mappa (hangoskönyv – több fájl együtt)"]
+                     "Egy egész mappa (hangoskönyv vagy több normál könyv együtt)"]
         dlg = wx.SingleChoiceDialog(
             self, "Mit küldesz át a telefonra?", "Könyv küldése", valasztek)
         rc = dlg.ShowModal()
@@ -666,8 +667,9 @@ class AtjaroFrame(wx.Frame):
             self._mond("Előbb add meg a telefon IP-címét és a PIN-t.")
             return
         if ut is None:
-            with wx.DirDialog(self, "Hangoskönyv-mappa küldése a telefonra "
-                              "(a mappa minden hangfájlja átmegy)") as dlg:
+            with wx.DirDialog(self, "Könyv-mappa küldése a telefonra (a mappa "
+                              "könyvei ÉS hangfájljai átmennek – hangoskönyv "
+                              "kötetekkel vagy több normál könyv is)") as dlg:
                 if dlg.ShowModal() != wx.ID_OK:
                     return
                 ut = dlg.GetPath()
@@ -675,7 +677,10 @@ class AtjaroFrame(wx.Frame):
         nev = os.path.basename(ut.rstrip("/\\"))
         self._utolso_mf = -1
         self._mond(f"A(z) {nev} mappa küldése a telefonra…")
-        _hatterben(lambda: AC.mappa_kuld(ip, pin, ut, csak_hang=True,
+        # konyv_is=True: nemcsak hangoskönyvet, normál könyveket (epub, txt, pdf,
+        # docx…) is átküld a mappából, a kötet-almappák szerkezetét megőrizve
+        _hatterben(lambda: AC.mappa_kuld(ip, pin, ut, csak_hang=False,
+                                         konyv_is=True,
                                          on_progress=self._kuldes_halad),
                    self._kuldes_kesz, self._hiba)
 

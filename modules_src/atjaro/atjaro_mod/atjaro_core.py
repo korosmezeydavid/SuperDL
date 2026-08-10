@@ -108,6 +108,17 @@ def _fajl_reszek(utak):
 HANG_KITERJESZTESEK = (".mp3", ".m4a", ".m4b", ".aac", ".ogg", ".oga", ".opus",
                        ".wav", ".flac", ".wma", ".mp2", ".mka")
 
+# NORMÁL (szöveges) könyv-kiterjesztések – hogy mappával ne csak hangoskönyvet,
+# hanem sima könyveket is át lehessen küldeni (a felhasználó kérése). PONTOSAN a
+# telefon SuperDL-je által OLVASHATÓ formátumok (BookTextExtractor.SUPPORTED_
+# EXTENSIONS), hogy amit átküldünk, azt a telefon könyv-listája fel is ismerje.
+KONYV_KITERJESZTESEK = (".txt", ".md", ".rtf", ".html", ".htm", ".epub", ".fb2",
+                        ".pdf", ".doc", ".docx", ".odt", ".mobi", ".azw",
+                        ".azw3", ".prc")
+
+# egy könyv-mappából KÜLDHETŐ minden (hangoskönyv-hang ÉS normál könyvfájl)
+KULDHETO_MAPPA_KITERJESZTESEK = tuple(HANG_KITERJESZTESEK) + KONYV_KITERJESZTESEK
+
 
 def feltolt(ip, pin, utak, dest=DEST_ZENE, port=ALAP_PORT, timeout=600, subdir=""):
     """Fájlok feltöltése a telefon adott mappájába a portál /upload route-ján.
@@ -189,13 +200,25 @@ def feltolt_egyenkent(ip, pin, utak, dest=DEST_ZENE, subdir="", port=ALAP_PORT,
     return ok, None
 
 
-def _mappa_fa(mappa_ut, csak_hang=True):
-    """A mappa ÖSSZES fájlja REKURZÍVAN: (teljes_út, relatív_almappa perjelekkel).
-    Így a kötet-almappák (pl. „1. kötet") szerkezete átküldhető és megőrizhető."""
+def _mappa_szuro(csak_hang, konyv_is):
+    """A mappából KÜLDENDŐ kiterjesztések halmaza (kisbetűvel), vagy None = minden
+    fájl. `konyv_is` esetén a hangfájlok MELLETT a normál könyvfájlok is mennek."""
+    if konyv_is:
+        return {e.lower() for e in KULDHETO_MAPPA_KITERJESZTESEK}
+    if csak_hang:
+        return {e.lower() for e in HANG_KITERJESZTESEK}
+    return None
+
+
+def _mappa_fa(mappa_ut, csak_hang=True, konyv_is=False):
+    """A mappa fájljai REKURZÍVAN: (teljes_út, relatív_almappa perjelekkel). Így a
+    kötet-almappák (pl. „1. kötet") szerkezete átküldhető és megőrizhető. A
+    `konyv_is=True` a hangfájlok mellett a normál könyveket is beveszi."""
+    szuro = _mappa_szuro(csak_hang, konyv_is)
     parok = []
     for gyoker, _dirs, fajlok in os.walk(mappa_ut):
         for fn in fajlok:
-            if csak_hang and os.path.splitext(fn)[1].lower() not in HANG_KITERJESZTESEK:
+            if szuro is not None and os.path.splitext(fn)[1].lower() not in szuro:
                 continue
             reldir = os.path.relpath(gyoker, mappa_ut).replace("\\", "/")
             if reldir == ".":
@@ -206,15 +229,19 @@ def _mappa_fa(mappa_ut, csak_hang=True):
 
 
 def mappa_kuld(ip, pin, mappa_ut, dest=DEST_KONYV, port=ALAP_PORT, csak_hang=True,
-               on_progress=None):
+               konyv_is=False, on_progress=None):
     """Egy egész mappa átküldése a telefonra – REKURZÍVAN, a kötet-almappák
     szerkezetét megőrizve (a telefonon a mappa NEVÉVEL kezdődő almappába kerül,
-    az almappákkal együtt). Fájlonként megy, hogy a haladás jelezhető legyen.
-    Visszaad: (darab, hiba|None)."""
+    az almappákkal együtt). `konyv_is=True` esetén nem csak hangoskönyvet, hanem
+    normál könyveket (epub, txt, pdf, docx…) is átküld. Fájlonként megy, hogy a
+    haladás jelezhető legyen. Visszaad: (darab, hiba|None)."""
     mappa_ut = (mappa_ut or "").rstrip("/\\")
     nev = os.path.basename(mappa_ut)
-    parok = _mappa_fa(mappa_ut, csak_hang=csak_hang)
+    parok = _mappa_fa(mappa_ut, csak_hang=csak_hang, konyv_is=konyv_is)
     if not parok:
+        if konyv_is:
+            return 0, ("Ebben a mappában (és almappáiban) nincs küldhető könyv "
+                       "vagy hangfájl.")
         return 0, ("Ebben a mappában (és almappáiban) nincs küldhető hangfájl."
                    if csak_hang else "Ez a mappa üres.")
     n = len(parok)
