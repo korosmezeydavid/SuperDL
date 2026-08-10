@@ -22,8 +22,10 @@ bin/espeak-ng.exe
 bin/libespeak-ng.dll
 bin/espeak-ng-data/
 
-# online jatek: beepitett (kozos) Ably-kulcs � NEM a nyilvanos forrasba
+# online jatek: beepitett (kozos) Ably-kulcs � NEM a nyilvanos forrasba
 modules_src/jatekok/jatekok_mod/ably_kulcs_beepitett.txt
+modules_src/csevej/csevej_mod/ably_kulcs_beepitett.txt
+**/ably_kulcs_beepitett.txt
 **/ably_key.txt
 
 # Super Mail – valódi OAuth kliens-ID-k (a ZIP-be kerülnek, de nem a repóba)

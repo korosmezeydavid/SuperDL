@@ -180,6 +180,20 @@
         "sha256": "2db811e1e340f39df4ed2457a8e875624525d18f3a6866303081475bb92c5c77",
         "size": 70131
       }
+    },
+    {
+      "id": "csevej",
+      "name": "Csevejcenter",
+      "category": "Kommunikáció",
+      "description": "Vak-first, teljesen akadálymentes valós idejű csevegő – gépek között, szoba-kóddal. Nyiss egy szobát (kapsz egy rövid, bemondható kódot, pl. GK7QP), oszd meg a kódot bárkivel, és máris beszélgethettek élőben, írásban. Mindenki látja, ki van a szobában (jelenlét), az érkező üzeneteket a képernyőolvasó azonnal felolvassa, és minden vezérlőnek olvasható neve van. Nem kell hozzá szerver, nem kell semmit beállítani: csak internet. Semmit nem tárolunk sehol – az üzenetek átmennek a szobán és eltűnnek. Ez az alap; hamarosan valós idejű, TÉRBELI (sztereó) hangos konferencia is épül rá, ahol mindenki onnan szól, ahol „ül”. Csak legális, tisztességes használatra.",
+      "latest": {
+        "version": "1.0.0",
+        "min_core_api": "1.0",
+        "min_core_version": "4.2.7",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-csevej-1.0.0/csevej-1.0.0.zip",
+        "sha256": "4ddb5c709d117a2b608b5560ff02c36cff65245f13246d6cdbc5bd59e9b220d4",
+        "size": 10623
+      }
     }
   ]
 }
