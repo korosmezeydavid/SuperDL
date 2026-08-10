@@ -441,13 +441,21 @@ class CsevejFrame(wx.Frame):
         tagok = self.szoba.tagok()
         try:
             if hh and hh.get("ki") in tagok and hh.get("ki") != self.szoba.nev:
-                h.kliens_indit(hh["ip"], hh["port"])
-                self._mond("Élő hang: csatlakoztál. Házigazda: %s. "
+                # KLIENS: a host jelöltjeire csatlakozunk, és hirdetjük a
+                # sajátjainkat, hogy a host is tudjon felénk hole-punchingolni
+                cand = h.kliens_indit(hh["cimek"])
+                self.szoba.hirdet_tag(cand)
+                self._mond("Élő hang: csatlakozás a házigazdához (%s). "
                            "Fejhallgatóban a legjobb!" % hh["ki"])
             else:
-                ip, port = h.host_indit()
-                self._host_cim = (ip, port)
-                self.szoba.hirdet_host(ip, port)
+                # HOST: bejelentjük a jelöltjeinket (LAN + publikus/STUN), és a
+                # már jelentkezett kliensek jelöltjeire elkezdünk punch-olni
+                cand = h.host_indit()
+                self._host_cim = cand
+                self.szoba.hirdet_host(cand)
+                for ki, ccand in self.szoba.hang_tagok().items():
+                    if ki != self.szoba.nev:
+                        h.punch_hozzaad(ccand)
                 self._host_timer = wx.Timer(self)
                 self.Bind(wx.EVT_TIMER, self._host_ujrahirdet, self._host_timer)
                 self._host_timer.Start(5000)
@@ -466,13 +474,20 @@ class CsevejFrame(wx.Frame):
             self._beszed_sync(False)
             return
         self._hang = h
+        # hostként: az élőben belépő új kliensek jelöltjeire is punch-olunk
+        self.szoba.on_hang_tag = lambda ki, cc: wx.CallAfter(self._on_hang_tag, ki, cc)
         self._hang.set_resztvevok(tagok)
         self._beszed_sync(True)
+
+    def _on_hang_tag(self, ki, cimek):
+        if self._hang is not None and getattr(self._hang, "_host", False) \
+                and self.szoba is not None and ki != self.szoba.nev:
+            self._hang.punch_hozzaad(cimek)
 
     def _host_ujrahirdet(self, e):
         if self._hang is not None and self.szoba is not None \
                 and getattr(self, "_host_cim", None):
-            self.szoba.hirdet_host(*self._host_cim)
+            self.szoba.hirdet_host(self._host_cim)
 
     def _beszed_le(self):
         if self._host_timer is not None:

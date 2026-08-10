@@ -32,13 +32,15 @@ class Csevejszoba:
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._sziv_szal = None
-        self._hang_host = None          # {ip, port, ki} – az utolsó hirdetett hang-host
+        self._hang_host = None          # {cimek: [[ip,port],...], ki} – hirdetett host
+        self._hang_tagok = {}           # ki -> [[ip,port],...] – kliensek jelöltjei
         # UI-callbackek (mind opcionális; a UI állítja be)
         self.on_uzenet = None           # (nev: str, szoveg: str, sajat: bool)
         self.on_belepett = None         # (nev: str)
         self.on_kilepett = None         # (nev: str)
         self.on_tagok = None            # (nevek: list[str])  – bármely változáskor
-        self.on_hang_host = None        # (ip, port, ki) – valaki hang-hostot hirdetett
+        self.on_hang_host = None        # (cimek, ki) – valaki hang-hostot hirdetett
+        self.on_hang_tag = None         # (ki, cimek) – egy kliens hirdette a jelöltjeit
 
     # ------------------------------------------------------------------
     def elerheto(self) -> bool:
@@ -62,6 +64,8 @@ class Csevejszoba:
                     self._uzenet(u, elozmeny=True)
                 elif u.get("tipus") == "hang_host":
                     self._hang_host_be(u, ertesit=False)
+                elif u.get("tipus") == "hang_tag":
+                    self._hang_tag_be(u, ertesit=False)
         except Exception:
             pass
         self._ertesit_tagok()
@@ -114,6 +118,9 @@ class Csevejszoba:
                 self._tag_kilep(ki)
         elif tipus == "hang_host":
             self._hang_host_be(u, ertesit=True)
+        elif tipus == "hang_tag":
+            if not sajat:
+                self._hang_tag_be(u, ertesit=True)
 
     def _uzenet(self, u: dict, elozmeny: bool):
         adat = u.get("adat") or {}
@@ -151,28 +158,60 @@ class Csevejszoba:
         if self.on_tagok:
             self.on_tagok(self.tagok())
 
-    # ---- hang-host hirdetés (a valós idejű hanghoz) -------------------
+    # ---- hang-host / hang-tag hirdetés (a valós idejű hanghoz) --------
+    @staticmethod
+    def _cimek_tisztit(adat: dict) -> list:
+        ki = []
+        for c in (adat.get("cimek") or []):
+            try:
+                ip = str(c[0]).strip()
+                port = int(c[1])
+                if ip and port:
+                    ki.append([ip, port])
+            except Exception:
+                pass
+        return ki
+
     def _hang_host_be(self, u: dict, ertesit: bool):
-        adat = u.get("adat") or {}
-        ip = str(adat.get("ip", "")).strip()
-        port = int(adat.get("port", 0) or 0)
+        cimek = self._cimek_tisztit(u.get("adat") or {})
         ki = u.get("ki") or ""
-        if not ip or not port:
+        if not cimek:
             return
-        self._hang_host = {"ip": ip, "port": port, "ki": ki}
+        self._hang_host = {"cimek": cimek, "ki": ki}
         if ertesit and self.on_hang_host:
-            self.on_hang_host(ip, port, ki)
+            self.on_hang_host(cimek, ki)
+
+    def _hang_tag_be(self, u: dict, ertesit: bool):
+        cimek = self._cimek_tisztit(u.get("adat") or {})
+        ki = u.get("ki") or ""
+        if not ki or not cimek:
+            return
+        self._hang_tagok[ki] = cimek
+        if ertesit and self.on_hang_tag:
+            self.on_hang_tag(ki, cimek)
 
     def hang_host(self):
-        """Az utolsó ismert hang-host {ip, port, ki} vagy None. A hívó a
-        jelenléttel (tagok) egészítheti ki, hogy él-e még."""
+        """Az utolsó ismert hang-host {cimek, ki} vagy None. A hívó a jelenléttel
+        (tagok) egészítheti ki, hogy él-e még."""
         return dict(self._hang_host) if self._hang_host else None
 
-    def hirdet_host(self, ip: str, port: int):
-        """Hostként bejelentjük a szobában a hang-címünket (a többiek ehhez
-        csatlakoznak). Ismételt hívással frissíthető (késői belépőknek)."""
+    def hang_tagok(self) -> dict:
+        """A kliensek eddig hirdetett jelöltjei {ki: cimek}."""
+        return dict(self._hang_tagok)
+
+    def hirdet_host(self, cimek):
+        """Hostként bejelentjük a szobában a hang-VÉGPONT-jelöltjeinket (LAN +
+        publikus). Ismételt hívással frissíthető (késői belépőknek)."""
         try:
-            self.net.kuld("hang_host", {"ip": ip, "port": int(port)})
+            self.net.kuld("hang_host", {"cimek": list(cimek)})
+        except Exception:
+            pass
+
+    def hirdet_tag(self, cimek):
+        """Kliensként bejelentjük a jelöltjeinket, hogy a host felénk is tudjon
+        hole-punch hello-t küldeni."""
+        try:
+            self.net.kuld("hang_tag", {"cimek": list(cimek)})
         except Exception:
             pass
 

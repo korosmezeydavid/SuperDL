@@ -1,32 +1,36 @@
 # -*- coding: utf-8 -*-
-"""Csevejcenter – valós idejű HANG-ÁTVITEL a helyi hálón (host-modell).
+"""Csevejcenter – valós idejű HANG-ÁTVITEL, HELYI hálón ÉS interneten át.
 
-Nulla VPS, nulla fizetés: egy résztvevő a HOST (bindol egy UDP-portot), a
-többiek hozzá küldik a mikrofon-kockáikat, a host pedig TOVÁBBÍTJA (nem keveri!)
-minden másiknak – így mindenki a SAJÁT gépén keveri térben (`terhang.Kevero`).
-A host LAN-címét a szoba Ably-csatornája hirdeti (a `netroom` intézi), tehát a
-felhasználónak nem kell IP-t beírnia.
+Host-modell, fizetős szerver NÉLKÜL. Egy résztvevő a HOST (UDP-port), a többiek
+hozzá küldik a mikrofon-kockáikat, a host TOVÁBBÍTJA (nem keveri) minden
+másiknak → mindenki a SAJÁT gépén kever térben (`terhang.Kevero`).
 
-Csomag: [1 bájt névhossz][név utf8][PCM16 mono kocka]. A „hello” (üres PCM) a
-jelenlét/cím-tanuláshoz és a tűzfal-leképezés életben tartásához kell.
+A felek a szoba Ably-csatornáján kicserélik a VÉGPONT-JELÖLTJEIKET:
+  • LAN-cím (ugyanazon a WiFi-n működik, kis késleltetés),
+  • PUBLIKUS cím (STUN-nal megtudva, interneten át).
+Majd UDP HOLE-PUNCHINGgal (mindketten küldenek a másik jelöltjeire) átlyukasztják
+a routereket. „Cone” NAT-nál (a legtöbb otthoni router) ez működik; a ritka
+„szimmetrikus” NAT-hoz TURN kellene (későbbi, opcionális).
 
-Csak beépített modulok: socket, threading, struct nélkül. A tényleges hang a
-`terhang.TerbeliHang` (sounddevice+numpy). Internetes (NAT-átfúró) változat
-később, aiortc-vel – az Core-buildbe tartozik.
+Csomag: [1B névhossz][név utf8][PCM16 mono]. Üres PCM = hello (hole-punch +
+cím-tanulás + keepalive). Csak beépített socket+struct+numpy+sounddevice.
 """
 import socket
 import threading
 import time
 
+from . import stun
 from .terhang import TerbeliHang, ulesek
 
-_HELLO_KOZ = 2.0        # keepalive/hello küldés köze (mp)
-_ALAP_PORT = 47690      # alapértelmezett UDP-port a hang-hosthoz
+_HELLO_GYORS = 0.4      # hole-punch alatt sűrű hello (mp)
+_HELLO_LASSU = 2.0      # utána keepalive (mp)
+_GYORS_DB = 30          # ennyi gyors hello után lassul (kb. 12 mp)
+_ALAP_PORT = 47690      # a host preferált UDP-portja
+_TAG_LEJAR = 15.0       # néma kliens kiejtése (host)
 
 
 def lan_ip() -> str:
-    """A gép LAN-IP-je (nem 127.0.0.1). UDP-t „connectelünk” egy külső címhez –
-    nem küld semmit, csak a kimenő interfészt választja ki."""
+    """A gép LAN-IP-je (nem 127.0.0.1)."""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         s.connect(("8.8.8.8", 80))
@@ -50,102 +54,132 @@ def _bont(p: bytes):
 
 
 class HangHalozat:
-    """A hang hálózati rétege. Vagy HOST (bind+továbbít), vagy KLIENS (a hosthoz
-    küld+fogad). Mindkettő a `TerbeliHang`-ot használja: a saját mikrofon-kockát
-    kiküldi, a fogadottakat a térbeli keverőbe teszi."""
+    """A hang hálózati rétege (host vagy kliens). LAN + internet (STUN + hole-
+    punch). A saját mikrofon-kockát kiküldi, a fogadottakat a térbeli keverőbe
+    teszi. A saját VÉGPONT-JELÖLTJEIT a `cimek` adja (a hívó a szobában hirdeti)."""
 
     def __init__(self, sajat_nev: str):
         self.nev = sajat_nev
         self.th = TerbeliHang()
         self._sock = None
         self._host = False
-        self._host_addr = None          # kliensként: (ip, port)
-        self._klienesk: dict = {}       # hostként: addr -> (nev, utolso_ido)
         self._lock = threading.Lock()
         self._stop = threading.Event()
-        self._szalak = []
+        self._punch = set()             # (ip,port) végpontok, amikre hello-t küldünk
+        self._klienesk = {}             # HOST: megerősített kliens addr -> (nev, ido)
+        self._host_addr = None          # KLIENS: a megerősített host-cím
+        self.cimek = []                 # a SAJÁT jelöltjeim [(ip,port),...]
 
     def elerheto(self) -> bool:
         return self.th.elerheto()
 
-    # ---- indítás hostként / kliensként --------------------------------
-    def host_indit(self, port: int = _ALAP_PORT):
-        """HOST: UDP-port bindolása, fogadó- és keepalive-szál, mikrofon-indítás.
-        Visszaad: (ip, port). Ha a port foglalt, a következőket is próbálja."""
+    # ---- bind + STUN --------------------------------------------------
+    def _bind_stun(self, port: int) -> list:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         utolso = None
-        for p in range(port, port + 8):
-            try:
-                s.bind(("", p))
-                port = p
-                break
-            except OSError as e:
-                utolso = e
+        if port:
+            for p in range(port, port + 8):
+                try:
+                    s.bind(("", p)); port = p; break
+                except OSError as e:
+                    utolso = e
+            else:
+                raise RuntimeError("Nem sikerült UDP-portot foglalni: %s" % utolso)
         else:
-            raise RuntimeError("Nem sikerült UDP-portot foglalni: %s" % utolso)
+            s.bind(("", 0))
+        helyi_port = s.getsockname()[1]
+        jeloltek = [(lan_ip(), helyi_port)]
+        pub = None
+        try:
+            pub = stun.publikus_cim(s)          # a saját socketen (leképezés-tartás)
+        except Exception:
+            pub = None
+        if pub and tuple(pub) not in jeloltek:
+            jeloltek.append((pub[0], int(pub[1])))
         s.setblocking(False)
         self._sock = s
+        self.cimek = jeloltek
+        return jeloltek
+
+    # ---- indítás ------------------------------------------------------
+    def host_indit(self, port: int = _ALAP_PORT) -> list:
+        cand = self._bind_stun(port)
         self._host = True
         self.th.indit(self._host_kimeno)
-        self._szal(self._host_fogado)
-        return lan_ip(), port
+        self._szal(self._fogado)
+        self._szal(self._punch_loop)
+        return cand
 
-    def kliens_indit(self, host_ip: str, host_port: int):
-        """KLIENS: a hosthoz köt, elindítja a mikrofon-küldést, a fogadást és a
-        rendszeres hello-t (hogy a host megtanulja a címünket)."""
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.bind(("", 0))
-        s.setblocking(False)
-        self._sock = s
+    def kliens_indit(self, host_cimek) -> list:
+        cand = self._bind_stun(0)
         self._host = False
-        self._host_addr = (host_ip, int(host_port))
+        self.punch_hozzaad(host_cimek)
         self.th.indit(self._kliens_kimeno)
-        self._szal(self._kliens_fogado)
-        self._szal(self._hello_loop)
+        self._szal(self._fogado)
+        self._szal(self._punch_loop)
+        return cand
 
-    # ---- kimenő mikrofon-kockák ---------------------------------------
+    def punch_hozzaad(self, cimek):
+        """Új végpont-jelöltek, amikre hole-punch hello-t küldünk (a host a
+        kliensek jelöltjeit, a kliens a hostét)."""
+        with self._lock:
+            for c in cimek or []:
+                try:
+                    self._punch.add((str(c[0]), int(c[1])))
+                except Exception:
+                    pass
+
+    # ---- kimenő mikrofon ---------------------------------------------
     def _host_kimeno(self, pcm: bytes):
-        # a host saját hangját minden kliensnek továbbítjuk (magának nem)
-        self._szor(_csomag(self.nev, pcm))
+        self._szor(_csomag(self.nev, pcm))          # host hangja minden kliensnek
 
     def _kliens_kimeno(self, pcm: bytes):
-        self._kuld(_csomag(self.nev, pcm), self._host_addr)
+        cs = _csomag(self.nev, pcm)
+        if self._host_addr is not None:             # megerősített út
+            self._kuld(cs, self._host_addr)
+        else:                                       # még punch alatt: minden jelöltre
+            with self._lock:
+                celok = list(self._punch)
+            for a in celok:
+                self._kuld(cs, a)
 
-    # ---- fogadó ciklusok ----------------------------------------------
-    def _host_fogado(self):
+    # ---- fogadó (közös) ----------------------------------------------
+    def _fogado(self):
         while not self._stop.is_set():
             try:
                 data, addr = self._sock.recvfrom(4096)
             except (BlockingIOError, socket.timeout):
-                time.sleep(0.005); continue
+                time.sleep(0.004); continue
             except OSError:
                 break
             nev, pcm = _bont(data)
             if not nev:
                 continue
+            if self._host:
+                with self._lock:
+                    self._klienesk[addr] = (nev, time.time())
+                if pcm:
+                    self.th.fogad(nev, pcm)
+                    self._szor(data, kiveve=addr)   # továbbítás a többi kliensnek
+            else:
+                if self._host_addr is None:         # az első hosttól jövő csomag rögzíti az utat
+                    self._host_addr = addr
+                if pcm:
+                    self.th.fogad(nev, pcm)
+
+    def _punch_loop(self):
+        n = 0
+        while not self._stop.wait(_HELLO_GYORS if n < _GYORS_DB else _HELLO_LASSU):
+            n += 1
+            hello = _csomag(self.nev, b"")
             with self._lock:
-                self._klienesk[addr] = (nev, time.time())
-            if pcm:                          # tényleges hang → keverőbe + továbbítás
-                self.th.fogad(nev, pcm)
-                self._szor(data, kiveve=addr)
+                celok = list(self._punch)
+            for a in celok:
+                self._kuld(hello, a)
+            if self._host:                          # a néma klienseket kiejtjük
+                self._takarit()
 
-    def _kliens_fogado(self):
-        while not self._stop.is_set():
-            try:
-                data, addr = self._sock.recvfrom(4096)
-            except (BlockingIOError, socket.timeout):
-                time.sleep(0.005); continue
-            except OSError:
-                break
-            nev, pcm = _bont(data)
-            if nev and pcm:
-                self.th.fogad(nev, pcm)
-
-    def _hello_loop(self):
-        while not self._stop.wait(_HELLO_KOZ):
-            self._kuld(_csomag(self.nev, b""), self._host_addr)   # üres = hello
-
-    # ---- küldés-segédek -----------------------------------------------
+    # ---- küldés-segédek ----------------------------------------------
     def _kuld(self, data: bytes, addr):
         if addr is None or self._sock is None:
             return
@@ -155,22 +189,22 @@ class HangHalozat:
             pass
 
     def _szor(self, data: bytes, kiveve=None):
-        """Hostként: a csomag szétküldése minden ismert kliensnek (kivéve a
-        feladót). A régóta néma klienseket kiejtjük."""
+        with self._lock:
+            celok = [a for a in self._klienesk if a != kiveve]
+        for a in celok:
+            self._kuld(data, a)
+
+    def _takarit(self):
         most = time.time()
         with self._lock:
-            for addr in list(self._klienesk):
-                nev, ido = self._klienesk[addr]
-                if most - ido > 15.0:
-                    del self._klienesk[addr]
+            for a in list(self._klienesk):
+                nev, ido = self._klienesk[a]
+                if most - ido > _TAG_LEJAR:
+                    del self._klienesk[a]
                     self.th.elenged(nev)
-                    continue
-                if addr != kiveve:
-                    self._kuld(data, addr)
 
-    # ---- ülések (térbeli pozíciók) + némítás --------------------------
+    # ---- ülések + némítás --------------------------------------------
     def set_resztvevok(self, nevek):
-        """A résztvevőkhöz térbeli pozíciók (a sajátot nem halljuk vissza)."""
         masok = [n for n in nevek if n and n != self.nev]
         self.th.set_ulesek(ulesek(masok))
 
@@ -178,9 +212,7 @@ class HangHalozat:
         self.th.nemit(ertek)
 
     def _szal(self, cel):
-        t = threading.Thread(target=cel, daemon=True)
-        t.start()
-        self._szalak.append(t)
+        threading.Thread(target=cel, daemon=True).start()
 
     def leallit(self):
         self._stop.set()
