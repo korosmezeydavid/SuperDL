@@ -231,8 +231,8 @@ class OnlinePanel(wx.Panel):
         self.g_porget = wx.Button(self, label="&Pörgetés")
         self.g_porget.Bind(wx.EVT_BUTTON, lambda e: self._akcio("porget"))
         akc.Add(self.g_porget, 0, wx.RIGHT, 4)
-        self.g_betu = wx.Button(self, label="Be&tű")
-        self.g_betu.Bind(wx.EVT_BUTTON, lambda e: self._akcio("betu", self.be.GetValue()))
+        self.g_betu = wx.Button(self, label="Be&tű / magánhangzó")
+        self.g_betu.Bind(wx.EVT_BUTTON, lambda e: self._betu_okos(self.be.GetValue()))
         akc.Add(self.g_betu, 0, wx.RIGHT, 4)
         self.g_mgh = wx.Button(self, label="M&agánhangzó")
         self.g_mgh.Bind(wx.EVT_BUTTON, lambda e: self._akcio("maganhangzo", self.be.GetValue()))
@@ -254,6 +254,26 @@ class OnlinePanel(wx.Panel):
         self.tabla_mezo.SetName("Megfejtendő sor")
         v.Add(self.tabla_mezo, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
 
+        # ---- CSEVEGÉS a játékosok között (indítás előtt és szünetben is) ----
+        # A szoba Ably-csatornáján megy, a HOST-tól függetlenül – bárki írhat,
+        # mindenki látja/hallja. „Várunk még valakit?", „10 perc, itt a futár" stb.
+        v.Add(wx.StaticText(self, label="&Csevegés a játékosokkal:"),
+              0, wx.LEFT | wx.TOP, 8)
+        self.chat_atirat = wx.TextCtrl(
+            self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
+            size=(-1, 64))
+        self.chat_atirat.SetName("Csevegés a játékosokkal")
+        v.Add(self.chat_atirat, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
+        csor = wx.BoxSizer(wx.HORIZONTAL)
+        self.chat_be = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.chat_be.SetName("Írj a többieknek, Enter a küldés")
+        self.chat_be.Bind(wx.EVT_TEXT_ENTER, lambda e: self._chat_kuld())
+        csor.Add(self.chat_be, 1, wx.RIGHT, 6)
+        self.chat_gomb = wx.Button(self, label="Kül&dés")
+        self.chat_gomb.Bind(wx.EVT_BUTTON, lambda e: self._chat_kuld())
+        csor.Add(self.chat_gomb, 0)
+        v.Add(csor, 0, wx.EXPAND | wx.ALL, 8)
+
         # Forró billentyűk, amelyek a fókusztól függetlenül működnek a panelen
         # (a puszta Alt+betű mnemonikok nem mindig sülnek el a képernyőolvasóval).
         self._ID_PORGET = wx.NewIdRef()
@@ -263,7 +283,7 @@ class OnlinePanel(wx.Panel):
         self.Bind(wx.EVT_MENU, lambda e: self._akcio("porget"),
                   id=self._ID_PORGET)
         self.Bind(wx.EVT_MENU,
-                  lambda e: self._akcio("betu", self.be.GetValue()),
+                  lambda e: self._betu_okos(self.be.GetValue()),
                   id=self._ID_BETU)
         self.Bind(wx.EVT_MENU,
                   lambda e: self._akcio("maganhangzo", self.be.GetValue()),
@@ -291,6 +311,16 @@ class OnlinePanel(wx.Panel):
                 self._akcio("betu", t)
         elif t:
             self._akcio("megfejt", t)
+
+    def _betu_okos(self, ertek):
+        """A fő „Betű" gomb legyen elnéző: ha MAGÁNHANGZÓT írsz be, azt VESZI
+        (nem utasítja el), mássalhangzónál pedig sima betű-mondás. Így az online
+        módban is természetesen lehet magánhangzót mondani."""
+        t = (ertek or "").strip().lower()
+        if len(t) == 1 and t.isalpha() and SZK._szk_maganhangzo(t):
+            self._akcio("maganhangzo", t)
+        else:
+            self._akcio("betu", ertek)
 
     def _alap_nev(self):
         try:
@@ -396,6 +426,29 @@ class OnlinePanel(wx.Panel):
                     self._szoba.kuld("allapot", allap)
         elif tipus == "allapot":
             self._render(adat)
+        elif tipus == "csevej":
+            self._chat_fogad(ki, adat)
+
+    def _chat_kuld(self):
+        t = (self.chat_be.GetValue() or "").strip()
+        if not t or not self._szoba:
+            return
+        self._szoba.kuld("csevej", {"szoveg": t})
+        self.chat_be.SetValue("")
+        self.chat_be.SetFocus()
+
+    def _chat_fogad(self, ki, adat):
+        szoveg = (adat.get("szoveg") or "").strip()
+        if not szoveg:
+            return
+        sajat = (ki == self._nev)
+        cimke = "Te" if sajat else (ki or "Valaki")
+        try:
+            self.chat_atirat.AppendText(f"{cimke}: {szoveg}\n")
+        except Exception:
+            pass
+        if not sajat:                       # a sajátot már látom, nem olvastatom fel
+            self._mondd(f"{ki} üzenete: {szoveg}")
 
     def _render(self, a):
         self._fazis = a.get("fazis", "jatek")
