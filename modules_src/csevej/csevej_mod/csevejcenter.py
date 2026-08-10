@@ -32,11 +32,13 @@ class Csevejszoba:
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._sziv_szal = None
+        self._hang_host = None          # {ip, port, ki} – az utolsó hirdetett hang-host
         # UI-callbackek (mind opcionális; a UI állítja be)
         self.on_uzenet = None           # (nev: str, szoveg: str, sajat: bool)
         self.on_belepett = None         # (nev: str)
         self.on_kilepett = None         # (nev: str)
         self.on_tagok = None            # (nevek: list[str])  – bármely változáskor
+        self.on_hang_host = None        # (ip, port, ki) – valaki hang-hostot hirdetett
 
     # ------------------------------------------------------------------
     def elerheto(self) -> bool:
@@ -52,12 +54,14 @@ class Csevejszoba:
         # magunkat rögtön a tagok közé vesszük (a saját szívverésünk is frissíti)
         with self._lock:
             self._tagok[self.nev] = time.time()
-        # 1) ELŐZMÉNY – csak a korábbi CSEVEGÉST hozzuk be némán (jelenlétet nem;
-        #    a régi szívverések nem jelentenek élő jelenlétet)
+        # 1) ELŐZMÉNY – a korábbi CSEVEGÉST némán behozzuk (jelenlétet nem; a régi
+        #    szívverések nem élő jelenlét), és megjegyezzük az utolsó hang-hostot
         try:
             for u in self.net.uj_uzenetek():
                 if u.get("tipus") == "uzenet":
                     self._uzenet(u, elozmeny=True)
+                elif u.get("tipus") == "hang_host":
+                    self._hang_host_be(u, ertesit=False)
         except Exception:
             pass
         self._ertesit_tagok()
@@ -108,6 +112,8 @@ class Csevejszoba:
         elif tipus == "kilep":
             if not sajat:
                 self._tag_kilep(ki)
+        elif tipus == "hang_host":
+            self._hang_host_be(u, ertesit=True)
 
     def _uzenet(self, u: dict, elozmeny: bool):
         adat = u.get("adat") or {}
@@ -144,6 +150,31 @@ class Csevejszoba:
     def _ertesit_tagok(self):
         if self.on_tagok:
             self.on_tagok(self.tagok())
+
+    # ---- hang-host hirdetés (a valós idejű hanghoz) -------------------
+    def _hang_host_be(self, u: dict, ertesit: bool):
+        adat = u.get("adat") or {}
+        ip = str(adat.get("ip", "")).strip()
+        port = int(adat.get("port", 0) or 0)
+        ki = u.get("ki") or ""
+        if not ip or not port:
+            return
+        self._hang_host = {"ip": ip, "port": port, "ki": ki}
+        if ertesit and self.on_hang_host:
+            self.on_hang_host(ip, port, ki)
+
+    def hang_host(self):
+        """Az utolsó ismert hang-host {ip, port, ki} vagy None. A hívó a
+        jelenléttel (tagok) egészítheti ki, hogy él-e még."""
+        return dict(self._hang_host) if self._hang_host else None
+
+    def hirdet_host(self, ip: str, port: int):
+        """Hostként bejelentjük a szobában a hang-címünket (a többiek ehhez
+        csatlakoznak). Ismételt hívással frissíthető (késői belépőknek)."""
+        try:
+            self.net.kuld("hang_host", {"ip": ip, "port": int(port)})
+        except Exception:
+            pass
 
     def _sziv_loop(self):
         """Periodikus szívverés + a lejárt (néma) tagok kiszűrése."""

@@ -65,6 +65,8 @@ class CsevejFrame(wx.Frame):
         self.szoba = None                 # aktív Csevejszoba vagy None
         self._kod = ""
         self._hangok = _Hangok()          # incoming / outgoing értesítő-hangok
+        self._hang = None                 # HangHalozat, ha az élő hang be van kapcsolva
+        self._host_timer = None           # hostként a cím ismételt hirdetése
 
         self._menusav()
         root = wx.Panel(self)
@@ -102,6 +104,9 @@ class CsevejFrame(wx.Frame):
         mi_bezar = m.Append(wx.ID_ANY, "Ablak be&zárása\tCtrl+W")
         mb.Append(m, "&Szoba")
         hg = wx.Menu()
+        self._mi_beszed = hg.Append(wx.ID_ANY, "&Beszéd – élő hang be/ki\tF4",
+                                    kind=wx.ITEM_CHECK)
+        hg.AppendSeparator()
         mi_demo = hg.Append(wx.ID_ANY, "&Térhang bemutató (körbejáró hang)\tF6")
         mb.Append(hg, "&Hang")
         h = wx.Menu()
@@ -109,6 +114,7 @@ class CsevejFrame(wx.Frame):
         mb.Append(h, "&Súgó")
         self.SetMenuBar(mb)
         self.Bind(wx.EVT_MENU, lambda e: self._terhang_bemutato(), mi_demo)
+        self.Bind(wx.EVT_MENU, lambda e: self._beszed_valt(), self._mi_beszed)
         self.Bind(wx.EVT_MENU, lambda e: self._uj_szoba(), self._mi_uj)
         self.Bind(wx.EVT_MENU, lambda e: self._fokusz_kod(), self._mi_csat)
         self.Bind(wx.EVT_MENU, lambda e: self._kod_masolas(), self._mi_kod)
@@ -271,6 +277,10 @@ class CsevejFrame(wx.Frame):
         kuld = wx.Button(p, label="&Küldés")
         kuld.Bind(wx.EVT_BUTTON, lambda e: self._kuld())
         also.Add(kuld, 0, wx.RIGHT, 6)
+        self._beszed_gomb = wx.ToggleButton(p, label="&Beszéd (élő hang)")
+        self._beszed_gomb.SetName("Élő hang be- és kikapcsolása")
+        self._beszed_gomb.Bind(wx.EVT_TOGGLEBUTTON, lambda e: self._beszed_valt())
+        also.Add(self._beszed_gomb, 0, wx.RIGHT, 6)
         ki = wx.Button(p, label="Ki&lépés")
         ki.Bind(wx.EVT_BUTTON, lambda e: self._kilep_szoba())
         also.Add(ki, 0)
@@ -331,6 +341,8 @@ class CsevejFrame(wx.Frame):
     def _kilep_szoba(self):
         if not self.szoba:
             return
+        if self._hang is not None:
+            self._beszed_le()
         try:
             self.szoba.kilep()
         except Exception:
@@ -363,6 +375,11 @@ class CsevejFrame(wx.Frame):
 
     def _on_tagok(self, nevek):
         self._taglista.Set(nevek)
+        if self._hang is not None:           # a térbeli ülések frissítése
+            try:
+                self._hang.set_resztvevok(nevek)
+            except Exception:
+                pass
 
     def _naplo_sor(self, szoveg):
         if self._naplo.GetValue():
@@ -403,6 +420,86 @@ class CsevejFrame(wx.Frame):
                           "van-e hangkimenet (fejhallgató/hangszóró)." % ex,
                           "Térhang bemutató", wx.OK | wx.ICON_INFORMATION, self)
 
+    # ---- élő hang (helyi háló, host-modell) ---------------------------
+    def _beszed_valt(self):
+        if not self.szoba:
+            self._beszed_sync(False)
+            return
+        if self._hang is not None:           # már megy → kikapcsolás
+            self._beszed_le()
+            return
+        from .lanhang import HangHalozat
+        h = HangHalozat(self.szoba.nev)
+        if not h.elerheto():
+            wx.MessageBox(
+                "Az élő hanghoz mikrofon és hangkimenet kell. A hangeszköz nem "
+                "érhető el ezen a gépen.", "Élő hang",
+                wx.OK | wx.ICON_WARNING, self)
+            self._beszed_sync(False)
+            return
+        hh = self.szoba.hang_host()
+        tagok = self.szoba.tagok()
+        try:
+            if hh and hh.get("ki") in tagok and hh.get("ki") != self.szoba.nev:
+                h.kliens_indit(hh["ip"], hh["port"])
+                self._mond("Élő hang: csatlakoztál. Házigazda: %s. "
+                           "Fejhallgatóban a legjobb!" % hh["ki"])
+            else:
+                ip, port = h.host_indit()
+                self._host_cim = (ip, port)
+                self.szoba.hirdet_host(ip, port)
+                self._host_timer = wx.Timer(self)
+                self.Bind(wx.EVT_TIMER, self._host_ujrahirdet, self._host_timer)
+                self._host_timer.Start(5000)
+                self._mond("Élő hang elindult – te vagy a házigazda. A többiek "
+                           "a Beszéd gombbal csatlakoznak. Fejhallgatóban a legjobb!")
+        except Exception as ex:
+            wx.MessageBox(
+                "Az élő hang nem indult: %s\n\nHa a Windows tűzfal rákérdez, "
+                "engedélyezd a SuperDL-t a HELYI hálón. A résztvevőknek ugyanazon "
+                "a WiFi-n/hálón kell lenniük." % ex,
+                "Élő hang", wx.OK | wx.ICON_ERROR, self)
+            try:
+                h.leallit()
+            except Exception:
+                pass
+            self._beszed_sync(False)
+            return
+        self._hang = h
+        self._hang.set_resztvevok(tagok)
+        self._beszed_sync(True)
+
+    def _host_ujrahirdet(self, e):
+        if self._hang is not None and self.szoba is not None \
+                and getattr(self, "_host_cim", None):
+            self.szoba.hirdet_host(*self._host_cim)
+
+    def _beszed_le(self):
+        if self._host_timer is not None:
+            try:
+                self._host_timer.Stop()
+            except Exception:
+                pass
+            self._host_timer = None
+        if self._hang is not None:
+            try:
+                self._hang.leallit()
+            except Exception:
+                pass
+            self._hang = None
+        self._mond("Élő hang kikapcsolva.")
+        self._beszed_sync(False)
+
+    def _beszed_sync(self, be):
+        try:
+            self._beszed_gomb.SetValue(bool(be))
+        except Exception:
+            pass
+        try:
+            self._mi_beszed.Check(bool(be))
+        except Exception:
+            pass
+
     def _fokusz_bevitel(self):
         if self.szoba:
             self._bevitel.SetFocus()
@@ -416,6 +513,11 @@ class CsevejFrame(wx.Frame):
                 pass
 
     def _on_close(self, e):
+        if self._hang is not None:
+            try:
+                self._beszed_le()
+            except Exception:
+                pass
         if self.szoba:
             try:
                 self.szoba.kilep()
