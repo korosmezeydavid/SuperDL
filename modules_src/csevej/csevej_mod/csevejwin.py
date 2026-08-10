@@ -101,10 +101,14 @@ class CsevejFrame(wx.Frame):
         m.AppendSeparator()
         mi_bezar = m.Append(wx.ID_ANY, "Ablak be&zárása\tCtrl+W")
         mb.Append(m, "&Szoba")
+        hg = wx.Menu()
+        mi_demo = hg.Append(wx.ID_ANY, "&Térhang bemutató (körbejáró hang)\tF6")
+        mb.Append(hg, "&Hang")
         h = wx.Menu()
         mi_sugo = h.Append(wx.ID_ANY, "&Súgó\tF1")
         mb.Append(h, "&Súgó")
         self.SetMenuBar(mb)
+        self.Bind(wx.EVT_MENU, lambda e: self._terhang_bemutato(), mi_demo)
         self.Bind(wx.EVT_MENU, lambda e: self._uj_szoba(), self._mi_uj)
         self.Bind(wx.EVT_MENU, lambda e: self._fokusz_kod(), self._mi_csat)
         self.Bind(wx.EVT_MENU, lambda e: self._kod_masolas(), self._mi_kod)
@@ -383,6 +387,21 @@ class CsevejFrame(wx.Frame):
             self._mond("A szobában: " + ", ".join(nevek))
         else:
             self._mond("Rajtad kívül még senki nincs a szobában.")
+
+    def _terhang_bemutato(self):
+        """A térbeli hang ÉLMÉNY-bemutatója (hálózat nélkül): egy hang körbejár
+        a fejed körül – ez mutatja, hogy a konferenciában mindenki onnan szól
+        majd, ahol „ül”. Fejhallgatóban a legjobb!"""
+        self._mond("Térhang bemutató: egy hang most körbejár a fejed körül. "
+                   "Fejhallgatóban hallod a legjobban.")
+        try:
+            import sounddevice as sd
+            from .terhang import bemutato_jel, FS
+            sd.play(bemutato_jel(6.0), FS)
+        except Exception as ex:
+            wx.MessageBox("A hang-bemutató nem indult: %s\n\nEllenőrizd, hogy "
+                          "van-e hangkimenet (fejhallgató/hangszóró)." % ex,
+                          "Térhang bemutató", wx.OK | wx.ICON_INFORMATION, self)
 
     def _fokusz_bevitel(self):
         if self.szoba:
