@@ -173,6 +173,7 @@ class OnlinePanel(wx.Panel):
         self._jatekosok = []
         self._soron = ""
         self._fazis = "lobbi"
+        self._hang_player = None
         self._build()
         wx.CallAfter(self._start_ellenoriz)
 
@@ -189,6 +190,7 @@ class OnlinePanel(wx.Panel):
         self.nev_mezo.SetName("A neved")
         sor.Add(self.nev_mezo, 1)
         v.Add(sor, 0, wx.EXPAND | wx.ALL, 8)
+        self._sor_nev = sor
 
         lob = wx.BoxSizer(wx.HORIZONTAL)
         self.uj_gomb = wx.Button(self, label="Ú&j szoba (én szervezem)")
@@ -210,6 +212,7 @@ class OnlinePanel(wx.Panel):
         self.indit_gomb.Disable()
         lob.Add(self.indit_gomb, 0)
         v.Add(lob, 0, wx.ALL, 8)
+        self._sor_lob = lob
 
         self.atirat = wx.TextCtrl(
             self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2)
@@ -276,6 +279,7 @@ class OnlinePanel(wx.Panel):
         ]))
 
         self._akciok_engedely(False)
+        self._v = v
         self.SetSizer(v)
 
     def _enter_akcio(self, e):
@@ -396,6 +400,10 @@ class OnlinePanel(wx.Panel):
     def _render(self, a):
         self._fazis = a.get("fazis", "jatek")
         self._soron = a.get("soron", "")
+        # játék közben a lobbi (név, Új szoba, kód, Csatlakozás, Indítás) eltűnik
+        self._lobbi_lathato(self._fazis != "jatek")
+        # esemény-hang (pörgetés, csőd, passz, jó/rossz betű, megfejtés, vége)
+        self._hang_esemeny(a.get("uzenet", ""), self._fazis)
         pont = a.get("bank", {})
         pont_szoveg = ", ".join(f"{n}: {pont.get(n, 0)}"
                                 for n in a.get("jatekosok", []))
@@ -419,6 +427,60 @@ class OnlinePanel(wx.Panel):
         if enyem:
             self._mondd("TE JÖSSZ! Pörgess, mondj betűt, vegyél magánhangzót, "
                         "vagy fejts meg!")
+
+    def _lobbi_lathato(self, latszik):
+        """Játék közben (fazis=jatek) a lobbi elrejtve → tiszta játékfelület; a
+        vége/lobbi fázisban visszajön (új szoba/játék indítható)."""
+        try:
+            self._v.Show(self._sor_nev, latszik, recursive=True)
+            self._v.Show(self._sor_lob, latszik, recursive=True)
+            self._v.Layout()
+        except Exception:
+            pass
+
+    def _hang(self, nev):
+        """Egy Szerencsekerék-effekt lejátszása a szerencsekerek_hang mappából."""
+        try:
+            import os
+            from superdl.audioengine import Player
+            mappa = os.path.join(os.path.dirname(__file__), "szerencsekerek_hang")
+            ut = None
+            for ext in (".wav", ".mp3"):
+                p = os.path.join(mappa, nev + ext)
+                if os.path.isfile(p):
+                    ut = p
+                    break
+            if not ut:
+                return
+            if self._hang_player is None:
+                self._hang_player = Player()
+            self._hang_player.play(ut, "")
+        except Exception:
+            pass
+
+    def _hang_esemeny(self, uzenet, fazis):
+        """Az állapot-üzenet alapján a megfelelő effekt (a HELYI móddal azonos
+        hangvilág az online játékban is)."""
+        u = uzenet or ""
+        nev = None
+        if fazis == "vege":
+            nev = "jatek_vege"
+        elif "CSŐD" in u:
+            nev = "csod"
+        elif "PASSZ" in u:
+            nev = "passz"
+        elif "pörgetett:" in u:
+            nev = "kerekporges"
+        elif "MEGFEJTETTE" in u:
+            nev = "megfejtes_siker"
+        elif "nincs a rejtvényben" in u or "megfejtése nem jó" in u:
+            nev = "sikertelen_tipp"
+        elif "vett egy" in u and "magánhangzó" in u:
+            nev = "maganhangzo_vasarlas"
+        elif "-szer" in u and "forint" in u:
+            nev = "sikeres_tipp"
+        if nev:
+            self._hang(nev)
 
     def _akcio(self, tipus, ertek=None):
         if not self._szoba or self._fazis != "jatek":
