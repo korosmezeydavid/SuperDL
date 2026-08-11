@@ -7,6 +7,7 @@ import importlib
 
 import pytest
 
+pytest.importorskip("wx")            # a blackjack_online a UI-panel miatt wx-et importál
 BASE = "modules_src.jatekok.jatekok_mod"
 BJ = importlib.import_module(BASE + ".blackjack_online")
 

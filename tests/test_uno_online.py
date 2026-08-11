@@ -7,6 +7,9 @@ játszanak végig a „vege" fázisig."""
 import importlib
 import random
 
+import pytest
+
+pytest.importorskip("wx")            # az uno_online a UI-panel miatt wx-et importál
 BASE = "modules_src.jatekok.jatekok_mod"
 UO = importlib.import_module(BASE + ".uno_online")
 SZK = importlib.import_module(BASE + ".jatekok.sajat")

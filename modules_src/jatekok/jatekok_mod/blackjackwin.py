@@ -80,41 +80,52 @@ class BlackjackAblak(wx.Dialog):
         wx.CallAfter(self._uj_leosztas)
 
     def _build(self):
+        nb = wx.Notebook(self)
+        helyi = wx.Panel(nb)
         v = wx.BoxSizer(wx.VERTICAL)
-        v.Add(wx.StaticText(self, label=(
+        v.Add(wx.StaticText(helyi, label=(
             "Blackjack az osztó ellen: kerülj 21-hez közel túllépés nélkül! "
             "Lapot kérek (H), Megállok (M), Duplázás (D). Súgó: F1.")),
             0, wx.ALL, 8)
 
-        self._allapot = wx.TextCtrl(self, style=wx.TE_READONLY)
+        self._allapot = wx.TextCtrl(helyi, style=wx.TE_READONLY)
         self._allapot.SetName("A lapjaid, az összeg, az osztó lapja és a zsetonjaid")
         v.Add(self._allapot, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
 
         sor = wx.BoxSizer(wx.HORIZONTAL)
-        self._g_hit = wx.Button(self, label="&Lapot kérek")
+        self._g_hit = wx.Button(helyi, label="&Lapot kérek")
         self._g_hit.Bind(wx.EVT_BUTTON, lambda e: self._hit())
         sor.Add(self._g_hit, 0, wx.RIGHT, 6)
-        self._g_stand = wx.Button(self, label="&Megállok")
+        self._g_stand = wx.Button(helyi, label="&Megállok")
         self._g_stand.Bind(wx.EVT_BUTTON, lambda e: self._stand())
         sor.Add(self._g_stand, 0, wx.RIGHT, 6)
-        self._g_dupla = wx.Button(self, label="&Duplázás")
+        self._g_dupla = wx.Button(helyi, label="&Duplázás")
         self._g_dupla.Bind(wx.EVT_BUTTON, lambda e: self._dupla())
         sor.Add(self._g_dupla, 0, wx.RIGHT, 6)
-        self._g_uj = wx.Button(self, label="Ú&j leosztás")
+        self._g_uj = wx.Button(helyi, label="Ú&j leosztás")
         self._g_uj.Bind(wx.EVT_BUTTON, lambda e: self._uj_leosztas())
         sor.Add(self._g_uj, 0, wx.RIGHT, 6)
-        g_zar = wx.Button(self, label="Be&zárás")
+        g_zar = wx.Button(helyi, label="Be&zárás")
         g_zar.Bind(wx.EVT_BUTTON, lambda e: self.Close())
         sor.Add(g_zar, 0)
         v.Add(sor, 0, wx.ALL, 8)
 
-        v.Add(wx.StaticText(self, label="&Játék menete:"), 0, wx.LEFT, 8)
+        v.Add(wx.StaticText(helyi, label="&Játék menete:"), 0, wx.LEFT, 8)
         self._naplo = wx.TextCtrl(
-            self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
+            helyi, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
             size=(-1, 200))
         self._naplo.SetName("A játék menete, csak olvasható")
         v.Add(self._naplo, 1, wx.EXPAND | wx.ALL, 8)
-        self.SetSizer(v)
+        helyi.SetSizer(v)
+
+        nb.AddPage(helyi, "Helyben – osztó ellen")
+        from .blackjack_online import BlackjackOnlinePanel
+        self._online = BlackjackOnlinePanel(nb, self.main)
+        nb.AddPage(self._online, "Online – közös osztó ellen!")
+        self._nb = nb
+        s = wx.BoxSizer(wx.VERTICAL)
+        s.Add(nb, 1, wx.EXPAND | wx.ALL, 6)
+        self.SetSizer(s)
 
     # --- hang + felolvasás ---
     def _hang(self, nev):
@@ -306,24 +317,42 @@ class BlackjackAblak(wx.Dialog):
 
     def _on_key(self, e):
         k = e.GetKeyCode()
-        ch = chr(k).lower() if 32 < k < 256 else ""
         if k == wx.WXK_F1:
+            online = False
+            try:
+                online = (self._nb.GetSelection() == 1)
+            except Exception:
+                pass
+            if online:
+                from .blackjack_online import BJ_ONLINE_SUGO
+                cim, szoveg = "Súgó – Blackjack online", BJ_ONLINE_SUGO
+            else:
+                cim, szoveg = "Súgó – Blackjack", self._SUGO
             try:
                 from superdl.helpdialog import show_help
-                show_help(self, "Súgó – Blackjack", self._SUGO)
+                show_help(self, cim, szoveg)
             except Exception:
-                wx.MessageBox(self._SUGO, "Súgó – Blackjack",
-                              wx.OK | wx.ICON_INFORMATION, self)
-        elif ch == "h" and self._g_hit.IsEnabled():
-            self._hit()
-        elif ch == "m" and self._g_stand.IsEnabled():
-            self._stand()
-        elif ch == "d" and self._g_dupla.IsEnabled():
-            self._dupla()
-        elif ch == "j":
-            self._uj_leosztas()
-        elif k == wx.WXK_ESCAPE:
+                wx.MessageBox(szoveg, cim, wx.OK | wx.ICON_INFORMATION, self)
+            return
+        if k == wx.WXK_ESCAPE:
             self.Close()
+            return
+        # A H/M/D/J gyorsbillentyűk CSAK a helyi fülön hatnak – különben az
+        # online fül csevegő-mezőjébe gépelt betűket nyelnék el helyi lépésként.
+        helyi = True
+        try:
+            helyi = (self._nb.GetSelection() == 0)
+        except Exception:
+            pass
+        ch = chr(k).lower() if 32 < k < 256 else ""
+        if helyi and ch == "h" and self._g_hit.IsEnabled():
+            self._hit()
+        elif helyi and ch == "m" and self._g_stand.IsEnabled():
+            self._stand()
+        elif helyi and ch == "d" and self._g_dupla.IsEnabled():
+            self._dupla()
+        elif helyi and ch == "j":
+            self._uj_leosztas()
         else:
             e.Skip()
 
@@ -332,6 +361,11 @@ class BlackjackAblak(wx.Dialog):
         try:
             if self._player is not None:
                 self._player.stop()
+        except Exception:
+            pass
+        try:
+            if getattr(self, "_online", None):
+                self._online.leallit()
         except Exception:
             pass
         e.Skip()
