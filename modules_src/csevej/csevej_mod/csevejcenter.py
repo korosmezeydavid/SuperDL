@@ -46,6 +46,8 @@ class Csevejszoba:
         self._sajat_pan = 0.0           # a SAJÁT választott helyem a térben
         self.on_kirugva = None          # () – az admin kirúgott a szobából
         self.on_nemitva = None          # (be) – az admin némított/feloldott
+        self.on_zene_engedely = None    # (be) – a host tagoknak is engedte a zenét
+        self._zene_engedelyezett = False
 
     # ------------------------------------------------------------------
     def elerheto(self) -> bool:
@@ -73,6 +75,8 @@ class Csevejszoba:
                     self._hang_tag_be(u, ertesit=False)
                 elif u.get("tipus") == "hely":
                     self._hely_be(u, ertesit=False)
+                elif u.get("tipus") == "zene_engedely":
+                    self._zene_engedelyezett = bool((u.get("adat") or {}).get("be"))
         except Exception:
             pass
         self._ertesit_tagok()
@@ -139,6 +143,10 @@ class Csevejszoba:
             adat = u.get("adat") or {}
             if str(adat.get("nev") or "") == self.nev and self.on_nemitva:
                 self.on_nemitva(bool(adat.get("be")))
+        elif tipus == "zene_engedely":
+            self._zene_engedelyezett = bool((u.get("adat") or {}).get("be"))
+            if self.on_zene_engedely:
+                self.on_zene_engedely(self._zene_engedelyezett)
 
     def _uzenet(self, u: dict, elozmeny: bool):
         adat = u.get("adat") or {}
@@ -288,6 +296,18 @@ class Csevejszoba:
             self.net.kuld("nemit", {"nev": nev, "be": bool(be)})
         except Exception:
             pass
+
+    def hirdet_zene_engedely(self, be: bool):
+        """Hostként engedélyezem (vagy visszavonom), hogy a TAGOK is tölthessenek
+        közös zenét. A host mindig tölthet."""
+        self._zene_engedelyezett = bool(be)
+        try:
+            self.net.kuld("zene_engedely", {"be": bool(be)})
+        except Exception:
+            pass
+
+    def zene_engedelyezett(self) -> bool:
+        return self._zene_engedelyezett
 
     def _sziv_loop(self):
         """Periodikus szívverés + a lejárt (néma) tagok kiszűrése."""

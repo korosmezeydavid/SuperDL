@@ -67,6 +67,7 @@ class CsevejFrame(wx.Frame):
         self._hangok = _Hangok()          # incoming / outgoing értesítő-hangok
         self._hang = None                 # HangHalozat, ha az élő hang be van kapcsolva
         self._host_timer = None           # hostként a cím ismételt hirdetése
+        self._zene = None                 # Zenelejatszo, ha közös zene megy
 
         self._menusav()
         root = wx.Panel(self)
@@ -111,6 +112,11 @@ class CsevejFrame(wx.Frame):
         mi_nemit = hg.Append(wx.ID_ANY, "Admin: résztvevő &némítása vagy feloldása…")
         mi_kirug = hg.Append(wx.ID_ANY, "Admin: résztvevő &kirúgása…")
         hg.AppendSeparator()
+        mi_zene = hg.Append(wx.ID_ANY, "Közös &zene betöltése…\tCtrl+Z")
+        mi_zene_ki = hg.Append(wx.ID_ANY, "Közös zene &leállítása")
+        self._mi_zene_eng = hg.Append(
+            wx.ID_ANY, "Admin: a tagok is tölthetnek zenét", kind=wx.ITEM_CHECK)
+        hg.AppendSeparator()
         mi_demo = hg.Append(wx.ID_ANY, "&Térhang bemutató (körbejáró hang)\tF6")
         mb.Append(hg, "&Hang")
         h = wx.Menu()
@@ -121,6 +127,9 @@ class CsevejFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, lambda e: self._hely_valaszt(), mi_hely)
         self.Bind(wx.EVT_MENU, lambda e: self._admin_nemit(), mi_nemit)
         self.Bind(wx.EVT_MENU, lambda e: self._admin_kirug(), mi_kirug)
+        self.Bind(wx.EVT_MENU, lambda e: self._zene_betolt(), mi_zene)
+        self.Bind(wx.EVT_MENU, lambda e: self._zene_leallit(), mi_zene_ki)
+        self.Bind(wx.EVT_MENU, lambda e: self._zene_engedely_valt(), self._mi_zene_eng)
         self.Bind(wx.EVT_MENU, lambda e: self._beszed_valt(), self._mi_beszed)
         self.Bind(wx.EVT_MENU, lambda e: self._uj_szoba(), self._mi_uj)
         self.Bind(wx.EVT_MENU, lambda e: self._fokusz_kod(), self._mi_csat)
@@ -477,6 +486,70 @@ class CsevejFrame(wx.Frame):
         self._mond("A házigazda némított – téged most nem hallanak."
                    if be else "A házigazda feloldotta a némításodat.")
 
+    # --- közös zene ---------------------------------------------------
+    def _zene_betolt(self):
+        if self._hang is None:
+            self._mond("Előbb kapcsold be az élő hangot (Beszéd), hogy legyen "
+                       "kinek szólnia a közös zenének.")
+            return
+        if not self._hang.is_host() and not (
+                self.szoba and self.szoba.zene_engedelyezett()):
+            self._mond("Közös zenét csak a házigazda tölthet be. A házigazda a "
+                       "menüből engedélyezheti a tagoknak is.")
+            return
+        with wx.FileDialog(
+                self, "Közös zene kiválasztása (mindenki ezt fogja hallani)",
+                wildcard=("Hang (*.mp3;*.wav;*.m4a;*.flac;*.ogg;*.opus)|"
+                          "*.mp3;*.wav;*.m4a;*.flac;*.ogg;*.opus|Minden fájl|*.*"),
+                style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as dlg:
+            if dlg.ShowModal() != wx.ID_OK:
+                return
+            ut = dlg.GetPath()
+        from .zenelejatszo import Zenelejatszo
+        z = Zenelejatszo(
+            on_kocka=lambda pcm: self._hang and self._hang.zene_kocka(pcm),
+            on_vege=lambda: wx.CallAfter(self._zene_veget_ert))
+        if not z.elerheto():
+            self._mond("A közös zenéhez az ffmpeg kell, ami most nem érhető el.")
+            return
+        self._zene_leallit()               # ha már ment egy, azt előbb leállítjuk
+        try:
+            z.indit(ut)
+        except Exception as ex:
+            self._mond("A közös zene nem indult: %s" % ex)
+            return
+        self._zene = z
+        self.SetStatusText("Közös zene megy: %s" % os.path.basename(ut))
+        self._mond("Közös zene elindult – mindenki hallja a szobában. "
+                   "Leállítás: Közös zene leállítása.")
+
+    def _zene_leallit(self):
+        if self._zene is not None:
+            z = self._zene
+            self._zene = None
+            try:
+                z.leallit()
+            except Exception:
+                pass
+            self._mond("Közös zene leállítva.")
+
+    def _zene_veget_ert(self):
+        if self._zene is not None:
+            self._zene = None
+            self._mond("A közös zene véget ért.")
+
+    def _zene_engedely_valt(self):
+        if self.szoba is None:
+            return
+        if self._hang is None or not self._hang.is_host():
+            self._mond("A közös zene engedélyét csak a házigazda állíthatja.")
+            self._mi_zene_eng.Check(self.szoba.zene_engedelyezett())
+            return
+        be = self._mi_zene_eng.IsChecked()
+        self.szoba.hirdet_zene_engedely(be)
+        self._mond("Mostantól a tagok is tölthetnek közös zenét."
+                   if be else "A tagok közös-zene betöltése kikapcsolva.")
+
     def _naplo_sor(self, szoveg):
         if self._naplo.GetValue():
             self._naplo.AppendText("\n")
@@ -586,6 +659,7 @@ class CsevejFrame(wx.Frame):
             self.szoba.hirdet_host(self._host_cim)
 
     def _beszed_le(self):
+        self._zene_leallit()               # a hang nélkül nincs kinek szólni a zene
         if self._host_timer is not None:
             try:
                 self._host_timer.Stop()
@@ -624,6 +698,10 @@ class CsevejFrame(wx.Frame):
                 pass
 
     def _on_close(self, e):
+        try:
+            self._zene_leallit()
+        except Exception:
+            pass
         if self._hang is not None:
             try:
                 self._beszed_le()

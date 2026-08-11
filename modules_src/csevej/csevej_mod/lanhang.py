@@ -41,6 +41,9 @@ def lan_ip() -> str:
         s.close()
 
 
+_ZENE_NEV = "🎵 Zene"        # a közös zene KÜLÖN forrásként (nem résztvevő)
+
+
 def _csomag(nev: str, pcm: bytes) -> bytes:
     nb = nev.encode("utf-8")[:255]
     return bytes([len(nb)]) + nb + pcm
@@ -158,6 +161,11 @@ class HangHalozat:
             if not nev:
                 continue
             if self._host:
+                if nev == _ZENE_NEV:                # közös zene: nem résztvevő –
+                    if pcm:                          # csak lejátsszuk + továbbítjuk
+                        self.th.fogad(nev, pcm)
+                        self._szor(data, kiveve=addr)
+                    continue
                 with self._lock:
                     tiltott = nev in self._tiltott
                     nemitott = nev in self._nemitott
@@ -255,6 +263,18 @@ class HangHalozat:
     def felold_tilt(self, nev: str):
         with self._lock:
             self._tiltott.discard(nev)
+
+    # ---- közös zene --------------------------------------------------
+    def zene_kocka(self, pcm: bytes):
+        """Egy közös-zene kockát szétküld a szobában, és helyben is lejátszik.
+        Hostként minden kliensnek megy; kliensként a hostnak (ő továbbítja a
+        többinek). A „🎵 Zene” mindenki keverőjében középen szól."""
+        cs = _csomag(_ZENE_NEV, pcm)
+        if self._host:
+            self._szor(cs)
+        elif self._host_addr is not None:
+            self._kuld(cs, self._host_addr)
+        self.th.fogad(_ZENE_NEV, pcm)
 
     def nemit(self, ertek: bool):
         self.th.nemit(ertek)
