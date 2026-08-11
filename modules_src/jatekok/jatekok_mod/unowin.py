@@ -61,6 +61,7 @@ class UnoAblak(wx.Dialog):
         self._closing = False
         self._player = None
         self._huztal = False        # ebben a körben már húztál-e (a passzhoz)
+        self._jatekosszam = 4       # 2 (te + 1 gép) vagy 4 (te + 3 gép)
         self._build()
         self.Bind(wx.EVT_CHAR_HOOK, self._on_key)
         self.Bind(wx.EVT_CLOSE, self._on_close)
@@ -70,9 +71,10 @@ class UnoAblak(wx.Dialog):
     def _build(self):
         v = wx.BoxSizer(wx.VERTICAL)
         v.Add(wx.StaticText(self, label=(
-            "UNO – te és három játékos. Fel/le nyíllal lépkedsz a lapjaidon "
-            "(a rakhatók jelölve), Enter vagy Kirakás: leteszed; Húzás: húzol. "
-            "Súgó: F1.")), 0, wx.ALL, 8)
+            "UNO – te és a gépi ellenfelek (2 vagy 4 fő, új játékkor "
+            "választhatsz). Fel/le nyíllal lépkedsz a lapjaidon (a rakhatók "
+            "jelölve), Enter vagy Kirakás: leteszed; Húzás: húzol. Súgó: F1.")),
+            0, wx.ALL, 8)
 
         self._felso = wx.TextCtrl(self, style=wx.TE_READONLY)
         self._felso.SetName("A felső lap és a soron lévő játékos")
@@ -135,13 +137,15 @@ class UnoAblak(wx.Dialog):
 
     # --------------------------------------------------------------- játék
     def _uj_jatek(self):
-        self.nevek = SJ._ellenfelek(3)
+        self._jatekosszam = self._jatekosszam_kerdes()
+        self.nevek = SJ._ellenfelek(self._jatekosszam - 1)
         self.nevlista = {0: "Te"}
         for i, n in enumerate(self.nevek, 1):
             self.nevlista[i] = n
         self.pakli = SJ._uno_pakli()
         self.dobo = []
-        self.kezek = {i: [self.pakli.pop() for _ in range(7)] for i in range(4)}
+        self.kezek = {i: [self.pakli.pop() for _ in range(7)]
+                      for i in range(self._jatekosszam)}
         while True:
             top = self.pakli.pop()
             if top[0] != "szín" and top[1] not in ("kihagy", "irany", "+2"):
@@ -229,7 +233,7 @@ class UnoAblak(wx.Dialog):
         if self._huztal:
             self._mondd("Már húztál ebben a körben – passzolsz.")
             self._huztal = False
-            self._lep_tovabb(SJ._uno_kov(0, self.irany, 4))
+            self._lep_tovabb(SJ._uno_kov(0, self.irany, self._jatekosszam))
             return
         self._huz(0, 1)
         self._huztal = True
@@ -243,7 +247,7 @@ class UnoAblak(wx.Dialog):
         else:
             self._mondd("Húztál: %s – nem rakható. Passzolsz." % SJ._uno_nev(uj))
             self._huztal = False
-            self._lep_tovabb(SJ._uno_kov(0, self.irany, 4))
+            self._lep_tovabb(SJ._uno_kov(0, self.irany, self._jatekosszam))
 
     # ---- egy lap letétele (bárki) + hatások ----
     def _letesz(self, aktiv, kartya):
@@ -277,16 +281,16 @@ class UnoAblak(wx.Dialog):
             self._veg()
             return
 
-        kov = SJ._uno_kov(aktiv, self.irany, 4)
+        kov = SJ._uno_kov(aktiv, self.irany, self._jatekosszam)
         ertek = kartya[1]
         # hatások
         if ertek == "irany":
             self.irany *= -1
             self._mondd("Irányváltó! Megfordul a kör.")
-            kov = SJ._uno_kov(aktiv, self.irany, 4)
+            kov = SJ._uno_kov(aktiv, self.irany, self._jatekosszam)
         elif ertek == "kihagy":
             kihagyott = kov
-            kov = SJ._uno_kov(kov, self.irany, 4)
+            kov = SJ._uno_kov(kov, self.irany, self._jatekosszam)
             self._mondd("%s kimarad ebből a körből." % self.nevlista[kihagyott])
             self._beszol_ha_gep(aktiv, kihagyott, _BESZOL_TAMAD)
         elif ertek == "+2":
@@ -295,14 +299,14 @@ class UnoAblak(wx.Dialog):
             if kov == 0:
                 self._hang("boo")
             self._beszol_ha_gep(aktiv, kov, _BESZOL_TAMAD)
-            kov = SJ._uno_kov(kov, self.irany, 4)
+            kov = SJ._uno_kov(kov, self.irany, self._jatekosszam)
         elif ertek == "+4":
             self._huz(kov, 4)
             self._mondd("%s húz NÉGY lapot és kimarad!" % self.nevlista[kov])
             if kov == 0:
                 self._hang("boo")
             self._beszol_ha_gep(aktiv, kov, _BESZOL_TAMAD)
-            kov = SJ._uno_kov(kov, self.irany, 4)
+            kov = SJ._uno_kov(kov, self.irany, self._jatekosszam)
 
         self._lep_tovabb(kov)
 
@@ -333,7 +337,7 @@ class UnoAblak(wx.Dialog):
                     self._mondd(random.choice(_BESZOL_HUZ).format(n=self.nevlista[aktiv]))
                 else:
                     self._mondd("%s húz és passzol." % self.nevlista[aktiv])
-                self._lep_tovabb(SJ._uno_kov(aktiv, self.irany, 4))
+                self._lep_tovabb(SJ._uno_kov(aktiv, self.irany, self._jatekosszam))
                 return
         if random.random() < 0.25:
             self._mondd(random.choice(_BESZOL_ALT).format(n=self.nevlista[aktiv]))
@@ -353,6 +357,18 @@ class UnoAblak(wx.Dialog):
                         "visszavágsz!" % self.nevlista[self.gyoztes])
             self._hang("ooo")
         wx.CallLater(400, lambda: self._mondd("Új játékhoz: Új játék gomb."))
+
+    # ---- játékos-szám (helyi játék: 2 vagy 4) ----
+    def _jatekosszam_kerdes(self):
+        valasztek = ["2 játékos (te és 1 gép)", "4 játékos (te és 3 gép)"]
+        dlg = wx.SingleChoiceDialog(self, "Hány játékos legyen?",
+                                    "UNO – játékosok", valasztek)
+        dlg.SetSelection(1 if self._jatekosszam == 4 else 0)
+        szam = self._jatekosszam
+        if dlg.ShowModal() == wx.ID_OK:
+            szam = 4 if dlg.GetSelection() == 1 else 2
+        dlg.Destroy()
+        return szam
 
     # ---- szín-kérdés (wild) ----
     def _szin_kerdes(self):
