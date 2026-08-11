@@ -139,3 +139,22 @@ def test_csevej_atmegy():
     ir._on_allapot = lambda k, a: kapott.update({k: a})
     seg.csevej_kuld("Szia, segítek!")
     assert kapott.get("csevej", {}).get("szoveg") == "Szia, segítek!"
+
+
+# ----------------------- irányító-oldali elkapás (wx→VK) -----------------------
+def test_wx_vk_leekepezes():
+    wx = pytest_importorskip_wx()
+    EK = importlib.import_module(BASE + ".elkapas")
+    assert EK.wx_vk(wx.WXK_RETURN) == 0x0D
+    assert EK.wx_vk(wx.WXK_ESCAPE) == 0x1B
+    assert EK.wx_vk(wx.WXK_LEFT) == 0x25 and EK.wx_vk(wx.WXK_DOWN) == 0x28
+    assert EK.wx_vk(wx.WXK_INSERT) == 0x2D          # képernyőolvasó-módosító
+    assert EK.wx_vk(wx.WXK_CONTROL) == 0x11
+    assert EK.wx_vk(wx.WXK_F1) == 0x70 and EK.wx_vk(wx.WXK_F12) == 0x7B
+    assert EK.wx_vk(ord("A")) == 0x41 and EK.wx_vk(ord("9")) == 0x39
+    assert EK.wx_vk(9999) is None
+
+
+def pytest_importorskip_wx():
+    import pytest
+    return pytest.importorskip("wx")
