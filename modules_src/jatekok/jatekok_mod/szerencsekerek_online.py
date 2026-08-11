@@ -241,6 +241,7 @@ class OnlinePanel(wx.Panel):
         self.g_megfejt.Bind(wx.EVT_BUTTON, lambda e: self._akcio("megfejt", self.be.GetValue()))
         akc.Add(self.g_megfejt, 0)
         v.Add(akc, 0, wx.ALL, 8)
+        self._akc_sizer = akc
 
         # Kategória + megfejtendő sor – MINDIG a panel alján, külön, csak-olvasható
         # mezőkben, hogy hallás után ne kelljen felfelé nyilazni és szavanként
@@ -257,8 +258,8 @@ class OnlinePanel(wx.Panel):
         # ---- CSEVEGÉS a játékosok között (indítás előtt és szünetben is) ----
         # A szoba Ably-csatornáján megy, a HOST-tól függetlenül – bárki írhat,
         # mindenki látja/hallja. „Várunk még valakit?", „10 perc, itt a futár" stb.
-        v.Add(wx.StaticText(self, label="&Csevegés a játékosokkal:"),
-              0, wx.LEFT | wx.TOP, 8)
+        self._chat_label = wx.StaticText(self, label="&Csevegés a játékosokkal:")
+        v.Add(self._chat_label, 0, wx.LEFT | wx.TOP, 8)
         self.chat_atirat = wx.TextCtrl(
             self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
             size=(-1, 64))
@@ -273,6 +274,7 @@ class OnlinePanel(wx.Panel):
         self.chat_gomb.Bind(wx.EVT_BUTTON, lambda e: self._chat_kuld())
         csor.Add(self.chat_gomb, 0)
         v.Add(csor, 0, wx.EXPAND | wx.ALL, 8)
+        self._csor_sizer = csor
 
         # Forró billentyűk, amelyek a fókusztól függetlenül működnek a panelen
         # (a puszta Alt+betű mnemonikok nem mindig sülnek el a képernyőolvasóval).
@@ -300,7 +302,13 @@ class OnlinePanel(wx.Panel):
 
         self._akciok_engedely(False)
         self._v = v
+        # a JÁTÉK- és CHAT-részek csak akkor látszódjanak, ha már szobában vagy –
+        # üres lobbiban feleslegesen zsúfolnák a felületet
+        self._jatek_widgetek = [self.atirat, self._chat_label, self.chat_atirat,
+                                self.kat_mezo, self.tabla_mezo]
+        self._jatek_sizerek = [self._akc_sizer, self._csor_sizer]
         self.SetSizer(v)
+        self._szoba_reszek_lathato(False)
 
     def _enter_akcio(self, e):
         t = (self.be.GetValue() or "").strip()
@@ -345,6 +353,7 @@ class OnlinePanel(wx.Panel):
         self._host = True
         self._jatekosok = [self._nev]
         self._szoba.figyel(self._uzenet_jott)
+        self._szoba_reszek_lathato(True)      # mostantól van értelme a chatnek/játéktérnek
         self.kod_mezo.SetValue(kod)
         self.uj_gomb.Disable()
         self.csat_gomb.Disable()
@@ -380,6 +389,7 @@ class OnlinePanel(wx.Panel):
             return
         self._host = False
         self._szoba.figyel(self._uzenet_jott)
+        self._szoba_reszek_lathato(True)      # mostantól van értelme a chatnek/játéktérnek
         self._szoba.kuld("csatlakozott", {"nev": self._nev})
         self.uj_gomb.Disable()
         self.csat_gomb.Disable()
@@ -480,6 +490,18 @@ class OnlinePanel(wx.Panel):
         if enyem:
             self._mondd("TE JÖSSZ! Pörgess, mondj betűt, vegyél magánhangzót, "
                         "vagy fejts meg!")
+
+    def _szoba_reszek_lathato(self, latszik):
+        """A játéktér (átirat, akciók, kategória, tábla) és a CHAT csak akkor
+        látszódjon, ha már beléptél egy szobába – üres lobbiban ne zsúfoljon."""
+        try:
+            for w in self._jatek_widgetek:
+                w.Show(latszik)
+            for s in self._jatek_sizerek:
+                self._v.Show(s, latszik, recursive=True)
+            self._v.Layout()
+        except Exception:
+            pass
 
     def _lobbi_lathato(self, latszik):
         """Játék közben (fazis=jatek) a lobbi elrejtve → tiszta játékfelület; a
