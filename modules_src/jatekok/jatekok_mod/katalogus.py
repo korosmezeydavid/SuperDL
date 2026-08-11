@@ -384,6 +384,12 @@ SAJAT: tuple[Jatek, ...] = (
           "kerülj 21-hez közel túllépés nélkül. Lapkérés, megállás, duplázás, "
           "zsetonok – az osztó beszól, a közönség él!",
           retro=False),
+    Jatek("poker", "Póker",
+          "Ötlapos húzós póker gépi ellenfelek ellen, modern, felolvasott "
+          "felülettel: dobd el a rossz lapokat, húzz újakat, a legjobb kéz "
+          "viszi a kasszát. A teljes póker-rangsorral, zsetonokkal, "
+          "közönséghangokkal és gép-beszólásokkal.",
+          retro=False),
     Jatek("enektanito", "Gépi ének",
           "Taníts a gépnek egy dalt, és a saját formáns-hangján elénekli! "
           "Soronként adsz meg egy hangot: SZÓTAG HANGNÉV HOSSZ (pl. „bo g4 0.4”). "
