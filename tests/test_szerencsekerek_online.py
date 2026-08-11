@@ -55,14 +55,24 @@ def test_csod_elveszi_a_penzt_es_lep(monkeypatch):
     assert a["soron"] == "B" and h.korpenz["A"] == 0
 
 
-def test_maganhangzo_vetel_levon_es_felfed(monkeypatch):
-    h = _host(monkeypatch)
-    monkeypatch.setattr(SZK, "_szk_porget", lambda: ("penz", 300))
+def test_maganhangzora_is_lehet_tippelni(monkeypatch):
+    # ÚJ szabály: nincs magánhangzó-VÉTEL – a magánhangzóra ugyanúgy TIPPELSZ,
+    # mint a mássalhangzóra (pörgetés után, az érték a darabszámmal szorzódik).
+    h = _host(monkeypatch)               # megoldás ALMA – 2 db 'a'
+    monkeypatch.setattr(SZK, "_szk_porget", lambda: ("penz", 100))
     h.akcio("A", "porget")
-    h.akcio("A", "betu", "l")               # korpenz 300
-    h.akcio("A", "maganhangzo", "a")        # 250 levonva, 'a' felfedve
-    assert h.korpenz["A"] == 300 - SZK._SZK_MGH_AR
+    a = h.akcio("A", "betu", "a")        # 2 db 'a' × 100 = 200, felfedve, jöhet újra
     assert "a" in h.felfedett
+    assert h.korpenz["A"] == 200 and a["soron"] == "A"
+
+
+def test_maganhangzo_akcio_mar_nincs(monkeypatch):
+    # a régi „venni" akció megszűnt: ismeretlen tipus → None (nincs hatás)
+    h = _host(monkeypatch)
+    monkeypatch.setattr(SZK, "_szk_porget", lambda: ("penz", 100))
+    h.akcio("A", "porget")
+    assert h.akcio("A", "maganhangzo", "a") is None
+    assert "a" not in h.felfedett
 
 
 def test_megfejtes_nyer_es_vege(monkeypatch):

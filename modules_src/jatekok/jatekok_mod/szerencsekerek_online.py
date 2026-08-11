@@ -31,7 +31,7 @@ class OnlineHost:
         self.megoldas = ""
         self.kategoria = ""
         self.felfedett = set()
-        self.mondott = set()          # MINDEN kimondott mássalhangzó (jó és rossz)
+        self.mondott = set()          # MINDEN megtippelt betű (magán+más, jó/rossz)
         self.korpenz = {n: 0 for n in self.jatekosok}
         self.soron_idx = 0
         self.utolso_porgetes = None
@@ -94,16 +94,13 @@ class OnlineHost:
                 self._kovetkezo()
                 return self.allapot(f"{ki} pörgetett: PASSZ! Jön a következő.")
             self.utolso_porgetes = p[1]
-            return self.allapot(f"{ki} pörgetett: {p[1]} forint! Most mondj egy "
-                                "mássalhangzót, vagy vegyél magánhangzót, vagy "
+            return self.allapot(f"{ki} pörgetett: {p[1]} forint! Most tippelj "
+                                "egy betűt (magán- vagy mássalhangzót), vagy "
                                 "fejtsd meg.")
         if tipus == "betu":
             betu = (ertek or "").strip().lower()[:1]
             if not betu.isalpha():
                 return None
-            if SZK._szk_maganhangzo(betu):
-                return self.allapot("Ez magánhangzó – azt VENNED kell, nem "
-                                    "pörgetéssel.")
             if betu in self.mondott:
                 # már elhangzott (jó vagy rossz) – NEM friss tévesztés, mint a
                 # gépi játékban. Ha volt függő pörgetés, a kör átszáll.
@@ -129,21 +126,6 @@ class OnlineHost:
             self._kovetkezo()
             return self.allapot(f"{ki}: {betu.upper()} – nincs a rejtvényben. "
                                 "Jön a következő.")
-        if tipus == "maganhangzo":
-            betu = (ertek or "").strip().lower()[:1]
-            if not SZK._szk_maganhangzo(betu):
-                return self.allapot("Ez nem magánhangzó.")
-            if betu in self.felfedett:
-                return self.allapot("Ezt a magánhangzót már felfedték.")
-            if self.korpenz[ki] < SZK._SZK_MGH_AR:
-                return self.allapot(f"Nincs elég köri pénzed – {SZK._SZK_MGH_AR} "
-                                    "forint kell egy magánhangzóra.")
-            self.korpenz[ki] -= SZK._SZK_MGH_AR
-            self.felfedett.add(betu)
-            db = SZK._szk_elofordul(self.megoldas, betu)
-            return self.allapot(f"{ki} vett egy {betu.upper()} magánhangzót "
-                                f"({SZK._SZK_MGH_AR} forint), {db}-szer szerepel. "
-                                f"{ki} jöhet.")
         if tipus == "megfejt":
             if SZK._szk_egyezik(ertek or "", self.megoldas):
                 self.bank[ki] += self.korpenz[ki]
@@ -226,19 +208,16 @@ class OnlinePanel(wx.Panel):
                 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         self.be = wx.TextCtrl(self, size=(170, -1), style=wx.TE_PROCESS_ENTER)
         self.be.SetName("Betű vagy megfejtés")
-        # Enter a mezőben = a legvalószínűbb akció (egy betű → Betű/Magánhangzó,
+        # Enter a mezőben = a legvalószínűbb akció (egy betű → Betű,
         # több karakter → Megfejtés) – így a gyakori eset gomb/hotkey nélkül megy.
         self.be.Bind(wx.EVT_TEXT_ENTER, self._enter_akcio)
         akc.Add(self.be, 0, wx.RIGHT, 8)
         self.g_porget = wx.Button(self, label="&Pörgetés")
         self.g_porget.Bind(wx.EVT_BUTTON, lambda e: self._akcio("porget"))
         akc.Add(self.g_porget, 0, wx.RIGHT, 4)
-        self.g_betu = wx.Button(self, label="Be&tű / magánhangzó")
+        self.g_betu = wx.Button(self, label="Be&tű")
         self.g_betu.Bind(wx.EVT_BUTTON, lambda e: self._betu_okos(self.be.GetValue()))
         akc.Add(self.g_betu, 0, wx.RIGHT, 4)
-        self.g_mgh = wx.Button(self, label="M&agánhangzó")
-        self.g_mgh.Bind(wx.EVT_BUTTON, lambda e: self._akcio("maganhangzo", self.be.GetValue()))
-        akc.Add(self.g_mgh, 0, wx.RIGHT, 4)
         self.g_megfejt = wx.Button(self, label="Me&gfejtés")
         self.g_megfejt.Bind(wx.EVT_BUTTON, lambda e: self._akcio("megfejt", self.be.GetValue()))
         akc.Add(self.g_megfejt, 0)
@@ -282,7 +261,6 @@ class OnlinePanel(wx.Panel):
         # (a puszta Alt+betű mnemonikok nem mindig sülnek el a képernyőolvasóval).
         self._ID_PORGET = wx.NewIdRef()
         self._ID_BETU = wx.NewIdRef()
-        self._ID_MGH = wx.NewIdRef()
         self._ID_MEGFEJT = wx.NewIdRef()
         self.Bind(wx.EVT_MENU, lambda e: self._akcio("porget"),
                   id=self._ID_PORGET)
@@ -290,15 +268,11 @@ class OnlinePanel(wx.Panel):
                   lambda e: self._betu_okos(self.be.GetValue()),
                   id=self._ID_BETU)
         self.Bind(wx.EVT_MENU,
-                  lambda e: self._akcio("maganhangzo", self.be.GetValue()),
-                  id=self._ID_MGH)
-        self.Bind(wx.EVT_MENU,
                   lambda e: self._akcio("megfejt", self.be.GetValue()),
                   id=self._ID_MEGFEJT)
         self.SetAcceleratorTable(wx.AcceleratorTable([
             (wx.ACCEL_ALT, ord("P"), self._ID_PORGET),
             (wx.ACCEL_ALT, ord("T"), self._ID_BETU),
-            (wx.ACCEL_ALT, ord("A"), self._ID_MGH),
             (wx.ACCEL_ALT, ord("G"), self._ID_MEGFEJT),
         ]))
 
@@ -315,22 +289,14 @@ class OnlinePanel(wx.Panel):
     def _enter_akcio(self, e):
         t = (self.be.GetValue() or "").strip()
         if len(t) == 1 and t.isalpha():
-            if SZK._szk_maganhangzo(t.lower()):
-                self._akcio("maganhangzo", t)
-            else:
-                self._akcio("betu", t)
+            self._akcio("betu", t)
         elif t:
             self._akcio("megfejt", t)
 
     def _betu_okos(self, ertek):
-        """A fő „Betű" gomb legyen elnéző: ha MAGÁNHANGZÓT írsz be, azt VESZI
-        (nem utasítja el), mássalhangzónál pedig sima betű-mondás. Így az online
-        módban is természetesen lehet magánhangzót mondani."""
-        t = (ertek or "").strip().lower()
-        if len(t) == 1 and t.isalpha() and SZK._szk_maganhangzo(t):
-            self._akcio("maganhangzo", t)
-        else:
-            self._akcio("betu", ertek)
+        """Bármely betűre lehet tippelni – magán- VAGY mássalhangzóra egyaránt
+        (nincs külön „magánhangzó-vétel")."""
+        self._akcio("betu", ertek)
 
     def _alap_nev(self):
         try:
@@ -490,8 +456,8 @@ class OnlinePanel(wx.Panel):
         enyem = (self._fazis == "jatek" and self._soron == self._nev)
         self._akciok_engedely(enyem)
         if enyem:
-            self._mondd("TE JÖSSZ! Pörgess, mondj betűt, vegyél magánhangzót, "
-                        "vagy fejts meg!")
+            self._mondd("TE JÖSSZ! Pörgess, mondj egy betűt (magán- vagy "
+                        "mássalhangzót), vagy fejts meg!")
 
     def _szoba_reszek_lathato(self, latszik):
         """A játéktér (átirat, akciók, kategória, tábla) és a CHAT csak akkor
@@ -566,11 +532,11 @@ class OnlinePanel(wx.Panel):
             self._mondd("Most nem te vagy soron – várj a köröodre.")
             return
         self._szoba.kuld("akcio", {"tipus": tipus, "ertek": ertek})
-        if tipus in ("betu", "maganhangzo", "megfejt"):
+        if tipus in ("betu", "megfejt"):
             self.be.SetValue("")
 
     def _akciok_engedely(self, be):
-        for g in (self.g_porget, self.g_betu, self.g_mgh, self.g_megfejt, self.be):
+        for g in (self.g_porget, self.g_betu, self.g_megfejt, self.be):
             g.Enable(be)
 
     def _mondd(self, szoveg):
@@ -601,18 +567,14 @@ class OnlinePanel(wx.Panel):
 
 # ===================== MODERN HELYI panel (egy gép + gépek) =================
 
-# a listában felajánlott mássalhangzók (egykarakteres latin betűk; a magyar
-# digráfokat – cs, sz stb. – a motor betűnként kezeli, így nem kellenek külön)
-_MASSALHANGZOK = "bcdfghjklmnpqrstvwxyz"
-
 
 class HelyiPanel(wx.Panel):
     """MODERN helyi Szerencsekerék: TE + gépi ellenfelek egy gépen.
 
-    Semmi konzolos begépelés: pörgetés GOMBBAL, a mássalhangzót egy
-    NAVIGÁLHATÓ listából választod (fel/le nyíl, Enter), a magánhangzót és a
-    megfejtést párbeszéddel adod meg. A képernyőolvasó mindent felolvas, a
-    gépek VALÓDI néven játszanak és beszólnak, és él a közönség (taps, nevetés,
+    Pörgetsz egy GOMBBAL, majd BEÍRSZ egy betűt a mezőbe (magán- VAGY
+    mássalhangzót – bármelyikre tippelhetsz, nincs „magánhangzó-vétel"), vagy
+    beírod a TELJES megfejtést. A képernyőolvasó mindent felolvas, a gépek
+    VALÓDI néven játszanak és beszólnak, és él a közönség (taps, nevetés,
     csalódás). A LOGIKA a host-authoritative OnlineHost-ból jön – pontosan az,
     ami az online játékban –, csak a felület modern és helyi."""
 
@@ -624,17 +586,15 @@ class HelyiPanel(wx.Panel):
         self._en = "Te"
         self._fazis = "beallitas"
         self._hang_player = None
-        self._lista_betuk = list(_MASSALHANGZOK)
         self._build()
 
     def _build(self):
         v = wx.BoxSizer(wx.VERTICAL)
         self._info = wx.StaticText(self, label=(
             "A klasszikus Szerencsekerék EGY gépen, gépi ellenfelekkel. "
-            "Pörgetsz, majd a listából választasz egy MÁSSALHANGZÓT (fel/le "
-            "nyíl, Enter), vagy veszel MAGÁNHANGZÓT, vagy MEGFEJTED a "
-            "rejtvényt. Minden felolvasva; a gépek beszólnak, él a közönség. "
-            "Súgó: F1."))
+            "Pörgetsz, majd BEÍRSZ egy betűt (magán- vagy mássalhangzót – "
+            "bármelyikre tippelhetsz), vagy beírod a TELJES megfejtést. "
+            "Minden felolvasva; a gépek beszólnak, él a közönség. Súgó: F1."))
         self._info.Wrap(720)
         v.Add(self._info, 0, wx.ALL, 10)
 
@@ -663,43 +623,39 @@ class HelyiPanel(wx.Panel):
         self.tabla_mezo.SetName("Megfejtendő sor")
         v.Add(self.tabla_mezo, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 8)
 
-        # --- akció-gombok ---
+        # --- betű/megfejtés BEÍRÓ mező + akció-gombok ---
         akc = wx.BoxSizer(wx.HORIZONTAL)
+        akc.Add(wx.StaticText(self, label="&Betű vagy megfejtés:"),
+                0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.be = wx.TextCtrl(self, size=(180, -1), style=wx.TE_PROCESS_ENTER)
+        self.be.SetName("Betű vagy megfejtés")
+        # egy betű → tipp; több karakter → megfejtés (Enter a mezőben eldönti)
+        self.be.Bind(wx.EVT_TEXT_ENTER, self._enter_akcio)
+        akc.Add(self.be, 0, wx.RIGHT, 8)
         self.g_porget = wx.Button(self, label="&Pörgetés")
         self.g_porget.Bind(wx.EVT_BUTTON, lambda e: self._porget())
         akc.Add(self.g_porget, 0, wx.RIGHT, 6)
-        self.g_mgh = wx.Button(self, label="M&agánhangzó vétele")
-        self.g_mgh.Bind(wx.EVT_BUTTON, lambda e: self._maganhangzo())
-        akc.Add(self.g_mgh, 0, wx.RIGHT, 6)
+        self.g_betu = wx.Button(self, label="&Tippelek egy betűt")
+        self.g_betu.Bind(wx.EVT_BUTTON, lambda e: self._betu(self.be.GetValue()))
+        akc.Add(self.g_betu, 0, wx.RIGHT, 6)
         self.g_megfejt = wx.Button(self, label="Me&gfejtés")
         self.g_megfejt.Bind(wx.EVT_BUTTON, lambda e: self._megfejtes())
         akc.Add(self.g_megfejt, 0)
         v.Add(akc, 0, wx.ALL, 10)
         self._akc_sizer = akc
 
-        # --- NAVIGÁLHATÓ mássalhangzó-lista ---
-        self._lbl_massal = wx.StaticText(self, label=(
-            "&Mássalhangzók (pörgetés után válassz, Enter = kimondom):"))
-        v.Add(self._lbl_massal, 0, wx.LEFT | wx.TOP, 10)
-        self.betu_lista = wx.ListBox(self, size=(-1, 120))
-        self.betu_lista.SetName("Mássalhangzók listája")
-        self.betu_lista.Bind(wx.EVT_LISTBOX_DCLICK, lambda e: self._betu_kimond())
-        self.betu_lista.Bind(wx.EVT_KEY_DOWN, self._lista_key)
-        v.Add(self.betu_lista, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 8)
-
         # --- játék-napló ---
         self._lbl_naplo = wx.StaticText(self, label="Játék &szövege:")
         v.Add(self._lbl_naplo, 0, wx.LEFT | wx.TOP, 10)
         self.atirat = wx.TextCtrl(
             self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
-            size=(-1, 90))
+            size=(-1, 120))
         self.atirat.SetName("Játék szövege")
         v.Add(self.atirat, 1, wx.EXPAND | wx.ALL, 8)
 
         self.SetSizer(v)
         self._v = v
         self._jatek_widgetek = [self.allapot_mezo, self.tabla_mezo,
-                                self._lbl_massal, self.betu_lista,
                                 self._lbl_naplo, self.atirat]
         self._jatek_lathato(False)
         self._vezerlok_engedely(False, False)
@@ -721,31 +677,12 @@ class HelyiPanel(wx.Panel):
         except Exception:
             pass
 
-    def _frissit_lista(self):
-        mondott = self.host.mondott if self.host else set()
-        felf = self.host.felfedett if self.host else set()
-        elemek = []
-        for c in self._lista_betuk:
-            if c in felf:
-                elemek.append(f"{c.upper()} — megvan ✅")
-            elif c in mondott:
-                elemek.append(f"{c.upper()} — már elhangzott")
-            else:
-                elemek.append(c.upper())
-        self.betu_lista.Set(elemek)
-        for i, c in enumerate(self._lista_betuk):
-            if c not in mondott and c not in felf:
-                self.betu_lista.SetSelection(i)
-                break
-
     def _vezerlok_engedely(self, enyem, pending):
         try:
             self.g_porget.Enable(enyem and not pending)
-            elerheto_mgh = (enyem and self.host is not None and
-                            self.host.korpenz.get(self._en, 0) >= SZK._SZK_MGH_AR)
-            self.g_mgh.Enable(bool(elerheto_mgh))
+            self.be.Enable(enyem)
+            self.g_betu.Enable(enyem and pending)
             self.g_megfejt.Enable(enyem)
-            self.betu_lista.Enable(enyem and pending)
         except Exception:
             pass
 
@@ -769,7 +706,6 @@ class HelyiPanel(wx.Panel):
         else:
             self.allapot_mezo.SetValue(f"Végeredmény – {pont_szoveg}.")
         self.tabla_mezo.SetValue(tabla)
-        self._frissit_lista()
         self._mondd("  ".join(s for s in (uz, tabla) if s))
 
         if self._fazis != "jatek":
@@ -786,11 +722,10 @@ class HelyiPanel(wx.Panel):
         self._vezerlok_engedely(enyem, pending)
         if enyem:
             if pending:
-                self._mondd("TE JÖSSZ! Válassz egy mássalhangzót a listából "
-                            "(fel/le nyíl, Enter), vagy vegyél magánhangzót, "
-                            "vagy fejts meg.")
+                self._mondd("TE JÖSSZ! Írj be egy betűt (magán- vagy "
+                            "mássalhangzót) és Enter, vagy fejts meg.")
                 try:
-                    self.betu_lista.SetFocus()
+                    self.be.SetFocus()
                 except Exception:
                     pass
             else:
@@ -834,68 +769,49 @@ class HelyiPanel(wx.Panel):
     def _porget(self):
         self._emberi("porget")
 
-    def _lista_key(self, e):
-        if e.GetKeyCode() in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER):
-            self._betu_kimond()
-        else:
-            e.Skip()
+    def _enter_akcio(self, e):
+        """A mezőben az Enter: egy betű → tipp; több karakter → megfejtés."""
+        t = (self.be.GetValue() or "").strip()
+        if len(t) == 1 and t.isalpha():
+            self._betu(t)
+        elif t:
+            self.be.SetValue("")
+            self._emberi("megfejt", t)
 
-    def _betu_kimond(self):
+    def _betu(self, ertek):
+        """Egyetlen betűre tippel – magán- VAGY mássalhangzóra (nincs vétel)."""
+        t = (ertek or "").strip().lower()
+        if len(t) != 1 or not t.isalpha():
+            self._mondd("Írj be EGY betűt, vagy a teljes megfejtést és a "
+                        "Megfejtés gombot.")
+            return
         if not self.host or self.host.soron != self._en:
-            return
-        i = self.betu_lista.GetSelection()
-        if i < 0:
-            return
-        betu = self._lista_betuk[i]
-        if betu in self.host.felfedett or betu in self.host.mondott:
-            self._mondd(f"A(z) {betu.upper()} betű már elhangzott — válassz "
-                        "másikat (a köröd megmarad).")
             return
         if self.host.utolso_porgetes is None:
-            self._mondd("Előbb pörgetned kell egy mássalhangzóhoz!")
+            self._mondd("Előbb pörgetned kell!")
             return
-        self._emberi("betu", betu)
-
-    def _maganhangzo(self):
-        if not self.host or self.host.soron != self._en:
-            return
-        if self.host.korpenz.get(self._en, 0) < SZK._SZK_MGH_AR:
-            self._mondd(f"Ehhez legalább {SZK._SZK_MGH_AR} forint kell a köri "
-                        "pénzedből — előbb gyűjts mássalhangzókkal.")
-            return
-        szabad = [c for c in "aáeéiíoóöőuúüű" if c not in self.host.felfedett]
-        if not szabad:
-            self._mondd("Már minden magánhangzó felfedve.")
-            return
-        dlg = wx.SingleChoiceDialog(
-            self, f"Melyik magánhangzót veszed meg ({SZK._SZK_MGH_AR} forint)?",
-            "Magánhangzó vétele", [c.upper() for c in szabad])
-        if dlg.ShowModal() == wx.ID_OK:
-            v = szabad[dlg.GetSelection()]
-            dlg.Destroy()
-            self._emberi("maganhangzo", v)
-        else:
-            dlg.Destroy()
+        self.be.SetValue("")
+        self._emberi("betu", t)
 
     def _megfejtes(self):
         if not self.host or self.host.soron != self._en:
             return
-        dlg = wx.TextEntryDialog(self, "Írd be a TELJES megfejtést:",
-                                 "Megfejtés")
-        if dlg.ShowModal() == wx.ID_OK:
-            t = (dlg.GetValue() or "").strip()
+        t = (self.be.GetValue() or "").strip()
+        if not t:
+            dlg = wx.TextEntryDialog(self, "Írd be a TELJES megfejtést:",
+                                     "Megfejtés")
+            if dlg.ShowModal() == wx.ID_OK:
+                t = (dlg.GetValue() or "").strip()
             dlg.Destroy()
-            if t:
-                self._emberi("megfejt", t)
-        else:
-            dlg.Destroy()
+        if t:
+            self.be.SetValue("")
+            self._emberi("megfejt", t)
 
     # ------------------------------- gép -----------------------------------
-    def _gep_massalhangzo(self):
+    def _gep_tipp_betu(self):
+        """A gép következő betű-tippje – magán- vagy mássalhangzó egyaránt."""
         elkerul = self.host.mondott | self.host.felfedett
         for c in SZK._SZK_GYAKORI:
-            if c in SZK._SZK_MGH:      # a magánhangzót venni kell, nem tippelni
-                continue
             if c not in elkerul:
                 return c
         return None
@@ -909,22 +825,15 @@ class HelyiPanel(wx.Panel):
         megoldas = self.host.megoldas
         osszes = set(ch.lower() for ch in megoldas if ch.isalpha())
         felf = self.host.felfedett
-        hianyzo = osszes - felf
         arany = (len(felf) / len(osszes)) if osszes else 0.0
         if self.host.utolso_porgetes is None:
             if arany >= 0.55 and random.random() < 0.55:
                 self._gep_akcio(ai, "megfejt", megoldas,
                                 f"{ai} megfejtést próbál…")
                 return
-            magh = [c for c in hianyzo if c in SZK._SZK_MGH]
-            if (magh and self.host.korpenz.get(ai, 0) >= SZK._SZK_MGH_AR
-                    and random.random() < 0.45):
-                self._gep_akcio(ai, "maganhangzo", magh[0],
-                                f"{ai} magánhangzót vesz…")
-                return
             self._gep_akcio(ai, "porget", None, f"{ai} pörget…")
         else:
-            betu = self._gep_massalhangzo()
+            betu = self._gep_tipp_betu()
             if betu:
                 self._gep_akcio(ai, "betu", betu, None)
             else:
@@ -1015,11 +924,12 @@ _SUGO = (
     "gépi ellenfelek ellen. Válaszd ki a JÁTÉKOSOK SZÁMÁT (2, 3 vagy 4 fő – te "
     "és a gépek), majd „Új játék indítása”. TE kezdesz. Amikor te jössz:\n"
     "• „Pörgetés” gomb – megpörgeti a kereket.\n"
-    "• Utána a „Mássalhangzók” LISTÁBÓL fel/le nyíllal választasz egy betűt, és "
-    "Enterrel kimondod (a már elhangzott és a megvan betűk meg vannak jelölve).\n"
-    "• „Magánhangzó vétele” gomb – egy listából megveszed ("
-    + str(SZK._SZK_MGH_AR) + " forint a köri pénzedből).\n"
-    "• „Megfejtés” gomb – beírod a teljes megoldást.\n"
+    "• Utána a „Betű vagy megfejtés” mezőbe ÍRJ BE EGY BETŰT és nyomj Entert "
+    "(vagy a „Tippelek egy betűt” gombot). Bármelyik betűre tippelhetsz – "
+    "MAGÁN- és MÁSSALHANGZÓRA egyaránt (nincs külön magánhangzó-vétel).\n"
+    "• Ha benne van, annyiszor a pörgetett érték a köri pénzedhez adódik, és "
+    "jöhetsz újra; ha nincs, a kör átszáll.\n"
+    "• „Megfejtés” gomb (vagy írd a mezőbe a teljes megoldást és Enter).\n"
     "A gépek maguktól lépnek és beszólnak, a közönség hangot ad. Minden lépés "
     "FELOLVASVA hangzik el; az „Állás” és a „Megfejtendő sor” mező mindig ott "
     "van, oda bármikor visszaléphetsz felolvasásért.\n\n"
@@ -1036,24 +946,25 @@ _SUGO = (
     "indítás ELŐTT (pl. „várunk még valakit?”) és SZÜNETBEN is (pl. „10 perc, "
     "itt a futár”). Enter vagy a „Küldés” gomb. Mindenki látja és hallja.\n\n"
     "AMIKOR TE JÖSSZ\n"
-    "• „Pörgetés”, majd írj be egy betűt és nyomd a „Betű / magánhangzó” gombot. "
-    "Ha MÁSSALHANGZÓT írsz, azt mondod ki; ha MAGÁNHANGZÓT, azt MEGVESZI (van rá "
-    "külön „Magánhangzó” gomb is).\n"
+    "• „Pörgetés”, majd írj be EGY betűt és nyomd a „Betű” gombot (vagy Enter a "
+    "mezőben). Bármelyik betűre tippelhetsz – MAGÁN- és MÁSSALHANGZÓRA egyaránt "
+    "(nincs magánhangzó-vétel).\n"
     "• Vagy írd be a TELJES megfejtést, és „Megfejtés”.\n"
-    "• A mezőben az Enter a legvalószínűbb lépést indítja.\n\n"
+    "• A mezőben az Enter a legvalószínűbb lépést indítja (egy betű → tipp, "
+    "több karakter → megfejtés).\n\n"
     "TISZTÁBB FELÜLET (ÚJ)\n"
     "Amint elindul a játék, a belépő rész (név, kód, gombok) ELTŰNIK – csak a "
     "tiszta játékfelület marad. A játék végén visszajön, hogy új szobát "
     "indíthass.\n\n"
     "HANGOK (ÚJ)\n"
     "Az online játékban is szól a teljes hangvilág: pörgetés, csőd, passz, jó és "
-    "rossz betű, magánhangzó-vásárlás, megfejtés és játék vége.\n\n"
+    "rossz betű, megfejtés és játék vége.\n\n"
     "HOL A REJTVÉNY?\n"
     "Az ablak alján, külön mezőkben MINDIG ott a „Kategória” és a „Megfejtendő "
     "sor” – a Ctrl+End odaugrik.\n\n"
     "GYORSBILLENTYŰK\n"
-    "Alt+P: Pörgetés. Alt+T: Betű / magánhangzó. Alt+A: Magánhangzó vétele. "
-    "Alt+G: Megfejtés. F1: ez a súgó. Escape: bezárás.\n\n"
+    "Alt+P: Pörgetés. Alt+T: Betű. Alt+G: Megfejtés. F1: ez a súgó. "
+    "Escape: bezárás.\n\n"
     "Minden lépés minden gépen FELOLVASVA hangzik el. A körök közt pár másodperc "
     "hálózati késés normális. Az online játékhoz csak internet kell – semmit nem "
     "kell beállítanod."
