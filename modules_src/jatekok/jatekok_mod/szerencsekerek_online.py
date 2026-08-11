@@ -8,6 +8,8 @@
   lehet csalni. Mindenki „akció"-t küld, a host teljes ÁLLAPOTOT broadcastol,
   amit minden gép felolvas.
 """
+import random
+
 import wx
 
 from . import netroom
@@ -597,13 +599,430 @@ class OnlinePanel(wx.Panel):
             pass
 
 
+# ===================== MODERN HELYI panel (egy gép + gépek) =================
+
+# a listában felajánlott mássalhangzók (egykarakteres latin betűk; a magyar
+# digráfokat – cs, sz stb. – a motor betűnként kezeli, így nem kellenek külön)
+_MASSALHANGZOK = "bcdfghjklmnpqrstvwxyz"
+
+
+class HelyiPanel(wx.Panel):
+    """MODERN helyi Szerencsekerék: TE + gépi ellenfelek egy gépen.
+
+    Semmi konzolos begépelés: pörgetés GOMBBAL, a mássalhangzót egy
+    NAVIGÁLHATÓ listából választod (fel/le nyíl, Enter), a magánhangzót és a
+    megfejtést párbeszéddel adod meg. A képernyőolvasó mindent felolvas, a
+    gépek VALÓDI néven játszanak és beszólnak, és él a közönség (taps, nevetés,
+    csalódás). A LOGIKA a host-authoritative OnlineHost-ból jön – pontosan az,
+    ami az online játékban –, csak a felület modern és helyi."""
+
+    def __init__(self, parent, main):
+        super().__init__(parent)
+        self.main = main
+        self._closing = False
+        self.host = None
+        self._en = "Te"
+        self._fazis = "beallitas"
+        self._hang_player = None
+        self._lista_betuk = list(_MASSALHANGZOK)
+        self._build()
+
+    def _build(self):
+        v = wx.BoxSizer(wx.VERTICAL)
+        self._info = wx.StaticText(self, label=(
+            "A klasszikus Szerencsekerék EGY gépen, gépi ellenfelekkel. "
+            "Pörgetsz, majd a listából választasz egy MÁSSALHANGZÓT (fel/le "
+            "nyíl, Enter), vagy veszel MAGÁNHANGZÓT, vagy MEGFEJTED a "
+            "rejtvényt. Minden felolvasva; a gépek beszólnak, él a közönség. "
+            "Súgó: F1."))
+        self._info.Wrap(720)
+        v.Add(self._info, 0, wx.ALL, 10)
+
+        # --- beállító sor: hány játékos + Új játék ---
+        beall = wx.BoxSizer(wx.HORIZONTAL)
+        beall.Add(wx.StaticText(self, label="&Játékosok száma:"),
+                  0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.letszam = wx.Choice(self, choices=[
+            "2 (te + 1 gép)", "3 (te + 2 gép)", "4 (te + 3 gép)"])
+        self.letszam.SetSelection(1)
+        self.letszam.SetName("Játékosok száma")
+        beall.Add(self.letszam, 0, wx.RIGHT, 10)
+        self.uj_gomb = wx.Button(self, label="Ú&j játék indítása")
+        self.uj_gomb.Bind(wx.EVT_BUTTON, self._uj_jatek)
+        beall.Add(self.uj_gomb, 0)
+        v.Add(beall, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
+        self._beall_sizer = beall
+
+        # --- állás + megfejtendő sor (mindig felolvasható, külön mezőkben) ---
+        self.allapot_mezo = wx.TextCtrl(self, style=wx.TE_READONLY)
+        self.allapot_mezo.SetName("Állás")
+        v.Add(self.allapot_mezo, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 10)
+        self.tabla_mezo = wx.TextCtrl(
+            self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
+            size=(-1, 56))
+        self.tabla_mezo.SetName("Megfejtendő sor")
+        v.Add(self.tabla_mezo, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 8)
+
+        # --- akció-gombok ---
+        akc = wx.BoxSizer(wx.HORIZONTAL)
+        self.g_porget = wx.Button(self, label="&Pörgetés")
+        self.g_porget.Bind(wx.EVT_BUTTON, lambda e: self._porget())
+        akc.Add(self.g_porget, 0, wx.RIGHT, 6)
+        self.g_mgh = wx.Button(self, label="M&agánhangzó vétele")
+        self.g_mgh.Bind(wx.EVT_BUTTON, lambda e: self._maganhangzo())
+        akc.Add(self.g_mgh, 0, wx.RIGHT, 6)
+        self.g_megfejt = wx.Button(self, label="Me&gfejtés")
+        self.g_megfejt.Bind(wx.EVT_BUTTON, lambda e: self._megfejtes())
+        akc.Add(self.g_megfejt, 0)
+        v.Add(akc, 0, wx.ALL, 10)
+        self._akc_sizer = akc
+
+        # --- NAVIGÁLHATÓ mássalhangzó-lista ---
+        self._lbl_massal = wx.StaticText(self, label=(
+            "&Mássalhangzók (pörgetés után válassz, Enter = kimondom):"))
+        v.Add(self._lbl_massal, 0, wx.LEFT | wx.TOP, 10)
+        self.betu_lista = wx.ListBox(self, size=(-1, 120))
+        self.betu_lista.SetName("Mássalhangzók listája")
+        self.betu_lista.Bind(wx.EVT_LISTBOX_DCLICK, lambda e: self._betu_kimond())
+        self.betu_lista.Bind(wx.EVT_KEY_DOWN, self._lista_key)
+        v.Add(self.betu_lista, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 8)
+
+        # --- játék-napló ---
+        self._lbl_naplo = wx.StaticText(self, label="Játék &szövege:")
+        v.Add(self._lbl_naplo, 0, wx.LEFT | wx.TOP, 10)
+        self.atirat = wx.TextCtrl(
+            self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
+            size=(-1, 90))
+        self.atirat.SetName("Játék szövege")
+        v.Add(self.atirat, 1, wx.EXPAND | wx.ALL, 8)
+
+        self.SetSizer(v)
+        self._v = v
+        self._jatek_widgetek = [self.allapot_mezo, self.tabla_mezo,
+                                self._lbl_massal, self.betu_lista,
+                                self._lbl_naplo, self.atirat]
+        self._jatek_lathato(False)
+        self._vezerlok_engedely(False, False)
+
+    # ----------------------------- megjelenítés -----------------------------
+    def _jatek_lathato(self, latszik):
+        try:
+            for w in self._jatek_widgetek:
+                w.Show(latszik)
+            self._v.Show(self._akc_sizer, latszik, recursive=True)
+            self._v.Layout()
+        except Exception:
+            pass
+
+    def _beall_lathato(self, latszik):
+        try:
+            self._v.Show(self._beall_sizer, latszik, recursive=True)
+            self._v.Layout()
+        except Exception:
+            pass
+
+    def _frissit_lista(self):
+        mondott = self.host.mondott if self.host else set()
+        felf = self.host.felfedett if self.host else set()
+        elemek = []
+        for c in self._lista_betuk:
+            if c in felf:
+                elemek.append(f"{c.upper()} — megvan ✅")
+            elif c in mondott:
+                elemek.append(f"{c.upper()} — már elhangzott")
+            else:
+                elemek.append(c.upper())
+        self.betu_lista.Set(elemek)
+        for i, c in enumerate(self._lista_betuk):
+            if c not in mondott and c not in felf:
+                self.betu_lista.SetSelection(i)
+                break
+
+    def _vezerlok_engedely(self, enyem, pending):
+        try:
+            self.g_porget.Enable(enyem and not pending)
+            elerheto_mgh = (enyem and self.host is not None and
+                            self.host.korpenz.get(self._en, 0) >= SZK._SZK_MGH_AR)
+            self.g_mgh.Enable(bool(elerheto_mgh))
+            self.g_megfejt.Enable(enyem)
+            self.betu_lista.Enable(enyem and pending)
+        except Exception:
+            pass
+
+    def _render(self, a):
+        if self._closing:
+            return
+        self._fazis = a.get("fazis", "jatek")
+        soron = a.get("soron", "")
+        uz = a.get("uzenet", "")
+        self._hang_esemeny(uz, self._fazis)
+        pont = a.get("bank", {})
+        pont_szoveg = ", ".join(f"{n}: {pont.get(n, 0)}"
+                                for n in a.get("jatekosok", []))
+        tabla = a.get("tabla", "")
+        kat = a.get("kategoria", "")
+        szavak = a.get("szavak", 0)
+        if self._fazis == "jatek":
+            self.allapot_mezo.SetValue(
+                f"Kategória: {kat} — a megfejtés {szavak} szóból áll.  "
+                f"Soron: {soron}.  Bank – {pont_szoveg}.")
+        else:
+            self.allapot_mezo.SetValue(f"Végeredmény – {pont_szoveg}.")
+        self.tabla_mezo.SetValue(tabla)
+        self._frissit_lista()
+        self._mondd("  ".join(s for s in (uz, tabla) if s))
+
+        if self._fazis != "jatek":
+            self._vezerlok_engedely(False, False)
+            self._beall_lathato(True)
+            try:
+                self.uj_gomb.SetFocus()
+            except Exception:
+                pass
+            return
+
+        enyem = (soron == self._en)
+        pending = self.host.utolso_porgetes is not None
+        self._vezerlok_engedely(enyem, pending)
+        if enyem:
+            if pending:
+                self._mondd("TE JÖSSZ! Válassz egy mássalhangzót a listából "
+                            "(fel/le nyíl, Enter), vagy vegyél magánhangzót, "
+                            "vagy fejts meg.")
+                try:
+                    self.betu_lista.SetFocus()
+                except Exception:
+                    pass
+            else:
+                self._mondd("TE JÖSSZ! Pörgess, vagy fejts meg.")
+                try:
+                    self.g_porget.SetFocus()
+                except Exception:
+                    pass
+        else:
+            if random.random() < 0.20:
+                cel = self._en if random.random() < 0.6 else soron
+                self._mondd(SZK._szk_beszol(
+                    SZK._SZK_BESZOL_JATEKOSNAK).format(nev=cel))
+                self._hang(SZK._szk_nevetes())
+            wx.CallLater(1700, self._gep_lep)
+
+    # ------------------------------ új játék -------------------------------
+    def _uj_jatek(self, e):
+        n = self.letszam.GetSelection() + 2
+        ellen = SZK._ellenfelek(n - 1)
+        jatekosok = [self._en] + ellen
+        self.host = OnlineHost(jatekosok)
+        self.atirat.SetValue("")
+        self._jatek_lathato(True)
+        self._beall_lathato(False)
+        self._render(self.host.allapot(
+            f"Új játék {n} játékossal: " + ", ".join(jatekosok) + ". "
+            + self.host.fordulo_intro() + " Te kezdesz!"))
+
+    # ---------------------------- emberi lépések ---------------------------
+    def _emberi(self, tipus, ertek=None):
+        if not self.host or self.host.fazis != "jatek":
+            return
+        if self.host.soron != self._en:
+            self._mondd("Most nem te vagy soron.")
+            return
+        allap = self.host.akcio(self._en, tipus, ertek)
+        if allap is not None:
+            self._render(allap)
+
+    def _porget(self):
+        self._emberi("porget")
+
+    def _lista_key(self, e):
+        if e.GetKeyCode() in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER):
+            self._betu_kimond()
+        else:
+            e.Skip()
+
+    def _betu_kimond(self):
+        if not self.host or self.host.soron != self._en:
+            return
+        i = self.betu_lista.GetSelection()
+        if i < 0:
+            return
+        betu = self._lista_betuk[i]
+        if betu in self.host.felfedett or betu in self.host.mondott:
+            self._mondd(f"A(z) {betu.upper()} betű már elhangzott — válassz "
+                        "másikat (a köröd megmarad).")
+            return
+        if self.host.utolso_porgetes is None:
+            self._mondd("Előbb pörgetned kell egy mássalhangzóhoz!")
+            return
+        self._emberi("betu", betu)
+
+    def _maganhangzo(self):
+        if not self.host or self.host.soron != self._en:
+            return
+        if self.host.korpenz.get(self._en, 0) < SZK._SZK_MGH_AR:
+            self._mondd(f"Ehhez legalább {SZK._SZK_MGH_AR} forint kell a köri "
+                        "pénzedből — előbb gyűjts mássalhangzókkal.")
+            return
+        szabad = [c for c in "aáeéiíoóöőuúüű" if c not in self.host.felfedett]
+        if not szabad:
+            self._mondd("Már minden magánhangzó felfedve.")
+            return
+        dlg = wx.SingleChoiceDialog(
+            self, f"Melyik magánhangzót veszed meg ({SZK._SZK_MGH_AR} forint)?",
+            "Magánhangzó vétele", [c.upper() for c in szabad])
+        if dlg.ShowModal() == wx.ID_OK:
+            v = szabad[dlg.GetSelection()]
+            dlg.Destroy()
+            self._emberi("maganhangzo", v)
+        else:
+            dlg.Destroy()
+
+    def _megfejtes(self):
+        if not self.host or self.host.soron != self._en:
+            return
+        dlg = wx.TextEntryDialog(self, "Írd be a TELJES megfejtést:",
+                                 "Megfejtés")
+        if dlg.ShowModal() == wx.ID_OK:
+            t = (dlg.GetValue() or "").strip()
+            dlg.Destroy()
+            if t:
+                self._emberi("megfejt", t)
+        else:
+            dlg.Destroy()
+
+    # ------------------------------- gép -----------------------------------
+    def _gep_massalhangzo(self):
+        elkerul = self.host.mondott | self.host.felfedett
+        for c in SZK._SZK_GYAKORI:
+            if c in SZK._SZK_MGH:      # a magánhangzót venni kell, nem tippelni
+                continue
+            if c not in elkerul:
+                return c
+        return None
+
+    def _gep_lep(self):
+        if self._closing or not self.host or self.host.fazis != "jatek":
+            return
+        ai = self.host.soron
+        if ai == self._en:
+            return
+        megoldas = self.host.megoldas
+        osszes = set(ch.lower() for ch in megoldas if ch.isalpha())
+        felf = self.host.felfedett
+        hianyzo = osszes - felf
+        arany = (len(felf) / len(osszes)) if osszes else 0.0
+        if self.host.utolso_porgetes is None:
+            if arany >= 0.55 and random.random() < 0.55:
+                self._gep_akcio(ai, "megfejt", megoldas,
+                                f"{ai} megfejtést próbál…")
+                return
+            magh = [c for c in hianyzo if c in SZK._SZK_MGH]
+            if (magh and self.host.korpenz.get(ai, 0) >= SZK._SZK_MGH_AR
+                    and random.random() < 0.45):
+                self._gep_akcio(ai, "maganhangzo", magh[0],
+                                f"{ai} magánhangzót vesz…")
+                return
+            self._gep_akcio(ai, "porget", None, f"{ai} pörget…")
+        else:
+            betu = self._gep_massalhangzo()
+            if betu:
+                self._gep_akcio(ai, "betu", betu, None)
+            else:
+                self._gep_akcio(ai, "megfejt", megoldas,
+                                f"{ai} megfejtést próbál…")
+
+    def _gep_akcio(self, ai, tipus, ertek, intro):
+        if self._closing:
+            return
+        if intro:
+            self._mondd(intro)
+        allap = self.host.akcio(ai, tipus, ertek)
+        if allap is not None:
+            self._render(allap)
+
+    # ------------------------------ hang + hang ----------------------------
+    def _hang(self, nev):
+        try:
+            import os
+            from superdl.audioengine import Player
+            mappa = os.path.join(os.path.dirname(__file__), "szerencsekerek_hang")
+            ut = None
+            for ext in (".wav", ".mp3"):
+                p = os.path.join(mappa, nev + ext)
+                if os.path.isfile(p):
+                    ut = p
+                    break
+            if not ut:
+                return
+            if self._hang_player is None:
+                self._hang_player = Player()
+            self._hang_player.play(ut, "")
+        except Exception:
+            pass
+
+    def _hang_esemeny(self, uzenet, fazis):
+        u = uzenet or ""
+        nev = None
+        if fazis == "vege":
+            nev = "jatek_vege"
+        elif "CSŐD" in u:
+            nev = "csod"
+        elif "PASSZ" in u:
+            nev = "passz"
+        elif "pörgetett:" in u:
+            nev = "kerekporges"
+        elif "MEGFEJTETTE" in u:
+            nev = "megfejtes_siker"
+        elif "nincs a rejtvényben" in u or "megfejtése nem jó" in u:
+            nev = "sikertelen_tipp"
+        elif "vett egy" in u and "magánhangzó" in u:
+            nev = "maganhangzo_vasarlas"
+        elif "-szer" in u and "forint" in u:
+            nev = "sikeres_tipp"
+        if nev:
+            self._hang(nev)
+
+    def _mondd(self, szoveg):
+        if self._closing or not (szoveg or "").strip():
+            return
+        try:
+            self.atirat.AppendText(szoveg + "\n")
+        except Exception:
+            pass
+        try:
+            from superdl import screenreader
+            if screenreader.speak(szoveg):
+                return
+        except Exception:
+            pass
+        sv = getattr(self.main, "selfvoice", None)
+        if sv:
+            try:
+                sv.speak(szoveg, force=True)
+            except Exception:
+                pass
+
+    def leallit(self):
+        self._closing = True
+
+
 # ====================== lapfüles ablak: helyi + online ======================
 
 _SUGO = (
     "SZERENCSEKERÉK – SÚGÓ\n\n"
     "Két fül van az ablakban (Ctrl+Tab vált köztük):\n\n"
-    "1) „Játszd itt helyben!” – a klasszikus Szerencsekerék EGY gépen, egy vagy "
-    "több játékossal felváltva. Kattints az „Új játék indítása” gombra.\n\n"
+    "1) „Játszd itt helyben – modern!” – a klasszikus Szerencsekerék EGY gépen, "
+    "gépi ellenfelek ellen. Válaszd ki a JÁTÉKOSOK SZÁMÁT (2, 3 vagy 4 fő – te "
+    "és a gépek), majd „Új játék indítása”. TE kezdesz. Amikor te jössz:\n"
+    "• „Pörgetés” gomb – megpörgeti a kereket.\n"
+    "• Utána a „Mássalhangzók” LISTÁBÓL fel/le nyíllal választasz egy betűt, és "
+    "Enterrel kimondod (a már elhangzott és a megvan betűk meg vannak jelölve).\n"
+    "• „Magánhangzó vétele” gomb – egy listából megveszed ("
+    + str(SZK._SZK_MGH_AR) + " forint a köri pénzedből).\n"
+    "• „Megfejtés” gomb – beírod a teljes megoldást.\n"
+    "A gépek maguktól lépnek és beszólnak, a közönség hangot ad. Minden lépés "
+    "FELOLVASVA hangzik el; az „Állás” és a „Megfejtendő sor” mező mindig ott "
+    "van, oda bármikor visszaléphetsz felolvasásért.\n\n"
     "2) „Játszd online!” – TÖBB gépről, egymástól távol, csak internettel.\n\n"
     "BELÉPÉS AZ ONLINE JÁTÉKBA\n"
     "• Írd be a NEVED.\n"
@@ -649,8 +1068,10 @@ class SzerencseAblak(wx.Dialog):
         self.jatek = jatek
         self.gep_getter = gep_getter
         self._online = None
+        self._helyi = None
         nb = wx.Notebook(self)
-        nb.AddPage(self._helyi_lap(nb), "Játszd itt helyben!")
+        self._helyi = HelyiPanel(nb, main)
+        nb.AddPage(self._helyi, "Játszd itt helyben – modern!")
         self._online = OnlinePanel(nb, main)
         nb.AddPage(self._online, "Játszd online – robbantsuk fel a netet!")
         s = wx.BoxSizer(wx.VERTICAL)
@@ -658,29 +1079,6 @@ class SzerencseAblak(wx.Dialog):
         self.SetSizer(s)
         self.Bind(wx.EVT_CHAR_HOOK, self._on_key)
         self.Bind(wx.EVT_CLOSE, self._on_close)
-
-    def _helyi_lap(self, parent):
-        p = wx.Panel(parent)
-        v = wx.BoxSizer(wx.VERTICAL)
-        v.Add(wx.StaticText(p, label=(
-            "A klasszikus Szerencsekerék EGY gépen, egy vagy több játékossal "
-            "felváltva.\n\nPörgetsz és mondasz egy betűt (magánhangzót is "
-            "vehetsz), vagy megfejted a rejtett magyar kifejezést. A gép is "
-            "beszállhat, és él a közönség: nevetés, taps, csalódás.\n\n"
-            "Súgó: F1.")), 0, wx.ALL, 12)
-        b = wx.Button(p, label="Ú&j játék indítása")
-        b.Bind(wx.EVT_BUTTON, self._helyi_indit)
-        v.Add(b, 0, wx.ALL, 12)
-        p.SetSizer(v)
-        return p
-
-    def _helyi_indit(self, e):
-        try:
-            from .jatekkonzol import JatekKonzol
-            JatekKonzol(self.main, self.jatek, self.gep_getter).Show()
-        except Exception as ex:
-            wx.MessageBox(f"A játék nem indult el: {ex}", "Hiba",
-                          wx.OK | wx.ICON_ERROR, self)
 
     def _on_key(self, e):
         k = e.GetKeyCode()
@@ -697,9 +1095,10 @@ class SzerencseAblak(wx.Dialog):
             e.Skip()
 
     def _on_close(self, e):
-        try:
-            if self._online:
-                self._online.leallit()
-        except Exception:
-            pass
+        for p in (self._online, self._helyi):
+            try:
+                if p:
+                    p.leallit()
+            except Exception:
+                pass
         e.Skip()
