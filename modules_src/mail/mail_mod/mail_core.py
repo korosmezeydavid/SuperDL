@@ -690,30 +690,82 @@ class ImapKliens:
                 ki.append(nev)
         return ki or ["INBOX"]
 
+    @staticmethod
+    def _mappa_arg(nev):
+        """A mappanevet IMAP-argumentumként idézőjelezi, ha kell (szóköz vagy
+        speciális karakter, pl. a Gmail „[Gmail]/Összes levél”). Enélkül a
+        szerver a szóköznél elvágja a nevet és hibázik."""
+        nev = str(nev or "INBOX")
+        if nev.startswith('"'):
+            return nev
+        if " " in nev or nev.startswith("[") or "/" in nev:
+            return '"' + nev.replace("\\", "\\\\").replace('"', '\\"') + '"'
+        return nev
+
     def valaszt(self, mappa="INBOX"):
-        typ, adat = self.M.select(mappa, readonly=False)
+        typ, adat = self.M.select(self._mappa_arg(mappa), readonly=False)
         return int(adat[0]) if typ == "OK" and adat and adat[0] else 0
 
-    def _uid_lista(self, keresés="ALL", limit=50):
+    def _uid_lista(self, keresés="ALL", limit=50, offset=0):
         typ, adat = self.M.uid("search", None, keresés)
         if typ != "OK" or not adat or not adat[0]:
             return []
-        uidok = adat[0].split()
-        return [u.decode() for u in uidok[-limit:][::-1]]   # legújabb elöl
+        # LEGÚJABB ELÖL: UID szerint csökkenő, majd offset-től limit darab (lapozás)
+        uidok = sorted((int(u) for u in adat[0].split()), reverse=True)
+        return [str(u) for u in uidok[offset:offset + limit]]
 
-    def lista(self, mappa="INBOX", limit=50):
-        """A mappa legutóbbi leveleinek fejléc-infói (feladó, tárgy, dátum,
-        olvasott, csatolmány) – UID-del."""
+    _FEJLEC_FETCH = "(UID FLAGS BODY.PEEK[HEADER.FIELDS (FROM SUBJECT DATE TO)])"
+
+    def lista(self, mappa="INBOX", limit=50, offset=0):
+        """A mappa leveleinek fejléc-infói (LEGÚJABB ELÖL), LAPOZÁSSAL.
+
+        Elsődlegesen SZEKVENCIA-tartománnyal tölt (gyors, és a nagy Gmail-
+        mappákhoz – Összes levél, Fontos – SEM kell a teljes UID-listát
+        letölteni); ha az valamiért nem megy, UID-keresésre esik vissza."""
+        exists = self.valaszt(mappa)
+        if not exists:
+            return []
+        try:
+            sor = self._lista_szekvenciaval(exists, limit, offset)
+            if sor is not None:
+                return sor
+        except Exception:
+            pass
+        return self._lista_uidokkal(mappa, limit, offset)
+
+    def _lista_szekvenciaval(self, exists, limit, offset):
+        felso = exists - offset
+        if felso < 1:
+            return []
+        also = max(1, felso - limit + 1)
+        typ, adat = self.M.fetch(f"{also}:{felso}", self._FEJLEC_FETCH)
+        if typ != "OK" or adat is None:
+            return None
+        ki = []
+        for item in adat:
+            if not isinstance(item, tuple) or len(item) < 2:
+                continue
+            meta, nyers = item[0], item[1]
+            m = re.search(rb"UID (\d+)", meta or b"")
+            uid = m.group(1).decode() if m else ""
+            flags = imaplib.ParseFlags(meta) if meta else ()
+            msg = email.message_from_bytes(nyers)
+            info = level_fejlec_info(msg)
+            info["uid"] = uid
+            info["olvasott"] = b"\\Seen" in flags
+            ki.append(info)
+        ki.reverse()          # a fetch NÖVEKVŐ szekvencia-sorrendben ad → legújabb elöl
+        return ki
+
+    def _lista_uidokkal(self, mappa, limit, offset):
         self.valaszt(mappa)
         ki = []
-        for uid in self._uid_lista("ALL", limit):
-            typ, adat = self.M.uid(
-                "fetch", uid,
-                "(FLAGS BODY.PEEK[HEADER.FIELDS (FROM SUBJECT DATE TO)])")
+        for uid in self._uid_lista("ALL", limit, offset):
+            typ, adat = self.M.uid("fetch", uid, self._FEJLEC_FETCH)
             if typ != "OK" or not adat or not adat[0]:
                 continue
-            nyers = adat[0][1]
-            flags = imaplib.ParseFlags(adat[0][0]) if adat[0][0] else ()
+            meta, nyers = adat[0][0], adat[0][1]
+            flags = imaplib.ParseFlags(meta) if meta else ()
             msg = email.message_from_bytes(nyers)
             info = level_fejlec_info(msg)
             info["uid"] = uid
@@ -753,7 +805,7 @@ class ImapKliens:
         """Levél(ek) MÁSOLÁSA a cél-mappába (a forrás megmarad). Az `uid` lehet
         egyetlen UID vagy vesszővel elválasztott UID-halmaz (kötegelt)."""
         self.valaszt(forras_mappa)
-        typ, _ = self.M.uid("copy", uid, cel_mappa)
+        typ, _ = self.M.uid("copy", uid, self._mappa_arg(cel_mappa))
         return typ == "OK"
 
     def athelyez(self, uid, cel_mappa, forras_mappa="INBOX"):
@@ -761,13 +813,14 @@ class ImapKliens:
         használ, ha a szerver támogatja (RFC 6851); különben copy+delete+expunge.
         Az `uid` lehet vesszővel elválasztott UID-halmaz is."""
         self.valaszt(forras_mappa)
+        cel = self._mappa_arg(cel_mappa)
         try:
-            typ, _ = self.M.uid("move", uid, cel_mappa)
+            typ, _ = self.M.uid("move", uid, cel)
             if typ == "OK":
                 return True
         except Exception:
             pass
-        typ, _ = self.M.uid("copy", uid, cel_mappa)
+        typ, _ = self.M.uid("copy", uid, cel)
         if typ != "OK":
             return False
         self.M.uid("store", uid, "+FLAGS", "(\\Deleted)")
@@ -787,13 +840,13 @@ class ImapKliens:
         except (ValueError, IndexError):
             return 0
 
-    def keres(self, kifejezes, mappa="INBOX", limit=50):
+    def keres(self, kifejezes, mappa="INBOX", limit=50, offset=0):
         """Szerver-oldali keresés (feladó VAGY tárgy VAGY törzs)."""
         self.valaszt(mappa)
         krit = f'(OR OR FROM "{kifejezes}" SUBJECT "{kifejezes}" ' \
                f'TEXT "{kifejezes}")'
         ki = []
-        for uid in self._uid_lista(krit, limit):
+        for uid in self._uid_lista(krit, limit, offset):
             typ, adat = self.M.uid(
                 "fetch", uid,
                 "(FLAGS BODY.PEEK[HEADER.FIELDS (FROM SUBJECT DATE TO)])")
@@ -839,11 +892,12 @@ class Pop3Kliens:
             self.P.pass_(self.fiok["jelszo"])
         return self
 
-    def lista(self, limit=50):
-        """A postafiók legutóbbi leveleinek fejléc-infói (sorszámmal)."""
+    def lista(self, limit=50, offset=0):
+        """A postafiók legutóbbi leveleinek fejléc-infói (sorszámmal), lapozva."""
         db = len(self.P.list()[1])
+        felso = db - offset
         ki = []
-        for i in range(db, max(0, db - limit), -1):
+        for i in range(felso, max(0, felso - limit), -1):
             nyers = b"\r\n".join(self.P.retr(i)[1])
             msg = email.message_from_bytes(nyers)
             info = level_fejlec_info(msg)

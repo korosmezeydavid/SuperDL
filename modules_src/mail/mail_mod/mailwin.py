@@ -1070,7 +1070,7 @@ class BeallitasokDialog(wx.Dialog):
         hs2 = wx.BoxSizer(wx.HORIZONTAL)
         hs2.Add(wx.StaticText(p, label="Levelek száma &listánként:"), 0,
                 wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
-        self.alt_limit = wx.SpinCtrl(p, min=10, max=300,
+        self.alt_limit = wx.SpinCtrl(p, min=10, max=500,
                                      initial=int(cfg.get("lista_limit", 50)))
         hs2.Add(self.alt_limit, 0)
         v.Add(hs2, 0, wx.ALL, 8)
@@ -1219,6 +1219,8 @@ class MailFrame(wx.Frame):
             m_fiok, "&Összes bejövő (minden fiók)", self._osszes_bejovo)
         m_fiok.AppendSeparator()
         self._mi(m_fiok, "&Frissítés  (F5)", lambda e: self._frissit_aktualis())
+        self._mi(m_fiok, "További levelek &betöltése  (B)",
+                 lambda e: self._tovabb_betolt())
         self._mi(m_fiok, "&Keresés…", self._keres)
         self._mi(m_fiok, "⚙ &Beállítások (fiókok, értesítők, címjegyzék)…",
                  self._beallitasok)
@@ -1256,7 +1258,9 @@ class MailFrame(wx.Frame):
         self._mi(m_level, "&Beillesztés ebbe a mappába  (Ctrl+V)",
                  lambda e: self._beilleszt())
         m_level.AppendSeparator()
-        self._mi(m_level, "Tör&lés  (Del)", self._torol)
+        self._mi(m_level, "Tör&lés – Kukába  (Del)", self._torol)
+        self._mi(m_level, "Vé&gleges törlés  (Shift+Del)",
+                 lambda e: self._torol(None, vegleges_kenyszer=True))
         mb.Append(m_level, "&Levél")
 
         m_seg = wx.Menu()
@@ -1405,9 +1409,10 @@ class MailFrame(wx.Frame):
             return
         self._osszesitett = False
         fiok, mappa = self._aktiv, self._mappa
-        self._mond(f"Levelek betöltése – {MC.mappa_display(mappa)}…")
-
         limit = int(MC.altalanos_betolt().get("lista_limit", 50))
+        self._utolso_limit = limit
+        self._mond(f"Levelek betöltése – {MC.mappa_display(mappa)}… "
+                   "kis türelmet, amíg megjönnek.")
 
         def munka():
             k = _kliens(fiok).kapcsolodik()
@@ -1452,6 +1457,17 @@ class MailFrame(wx.Frame):
         else:
             self._frissit()
 
+    def _sor_szoveg(self, info):
+        """Egy levél listasora (olvasott-jel, feladó, tárgy, dátum, csatolmány)."""
+        jel = "•" if not info.get("olvasott") else " "
+        csat = " 📎" if info.get("csatolmany") else ""
+        fiok_cimke = ""
+        if self._osszesitett:
+            f = info.get("_fiok") or {}
+            fiok_cimke = f"[{f.get('nev') or f.get('email') or ''}] "
+        return (f"{jel} {fiok_cimke}{info.get('felado','')} — "
+                f"{info.get('targy','')} — {info.get('datum','')}{csat}")
+
     def _lista_kesz(self, lista):
         if self._closing:
             return
@@ -1466,23 +1482,57 @@ class MailFrame(wx.Frame):
                 and self._aktiv.get("protokoll") != "pop"
                 and (self._mappa or "").upper() == "INBOX"):
             self._uj_level_ellenoriz(self._aktiv, lista)
-        sorok = []
-        for info in lista:
-            jel = "•" if not info.get("olvasott") else " "
-            csat = " 📎" if info.get("csatolmany") else ""
-            fiok_cimke = ""
-            if self._osszesitett:
-                f = info.get("_fiok") or {}
-                fiok_cimke = f"[{f.get('nev') or f.get('email') or ''}] "
-            sorok.append(f"{jel} {fiok_cimke}{info.get('felado','')} — "
-                         f"{info.get('targy','')} — {info.get('datum','')}{csat}")
-        self.level_lista.Set(sorok)
+        self.level_lista.Set([self._sor_szoveg(info) for info in lista])
+        tobb = (not self._osszesitett
+                and len(lista) >= int(getattr(self, "_utolso_limit", 50)))
         if self._osszesitett:
             self._mond(f"{len(lista)} levél az összes fiók bejövőjéből, "
                        "mindegyiknél a fiók nevével.")
         else:
             self._mond(f"{len(lista)} levél a(z) "
-                       f"{MC.mappa_display(self._mappa)} mappában.")
+                       f"{MC.mappa_display(self._mappa)} mappában."
+                       + (" A B betűvel tölthetsz be továbbiakat." if tobb else ""))
+
+    def _lista_hozzafuz(self, lista):
+        """A lapozással behúzott KÖVETKEZŐ adag hozzáfűzése a listához."""
+        if self._closing:
+            return
+        if not lista:
+            self._mond("Nincs több betölthető levél ebben a mappában.")
+            return
+        try:
+            MC.cimjegyzek_tanul([info.get("felado", "") for info in lista])
+        except Exception:
+            pass
+        self._lista.extend(lista)
+        for info in lista:
+            self.level_lista.Append(self._sor_szoveg(info))
+        self._mond(f"Még {len(lista)} levél betöltve – összesen "
+                   f"{len(self._lista)}. A B betűvel jöhet a következő adag.")
+
+    def _tovabb_betolt(self):
+        """A KÖVETKEZŐ adag levél betöltése az aktuális mappából (lapozás, B)."""
+        if self._osszesitett:
+            self._mond("Az Összes bejövő nézetben nincs lapozás – válassz egy "
+                       "konkrét mappát a továbbiakhoz.")
+            return
+        if not self._aktiv:
+            return
+        fiok, mappa = self._aktiv, self._mappa
+        offset = len(self._lista)
+        limit = int(MC.altalanos_betolt().get("lista_limit", 50))
+        self._mond("További levelek betöltése… kis türelmet.")
+
+        def munka():
+            k = _kliens(fiok).kapcsolodik()
+            lista = (k.lista(limit, offset) if isinstance(k, MC.Pop3Kliens)
+                     else k.lista(mappa, limit, offset))
+            k.bezar()
+            for it in lista:
+                it["_fiok"] = fiok
+                it["_mappa"] = mappa
+            return lista
+        _hatterben(munka, self._lista_hozzafuz, self._halo_hiba)
 
     def _uj_level_ellenoriz(self, fiok, lista):
         """Új levél észlelése a legfrissebb INBOX-UID alapján; ha nőtt, értesít."""
@@ -1743,7 +1793,7 @@ class MailFrame(wx.Frame):
                 return m
         return None
 
-    def _torol(self, e):
+    def _torol(self, e, vegleges_kenyszer=False):
         infok = self._kivalasztottak()
         if not infok:
             egy = self._kivalasztott()
@@ -1751,24 +1801,29 @@ class MailFrame(wx.Frame):
         if not infok:
             return
         n = len(infok)
+        # a törlés UTÁNI fókuszhoz: az első kijelölt sor indexe
+        sel = self.level_lista.GetSelections()
+        elso_idx = sel[0] if sel else self.level_lista.GetSelection()
         kuka = self._kuka_mappa()
-        # ha nincs Kuka, vagy épp a Kukából törlünk → VÉGLEGES; különben Kukába
-        vegleges = (not kuka) or (self._mappa == kuka)
+        # KUKÁBA helyezés = visszaállítható → NEM kérdezünk. VÉGLEGES törlésnél
+        # (nincs Kuka, a Kukából törlünk, vagy Shift+Del) MINDIG kérdezünk.
+        vegleges = vegleges_kenyszer or (not kuka) or (self._mappa == kuka)
         if vegleges:
-            kerdes = (f"VÉGLEGESEN törlöd a kijelölt {n} levelet?" if n > 1
-                      else "VÉGLEGESEN törlöd ezt a levelet?")
-        else:
-            kerdes = (f"A Kukába helyezed a kijelölt {n} levelet?" if n > 1
-                      else "A Kukába helyezed ezt a levelet?")
-        if wx.MessageBox(kerdes, "Törlés",
-                         wx.YES_NO | wx.ICON_QUESTION, self) != wx.YES:
-            return
+            kerdes = (f"VÉGLEGESEN törlöd a kijelölt {n} levelet? Ez NEM vonható "
+                      "vissza!" if n > 1
+                      else "VÉGLEGESEN törlöd ezt a levelet? Ez NEM vonható "
+                      "vissza!")
+            if wx.MessageBox(kerdes, "Végleges törlés",
+                             wx.YES_NO | wx.ICON_WARNING, self) != wx.YES:
+                return
+
+        torlendo = list(infok)
+        torlendo_id = {id(x) for x in torlendo}
 
         def munka():
             from collections import defaultdict
-            # fiók+mappa szerint csoportosítva (az „Összes bejövő" is működjön)
             csoport = defaultdict(list)
-            for it in infok:
+            for it in torlendo:
                 f = it.get("_fiok") or self._aktiv
                 m = it.get("_mappa") or self._mappa
                 csoport[(id(f), m)].append((f, m, it))
@@ -1781,14 +1836,17 @@ class MailFrame(wx.Frame):
                         k.torol(it["szam"])
                 else:
                     uidok = ",".join(it["uid"] for _, _, it in tetelek)
-                    # az AKTUÁLIS fiók Kukájába helyezés (visszaállítható), ha van
-                    # Kuka és nem onnan törlünk; különben VÉGLEGES törlés
-                    kuka_f = self._kuka_mappa() if f is self._aktiv else None
+                    # VÉGLEGES kényszernél sosem tesszük Kukába; különben a fiók
+                    # Kukájába helyezzük (visszaállítható), ha van és nem onnan
+                    # törlünk
+                    kuka_f = (None if vegleges_kenyszer
+                              else (self._kuka_mappa() if f is self._aktiv
+                                    else None))
                     if kuka_f and m != kuka_f:
                         if not k.athelyez(uidok, kuka_f, m):
-                            k.torol(uidok, m)   # ha a Kukába tétel elakad, végleges
+                            k.torol(uidok, m)
                     else:
-                        k.torol(uidok, m)       # kötegelt, ellenőrzött UID-törlés
+                        k.torol(uidok, m)
                 k.bezar()
                 total += len(tetelek)
             return total
@@ -1798,7 +1856,17 @@ class MailFrame(wx.Frame):
                 return
             self._mond(f"{r} levél " + ("véglegesen törölve."
                                         if vegleges else "a Kukába helyezve."))
-            self._frissit_aktualis()
+            # a törölteket HELYBEN kivesszük, és a KÖVETKEZŐ levélre lépünk
+            # (nem töltjük újra a szerverről – gyors és megtartja a helyed)
+            self._lista = [it for it in self._lista
+                           if id(it) not in torlendo_id]
+            self.level_lista.Set([self._sor_szoveg(it) for it in self._lista])
+            if self._lista:
+                uj = max(0, min(elso_idx, len(self._lista) - 1))
+                self.level_lista.SetSelection(uj)
+                self._mond(self._sor_szoveg(self._lista[uj]))
+            else:
+                self._mond("Nincs több levél ebben a mappában.")
         _hatterben(munka, kesz, self._halo_hiba)
 
     # ---- vágólap: kivágás/másolás (Ctrl+X/C) → beillesztés (Ctrl+V) ----
@@ -1946,10 +2014,13 @@ class MailFrame(wx.Frame):
         elif m == 0 and k == ord("F"):
             self._menu_level_akcio(
                 lambda msg, f: self._tovabbit(msg=msg, fiok=f))
+        elif m == 0 and k == ord("B"):
+            self._tovabb_betolt()                 # következő adag levél (lapozás)
         elif k == wx.WXK_F5:
             self._frissit_aktualis()
         elif k == wx.WXK_DELETE:
-            self._torol(None)
+            # Del = Kukába (nem kérdez); Shift+Del = VÉGLEGES törlés (kérdez)
+            self._torol(None, vegleges_kenyszer=(m == wx.MOD_SHIFT))
         elif k == wx.WXK_ESCAPE:
             self.Close()
         else:
