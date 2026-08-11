@@ -44,6 +44,8 @@ class Csevejszoba:
         self.on_hely = None             # (ki, pan) – valaki bejelentette a sztereó-helyét
         self._helyek = {}               # ki -> pan (-1..+1): a bejelentett sztereó-helyek
         self._sajat_pan = 0.0           # a SAJÁT választott helyem a térben
+        self.on_kirugva = None          # () – az admin kirúgott a szobából
+        self.on_nemitva = None          # (be) – az admin némított/feloldott
 
     # ------------------------------------------------------------------
     def elerheto(self) -> bool:
@@ -129,6 +131,14 @@ class Csevejszoba:
         elif tipus == "hely":
             if not sajat:
                 self._hely_be(u, ertesit=True)
+        elif tipus == "kirug":
+            cel = str((u.get("adat") or {}).get("nev") or "")
+            if cel == self.nev and self.on_kirugva:
+                self.on_kirugva()
+        elif tipus == "nemit":
+            adat = u.get("adat") or {}
+            if str(adat.get("nev") or "") == self.nev and self.on_nemitva:
+                self.on_nemitva(bool(adat.get("be")))
 
     def _uzenet(self, u: dict, elozmeny: bool):
         adat = u.get("adat") or {}
@@ -260,6 +270,22 @@ class Csevejszoba:
             self._helyek[self.nev] = pan
         try:
             self.net.kuld("hely", {"pan": pan})
+        except Exception:
+            pass
+
+    # ---- admin-jelzések a szobában (a host küldi) --------------------
+    def kirug(self, nev: str):
+        """Hostként kirúgok valakit: jelzés a szobában, hogy ő kilépjen."""
+        try:
+            self.net.kuld("kirug", {"nev": nev})
+        except Exception:
+            pass
+
+    def nemit_jelzes(self, nev: str, be: bool):
+        """Hostként jelzem az érintettnek (és a szobának), hogy némítottam/
+        feloldottam – így a képernyőolvasó bemondhatja neki."""
+        try:
+            self.net.kuld("nemit", {"nev": nev, "be": bool(be)})
         except Exception:
             pass
 

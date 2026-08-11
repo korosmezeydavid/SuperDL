@@ -69,6 +69,8 @@ class HangHalozat:
         self._klienesk = {}             # HOST: megerősített kliens addr -> (nev, ido)
         self._host_addr = None          # KLIENS: a megerősített host-cím
         self.cimek = []                 # a SAJÁT jelöltjeim [(ip,port),...]
+        self._nemitott = set()          # HOST: némított résztvevők (nevek) – nem hallhatók
+        self._tiltott = set()           # HOST: kitiltottak (nevek) – hangja teljesen figyelmen kívül
 
     def elerheto(self) -> bool:
         return self.th.elerheto()
@@ -157,8 +159,13 @@ class HangHalozat:
                 continue
             if self._host:
                 with self._lock:
+                    tiltott = nev in self._tiltott
+                    nemitott = nev in self._nemitott
+                if tiltott:
+                    continue                        # kitiltott: hangját teljesen figyelmen kívül
+                with self._lock:
                     self._klienesk[addr] = (nev, time.time())
-                if pcm:
+                if pcm and not nemitott:            # némítottat NEM halljuk/továbbítjuk
                     self.th.fogad(nev, pcm)
                     self._szor(data, kiveve=addr)   # továbbítás a többi kliensnek
             else:
@@ -218,6 +225,36 @@ class HangHalozat:
                     except Exception:
                         pass
         self.th.set_ulesek(pan_map)
+
+    # ---- admin (csak a HOST-nál van értelme) -------------------------
+    def is_host(self) -> bool:
+        return self._host
+
+    def nemit_tag(self, nev: str, ertek: bool):
+        """Hostként: egy résztvevő némítása/feloldása – némítva a hangját senki
+        nem hallja (a host nem továbbítja)."""
+        with self._lock:
+            if ertek:
+                self._nemitott.add(nev)
+            else:
+                self._nemitott.discard(nev)
+
+    def nemitott_e(self, nev: str) -> bool:
+        with self._lock:
+            return nev in self._nemitott
+
+    def tilt_tag(self, nev: str):
+        """Hostként: egy résztvevő kitiltása – a hangját teljesen figyelmen kívül
+        hagyjuk, és kidobjuk a kapcsolatból (a szoba-jelzés külön szól neki)."""
+        with self._lock:
+            self._tiltott.add(nev)
+            for a in [addr for addr, (n, _) in self._klienesk.items() if n == nev]:
+                del self._klienesk[a]
+        self.th.elenged(nev)
+
+    def felold_tilt(self, nev: str):
+        with self._lock:
+            self._tiltott.discard(nev)
 
     def nemit(self, ertek: bool):
         self.th.nemit(ertek)

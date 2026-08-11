@@ -108,6 +108,9 @@ class CsevejFrame(wx.Frame):
                                     kind=wx.ITEM_CHECK)
         mi_hely = hg.Append(wx.ID_ANY, "&Hol ülj a térben…\tCtrl+H")
         hg.AppendSeparator()
+        mi_nemit = hg.Append(wx.ID_ANY, "Admin: résztvevő &némítása vagy feloldása…")
+        mi_kirug = hg.Append(wx.ID_ANY, "Admin: résztvevő &kirúgása…")
+        hg.AppendSeparator()
         mi_demo = hg.Append(wx.ID_ANY, "&Térhang bemutató (körbejáró hang)\tF6")
         mb.Append(hg, "&Hang")
         h = wx.Menu()
@@ -116,6 +119,8 @@ class CsevejFrame(wx.Frame):
         self.SetMenuBar(mb)
         self.Bind(wx.EVT_MENU, lambda e: self._terhang_bemutato(), mi_demo)
         self.Bind(wx.EVT_MENU, lambda e: self._hely_valaszt(), mi_hely)
+        self.Bind(wx.EVT_MENU, lambda e: self._admin_nemit(), mi_nemit)
+        self.Bind(wx.EVT_MENU, lambda e: self._admin_kirug(), mi_kirug)
         self.Bind(wx.EVT_MENU, lambda e: self._beszed_valt(), self._mi_beszed)
         self.Bind(wx.EVT_MENU, lambda e: self._uj_szoba(), self._mi_uj)
         self.Bind(wx.EVT_MENU, lambda e: self._fokusz_kod(), self._mi_csat)
@@ -312,6 +317,8 @@ class CsevejFrame(wx.Frame):
         szoba.on_kilepett = lambda n: wx.CallAfter(self._on_kilepett, n)
         szoba.on_tagok = lambda lst: wx.CallAfter(self._on_tagok, lst)
         szoba.on_hely = lambda ki, pan: wx.CallAfter(self._on_hely, ki, pan)
+        szoba.on_kirugva = lambda: wx.CallAfter(self._on_kirugva)
+        szoba.on_nemitva = lambda be: wx.CallAfter(self._on_nemitva, be)
         self.szoba = szoba
         self._kod = kod
         # felület átváltása a szobára
@@ -416,6 +423,59 @@ class CsevejFrame(wx.Frame):
             self.SetStatusText("A helyed a térben: %s" % cimke)
             self._mond("A helyed a térben: %s. A többiek innen hallanak." % cimke)
         dlg.Destroy()
+
+    # --- admin (a szoba HÁZIGAZDÁJA szabályozhat) ---------------------
+    def _admin_ok(self):
+        if self._hang is None or not self._hang.is_host():
+            self._mond("Admin-műveletek csak a szoba házigazdájánál érhetők el, "
+                       "és csak ha az élő hang be van kapcsolva.")
+            return False
+        return True
+
+    def _valassz_resztvevo(self, kerdes):
+        nevek = [n for n in (self.szoba.tagok() if self.szoba else [])
+                 if n != self.szoba.nev]
+        if not nevek:
+            self._mond("Rajtad kívül nincs más a szobában.")
+            return None
+        dlg = wx.SingleChoiceDialog(self, kerdes, "Résztvevő", nevek)
+        nev = nevek[dlg.GetSelection()] if dlg.ShowModal() == wx.ID_OK else None
+        dlg.Destroy()
+        return nev
+
+    def _admin_nemit(self):
+        if not self._admin_ok():
+            return
+        nev = self._valassz_resztvevo("Kit némítasz vagy oldasz fel?")
+        if not nev:
+            return
+        be = not self._hang.nemitott_e(nev)
+        self._hang.nemit_tag(nev, be)
+        self.szoba.nemit_jelzes(nev, be)
+        self._mond(("%s némítva – őt most senki nem hallja." if be
+                    else "%s némítása feloldva.") % nev)
+
+    def _admin_kirug(self):
+        if not self._admin_ok():
+            return
+        nev = self._valassz_resztvevo("Kit rúgsz ki a szobából?")
+        if not nev:
+            return
+        if wx.MessageBox("Biztosan kirúgod: %s? A hangját azonnal kizárom, és "
+                         "szólok neki, hogy kilépjen." % nev, "Kirúgás",
+                         wx.YES_NO | wx.ICON_QUESTION, self) != wx.YES:
+            return
+        self._hang.tilt_tag(nev)
+        self.szoba.kirug(nev)
+        self._mond("%s kirúgva a szobából." % nev)
+
+    def _on_kirugva(self):
+        self._mond("A házigazda kirúgott a szobából.")
+        self._kilep_szoba()
+
+    def _on_nemitva(self, be):
+        self._mond("A házigazda némított – téged most nem hallanak."
+                   if be else "A házigazda feloldotta a némításodat.")
 
     def _naplo_sor(self, szoveg):
         if self._naplo.GetValue():
