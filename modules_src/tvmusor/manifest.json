@@ -1,0 +1,12 @@
+{
+  "id": "tvmusor",
+  "name": "TV műsor (tévéújság)",
+  "version": "1.0.0",
+  "entry": "tvmusor_mod",
+  "category": "Média",
+  "description": "Akadálymentes, FELOLVASOTT TÉVÉÚJSÁG – és a legjobb: IPTV-előfizetés NÉLKÜL is működik. Ha csak egy szimpla antennád van (vagy semmid), akkor is megnézheted, mi megy MOST az RTL-en, a TV2-n, az m1-en, a Dunán és több mint száz további csatornán. Négy nézet: „Mi megy most?” (minden csatorna épp futó műsora), „Ma este” (a 20:00–23:00 közti főműsoridő, kezdés szerint), „Csatornák” (válassz csatornát, alatta a műsora mostantól) és „Keresés” – ez utóbbival egyetlen kérdésre megkapod, MIKOR és MELYIK csatornán adják a kedvencedet (ékezet nélkül is megtalálja, és a műsor leírásában is keres). Minden lista fel/le nyíllal navigálható, a képernyőolvasó minden sort felolvas, a kijelölt műsor részletei (pontos idő, hossz, leírás) külön mezőben olvashatók. A műsoradat egy nyilvános műsorújság-forrásból (szabványos XMLTV) érkezik, ami a Beállítás fülön bármikor felülírható; ha a forrás nem elérhető, automatikusan tartalékot próbálunk, és a korábban letöltött műsor offline is megmarad. A műsoradat a forrás szolgáltatójáé – a SuperDL csak megjeleníti, nem tárolja és nem terjeszti; a műsorváltozás jogát a csatornák fenntartják.",
+  "min_core_api": "1.0",
+  "min_core_version": "4.2.7",
+  "requires_tools": [],
+  "author": "Kőrösmezey Dávid"
+}
