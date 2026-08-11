@@ -51,3 +51,91 @@ def test_biztonsagi_szovegek_megvannak():
         or "leáll" in SZ.BELEEGYEZO_SEGITETT.lower()
     assert "vissza" in SZ.BELEEGYEZO_IRANYITO.lower()   # „ne élj vissza”
     assert "{ki}" in SZ.IRANYITAS_AKTIV                 # a felület behelyettesíti
+
+
+# ----------------------- munkamenet (vezérlő-hurok) -----------------------
+SESSION = importlib.import_module(BASE + ".session")
+
+
+class _LokalisTranszport:
+    """Két végpontot köt össze memóriában (a.kuld → b.fogado, szinkron)."""
+    def __init__(self):
+        self._fogado = None
+        self.tars = None
+    def set_fogado(self, cb):
+        self._fogado = cb
+    def kuld(self, uzenet):
+        if self.tars and self.tars._fogado:
+            self.tars._fogado(dict(uzenet))
+    @staticmethod
+    def par():
+        a, b = _LokalisTranszport(), _LokalisTranszport()
+        a.tars, b.tars = b, a
+        return a, b
+
+
+class _MockVezerlo:
+    def __init__(self):
+        self.aktiv = False
+        self.alkalmazott = []
+    def alkalmaz(self, esemeny):
+        if not self.aktiv:
+            return False
+        self.alkalmazott.append(esemeny)
+        return True
+
+
+def _par():
+    ta, tb = _LokalisTranszport.par()
+    mv = _MockVezerlo()
+    segitett = SESSION.Munkamenet(ta, "segitett", "Segitett", vezerlo=mv)
+    iranyito = SESSION.Munkamenet(tb, "iranyito", "Iranyito")
+    return segitett, iranyito, mv
+
+
+def test_esemeny_csak_engedely_utan_hajtodik_vegre():
+    seg, ir, mv = _par()
+    # engedély ELŐTT: az irányító küldése nem megy át (nincs jogosultság)
+    assert ir.esemeny_kuld(V.e_char("x")) is False
+    assert mv.alkalmazott == []
+    # a SEGÍTETT engedélyez (beleegyezés után)
+    seg.iranyitas_engedelyez()
+    assert seg.iranyit and mv.aktiv is True and ir.iranyit is True
+    # most már átmegy és VÉGREHAJTÓDIK
+    assert ir.esemeny_kuld(V.e_char("x")) is True
+    assert mv.alkalmazott == [{"t": "char", "ch": "x"}]
+
+
+def test_panik_azonnal_lezar():
+    seg, ir, mv = _par()
+    seg.iranyitas_engedelyez()
+    ir.esemeny_kuld(V.e_bill(65))
+    assert len(mv.alkalmazott) == 1
+    # PÁNIK a segített oldalán → a kapu becsukódik mindkét félnél
+    seg.iranyitas_leallit(panik=True)
+    assert seg.iranyit is False and mv.aktiv is False and ir.iranyit is False
+    # ezután az irányító küldése már nem hajtódik végre
+    assert ir.esemeny_kuld(V.e_bill(66)) is False
+    assert len(mv.alkalmazott) == 1        # nem nőtt
+
+
+def test_iranyito_oldali_panik_is_lezar():
+    seg, ir, mv = _par()
+    seg.iranyitas_engedelyez()
+    ir.iranyitas_leallit(panik=True)       # az IRÁNYÍTÓ áll le
+    assert mv.aktiv is False and seg.iranyit is False
+
+
+def test_segitett_soha_nem_kuld_esemenyt():
+    seg, ir, mv = _par()
+    seg.iranyitas_engedelyez()
+    # a segített szerep NEM küldhet vezérlést (csak fogad)
+    assert seg.esemeny_kuld(V.e_char("z")) is False
+
+
+def test_csevej_atmegy():
+    seg, ir, mv = _par()
+    kapott = {}
+    ir._on_allapot = lambda k, a: kapott.update({k: a})
+    seg.csevej_kuld("Szia, segítek!")
+    assert kapott.get("csevej", {}).get("szoveg") == "Szia, segítek!"
