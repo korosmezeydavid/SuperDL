@@ -20,7 +20,7 @@ class Kapcsolat:
     def __init__(self, nev):
         self.nev = nev
         self._szoba = None
-        self._p2p = P2PHalozat(on_adat=self._p2p_adat)
+        self._p2p = P2PHalozat(on_adat=self._p2p_adat, on_kesz=self._jelez_kesz)
         self._host = False
         self._fogado = None            # a Munkamenet.fogad (vezérlés-üzenetek)
         self._on_hang = None           # cb(pcm: bytes) – beérkező hang

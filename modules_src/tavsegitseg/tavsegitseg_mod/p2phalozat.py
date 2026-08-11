@@ -22,14 +22,31 @@ _TIP_ADAT = 1
 
 
 class P2PHalozat:
-    def __init__(self, on_adat=None):
+    def __init__(self, on_adat=None, on_kesz=None):
         self.on_adat = on_adat          # cb(payload: bytes)
+        self.on_kesz = on_kesz          # cb() – amikor a peer ELŐSZÖR rögzül
         self._sock = None
         self._peer = None               # a rögzített élő társ-cím (ip, port)
         self._jeloltek = []             # a társ lehetséges címei (punch-cél)
         self._fut = False
         self._closing = False
+        self._kesz_jelezve = False
         self._lock = threading.Lock()
+
+    def _peer_rogzit(self, addr):
+        """A peer első rögzítése – jelez a felső rétegnek (a lyukfúrás kész)."""
+        elso = False
+        with self._lock:
+            if self._peer is None:
+                self._peer = addr
+                elso = True
+            if elso and not self._kesz_jelezve:
+                self._kesz_jelezve = True
+        if elso and self.on_kesz:
+            try:
+                self.on_kesz()
+            except Exception:
+                pass
 
     # ------------------------------------------------------------ indítás
     def indit(self, stun_lekeres=True):
@@ -99,14 +116,10 @@ class P2PHalozat:
                 continue
             tip = data[0]
             if tip == _TIP_HELLO:
-                with self._lock:
-                    if self._peer is None:
-                        self._peer = addr             # rögzítjük az élő utat
+                self._peer_rogzit(addr)               # rögzítjük az élő utat + jelez
                 self._raw(_TIP_HELLO, b"", addr)      # hello-ra hello
             elif tip == _TIP_ADAT:
-                with self._lock:
-                    if self._peer is None:
-                        self._peer = addr
+                self._peer_rogzit(addr)
                 if self.on_adat:
                     try:
                         self.on_adat(data[1:])
