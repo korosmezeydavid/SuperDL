@@ -41,6 +41,9 @@ class OrszagVarosAblak(wx.Dialog):
 
         nb = wx.Notebook(self)
         nb.AddPage(self._play_lap(nb), "Játszunk!")
+        from .orszagvaros_online import OrszagVarosOnlinePanel
+        self._online = OrszagVarosOnlinePanel(nb, main)
+        nb.AddPage(self._online, "Online – többen, több gépről!")
         nb.AddPage(self._tanit_lap(nb), "A játék tanítása")
         s = wx.BoxSizer(wx.VERTICAL)
         s.Add(nb, 1, wx.EXPAND | wx.ALL, 6)
@@ -250,6 +253,11 @@ class OrszagVarosAblak(wx.Dialog):
     def _on_close(self, e):
         try:
             self._commit()               # a mentetlen mező-tartalom se vesszen el
+        except Exception:
+            pass
+        try:
+            if getattr(self, "_online", None):
+                self._online.leallit()
         except Exception:
             pass
         e.Skip()
