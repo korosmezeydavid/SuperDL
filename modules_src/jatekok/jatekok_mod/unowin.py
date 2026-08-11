@@ -16,6 +16,7 @@ import wx
 
 from superdl import store  # noqa: F401 (a mintához; nem kötelező)
 from .jatekok import sajat as SJ
+from .uno_online import UnoOnlinePanel
 
 
 def _mond_sr(szoveg):
@@ -69,46 +70,56 @@ class UnoAblak(wx.Dialog):
 
     # ------------------------------------------------------------------ UI
     def _build(self):
+        nb = wx.Notebook(self)
+        helyi = wx.Panel(nb)
         v = wx.BoxSizer(wx.VERTICAL)
-        v.Add(wx.StaticText(self, label=(
+        v.Add(wx.StaticText(helyi, label=(
             "UNO – te és a gépi ellenfelek (2 vagy 4 fő, új játékkor "
             "választhatsz). Fel/le nyíllal lépkedsz a lapjaidon (a rakhatók "
             "jelölve), Enter vagy Kirakás: leteszed; Húzás: húzol. Súgó: F1.")),
             0, wx.ALL, 8)
 
-        self._felso = wx.TextCtrl(self, style=wx.TE_READONLY)
+        self._felso = wx.TextCtrl(helyi, style=wx.TE_READONLY)
         self._felso.SetName("A felső lap és a soron lévő játékos")
         v.Add(self._felso, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
 
-        v.Add(wx.StaticText(self, label="A &lapjaid (fel/le nyíl, Enter = kirakás):"),
+        v.Add(wx.StaticText(helyi, label="A &lapjaid (fel/le nyíl, Enter = kirakás):"),
               0, wx.LEFT | wx.TOP, 8)
-        self._kez_lst = wx.ListBox(self, style=wx.LB_SINGLE)
+        self._kez_lst = wx.ListBox(helyi, style=wx.LB_SINGLE)
         self._kez_lst.SetName("A lapjaid")
         self._kez_lst.Bind(wx.EVT_LISTBOX_DCLICK, lambda e: self._kirak())
         v.Add(self._kez_lst, 1, wx.EXPAND | wx.ALL, 8)
 
         sor = wx.BoxSizer(wx.HORIZONTAL)
-        self._g_kirak = wx.Button(self, label="&Kirakás")
+        self._g_kirak = wx.Button(helyi, label="&Kirakás")
         self._g_kirak.Bind(wx.EVT_BUTTON, lambda e: self._kirak())
         sor.Add(self._g_kirak, 0, wx.RIGHT, 6)
-        self._g_huz = wx.Button(self, label="&Húzás")
+        self._g_huz = wx.Button(helyi, label="&Húzás")
         self._g_huz.Bind(wx.EVT_BUTTON, lambda e: self._huz_akcio())
         sor.Add(self._g_huz, 0, wx.RIGHT, 6)
-        self._g_uj = wx.Button(self, label="Ú&j játék")
+        self._g_uj = wx.Button(helyi, label="Ú&j játék")
         self._g_uj.Bind(wx.EVT_BUTTON, lambda e: self._uj_jatek())
         sor.Add(self._g_uj, 0, wx.RIGHT, 6)
-        g_zar = wx.Button(self, label="Be&zárás")
+        g_zar = wx.Button(helyi, label="Be&zárás")
         g_zar.Bind(wx.EVT_BUTTON, lambda e: self.Close())
         sor.Add(g_zar, 0)
         v.Add(sor, 0, wx.ALL, 8)
 
-        v.Add(wx.StaticText(self, label="&Játék menete:"), 0, wx.LEFT, 8)
+        v.Add(wx.StaticText(helyi, label="&Játék menete:"), 0, wx.LEFT, 8)
         self._naplo = wx.TextCtrl(
-            self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
+            helyi, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
             size=(-1, 130))
         self._naplo.SetName("A játék menete, csak olvasható")
         v.Add(self._naplo, 0, wx.EXPAND | wx.ALL, 8)
-        self.SetSizer(v)
+        helyi.SetSizer(v)
+
+        nb.AddPage(helyi, "Helyben – gépek ellen")
+        self._online = UnoOnlinePanel(nb, self.main)
+        nb.AddPage(self._online, "Online – robbantsuk fel a netet!")
+        self._nb = nb
+        s = wx.BoxSizer(wx.VERTICAL)
+        s.Add(nb, 1, wx.EXPAND | wx.ALL, 6)
+        self.SetSizer(s)
 
     # --------------------------------------------------------------- hang
     def _hang(self, nev):
@@ -396,11 +407,21 @@ class UnoAblak(wx.Dialog):
     def _on_key(self, e):
         k = e.GetKeyCode()
         if k == wx.WXK_F1:
+            online = False
+            try:
+                online = (self._nb.GetSelection() == 1)
+            except Exception:
+                pass
+            if online:
+                from .uno_online import UNO_ONLINE_SUGO
+                cim, szoveg = "Súgó – UNO online", UNO_ONLINE_SUGO
+            else:
+                cim, szoveg = "Súgó – UNO", self._SUGO
             try:
                 from superdl.helpdialog import show_help
-                show_help(self, "Súgó – UNO", self._SUGO)
+                show_help(self, cim, szoveg)
             except Exception:
-                wx.MessageBox(self._SUGO, "Súgó – UNO", wx.OK | wx.ICON_INFORMATION, self)
+                wx.MessageBox(szoveg, cim, wx.OK | wx.ICON_INFORMATION, self)
         elif k in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER) and \
                 self.FindFocus() is self._kez_lst:
             self._kirak()
@@ -414,6 +435,11 @@ class UnoAblak(wx.Dialog):
         try:
             if self._player is not None:
                 self._player.stop()
+        except Exception:
+            pass
+        try:
+            if getattr(self, "_online", None):
+                self._online.leallit()
         except Exception:
             pass
         e.Skip()
