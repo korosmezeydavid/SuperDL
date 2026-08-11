@@ -375,8 +375,14 @@ SAJAT: tuple[Jatek, ...] = (
           "változat – a műsor zenéje és hangja nélkül.",
           retro=False),
     Jatek("uno", "UNO",
-          "A klasszikus UNO három ellenféllel: rakj színben vagy értékben "
-          "egyezőt, és fogyj ki elsőként a lapjaidból!",
+          "A klasszikus UNO két vagy négy fővel: modern, felolvasott felület – "
+          "fel/le nyíllal lépkedsz a lapjaidon, a rakhatók jelölve. "
+          "Közönséghangok és a gépi ellenfelek beszólnak!",
+          retro=False),
+    Jatek("blackjack21", "Blackjack",
+          "Kaszinó blackjack az osztó ellen, modern, felolvasott felülettel: "
+          "kerülj 21-hez közel túllépés nélkül. Lapkérés, megállás, duplázás, "
+          "zsetonok – az osztó beszól, a közönség él!",
           retro=False),
     Jatek("enektanito", "Gépi ének",
           "Taníts a gépnek egy dalt, és a saját formáns-hangján elénekli! "
