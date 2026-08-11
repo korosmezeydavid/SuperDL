@@ -132,6 +132,7 @@ class PokerHost:
         return {
             "fazis": self.fazis, "kor": self.kor, "pot": self.pot,
             "soron": self.soron, "tet_szint": getattr(self, "tet_szint", 0),
+            "tet_egyseg": self.tet_egyseg, "ante": self.ante,
             "korbe": dict(getattr(self, "korbe", {})),
             "zseton": dict(self.zseton), "statusz": dict(self.statusz),
             "lapszamok": {n: len(self.kezek[n]) for n in self.jatekosok},
@@ -280,3 +281,565 @@ class PokerHost:
             return self.allapot_publikus(uz)
 
         return None
+
+
+# ============================ ONLINE panel (fül) =============================
+
+import wx
+
+from . import netroom
+
+POKER_ONLINE_SUGO = (
+    "PÓKER ONLINE – SÚGÓ\n\n"
+    "Ötlapos húzós póker több gépről, csak internettel. A szobát nyitó játékos a "
+    "HOST: nála fut a hiteles játék, ő oszt. MINDENKI CSAK A SAJÁT lapjait látja "
+    "(a leleplezésig); a többiektől a tétet és a zsetont látod.\n\n"
+    "BELÉPÉS\n"
+    "• Írd be a NEVED. Ha TE szervezed: „Új szoba” → KÓD, „Kód másolása”, majd "
+    "„Játék indítása”. Ha CSATLAKOZOL: kód + „Csatlakozás”.\n\n"
+    "EGY LEOSZTÁS\n"
+    "Mindenki beteszi az antét, és kap 5 lapot. Két tétkör van (a csere előtt és "
+    "után), köztük a csere.\n"
+    "• Tétkörben: „Passz/Megadás” (ha nincs tét: passzolsz; ha van: megadod), "
+    "„Emel” (nyitsz vagy emelsz egy fix egységgel), „Bedob” (feladod a lapjaid). "
+    "Ha mindenki más bedob, te viszed a potot.\n"
+    "• Cserében: a lapjaid listáján fel/le nyíllal lépkedsz, SZÓKÖZ jelöli/veszi "
+    "le az eldobandót, majd „Csere” – a jelölteket lecseréled újakra.\n"
+    "• Leleplezés: a legjobb kéz viszi a potot (döntetlennél osztott). A HOST az "
+    "„Új leosztás” gombbal oszthat újra.\n\n"
+    "Kéz-rangsor (erősödő): magas lap, pár, két pár, drill, sor, szín, full "
+    "house, póker (négy egyforma), színsor. Csevegés az ablak alján; szünetet a "
+    "host kapcsolhat. Csak internet kell."
+)
+
+
+class PokerOnlinePanel(wx.Panel):
+    """Host-authoritative ONLINE póker (ötlapos húzós), MAGÁNKÉZZEL (mint az
+    UNO): a host a publikus állapotot broadcastolja, a privát kezet címzetten
+    küldi. Tétkörök + csere + leleplezés; lobbi + csevegés + (host) szünet."""
+
+    def __init__(self, parent, main):
+        super().__init__(parent)
+        self.main = main
+        self._closing = False
+        self._szoba = None
+        self._host = False
+        self._motor = None
+        self._nev = "Játékos"
+        self._jatekosok = []
+        self._soron = ""
+        self._fazis = "lobbi"
+        self._szunet = False
+        self._kezem = []
+        self._eldobando = set()
+        self._allapot = {}
+        self._hang_player = None
+        self._build()
+        wx.CallAfter(self._start_ellenoriz)
+
+    # -------------------------------------------------------------- felület
+    def _build(self):
+        v = wx.BoxSizer(wx.VERTICAL)
+        v.Add(wx.StaticText(self, label=(
+            "Ötlapos húzós PÓKER több gépről – csak internet kell! Mindenki csak "
+            "a SAJÁT lapjait látja a leleplezésig. Súgó: F1.")), 0, wx.ALL, 8)
+
+        sor = wx.BoxSizer(wx.HORIZONTAL)
+        sor.Add(wx.StaticText(self, label="A &neved:"),
+                0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.nev_mezo = wx.TextCtrl(self, value=self._alap_nev())
+        self.nev_mezo.SetName("A neved")
+        sor.Add(self.nev_mezo, 1)
+        v.Add(sor, 0, wx.EXPAND | wx.ALL, 8)
+        self._sor_nev = sor
+
+        lob = wx.BoxSizer(wx.HORIZONTAL)
+        self.uj_gomb = wx.Button(self, label="Ú&j szoba (én szervezem)")
+        self.uj_gomb.Bind(wx.EVT_BUTTON, self._uj_szoba)
+        lob.Add(self.uj_gomb, 0, wx.RIGHT, 6)
+        lob.Add(wx.StaticText(self, label="&kód:"),
+                0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
+        self.kod_mezo = wx.TextCtrl(self, size=(90, -1))
+        self.kod_mezo.SetName("Szobakód")
+        lob.Add(self.kod_mezo, 0, wx.RIGHT, 4)
+        self.masol_gomb = wx.Button(self, label="Kód &másolása")
+        self.masol_gomb.Bind(wx.EVT_BUTTON, self._kod_masol)
+        lob.Add(self.masol_gomb, 0, wx.RIGHT, 6)
+        self.csat_gomb = wx.Button(self, label="&Csatlakozás")
+        self.csat_gomb.Bind(wx.EVT_BUTTON, self._csatlakozas)
+        lob.Add(self.csat_gomb, 0, wx.RIGHT, 6)
+        self.indit_gomb = wx.Button(self, label="Játék &indítása")
+        self.indit_gomb.Bind(wx.EVT_BUTTON, self._indit)
+        self.indit_gomb.Disable()
+        lob.Add(self.indit_gomb, 0)
+        v.Add(lob, 0, wx.ALL, 8)
+        self._sor_lob = lob
+
+        # asztal (pot + játékosok) + saját kéz
+        self._asztal = wx.TextCtrl(
+            self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
+            size=(-1, 96))
+        self._asztal.SetName("Az asztal: pot, tét, zsetonok")
+        v.Add(self._asztal, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 8)
+
+        v.Add(wx.StaticText(self, label="A &lapjaid (fel/le nyíl; SZÓKÖZ = "
+                            "eldobandó jelölése cserénél):"),
+              0, wx.LEFT | wx.TOP, 8)
+        self._kez_lst = wx.ListBox(self, style=wx.LB_SINGLE)
+        self._kez_lst.SetName("A lapjaid")
+        self._kez_lst.Bind(wx.EVT_KEY_DOWN, self._kez_key)
+        v.Add(self._kez_lst, 1, wx.EXPAND | wx.ALL, 8)
+
+        akc = wx.BoxSizer(wx.HORIZONTAL)
+        self.g_megad = wx.Button(self, label="&Passz / Megadás")
+        self.g_megad.Bind(wx.EVT_BUTTON, lambda e: self._akcio("megad"))
+        akc.Add(self.g_megad, 0, wx.RIGHT, 6)
+        self.g_emel = wx.Button(self, label="&Emel")
+        self.g_emel.Bind(wx.EVT_BUTTON, lambda e: self._akcio("emel"))
+        akc.Add(self.g_emel, 0, wx.RIGHT, 6)
+        self.g_dob = wx.Button(self, label="&Bedob")
+        self.g_dob.Bind(wx.EVT_BUTTON, lambda e: self._akcio("dob"))
+        akc.Add(self.g_dob, 0, wx.RIGHT, 6)
+        self.g_csere = wx.Button(self, label="&Csere (a jelölteket)")
+        self.g_csere.Bind(wx.EVT_BUTTON, lambda e: self._csere())
+        akc.Add(self.g_csere, 0, wx.RIGHT, 6)
+        self.g_ujleoszt = wx.Button(self, label="Ú&j leosztás (host)")
+        self.g_ujleoszt.Bind(wx.EVT_BUTTON, self._uj_leosztas)
+        akc.Add(self.g_ujleoszt, 0, wx.RIGHT, 6)
+        self.g_szunet = wx.Button(self, label="&Szünet")
+        self.g_szunet.Bind(wx.EVT_BUTTON, self._szunet_valt)
+        akc.Add(self.g_szunet, 0)
+        v.Add(akc, 0, wx.ALL, 8)
+        self._akc_sizer = akc
+
+        # csevegés
+        self._chat_label = wx.StaticText(self, label="&Csevegés a játékosokkal:")
+        v.Add(self._chat_label, 0, wx.LEFT | wx.TOP, 8)
+        self.chat_atirat = wx.TextCtrl(
+            self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
+            size=(-1, 48))
+        self.chat_atirat.SetName("Csevegés a játékosokkal")
+        v.Add(self.chat_atirat, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
+        csor = wx.BoxSizer(wx.HORIZONTAL)
+        self.chat_be = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.chat_be.SetName("Írj a többieknek, Enter a küldés")
+        self.chat_be.Bind(wx.EVT_TEXT_ENTER, lambda e: self._chat_kuld())
+        csor.Add(self.chat_be, 1, wx.RIGHT, 6)
+        self.chat_gomb = wx.Button(self, label="Kül&dés")
+        self.chat_gomb.Bind(wx.EVT_BUTTON, lambda e: self._chat_kuld())
+        csor.Add(self.chat_gomb, 0)
+        v.Add(csor, 0, wx.EXPAND | wx.ALL, 8)
+        self._csor_sizer = csor
+
+        self._naplo = wx.TextCtrl(
+            self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
+            size=(-1, 60))
+        self._naplo.SetName("A játék menete, csak olvasható")
+        v.Add(self._naplo, 0, wx.EXPAND | wx.ALL, 8)
+
+        self.SetSizer(v)
+        self._v = v
+        self._jatek_widgetek = [self._asztal, self._kez_lst, self._chat_label,
+                                self.chat_atirat, self._naplo]
+        self._jatek_sizerek = [self._akc_sizer, self._csor_sizer]
+        self._vez(False)
+        self._szoba_reszek_lathato(False)
+
+    def _alap_nev(self):
+        try:
+            s = getattr(self.main, "settings", {}) or {}
+            return (s.get("nev") or s.get("felhasznalo") or "").strip() or "Játékos"
+        except Exception:
+            return "Játékos"
+
+    def _start_ellenoriz(self):
+        if not netroom.ably_kulcs():
+            self._mondd("Az online játék ebben a verzióban még nem elérhető. A "
+                        "helyi Póker a másik fülön viszont mindig megy!")
+
+    # -------------------------------------------------------------- lobbi
+    def _uj_szoba(self, e):
+        self._nev = (self.nev_mezo.GetValue() or "Játékos").strip()
+        kod = netroom.szobakod()
+        self._szoba = netroom.NetSzoba(kod, self._nev)
+        if not self._szoba.elerheto():
+            self._mondd("Nincs online kulcs beállítva – nem tudok szobát nyitni.")
+            return
+        self._host = True
+        self._jatekosok = [self._nev]
+        self._szoba.figyel(self._uzenet_jott)
+        self._szoba_reszek_lathato(True)
+        self.kod_mezo.SetValue(kod)
+        self.uj_gomb.Disable()
+        self.csat_gomb.Disable()
+        self.indit_gomb.Enable()
+        self._mondd(f"Szoba nyitva! A kódod: {kod} (betűnként: {' '.join(kod)}). "
+                    "Küldd el a haverjaidnak, és ha mind bent vannak, indítsd a "
+                    "játékot!")
+
+    def _kod_masol(self, e):
+        kod = (self.kod_mezo.GetValue() or "").strip()
+        if not kod:
+            self._mondd("Előbb nyiss egy szobát – akkor lesz kód a másoláshoz.")
+            return
+        try:
+            if wx.TheClipboard.Open():
+                wx.TheClipboard.SetData(wx.TextDataObject(kod))
+                wx.TheClipboard.Close()
+                self._mondd(f"A(z) {kod} kód a vágólapon!")
+        except Exception:
+            self._mondd(f"A kód: {kod} – mondd be a többieknek.")
+
+    def _csatlakozas(self, e):
+        self._nev = (self.nev_mezo.GetValue() or "Játékos").strip()
+        kod = (self.kod_mezo.GetValue() or "").strip().upper()
+        if not kod:
+            self._mondd("Írd be a szobakódot, amit a szervező mondott.")
+            return
+        self._szoba = netroom.NetSzoba(kod, self._nev)
+        if not self._szoba.elerheto():
+            self._mondd("Nincs online kulcs beállítva – nem tudok csatlakozni.")
+            return
+        self._host = False
+        self._szoba.figyel(self._uzenet_jott)
+        self._szoba_reszek_lathato(True)
+        self._szoba.kuld("csatlakozott", {"nev": self._nev})
+        self.uj_gomb.Disable()
+        self.csat_gomb.Disable()
+        self._mondd(f"Csatlakoztál a(z) {kod} szobához {self._nev} néven. "
+                    "Várd, hogy a szervező elindítsa a játékot!")
+
+    def _indit(self, e):
+        if not self._host or not self._szoba:
+            return
+        if len(self._jatekosok) < 2:
+            self._mondd("Legalább két játékos kell – várj, míg csatlakoznak!")
+            return
+        from .poker_online import PokerHost
+        self._motor = PokerHost(self._jatekosok)
+        self.indit_gomb.Disable()
+        self._szoba.kuld("start", {"jatekosok": self._jatekosok})
+        self._broadcast(f"Kezdődik a Póker {len(self._jatekosok)} játékossal! "
+                        "Mindenki betette az antét, itt az 5 lapod.")
+
+    def _broadcast(self, uzenet=""):
+        if not (self._host and self._motor and self._szoba):
+            return
+        self._szoba.kuld("allapot", self._motor.allapot_publikus(uzenet))
+        for nev in self._motor.jatekosok:
+            self._szoba.kuld("kez", {"cimzett": nev,
+                                     "lapok": self._motor.kez(nev)})
+
+    # -------------------------------------------------------------- hálózat
+    def _uzenet_jott(self, u):
+        if not self._closing:
+            wx.CallAfter(self._kezeld, u)
+
+    def _kezeld(self, u):
+        if self._closing:
+            return
+        tipus = u.get("tipus")
+        ki = u.get("ki")
+        adat = u.get("adat") or {}
+        if tipus == "csatlakozott":
+            if self._host:
+                nev = (adat.get("nev") or ki or "").strip()
+                if nev and nev not in self._jatekosok:
+                    self._jatekosok.append(nev)
+                    self._mondd(f"{nev} csatlakozott! Játékosok: "
+                                + ", ".join(self._jatekosok) + ".")
+        elif tipus == "start":
+            self._jatekosok = adat.get("jatekosok", self._jatekosok)
+            self._mondd("Indul a Póker! Játékosok: "
+                        + ", ".join(self._jatekosok) + ".")
+        elif tipus == "akcio":
+            if self._host and self._motor and not self._szunet:
+                allap = self._motor.akcio(ki, adat.get("tipus"),
+                                          adat.get("adat"))
+                if allap is not None:
+                    self._broadcast(allap.get("uzenet", ""))
+        elif tipus == "uj_leosztas":
+            if self._host and self._motor and not self._szunet:
+                self._motor.osztas()
+                self._broadcast("Új leosztás! Mindenki betette az antét.")
+        elif tipus == "allapot":
+            self._render_publikus(adat)
+        elif tipus == "kez":
+            if adat.get("cimzett") == self._nev:
+                self._kezem = [tuple(x) for x in adat.get("lapok", [])]
+                self._frissit_kez()
+        elif tipus == "szunet":
+            self._szunet = bool(adat.get("be"))
+            self._mondd("A játék SZÜNETEL (a host állította meg)." if self._szunet
+                        else "A játék FOLYTATÓDIK!")
+            self._vez_allapot()
+        elif tipus == "csevej":
+            self._chat_fogad(ki, adat)
+
+    # -------------------------------------------------------------- render
+    def _enyem(self):
+        st = (self._allapot.get("statusz", {}) or {}).get(self._nev, "")
+        return (self._soron == self._nev and st == "jatszik" and not self._szunet)
+
+    def _lap_txt(self, k):
+        return "%s %s" % (k[1], k[0])
+
+    def _asztal_szoveg(self, a):
+        sorok = ["Pot: %d.  Kör-tét: %d." % (a.get("pot", 0),
+                                             a.get("tet_szint", 0))]
+        st = a.get("statusz", {})
+        zseton = a.get("zseton", {})
+        korbe = a.get("korbe", {})
+        lapszam = a.get("lapszamok", {})
+        lel = a.get("leleplezes", {})
+        lelnev = a.get("leleplezes_nev", {})
+        cimkek = {"jatszik": "játszik", "passzolt": "bedobta", "kiul": "kimarad"}
+        gy = a.get("gyoztes", [])
+        for n in a.get("jatekosok", []):
+            reszek = ["%s: zseton %d" % (n, zseton.get(n, 0))]
+            reszek.append("[%s]" % cimkek.get(st.get(n, ""), st.get(n, "")))
+            if korbe.get(n):
+                reszek.append("a körben %d" % korbe[n])
+            if n in lel:
+                kez = ", ".join(self._lap_txt(k) for k in lel[n])
+                reszek.append("→ %s (%s)" % (kez, lelnev.get(n, "")))
+            else:
+                reszek.append("%d lap" % lapszam.get(n, 0))
+            if n in gy:
+                reszek.append("🏆 NYERT")
+            jel = " ◄ TE" if n == self._nev else ""
+            sorok.append("  ".join(reszek) + jel)
+        return "\n".join(sorok)
+
+    def _render_publikus(self, a):
+        self._allapot = a
+        self._fazis = a.get("fazis", "tet1")
+        self._soron = a.get("soron", "")
+        self._lobbi_lathato(self._fazis == "lobbi")
+        uz = a.get("uzenet", "")
+        self._hang_esemeny(uz, self._fazis, a)
+        if self._fazis == "csere" and not getattr(self, "_csere_faz_volt", False):
+            self._eldobando = set()
+        self._csere_faz_volt = (self._fazis == "csere")
+        self._asztal.SetValue(self._asztal_szoveg(a))
+        if uz:
+            self._mondd(uz)
+        self._frissit_kez()
+        self._vez_allapot()
+        if self._fazis == "vege":
+            gy = a.get("gyoztes", [])
+            enyertem = self._nev in gy
+            self._mondd(("NYERTÉL %d zsetont! " % a.get("nyeremeny", 0)
+                         if enyertem else "A leosztás vége. Győztes: %s. "
+                         % ", ".join(gy))
+                        + ("Oszthatsz újat!" if self._host
+                           else "Várd a host új leosztását!"))
+            return
+        if self._enyem():
+            if self._fazis == "csere":
+                self._mondd("TE JÖSSZ – CSERE! Jelöld a SZÓKÖZZEL az eldobandó "
+                            "lapokat, aztán „Csere”.")
+            else:
+                tetszint = a.get("tet_szint", 0)
+                diff = tetszint - (a.get("korbe", {}) or {}).get(self._nev, 0)
+                self._mondd("TE JÖSSZ! %s Emelhetsz, vagy bedobhatsz."
+                            % ("Nincs tét, passzolhatsz."
+                               if diff <= 0 else "Megadáshoz %d kell." % diff))
+            try:
+                (self._kez_lst if self._fazis == "csere"
+                 else self.g_megad).SetFocus()
+            except Exception:
+                pass
+
+    def _frissit_kez(self):
+        elemek = []
+        for i, k in enumerate(self._kezem):
+            jel = "  🗑 eldobom" if i in self._eldobando else ""
+            elemek.append(self._lap_txt(k) + jel)
+        kijel = self._kez_lst.GetSelection()
+        self._kez_lst.Set(elemek)
+        if elemek:
+            self._kez_lst.SetSelection(min(max(kijel, 0), len(elemek) - 1))
+
+    def _vez_allapot(self):
+        enyem = self._enyem()
+        bet = enyem and self._fazis in ("tet1", "tet2")
+        csere = enyem and self._fazis == "csere"
+        try:
+            # dinamikus feliratok a tétkörben (mit csinál a Megadás/Emel gomb)
+            if bet:
+                a = self._allapot
+                diff = a.get("tet_szint", 0) - (a.get("korbe", {}) or {}).get(
+                    self._nev, 0)
+                self.g_megad.SetLabel("&Passz (nem teszek be)" if diff <= 0
+                                      else "&Megadás (%d)" % diff)
+                self.g_emel.SetLabel("&Emel (+%d)" % a.get("tet_egyseg", 0))
+            self.g_megad.Enable(bet)
+            self.g_emel.Enable(bet)
+            self.g_dob.Enable(bet)
+            self.g_csere.Enable(csere)
+            self.g_ujleoszt.Enable(self._host and self._fazis == "vege"
+                                   and not self._szunet)
+            self.g_szunet.Enable(self._host and self._fazis in (
+                "tet1", "tet2", "csere", "vege"))
+        except Exception:
+            pass
+
+    def _vez(self, be):
+        for g in (self.g_megad, self.g_emel, self.g_dob, self.g_csere):
+            try:
+                g.Enable(be)
+            except Exception:
+                pass
+        for g in (self.g_ujleoszt, self.g_szunet):
+            try:
+                g.Enable(False)
+            except Exception:
+                pass
+
+    # -------------------------------------------------------------- akciók
+    def _kez_key(self, e):
+        if e.GetKeyCode() == wx.WXK_SPACE and self._fazis == "csere" \
+                and self._enyem():
+            i = self._kez_lst.GetSelection()
+            if 0 <= i < len(self._kezem):
+                if i in self._eldobando:
+                    self._eldobando.discard(i)
+                    self._mondd("%s – marad." % self._lap_txt(self._kezem[i]))
+                else:
+                    self._eldobando.add(i)
+                    self._mondd("%s – eldobom." % self._lap_txt(self._kezem[i]))
+                self._frissit_kez()
+        else:
+            e.Skip()
+
+    def _akcio(self, tipus):
+        if not self._szoba or self._fazis not in ("tet1", "tet2"):
+            return
+        if self._szunet:
+            self._mondd("A játék szünetel.")
+            return
+        if not self._enyem():
+            self._mondd("Most nem te jössz – várj a köröodre.")
+            return
+        self._szoba.kuld("akcio", {"tipus": tipus, "adat": {}})
+
+    def _csere(self):
+        if not self._szoba or self._fazis != "csere" or not self._enyem():
+            return
+        self._szoba.kuld("akcio", {"tipus": "csere",
+                                   "adat": {"indexek": sorted(self._eldobando)}})
+        self._eldobando = set()
+
+    def _uj_leosztas(self, e):
+        if not self._host or not self._szoba:
+            self._mondd("Új leosztást a szoba szervezője (host) oszthat.")
+            return
+        if self._fazis != "vege":
+            self._mondd("Új leosztás csak a mostani vége után.")
+            return
+        self._szoba.kuld("uj_leosztas", {})
+
+    def _szunet_valt(self, e):
+        if not self._host or not self._szoba:
+            self._mondd("A szünetet a szoba szervezője (host) kapcsolhatja.")
+            return
+        self._szoba.kuld("szunet", {"be": not self._szunet})
+
+    # -------------------------------------------------------------- csevegés
+    def _chat_kuld(self):
+        t = (self.chat_be.GetValue() or "").strip()
+        if not t or not self._szoba:
+            return
+        self._szoba.kuld("csevej", {"szoveg": t})
+        self.chat_be.SetValue("")
+        self.chat_be.SetFocus()
+
+    def _chat_fogad(self, ki, adat):
+        szoveg = (adat.get("szoveg") or "").strip()
+        if not szoveg:
+            return
+        sajat = (ki == self._nev)
+        cimke = "Te" if sajat else (ki or "Valaki")
+        try:
+            self.chat_atirat.AppendText(f"{cimke}: {szoveg}\n")
+        except Exception:
+            pass
+        if not sajat:
+            self._mondd(f"{ki} üzenete: {szoveg}")
+
+    # -------------------------------------------------------------- láthatóság
+    def _szoba_reszek_lathato(self, latszik):
+        try:
+            for w in self._jatek_widgetek:
+                w.Show(latszik)
+            for s in self._jatek_sizerek:
+                self._v.Show(s, latszik, recursive=True)
+            self._v.Layout()
+        except Exception:
+            pass
+
+    def _lobbi_lathato(self, latszik):
+        try:
+            self._v.Show(self._sor_nev, latszik, recursive=True)
+            self._v.Show(self._sor_lob, latszik, recursive=True)
+            self._v.Layout()
+        except Exception:
+            pass
+
+    # -------------------------------------------------------------- hang
+    def _hang(self, nev):
+        try:
+            import os
+            from superdl.audioengine import Player
+            mappa = os.path.join(os.path.dirname(__file__), "szerencsekerek_hang")
+            ut = None
+            for ext in (".wav", ".mp3"):
+                p = os.path.join(mappa, nev + ext)
+                if os.path.isfile(p):
+                    ut = p
+                    break
+            if not ut:
+                return
+            if self._hang_player is None:
+                self._hang_player = Player()
+            self._hang_player.play(ut, "")
+        except Exception:
+            pass
+
+    def _hang_esemeny(self, uzenet, fazis, a):
+        nev = None
+        if fazis == "vege":
+            nev = "taps" if self._nev in a.get("gyoztes", []) else "ooo"
+        elif "emel" in (uzenet or "") or "nyit" in (uzenet or ""):
+            nev = "maganhangzo_vasarlas"
+        if nev:
+            self._hang(nev)
+
+    def _mondd(self, szoveg):
+        if self._closing or not (szoveg or "").strip():
+            return
+        try:
+            self._naplo.AppendText(szoveg + "\n")
+        except Exception:
+            pass
+        try:
+            from superdl import screenreader
+            if screenreader.speak(szoveg):
+                return
+        except Exception:
+            pass
+        sv = getattr(self.main, "selfvoice", None)
+        if sv:
+            try:
+                sv.speak(szoveg, force=True)
+            except Exception:
+                pass
+
+    def leallit(self):
+        self._closing = True
+        try:
+            if self._szoba:
+                self._szoba.leallit()
+        except Exception:
+            pass

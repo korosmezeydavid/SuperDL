@@ -107,41 +107,52 @@ class PokerAblak(wx.Dialog):
         wx.CallAfter(self._uj_leosztas)
 
     def _build(self):
+        nb = wx.Notebook(self)
+        helyi = wx.Panel(nb)
         v = wx.BoxSizer(wx.VERTICAL)
-        v.Add(wx.StaticText(self, label=(
+        v.Add(wx.StaticText(helyi, label=(
             "Ötlapos húzós póker: dobd el a rossz lapokat (Space jelöli a "
             "kijelöltet), Csere = húzol helyettük, a legjobb kéz nyer. Súgó: F1.")),
             0, wx.ALL, 8)
-        self._allapot = wx.TextCtrl(self, style=wx.TE_READONLY)
+        self._allapot = wx.TextCtrl(helyi, style=wx.TE_READONLY)
         self._allapot.SetName("A kéz értéke, a kassza és a zsetonjaid")
         v.Add(self._allapot, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
 
-        v.Add(wx.StaticText(self, label="A &lapjaid (Space = eldobom / meggondolom):"),
+        v.Add(wx.StaticText(helyi, label="A &lapjaid (Space = eldobom / meggondolom):"),
               0, wx.LEFT | wx.TOP, 8)
-        self._kez_lst = wx.ListBox(self, style=wx.LB_SINGLE)
+        self._kez_lst = wx.ListBox(helyi, style=wx.LB_SINGLE)
         self._kez_lst.SetName("A lapjaid")
         self._kez_lst.Bind(wx.EVT_LISTBOX_DCLICK, lambda e: self._jelol_valt())
         v.Add(self._kez_lst, 1, wx.EXPAND | wx.ALL, 8)
 
         sor = wx.BoxSizer(wx.HORIZONTAL)
-        self._g_csere = wx.Button(self, label="&Csere (a jelölteket eldobod)")
+        self._g_csere = wx.Button(helyi, label="&Csere (a jelölteket eldobod)")
         self._g_csere.Bind(wx.EVT_BUTTON, lambda e: self._csere())
         sor.Add(self._g_csere, 0, wx.RIGHT, 6)
-        self._g_uj = wx.Button(self, label="Ú&j leosztás")
+        self._g_uj = wx.Button(helyi, label="Ú&j leosztás")
         self._g_uj.Bind(wx.EVT_BUTTON, lambda e: self._uj_leosztas())
         sor.Add(self._g_uj, 0, wx.RIGHT, 6)
-        g_zar = wx.Button(self, label="Be&zárás")
+        g_zar = wx.Button(helyi, label="Be&zárás")
         g_zar.Bind(wx.EVT_BUTTON, lambda e: self.Close())
         sor.Add(g_zar, 0)
         v.Add(sor, 0, wx.ALL, 8)
 
-        v.Add(wx.StaticText(self, label="&Játék menete:"), 0, wx.LEFT, 8)
+        v.Add(wx.StaticText(helyi, label="&Játék menete:"), 0, wx.LEFT, 8)
         self._naplo = wx.TextCtrl(
-            self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
+            helyi, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
             size=(-1, 170))
         self._naplo.SetName("A játék menete, csak olvasható")
         v.Add(self._naplo, 0, wx.EXPAND | wx.ALL, 8)
-        self.SetSizer(v)
+        helyi.SetSizer(v)
+
+        nb.AddPage(helyi, "Helyben – gépek ellen")
+        from .poker_online import PokerOnlinePanel
+        self._online = PokerOnlinePanel(nb, self.main)
+        nb.AddPage(self._online, "Online – több gépről!")
+        self._nb = nb
+        s = wx.BoxSizer(wx.VERTICAL)
+        s.Add(nb, 1, wx.EXPAND | wx.ALL, 6)
+        self.SetSizer(s)
 
     def _hang(self, nev):
         try:
@@ -295,17 +306,36 @@ class PokerAblak(wx.Dialog):
     def _on_key(self, e):
         k = e.GetKeyCode()
         if k == wx.WXK_F1:
+            online = False
+            try:
+                online = (self._nb.GetSelection() == 1)
+            except Exception:
+                pass
+            if online:
+                from .poker_online import POKER_ONLINE_SUGO
+                cim, szoveg = "Súgó – Póker online", POKER_ONLINE_SUGO
+            else:
+                cim, szoveg = "Súgó – Póker", self._SUGO
             try:
                 from superdl.helpdialog import show_help
-                show_help(self, "Súgó – Póker", self._SUGO)
+                show_help(self, cim, szoveg)
             except Exception:
-                wx.MessageBox(self._SUGO, "Súgó – Póker", wx.OK | wx.ICON_INFORMATION, self)
-        elif k == wx.WXK_SPACE and self.FindFocus() is self._kez_lst:
-            self._jelol_valt()
-        elif 32 < k < 256 and chr(k).lower() == "j":
-            self._uj_leosztas()
-        elif k == wx.WXK_ESCAPE:
+                wx.MessageBox(szoveg, cim, wx.OK | wx.ICON_INFORMATION, self)
+            return
+        if k == wx.WXK_ESCAPE:
             self.Close()
+            return
+        # a Space (helyi jelölés) és a „j” (új leosztás) CSAK a helyi fülön –
+        # különben az online fül csevegő-mezőjébe gépelést nyelnék el
+        helyi = True
+        try:
+            helyi = (self._nb.GetSelection() == 0)
+        except Exception:
+            pass
+        if helyi and k == wx.WXK_SPACE and self.FindFocus() is self._kez_lst:
+            self._jelol_valt()
+        elif helyi and 32 < k < 256 and chr(k).lower() == "j":
+            self._uj_leosztas()
         else:
             e.Skip()
 
@@ -314,6 +344,11 @@ class PokerAblak(wx.Dialog):
         try:
             if self._player is not None:
                 self._player.stop()
+        except Exception:
+            pass
+        try:
+            if getattr(self, "_online", None):
+                self._online.leallit()
         except Exception:
             pass
         e.Skip()
