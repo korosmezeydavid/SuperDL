@@ -106,6 +106,7 @@ class CsevejFrame(wx.Frame):
         hg = wx.Menu()
         self._mi_beszed = hg.Append(wx.ID_ANY, "&Beszéd – élő hang be/ki\tF4",
                                     kind=wx.ITEM_CHECK)
+        mi_hely = hg.Append(wx.ID_ANY, "&Hol ülj a térben…\tCtrl+H")
         hg.AppendSeparator()
         mi_demo = hg.Append(wx.ID_ANY, "&Térhang bemutató (körbejáró hang)\tF6")
         mb.Append(hg, "&Hang")
@@ -114,6 +115,7 @@ class CsevejFrame(wx.Frame):
         mb.Append(h, "&Súgó")
         self.SetMenuBar(mb)
         self.Bind(wx.EVT_MENU, lambda e: self._terhang_bemutato(), mi_demo)
+        self.Bind(wx.EVT_MENU, lambda e: self._hely_valaszt(), mi_hely)
         self.Bind(wx.EVT_MENU, lambda e: self._beszed_valt(), self._mi_beszed)
         self.Bind(wx.EVT_MENU, lambda e: self._uj_szoba(), self._mi_uj)
         self.Bind(wx.EVT_MENU, lambda e: self._fokusz_kod(), self._mi_csat)
@@ -309,6 +311,7 @@ class CsevejFrame(wx.Frame):
         szoba.on_belepett = lambda n: wx.CallAfter(self._on_belepett, n)
         szoba.on_kilepett = lambda n: wx.CallAfter(self._on_kilepett, n)
         szoba.on_tagok = lambda lst: wx.CallAfter(self._on_tagok, lst)
+        szoba.on_hely = lambda ki, pan: wx.CallAfter(self._on_hely, ki, pan)
         self.szoba = szoba
         self._kod = kod
         # felület átváltása a szobára
@@ -375,11 +378,44 @@ class CsevejFrame(wx.Frame):
 
     def _on_tagok(self, nevek):
         self._taglista.Set(nevek)
-        if self._hang is not None:           # a térbeli ülések frissítése
+        self._frissit_ulesek(nevek)
+
+    def _on_hely(self, ki, pan):
+        """Valaki áthelyezte magát a sztereó térben – frissítjük a keverést."""
+        if self.szoba is not None:
+            self._frissit_ulesek(self.szoba.tagok())
+
+    def _frissit_ulesek(self, nevek):
+        if self._hang is not None and self.szoba is not None:
             try:
-                self._hang.set_resztvevok(nevek)
+                self._hang.set_resztvevok(nevek, self.szoba.helyek())
             except Exception:
                 pass
+
+    _HELYEK = [("Bal szél", -1.0), ("Balra", -0.5), ("Középen", 0.0),
+               ("Jobbra", 0.5), ("Jobb szél", 1.0)]
+
+    def _hely_valaszt(self):
+        """A felhasználó megválasztja, HOL üljön a sztereó térben – mindenki
+        gépén ide kerül a hangja. Öt diszkrét pozíció, akadálymentes választóval."""
+        if not self.szoba:
+            self._mond("Előbb lépj be egy szobába.")
+            return
+        cimkek = [c for c, _ in self._HELYEK]
+        akt = self.szoba.sajat_pan()
+        sel = min(range(len(self._HELYEK)),
+                  key=lambda i: abs(self._HELYEK[i][1] - akt))
+        dlg = wx.SingleChoiceDialog(
+            self, "Hol ülj a sztereó térben? A többiek innen fognak hallani "
+            "téged. Fejhallgatóban a legjobb.", "Hely a térben", cimkek)
+        dlg.SetSelection(sel)
+        if dlg.ShowModal() == wx.ID_OK:
+            cimke, pan = self._HELYEK[dlg.GetSelection()]
+            self.szoba.hirdet_hely(pan)
+            self._frissit_ulesek(self.szoba.tagok())
+            self.SetStatusText("A helyed a térben: %s" % cimke)
+            self._mond("A helyed a térben: %s. A többiek innen hallanak." % cimke)
+        dlg.Destroy()
 
     def _naplo_sor(self, szoveg):
         if self._naplo.GetValue():
@@ -476,7 +512,7 @@ class CsevejFrame(wx.Frame):
         self._hang = h
         # hostként: az élőben belépő új kliensek jelöltjeire is punch-olunk
         self.szoba.on_hang_tag = lambda ki, cc: wx.CallAfter(self._on_hang_tag, ki, cc)
-        self._hang.set_resztvevok(tagok)
+        self._hang.set_resztvevok(tagok, self.szoba.helyek())
         self._beszed_sync(True)
 
     def _on_hang_tag(self, ki, cimek):

@@ -41,6 +41,9 @@ class Csevejszoba:
         self.on_tagok = None            # (nevek: list[str])  – bármely változáskor
         self.on_hang_host = None        # (cimek, ki) – valaki hang-hostot hirdetett
         self.on_hang_tag = None         # (ki, cimek) – egy kliens hirdette a jelöltjeit
+        self.on_hely = None             # (ki, pan) – valaki bejelentette a sztereó-helyét
+        self._helyek = {}               # ki -> pan (-1..+1): a bejelentett sztereó-helyek
+        self._sajat_pan = 0.0           # a SAJÁT választott helyem a térben
 
     # ------------------------------------------------------------------
     def elerheto(self) -> bool:
@@ -66,6 +69,8 @@ class Csevejszoba:
                     self._hang_host_be(u, ertesit=False)
                 elif u.get("tipus") == "hang_tag":
                     self._hang_tag_be(u, ertesit=False)
+                elif u.get("tipus") == "hely":
+                    self._hely_be(u, ertesit=False)
         except Exception:
             pass
         self._ertesit_tagok()
@@ -121,6 +126,9 @@ class Csevejszoba:
         elif tipus == "hang_tag":
             if not sajat:
                 self._hang_tag_be(u, ertesit=True)
+        elif tipus == "hely":
+            if not sajat:
+                self._hely_be(u, ertesit=True)
 
     def _uzenet(self, u: dict, elozmeny: bool):
         adat = u.get("adat") or {}
@@ -212,6 +220,46 @@ class Csevejszoba:
         hole-punch hello-t küldeni."""
         try:
             self.net.kuld("hang_tag", {"cimek": list(cimek)})
+        except Exception:
+            pass
+
+    # ---- saját sztereó-hely a térben ---------------------------------
+    def _hely_be(self, u: dict, ertesit: bool):
+        adat = u.get("adat") or {}
+        ki = u.get("ki") or ""
+        try:
+            pan = float(adat.get("pan", 0.0))
+        except Exception:
+            return
+        pan = max(-1.0, min(1.0, pan))
+        if not ki:
+            return
+        with self._lock:
+            self._helyek[ki] = pan
+        if ertesit and self.on_hely:
+            self.on_hely(ki, pan)
+
+    def helyek(self) -> dict:
+        """A bejelentett sztereó-helyek {ki: pan}. Akinél nincs, azt a hívó az
+        automatikus (névsor szerinti) elrendezéssel egészíti ki."""
+        with self._lock:
+            return dict(self._helyek)
+
+    def sajat_pan(self) -> float:
+        return self._sajat_pan
+
+    def hirdet_hely(self, pan: float):
+        """Bejelentem, HOL ülök a sztereó térben (-1 bal … 0 közép … +1 jobb).
+        Mindenki gépén ide kerül a hangom. Ismételt hívással áthelyezhetem magam."""
+        try:
+            pan = max(-1.0, min(1.0, float(pan)))
+        except Exception:
+            return
+        self._sajat_pan = pan
+        with self._lock:
+            self._helyek[self.nev] = pan
+        try:
+            self.net.kuld("hely", {"pan": pan})
         except Exception:
             pass
 

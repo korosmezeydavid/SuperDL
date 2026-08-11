@@ -204,9 +204,20 @@ class HangHalozat:
                     self.th.elenged(nev)
 
     # ---- ülések + némítás --------------------------------------------
-    def set_resztvevok(self, nevek):
+    def set_resztvevok(self, nevek, helyek=None):
+        """A térbeli ülések a résztvevőkhöz. Alap: névsor szerinti automatikus
+        elrendezés; a `helyek` (ki→pan) a BEJELENTETT saját helyekkel felülírja –
+        így mindenki ott hallatszik, ahová maga helyezte magát a térben."""
         masok = [n for n in nevek if n and n != self.nev]
-        self.th.set_ulesek(ulesek(masok))
+        pan_map = ulesek(masok)
+        if helyek:
+            for n, p in helyek.items():
+                if n in pan_map:
+                    try:
+                        pan_map[n] = max(-1.0, min(1.0, float(p)))
+                    except Exception:
+                        pass
+        self.th.set_ulesek(pan_map)
 
     def nemit(self, ertek: bool):
         self.th.nemit(ertek)
