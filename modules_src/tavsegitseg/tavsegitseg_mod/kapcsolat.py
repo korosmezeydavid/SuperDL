@@ -22,7 +22,8 @@ class Kapcsolat:
         self._szoba = None
         self._p2p = P2PHalozat(on_adat=self._p2p_adat)
         self._host = False
-        self._fogado = None            # a Munkamenet.fogad
+        self._fogado = None            # a Munkamenet.fogad (vezérlés-üzenetek)
+        self._on_hang = None           # cb(pcm: bytes) – beérkező hang
         self._on_kesz = None           # cb() amikor a P2P élővé válik
         self._sajat_cimek = []
         self._viszont_kuldve = False
@@ -31,6 +32,9 @@ class Kapcsolat:
     # -- a Munkamenet transzport-interfésze --
     def set_fogado(self, cb):
         self._fogado = cb
+
+    def set_hang_fogado(self, cb):
+        self._on_hang = cb
 
     def figyeld_kesz(self, cb):
         self._on_kesz = cb
@@ -82,14 +86,24 @@ class Kapcsolat:
             if self._fogado:
                 self._fogado(adat.get("d") or {})
 
-    # -- P2P beérkező --
+    # -- P2P beérkező (al-típus: 0 = vezérlés-JSON, 1 = hang-PCM) --
     def _p2p_adat(self, payload):
-        try:
-            d = json.loads(payload.decode("utf-8"))
-        except Exception:
+        if not payload:
             return
-        if self._fogado:
-            self._fogado(d)
+        self._jelez_kesz()
+        sub, body = payload[0], payload[1:]
+        if sub == 0:
+            try:
+                d = json.loads(body.decode("utf-8"))
+            except Exception:
+                return
+            if self._fogado:
+                self._fogado(d)
+        elif sub == 1:
+            if self._on_hang:
+                self._on_hang(body)
+
+    def _jelez_kesz(self):
         if self._on_kesz:
             cb, self._on_kesz = self._on_kesz, None
             try:
@@ -97,17 +111,23 @@ class Kapcsolat:
             except Exception:
                 pass
 
-    # -- küldés (P2P, tartalék netroom) --
+    # -- vezérlés-küldés (P2P al-típus 0, tartalék netroom) --
     def kuld(self, uzenet):
         if self._closing:
             return
         try:
-            b = json.dumps(uzenet).encode("utf-8")
+            b = b"\x00" + json.dumps(uzenet).encode("utf-8")
         except Exception:
             return
         if not self._p2p.kuld(b):
             if self._szoba:                  # P2P még nem áll → netroom-tartalék
                 self._szoba.kuld("fallback", {"nev": self.nev, "d": uzenet})
+
+    # -- hang-küldés (CSAK P2P al-típus 1; a hang nem megy netroom-tartalékon) --
+    def hang_kuld(self, pcm):
+        if self._closing or not pcm:
+            return
+        self._p2p.kuld(b"\x01" + pcm)
 
     def kesz(self):
         return self._p2p.kesz()
