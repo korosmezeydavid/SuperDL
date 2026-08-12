@@ -590,7 +590,10 @@ _ALTALANOS_ALAP = {"auto_ellenoriz": True, "ellenoriz_perc": 3,
                    "lista_felado": True,    # a feladó NEVE
                    "lista_cim": False,      # a feladó e-mail CÍME
                    "lista_targy": True,
-                   "lista_ido": True}
+                   "lista_ido": True,
+                   # helyesírás-ellenőrzés küldés előtt (a levélírás
+                   # helyi menüjéből kapcsolható)
+                   "helyesiras": True}
 
 
 def altalanos_betolt():

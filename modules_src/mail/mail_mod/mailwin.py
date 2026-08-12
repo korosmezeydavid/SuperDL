@@ -164,6 +164,120 @@ def _mondd(main, szoveg):
             pass
 
 
+class HelyesirasDialog(wx.Dialog):
+    """A talált helyesírási hibák VAK-FIRST javítója: a hibák listában, minden
+    hibához javaslatok; Enterrel cserélsz. (Nem aláhúzás – felsorolás.)"""
+
+    def __init__(self, parent, main, ellenorzo, szoveg):
+        super().__init__(parent, title="Helyesírás-ellenőrzés",
+                         size=(640, 480),
+                         style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        self.main = main
+        self._e = ellenorzo
+        self._szoveg = szoveg
+        self._hibak = []
+        v = wx.BoxSizer(wx.VERTICAL)
+        self._cimke = wx.StaticText(self, label="Ellenőrzés…")
+        v.Add(self._cimke, 0, wx.ALL, 8)
+
+        v.Add(wx.StaticText(self, label="&Talált hibák (fel/le nyíl):"),
+              0, wx.LEFT, 8)
+        self._lista = wx.ListBox(self, style=wx.LB_SINGLE)
+        self._lista.SetName("Talált helyesírási hibák")
+        self._lista.Bind(wx.EVT_LISTBOX, lambda e: self._hiba_valt())
+        v.Add(self._lista, 1, wx.EXPAND | wx.ALL, 8)
+
+        v.Add(wx.StaticText(self, label="&Javaslatok (Enter: csere):"),
+              0, wx.LEFT, 8)
+        self._jav = wx.ListBox(self, style=wx.LB_SINGLE)
+        self._jav.SetName("Javaslatok")
+        self._jav.Bind(wx.EVT_LISTBOX_DCLICK, lambda e: self._csere())
+        v.Add(self._jav, 1, wx.EXPAND | wx.ALL, 8)
+
+        sor = wx.BoxSizer(wx.HORIZONTAL)
+        for cimke, kez in (("&Csere", self._csere),
+                           ("&Kihagyás", self._kihagy),
+                           ("Felvétel a &szótárba", self._szotarba)):
+            b = wx.Button(self, label=cimke)
+            b.Bind(wx.EVT_BUTTON, lambda e, k=kez: k())
+            sor.Add(b, 0, wx.RIGHT, 6)
+        kesz = wx.Button(self, wx.ID_OK, "&Kész")
+        sor.Add(kesz, 0)
+        v.Add(sor, 0, wx.ALL, 8)
+        self.SetSizer(v)
+        self.Bind(wx.EVT_CHAR_HOOK, self._bill)
+        wx.CallAfter(self._ujraellenoriz)
+
+    @property
+    def szoveg(self):
+        return self._szoveg
+
+    def _ujraellenoriz(self):
+        self._hibak = self._e.ellenoriz(self._szoveg)
+        self._lista.Set([h.felolvasva() for h in self._hibak])
+        if self._hibak:
+            self._lista.SetSelection(0)
+            self._hiba_valt()
+            self._cimke.SetLabel("%d lehetséges hiba." % len(self._hibak))
+            _mondd(self.main, "%d lehetséges helyesírási hiba. Az elsőt "
+                   "kijelöltem: %s" % (len(self._hibak),
+                                       self._hibak[0].felolvasva()))
+        else:
+            self._jav.Set([])
+            self._cimke.SetLabel("Nincs több hiba.")
+            _mondd(self.main, "Nem találtam több helyesírási hibát.")
+
+    def _hiba_valt(self):
+        i = self._lista.GetSelection()
+        if 0 <= i < len(self._hibak):
+            self._jav.Set(self._hibak[i].javaslatok or ["(nincs javaslat)"])
+            if self._hibak[i].javaslatok:
+                self._jav.SetSelection(0)
+
+    def _aktualis(self):
+        i = self._lista.GetSelection()
+        return self._hibak[i] if 0 <= i < len(self._hibak) else None
+
+    def _csere(self):
+        h = self._aktualis()
+        j = self._jav.GetSelection()
+        if not h or not h.javaslatok or j < 0 or j >= len(h.javaslatok):
+            _mondd(self.main, "Nincs kiválasztott javaslat.")
+            return
+        uj = h.javaslatok[j]
+        self._szoveg = (self._szoveg[:h.kezdet] + uj
+                        + self._szoveg[h.kezdet + h.hossz:])
+        _mondd(self.main, "Kicserélve: %s helyett %s." % (h.szo, uj))
+        self._ujraellenoriz()
+
+    def _kihagy(self):
+        h = self._aktualis()
+        if h:
+            self._e.hozzaad  # (nem szótárazzuk, csak a listából vesszük ki)
+            i = self._lista.GetSelection()
+            self._hibak.pop(i)
+            self._lista.Delete(i)
+            if self._lista.GetCount():
+                self._lista.SetSelection(min(i, self._lista.GetCount() - 1))
+                self._hiba_valt()
+            _mondd(self.main, "Kihagyva: %s" % h.szo)
+
+    def _szotarba(self):
+        h = self._aktualis()
+        if h and self._e.hozzaad(h.szo):
+            _mondd(self.main, "Felvéve a szótárba: %s" % h.szo)
+            self._ujraellenoriz()
+        elif h:
+            _mondd(self.main, "A szótárba felvétel nem sikerült.")
+
+    def _bill(self, e):
+        if (e.GetKeyCode() in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER)
+                and self.FindFocus() is self._jav):
+            self._csere()
+        else:
+            e.Skip()
+
+
 _ERT_PLAYER = None          # az értesítő-hang lejátszója (életben tartva)
 
 
@@ -557,11 +671,68 @@ class LevelIroDialog(wx.Dialog):
         self.SetSizer(v)
         # CTRL+ENTER = küldés (mint az Outlookban) – bárhonnan az ablakban
         self.Bind(wx.EVT_CHAR_HOOK, self._iro_billentyu)
+        # HELYESÍRÁS: helyi menü (jobb gomb / Alkalmazás billentyű) a szövegen
+        self._helyesiras = None
+        self.torzs.Bind(wx.EVT_CONTEXT_MENU, self._helyi_menu)
+
+    # ---- helyesírás-ellenőrzés ----
+    def _helyesiras_be(self):
+        """Be van-e kapcsolva a küldés előtti ellenőrzés (elmentett beállítás)."""
+        return bool(MC.altalanos_betolt().get("helyesiras", True))
+
+    def _helyi_menu(self, e):
+        """A levél szövegének HELYI MENÜJE – innen kapcsolható a helyesírás-
+        ellenőrzés, és innen indítható azonnal (a tesztelő kérése)."""
+        m = wx.Menu()
+        it_most = m.Append(wx.ID_ANY, "Helyesírás-ellenőrzés &most\tF7")
+        self.Bind(wx.EVT_MENU, lambda ev: self._helyesiras_futtat(), it_most)
+        it_be = m.AppendCheckItem(
+            wx.ID_ANY, "Ellenőrzés &küldés előtt (be/ki)")
+        it_be.Check(self._helyesiras_be())
+
+        def valt(ev):
+            cfg = MC.altalanos_betolt()
+            uj = not bool(cfg.get("helyesiras", True))
+            cfg["helyesiras"] = uj
+            MC.altalanos_ment(cfg)
+            _mondd(self.main, "Helyesírás-ellenőrzés küldés előtt: "
+                   + ("bekapcsolva." if uj else "kikapcsolva."))
+        self.Bind(wx.EVT_MENU, valt, it_be)
+        self.PopupMenu(m)
+        m.Destroy()
+
+    def _ellenorzo(self):
+        if self._helyesiras is None:
+            from .helyesiras import Ellenorzo
+            self._helyesiras = Ellenorzo()
+        return self._helyesiras
+
+    def _helyesiras_futtat(self, csendes=False):
+        """Ellenőrzés + javító párbeszéd. Visszaad: True, ha mehet a küldés."""
+        e = self._ellenorzo()
+        if not e.elerheto:
+            if not csendes:
+                _mondd(self.main, e.hiba_oka)
+                wx.MessageBox(e.hiba_oka, "Helyesírás-ellenőrzés",
+                              wx.OK | wx.ICON_INFORMATION, self)
+            return True                     # ne akadályozza a küldést
+        szoveg = self.torzs.GetValue()
+        if not e.ellenoriz(szoveg):
+            if not csendes:
+                _mondd(self.main, "Nem találtam helyesírási hibát. ")
+            return True
+        dlg = HelyesirasDialog(self, self.main, e, szoveg)
+        dlg.ShowModal()
+        self.torzs.SetValue(dlg.szoveg)     # a javított szöveg vissza
+        dlg.Destroy()
+        return True
 
     def _iro_billentyu(self, e):
-        if (e.GetKeyCode() in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER)
-                and e.ControlDown()):
+        k = e.GetKeyCode()
+        if k in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER) and e.ControlDown():
             self._kuld(None)
+        elif k == wx.WXK_F7:               # F7 = helyesírás (mint az Office-ban)
+            self._helyesiras_futtat()
         else:
             e.Skip()
 
@@ -597,6 +768,9 @@ class LevelIroDialog(wx.Dialog):
             wx.MessageBox("Adj meg legalább egy címzettet.", "Küldés",
                           wx.OK | wx.ICON_WARNING, self)
             return
+        # helyesírás-ellenőrzés küldés ELŐTT (a helyi menüből kikapcsolható)
+        if self._helyesiras_be():
+            self._helyesiras_futtat(csendes=True)
         if wx.MessageBox(f"Elküldöd a levelet ide: {cim or bcc}?", "Küldés "
                          "megerősítése", wx.YES_NO | wx.ICON_QUESTION,
                          self) != wx.YES:
@@ -768,11 +942,11 @@ class LevelOlvasoFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, kez, it)
 
         m = wx.Menu()
-        mi(m, "&Válasz  (R)", lambda e: self._mf._valasz(
+        mi(m, "&Válasz  (R vagy Ctrl+R)", lambda e: self._mf._valasz(
             msg=self._msg, fiok=self._fiok))
-        mi(m, "Válasz min&denkinek", lambda e: self._mf._valasz(
+        mi(m, "Válasz min&denkinek  (Shift+R)", lambda e: self._mf._valasz(
             msg=self._msg, fiok=self._fiok, mind=True))
-        mi(m, "&Továbbítás  (F)", lambda e: self._mf._tovabbit(
+        mi(m, "&Továbbítás  (F vagy Ctrl+F)", lambda e: self._mf._tovabbit(
             msg=self._msg, fiok=self._fiok))
         m.AppendSeparator()
         mi(m, "&Csatolmány mentése…",
@@ -848,7 +1022,14 @@ class LevelOlvasoFrame(wx.Frame):
         _hatterben(munka, kesz, lambda ex: _mondd(self.main, f"Hiba: {ex}"))
 
     def _on_key(self, e):
+        """A megnyitott levél billentyűi. FONTOS: a válasz/továbbítás billentyűk
+        eddig CSAK a levéllistában működtek, a megnyitott levélben NEM (a menü
+        felirata viszont ígérte) – a tesztelő jelezte, javítva. Itt minden mező
+        csak olvasható, ezért a puszta R/F is biztonságos, de a kért Ctrl+R és
+        Ctrl+F is megy (mint máshol a „reply" és „forward")."""
         k = e.GetKeyCode()
+        ch = chr(k).lower() if 32 < k < 256 else ""
+        ctrl = e.ControlDown()
         if k == wx.WXK_ESCAPE:
             self.Close()
         elif k == wx.WXK_F1:
@@ -856,6 +1037,14 @@ class LevelOlvasoFrame(wx.Frame):
         elif (k in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER)
               and self.FindFocus() is self.link_lista):
             self._link_nyit()
+        elif ch == "r" and e.ShiftDown():          # válasz MINDENKINEK
+            self._mf._valasz(msg=self._msg, fiok=self._fiok, mind=True)
+        elif ch == "r":                            # R vagy Ctrl+R: válasz
+            self._mf._valasz(msg=self._msg, fiok=self._fiok)
+        elif ch == "f":                            # F vagy Ctrl+F: továbbítás
+            self._mf._tovabbit(msg=self._msg, fiok=self._fiok)
+        elif ctrl and ch == "s":                   # Ctrl+S: csatolmány mentése
+            self._mf._csat_ment_msg(self._msg)
         else:
             e.Skip()
 
@@ -1336,11 +1525,11 @@ class MailFrame(wx.Frame):
         self._mi(m_level, "&Megnyitás külön ablakban  (Enter)",
                  lambda e: self._megnyit())
         m_level.AppendSeparator()
-        self._mi(m_level, "&Válasz  (R)", lambda e: self._menu_level_akcio(
+        self._mi(m_level, "&Válasz  (R vagy Ctrl+R)", lambda e: self._menu_level_akcio(
             lambda msg, f: self._valasz(msg=msg, fiok=f)))
         self._mi(m_level, "Válasz min&denkinek", lambda e: self._menu_level_akcio(
             lambda msg, f: self._valasz(msg=msg, fiok=f, mind=True)))
-        self._mi(m_level, "&Továbbítás  (F)", lambda e: self._menu_level_akcio(
+        self._mi(m_level, "&Továbbítás  (F vagy Ctrl+F)", lambda e: self._menu_level_akcio(
             lambda msg, f: self._tovabbit(msg=msg, fiok=f)))
         m_level.AppendSeparator()
         self._mi(m_level, "&Olvasottnak jelölés", lambda e: self._jelol(True))
@@ -2145,9 +2334,12 @@ class MailFrame(wx.Frame):
             self._masol_vagolapra(cut=True)
         elif m == 0 and k == ord("N"):
             self._uj(None)
-        elif m == 0 and k == ord("R"):
+        elif k == ord("R") and m in (0, wx.MOD_CONTROL):
             self._menu_level_akcio(lambda msg, f: self._valasz(msg=msg, fiok=f))
-        elif m == 0 and k == ord("F"):
+        elif k == ord("R") and m == wx.MOD_SHIFT:
+            self._menu_level_akcio(
+                lambda msg, f: self._valasz(msg=msg, fiok=f, mind=True))
+        elif k == ord("F") and m in (0, wx.MOD_CONTROL):
             self._menu_level_akcio(
                 lambda msg, f: self._tovabbit(msg=msg, fiok=f))
         elif m == 0 and k == ord("B"):
