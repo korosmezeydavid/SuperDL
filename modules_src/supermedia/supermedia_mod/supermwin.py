@@ -1068,6 +1068,18 @@ class SuperMFrame(wx.Frame):
         if self._closing:
             return
         sv = getattr(self.main, "selfvoice", None)
+        # 1) TELJES némítás: a program egyetlen szót se mondjon (Beállítások)
+        if sv is not None and getattr(sv, "muted", False):
+            return
+        # 2) A BEJELENTŐ a KÉPERNYŐOLVASÓ – ha van, ő mondja (nincs dupla beszéd,
+        #    és a felhasználó a saját olvasójával szabályozza)
+        try:
+            from superdl import screenreader
+            if screenreader.speak(text):
+                return
+        except Exception:
+            pass
+        # 3) Csak ha NINCS képernyőolvasó: a beépített hang segít ki
         if sv:
             try:
                 sv.speak(text, force=True)

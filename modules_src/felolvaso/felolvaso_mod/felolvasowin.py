@@ -260,8 +260,17 @@ class FelolvasoFrame(wx.Frame):
         # fel magától – ezért a program SAJÁT hangján (SAPI/eSpeak) is bemondjuk.
         # (force=True: akkor is szól, ha a self-voice alapból ki van kapcsolva.)
         sv = getattr(self.main, "selfvoice", None)
+        if sv is not None and getattr(sv, "muted", False):
+            return                       # TELJES némítás: egyetlen szót sem
         spoke = False
-        if sv and not getattr(sv, "muted", False):
+        # A BEJELENTŐ elsősorban a KÉPERNYŐOLVASÓ (ő az, akit a felhasználó a
+        # saját beállításaival szabályoz) – csak ha nincs, jön a beépített hang.
+        try:
+            from superdl import screenreader
+            spoke = bool(screenreader.speak(text))
+        except Exception:
+            spoke = False
+        if not spoke and sv:
             try:
                 sv.speak(text, force=True)
                 spoke = True
