@@ -187,12 +187,12 @@
       "category": "Kommunikáció",
       "description": "Vak-first, teljesen akadálymentes e-mail kliens – kizárólag emailezés: leveleket olvasol, küldesz és keresel (IMAP, POP3, SMTP). Hitelesítés APP-JELSZÓVAL: a valódi fő-jelszavadat sosem adod meg, hanem egy dedikált, csak a Super Mailhez szóló app-jelszót, amit te hozol létre a saját fiókodban és bármikor visszavonhatsz – így az azonosságod és a fiókod végig a te kezedben marad. Bármilyen szolgáltató kézzel is beállítható (Freemail, Citromail, céges, saját domain): a szerver-nevek és a portok felülírhatók. Adatvédelem az első helyen: az első indításkor hozzájárulást kérünk, és világosan közöljük, hogy SEMMIT, DE SEMMIT nem továbbítunk sehová – a program közvetlenül a te e-mail-szolgáltatód szerveréhez csatlakozik, semmi máshoz, a fiók-adatok pedig a te gépeden, a Windows DPAPI-titkosításával élnek. Nincs naptár, nincs telemetria, nincs felhő, nincs külső belépés. A HTML-levelek távoli képei alapból nem töltődnek be (nyomkövetés ellen). Bármikor visszavonható: a fiók törlésével a tárolt app-jelszó véglegesen törlődik. Csak a saját fiókjaidhoz.",
       "latest": {
-        "version": "1.0.3",
+        "version": "1.0.4",
         "min_core_api": "1.0",
         "min_core_version": "4.2.7",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mail-1.0.3/mail-1.0.3.zip",
-        "sha256": "90e04b117293f44b5298fd36de2b17adcd22165a56792e1345a536cb37c4d9a8",
-        "size": 71720
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mail-1.0.4/mail-1.0.4.zip",
+        "sha256": "35db6d8676a39b1eb32b15bfd3fe00ae82954c3c1dcfebf11631bd236ab2d24f",
+        "size": 74286
       }
     },
     {

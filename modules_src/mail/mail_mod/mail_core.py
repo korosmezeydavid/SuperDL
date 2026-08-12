@@ -584,7 +584,13 @@ def cimjegyzek_frissit(email_cim, nev):
 # ---- általános beállítások (háttér-ellenőrzés stb.) ----
 _ALTALANOS_FILE = store.CONFIG_DIR / "mail_settings.json"
 _ALTALANOS_ALAP = {"auto_ellenoriz": True, "ellenoriz_perc": 3,
-                   "lista_limit": 50}
+                   "lista_limit": 50,
+                   # mi jelenjen meg a levéllista soraiban (testreszabható)
+                   "lista_allapot": True,   # „olvasatlan” szóval
+                   "lista_felado": True,    # a feladó NEVE
+                   "lista_cim": False,      # a feladó e-mail CÍME
+                   "lista_targy": True,
+                   "lista_ido": True}
 
 
 def altalanos_betolt():

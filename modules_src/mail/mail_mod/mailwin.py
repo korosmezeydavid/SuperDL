@@ -6,6 +6,8 @@ csinál, és SEMMIT nem továbbít sehová. Az első indításkor hozzájárulá
 és világosan közöljük: a megadott adatok kizárólag a te gépeden, titkosítva
 élnek, és egyetlen céljuk, hogy az e-mail működjön.
 """
+import os
+import re
 import threading
 
 import wx
@@ -160,6 +162,46 @@ def _mondd(main, szoveg):
             sv.speak(szoveg, force=True)
         except Exception:
             pass
+
+
+_ERT_PLAYER = None          # az értesítő-hang lejátszója (életben tartva)
+
+
+def ertesito_hang(ut):
+    """Egy értesítő-hang lejátszása. Visszaad: (siker, üzenet).
+
+    FONTOS TANULSÁG (tesztelői visszajelzés): korábban a Core Player-ét
+    használtuk, ami FFMPEG-et igényel – ha az nincs letöltve, a hang NÉMÁN
+    elmaradt (sem WAV, sem MP3 nem szólt). Most:
+      1) WAV → a Windows beépített `winsound`-ja (nem kell hozzá SEMMI),
+      2) egyéb (MP3, OGG…) → a Player (ffmpeg),
+      3) ha egyik sem megy, VISSZAJELZÜNK, hogy miért – néma hiba nincs.
+    A lejátszót modul-szinten tartjuk életben, hogy a párbeszéd bezárása ne
+    vágja el a hangot."""
+    ut = (ut or "").strip()
+    if not ut:
+        return False, "Nincs hangfájl megadva."
+    if not os.path.isfile(ut):
+        return False, "A megadott hangfájl nem található: %s" % ut
+    if os.path.splitext(ut)[1].lower() == ".wav":
+        try:
+            import winsound
+            winsound.PlaySound(ut, winsound.SND_FILENAME | winsound.SND_ASYNC)
+            return True, ""
+        except Exception as ex:
+            return False, "A WAV lejátszása nem sikerült: %s" % ex
+    try:
+        from superdl.audioengine import Player, _ffmpeg_exe
+        if not _ffmpeg_exe():
+            return False, ("Ehhez a formátumhoz az FFmpeg kell, ami még nincs "
+                           "letöltve. WAV-fájl viszont FFmpeg nélkül is szól – "
+                           "próbálj egy .wav hangot!")
+        global _ERT_PLAYER
+        _ERT_PLAYER = Player()
+        _ERT_PLAYER.play(ut, "")
+        return True, ""
+    except Exception as ex:
+        return False, "A hang lejátszása nem sikerült: %s" % ex
 
 
 def _hatterben(munka, kesz, hiba):
@@ -505,7 +547,7 @@ class LevelIroDialog(wx.Dialog):
         cj.Bind(wx.EVT_BUTTON, self._cimjegyzek_nyit)
         cs = wx.Button(self, label="📎 Csatolmány &hozzáadása")
         cs.Bind(wx.EVT_BUTTON, self._csatol)
-        kb = wx.Button(self, wx.ID_OK, "&Küldés")
+        kb = wx.Button(self, wx.ID_OK, "&Küldés  (Ctrl+Enter)")
         kb.Bind(wx.EVT_BUTTON, self._kuld)
         gs.Add(cj, 0, wx.RIGHT, 8)
         gs.Add(cs, 0, wx.RIGHT, 8)
@@ -513,6 +555,15 @@ class LevelIroDialog(wx.Dialog):
         gs.Add(wx.Button(self, wx.ID_CANCEL, "Mégsem"), 0)
         v.Add(gs, 0, wx.ALL | wx.ALIGN_CENTER, 10)
         self.SetSizer(v)
+        # CTRL+ENTER = küldés (mint az Outlookban) – bárhonnan az ablakban
+        self.Bind(wx.EVT_CHAR_HOOK, self._iro_billentyu)
+
+    def _iro_billentyu(self, e):
+        if (e.GetKeyCode() in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER)
+                and e.ControlDown()):
+            self._kuld(None)
+        else:
+            e.Skip()
 
     def _cimjegyzek_autocomplete(self):
         """A címzett/Cc/Bcc mezőkre autókiegészítést tesz a címjegyzékből."""
@@ -633,15 +684,13 @@ class ErtesitoDialog(wx.Dialog):
                 self.hang.SetValue(dlg.GetPath())
 
     def _proba(self, e):
-        h = self.hang.GetValue().strip()
-        if self.mod.GetSelection() == 2 and h and os.path.isfile(h):
-            try:
-                from superdl.audioengine import Player
-                self._pj = Player()
-                self._pj.play(h)
-                return
-            except Exception:
-                pass
+        if self.mod.GetSelection() == 2:
+            siker, uzenet = ertesito_hang(self.hang.GetValue())
+            if not siker:                     # SOHA ne haljon el némán
+                _mondd(self.main, uzenet)
+                wx.MessageBox(uzenet, "Az értesítő hang nem szólalt meg",
+                              wx.OK | wx.ICON_WARNING, self)
+            return
         _mondd(self.main, self.szoveg.GetValue() or "Új leveled érkezett.")
 
     def _ment(self, e):
@@ -700,6 +749,10 @@ class LevelOlvasoFrame(wx.Frame):
         self.Bind(wx.EVT_CHAR_HOOK, self._on_key)
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self.Centre()
+        # a fókusz rögtön a LEVÉL SZÖVEGÉRE kerül (a tesztelő kérése): így a
+        # képernyőolvasóval azonnal olvasható a tartalom, nem kell a fejlécen
+        # átlépkedni – a fejléc külön mezőben ott marad (Shift+Tab).
+        wx.CallAfter(self.olvaso.SetFocus)
         n = len(self._linkek)
         wx.CallAfter(_mondd, self.main,
                      f"{fej['felado']}. Tárgy: {fej['targy']}. A szöveg a Levél "
@@ -972,15 +1025,13 @@ class BeallitasokDialog(wx.Dialog):
                 self.ert_hang.SetValue(dlg.GetPath())
 
     def _ert_proba(self, e):
-        h = self.ert_hang.GetValue().strip()
-        if self.ert_mod.GetSelection() == 2 and h and os.path.isfile(h):
-            try:
-                from superdl.audioengine import Player
-                self._pj = Player()
-                self._pj.play(h)
-                return
-            except Exception:
-                pass
+        if self.ert_mod.GetSelection() == 2:
+            siker, uzenet = ertesito_hang(self.ert_hang.GetValue())
+            if not siker:                     # SOHA ne haljon el némán
+                _mondd(self.main, uzenet)
+                wx.MessageBox(uzenet, "Az értesítő hang nem szólalt meg",
+                              wx.OK | wx.ICON_WARNING, self)
+            return
         _mondd(self.main, self.ert_szoveg.GetValue() or "Új leveled érkezett.")
 
     def _ert_ment(self, e):
@@ -1074,6 +1125,24 @@ class BeallitasokDialog(wx.Dialog):
                                      initial=int(cfg.get("lista_limit", 50)))
         hs2.Add(self.alt_limit, 0)
         v.Add(hs2, 0, wx.ALL, 8)
+
+        # --- mi legyen a levéllista soraiban? (a tesztelő kérése) ---
+        v.Add(wx.StaticText(p, label=(
+            "Mi hangozzon el a levéllistában? (Csak azt kapcsold be, amire "
+            "szükséged van – így rövidebb, gyorsabban átfutható sorokat kapsz.)")),
+            0, wx.LEFT | wx.TOP, 8)
+        self.alt_lista_mezok = {}
+        for kulcs, cimke, alap in (
+                ("lista_allapot", "&Olvasatlan jelzés (kimondja: „olvasatlan”)", True),
+                ("lista_felado", "A feladó &neve", True),
+                ("lista_cim", "A feladó &e-mail címe", False),
+                ("lista_targy", "A levél &tárgya", True),
+                ("lista_ido", "A küldés &ideje", True)):
+            cb = wx.CheckBox(p, label=cimke)
+            cb.SetValue(bool(cfg.get(kulcs, alap)))
+            v.Add(cb, 0, wx.LEFT | wx.TOP, 12)
+            self.alt_lista_mezok[kulcs] = cb
+
         mb = wx.Button(p, label="&Mentés")
         mb.Bind(wx.EVT_BUTTON, self._alt_ment)
         v.Add(mb, 0, wx.ALL, 8)
@@ -1081,9 +1150,16 @@ class BeallitasokDialog(wx.Dialog):
         return p
 
     def _alt_ment(self, e):
-        MC.altalanos_ment({"auto_ellenoriz": bool(self.alt_auto.GetValue()),
-                           "ellenoriz_perc": int(self.alt_perc.GetValue()),
-                           "lista_limit": int(self.alt_limit.GetValue())})
+        adat = {"auto_ellenoriz": bool(self.alt_auto.GetValue()),
+                "ellenoriz_perc": int(self.alt_perc.GetValue()),
+                "lista_limit": int(self.alt_limit.GetValue())}
+        for kulcs, cb in getattr(self, "alt_lista_mezok", {}).items():
+            adat[kulcs] = bool(cb.GetValue())
+        MC.altalanos_ment(adat)
+        try:                                   # a lista azonnal az új formátumra
+            self._mf._lista_ujrarajzol()
+        except Exception:
+            pass
         try:
             self._mf._ertesito_timer_beallit()
         except Exception:
@@ -1137,13 +1213,27 @@ class MailFrame(wx.Frame):
         dlg.Destroy()
 
     def _auto_ellenoriz(self):
-        """Háttér új-levél ellenőrzés az AKTÍV fiók INBOX-ában (értesítéssel)."""
+        """Háttér új-levél ellenőrzés az AKTÍV fiók INBOX-ában.
+
+        A tesztelő jelezte, hogy hiába állította 1 percre, az új levél csak
+        F5-re jött meg. Két oka volt: (1) csak a legfrissebb UID-et néztük, és a
+        LISTÁT csak akkor frissítettük, ha a UID-összehasonlítás sikerült;
+        (2) a háttérhibák NÉMÁN elnyelődtek (`lambda ex: None`), így semmi jel
+        nem volt. Most: ha a Beérkezett van nyitva, egyszerűen ÚJRATÖLTJÜK a
+        listát (ez az, amit a felhasználó „automatikus frissítésen" ért), és a
+        hibát legalább az állapotsorban jelezzük."""
         if (self._closing or not self._aktiv
                 or self._aktiv.get("protokoll") == "pop"):
             return
         fiok = self._aktiv
         em = (fiok.get("email") or "").lower()
-        if em not in self._utolso_uid:          # csak ha már van kiindulási alap
+        beerkezett_nezet = (not self._osszesitett
+                            and (self._mappa or "").upper() == "INBOX")
+
+        if beerkezett_nezet:
+            # a lista tényleges újratöltése – az új levél MEGJELENIK magától
+            # (az értesítést a _lista_kesz → _uj_level_ellenoriz intézi)
+            self._frissit(csendes=True)
             return
 
         def munka():
@@ -1156,12 +1246,25 @@ class MailFrame(wx.Frame):
             if self._closing:
                 return
             elozo = self._utolso_uid.get(em)
-            if elozo is not None and u > elozo:
+            if elozo is None:
+                self._utolso_uid[em] = u        # kiindulási alap, ha még nem volt
+                return
+            if u > elozo:
                 self._utolso_uid[em] = u
                 self._ertesit(fiok)
-                if not self._osszesitett and (self._mappa or "").upper() == "INBOX":
-                    self._frissit()
-        _hatterben(munka, kesz, lambda ex: None)
+
+        def hiba(ex):                            # nem némán: legalább látszódjon
+            if not self._closing:
+                self._allapot_uzenet("A háttér-ellenőrzés most nem sikerült: %s"
+                                     % ex)
+        _hatterben(munka, kesz, hiba)
+
+    def _allapot_uzenet(self, szoveg):
+        """Csendes állapot-üzenet (nem szakítja félbe a képernyőolvasót)."""
+        try:
+            self.SetStatusText(szoveg)
+        except Exception:
+            pass
 
     def _build(self):
         p = self._panel
@@ -1404,15 +1507,19 @@ class MailFrame(wx.Frame):
         self._mappa = raw[i] if 0 <= i < len(raw) else "INBOX"
         self._frissit()
 
-    def _frissit(self):
+    def _frissit(self, csendes=False):
+        """A lista újratöltése. `csendes`=True: háttér-frissítés – nem szövegel,
+        csak akkor szól, ha ÚJ levél érkezett (ezt a _lista_kesz intézi)."""
         if not self._aktiv:
             return
         self._osszesitett = False
         fiok, mappa = self._aktiv, self._mappa
         limit = int(MC.altalanos_betolt().get("lista_limit", 50))
         self._utolso_limit = limit
-        self._mond(f"Levelek betöltése – {MC.mappa_display(mappa)}… "
-                   "kis türelmet, amíg megjönnek.")
+        self._csendes_frissites = bool(csendes)
+        if not csendes:
+            self._mond(f"Levelek betöltése – {MC.mappa_display(mappa)}… "
+                       "kis türelmet, amíg megjönnek.")
 
         def munka():
             k = _kliens(fiok).kapcsolodik()
@@ -1458,15 +1565,35 @@ class MailFrame(wx.Frame):
             self._frissit()
 
     def _sor_szoveg(self, info):
-        """Egy levél listasora (olvasott-jel, feladó, tárgy, dátum, csatolmány)."""
-        jel = "•" if not info.get("olvasott") else " "
-        csat = " 📎" if info.get("csatolmany") else ""
-        fiok_cimke = ""
+        """Egy levél listasora – a TARTALMA a Beállítás → Általános fülön
+        szabható testre (feladó / e-mail cím / tárgy / idő), és az OLVASATLAN
+        állapotot SZÓVAL is kimondjuk (nem csak egy jellel, amit a képernyő-
+        olvasó könnyen elhallgat)."""
+        cfg = MC.altalanos_betolt()
+        reszek = []
+        if cfg.get("lista_allapot", True) and not info.get("olvasott"):
+            reszek.append("olvasatlan")
         if self._osszesitett:
             f = info.get("_fiok") or {}
-            fiok_cimke = f"[{f.get('nev') or f.get('email') or ''}] "
-        return (f"{jel} {fiok_cimke}{info.get('felado','')} — "
-                f"{info.get('targy','')} — {info.get('datum','')}{csat}")
+            reszek.append("[%s]" % (f.get("nev") or f.get("email") or ""))
+        felado = (info.get("felado", "") or "").strip()
+        if cfg.get("lista_felado", True):
+            # a „Név <cim@pelda.hu>" formából csak a NEVET, ha kérték a címet
+            # külön (vagy ha a cím nem kell)
+            nev = re.sub(r"\s*<[^>]*>\s*", "", felado).strip().strip('"')
+            reszek.append(nev or felado)
+        if cfg.get("lista_cim", False):
+            m = re.search(r"<([^>]+)>", felado)
+            cim = m.group(1) if m else (felado if "@" in felado else "")
+            if cim:
+                reszek.append(cim)
+        if cfg.get("lista_targy", True):
+            reszek.append(info.get("targy", "") or "(nincs tárgy)")
+        if cfg.get("lista_ido", True):
+            reszek.append(info.get("datum", ""))
+        if info.get("csatolmany"):
+            reszek.append("csatolmány")
+        return " — ".join(r for r in reszek if r)
 
     def _lista_kesz(self, lista):
         if self._closing:
@@ -1483,6 +1610,9 @@ class MailFrame(wx.Frame):
                 and (self._mappa or "").upper() == "INBOX"):
             self._uj_level_ellenoriz(self._aktiv, lista)
         self.level_lista.Set([self._sor_szoveg(info) for info in lista])
+        if getattr(self, "_csendes_frissites", False):
+            self._csendes_frissites = False     # háttér-frissítés: nem szövegel
+            return
         tobb = (not self._osszesitett
                 and len(lista) >= int(getattr(self, "_utolso_limit", 50)))
         if self._osszesitett:
@@ -1492,6 +1622,16 @@ class MailFrame(wx.Frame):
             self._mond(f"{len(lista)} levél a(z) "
                        f"{MC.mappa_display(self._mappa)} mappában."
                        + (" A B betűvel tölthetsz be továbbiakat." if tobb else ""))
+
+    def _lista_ujrarajzol(self):
+        """A meglévő listát újrarajzolja (pl. ha a megjelenítendő mezők
+        beállítása változott) – a kijelölést megtartva, hálózat nélkül."""
+        if self._closing or not self._lista:
+            return
+        kijel = self.level_lista.GetSelection()
+        self.level_lista.Set([self._sor_szoveg(i) for i in self._lista])
+        if 0 <= kijel < self.level_lista.GetCount():
+            self.level_lista.SetSelection(kijel)
 
     def _lista_hozzafuz(self, lista):
         """A lapozással behúzott KÖVETKEZŐ adag hozzáfűzése a listához."""
@@ -1556,14 +1696,10 @@ class MailFrame(wx.Frame):
         tipus = cfg.get("tipus", "szoveg")
         if tipus == "nincs":
             return
-        if tipus == "hang" and cfg.get("hang") and os.path.isfile(cfg["hang"]):
-            try:
-                from superdl.audioengine import Player
-                self._ert_hang = Player()
-                self._ert_hang.play(cfg["hang"])
+        if tipus == "hang" and cfg.get("hang"):
+            siker, _uz = ertesito_hang(cfg["hang"])
+            if siker:
                 return
-            except Exception:
-                pass
         # szöveg (vagy ha a hang nem szólalt meg): felolvasás
         self._mond(cfg.get("szoveg") or "Új leveled érkezett.")
 
