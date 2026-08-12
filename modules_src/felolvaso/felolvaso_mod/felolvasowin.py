@@ -94,7 +94,7 @@ DEFAULT_RATE = 7
 
 # a modul verziója – a felhasználó HALLJA (indításkor és F8-ra), hogy tényleg a
 # friss változat fut-e (a manifest.json-nal kézzel szinkronban tartva)
-MOD_VERSION = "1.4.6"
+MOD_VERSION = "1.4.7"
 
 
 def _rovid_hiba(err: str) -> str:
