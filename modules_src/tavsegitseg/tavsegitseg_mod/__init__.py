@@ -21,7 +21,7 @@ def register(core):
     menu = _sub("&Kommunikáció", "&Távsegítség") if _sub else core.add_menu(
         "&Távsegítség")
     item = core.add_menu_item(
-        menu, "&Távsegítség\tCtrl+Shift+T", opener,
+        menu, "&Távsegítség\tCtrl+Alt+T", opener,
         help="Akadálymentes távsegítség/távvezérlés – megbízható segítővel, "
              "szoba-kóddal, felügyelt módban")
     _state["item"] = item

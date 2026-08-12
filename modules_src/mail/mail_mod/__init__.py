@@ -34,7 +34,7 @@ def register(core):
     menu = _sub("&Kommunikáció", "Super &Mail") if _sub else core.add_menu(
         "Super &Mail")
     item = core.add_menu_item(
-        menu, "Super &Mail\tCtrl+Shift+M", opener,
+        menu, "Super &Mail\tCtrl+Alt+M", opener,
         help="Akadálymentes e-mail: olvasás, küldés, keresés (IMAP/POP3/SMTP)")
     _state["item"] = item
     core.log.info("mail modul betöltve")

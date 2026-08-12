@@ -1079,14 +1079,21 @@ class BeallitasokDialog(wx.Dialog):
     def _fiokok_lap(self, nb):
         p = wx.Panel(nb)
         v = wx.BoxSizer(wx.VERTICAL)
-        v.Add(wx.StaticText(p, label="A beállított e-mail fiókjaid:"), 0, wx.ALL, 6)
+        v.Add(wx.StaticText(p, label=(
+            "A beállított e-mail fiókjaid. A LISTA SORRENDJE számít: a LEGFELSŐ "
+            "az ALAPÉRTELMEZETT – ez nyílik meg a levelező indításakor. A "
+            "sorrendet a Feljebb/Lejjebb gombokkal állíthatod.")),
+            0, wx.ALL, 6)
         self.fiok_lb = wx.ListBox(p)
-        self.fiok_lb.SetName("Fiókok")
+        self.fiok_lb.SetName("Fiókok (a legfelső az alapértelmezett)")
         v.Add(self.fiok_lb, 1, wx.EXPAND | wx.ALL, 6)
         s = wx.BoxSizer(wx.HORIZONTAL)
         for cimke, kez in (("&Hozzáadás…", self._f_add),
                            ("Sze&rkesztés…", self._f_edit),
-                           ("&Törlés", self._f_del)):
+                           ("&Törlés", self._f_del),
+                           ("Fel&jebb", self._f_fel),
+                           ("&Lejjebb", self._f_le),
+                           ("Legyen ez az &alapértelmezett", self._f_alap)):
             b = wx.Button(p, label=cimke)
             b.Bind(wx.EVT_BUTTON, kez)
             s.Add(b, 0, wx.RIGHT, 6)
@@ -1094,6 +1101,44 @@ class BeallitasokDialog(wx.Dialog):
         p.SetSizer(v)
         self._fiokok_frissit()
         return p
+
+    # ---- fiók-sorrend (az első = alapértelmezett, az indul is ezt nyitja) ----
+    def _f_mozgat(self, irany):
+        i = self.fiok_lb.GetSelection()
+        j = i + irany
+        if i < 0 or not (0 <= j < len(self._fiokok)):
+            return
+        self._fiokok[i], self._fiokok[j] = self._fiokok[j], self._fiokok[i]
+        MC.fiokok_ment(self._fiokok)
+        self._fiokok_frissit()
+        self.fiok_lb.SetSelection(j)
+        self._mf_reload()
+        nev = self._fiokok[j].get("nev") or self._fiokok[j].get("email")
+        _mondd(self.main, "%s a(z) %d. helyre került.%s"
+               % (nev, j + 1,
+                  " Ez mostantól az alapértelmezett fiók." if j == 0 else ""))
+
+    def _f_fel(self, e):
+        self._f_mozgat(-1)
+
+    def _f_le(self, e):
+        self._f_mozgat(1)
+
+    def _f_alap(self, e):
+        """A kijelölt fiókot a lista ELEJÉRE teszi → ez lesz az alapértelmezett."""
+        i = self.fiok_lb.GetSelection()
+        if i <= 0:
+            if i == 0:
+                _mondd(self.main, "Ez már az alapértelmezett fiók.")
+            return
+        self._fiokok.insert(0, self._fiokok.pop(i))
+        MC.fiokok_ment(self._fiokok)
+        self._fiokok_frissit()
+        self.fiok_lb.SetSelection(0)
+        self._mf_reload()
+        nev = self._fiokok[0].get("nev") or self._fiokok[0].get("email")
+        _mondd(self.main, "%s mostantól az alapértelmezett fiók – ez nyílik "
+               "meg a levelező indításakor." % nev)
 
     def _fiokok_frissit(self):
         self._fiokok = MC.fiokok_betolt()
@@ -1517,7 +1562,7 @@ class MailFrame(wx.Frame):
         self._mi(m_fiok, "⚙ &Beállítások (fiókok, értesítők, címjegyzék)…",
                  self._beallitasok)
         m_fiok.AppendSeparator()
-        self._mi(m_fiok, "Be&zárás  (Esc)", lambda e: self.Close())
+        self._mi(m_fiok, "Be&zárás  (Alt+F4)", lambda e: self.Close())
         mb.Append(m_fiok, "&Fiók")
 
         m_level = wx.Menu()
@@ -2349,9 +2394,10 @@ class MailFrame(wx.Frame):
         elif k == wx.WXK_DELETE:
             # Del = Kukába (nem kérdez); Shift+Del = VÉGLEGES törlés (kérdez)
             self._torol(None, vegleges_kenyszer=(m == wx.MOD_SHIFT))
-        elif k == wx.WXK_ESCAPE:
-            self.Close()
         else:
+            # Az ESC SZÁNDÉKOSAN nem zár be (a tesztelő kérése): egy levelezőt
+            # nem szerencsés véletlen Escape-pel bezárni. Kilépés: Alt+F4, a
+            # Fiók menü „Bezárás” pontja, vagy az ablak bezáró gombja.
             e.Skip()
 
     def _sugo(self):

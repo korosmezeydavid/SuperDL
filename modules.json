@@ -49,12 +49,12 @@
       "category": "Szervezés",
       "description": "Szervezés-eszközök egy csomagban: akadálymentes Hírolvasó (RSS), Podcast-felfedező, Naptár/teendők/jegyzetek (emlékeztetővel, ICS-szinkronnal) ÚJ rezsi/költség-kalkulátor füllel (havi/éves összesítés, naptári emlékeztetők, opcionális PIN-lakat), és Napi infó (időjárás, névnap).",
       "latest": {
-        "version": "1.3.1",
+        "version": "1.3.2",
         "min_core_api": "1.0",
         "min_core_version": "4.0.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.3.1/szervezes-1.3.1.zip",
-        "sha256": "e513cc9827595d5ff3bd84a56631de5b9a52a2dc677fc156adf685661887846e",
-        "size": 30404
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.3.2/szervezes-1.3.2.zip",
+        "sha256": "7d231aa3726aa46f43e284a4a26ad12ea2477c013cc7919339478f0ccd14cd45",
+        "size": 30421
       }
     },
     {
@@ -187,12 +187,12 @@
       "category": "Kommunikáció",
       "description": "Vak-first, teljesen akadálymentes e-mail kliens – kizárólag emailezés: leveleket olvasol, küldesz és keresel (IMAP, POP3, SMTP). Hitelesítés APP-JELSZÓVAL: a valódi fő-jelszavadat sosem adod meg, hanem egy dedikált, csak a Super Mailhez szóló app-jelszót, amit te hozol létre a saját fiókodban és bármikor visszavonhatsz – így az azonosságod és a fiókod végig a te kezedben marad. Bármilyen szolgáltató kézzel is beállítható (Freemail, Citromail, céges, saját domain): a szerver-nevek és a portok felülírhatók. Adatvédelem az első helyen: az első indításkor hozzájárulást kérünk, és világosan közöljük, hogy SEMMIT, DE SEMMIT nem továbbítunk sehová – a program közvetlenül a te e-mail-szolgáltatód szerveréhez csatlakozik, semmi máshoz, a fiók-adatok pedig a te gépeden, a Windows DPAPI-titkosításával élnek. Nincs naptár, nincs telemetria, nincs felhő, nincs külső belépés. A HTML-levelek távoli képei alapból nem töltődnek be (nyomkövetés ellen). ÚJ: HELYESÍRÁS-ELLENŐRZŐ a levélíráshoz – a Windows beépített (magyar) szótárával, tehát nincs letöltendő szótár; a levél szövegének helyi menüjéből (jobb gomb) bármikor be- és kikapcsolható, F7-tel azonnal indítható, és vak-first: a hibákat FELSOROLJA javaslatokkal, amiket Enterrel cserélhetsz. Bármikor visszavonható: a fiók törlésével a tárolt app-jelszó véglegesen törlődik. Csak a saját fiókjaidhoz.",
       "latest": {
-        "version": "1.0.5",
+        "version": "1.0.6",
         "min_core_api": "1.0",
         "min_core_version": "4.2.7",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mail-1.0.5/mail-1.0.5.zip",
-        "sha256": "a24272b3f209274947d13777f08f326afe692d69bb10953d2c5a456be41bc2e9",
-        "size": 79247
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mail-1.0.6/mail-1.0.6.zip",
+        "sha256": "3260dfef62492a06e469f66bb0f0eeefbb8233af035b0d7397dc8c642c74a858",
+        "size": 79892
       }
     },
     {
@@ -201,12 +201,12 @@
       "category": "Kommunikáció",
       "description": "Vak-first, akadálymentes TÁVSEGÍTSÉG: egy megbízható ember távolról segíthet a gépeden, vagy te segíthetsz valakinek – szoba-kóddal, szerver nélkül, csak internettel (mint a Csevejcenternél). Két szerep: „Segítséget kérek” (téged irányítanak) és „Segítek” (te irányítasz). A segített szobát nyit, kap egy rövid, bemondható kódot, és elküldi a MEGBÍZHATÓ segítőjének. Amint a kapcsolat él, a segítő HALLJA a segített gépét – benne a képernyőolvasó beszédét is (rendszerhang-átvitel) –, így vak is tud vaknak segíteni. Az IRÁNYÍTÁST a segített KÜLÖN, egy leokézható beleegyezés után engedélyezi; ekkor a segítő billentyűi (a képernyőolvasó-parancsok is) a másik gépre mennek. BIZTONSÁG az első helyen és felügyelt módban: minden munkamenetet a segített indít és minden irányítást ő engedélyez; a Ctrl+Alt+Pause rendszer-gyorsbillentyű (vagy a pánik gomb) bármikor AZONNAL bontja a vezérlést; nincs felügyelet nélküli, rejtett hozzáférés. A JAWS Tandem / NVDA Remote alternatívája, mert mindkét fél már fenn van a SuperDL-en (nincs külön licenc/bővítmény). Kizárólag megbízható, kölcsönös segítségre – az irányítás bizalmi funkció.",
       "latest": {
-        "version": "1.0.0",
+        "version": "1.0.1",
         "min_core_api": "1.0",
         "min_core_version": "4.2.7",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-tavsegitseg-1.0.0/tavsegitseg-1.0.0.zip",
-        "sha256": "db4ee41b03ae6ed5f141f62617ed6daf7c95d633aa045c9f3663a309882f117a",
-        "size": 26463
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-tavsegitseg-1.0.1/tavsegitseg-1.0.1.zip",
+        "sha256": "35fae75d5b315e1668c4ab60004ed3dfec94599642a8fd6d7a23ffc646e14934",
+        "size": 26476
       }
     },
     {

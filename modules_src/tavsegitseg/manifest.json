@@ -1,7 +1,7 @@
 {
   "id": "tavsegitseg",
   "name": "Távsegítség (távvezérlés)",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "entry": "tavsegitseg_mod",
   "category": "Kommunikáció",
   "description": "Vak-first, akadálymentes TÁVSEGÍTSÉG: egy megbízható ember távolról segíthet a gépeden, vagy te segíthetsz valakinek – szoba-kóddal, szerver nélkül, csak internettel (mint a Csevejcenternél). Két szerep: „Segítséget kérek” (téged irányítanak) és „Segítek” (te irányítasz). A segített szobát nyit, kap egy rövid, bemondható kódot, és elküldi a MEGBÍZHATÓ segítőjének. Amint a kapcsolat él, a segítő HALLJA a segített gépét – benne a képernyőolvasó beszédét is (rendszerhang-átvitel) –, így vak is tud vaknak segíteni. Az IRÁNYÍTÁST a segített KÜLÖN, egy leokézható beleegyezés után engedélyezi; ekkor a segítő billentyűi (a képernyőolvasó-parancsok is) a másik gépre mennek. BIZTONSÁG az első helyen és felügyelt módban: minden munkamenetet a segített indít és minden irányítást ő engedélyez; a Ctrl+Alt+Pause rendszer-gyorsbillentyű (vagy a pánik gomb) bármikor AZONNAL bontja a vezérlést; nincs felügyelet nélküli, rejtett hozzáférés. A JAWS Tandem / NVDA Remote alternatívája, mert mindkét fél már fenn van a SuperDL-en (nincs külön licenc/bővítmény). Kizárólag megbízható, kölcsönös segítségre – az irányítás bizalmi funkció.",
