@@ -775,7 +775,7 @@ class LevelIroDialog(wx.Dialog):
                          "megerősítése", wx.YES_NO | wx.ICON_QUESTION,
                          self) != wx.YES:
             return
-        msg = MC.level_epit(self.fiok["email"], cim, self.targy.GetValue(),
+        msg = MC.level_epit(MC.felado_fejlec(self.fiok), cim, self.targy.GetValue(),
                             self.torzs.GetValue(), self.masolat.GetValue(),
                             self._csatolmanyok, self.valasz_id, titkos=bcc)
         # a címzetteket felvesszük a címjegyzékbe (auto-tanulás)

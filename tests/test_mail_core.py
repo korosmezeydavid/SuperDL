@@ -103,3 +103,21 @@ def test_kliens_valasztas_protokoll_szerint():
     pop_f = MC.uj_fiok("B", "b@x.hu", "j", "pop")
     assert isinstance(MC.ImapKliens(imap_f), MC.ImapKliens)
     assert isinstance(MC.Pop3Kliens(pop_f), MC.Pop3Kliens)
+
+
+def test_felado_fejlec_nevvel_es_nev_nelkul():
+    """A kimenő levél From fejléce NÉVVEL menjen (tesztelői visszajelzés: a
+    címzettnél a hosszú e-mail cím hangzott el a név helyett)."""
+    f = {"nev": "Kőrösmezey Dávid", "email": "david@pelda.hu"}
+    fej = MC.felado_fejlec(f)
+    assert "david@pelda.hu" in fej          # a cím mindig nyersen benne van
+    # az ékezetes NÉV RFC 2047 szerint kódolva megy a dróton, de a kész
+    # levélben (és a címzett levelezőjében) visszafejtve a NÉV látszik
+    m = MC.level_epit(fej, "miki@pelda.hu", "Teszt", "szia")
+    assert "Kőrösmezey Dávid" in str(m["From"])
+    assert "david@pelda.hu" in str(m["From"])
+    # ASCII névnél kódolás sincs
+    assert MC.felado_fejlec({"nev": "Miki", "email": "m@b.hu"}) == "Miki <m@b.hu>"
+    # név nélkül (vagy ha a név maga a cím) marad a puszta cím
+    assert MC.felado_fejlec({"nev": "", "email": "a@b.hu"}) == "a@b.hu"
+    assert MC.felado_fejlec({"nev": "a@b.hu", "email": "a@b.hu"}) == "a@b.hu"

@@ -403,6 +403,21 @@ _HANG_KITERJESZTESEK = (".mp3", ".m4a", ".aac", ".ogg", ".oga", ".opus",
                         ".wav", ".flac", ".wma", ".mp2")
 
 
+def felado_fejlec(fiok):
+    """A kimenő levél „From” fejléce: „Név <cim@pelda.hu>”, ha a fiókhoz van
+    megjelenítendő NÉV; különben a puszta cím.
+
+    MIÉRT FONTOS (tesztelői visszajelzés): eddig CSAK a nyers e-mail címet
+    küldtük feladóként, ezért a címzett levelezője (és a képernyőolvasója) a
+    hosszú e-mail címet mondta be a neved helyett. A név a fiók beállításából
+    (Fiókok → Név) jön."""
+    cim = (fiok.get("email") or "").strip()
+    nev = (fiok.get("nev") or "").strip()
+    if nev and nev.lower() != cim.lower():
+        return email.utils.formataddr((nev, cim))
+    return cim
+
+
 def level_epit(felado, cimzett, targy, torzs, masolat="", csatolmanyok_lista=None,
                valasz_id=None, titkos="", autosound_nev=""):
     """Kimenő levél MIME-üzenetté formázása. `csatolmanyok_lista`: fájl-utak
