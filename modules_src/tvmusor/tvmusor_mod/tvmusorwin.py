@@ -212,9 +212,34 @@ class TvMusorFrame(wx.Frame):
                 self._kedvenc_ertesit.GetValue()))
         s.Add(self._kedvenc_ertesit, 0, wx.ALL, 6)
 
+        sor2 = wx.BoxSizer(wx.HORIZONTAL)
         g_most = wx.Button(lap, label="&Mikor jönnek a kedvenceim? (most nézd meg)")
         g_most.Bind(wx.EVT_BUTTON, lambda e: self._kedvencek_ellenoriz(kezi=True))
-        s.Add(g_most, 0, wx.ALL, 6)
+        sor2.Add(g_most, 0, wx.RIGHT, 6)
+        self._g_emlek = wx.Button(lap, label="&Emlékeztetőt kérek a kijelöltre")
+        self._g_emlek.Bind(wx.EVT_BUTTON, lambda e: self._emlekezteto_egy())
+        sor2.Add(self._g_emlek, 0, wx.RIGHT, 6)
+        self._g_emlek_mind = wx.Button(lap, label="Emlékeztető M&INDRE")
+        self._g_emlek_mind.Bind(wx.EVT_BUTTON, lambda e: self._emlekezteto_mind())
+        sor2.Add(self._g_emlek_mind, 0)
+        s.Add(sor2, 0, wx.ALL, 6)
+
+        eml = wx.BoxSizer(wx.HORIZONTAL)
+        eml.Add(wx.StaticText(lap, label="Emlékeztető &ennyi perccel előtte:"),
+                0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self._emlek_perc = wx.SpinCtrl(lap, min=0, max=120,
+                                       initial=self._emlek_perc_betolt())
+        self._emlek_perc.SetName("Emlékeztető hány perccel a kezdés előtt")
+        self._emlek_perc.Bind(wx.EVT_SPINCTRL, lambda e: self._emlek_perc_ment())
+        eml.Add(self._emlek_perc, 0, wx.RIGHT, 12)
+        self._emlek_auto = wx.CheckBox(
+            lap, label="Emlékeztető beállítása &magától az új kedvenc-műsorokra")
+        self._emlek_auto.SetValue(self._emlek_auto_betolt())
+        self._emlek_auto.Bind(
+            wx.EVT_CHECKBOX, lambda e: self._emlek_auto_ment(
+                self._emlek_auto.GetValue()))
+        eml.Add(self._emlek_auto, 0, wx.ALIGN_CENTER_VERTICAL)
+        s.Add(eml, 0, wx.ALL, 6)
 
         s.Add(wx.StaticText(lap, label="&Ami jön a kedvencekből:"), 0, wx.LEFT, 6)
         self._kedvenc_talalat = wx.ListBox(lap, style=wx.LB_SINGLE)
@@ -294,6 +319,149 @@ class TvMusorFrame(wx.Frame):
         self._kedvencek_listaz()
         self._mond("Törölve a kedvencek közül: %s" % cim)
 
+    # ---- naptári emlékeztető a kedvenc műsorokra ----
+    def _emlek_perc_betolt(self):
+        try:
+            return int(self.core.store.load("tvmusor_emlek_perc", 10) or 10)
+        except Exception:
+            return 10
+
+    def _emlek_perc_ment(self):
+        try:
+            self.core.store.save("tvmusor_emlek_perc",
+                                 int(self._emlek_perc.GetValue()))
+        except Exception:
+            pass
+
+    def _emlek_auto_betolt(self):
+        try:
+            return bool(self.core.store.load("tvmusor_emlek_auto", False))
+        except Exception:
+            return False
+
+    def _emlek_auto_ment(self, ertek):
+        try:
+            self.core.store.save("tvmusor_emlek_auto", bool(ertek))
+        except Exception:
+            pass
+        self._mond("Automatikus emlékeztető a kedvencekre: "
+                   + ("bekapcsolva." if ertek else "kikapcsolva."))
+        if ertek:
+            self._emlekezteto_mind(csendes=True)
+
+    def _beallitott_emlekeztetok(self):
+        """A már beállított kedvenc-emlékeztetők kulcsai – hogy ne tegyünk be
+        ugyanarra a műsorra kétszer (a naptár ne teljen meg fölöslegesen)."""
+        try:
+            return set(self.core.store.load("tvmusor_emlek_kulcsok", []) or [])
+        except Exception:
+            return set()
+
+    def _emlek_kulcsok_ment(self, kulcsok):
+        try:
+            # csak a friss (mai naptól) kulcsokat tartjuk meg
+            ma = _dt.date.today().isoformat()
+            szurt = [k for k in kulcsok if k.split("|", 1)[0] >= ma]
+            self.core.store.save("tvmusor_emlek_kulcsok", sorted(szurt)[-500:])
+        except Exception:
+            pass
+
+    def _emlekezteto_hozzaad(self, nev, m):
+        """Egy műsorra naptári emlékeztetőt tesz (a Core közös naptárába).
+        Visszaad: True, ha most tettük be; False, ha már volt / nem sikerült."""
+        org = getattr(self.core, "organizer", None) or \
+            getattr(self.core, "_organizer", None)
+        if org is None:
+            main = getattr(self.core, "main", None)
+            org = getattr(main, "_organizer", None) if main else None
+        if org is None:
+            return None                      # nincs naptár – a hívó jelzi
+        kulcs = "%s|%s|%s" % (m.kezd.date().isoformat(), m.idopont,
+                              (m.cim or "")[:60])
+        meglevo = self._beallitott_emlekeztetok()
+        if kulcs in meglevo:
+            return False
+        try:
+            from superdl import organizer as O
+            perc = int(self._emlek_perc.GetValue())
+            ev = O.Event(
+                id=O.new_id(),
+                title="TV: %s – %s" % (nev, m.cim or "műsor"),
+                date=m.kezd.date().isoformat(),
+                time=m.kezd.strftime("%H:%M"),
+                note="SuperDL kedvenc-emlékeztető",
+                reminder_min=perc,
+                action_type="speak",
+                action_data=("Figyelem! %s perc múlva kezdődik a kedvenced: %s, "
+                             "a(z) %s csatornán." % (perc, m.cim or "műsor", nev))
+                if perc else
+                ("Most kezdődik a kedvenced: %s, a(z) %s csatornán."
+                 % (m.cim or "műsor", nev)))
+            org.add_event(ev)
+        except Exception:
+            return None
+        meglevo.add(kulcs)
+        self._emlek_kulcsok_ment(meglevo)
+        return True
+
+    def _emlekezteto_egy(self):
+        i = self._kedvenc_talalat.GetSelection()
+        if not (0 <= i < len(self._kedvenc_sorok)):
+            self._mond("Előbb válassz ki egy műsort a kedvencek listájából.")
+            return
+        nev, m = self._kedvenc_sorok[i]
+        eredmeny = self._emlekezteto_hozzaad(nev, m)
+        if eredmeny is None:
+            self._mond("A naptár most nem érhető el, ezért nem tudok "
+                       "emlékeztetőt beállítani. (A Szervezés modul naptára "
+                       "kell hozzá.)")
+        elif eredmeny:
+            self._mond("Emlékeztető beállítva: %s, %s csatorna, %s %s-kor – "
+                       "%d perccel előtte szólok."
+                       % (m.cim, nev, m.kezd.strftime("%m. %d."), m.idopont,
+                          int(self._emlek_perc.GetValue())))
+        else:
+            self._mond("Erre a műsorra már van emlékeztetőd.")
+
+    def _emlekezteto_mind(self, csendes=False):
+        if not self._kedvenc_sorok:
+            if not csendes:
+                self._mond("Előbb nézzük meg, mikor jönnek a kedvenceid.")
+            return
+        # ne lehessen véletlenül teleszórni a naptárat (pl. ha a kedvenc egy
+        # gyakori szó, mint a „híradó”) – sok tételnél rákérdezünk
+        if not csendes and len(self._kedvenc_sorok) > 20:
+            kerdes = ("%d műsorra tennék be emlékeztetőt – ez elég sok, és mind "
+                      "bekerül a naptáradba.\n\nBiztosan mindre kéred? (Ha nem, "
+                      "válaszd ki egyesével a listából, és használd az "
+                      "„Emlékeztetőt kérek a kijelöltre” gombot.)"
+                      % len(self._kedvenc_sorok))
+            self._mond(kerdes)
+            if wx.MessageBox(kerdes, "Emlékeztető mindre",
+                             wx.YES_NO | wx.ICON_QUESTION, self) != wx.YES:
+                self._mond("Rendben, nem tettem be emlékeztetőt.")
+                return
+        uj = mar = 0
+        nincs_naptar = False
+        for nev, m in self._kedvenc_sorok:
+            e = self._emlekezteto_hozzaad(nev, m)
+            if e is None:
+                nincs_naptar = True
+                break
+            uj += 1 if e else 0
+            mar += 0 if e else 1
+        if nincs_naptar:
+            if not csendes:
+                self._mond("A naptár most nem érhető el, ezért nem tudok "
+                           "emlékeztetőt beállítani.")
+            return
+        if csendes and not uj:
+            return
+        self._mond("Kész: %d új emlékeztető a kedvenceidre%s. A naptár %d "
+                   "perccel a kezdés előtt szól."
+                   % (uj, (" (%d már megvolt)" % mar) if mar else "",
+                      int(self._emlek_perc.GetValue())))
+
     def _kedvencek_ellenoriz(self, kezi=False):
         """Megnézi, jön-e valamelyik kedvenc – és SZÓL, ha igen."""
         kedvencek = self._kedvencek_betolt()
@@ -332,6 +500,9 @@ class TvMusorFrame(wx.Frame):
             uzenet += " Összesen %d kedvenc-műsor jön – a Kedvencek fülön " \
                       "mind ott van." % len(tal)
         self._mond(uzenet)
+        # ha kérted, a NAPTÁR is emlékeztessen – csak az ÚJ műsorokra
+        if self._emlek_auto_betolt():
+            self._emlekezteto_mind(csendes=True)
 
     def _beall_lap(self, nb):
         lap = wx.Panel(nb)
@@ -509,6 +680,11 @@ class TvMusorFrame(wx.Frame):
         "betöltéskor megnézi, jön-e valamelyik, és SZÓL: „Helló! Lesz a "
         "kedvenced…”. Ez a jelzés a fülön ki-be kapcsolható, és a „Mikor jönnek "
         "a kedvenceim?” gombbal bármikor lekérdezhető.\n"
+        "  NAPTÁRI EMLÉKEZTETŐ: a kijelölt (vagy az összes) kedvenc-műsorra "
+        "emlékeztetőt kérhetsz, és a SuperDL naptára a kezdés előtt megszólal: "
+        "„Figyelem! 10 perc múlva kezdődik a kedvenced…”. Az előidő percben "
+        "állítható, és bekapcsolható, hogy az ÚJ kedvenc-műsorokra magától "
+        "beállítsa. Ugyanarra a műsorra nem tesz be kétszer.\n"
         "• Beállítás – a műsorújság forrásának címe (üresen: alapértelmezett; "
         "ha az nem elérhető, automatikusan tartalék forrást próbálunk).\n\n"
         "A listákon fel/le nyíllal lépkedsz, a képernyőolvasó minden sort "
