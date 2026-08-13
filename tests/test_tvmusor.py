@@ -168,3 +168,43 @@ def test_betolt_okosan_offline_regi_adatot_ad(tmp_path, monkeypatch):
                         lambda url, idokorlat=120: (_ for _ in ()).throw(OSError("nincs net")))
     tv, honnan = E.TvMusor.betolt_okosan()
     assert honnan == "regi" and tv.csatorna_nev("tv2.hu") == "TV2"
+
+
+# ----------------------- KEDVENC-FIGYELŐ -----------------------
+def test_kedvencek_talalat_idorendben():
+    tv = _tv()
+    mikor = _helyi(12)
+    tal = tv.kedvencek_talalat(["Kékfény", "Reszkessetek"], mikortol=mikor)
+    # időrendben: 20:00 Reszkessetek (RTL), 21:00 Kékfény (M1)
+    assert [t[2].cim for t in tal] == ["Reszkessetek, betörők!", "Kékfény"]
+    kedvenc, csatorna, musor = tal[0]
+    assert kedvenc == "Reszkessetek" and csatorna == "RTL"
+    assert musor.idopont == "20:00"
+
+
+def test_kedvencek_ekezet_nelkul_es_leirasban_is():
+    tv = _tv()
+    mikor = _helyi(12)
+    # ékezet nélkül is megtalálja
+    assert tv.kedvencek_talalat(["kekfeny"], mikortol=mikor)
+    # a LEÍRÁSBAN is keres (Kevin a Reszkessetek leírásában van)
+    tal = tv.kedvencek_talalat(["Kevin"], mikortol=mikor)
+    assert tal and tal[0][2].cim == "Reszkessetek, betörők!"
+
+
+def test_kedvencek_nincs_duplikatum():
+    tv = _tv()
+    mikor = _helyi(12)
+    # két kedvenc ugyanarra a műsorra illik → CSAK EGYSZER szerepeljen
+    tal = tv.kedvencek_talalat(["Reszkessetek", "Kevin", "betörők"],
+                               mikortol=mikor)
+    cimek = [t[2].cim for t in tal]
+    assert cimek.count("Reszkessetek, betörők!") == 1
+
+
+def test_kedvencek_ures_es_mult():
+    tv = _tv()
+    assert tv.kedvencek_talalat([], mikortol=_helyi(12)) == []
+    assert tv.kedvencek_talalat(["", "   "], mikortol=_helyi(12)) == []
+    # ami már lement, nem kedvenc-találat
+    assert tv.kedvencek_talalat(["Reszkessetek"], mikortol=_helyi(23)) == []

@@ -291,6 +291,29 @@ class TvMusor:
         ki.sort(key=lambda t: (t[1].kezd, _norm(t[0])))
         return ki
 
+    def kedvencek_talalat(self, cimek, mikortol=None, darab: int = 100) -> list:
+        """KEDVENC-FIGYELŐ: a megadott címek (filmek, sorozatok) közül melyik jön
+        a műsorban? Visszaad: (kedvenc_cím, csatornanév, Musor) hármasok
+        IDŐRENDBEN – így egyetlen mondatban megmondható, „lesz a kedvenced itt és
+        ekkor”.
+
+        Ugyanazt a műsort csak EGYSZER adja vissza, akkor is, ha több kedvencre
+        is illik (pl. „Kevin” és „Reszkessetek”)."""
+        mikortol = mikortol or _dt.datetime.now()
+        ki, latott = [], set()
+        for cim in (cimek or []):
+            cim = (cim or "").strip()
+            if not cim:
+                continue
+            for nev, m in self.keres(cim, mikortol=mikortol, darab=darab):
+                kulcs = (m.csatorna, m.kezd, _norm(m.cim))
+                if kulcs in latott:
+                    continue
+                latott.add(kulcs)
+                ki.append((cim, nev, m))
+        ki.sort(key=lambda t: t[2].kezd)
+        return ki[:darab]
+
     def keres(self, kifejezes: str, mikortol=None, darab: int = 200) -> list:
         """Cím (és leírás) szerinti keresés MINDEN csatornán – ékezet- és
         kisbetű-érzéketlen. Visszaad: (csatornanév, Musor), időrendben.

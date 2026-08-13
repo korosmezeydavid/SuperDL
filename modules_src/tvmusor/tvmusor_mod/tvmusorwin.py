@@ -9,6 +9,7 @@ képernyőolvasó minden sort felolvas, a részletek külön mezőben olvasható
 A műsoradat a felhasználó által választott (alapból közösségi, ingyenes) XMLTV
 forrásból jön – IPTV-előfizetés NEM kell hozzá.
 """
+import datetime as _dt
 import threading
 
 import wx
@@ -57,6 +58,7 @@ class TvMusorFrame(wx.Frame):
         nb.AddPage(self._este_lap(nb), "Ma este")
         nb.AddPage(self._csatorna_lap(nb), "Csatornák")
         nb.AddPage(self._keres_lap(nb), "Keresés")
+        nb.AddPage(self._kedvenc_lap(nb), "Kedvencek")
         nb.AddPage(self._beall_lap(nb), "Beállítás")
         self._nb = nb
         v.Add(nb, 1, wx.EXPAND | wx.ALL, 6)
@@ -170,6 +172,167 @@ class TvMusorFrame(wx.Frame):
         lap.SetSizer(s)
         return lap
 
+    def _kedvenc_lap(self, nb):
+        """KEDVENC-FIGYELŐ: írd be a kedvenc filmjeid/sorozataid címét, és a
+        program szól, ha jönnek a műsorban."""
+        lap = wx.Panel(nb)
+        s = wx.BoxSizer(wx.VERTICAL)
+        s.Add(wx.StaticText(lap, label=(
+            "Írd be a kedvenc filmjeid, sorozataid címét – a program minden "
+            "betöltéskor megnézi, jön-e valamelyik, és SZÓL, ha igen.\n"
+            "Elég a cím egy jellemző része is (ékezet nélkül is jó): pl. "
+            "„reszkessetek”, „barátok közt”, „columbo”.")), 0, wx.ALL, 6)
+
+        sor = wx.BoxSizer(wx.HORIZONTAL)
+        sor.Add(wx.StaticText(lap, label="Új &kedvenc:"),
+                0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self._kedvenc_mezo = wx.TextCtrl(lap, style=wx.TE_PROCESS_ENTER)
+        self._kedvenc_mezo.SetName("Új kedvenc címe")
+        self._kedvenc_mezo.Bind(wx.EVT_TEXT_ENTER, lambda e: self._kedvenc_add())
+        sor.Add(self._kedvenc_mezo, 1, wx.RIGHT, 6)
+        g_add = wx.Button(lap, label="&Hozzáadás")
+        g_add.Bind(wx.EVT_BUTTON, lambda e: self._kedvenc_add())
+        sor.Add(g_add, 0, wx.RIGHT, 6)
+        g_del = wx.Button(lap, label="&Törlés a listából")
+        g_del.Bind(wx.EVT_BUTTON, lambda e: self._kedvenc_torol())
+        sor.Add(g_del, 0)
+        s.Add(sor, 0, wx.EXPAND | wx.ALL, 6)
+
+        s.Add(wx.StaticText(lap, label="A &kedvenceid:"), 0, wx.LEFT, 6)
+        self._kedvenc_lista = wx.ListBox(lap, style=wx.LB_SINGLE)
+        self._kedvenc_lista.SetName("A kedvenceid")
+        s.Add(self._kedvenc_lista, 1, wx.EXPAND | wx.ALL, 6)
+
+        self._kedvenc_ertesit = wx.CheckBox(
+            lap, label="&Szóljon magától, ha jön valamelyik kedvencem "
+                       "(a műsor betöltésekor)")
+        self._kedvenc_ertesit.SetValue(self._ertesites_be())
+        self._kedvenc_ertesit.Bind(
+            wx.EVT_CHECKBOX, lambda e: self._ertesites_ment(
+                self._kedvenc_ertesit.GetValue()))
+        s.Add(self._kedvenc_ertesit, 0, wx.ALL, 6)
+
+        g_most = wx.Button(lap, label="&Mikor jönnek a kedvenceim? (most nézd meg)")
+        g_most.Bind(wx.EVT_BUTTON, lambda e: self._kedvencek_ellenoriz(kezi=True))
+        s.Add(g_most, 0, wx.ALL, 6)
+
+        s.Add(wx.StaticText(lap, label="&Ami jön a kedvencekből:"), 0, wx.LEFT, 6)
+        self._kedvenc_talalat = wx.ListBox(lap, style=wx.LB_SINGLE)
+        self._kedvenc_talalat.SetName("A kedvencek közelgő műsorai")
+        self._kedvenc_talalat.Bind(
+            wx.EVT_LISTBOX,
+            lambda e: self._reszlet_mutat(self._kedvenc_sorok,
+                                          self._kedvenc_talalat,
+                                          self._kedvenc_reszlet))
+        s.Add(self._kedvenc_talalat, 1, wx.EXPAND | wx.ALL, 6)
+        self._kedvenc_reszlet = wx.TextCtrl(
+            lap, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2,
+            size=(-1, 70))
+        self._kedvenc_reszlet.SetName("A kijelölt műsor részletei")
+        s.Add(self._kedvenc_reszlet, 0, wx.EXPAND | wx.ALL, 6)
+        self._kedvenc_sorok = []
+        lap.SetSizer(s)
+        wx.CallAfter(self._kedvencek_listaz)
+        return lap
+
+    # ---- kedvencek tárolása ----
+    def _kedvencek_betolt(self):
+        try:
+            ertek = self.core.store.load("tvmusor_kedvencek", []) or []
+            return [str(x) for x in ertek if str(x).strip()]
+        except Exception:
+            return []
+
+    def _kedvencek_ment(self, lista):
+        try:
+            self.core.store.save("tvmusor_kedvencek", list(lista))
+        except Exception:
+            pass
+
+    def _ertesites_be(self):
+        try:
+            return bool(self.core.store.load("tvmusor_kedvenc_ertesites", True))
+        except Exception:
+            return True
+
+    def _ertesites_ment(self, ertek):
+        try:
+            self.core.store.save("tvmusor_kedvenc_ertesites", bool(ertek))
+        except Exception:
+            pass
+        self._mond("Kedvenc-értesítés: " + ("bekapcsolva." if ertek
+                                            else "kikapcsolva."))
+
+    def _kedvencek_listaz(self):
+        self._kedvenc_lista.Set(self._kedvencek_betolt())
+
+    def _kedvenc_add(self):
+        cim = (self._kedvenc_mezo.GetValue() or "").strip()
+        if not cim:
+            self._mond("Írd be a kedvenc film vagy sorozat címét.")
+            return
+        lista = self._kedvencek_betolt()
+        if any(x.lower() == cim.lower() for x in lista):
+            self._mond("Ez már a kedvenceid között van: %s" % cim)
+            return
+        lista.append(cim)
+        self._kedvencek_ment(lista)
+        self._kedvencek_listaz()
+        self._kedvenc_mezo.SetValue("")
+        self._mond("Felvéve a kedvencek közé: %s. Összesen %d kedvenced van."
+                   % (cim, len(lista)))
+        self._kedvencek_ellenoriz(kezi=True)
+
+    def _kedvenc_torol(self):
+        i = self._kedvenc_lista.GetSelection()
+        lista = self._kedvencek_betolt()
+        if not (0 <= i < len(lista)):
+            self._mond("Előbb válassz ki egy kedvencet a listából.")
+            return
+        cim = lista.pop(i)
+        self._kedvencek_ment(lista)
+        self._kedvencek_listaz()
+        self._mond("Törölve a kedvencek közül: %s" % cim)
+
+    def _kedvencek_ellenoriz(self, kezi=False):
+        """Megnézi, jön-e valamelyik kedvenc – és SZÓL, ha igen."""
+        kedvencek = self._kedvencek_betolt()
+        if not kedvencek:
+            if kezi:
+                self._mond("Még nincs egy kedvenced sem. Írj be egyet fent, "
+                           "és Hozzáadás.")
+            return
+        if not self._tv.csatorna_lista():
+            if kezi:
+                self._mond("Előbb be kell töltenem a műsorújságot – kis türelmet.")
+            return
+        tal = self._tv.kedvencek_talalat(kedvencek)
+        self._kedvenc_sorok = [(nev, m) for _k, nev, m in tal]
+        self._kedvenc_talalat.Set([
+            "%s %s – %s – %s%s" % (m.kezd.strftime("%m. %d."), m.idopont, nev,
+                                   m.cim or "(nincs cím)",
+                                   (" – %d perc" % m.hossz_perc)
+                                   if m.hossz_perc else "")
+            for _k, nev, m in tal])
+        if not tal:
+            if kezi:
+                self._mond("A jelenlegi műsorújságban egyik kedvenced sem "
+                           "szerepel. A műsor általában néhány napra előre "
+                           "tartalmaz adatot.")
+            return
+        self._kedvenc_talalat.SetSelection(0)
+        _kedvenc, nev, m = tal[0]
+        napok = {0: "ma", 1: "holnap"}.get(
+            (m.kezd.date() - _dt.date.today()).days, "")
+        mikor = ("%s %s-kor" % (napok, m.idopont) if napok
+                 else m.kezd.strftime("%m. %d-án %H:%M-kor"))
+        uzenet = ("Helló! Lesz a kedvenced: %s, a(z) %s csatornán, %s."
+                  % (m.cim, nev, mikor))
+        if len(tal) > 1:
+            uzenet += " Összesen %d kedvenc-műsor jön – a Kedvencek fülön " \
+                      "mind ott van." % len(tal)
+        self._mond(uzenet)
+
     def _beall_lap(self, nb):
         lap = wx.Panel(nb)
         s = wx.BoxSizer(wx.VERTICAL)
@@ -238,8 +401,11 @@ class TvMusorFrame(wx.Frame):
                                % (len(self._csatornak),
                                   cimke.get(honnan, honnan)))
         self._mond("Megvan a műsorújság: %d csatorna, %s. Válts a fülek közt: "
-                   "Mi megy most, Ma este, Csatornák, Keresés."
+                   "Mi megy most, Ma este, Csatornák, Keresés, Kedvencek."
                    % (len(self._csatornak), cimke.get(honnan, honnan)))
+        # KEDVENC-FIGYELŐ: ha be van kapcsolva, magától szól, ha jön kedvenc
+        if self._ertesites_be():
+            wx.CallLater(1200, lambda: self._kedvencek_ellenoriz(kezi=False))
 
     def _betolt_hiba(self, ex):
         if self._closing:
@@ -338,6 +504,11 @@ class TvMusorFrame(wx.Frame):
         "• Csatornák – válassz csatornát, alatta a műsora mostantól.\n"
         "• Keresés – írd be egy film/műsor címét (ékezet nélkül is jó), és "
         "megmondja, MIKOR és MELYIK csatornán adják.\n"
+        "• KEDVENCEK – írd be a kedvenc filmjeid, sorozataid címét (akár többet "
+        "is; elég egy jellemző rész, ékezet nélkül is). A program minden "
+        "betöltéskor megnézi, jön-e valamelyik, és SZÓL: „Helló! Lesz a "
+        "kedvenced…”. Ez a jelzés a fülön ki-be kapcsolható, és a „Mikor jönnek "
+        "a kedvenceim?” gombbal bármikor lekérdezhető.\n"
         "• Beállítás – a műsorújság forrásának címe (üresen: alapértelmezett; "
         "ha az nem elérhető, automatikusan tartalék forrást próbálunk).\n\n"
         "A listákon fel/le nyíllal lépkedsz, a képernyőolvasó minden sort "
