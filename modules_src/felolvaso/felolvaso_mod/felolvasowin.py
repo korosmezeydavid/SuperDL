@@ -94,7 +94,7 @@ DEFAULT_RATE = 7
 
 # a modul verziója – a felhasználó HALLJA (indításkor és F8-ra), hogy tényleg a
 # friss változat fut-e (a manifest.json-nal kézzel szinkronban tartva)
-MOD_VERSION = "1.4.7"
+MOD_VERSION = "1.4.8"
 
 
 def _rovid_hiba(err: str) -> str:
@@ -260,16 +260,17 @@ class FelolvasoFrame(wx.Frame):
         # fel magától – ezért a program SAJÁT hangján (SAPI/eSpeak) is bemondjuk.
         # (force=True: akkor is szól, ha a self-voice alapból ki van kapcsolva.)
         sv = getattr(self.main, "selfvoice", None)
-        if sv is not None and getattr(sv, "muted", False):
-            return                       # TELJES némítás: egyetlen szót sem
         spoke = False
-        # A BEJELENTŐ elsősorban a KÉPERNYŐOLVASÓ (ő az, akit a felhasználó a
-        # saját beállításaival szabályoz) – csak ha nincs, jön a beépített hang.
+        # A BEJELENTŐ ELŐSZÖR a KÉPERNYŐOLVASÓ. FONTOS: képernyőolvasó-módban a
+        # Core a saját hangot NÉMÍTJA (muted=True) ÉPP AZÉRT, hogy az olvasó
+        # beszéljen – ezért a némítás CSAK a beépített hangra vonatkozhat.
         try:
             from superdl import screenreader
             spoke = bool(screenreader.speak(text))
         except Exception:
             spoke = False
+        if not spoke and sv is not None and getattr(sv, "muted", False):
+            return                       # nincs olvasó + teljes némítás → csend
         if not spoke and sv:
             try:
                 sv.speak(text, force=True)

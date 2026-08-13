@@ -60,6 +60,8 @@ class P2PFrame(wx.Frame):
         self._closing = False            # zárás alatt a háttér-callbackek ne nyúljanak hozzánk
         self._send_pct = -1              # utolsó ismert haladás (küldés/fogadás)
         self._recv_pct = -1
+        self._beeper = None              # hallható haladás-pittyegés (Core)
+        self._mondott_pct = {}           # irány → utoljára BEMONDOTT 25%-lépcső
 
         self._build()
         self.CreateStatusBar()
@@ -79,18 +81,20 @@ class P2PFrame(wx.Frame):
 
     def _speak(self, text):
         sv = getattr(self.main, "selfvoice", None)
-        # 1) TELJES némítás: a program egyetlen szót se mondjon (Beállítások)
-        if sv is not None and getattr(sv, "muted", False):
-            return
-        # 2) A BEJELENTŐ a KÉPERNYŐOLVASÓ – ha van, ő mondja (nincs dupla beszéd,
-        #    és a felhasználó a saját olvasójával szabályozza)
+        # 1) A BEJELENTŐ a KÉPERNYŐOLVASÓ – ELŐSZÖR mindig ŐT kérjük.
+        #    FONTOS: képernyőolvasó-módban a Core a saját hangot NÉMÍTJA
+        #    (muted=True) ÉPP AZÉRT, hogy az olvasó beszéljen – ezért a
+        #    némítás-ellenőrzés CSAK a beépített hangra vonatkozhat, ide nem.
         try:
             from superdl import screenreader
             if screenreader.speak(text):
                 return
         except Exception:
             pass
-        # 3) Csak ha NINCS képernyőolvasó: a beépített hang segít ki
+        # 2) Nincs képernyőolvasó → a beépített hang segít ki, DE a Teljes
+        #    némítás ilyenkor is némít
+        if sv is not None and getattr(sv, "muted", False):
+            return
         if sv:
             try:
                 sv.speak(text, force=True)
@@ -206,6 +210,7 @@ class P2PFrame(wx.Frame):
         self.SetStatusText(f"Küldés előkészítése: {Path(path).name} … "
                            "mindjárt megjelenik a kód.")
         self._send_pct = -1
+        self._mondott_pct.pop("kuld", None)
         self.send_session = p2p.SendSession(
             path,
             on_code=lambda c: wx.CallAfter(self._send_code, c),
@@ -219,6 +224,7 @@ class P2PFrame(wx.Frame):
         self._send_pct = pct
         self.SetStatusText(f"Küldés folyamatban: {pct} százalék. (F8: haladás "
                            "bemondása. Az ablakot tartsd nyitva.)")
+        self._haladas_jelez("Küldés", pct, "kuld")
 
     def _send_code(self, code):
         if self._closing:
@@ -295,18 +301,20 @@ class P2PFrame(wx.Frame):
         except Exception:
             pass
         sv = getattr(self.main, "selfvoice", None)
-        # 1) TELJES némítás: a program egyetlen szót se mondjon (Beállítások)
-        if sv is not None and getattr(sv, "muted", False):
-            return
-        # 2) A BEJELENTŐ a KÉPERNYŐOLVASÓ – ha van, ő mondja (nincs dupla beszéd,
-        #    és a felhasználó a saját olvasójával szabályozza)
+        # 1) A BEJELENTŐ a KÉPERNYŐOLVASÓ – ELŐSZÖR mindig ŐT kérjük.
+        #    FONTOS: képernyőolvasó-módban a Core a saját hangot NÉMÍTJA
+        #    (muted=True) ÉPP AZÉRT, hogy az olvasó beszéljen – ezért a
+        #    némítás-ellenőrzés CSAK a beépített hangra vonatkozhat, ide nem.
         try:
             from superdl import screenreader
             if screenreader.speak(text):
                 return
         except Exception:
             pass
-        # 3) Csak ha NINCS képernyőolvasó: a beépített hang segít ki
+        # 2) Nincs képernyőolvasó → a beépített hang segít ki, DE a Teljes
+        #    némítás ilyenkor is némít
+        if sv is not None and getattr(sv, "muted", False):
+            return
         if sv:
             try:
                 sv.speak(text, force=True)
@@ -355,6 +363,7 @@ class P2PFrame(wx.Frame):
         self._sv("receive", "start")
         self.SetStatusText("Csatlakozás a küldőhöz… egy pillanat.")
         self._recv_pct = -1
+        self._mondott_pct.pop("fogad", None)
         self.recv_session = p2p.ReceiveSession(
             code, out_dir,
             on_done=lambda ok, msg: wx.CallAfter(self._recv_done, ok, msg),
@@ -367,6 +376,33 @@ class P2PFrame(wx.Frame):
         self._recv_pct = pct
         self.SetStatusText(f"Fogadás folyamatban: {pct} százalék. "
                            "(F8: haladás bemondása.)")
+        self._haladas_jelez("Fogadás", pct, "fogad")
+
+    def _haladas_jelez(self, cimke, pct, irany):
+        """AKTÍV haladás-jelzés – a státuszsort a képernyőolvasó NEM olvassa
+        magától, ezért a vak felhasználó eddig nem érzékelte, hol tart az
+        átvitel (Laci jelezte a küldő, Barbi a fogadó oldalról).
+
+        Kettős visszajelzés, hogy ne legyen se néma, se fárasztó:
+          • HANG: halk pittyegés, ami a haladással emelkedik (a Core közös
+            ProgressBeeperje) – folyamatos érzet, beszéd nélkül;
+          • BESZÉD: 25 százalékonként (25/50/75) és a végén egy rövid mondat.
+        """
+        try:
+            if self._beeper is None:
+                from superdl import sounds
+                self._beeper = sounds.ProgressBeeper()
+            self._beeper.update(pct)
+        except Exception:
+            pass
+        try:
+            utolso = self._mondott_pct.get(irany, -1)
+            lepcso = (pct // 25) * 25            # 0 / 25 / 50 / 75 / 100
+            if lepcso >= 25 and lepcso > utolso:
+                self._mondott_pct[irany] = lepcso
+                self._speak("%s: %d százalék." % (cimke, lepcso))
+        except Exception:
+            pass
 
     def _recv_done(self, ok, msg):
         if self._closing:

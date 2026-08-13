@@ -294,18 +294,20 @@ class SuperEditorFrame(wx.Frame):
             return
         self.SetStatusText(text)
         sv = getattr(self.main, "selfvoice", None)
-        # 1) TELJES némítás: a program egyetlen szót se mondjon (Beállítások)
-        if sv is not None and getattr(sv, "muted", False):
-            return
-        # 2) A BEJELENTŐ a KÉPERNYŐOLVASÓ – ha van, ő mondja (nincs dupla beszéd,
-        #    és a felhasználó a saját olvasójával szabályozza)
+        # 1) A BEJELENTŐ a KÉPERNYŐOLVASÓ – ELŐSZÖR mindig ŐT kérjük.
+        #    FONTOS: képernyőolvasó-módban a Core a saját hangot NÉMÍTJA
+        #    (muted=True) ÉPP AZÉRT, hogy az olvasó beszéljen – ezért a
+        #    némítás-ellenőrzés CSAK a beépített hangra vonatkozhat, ide nem.
         try:
             from superdl import screenreader
             if screenreader.speak(text):
                 return
         except Exception:
             pass
-        # 3) Csak ha NINCS képernyőolvasó: a beépített hang segít ki
+        # 2) Nincs képernyőolvasó → a beépített hang segít ki, DE a Teljes
+        #    némítás ilyenkor is némít
+        if sv is not None and getattr(sv, "muted", False):
+            return
         if sv:
             try:
                 sv.speak(text, force=True)
