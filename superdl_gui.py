@@ -161,6 +161,7 @@ KEYS_TEXT = (
     "  Ctrl+F   – médiakereső (keresés, lejátszás, letöltés)\n"
     "  Ctrl+Shift+R – internetes rádió\n"
     "  Ctrl+U   – frissítések keresése\n"
+    "  Ctrl+Alt+I – Internet-teszt (sebesség, késleltetés, wifi, IP-cím)\n"
     "  Delete   – futó letöltés leállítása; befejezett/hibás elem törlése\n"
     "  Shift+Delete – a kijelölt elem eltávolítása a listából\n"
     "  Ctrl+Shift+S – minden letöltés leállítása\n"
@@ -194,6 +195,12 @@ PRIVACY_TEXT = (
     "Facebook, TikTok) a saját stream-kulcsoddal;\n"
     "  • a hír- és időjárás-funkciók a megfelelő szolgáltatásoktól kérnek le "
     "adatot; a Modulkezelő a hivatalos modul-forrásból tölt;\n"
+    "  • az Internet-teszt (Ctrl+Alt+I) – csak amikor TE indítod – letölt és "
+    "feltölt néhány tíz megabájt ÉRTELEM NÉLKÜLI mérőadatot, lekéri a publikus "
+    "IP-címedet és a szolgáltatód nevét (Cloudflare, ipinfo.io), és TCP-vel "
+    "megkopogtatja a SuperDL-szolgáltatásokat. Semmilyen személyes adatot nem "
+    "küld; az eredmény a saját gépeden marad, a naplóba pedig a publikus IP "
+    "MASZKOLVA kerül;\n"
     "  • frissítéskor a github.com / pypi.org címekhez (verziók + motorok).\n\n"
     "BÖNGÉSZŐ-SÜTIK – ha bekapcsolod, a letöltő a böngésződ bejelentkezett "
     "sütijeit használja (pl. a YouTube bot-ellenőrzéséhez); ezeket csak a "
@@ -578,6 +585,10 @@ class MainFrame(wx.Frame):
         # A P2P fájlküldés MOSTANTÓL külön MODUL (Modulkezelő → telepítés).
         # A Super Stream – élő multistream MOSTANTÓL a „Super Media" MODULban.
         m_tools.AppendSeparator()
+        mi_nettest = m_tools.Append(
+            wx.ID_ANY, "&Internet-teszt…\tCtrl+Alt+I",
+            "Sebesség, késleltetés, wifi, IP-cím és a szolgáltatások "
+            "elérhetősége – egy gombnyomásra, felolvasva")
         mi_modmgr = m_tools.Append(
             wx.ID_ANY, "&Modulkezelő…",
             "Opcionális SuperDL-modulok telepítése, frissítése és eltávolítása")
@@ -671,6 +682,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_diagnostics, mi_diag)
         self.Bind(wx.EVT_MENU, self._on_search_window, mi_search)
         self.Bind(wx.EVT_MENU, self._on_modmgr_window, mi_modmgr)
+        self.Bind(wx.EVT_MENU, self._on_nettest, mi_nettest)
         self.Bind(wx.EVT_MENU, self._on_ai_image, mi_ai_img)
         self.Bind(wx.EVT_MENU, self._on_ai_clip, mi_ai_clip)
         self.Bind(wx.EVT_MENU, self._on_ai_ocr, mi_ai_ocr)
@@ -744,6 +756,20 @@ class MainFrame(wx.Frame):
         box.Add(self.audio_chk, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 12)
         box.Add(btn_settings, 0, wx.ALIGN_CENTER_VERTICAL)
         vbox.Add(box, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
+
+        # Gyors eszközök sora – TABULÁTORRAL elérhető gomb a főablakban.
+        # (Az Internet-teszt a MAGBAN van, nem modulban: épp akkor kell
+        # működnie, amikor valami nem megy.)
+        row_tools = wx.BoxSizer(wx.HORIZONTAL)
+        btn_nettest = wx.Button(panel, label="&Internet-teszt…")
+        btn_nettest.SetName("Internet-teszt: sebesség, késleltetés, IP-cím és "
+                            "a szolgáltatások elérhetősége")
+        btn_nettest.SetToolTip("Sebesség, késleltetés, wifi, IP-cím és a "
+                               "SuperDL-szolgáltatások elérhetősége "
+                               "(Ctrl+Alt+I)")
+        btn_nettest.Bind(wx.EVT_BUTTON, self._on_nettest)
+        row_tools.Add(btn_nettest, 0, wx.RIGHT, 6)
+        vbox.Add(row_tools, 0, wx.LEFT | wx.RIGHT | wx.TOP, 8)
 
         # letöltési lista
         lbl_list = wx.StaticText(panel, label="Letöltések listája:")
@@ -1228,6 +1254,14 @@ class MainFrame(wx.Frame):
         from superdl.modmanagerwin import ModuleManagerFrame
         self._modmgr_win = ModuleManagerFrame(self)
         self._modmgr_win.Show()
+
+    def _on_nettest(self, event=None):
+        """Internet-teszt (gomb a főablakon, Eszközök menü, Ctrl+Alt+I).
+        Nem igényel netet az INDÍTÁSHOZ: pont az a dolga, hogy megmondja,
+        van-e és milyen."""
+        from superdl import nettestwin
+        nettestwin.mutasd(self, settings=self.settings,
+                          selfvoice=getattr(self, "selfvoice", None))
 
 
 
