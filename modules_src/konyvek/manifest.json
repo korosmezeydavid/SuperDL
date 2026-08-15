@@ -1,10 +1,10 @@
 {
   "id": "konyvek",
   "name": "Könyvek",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "entry": "konyvek_mod",
   "category": "Könyvek",
-  "description": "Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3, választható hanggal és sebességgel).",
+  "description": "Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3, választható hanggal és sebességgel). ÚJ: a kész hangoskönyv kérésre a KÖNYV MELLÉ kerül (oda, ahonnan betallóztad); darabolásnál mindig külön almappába; a végén hangjelzés (fanfár sikernél, másik jelzés hibánál), és a darab-hossz mező csak akkor jelenik meg, ha a darabolás be van kapcsolva.",
   "min_core_api": "1.0",
   "min_core_version": "4.3.0",
   "requires_tools": [],

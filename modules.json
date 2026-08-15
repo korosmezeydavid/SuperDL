@@ -61,14 +61,14 @@
       "id": "konyvek",
       "name": "Könyvek",
       "category": "Könyvek",
-      "description": "Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3, választható hanggal és sebességgel).",
+      "description": "Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3, választható hanggal és sebességgel). ÚJ: a kész hangoskönyv kérésre a KÖNYV MELLÉ kerül (oda, ahonnan betallóztad); darabolásnál mindig külön almappába; a végén hangjelzés (fanfár sikernél, másik jelzés hibánál), és a darab-hossz mező csak akkor jelenik meg, ha a darabolás be van kapcsolva.",
       "latest": {
-        "version": "1.2.0",
+        "version": "1.2.1",
         "min_core_api": "1.0",
         "min_core_version": "4.3.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-konyvek-1.2.0/konyvek-1.2.0.zip",
-        "sha256": "1b3a48f3f9f9dc6ca37dd3df69592dcf89ac5e9cf6af6fc37a0a2c6216bd11a7",
-        "size": 29373
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-konyvek-1.2.1/konyvek-1.2.1.zip",
+        "sha256": "5dab30a87ffaefbc3fd33fa553710223b7d06b0700f17f1eb7c4e9a18a2bb503",
+        "size": 34833
       }
     },
     {
@@ -185,14 +185,14 @@
       "id": "mail",
       "name": "Super Mail (e-mail)",
       "category": "Kommunikáció",
-      "description": "Vak-first, teljesen akadálymentes e-mail kliens – kizárólag emailezés: leveleket olvasol, küldesz és keresel (IMAP, POP3, SMTP). Hitelesítés APP-JELSZÓVAL: a valódi fő-jelszavadat sosem adod meg, hanem egy dedikált, csak a Super Mailhez szóló app-jelszót, amit te hozol létre a saját fiókodban és bármikor visszavonhatsz – így az azonosságod és a fiókod végig a te kezedben marad. Bármilyen szolgáltató kézzel is beállítható (Freemail, Citromail, céges, saját domain): a szerver-nevek és a portok felülírhatók. Adatvédelem az első helyen: az első indításkor hozzájárulást kérünk, és világosan közöljük, hogy SEMMIT, DE SEMMIT nem továbbítunk sehová – a program közvetlenül a te e-mail-szolgáltatód szerveréhez csatlakozik, semmi máshoz, a fiók-adatok pedig a te gépeden, a Windows DPAPI-titkosításával élnek. Nincs naptár, nincs telemetria, nincs felhő, nincs külső belépés. A HTML-levelek távoli képei alapból nem töltődnek be (nyomkövetés ellen). ÚJ: HELYESÍRÁS-ELLENŐRZŐ a levélíráshoz – a Windows beépített (magyar) szótárával, tehát nincs letöltendő szótár; a levél szövegének helyi menüjéből (jobb gomb) bármikor be- és kikapcsolható, F7-tel azonnal indítható, és vak-first: a hibákat FELSOROLJA javaslatokkal, amiket Enterrel cserélhetsz. Bármikor visszavonható: a fiók törlésével a tárolt app-jelszó véglegesen törlődik. Csak a saját fiókjaidhoz.",
+      "description": "Vak-first, teljesen akadálymentes e-mail kliens – kizárólag emailezés: leveleket olvasol, küldesz és keresel (IMAP, POP3, SMTP). Hitelesítés APP-JELSZÓVAL: a valódi fő-jelszavadat sosem adod meg, hanem egy dedikált, csak a Super Mailhez szóló app-jelszót, amit te hozol létre a saját fiókodban és bármikor visszavonhatsz – így az azonosságod és a fiókod végig a te kezedben marad. Bármilyen szolgáltató kézzel is beállítható (Freemail, Citromail, céges, saját domain): a szerver-nevek és a portok felülírhatók. Adatvédelem az első helyen: az első indításkor hozzájárulást kérünk, és világosan közöljük, hogy SEMMIT, DE SEMMIT nem továbbítunk sehová – a program közvetlenül a te e-mail-szolgáltatód szerveréhez csatlakozik, semmi máshoz, a fiók-adatok pedig a te gépeden, a Windows DPAPI-titkosításával élnek. Nincs naptár, nincs telemetria, nincs felhő, nincs külső belépés. A HTML-levelek távoli képei alapból nem töltődnek be (nyomkövetés ellen). Bármikor visszavonható: a fiók törlésével a tárolt app-jelszó véglegesen törlődik. ÚJ: HELYESÍRÁS-ELLENŐRZŐ a levélíráshoz – a Windows beépített (magyar) szótárával, tehát nincs letöltendő szótár; a levél szövegének helyi menüjéből (jobb gomb) bármikor be- és kikapcsolható, F7-tel azonnal indítható, és vak-first: a hibákat FELSOROLJA javaslatokkal, amiket Enterrel cserélhetsz (vagy felveheted a szót a szótáradba). Csak a saját fiókjaidhoz. ÚJ: válasznál (R vagy Ctrl+R) a kurzor rögtön a levél szövegének elejére ugrik, az idézet fölé – csak írni kell.",
       "latest": {
-        "version": "1.0.7",
+        "version": "1.0.8",
         "min_core_api": "1.0",
         "min_core_version": "4.2.7",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mail-1.0.7/mail-1.0.7.zip",
-        "sha256": "7bf747ec7ef56be6ef4e9e02926358e38fa6cb5217624bd496f60e7d7131c679",
-        "size": 80168
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mail-1.0.8/mail-1.0.8.zip",
+        "sha256": "cbad67f61b4e1d44c4fa6e9cabf7adb392338e7c777109c4f6e1f65dd321daad",
+        "size": 80520
       }
     },
     {

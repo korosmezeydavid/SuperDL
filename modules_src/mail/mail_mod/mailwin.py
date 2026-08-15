@@ -131,6 +131,9 @@ _SUGO = (
     "KÜLDÉS, KERESÉS\n"
     "• Új (N) levél; Válasz (R); Továbbítás (F); Titkos másolat (Bcc) is. A "
     "küldés mindig megerősítést kér.\n"
+    "• VÁLASZNÁL a kurzor egyből a levél szövegének elejére kerül (az idézet "
+    "fölé), tehát csak írni kell. Új levélnél és továbbításnál a Címzett mezőn "
+    "indulsz, mert ott azt kell először kitölteni.\n"
     "• Keresés: feladó, tárgy vagy szöveg szerint.\n\n"
     "GYORSBILLENTYŰK\n"
     "• Enter: megnyitás külön ablakban  • N: új  • R: válasz  • F: továbbítás\n"
@@ -621,7 +624,7 @@ class CimjegyzekValaszto(wx.Dialog):
 # ======================================================================
 class LevelIroDialog(wx.Dialog):
     def __init__(self, parent, main, fiok, cimzett="", targy="", torzs="",
-                 valasz_id=None):
+                 valasz_id=None, torzsre=False):
         super().__init__(parent, title="Új levél", size=(640, 560),
                          style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         self.main = main
@@ -674,6 +677,15 @@ class LevelIroDialog(wx.Dialog):
         # HELYESÍRÁS: helyi menü (jobb gomb / Alkalmazás billentyű) a szövegen
         self._helyesiras = None
         self.torzs.Bind(wx.EVT_CONTEXT_MENU, self._helyi_menu)
+
+        # VÁLASZNÁL egyből a LEVÉL SZÖVEGÉBE ugrunk, a kurzor az elejére – az
+        # idézet FÖLÉ –, hogy csak írni kelljen (felhasználói kérés). A címzett
+        # és a tárgy ilyenkor már ki van töltve, azokon nincs mit tenni. Új
+        # levélnél és TOVÁBBÍTÁSNÁL marad a Címzett, mert ott az az első dolog.
+        if torzsre:
+            self.torzs.SetInsertionPoint(0)
+            wx.CallAfter(self.torzs.SetFocus)
+            wx.CallAfter(self.torzs.SetInsertionPoint, 0)
 
     # ---- helyesírás-ellenőrzés ----
     def _helyesiras_be(self):
@@ -2055,7 +2067,7 @@ class MailFrame(wx.Frame):
         idezet = "\n\n> " + MC.level_szovegtorzs(msg).replace("\n", "\n> ")
         d = LevelIroDialog(self, self.main, fiok, cim,
                            "Re: " + fej["targy"], idezet,
-                           msg.get("Message-ID"))
+                           msg.get("Message-ID"), torzsre=True)
         d.masolat.SetValue(cc)
         d.ShowModal()
 

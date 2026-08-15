@@ -16,6 +16,28 @@ import wx
 from superdl import audiobook, booktext, store, tts   # megosztott backend a Core-ból
 from superdl.audioengine import Player                 # megosztott lejátszó a Core-ból
 
+from . import kimenet
+
+
+def _mondd(main, szoveg):
+    """BEMONDÁS – a KÖTELEZŐ sorrendben: ELŐBB a képernyőolvasó, és CSAK utána
+    a némítás-vizsgálat meg a beépített hang. Fordítva képernyőolvasó-módban
+    néma maradna, mert a Core ilyenkor szándékosan némítja a saját hangját."""
+    if not (szoveg or "").strip():
+        return
+    try:
+        from superdl import screenreader
+        if screenreader.speak(szoveg):
+            return
+    except Exception:
+        pass
+    sv = getattr(main, "selfvoice", None)
+    if sv and not getattr(sv, "muted", False):
+        try:
+            sv.speak(szoveg, force=True)
+        except Exception:
+            pass
+
 ENGINE_ORDER = ["sapi", "edge", "gemini", "cloud"]
 
 HELP = """HANGOSKÖNYV-KÉSZÍTŐ
@@ -29,9 +51,22 @@ LÉPÉSRŐL LÉPÉSRE (vakon is)
    Google Cloud (saját kulccsal).
 3. „Hangok frissítése”, majd válassz „Hang”-ot; állítsd a magasságot és a
    sebességet; a „Hangteszt” gombbal meghallgathatod.
-4. Válaszd: egyben vagy „Darabolva percenként”, és a célmappát.
+4. Válaszd: egyben vagy „Darabolás több MP3-ra” (bekapcsolva megjelenik a
+   „Darab hossza percben” mező, és a fókusz rá is ugrik), majd a célmappát.
 5. „Hangoskönyv készítése” – a végén fix bevezető és záró nyilatkozat is
    rákerül; a program bemondja, hova mentette.
+
+HOVA MENTSE?
+• „A kész hangoskönyv a könyv MELLÉ kerüljön”: oda készül, ahonnan a könyvet
+  betallóztad. Beillesztett szövegnél vagy írásvédett mappánál a célmappába
+  kerül – a program ezt ki is mondja.
+• DARABOLÁSNÁL mindig a könyv címéről elnevezett ALMAPPÁBA kerülnek a részek,
+  hogy ne szóródjon szét húsz fájl. Meglévő fájlt vagy mappát nem írunk felül.
+
+HANGJELZÉS A VÉGÉN
+A „Hangjelzés a végén” pipával a készítés végén rövid fanfár szól, hiba esetén
+egy másik, jól megkülönböztethető jelzés – így a gép mellől is el lehet menni.
+A beállítások (pipák, célmappa, darab-hossz) megjegyződnek.
 
 GYORSBILLENTYŰK
 F1 – súgó.  Tab / Shift+Tab – mozgás.  Enter vagy Szóköz – gomb.
@@ -54,6 +89,7 @@ class BookFrame(wx.Frame):
         self._closing = False        # zárás alatt a háttér-callbackek ne nyúljanak hozzánk
 
         self._build()
+        self._beallitasok_betolt()         # megjegyzett pipák és célmappa
         self.CreateStatusBar()
         self._on_engine()                  # induló motor beállítása
         self.SetStatusText("Válassz könyvet, motort és hangot, majd készítsd "
@@ -165,11 +201,15 @@ class BookFrame(wx.Frame):
 
         # kimenet
         r4 = wx.BoxSizer(wx.HORIZONTAL)
-        self.split_chk = wx.CheckBox(p, label="&Darabolva, percenként:")
-        self.split_chk.SetName("Több MP3-ra darabolja a megadott percenként")
+        self.split_chk = wx.CheckBox(p, label="&Darabolás több MP3-ra")
+        self.split_chk.SetName("Több MP3-ra darabolja a hangoskönyvet; "
+                               "bekapcsolva megjelenik a darab hossza mező")
+        self.split_chk.Bind(wx.EVT_CHECKBOX, self._on_split_valt)
+        self.split_lbl = wx.StaticText(p, label="Darab &hossza percben:")
         self.split_sp = wx.SpinCtrl(p, min=1, max=240, initial=30, size=(70, -1))
         self.split_sp.SetName("Darab hossza percben")
-        r4.Add(self.split_chk, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        r4.Add(self.split_chk, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
+        r4.Add(self.split_lbl, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
         r4.Add(self.split_sp, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 16)
         r4.Add(wx.StaticText(p, label="Cél&mappa:"), 0,
                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
@@ -181,6 +221,31 @@ class BookFrame(wx.Frame):
         r4.Add(self.out_txt, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
         r4.Add(b_dir, 0)
         v.Add(r4, 0, wx.EXPAND | wx.ALL, 8)
+        # A perc-mező NEM „szürke", hanem REJTETT, amíg nincs darabolás: a
+        # letiltott vezérlőn a tabulátor sokszor akkor is megáll és a
+        # képernyőolvasó felolvassa – rejtve viszont teljesen kiesik a
+        # tab-sorrendből. (Felhasználói kérés: „feleslegesen zavaró tényező".)
+        self._split_mezo_lathato(False)
+
+        # ÚJ: a kész hangoskönyv a FORRÁSKÖNYV mellé kerüljön
+        self.melle_chk = wx.CheckBox(
+            p, label="A kész hangoskönyv a könyv &mellé kerüljön (oda, "
+                     "ahonnan betallóztad)")
+        self.melle_chk.SetName("A kész hangoskönyv az eredeti könyv mappájába "
+                               "kerül; darabolásnál a könyv címéről elnevezett "
+                               "almappába")
+        self.melle_chk.Bind(wx.EVT_CHECKBOX, lambda e: (self._beallitas_ment(),
+                                                        self._hova_mond()))
+        v.Add(self.melle_chk, 0, wx.LEFT | wx.BOTTOM, 8)
+
+        # ÚJ: hangjelzés a végén – hosszú könyvnél a gép mellől el lehessen menni
+        self.hang_chk = wx.CheckBox(
+            p, label="Hang&jelzés a végén (siker és hiba is)")
+        self.hang_chk.SetName("A készítés végén rövid fanfár szól, hiba esetén "
+                              "egy másik, jól megkülönböztethető jelzés")
+        self.hang_chk.SetValue(True)
+        self.hang_chk.Bind(wx.EVT_CHECKBOX, lambda e: self._beallitas_ment())
+        v.Add(self.hang_chk, 0, wx.LEFT | wx.BOTTOM, 8)
 
         self.gauge = wx.Gauge(p, range=100)
         v.Add(self.gauge, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
@@ -314,12 +379,90 @@ class BookFrame(wx.Frame):
         self.info_lbl.SetLabel(
             f"„{bk.title}” – {len(bk.sections)} szakasz, "
             f"{bk.chars} karakter.")
+        if self.melle_chk.GetValue():
+            self._hova_mond()     # „a könyv mellé" módban rögtön hallja, hova megy
 
     def _on_pick_dir(self, e):
         dlg = wx.DirDialog(self, "Célmappa", self.out_txt.GetValue())
         if dlg.ShowModal() == wx.ID_OK:
             self.out_txt.SetValue(dlg.GetPath())
         dlg.Destroy()
+
+    # ---- darabolás / kimenet-beállítások -------------------------------
+
+    def _split_mezo_lathato(self, latszik: bool) -> None:
+        for w in (self.split_lbl, self.split_sp):
+            w.Show(latszik)
+        self.Layout()
+
+    def _on_split_valt(self, e=None):
+        be = self.split_chk.GetValue()
+        self._split_mezo_lathato(be)
+        self._beallitas_ment()
+        if be:
+            # A megjelenő mezőre RÁ IS UGRUNK, különben vakon keresgélni
+            # kellene, hová került az új vezérlő.
+            self.split_sp.SetFocus()
+            self._mond("Darabolás bekapcsolva. Darab hossza percben: %d. "
+                       "A részek külön mappába kerülnek."
+                       % self.split_sp.GetValue())
+        else:
+            self._mond("Darabolás kikapcsolva, egyetlen fájl készül.")
+        self._hova_mond()
+
+    def _beallitas_fajl(self):
+        return Path.home() / ".superdl" / "konyvek_keszito.json"
+
+    def _beallitasok_betolt(self):
+        d = store.load_json(self._beallitas_fajl(), {}) or {}
+        self.hang_chk.SetValue(bool(d.get("hangjelzes", True)))
+        self.melle_chk.SetValue(bool(d.get("konyv_melle", False)))
+        self.split_chk.SetValue(bool(d.get("darabolas", False)))
+        if d.get("darab_perc"):
+            try:
+                self.split_sp.SetValue(int(d["darab_perc"]))
+            except Exception:
+                pass
+        if d.get("celmappa"):
+            self.out_txt.SetValue(str(d["celmappa"]))
+        self._split_mezo_lathato(self.split_chk.GetValue())
+
+    def _beallitas_ment(self):
+        try:
+            store.save_json(self._beallitas_fajl(), {
+                "hangjelzes": bool(self.hang_chk.GetValue()),
+                "konyv_melle": bool(self.melle_chk.GetValue()),
+                "darabolas": bool(self.split_chk.GetValue()),
+                "darab_perc": int(self.split_sp.GetValue()),
+                "celmappa": self.out_txt.GetValue()})
+        except Exception:
+            pass
+
+    def _hova_keszul(self):
+        """(kimeneti útvonal, mappa, üzenet) – a tényleges célhely. Egy helyen
+        dől el, hogy a készítés és a bemondás UGYANAZT mondja."""
+        forras = self.book_txt.GetValue().strip()
+        mappa, uzenet = kimenet.celmappa(forras, self.out_txt.GetValue(),
+                                         self.melle_chk.GetValue())
+        cim = (self.book.title if self.book else
+               (self.paste_title.GetValue().strip() or "hangoskonyv"))
+        ut = kimenet.kimeneti_ut(mappa, cim, self.split_chk.GetValue())
+        return ut, mappa, uzenet
+
+    def _hova_mond(self):
+        """Kimondja, hova fog kerülni a kész hangoskönyv – MIELŐTT elindul a
+        munka, ne utólag derüljön ki."""
+        try:
+            ut, mappa, uzenet = self._hova_keszul()
+        except Exception:
+            return
+        szoveg = "A hangoskönyv ide kerül: %s." % ut.parent
+        if self.split_chk.GetValue():
+            szoveg += " A részek ebbe az almappába."
+        if uzenet:
+            szoveg += " " + uzenet
+        self.SetStatusText(szoveg)
+        self._mond(szoveg)
 
     # ---- előhallgatás -------------------------------------------------
 
@@ -381,9 +524,21 @@ class BookFrame(wx.Frame):
         key = self.keys.get(eng_key, "")
         pitch, rate = self.pitch_sp.GetValue(), self.rate_sp.GetValue()
         split = self.split_sp.GetValue() if self.split_chk.GetValue() else 0
-        safe = "".join(c for c in book.title
-                       if c.isalnum() or c in " -_").strip() or "hangoskonyv"
-        out = os.path.join(self.out_txt.GetValue(), safe + ".mp3")
+        # HOVÁ: a könyv mellé vagy a célmappába; darabolásnál MINDIG almappába.
+        forras = self.book_txt.GetValue().strip()
+        mappa, uzenet = kimenet.celmappa(forras, self.out_txt.GetValue(),
+                                         self.melle_chk.GetValue())
+        out_ut = kimenet.kimeneti_ut(mappa, book.title, bool(split))
+        try:
+            out_ut.parent.mkdir(parents=True, exist_ok=True)
+        except Exception as ex:
+            self.SetStatusText("A célmappa nem hozható létre: %s" % ex)
+            self._mond("A célmappa nem hozható létre. %s" % ex)
+            return
+        out = str(out_ut)
+        if uzenet:
+            self._mond(uzenet)
+        self._beallitas_ment()
 
         self._busy = True
         self._cancel = threading.Event()      # megszakítás-jelző [AB-P0-02]
@@ -431,18 +586,32 @@ class BookFrame(wx.Frame):
         self.gauge.SetValue(0)
         if err:
             self.SetStatusText(f"Hiba a készítés során: {err}")
+            # HANGJELZÉS hibánál is: hosszú könyvnél a felhasználó rég nem a gép
+            # előtt ül – eddig a kudarc teljesen néma volt.
+            if self.hang_chk.GetValue():
+                kimenet.jelzes(False)
+            self._mond("A hangoskönyv készítése nem sikerült. %s" % err)
             wx.MessageBox(f"Nem sikerült: {err}", "Hangoskönyv készítő",
                           wx.OK | wx.ICON_ERROR, self)
             return
+        mappa = os.path.dirname(res[0])
         msg = (f"Kész! {len(res)} fájl: " + ", ".join(os.path.basename(r)
                                                       for r in res))
         self.SetStatusText(msg)
-        if hasattr(self.main, "_sfx"):
+        if self.hang_chk.GetValue():
+            kimenet.jelzes(True)          # rövid fanfár
+        elif hasattr(self.main, "_sfx"):
             self.main._sfx("done")
-        wx.MessageBox(msg + f"\n\nMappa: {os.path.dirname(res[0])}",
+        self._mond("Kész a hangoskönyv: %d fájl. Ide került: %s"
+                   % (len(res), mappa))
+        wx.MessageBox(msg + f"\n\nMappa: {mappa}",
                       "Hangoskönyv készítő", wx.OK | wx.ICON_INFORMATION, self)
 
     # ---- súgó / zárás -------------------------------------------------
+
+    def _mond(self, szoveg):
+        if not self._closing:
+            _mondd(self.main, szoveg)
 
     def _help(self):
         try:
