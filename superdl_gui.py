@@ -1284,23 +1284,44 @@ class MainFrame(wx.Frame):
                         names.append(c["name"].split(" (")[0])
             except Exception:
                 pass
-            wx.CallAfter(self._after_auto_check, names, today)
+            # A MODULOKAT is nézzük: eddig csak a programra és a motorokra
+            # szólt a jelzés, a modul-frissítésekről a felhasználó csak akkor
+            # értesült, ha magától benézett a Modulkezelőbe (Laci észrevétele).
+            modulok = []
+            try:
+                from superdl import coremod
+                modulok = [nev for _, nev, _ in coremod.modul_frissitesek()]
+            except Exception:
+                pass
+            wx.CallAfter(self._after_auto_check, names, today, modulok)
 
         threading.Thread(target=work, daemon=True).start()
 
-    def _after_auto_check(self, names, today):
+    def _after_auto_check(self, names, today, modulok=None):
         self.settings["update_last_check"] = today
         self._save_settings()
-        if not names:
+        modulok = modulok or []
+        if not names and not modulok:
             return
-        joined = ", ".join(names)
-        self._announce(f"Frissítés érhető el: {joined}.", toast=True)
-        if wx.MessageBox(
-                f"Új verzió érhető el ehhez: {joined}.\n\n"
-                "Megnyitod a frissítéskezelőt?",
-                "SuperDL – frissítés", wx.YES_NO | wx.ICON_INFORMATION,
-                self) == wx.YES:
-            self._on_check_updates()
+        if names:
+            joined = ", ".join(names)
+            self._announce(f"Frissítés érhető el: {joined}.", toast=True)
+            if wx.MessageBox(
+                    f"Új verzió érhető el ehhez: {joined}.\n\n"
+                    "Megnyitod a frissítéskezelőt?",
+                    "SuperDL – frissítés", wx.YES_NO | wx.ICON_INFORMATION,
+                    self) == wx.YES:
+                self._on_check_updates()
+        if modulok:
+            szoveg = "%d modulhoz van frissítés: %s." % (len(modulok),
+                                                         ", ".join(modulok))
+            self._announce(szoveg, toast=True)
+            if wx.MessageBox(
+                    szoveg + "\n\nMegnyitod a Modulkezelőt? Ott az „Összes "
+                    "frissítése” gombbal egyben is elintézhető.",
+                    "SuperDL – modul-frissítés",
+                    wx.YES_NO | wx.ICON_INFORMATION, self) == wx.YES:
+                self._on_modmgr_window()
 
     # ---- folytatás induláskor -----------------------------------------
 

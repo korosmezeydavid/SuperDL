@@ -62,6 +62,16 @@ def compute_rows(entries, installed: dict, core_api: str = modkit.CORE_API):
     return rows
 
 
+def frissitheto_sorok(rows) -> list:
+    """Melyik sorokat érinti az „Összes frissítése"? CSAK a TELEPÍTETT, valóban
+    frissíthető modulokat (TISZTA függvény, tesztelhető). Laci kérése pontosan
+    ez volt: „természetesen csak azon modulokra vonatkoztatva, amiket a
+    felhasználó már telepített korábban"."""
+    return [r for r in (rows or [])
+            if r.get("status") == "Frissíthető" and r.get("entry")
+            and r.get("installable")]
+
+
 class ModuleManagerFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Modulkezelő", size=(760, 520))
@@ -74,8 +84,8 @@ class ModuleManagerFrame(wx.Frame):
 
         self._build()
         self.CreateStatusBar()
-        self.SetStatusText("A boltból frissíthető a lista. Enter egy soron: "
-                           "telepítés/frissítés. Delete: eltávolítás.")
+        self.SetStatusText("Enter egy soron: telepítés/frissítés. Delete: "
+                           "eltávolítás. „Összes frissítése”: mind egyben.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
         wx.CallAfter(self._refresh_async)
 
@@ -100,15 +110,30 @@ class ModuleManagerFrame(wx.Frame):
         v.Add(self.list, 1, wx.EXPAND | wx.ALL, 10)
 
         row = wx.BoxSizer(wx.HORIZONTAL)
-        self.refresh_btn = wx.Button(p, label="&Frissítés a boltból")
-        self.refresh_btn.Bind(wx.EVT_BUTTON, lambda e: self._refresh_async())
         self.install_btn = wx.Button(p, label="&Telepítés / frissítés")
+        self.install_btn.SetName("A kijelölt modul telepítése vagy frissítése")
         self.install_btn.Bind(wx.EVT_BUTTON, lambda e: self._install_selected())
+        # Laci észrevétele: egyesével frissíteni sok modulnál kínszenvedés.
+        # Ez a gomb VÉGIGMEGY az összes TELEPÍTETT, frissíthető modulon.
+        self.update_all_btn = wx.Button(p, label="Összes f&rissítése")
+        self.update_all_btn.SetName("Az összes telepített modul frissítése "
+                                    "egyben")
+        self.update_all_btn.Bind(wx.EVT_BUTTON, lambda e: self._update_all())
         self.remove_btn = wx.Button(p, label="&Eltávolítás")
+        self.remove_btn.SetName("A kijelölt modul eltávolítása")
         self.remove_btn.Bind(wx.EVT_BUTTON, lambda e: self._remove_selected())
+        # ÁTNEVEZVE: a régi „Frissítés a boltból" félrevezető volt – nem modult
+        # frissít, hanem a KÍNÁLATOT tölti újra. Laci jelezte, hogy érthetetlen.
+        self.refresh_btn = wx.Button(p, label="&Kínálat újratöltése")
+        self.refresh_btn.SetName("A modulok listájának újratöltése a boltból – "
+                                 "ez csak a kínálatot frissíti, modult nem")
+        self.refresh_btn.SetToolTip("Csak a LISTÁT tölti újra: mi kapható, és "
+                                    "melyik modulhoz van újabb verzió")
+        self.refresh_btn.Bind(wx.EVT_BUTTON, lambda e: self._refresh_async())
         close_btn = wx.Button(p, label="Be&zárás")
         close_btn.Bind(wx.EVT_BUTTON, lambda e: self.Close())
-        for b in (self.refresh_btn, self.install_btn, self.remove_btn, close_btn):
+        for b in (self.install_btn, self.update_all_btn, self.remove_btn,
+                  self.refresh_btn, close_btn):
             row.Add(b, 0, wx.RIGHT, 6)
         v.Add(row, 0, wx.ALL, 10)
 
@@ -124,9 +149,14 @@ class ModuleManagerFrame(wx.Frame):
                   "• Fel/le nyíl: választás a listából.\n"
                   "• A gombokkal (vagy Enterrel) telepíted/frissíted a "
                   "kijelöltet; a modul saját ablaka a menüből nyílik.\n"
-                  "• Ha egy modul újabb programverziót igényel, a lista jelzi.")
+                  "• Ha egy modul újabb programverziót igényel, a lista jelzi.\n"
+                  "• „Összes frissítése”: végigmegy az ÖSSZES telepített, "
+                  "frissíthető modulon – nem kell egyesével.\n"
+                  "• „Kínálat újratöltése”: csak a listát tölti újra a boltból "
+                  "(nem frissít modult).")
         self.install_btn.Disable()
         self.remove_btn.Disable()
+        self.update_all_btn.Disable()
 
     # ---- segédek ------------------------------------------------------
 
@@ -201,8 +231,9 @@ class ModuleManagerFrame(wx.Frame):
             self.list.SetItem(i, 1, r["category"])
             self.list.SetItem(i, 2, r["status"])
             self.list.SetItem(i, 3, r["version"] or "")
-        n_upd = sum(1 for r in self._rows if r["status"] == "Frissíthető")
+        n_upd = len(frissitheto_sorok(self._rows))
         n_av = sum(1 for r in self._rows if r["status"] == "Elérhető")
+        self.update_all_btn.Enable(bool(n_upd) and not self._busy)
         msg = f"{len(self._rows)} modul a listában"
         if n_upd:
             msg += f", ebből {n_upd} frissíthető"
@@ -211,6 +242,11 @@ class ModuleManagerFrame(wx.Frame):
         if not self._rows:
             msg = ("Nincs elérhető modul (a bolt-index még üres vagy nem "
                    "elérhető). Később próbáld újra.")
+        elif n_upd:
+            # FONTOS a felfedezhetőség miatt: aki nem böngészi végig a gombokat,
+            # magától sosem tudná meg, hogy egyben is lehet frissíteni.
+            msg += (f". Az „Összes frissítése” gombbal mind a(z) {n_upd} "
+                    "elintézhető egyszerre")
         self._announce(msg + ".")
         if self._rows:
             self.list.Select(0)
@@ -218,23 +254,141 @@ class ModuleManagerFrame(wx.Frame):
 
     # ---- telepítés / frissítés ----------------------------------------
 
+    def _forras_rendben(self) -> bool:
+        """BIZTONSÁG: nem hivatalos modul-forrásból telepíteni csak kifejezett
+        megerősítéssel lehet (Tibi-audit 3.5; a kérdést az olvasó felolvassa)."""
+        from superdl import selfupdate
+        if selfupdate.repo_is_official():
+            return True
+        return wx.MessageBox(
+            "A modul NEM a hivatalos boltból jönne, hanem innen:\n\n"
+            f"    {selfupdate.get_repo()}\n\n"
+            "Csak akkor folytasd, ha ezt TE állítottad be (Fejlesztői "
+            "mód). Biztosan telepíted?",
+            "Nem hivatalos modul-forrás",
+            wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING, self) == wx.YES
+
+    def _gombok(self, be: bool) -> None:
+        self.install_btn.Enable(be)
+        self.remove_btn.Enable(be)
+        self.update_all_btn.Enable(be)
+        self.refresh_btn.Enable(be)
+
+    # ---- ÖSSZES frissítése (Laci kérése) -------------------------------
+
+    def _update_all(self):
+        """Végigmegy az ÖSSZES telepített, frissíthető modulon. Csak a
+        telepítettekre – amit a felhasználó nem használ, azt nem tesszük fel."""
+        if self._busy:
+            return
+        sorok = frissitheto_sorok(self._rows)
+        if not sorok:
+            self._announce("Most nincs frissíthető modul. Ha frissebb "
+                           "kínálatra vagy kíváncsi, előbb töltsd újra a "
+                           "kínálatot.")
+            return
+        if not self._forras_rendben():
+            return
+        nevek = ", ".join(r["name"] for r in sorok)
+        kerdes = (f"{len(sorok)} modulhoz van újabb verzió:\n\n    {nevek}\n\n"
+                  "Frissítsem mindet, egymás után?")
+        self._announce(f"{len(sorok)} modulhoz van újabb verzió: {nevek}. "
+                       "Frissítsem mindet, egymás után?")
+        if wx.MessageBox(kerdes, "Összes modul frissítése",
+                         wx.YES_NO | wx.ICON_QUESTION, self) != wx.YES:
+            self._announce("A frissítés elmarad.")
+            return
+
+        self._busy = True
+        self._gombok(False)
+        osszes = len(sorok)
+
+        def work():
+            from . import netdialog
+            if not netdialog.ensure_online(self, "a modulok frissítéséhez",
+                                           speak=self._announce):
+                wx.CallAfter(self._update_all_done, [], [],
+                             "Nincs internetkapcsolat.")
+                return
+            sikeres, hibas = [], []
+            for i, r in enumerate(sorok, 1):
+                nev = r["name"]
+                wx.CallAfter(self._announce,
+                             f"{i} / {osszes}: {nev} frissítése…")
+
+                def prog(frac, i=i):
+                    egesz = (i - 1 + max(0.0, min(1.0, frac))) / osszes
+                    wx.CallAfter(self.gauge.SetValue, int(egesz * 100))
+
+                try:
+                    man = coremod.install_entry(self.loader, r["entry"], prog,
+                                                self.root)
+                    sikeres.append(f"{man.name} {man.version}")
+                    continue
+                except Exception as ex:
+                    elso_hiba = ex
+                # TARTALÉK: a helyben-csere jellemzően FÁJLZÁR miatt bukik (a
+                # vírusirtó/Windows fogja a betöltött modul mappáját). Kézzel az
+                # „Eltávolítás majd Telepítés" mindig megoldotta – itt ezt
+                # automatikusan megtesszük. A modul adatai nem vesznek el, mert
+                # azok a ~/.superdl/modules_data mappában vannak.
+                wx.CallAfter(self._announce,
+                             f"{nev}: a helyben-frissítés nem ment, "
+                             "újratelepítéssel próbálom…")
+                try:
+                    man = coremod.reinstall_entry(self.loader, r["entry"], prog,
+                                                  self.root)
+                    sikeres.append(f"{man.name} {man.version} (újratelepítve)")
+                except Exception as ex2:
+                    hibas.append(f"{nev}: {ex2 or elso_hiba}")
+            wx.CallAfter(self._update_all_done, sikeres, hibas, "")
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _update_all_done(self, sikeres, hibas, hiba_uzenet):
+        self._busy = False
+        self.gauge.SetValue(0)
+        self._gombok(True)
+        if hiba_uzenet:
+            self._announce(hiba_uzenet)
+            return
+        reszek = []
+        if sikeres:
+            reszek.append("%d modul frissítve: %s"
+                          % (len(sikeres), ", ".join(sikeres)))
+        if hibas:
+            reszek.append("%d nem sikerült: %s" % (len(hibas), "; ".join(hibas)))
+        uzenet = ". ".join(reszek) if reszek else "Nem történt frissítés."
+        self._announce(uzenet + ".")
+        self._refresh_async()
+        if sikeres:
+            self._ujraindit_ajanlat(uzenet)
+
+    def _ujraindit_ajanlat(self, uzenet: str) -> None:
+        """A friss modul-kód csak új indítás után él teljesen – ezt ne a
+        felhasználónak kelljen tudnia."""
+        kerdes = (uzenet + ".\n\nA frissítések teljes érvényesüléséhez a "
+                  "SuperDL-t újra kell indítani. Újraindítsam most?")
+        if wx.MessageBox(kerdes, "Frissítés kész",
+                         wx.YES_NO | wx.ICON_INFORMATION, self) != wx.YES:
+            self._announce("Rendben, a frissítések a következő indításkor "
+                           "lépnek teljesen életbe.")
+            return
+        if coremod.restart_app():
+            self._announce("Újraindítás…")
+            wx.CallAfter(self.main.Close)
+        else:
+            self._announce("Az újraindítást most nem tudom elvégezni – zárd be "
+                           "és indítsd el a SuperDL-t.")
+
+    # ---- egyetlen modul telepítése / frissítése ------------------------
+
     def _install_selected(self):
         r = self._selected_row()
         if self._busy or not r or not r["installable"] or not r["entry"]:
             return
-        # BIZTONSÁG: nem hivatalos modul-forrásból telepíteni csak kifejezett
-        # megerősítéssel lehet (Tibi-audit 3.5; a kérdést az olvasó felolvassa)
-        from superdl import selfupdate
-        if not selfupdate.repo_is_official():
-            a = wx.MessageBox(
-                "A modul NEM a hivatalos boltból jönne, hanem innen:\n\n"
-                f"    {selfupdate.get_repo()}\n\n"
-                "Csak akkor folytasd, ha ezt TE állítottad be (Fejlesztői "
-                "mód). Biztosan telepíted?",
-                "Nem hivatalos modul-forrás",
-                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING, self)
-            if a != wx.YES:
-                return
+        if not self._forras_rendben():
+            return
         self._busy = True
         self.install_btn.Disable()
         self.remove_btn.Disable()

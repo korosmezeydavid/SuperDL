@@ -80,6 +80,99 @@ def install_entry(loader, entry, progress=None, root=None):
     return man
 
 
+def reinstall_entry(loader, entry, progress=None, root=None):
+    """KÉNYSZERÍTETT ÚJRATELEPÍTÉS – a fájlzár-csapda gyógyszere.
+
+    Ha a helyben-frissítés elhasal (jellemzően a Windows vagy a vírusirtó fogja
+    a betöltött modul mappáját a csere közben), a kézi „Eltávolítás, majd
+    Telepítés" mindig megoldotta. Ezt automatizálja ez a függvény.
+
+    KRITIKUS SORREND: ELŐSZÖR LETÖLTJÜK a csomagot, és CSAK AZUTÁN töröljük a
+    régit. Fordítva egy megszakadó net a modul ELVESZTÉSÉHEZ vezetne.
+    A modul ADATAI nem itt vannak (`~/.superdl/modules_data`), így a beállítások
+    és a könyvjelzők túlélik az újratelepítést."""
+    root = Path(root) if root is not None else modkit.modules_root()
+    data = download_bytes(entry.url, progress)      # ELŐBB a csomag legyen meg
+    remove_module(loader, entry.id, root)           # …csak azután a törlés
+    man = modkit.install_module_zip(data, entry.sha256 or None, root,
+                                    keep_backup=False)
+    if loader.load_dir(root / man.id) is None:
+        raise RuntimeError("Az újratelepített modul betöltése sikertelen: %s"
+                           % loader.errors.get(man.id, "ismeretlen hiba"))
+    return man
+
+
+def modul_frissitesek(root=None, entries=None) -> list:
+    """MELYIK TELEPÍTETT modulhoz van újabb verzió? Visszaad: (id, név, új
+    verzió) hármasok. Csak a TELEPÍTETTEKET nézi – ami nincs fent, az nem
+    „frissítés". Hálózati hiba esetén üres lista (a program megy tovább)."""
+    root = Path(root) if root is not None else modkit.modules_root()
+    if entries is None:
+        entries = fetch_index()
+    telepitett = {}
+    for d in sorted(root.glob("*/manifest.json")) if root.is_dir() else []:
+        try:
+            man = modkit.parse_manifest(json.loads(d.read_text(encoding="utf-8")))
+            telepitett[man.id] = man.version
+        except Exception:
+            continue
+    ki = []
+    for e in entries:
+        van = telepitett.get(e.id)
+        if van and e.version and modkit.version_gt(e.version, van) \
+                and e.compatible(modkit.CORE_API) \
+                and modkit.core_version_ok(getattr(e, "min_core_version", "")):
+            ki.append((e.id, e.name, e.version))
+    return ki
+
+
+def _restart_script(exe: Path, pid: int) -> str:
+    """A programot ÚJRAINDÍTÓ kötegfájl. Megvárja, míg a futó példány (PID)
+    tényleg kilép – csak azután indít újat. Ez azért kell, mert a SuperDL
+    egypéldányos (mutex): ha azonnal indítanánk, a második példány csendben
+    kilépne, és a felhasználó azt látná, hogy „nem indult újra"."""
+    sys32 = r"%SystemRoot%\System32"
+    return "\r\n".join([
+        "@echo off", "setlocal enableextensions",
+        "set /a n=0",
+        ":wait",
+        f'"{sys32}\\tasklist.exe" /FI "PID eq {pid}" 2>NUL | '
+        f'"{sys32}\\find.exe" "{pid}" >NUL',
+        "if errorlevel 1 goto run",
+        "set /a n+=1",
+        "if %n% GEQ 60 goto run",
+        f'"{sys32}\\ping.exe" -n 2 127.0.0.1 >NUL',
+        "goto wait",
+        ":run",
+        f'"{sys32}\\ping.exe" -n 3 127.0.0.1 >NUL',
+        f'start "" "{exe}"',
+        'del "%~f0"', ""])
+
+
+def restart_app() -> bool:
+    """A SuperDL újraindítása (a modul-frissítések teljes érvényesüléséhez).
+    A hívó a visszatérés után lépjen ki. Csak Windowson; hiba esetén False."""
+    import os
+    import subprocess
+    import sys
+    import tempfile
+    if os.name != "nt":
+        return False
+    try:
+        exe = Path(sys.executable)
+        if not getattr(sys, "frozen", False):        # forrásból futunk
+            return False
+        bat = Path(tempfile.gettempdir()) / "superdl_ujraindit.bat"
+        bat.write_text(_restart_script(exe, os.getpid()), encoding="cp852",
+                       errors="replace")
+        subprocess.Popen(["cmd.exe", "/c", str(bat)],
+                         creationflags=0x08000000 | 0x00000008)  # NO_WINDOW
+        return True
+    except Exception:
+        _log.exception("az újraindítás előkészítése nem sikerült")
+        return False
+
+
 def remove_module(loader, module_id, root=None) -> bool:
     """Egy telepített modul leszerelése + a mappája törlése."""
     import shutil
