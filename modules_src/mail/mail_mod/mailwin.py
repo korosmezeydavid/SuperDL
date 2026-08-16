@@ -2065,8 +2065,13 @@ class MailFrame(wx.Frame):
             e.Skip()                      # a kijelölés-bővítést nem bántjuk
             return
         n = lista.GetCount()
-        i = lista.GetSelection()
-        if n == 0:
+        i = self._lista_index(lista)
+        if n == 0 or i < 0:
+            # NEM TUDJUK, hol állunk (pl. semmi nincs kijelölve, vagy több sor
+            # van kijelölve) → SOHA nem nyelünk el billentyűt. Ez a szabály
+            # azért van, mert a levéllista TÖBBSZÖRÖS kijelölésű (LB_EXTENDED),
+            # és ott a `GetSelection()` mínusz egyet ad – emiatt a felfelé nyíl
+            # egy kiadásban ELNYELŐDÖTT, vagyis megbénult a navigáció.
             e.Skip()
             return
         if fel and i <= 0:
@@ -2076,6 +2081,27 @@ class MailFrame(wx.Frame):
             self._szel_jelzes(False, fajta)
             return
         e.Skip()
+
+    @staticmethod
+    def _lista_index(lista) -> int:
+        """Hol állunk a listában? Mínusz egy, ha ezt NEM tudjuk BIZTOSAN.
+
+        A levéllista LB_EXTENDED (többszörös kijelölés), ahol a `GetSelection()`
+        mínusz egyet ad – ezért a kijelöléseket kérdezzük. Ha nincs vagy több
+        kijelölés van, inkább bevalljuk, hogy nem tudjuk (mínusz egy), és a
+        hívó nem nyel el semmilyen billentyűt."""
+        try:
+            sel = list(lista.GetSelections())
+        except Exception:
+            sel = []
+        if len(sel) == 1:
+            return sel[0]
+        if sel:
+            return -1                     # több kijelölt sor: ne kockáztassunk
+        try:
+            return int(lista.GetSelection())
+        except Exception:
+            return -1
 
     def _szel_jelzes(self, teteje: bool, fajta: str) -> None:
         hol = "teteje" if teteje else "vége"

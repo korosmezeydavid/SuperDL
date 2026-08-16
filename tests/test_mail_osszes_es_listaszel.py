@@ -118,3 +118,105 @@ def test_a_bling_sosem_dob_hibat(monkeypatch):
     monkeypatch.setattr(H, "hang_fajl",
                         lambda teteje: (_ for _ in ()).throw(OSError("nincs")))
     assert H.bling(True) is False
+
+
+# ------------------------------------------------ REGRESSZIÓ: a navigáció
+
+class _HamisLista:
+    """A levéllista LB_EXTENDED (többszörös kijelölés): ott a `GetSelection()`
+    MÍNUSZ EGYET ad, akkor is, ha a felhasználó épp a lista közepén áll."""
+
+    def __init__(self, n, kijelolt=(), extended=True):
+        self._n, self._sel, self._ext = n, list(kijelolt), extended
+
+    def GetCount(self):
+        return self._n
+
+    def GetSelections(self):
+        return tuple(self._sel)
+
+    def GetSelection(self):
+        if self._ext:
+            return -1                     # a wx pontosan így viselkedik
+        return self._sel[0] if self._sel else -1
+
+
+class _HamisBillentyu:
+    def __init__(self, kod):
+        self.kod, self.tovabb = kod, False
+
+    def GetKeyCode(self):
+        return self.kod
+
+    def ShiftDown(self):
+        return False
+
+    def ControlDown(self):
+        return False
+
+    def Skip(self):
+        self.tovabb = True
+
+
+def test_lista_index_tobbszoros_kijelolesu_listan_is_helyes():
+    from mail_mod import mailwin as MW
+    ix = MW.MailFrame._lista_index
+    assert ix(_HamisLista(5, [2])) == 2, "egy kijelölt sor: tudjuk, hol állunk"
+    assert ix(_HamisLista(5, [])) == -1, "semmi kijelölve: NEM tudjuk"
+    assert ix(_HamisLista(5, [1, 2])) == -1, "több kijelölt: NEM tudjuk"
+    assert ix(_HamisLista(5, [3], extended=False)) == 3, "egyszerű lista is jó"
+
+
+@pytest.mark.parametrize("kijelolt", [(), (0, 1)])
+def test_ha_nem_tudjuk_hol_allunk_SOHA_nem_nyeljuk_el_a_nyilat(kijelolt):
+    """EZ A REGRESSZIÓ: egy kiadásban a felfelé nyíl elnyelődött a levéllistán,
+    mert a `GetSelection()` mínusz egyet adott – a navigáció megbénult."""
+    import wx
+    from mail_mod import mailwin as MW
+
+    class Onallo:
+        _lista_index = staticmethod(MW.MailFrame._lista_index)
+        _lista_szel = MW.MailFrame._lista_szel
+        jelzesek = []
+
+        def _szel_jelzes(self, teteje, fajta):
+            self.jelzesek.append(teteje)
+
+    o = Onallo()
+    for kod in (wx.WXK_UP, wx.WXK_DOWN):
+        e = _HamisBillentyu(kod)
+        o._lista_szel(e, _HamisLista(5, kijelolt), "level")
+        assert e.tovabb is True, "a billentyűnek TOVÁBB kell mennie"
+    assert not o.jelzesek, "és jelzés sem járhat ilyenkor"
+
+
+def test_a_valodi_szeleken_viszont_elnyeljuk():
+    import wx
+    from mail_mod import mailwin as MW
+
+    class Onallo:
+        _lista_index = staticmethod(MW.MailFrame._lista_index)
+        _lista_szel = MW.MailFrame._lista_szel
+
+        def __init__(self):
+            self.jelzesek = []
+
+        def _szel_jelzes(self, teteje, fajta):
+            self.jelzesek.append(teteje)
+
+    o = Onallo()
+    e = _HamisBillentyu(wx.WXK_UP)
+    o._lista_szel(e, _HamisLista(5, [0]), "level")
+    assert e.tovabb is False and o.jelzesek == [True]
+
+    o = Onallo()
+    e = _HamisBillentyu(wx.WXK_DOWN)
+    o._lista_szel(e, _HamisLista(5, [4]), "level")
+    assert e.tovabb is False and o.jelzesek == [False]
+
+    # középen mindkét irány szabad
+    for kod in (wx.WXK_UP, wx.WXK_DOWN):
+        o = Onallo()
+        e = _HamisBillentyu(kod)
+        o._lista_szel(e, _HamisLista(5, [2]), "level")
+        assert e.tovabb is True and not o.jelzesek
