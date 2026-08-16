@@ -20,6 +20,7 @@ import poplib
 import re
 import smtplib
 import ssl
+import time
 from email.message import EmailMessage
 from html.parser import HTMLParser
 
@@ -598,6 +599,48 @@ def cimjegyzek_frissit(email_cim, nev):
 
 # ---- általános beállítások (háttér-ellenőrzés stb.) ----
 _ALTALANOS_FILE = store.CONFIG_DIR / "mail_settings.json"
+# ---------------------------------------------------------------------------
+# ALÁÍRÁS
+# ---------------------------------------------------------------------------
+
+# A felhasználó által SZERKESZTHETŐ (akár törölhető) alapértelmezett aláírás.
+# A „Super Mail-lel küldve" SZÁNDÉKOSAN nincs benne: azt a fix zárósor mondja
+# ki a levél legalján, és kétszer leírva bántóan ismételne.
+ALAP_ALAIRAS = ("Super DL: ahol a hozzáférés nem termék, hanem jog.\n"
+                "https://super-dl.com")
+
+# A levél legaljára KERÜLŐ, rövid zárósor. Szándékosan link nélküli és egy
+# soros: a linkes-reklámos lábléceket a szigorúbb spamszűrők pontozzák, és egy
+# hosszú blokk minden levélben mások postaládájában is zavaró lenne.
+FIX_ZAROSOR = "Super Mail-lel küldve."
+
+
+def torzs_zarosorral(torzs: str) -> str:
+    """KÜLDÉSKOR: a levél szövege + a fix zárósor a legaljára.
+
+    Az aláírást NEM tesszük hozzá újra: az már a szerkesztőben ott van (a
+    levélíró ablak illeszti be nyitáskor), és a felhasználó akár át is írta
+    vagy törölte – az az ő döntése. Ha a zárósor már szerepel a szövegben,
+    nem duplázzuk."""
+    torzs = (torzs or "").rstrip()
+    if FIX_ZAROSOR in torzs:
+        return torzs + "\n"
+    return (torzs + "\n\n" + FIX_ZAROSOR).strip() + "\n"
+
+
+def torzs_alairassal(torzs: str, alairas: str = None) -> str:
+    """A levél szövege + a felhasználó aláírása + a fix zárósor. (A levélíró
+    ablak a szerkesztőbe illesztéshez használja az aláírás-részt; a küldéshez a
+    `torzs_zarosorral` való.) Semmit nem teszünk be kétszer."""
+    torzs = (torzs or "").rstrip()
+    if alairas is None:
+        alairas = altalanos_betolt().get("alairas", ALAP_ALAIRAS)
+    alairas = (alairas or "").strip()
+    if alairas and alairas not in torzs:
+        torzs = (torzs + "\n\n-- \n" + alairas).strip()
+    return torzs_zarosorral(torzs)
+
+
 _ALTALANOS_ALAP = {"auto_ellenoriz": True, "ellenoriz_perc": 3,
                    "lista_limit": 50,
                    # mi jelenjen meg a levéllista soraiban (testreszabható)
@@ -608,7 +651,14 @@ _ALTALANOS_ALAP = {"auto_ellenoriz": True, "ellenoriz_perc": 3,
                    "lista_ido": True,
                    # helyesírás-ellenőrzés küldés előtt (a levélírás
                    # helyi menüjéből kapcsolható)
-                   "helyesiras": True}
+                   "helyesiras": True,
+                   # a lista szélén: „bling" vagy „beszed"
+                   "lista_szel": "bling",
+                   # küldés előtti rákérdezés (a párbeszédben kikapcsolható,
+                   # ITT bármikor visszakapcsolható – sose legyen egyirányú utca)
+                   "kuldes_kerdes": True,
+                   # ALÁÍRÁS: szabadon szerkeszthető, akár teljesen törölhető
+                   "alairas": ALAP_ALAIRAS}
 
 
 def altalanos_betolt():
@@ -851,6 +901,43 @@ class ImapKliens:
         self.M.expunge()
         return True
 
+    def piszkozat_mappa(self):
+        r"""A szolgáltató PISZKOZATOK mappája. Nem találgatunk vakon: előbb a
+        szerver saját jelöléseit (RFC 6154 \Drafts) nézzük, és csak utána a
+        szokásos neveket – így a Gmail „[Gmail]/Vázlatok" vagy egy német
+        „Entwürfe" is megtalálható."""
+        try:
+            typ, adat = self.M.list()
+        except Exception:
+            return ""
+        if typ != "OK" or not adat:
+            return ""
+        jeloltek = []
+        for sor in adat:
+            szoveg = sor.decode("utf-8", "replace") if isinstance(sor, bytes) else str(sor)
+            nev = szoveg.split(' "', 2)[-1].strip().strip('"')
+            if r"\Drafts" in szoveg:          # a szerver MAGA jelölte meg
+                return nev
+            jeloltek.append(nev)
+        for n in jeloltek:
+            kicsi = n.lower()
+            if any(k in kicsi for k in ("draft", "piszkoz", "vázlat", "vazlat",
+                                        "entw", "brouillon")):
+                return n
+        return ""
+
+    def piszkozat_ment(self, msg, mappa=""):
+        r"""A megírt levél elmentése a szolgáltató PISZKOZATOK mappájába
+        (IMAP APPEND, `\Draft` jelzéssel). Így a telefonodon is ott lesz.
+        Visszaadja a mappa nevét; ha nincs hova, üres sztringet."""
+        mappa = mappa or self.piszkozat_mappa()
+        if not mappa:
+            return ""
+        nyers = msg.as_bytes() if hasattr(msg, "as_bytes") else bytes(msg)
+        ido = imaplib.Time2Internaldate(time.time())
+        typ, _ = self.M.append(self._mappa_arg(mappa), r"\Draft", ido, nyers)
+        return mappa if typ == "OK" else ""
+
     def legujabb_uid(self, mappa="INBOX"):
         """A mappa LEGNAGYOBB (legfrissebb) UID-ja – pehelysúlyú új-levél
         ellenőrzéshez (nem tölt le fejlécet)."""
@@ -966,6 +1053,29 @@ class SmtpKuldo:
         else:
             s.login(self.fiok["felhasznalo"], self.fiok["jelszo"])
 
+    def max_meret(self) -> int:
+        """A kiszolgáló VALÓDI méretkorlátja (RFC 1870 SIZE), bájtban.
+        Nem tippelünk 25 megabájtot: a Gmail, a Freemail és egy céges szerver
+        is mást enged. Ha a szerver nem mondja meg, nullát adunk vissza."""
+        host = self.fiok["smtp_host"]
+        port = int(self.fiok.get("smtp_port", 465))
+        ctx = ssl.create_default_context()
+        try:
+            if port == 465:
+                with smtplib.SMTP_SSL(host, port, context=ctx, timeout=20) as s:
+                    s.ehlo()
+                    return int(s.esmtp_features.get("size", 0) or 0)
+            with smtplib.SMTP(host, port, timeout=20) as s:
+                s.ehlo()
+                try:
+                    s.starttls(context=ctx)
+                    s.ehlo()
+                except Exception:
+                    pass
+                return int(s.esmtp_features.get("size", 0) or 0)
+        except Exception:
+            return 0
+
     def kuld(self, msg):
         host = self.fiok["smtp_host"]
         port = int(self.fiok.get("smtp_port", 465))
@@ -1017,3 +1127,208 @@ def rendez_ido_szerint(lista) -> list:
     """A legfrissebb levél elöl. Stabil: az azonos idejűek megtartják a
     beérkezési sorrendjüket, így a lista nem ugrál frissítésenként."""
     return sorted(list(lista or []), key=datum_kulcs, reverse=True)
+
+
+# ---------------------------------------------------------------------------
+# HTML-LEVÉL – jelölésekből (a szerkesztő SIMA SZÖVEG marad)
+# ---------------------------------------------------------------------------
+#
+# Miért így? Egy formázott (rich text) szerkesztő vakon rémálom: a
+# képernyőolvasók akadoznak rajta, a kurzor ugrál. Ezért a felhasználó SIMA
+# SZÖVEGET ír, benne LÁTHATÓ, FELOLVASHATÓ jelölésekkel:
+#     [itt éred el](https://pelda.hu)      → kattintható hivatkozás
+#     [kép: naplemente.jpg]                → a levél testébe ágyazott kép
+# Küldéskor ebből KÉT változat készül (multipart/alternative): egy HTML és egy
+# sima szöveges. A szöveges rész nem udvariassági gesztus: sok vak felhasználó
+# levelezője ezt olvassa, és a spamszűrők is jobban fogadják.
+
+LINK_JELOLO = re.compile(r"\[([^\]\n]*)\]\((https?://[^\s)]+)\)")
+KEP_JELOLO = re.compile(r"\[kép:\s*([^\]\n]+)\]", re.IGNORECASE)
+
+
+def van_html_jeloles(szoveg: str) -> bool:
+    """Van-e a szövegben olyan jelölés, amiért érdemes HTML-t is küldeni?
+    Ha nincs, marad a sima szöveg – fölösleges HTML-t nem gyártunk."""
+    sz = szoveg or ""
+    return bool(LINK_JELOLO.search(sz) or KEP_JELOLO.search(sz))
+
+
+def _html_ovatos(sz: str) -> str:
+    return (sz.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            .replace('"', "&quot;"))
+
+
+def jelolesek_szovegge(szoveg: str) -> str:
+    """A jelölések EMBERI szöveggé – ez megy a sima szöveges részbe.
+    A hivatkozás így néz ki: „itt éred el: https://…” – tehát a cím akkor is
+    megvan, ha a címzett csak a szöveges változatot látja."""
+    def link(m):
+        cimke, url = (m.group(1) or "").strip(), m.group(2)
+        return "%s: %s" % (cimke, url) if cimke else url
+    ki = LINK_JELOLO.sub(link, szoveg or "")
+    return KEP_JELOLO.sub(lambda m: "[kép: %s]" % m.group(1).strip(), ki)
+
+
+def jelolesek_htmlbe(szoveg: str, kep_cid: dict | None = None) -> str:
+    """A jelölések HTML-lé. `kep_cid`: {fájlnév: cid} a beágyazott képekhez."""
+    kep_cid = kep_cid or {}
+    darabok, utolso = [], 0
+    for m in LINK_JELOLO.finditer(szoveg or ""):
+        darabok.append(_html_ovatos(szoveg[utolso:m.start()]))
+        cimke = (m.group(1) or "").strip() or m.group(2)
+        darabok.append('<a href="%s">%s</a>'
+                       % (_html_ovatos(m.group(2)), _html_ovatos(cimke)))
+        utolso = m.end()
+    darabok.append(_html_ovatos((szoveg or "")[utolso:]))
+    ki = "".join(darabok)
+
+    def kep(m):
+        nev = m.group(1).strip()
+        cid = kep_cid.get(nev) or kep_cid.get(os.path.basename(nev))
+        if not cid:
+            return _html_ovatos("[kép: %s]" % nev)
+        # az `alt` NEM dísz: a vak címzett ezt hallja a kép helyén
+        return ('<img src="cid:%s" alt="%s" style="max-width:100%%">'
+                % (cid, _html_ovatos(nev)))
+
+    ki = KEP_JELOLO.sub(kep, ki)
+    return ("<html><body style=\"font-family:sans-serif\">%s</body></html>"
+            % ki.replace("\n", "<br>\n"))
+
+
+def level_epit_html(felado, cimzett, targy, torzs, masolat="",
+                    csatolmanyok_lista=None, valasz_id=None, titkos="",
+                    kepek=None):
+    """HTML + sima szöveges levél (multipart/alternative), beágyazott képekkel.
+    `kepek`: a levél testébe ágyazandó képfájlok útjai. A többi csatolmány a
+    szokásos módon megy."""
+    kepek = list(kepek or [])
+    cidek = {}
+    for i, ut in enumerate(kepek):
+        cidek[os.path.basename(ut)] = "kep%d@superdl" % (i + 1)
+
+    m = EmailMessage()
+    m["From"] = felado
+    m["To"] = cimzett
+    if masolat:
+        m["Cc"] = masolat
+    if titkos:
+        m["Bcc"] = titkos
+    m["Subject"] = targy or "(nincs tárgy)"
+    if valasz_id:
+        m["In-Reply-To"] = valasz_id
+        m["References"] = valasz_id
+    m.set_content(jelolesek_szovegge(torzs or ""))
+    m.add_alternative(jelolesek_htmlbe(torzs or "", cidek), subtype="html")
+
+    html_resz = m.get_payload()[-1]
+    for ut in kepek:
+        try:
+            with open(ut, "rb") as f:
+                adat = f.read()
+        except OSError:
+            continue
+        tipus, _ = mimetypes.guess_type(ut)
+        al = (tipus.split("/", 1)[1] if tipus and tipus.startswith("image/")
+              else "png")
+        html_resz.add_related(adat, maintype="image", subtype=al,
+                              cid="<%s>" % cidek[os.path.basename(ut)],
+                              filename=os.path.basename(ut))
+    for ut in (csatolmanyok_lista or []):
+        try:
+            with open(ut, "rb") as f:
+                adat = f.read()
+        except OSError:
+            continue
+        tipus, _ = mimetypes.guess_type(ut)
+        fo, al = (tipus.split("/", 1) if tipus else ("application",
+                                                     "octet-stream"))
+        m.add_attachment(adat, maintype=fo, subtype=al,
+                         filename=os.path.basename(ut))
+    return m
+
+
+# ---------------------------------------------------------------------------
+# NAGY FÁJLOK: a szolgáltató VALÓDI korlátja + feltöltés megosztóra
+# ---------------------------------------------------------------------------
+
+# Nem tippelünk 25 megabájtot: a levél mérete a KÓDOLT méret (a base64 kb.
+# 33%-kal hizlal), és minden szolgáltatónál más a korlát. Az SMTP-kiszolgáló
+# belépéskor MEGMONDJA a sajátját (RFC 1870 SIZE) – azt kérdezzük meg.
+ALAP_MERETKORLAT = 25 * 1024 * 1024      # csak végső tartalék, ha nem mondja meg
+
+
+def becsult_meret(torzs: str, csatolmanyok=None, kepek=None) -> int:
+    """A leendő levél KÓDOLT mérete bájtban (base64 = +33%, plusz fejlécek)."""
+    meret = len((torzs or "").encode("utf-8", "replace")) + 4096
+    for ut in list(csatolmanyok or []) + list(kepek or []):
+        try:
+            meret += int(os.path.getsize(ut) * 4 / 3) + 512
+        except OSError:
+            continue
+    return meret
+
+
+def meret_szoveg(bajt: int) -> str:
+    if bajt >= 1024 * 1024:
+        return "%.1f megabájt" % (bajt / 1024 / 1024)
+    return "%.0f kilobájt" % (bajt / 1024)
+
+
+# Fájlmegosztók. Cserélhető lista, mert ezek a szolgáltatások jönnek-mennek
+# (a transfer.sh évekig szabvány volt, aztán elhalt) – ha az egyik nem megy,
+# a hívó szólhat és válthat. A filebin.net kulcs nélküli, dokumentált API.
+MEGOSZTOK = [
+    {"id": "filebin", "nev": "filebin.net (7 napig él, kulcs nélkül)",
+     "url": "https://filebin.net/%(bin)s/%(fajl)s",
+     "letoltes": "https://filebin.net/%(bin)s"},
+]
+
+
+def megoszto_feltolt(ut: str, megoszto: str = "filebin", halad=None) -> dict:
+    """Egy fájl feltöltése egy nyilvános megosztóra. Visszaad: {"url", "lejar",
+    "nev"}.
+
+    ADATVÉDELEM: ezek a tárhelyek NYILVÁNOSAK – akinek megvan a link, letöltheti,
+    és nincs titkosítás. Ezért a hívónak KÖTELESSÉGE ezt kimondani és külön
+    engedélyt kérni, mielőtt ideküld bármit."""
+    import json as _json
+    import secrets
+    import urllib.request
+    nev = os.path.basename(ut)
+    biztos_nev = re.sub(r"[^A-Za-z0-9._-]", "_", nev) or "fajl"
+    bin_nev = "superdl-" + secrets.token_hex(8)
+    with open(ut, "rb") as f:
+        adat = f.read()
+    if halad:
+        halad(0.1)
+    m = next((x for x in MEGOSZTOK if x["id"] == megoszto), MEGOSZTOK[0])
+    cel = m["url"] % {"bin": bin_nev, "fajl": biztos_nev}
+    keres = urllib.request.Request(
+        cel, data=adat, method="POST",
+        headers={"Content-Type": "application/octet-stream",
+                 "User-Agent": "SuperDL-mail/1.0", "accept": "application/json"})
+    with urllib.request.urlopen(keres, timeout=900) as v:
+        valasz = v.read().decode("utf-8", "replace")
+    if halad:
+        halad(1.0)
+    lejar = ""
+    try:
+        lejar = (_json.loads(valasz).get("bin", {}).get("expired_at") or "")[:10]
+    except Exception:
+        pass
+    return {"url": m["letoltes"] % {"bin": bin_nev, "fajl": biztos_nev},
+            "lejar": lejar, "nev": nev}
+
+
+def nagy_fajl_szoveg(feltoltott: list) -> str:
+    """A levélbe kerülő szöveg a feltöltött fájlokról – jelöléssel, hogy a
+    HTML-változatban kattintható legyen."""
+    sorok = ["", "A csatolmány(ok) mérete miatt a fájl(ok) letölthető "
+             "hivatkozásként:"]
+    for f in feltoltott:
+        sor = "[%s](%s)" % (f["nev"], f["url"])
+        if f.get("lejar"):
+            sor += " – elérhető eddig: %s" % f["lejar"]
+        sorok.append("• " + sor)
+    return "\n".join(sorok) + "\n"

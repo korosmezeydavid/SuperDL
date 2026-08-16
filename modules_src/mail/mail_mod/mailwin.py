@@ -9,8 +9,11 @@ csinál, és SEMMIT nem továbbít sehová. Az első indításkor hozzájárulá
 import os
 import re
 import threading
+from pathlib import Path
 
 import wx
+
+from . import ailevel as AI
 
 from . import mail_core as MC
 # OAuth eltávolítva: kizárólag app-jelszavas hitelesítés (lásd a súgót).
@@ -141,6 +144,28 @@ _SUGO = (
     "• VÁLASZNÁL a kurzor egyből a levél szövegének elejére kerül (az idézet "
     "fölé), tehát csak írni kell. Új levélnél és továbbításnál a Címzett mezőn "
     "indulsz, mert ott azt kell először kitölteni.\n"
+    "• PISZKOZAT: ha félkész levéllel zárnád be az ablakot, a program "
+    "rákérdez, és a szolgáltatód Piszkozatok mappájába menti (így a telefonodon "
+    "is ott lesz); ha az nem megy, a saját gépedre. Menet közben: Ctrl+S.\n"
+    "• ALÁÍRÁS: a Beállítások → Általános fülön szabadon átírható, akár "
+    "törölhető. A levél legaljára minden esetben odakerül egy sor: "
+    "„Super Mail-lel küldve.”\n"
+    "• BESZÚRÁS gomb (a levélírásnál): HIVATKOZÁS (Ctrl+K – a megjelenő szöveg "
+    "nem kötelező), KÉP a levél testébe (Ctrl+Shift+K) és VIDEÓ-HIVATKOZÁS. "
+    "Videót levélbe beágyazva egyetlen levelező sem játszik le, ezért oda "
+    "kattintható hivatkozás kerül. Ha van a levélben hivatkozás vagy kép, a "
+    "program HTML-t ÉS sima szöveget is küld – a címzett gépe választ.\n"
+    "• CTRL+V: ha a vágólapon fájl vagy kép van (pl. képernyőkép), a program "
+    "csatolmányként teszi be, és bemondja.\n"
+    "• NAGY FÁJL: a program megkérdezi a szolgáltatód VALÓDI méretkorlátját, és "
+    "ha a levél nem férne át, választhatsz: feltöltés nyilvános megosztóra "
+    "(a link a levélbe kerül – de figyelj: az a tárhely bárkinek elérhető, "
+    "akinek megvan a link), vagy P2P fájlküldés (titkosított, felhő nélkül).\n"
+    "• AI-LEVÉL gomb: megmondod, kinek és miről írjunk, választasz hangnemet, "
+    "megszólítást és hosszt, a többit az AI írja meg – elfogadod, pontosítod "
+    "vagy újragenerálod. EHHEZ AI-KULCS KELL (AI menü → AI-beállítások). A "
+    "leírás és – ha kéred – a megválaszolandó levél elmegy a választott "
+    "AI-szolgáltatóhoz; csatolmányt sosem küldünk el.\n"
     "• Keresés: feladó, tárgy vagy szöveg szerint.\n\n"
     "GYORSBILLENTYŰK\n"
     "• Enter: megnyitás külön ablakban  • N: új  • R: válasz  • F: továbbítás\n"
@@ -629,6 +654,299 @@ class CimjegyzekValaszto(wx.Dialog):
 # ======================================================================
 #  Levélíró
 # ======================================================================
+def _helyi_piszkozat(msg) -> str:
+    """Tartalék: a piszkozat mentése a saját gépre .eml-ként (POP3-fióknál vagy
+    ha a szolgáltatónál nincs Piszkozatok mappa)."""
+    import time as _ido
+    mappa = Path.home() / ".superdl" / "mail_piszkozatok"
+    mappa.mkdir(parents=True, exist_ok=True)
+    nev = _ido.strftime("piszkozat_%Y-%m-%d_%H-%M-%S.eml")
+    ut = mappa / nev
+    ut.write_bytes(msg.as_bytes() if hasattr(msg, "as_bytes") else bytes(msg))
+    return str(ut)
+
+
+class HaromValaszDialog(wx.Dialog):
+    """Háromgombos, FELOLVASOTT kérdés (Igen / Nem / Mégsem). Saját ablak, mert
+    a Windows beépített háromgombos párbeszédét nem minden képernyőolvasó
+    kezeli egyformán; itt minden gomb tabulátorral elérhető és nevesített."""
+
+    def __init__(self, parent, cim, kerdes, igen, nem, megsem, main=None):
+        super().__init__(parent, title=cim)
+        v = wx.BoxSizer(wx.VERTICAL)
+        szoveg = wx.StaticText(self, label=kerdes)
+        szoveg.SetName(kerdes)
+        v.Add(szoveg, 0, wx.ALL, 14)
+        gs = wx.BoxSizer(wx.HORIZONTAL)
+        for cimke, azon, alap in ((igen, wx.ID_YES, True), (nem, wx.ID_NO, False),
+                                  (megsem, wx.ID_CANCEL, False)):
+            b = wx.Button(self, azon, cimke)
+            b.SetName(cimke.replace("&", ""))
+            b.Bind(wx.EVT_BUTTON, lambda e, a=azon: self.EndModal(a))
+            if alap:
+                b.SetDefault()
+                b.SetFocus()
+            gs.Add(b, 0, wx.RIGHT, 8)
+        v.Add(gs, 0, wx.ALL | wx.ALIGN_CENTER, 12)
+        self.SetSizerAndFit(v)
+        self.SetEscapeId(wx.ID_CANCEL)
+        self.CentreOnParent()
+        if main is not None:
+            wx.CallAfter(_mondd, main, "%s %s, %s, vagy %s."
+                         % (kerdes, igen.replace("&", ""), nem.replace("&", ""),
+                            megsem.replace("&", "")))
+
+
+class KuldesKerdesDialog(wx.Dialog):
+    """Küldés megerősítése – PIPÁVAL, hogy legközelebb ne kérdezzen.
+    A pipa saját vezérlő (nem a Windows task-dialógusáé), így biztosan
+    felolvasható és tabulátorral elérhető. A Beállítások → Általános fülön
+    bármikor visszakapcsolható – egy kikapcsolt kérdés ne legyen egyirányú."""
+
+    def __init__(self, parent, cimzett, main=None):
+        super().__init__(parent, title="Küldés megerősítése")
+        v = wx.BoxSizer(wx.VERTICAL)
+        kerdes = "Elküldöd a levelet ide: %s?" % cimzett
+        st = wx.StaticText(self, label=kerdes)
+        st.SetName(kerdes)
+        v.Add(st, 0, wx.ALL, 14)
+        self.pipa = wx.CheckBox(self, label="&Ne kérdezze meg többé")
+        self.pipa.SetName("Ne kérdezze meg többé a küldés előtt; a "
+                          "Beállítások Általános fülén visszakapcsolható")
+        v.Add(self.pipa, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 14)
+        gs = wx.BoxSizer(wx.HORIZONTAL)
+        b_ok = wx.Button(self, wx.ID_YES, "&Küldés")
+        b_ok.SetDefault()
+        b_ok.Bind(wx.EVT_BUTTON, lambda e: self.EndModal(wx.ID_YES))
+        b_no = wx.Button(self, wx.ID_NO, "&Mégsem")
+        b_no.Bind(wx.EVT_BUTTON, lambda e: self.EndModal(wx.ID_NO))
+        gs.Add(b_ok, 0, wx.RIGHT, 8)
+        gs.Add(b_no, 0)
+        v.Add(gs, 0, wx.ALL | wx.ALIGN_CENTER, 12)
+        self.SetSizerAndFit(v)
+        self.SetEscapeId(wx.ID_NO)
+        self.CentreOnParent()
+        b_ok.SetFocus()
+        if main is not None:
+            wx.CallAfter(_mondd, main, kerdes + " Küldés, vagy Mégsem. "
+                         "Pipával kérheted, hogy többé ne kérdezzen.")
+
+
+class AiLevelDialog(wx.Dialog):
+    """LEVÉL ÍRÁSA AI-VAL. Megmondod, kinek és miről; választasz hangnemet,
+    megszólítást és hosszt; a kész szöveget elfogadod, pontosítod vagy
+    újragenerálod. Elfogadáskor AZONNAL a levélbe kerül.
+
+    ADATVÉDELEM: a leírás – és ha kéred, a megválaszolandó levél – elmegy a
+    VÁLASZTOTT AI-szolgáltatóhoz, a TE kulcsoddal. Csatolmányt sosem küldünk."""
+
+    def __init__(self, parent, main, cimzett="", eredeti=""):
+        super().__init__(parent, title="Levél írása AI-val",
+                         size=(700, 640),
+                         style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        self.main = main
+        self._eredeti = eredeti or ""
+        self._eredmeny = ""
+        self._targy = ""
+        self._fut = False
+        cfg = MC.altalanos_betolt()
+
+        v = wx.BoxSizer(wx.VERTICAL)
+        fej = wx.StaticText(self, label=(
+            "A megadott leírás%s elmegy a beállított AI-szolgáltatóhoz (a te "
+            "kulcsoddal). Csatolmányt sosem küldünk el."
+            % (" és a megválaszolandó levél" if self._eredeti else "")))
+        fej.Wrap(660)
+        v.Add(fej, 0, wx.ALL, 10)
+
+        s1 = wx.BoxSizer(wx.HORIZONTAL)
+        s1.Add(wx.StaticText(self, label="&Kinek írunk?"), 0,
+               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.kinek = wx.TextCtrl(self, value=cimzett)
+        self.kinek.SetName("Kinek írunk")
+        s1.Add(self.kinek, 1)
+        v.Add(s1, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+
+        v.Add(wx.StaticText(self, label="&Miről szóljon a levél?"), 0,
+              wx.LEFT | wx.TOP, 10)
+        self.mirol = wx.TextCtrl(self, style=wx.TE_MULTILINE, size=(-1, 80))
+        self.mirol.SetName("Miről szóljon a levél")
+        self.mirol.SetHint("pl. lemondom a keddi időpontot, kérek újat jövő hétre")
+        v.Add(self.mirol, 0, wx.EXPAND | wx.ALL, 10)
+
+        r = wx.BoxSizer(wx.HORIZONTAL)
+        self.hangnem = wx.RadioBox(
+            self, label="&Hangnem", majorDimension=1,
+            choices=[n for _, n, _ in AI.HANGNEMEK])
+        self.megszolitas = wx.RadioBox(
+            self, label="Meg&szólítás", majorDimension=1,
+            choices=[n for _, n, _ in AI.MEGSZOLITASOK])
+        self.hossz = wx.RadioBox(
+            self, label="H&ossz", majorDimension=1,
+            choices=["%s (%d–%d karakter)" % (n, a, b)
+                     for _, n, a, b in AI.HOSSZAK])
+        for doboz, kulcs, lista in ((self.hangnem, "ai_hangnem", AI.HANGNEMEK),
+                                    (self.megszolitas, "ai_megszolitas",
+                                     AI.MEGSZOLITASOK),
+                                    (self.hossz, "ai_hossz", AI.HOSSZAK)):
+            mentett = cfg.get(kulcs)
+            kulcsok = [x[0] for x in lista]
+            doboz.SetSelection(kulcsok.index(mentett) if mentett in kulcsok else 0)
+            r.Add(doboz, 0, wx.RIGHT, 10)
+        v.Add(r, 0, wx.LEFT | wx.RIGHT, 10)
+
+        self.eredetit = wx.CheckBox(
+            self, label="&Vegye figyelembe a megválaszolandó levelet is")
+        self.eredetit.SetValue(bool(self._eredeti))
+        self.eredetit.Enable(bool(self._eredeti))
+        v.Add(self.eredetit, 0, wx.ALL, 10)
+
+        g1 = wx.BoxSizer(wx.HORIZONTAL)
+        self.b_gen = wx.Button(self, label="&Generálás")
+        self.b_gen.SetDefault()
+        self.b_gen.Bind(wx.EVT_BUTTON, lambda e: self._general())
+        g1.Add(self.b_gen, 0, wx.RIGHT, 8)
+        v.Add(g1, 0, wx.LEFT | wx.BOTTOM, 10)
+
+        v.Add(wx.StaticText(self, label="A &kész levél (szerkeszthető):"), 0,
+              wx.LEFT, 10)
+        self.szoveg = wx.TextCtrl(self, style=wx.TE_MULTILINE, size=(-1, 180))
+        self.szoveg.SetName("A generált levél szövege, szerkeszthető")
+        v.Add(self.szoveg, 1, wx.EXPAND | wx.ALL, 10)
+
+        g2 = wx.BoxSizer(wx.HORIZONTAL)
+        self.b_ok = wx.Button(self, wx.ID_OK, "&Beillesztés a levélbe")
+        self.b_pont = wx.Button(self, label="&Pontosítás…")
+        self.b_pont.Bind(wx.EVT_BUTTON, lambda e: self._pontositas())
+        self.b_ujra = wx.Button(self, label="Ú&jra")
+        self.b_ujra.Bind(wx.EVT_BUTTON, lambda e: self._general())
+        for b in (self.b_ok, self.b_pont, self.b_ujra):
+            b.Enable(False)
+            g2.Add(b, 0, wx.RIGHT, 8)
+        g2.Add(wx.Button(self, wx.ID_CANCEL, "&Mégsem"), 0)
+        v.Add(g2, 0, wx.ALL | wx.ALIGN_CENTER, 10)
+        self.SetSizer(v)
+        self.CentreOnParent()
+        self.mirol.SetFocus()
+
+    # -- generálás --------------------------------------------------------
+
+    def _general(self, pontositas: str = ""):
+        mirol = self.mirol.GetValue().strip()
+        if not mirol and not pontositas:
+            _mondd(self.main, "Előbb írd le, miről szóljon a levél.")
+            self.mirol.SetFocus()
+            return
+        if self._fut:
+            return
+        self._fut = True
+        self.b_gen.Enable(False)
+        _mondd(self.main, "A levél készül…")
+        kulcsok = ([x[0] for x in AI.HANGNEMEK][self.hangnem.GetSelection()],
+                   [x[0] for x in AI.MEGSZOLITASOK][self.megszolitas.GetSelection()],
+                   [x[0] for x in AI.HOSSZAK][self.hossz.GetSelection()])
+        cfg = MC.altalanos_betolt()
+        cfg.update({"ai_hangnem": kulcsok[0], "ai_megszolitas": kulcsok[1],
+                    "ai_hossz": kulcsok[2]})
+        MC.altalanos_ment(cfg)
+        eredeti = self._eredeti if self.eredetit.GetValue() else ""
+        kerdes = AI.prompt_epit(mirol, self.kinek.GetValue(), kulcsok[0],
+                                kulcsok[1], kulcsok[2], eredeti, pontositas,
+                                self.szoveg.GetValue())
+
+        def munka():
+            from superdl import aiclient
+            szoveg = AI.valasz_tisztit(aiclient.chat(kerdes, AI.RENDSZER))
+            targy = ""
+            try:
+                targy = AI.targy_tisztit(aiclient.chat(AI.targy_prompt(szoveg)))
+            except Exception:
+                pass
+            return szoveg, targy
+
+        _hatterben(munka, self._kesz, self._hiba)
+
+    def _kesz(self, eredmeny):
+        szoveg, targy = eredmeny
+        self._fut = False
+        self.b_gen.Enable(True)
+        self._eredmeny, self._targy = szoveg, targy
+        self.szoveg.SetValue(szoveg)
+        for b in (self.b_ok, self.b_pont, self.b_ujra):
+            b.Enable(True)
+        self.szoveg.SetFocus()
+        _mondd(self.main, "Elkészült, %d karakter. Elfogadhatod, pontosíthatod, "
+               "vagy kérhetsz újat." % len(szoveg))
+
+    def _hiba(self, ex):
+        self._fut = False
+        self.b_gen.Enable(True)
+        uz = str(ex)
+        if "kulcs" in uz.lower() or "key" in uz.lower() or "provider" in uz.lower():
+            uz = ("Ehhez AI-kulcs kell. A főablakban: AI menü → AI-beállítások, "
+                  "vagy Súgó → AI-kulcsok beszerzése.")
+        _mondd(self.main, "Nem sikerült: " + uz)
+        wx.MessageBox(uz, "AI-levélírás", wx.OK | wx.ICON_ERROR, self)
+
+    def _pontositas(self):
+        d = wx.TextEntryDialog(self, "Mit írjon át? (pl. legyen rövidebb, "
+                               "hagyd ki a bocsánatkérést, tegeződjön)",
+                               "Pontosítás")
+        if d.ShowModal() == wx.ID_OK and d.GetValue().strip():
+            self._general(pontositas=d.GetValue().strip())
+        d.Destroy()
+
+    def levelszoveg(self):
+        return self.szoveg.GetValue().strip()
+
+    def javasolt_targy(self):
+        return self._targy
+
+
+class KetMezosDialog(wx.Dialog):
+    """Két beviteli mező (pl. webcím + megjelenő szöveg), felolvasott súgóval.
+    A második mező SZÁNDÉKOSAN nem kötelező – a felhasználó kérése szerint a
+    magyarázó szöveg elhagyható."""
+
+    def __init__(self, parent, cim, cimke1, cimke2, main=None, sugo=""):
+        super().__init__(parent, title=cim, size=(560, -1))
+        v = wx.BoxSizer(wx.VERTICAL)
+        if sugo:
+            st = wx.StaticText(self, label=sugo)
+            st.Wrap(520)
+            st.SetName(sugo)
+            v.Add(st, 0, wx.ALL, 12)
+        self._m1 = self._sor(v, cimke1)
+        self._m2 = self._sor(v, cimke2)
+        gs = wx.BoxSizer(wx.HORIZONTAL)
+        ok = wx.Button(self, wx.ID_OK, "&Beszúrás")
+        ok.SetDefault()
+        gs.Add(ok, 0, wx.RIGHT, 8)
+        gs.Add(wx.Button(self, wx.ID_CANCEL, "&Mégsem"), 0)
+        v.Add(gs, 0, wx.ALL | wx.ALIGN_CENTER, 12)
+        self.SetSizerAndFit(v)
+        self.CentreOnParent()
+        self._m1.SetFocus()
+        if main is not None and sugo:
+            wx.CallAfter(_mondd, main, "%s %s" % (cim, sugo))
+
+    def _sor(self, v, cimke):
+        s = wx.BoxSizer(wx.HORIZONTAL)
+        st = wx.StaticText(self, label=cimke)
+        ctrl = wx.TextCtrl(self, size=(340, -1))
+        ctrl.SetName(cimke.replace("&", "").rstrip(":"))
+        s.Add(st, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
+        s.Add(ctrl, 1, wx.ALIGN_CENTER_VERTICAL)
+        v.Add(s, 0, wx.EXPAND | wx.ALL, 8)
+        return ctrl
+
+    def ertek1(self):
+        return self._m1.GetValue().strip()
+
+    def ertek2(self):
+        return self._m2.GetValue().strip()
+
+
 class LevelIroDialog(wx.Dialog):
     def __init__(self, parent, main, fiok, cimzett="", targy="", torzs="",
                  valasz_id=None, torzsre=False):
@@ -638,6 +956,7 @@ class LevelIroDialog(wx.Dialog):
         self.fiok = fiok
         self.valasz_id = valasz_id
         self._csatolmanyok = []
+        self._kepek = []          # a levél TESTÉBE ágyazott képek
         v = wx.BoxSizer(wx.VERTICAL)
 
         # A címke MINDIG a mező ELŐTT jön létre (z-sorrend) – hogy a
@@ -661,7 +980,11 @@ class LevelIroDialog(wx.Dialog):
 
         self.torzs = wx.TextCtrl(self, value=torzs,
                                  style=wx.TE_MULTILINE | wx.TE_RICH2)
-        self.torzs.SetName("Levél szövege")
+        # A fix zárósort a mező NEVÉBEN mondjuk ki (a képernyőolvasó a mezőre
+        # lépéskor felolvassa) – így senkit nem ér meglepetés, de nem is
+        # szövegelünk minden ablaknyitáskor.
+        self.torzs.SetName("Levél szövege; a levél aljára automatikusan "
+                           "odakerül: %s" % MC.FIX_ZAROSOR)
         v.Add(self.torzs, 1, wx.EXPAND | wx.ALL, 6)
         self.csat_cimke = wx.StaticText(self, label="Csatolmány: nincs")
         v.Add(self.csat_cimke, 0, wx.LEFT, 8)
@@ -669,11 +992,22 @@ class LevelIroDialog(wx.Dialog):
         gs = wx.BoxSizer(wx.HORIZONTAL)
         cj = wx.Button(self, label="📇 &Címjegyzék…")
         cj.Bind(wx.EVT_BUTTON, self._cimjegyzek_nyit)
+        # BESZÚRÁS: valódi felugró menü (a képernyőolvasók a menüket jól
+        # kezelik), plusz minden pontnak van saját gyorsbillentyűje is.
+        ai = wx.Button(self, label="🤖 &AI-levél…")
+        ai.SetName("Levél írása AI-val – AI-kulcs szükséges hozzá")
+        ai.SetToolTip("A megadott leírásból megírja a levelet (AI-kulcs kell)")
+        ai.Bind(wx.EVT_BUTTON, lambda e: self._ai_level())
+        besz = wx.Button(self, label="➕ &Beszúrás…")
+        besz.SetName("Beszúrás: hivatkozás, kép, videó-hivatkozás")
+        besz.Bind(wx.EVT_BUTTON, lambda e: self._beszuras_menu(besz))
         cs = wx.Button(self, label="📎 Csatolmány &hozzáadása")
         cs.Bind(wx.EVT_BUTTON, self._csatol)
         kb = wx.Button(self, wx.ID_OK, "&Küldés  (Ctrl+Enter)")
         kb.Bind(wx.EVT_BUTTON, self._kuld)
         gs.Add(cj, 0, wx.RIGHT, 8)
+        gs.Add(ai, 0, wx.RIGHT, 8)
+        gs.Add(besz, 0, wx.RIGHT, 8)
         gs.Add(cs, 0, wx.RIGHT, 8)
         gs.Add(kb, 0, wx.RIGHT, 8)
         gs.Add(wx.Button(self, wx.ID_CANCEL, "Mégsem"), 0)
@@ -689,6 +1023,16 @@ class LevelIroDialog(wx.Dialog):
         # idézet FÖLÉ –, hogy csak írni kelljen (felhasználói kérés). A címzett
         # és a tárgy ilyenkor már ki van töltve, azokon nincs mit tenni. Új
         # levélnél és TOVÁBBÍTÁSNÁL marad a Címzett, mert ott az az első dolog.
+        # ALÁÍRÁS: a felhasználó SZERKESZTHETŐ aláírása bekerül a szövegbe (így
+        # látja, hallja és bele is írhat), válasznál az IDÉZET FÖLÉ. A fix
+        # zárósor NEM itt, hanem küldéskor kerül a legaljára.
+        self._alairas_beszur(torzs)
+        self._kuldve = False
+        self._indulo_allapot = self._allapot()      # ehhez mérjük a változást
+        self.Bind(wx.EVT_CLOSE, self._on_iro_close)
+        # az Esc / Mégsem gomb is a piszkozat-kérdésen menjen át
+        self.Bind(wx.EVT_BUTTON, self._on_iro_close, id=wx.ID_CANCEL)
+
         if torzsre:
             self.torzs.SetInsertionPoint(0)
             wx.CallAfter(self.torzs.SetFocus)
@@ -752,8 +1096,339 @@ class LevelIroDialog(wx.Dialog):
             self._kuld(None)
         elif k == wx.WXK_F7:               # F7 = helyesírás (mint az Office-ban)
             self._helyesiras_futtat()
+        elif k in (ord("S"), ord("s")) and e.ControlDown():
+            self._piszkozat_ment(bezar=False)     # Ctrl+S: mentés menet közben
+        elif k in (ord("K"), ord("k")) and e.ControlDown() and e.ShiftDown():
+            self._beszur_kep()
+        elif k in (ord("K"), ord("k")) and e.ControlDown():
+            self._beszur_link()
+        elif k in (ord("V"), ord("v")) and e.ControlDown():
+            # Ctrl+V: ha a vágólapon FÁJL vagy KÉP van, csatolmány lesz belőle;
+            # sima szövegnél megy a szokásos beillesztés.
+            if not self._vagolap_csatolmany():
+                e.Skip()
         else:
             e.Skip()
+
+    # ---- AI-levélírás --------------------------------------------------
+
+    def _ai_level(self):
+        """Levél írása AI-val. Az elfogadott szöveg AZONNAL a levélbe kerül –
+        a kurzor helyére, az aláírás fölé –, semmi másolgatás."""
+        eredeti = ""
+        if self.valasz_id:                    # válasznál az idézetet adjuk át
+            eredeti = re.sub(r"^> ?", "", self.torzs.GetValue(), flags=re.M)
+        d = AiLevelDialog(self, self.main, self.cimzett.GetValue().strip(),
+                          eredeti)
+        if d.ShowModal() == wx.ID_OK:
+            szoveg = d.levelszoveg()
+            if szoveg:
+                regi = self.torzs.GetValue()
+                self.torzs.SetValue(szoveg + ("\n" + regi if regi else ""))
+                self.torzs.SetInsertionPoint(0)
+                self.torzs.SetFocus()
+                if not self.targy.GetValue().strip() and d.javasolt_targy():
+                    self.targy.SetValue(d.javasolt_targy())
+                    _mondd(self.main, "A levél bekerült. Javasolt tárgy: %s"
+                           % d.javasolt_targy())
+                else:
+                    _mondd(self.main, "A levél bekerült a szerkesztőbe.")
+        d.Destroy()
+
+    # ---- beszúrás (hivatkozás, kép, videó) -----------------------------
+
+    def _beszuras_menu(self, honnan=None):
+        m = wx.Menu()
+        pontok = ((("&Hivatkozás…\tCtrl+K"), self._beszur_link),
+                  (("&Kép a levélbe…\tCtrl+Shift+K"), self._beszur_kep),
+                  (("&Videó-hivatkozás…"), self._beszur_video),
+                  (("&Csatolmány…"), lambda: self._csatol(None)))
+        for cimke, fv in pontok:
+            it = m.Append(wx.ID_ANY, cimke)
+            self.Bind(wx.EVT_MENU, lambda e, f=fv: f(), it)
+        self.PopupMenu(m, honnan.GetPosition() if honnan else wx.DefaultPosition)
+        m.Destroy()
+
+    def _torzsbe_ir(self, szoveg: str, bemondas: str = "") -> None:
+        """A kurzor helyére szúrja a jelölést, és a fókusz marad a szövegen."""
+        self.torzs.WriteText(szoveg)
+        self.torzs.SetFocus()
+        if bemondas:
+            _mondd(self.main, bemondas)
+
+    def _beszur_link(self):
+        d = KetMezosDialog(
+            self, "Hivatkozás beszúrása", "&Webcím (URL):",
+            "&Megjelenő szöveg (nem kötelező):", self.main,
+            sugo="Ha a megjelenő szöveget üresen hagyod, maga a webcím látszik.")
+        if d.ShowModal() == wx.ID_OK:
+            url, cimke = d.ertek1(), d.ertek2()
+            if url:
+                if not re.match(r"^[a-z]+://", url, re.I):
+                    url = "https://" + url         # a puszta domaint kiegészítjük
+                self._torzsbe_ir("[%s](%s)" % (cimke, url) if cimke else url,
+                                 "Hivatkozás beszúrva."
+                                 + (" Megjelenő szöveg: %s." % cimke if cimke
+                                    else " A címzett a webcímet fogja látni."))
+        d.Destroy()
+
+    def _beszur_kep(self):
+        dlg = wx.FileDialog(
+            self, "Kép a levélbe",
+            wildcard="Képek (*.png;*.jpg;*.jpeg;*.gif;*.bmp)|"
+                     "*.png;*.jpg;*.jpeg;*.gif;*.bmp|Minden fájl|*.*",
+            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        if dlg.ShowModal() == wx.ID_OK:
+            ut = dlg.GetPath()
+            self._kepek.append(ut)
+            nev = os.path.basename(ut)
+            self._torzsbe_ir("\n[kép: %s]\n" % nev,
+                             "Kép beszúrva a levél testébe: %s. A címzett a "
+                             "levélben látja majd." % nev)
+        dlg.Destroy()
+
+    def _beszur_video(self):
+        d = KetMezosDialog(
+            self, "Videó-hivatkozás beszúrása", "A videó &webcíme:",
+            "&Megjelenő szöveg (nem kötelező):", self.main,
+            sugo="Fontos: videót nem lehet lejátszhatóan beágyazni levélbe – "
+                 "egyetlen levelező sem támogatja biztonsági okból. Ide "
+                 "KATTINTHATÓ HIVATKOZÁS kerül, ami a címzett böngészőjében "
+                 "nyílik meg.")
+        if d.ShowModal() == wx.ID_OK:
+            url, cimke = d.ertek1(), d.ertek2()
+            if url:
+                if not re.match(r"^[a-z]+://", url, re.I):
+                    url = "https://" + url
+                self._torzsbe_ir("[%s](%s)" % (cimke or "Videó megtekintése",
+                                               url),
+                                 "Videó-hivatkozás beszúrva.")
+        d.Destroy()
+
+    # ---- nagy fájlok ---------------------------------------------------
+
+    def _szerver_korlat(self) -> int:
+        """A fiók SMTP-kiszolgálójának valódi méretkorlátja, fiókonként
+        megjegyezve (a lekérdezés egy kapcsolatot igényel, ne csináljuk
+        minden küldésnél)."""
+        kulcs = "smtp_korlat_" + (self.fiok.get("email") or "")
+        cfg = MC.altalanos_betolt()
+        if cfg.get(kulcs):
+            return int(cfg[kulcs])
+        try:
+            korlat = MC.SmtpKuldo(self.fiok).max_meret()
+        except Exception:
+            korlat = 0
+        if korlat:
+            cfg[kulcs] = int(korlat)
+            MC.altalanos_ment(cfg)
+        return korlat or MC.ALAP_MERETKORLAT
+
+    def _nagy_fajl_rendez(self) -> bool:
+        """Ha a levél nem férne át, három választást adunk. False = ne küldjünk."""
+        if not (self._csatolmanyok or self._kepek):
+            return True
+        meret = MC.becsult_meret(self.torzs.GetValue(), self._csatolmanyok,
+                                 self._kepek)
+        korlat = self._szerver_korlat()
+        if meret <= korlat:
+            return True
+        uzenet = ("A levél kb. %s lenne, a szolgáltatód viszont legfeljebb %s-ot "
+                  "enged át.\n\nMit tegyünk a nagy fájllal?"
+                  % (MC.meret_szoveg(meret), MC.meret_szoveg(korlat)))
+        d = HaromValaszDialog(
+            self, "Nagy fájl", uzenet,
+            "&Feltöltés megosztóra, link a levélbe",
+            "&P2P fájlküldés (titkosított, felhő nélkül)",
+            "&Mégsem (nem küldöm el)", self.main)
+        valasz = d.ShowModal()
+        d.Destroy()
+        if valasz == wx.ID_YES:
+            return self._feltoltes_megosztora()
+        if valasz == wx.ID_NO:
+            self._p2p_ajanlat()
+            return False
+        return False
+
+    def _feltoltes_megosztora(self) -> bool:
+        """Feltöltés – de CSAK kifejezett, tájékozott engedéllyel: ezek a
+        tárhelyek NYILVÁNOSAK, akinek megvan a link, letöltheti."""
+        nevek = ", ".join(os.path.basename(u) for u in self._csatolmanyok)
+        figyelmeztetes = (
+            "A fájl(ok) egy NYILVÁNOS megosztóra kerülnek (filebin.net), és "
+            "akinek megvan a link, LETÖLTHETI – nincs titkosítás, nincs "
+            "jelszó. A fájl néhány nap múlva magától törlődik.\n\n"
+            "Bizalmas anyagot inkább a P2P fájlküldéssel küldj.\n\n"
+            "Feltöltsem ezeket: %s?" % nevek)
+        _mondd(self.main, figyelmeztetes)
+        if wx.MessageBox(figyelmeztetes, "Feltöltés nyilvános megosztóra",
+                         wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING,
+                         self) != wx.YES:
+            return False
+        kesz, hibak = [], []
+        for ut in list(self._csatolmanyok):
+            _mondd(self.main, "Feltöltés: %s…" % os.path.basename(ut))
+            try:
+                kesz.append(MC.megoszto_feltolt(ut))
+            except Exception as ex:
+                hibak.append("%s: %s" % (os.path.basename(ut), ex))
+        if hibak:
+            uz = ("A feltöltés nem sikerült: %s. A levelet nem küldtem el."
+                  % "; ".join(hibak))
+            _mondd(self.main, uz)
+            wx.MessageBox(uz, "Feltöltés", wx.OK | wx.ICON_ERROR, self)
+            return False
+        self.torzs.SetValue(self.torzs.GetValue().rstrip() + "\n"
+                            + MC.nagy_fajl_szoveg(kesz))
+        self._csatolmanyok = []          # a fájlok már a linken vannak
+        self._csat_frissit()
+        _mondd(self.main, "Kész: %d fájl feltöltve, a hivatkozás bekerült a "
+               "levélbe." % len(kesz))
+        return True
+
+    def _p2p_ajanlat(self) -> None:
+        """A P2P küldés a SuperDL SAJÁT modulja: végpontok közötti titkosítás,
+        semmilyen külső tárhely. Cserébe MINDKÉT gépnek online kell lennie az
+        átvitel alatt – ezt ki is mondjuk, mert enélkül félrevezető lenne."""
+        _mondd(self.main, "P2P fájlküldés választva.")
+        wx.MessageBox(
+            "A P2P fájlküldésnél a fájl közvetlenül a másik gépre megy, "
+            "végpontok közötti titkosítással – semmilyen külső tárhelyre nem "
+            "kerül fel.\n\nFONTOS: ehhez MINDKÉT gépnek online kell lennie az "
+            "átvitel alatt, tehát előbb beszéljétek meg.\n\n"
+            "Nyisd meg: Eszközök → P2P fájlküldés (a Modulkezelőből "
+            "telepíthető), és a kapott kódot írd bele a levélbe.\n\n"
+            "A levél most nem ment el – küldd el, ha a kód megvan.",
+            "P2P fájlküldés", wx.OK | wx.ICON_INFORMATION, self)
+
+    # ---- vágólap: fájl vagy kép beillesztése csatolmányként ------------
+
+    def _vagolap_csatolmany(self) -> bool:
+        """Ctrl+V-re: ha a vágólapon FÁJL vagy KÉP van, csatolmány lesz belőle.
+        Sima szövegnél False, és akkor a szokásos beillesztés fut le."""
+        if not wx.TheClipboard.Open():
+            return False
+        try:
+            fajlok = wx.FileDataObject()
+            if wx.TheClipboard.GetData(fajlok):
+                utak = list(fajlok.GetFilenames())
+                if utak:
+                    self._csatolmanyok.extend(utak)
+                    self._csat_frissit()
+                    _mondd(self.main, "Csatolva: %s."
+                           % ", ".join(os.path.basename(u) for u in utak))
+                    return True
+            kep = wx.BitmapDataObject()
+            if wx.TheClipboard.GetData(kep):
+                import time as _ido
+                mappa = Path.home() / ".superdl" / "mail_vagolap"
+                mappa.mkdir(parents=True, exist_ok=True)
+                nev = _ido.strftime("kep_%Y-%m-%d_%H-%M-%S.png")
+                ut = str(mappa / nev)
+                kep.GetBitmap().ConvertToImage().SaveFile(ut, wx.BITMAP_TYPE_PNG)
+                self._csatolmanyok.append(ut)
+                self._csat_frissit()
+                _mondd(self.main, "A vágólapon lévő kép csatolva: %s." % nev)
+                return True
+        except Exception:
+            return False
+        finally:
+            wx.TheClipboard.Close()
+        return False
+
+    def _csat_frissit(self):
+        nevek = [os.path.basename(u) for u in self._csatolmanyok]
+        self.csat_cimke.SetLabel("Csatolmány: " + (", ".join(nevek) or "nincs"))
+
+    # ---- aláírás -------------------------------------------------------
+
+    def _alairas_beszur(self, eredeti_torzs: str) -> None:
+        """Az aláírás a levél TETEJE (a te szövegednek hagyott hely) és az
+        esetleges IDÉZET közé kerül – ez a szokásos magyar levelezési sorrend.
+        Ha az aláírás üres (a felhasználó törölte), nem teszünk semmit."""
+        alairas = (MC.altalanos_betolt().get("alairas", MC.ALAP_ALAIRAS) or "").strip()
+        if not alairas:
+            return
+        blokk = "\n\n-- \n" + alairas + "\n"
+        idezet = eredeti_torzs or ""
+        self.torzs.SetValue(blokk + idezet if idezet else blokk)
+
+    # ---- piszkozat -----------------------------------------------------
+
+    def _allapot(self) -> tuple:
+        return (self.cimzett.GetValue(), self.masolat.GetValue(),
+                self.titkos.GetValue(), self.targy.GetValue(),
+                self.torzs.GetValue(), tuple(self._csatolmanyok))
+
+    def _valtozott(self) -> bool:
+        """Írt-e egyáltalán valamit? Csak akkor kérdezünk piszkozatról, ha IGEN
+        – egy érintetlenül bezárt válasz-ablak (címzett, tárgy, idézet, aláírás)
+        ne nyaggassa a felhasználót."""
+        return self._allapot() != getattr(self, "_indulo_allapot", None)
+
+    def _piszkozat_uzenet(self):
+        return MC.level_epit(
+            MC.felado_fejlec(self.fiok), self.cimzett.GetValue().strip(),
+            self.targy.GetValue(), self.torzs.GetValue(),
+            self.masolat.GetValue(), self._csatolmanyok, self.valasz_id,
+            titkos=self.titkos.GetValue().strip())
+
+    def _piszkozat_ment(self, bezar: bool = True) -> None:
+        """Mentés a SZOLGÁLTATÓ piszkozatai közé (így a telefonon is ott lesz).
+        Ha az nem megy (POP3-fiók, nincs ilyen mappa, hiba), akkor HELYBEN
+        mentjük .eml-ként – és mindkét esetben KIMONDJUK, hova került."""
+        try:
+            msg = self._piszkozat_uzenet()
+        except Exception as ex:
+            _mondd(self.main, "A piszkozat összeállítása nem sikerült: %s" % ex)
+            return
+        _mondd(self.main, "Piszkozat mentése…")
+
+        def munka():
+            if self.fiok.get("protokoll") != "pop":
+                try:
+                    k = _kliens(self.fiok).kapcsolodik()
+                    try:
+                        mappa = k.piszkozat_ment(msg)
+                    finally:
+                        k.bezar()
+                    if mappa:
+                        return "a szolgáltatód „%s” mappájába"\
+                            % MC.mappa_display(mappa)
+                except Exception:
+                    pass
+            return "ide a gépeden: %s" % _helyi_piszkozat(msg)
+
+        def kesz(hol):
+            _mondd(self.main, "Piszkozat elmentve %s." % hol)
+            if bezar:
+                self.EndModal(wx.ID_CANCEL)
+
+        def hiba(ex):
+            _mondd(self.main, "A piszkozat mentése nem sikerült: %s" % ex)
+
+        _hatterben(munka, kesz, hiba)
+
+    def _on_iro_close(self, e=None):
+        """Bezáráskor: ha van mit menteni, HÁROM választás – mentés, eldobás,
+        vagy visszatérés a levélhez (az utóbbi nélkül nem lehetne meggondolni
+        magad)."""
+        if getattr(self, "_kuldve", False) or not self._valtozott():
+            self.EndModal(wx.ID_CANCEL)
+            return
+        d = HaromValaszDialog(
+            self, "Piszkozat",
+            "A levél nincs elküldve. Elmentsem piszkozatként?",
+            "&Mentés piszkozatként", "&Eldobás", "&Mégsem (vissza a levélhez)",
+            self.main)
+        valasz = d.ShowModal()
+        d.Destroy()
+        if valasz == wx.ID_YES:
+            self._piszkozat_ment(bezar=True)
+        elif valasz == wx.ID_NO:
+            _mondd(self.main, "A levél eldobva.")
+            self.EndModal(wx.ID_CANCEL)
+        # ID_CANCEL: marad nyitva
 
     def _cimjegyzek_autocomplete(self):
         """A címzett/Cc/Bcc mezőkre autókiegészítést tesz a címjegyzékből."""
@@ -776,9 +1451,7 @@ class LevelIroDialog(wx.Dialog):
         with wx.FileDialog(self, "Csatolmány", style=wx.FD_OPEN) as dlg:
             if dlg.ShowModal() == wx.ID_OK:
                 self._csatolmanyok.append(dlg.GetPath())
-                self.csat_cimke.SetLabel(
-                    "Csatolmány: " + ", ".join(
-                        p.rsplit("\\", 1)[-1] for p in self._csatolmanyok))
+                self._csat_frissit()
 
     def _kuld(self, e):
         cim = self.cimzett.GetValue().strip()
@@ -790,13 +1463,39 @@ class LevelIroDialog(wx.Dialog):
         # helyesírás-ellenőrzés küldés ELŐTT (a helyi menüből kikapcsolható)
         if self._helyesiras_be():
             self._helyesiras_futtat(csendes=True)
-        if wx.MessageBox(f"Elküldöd a levelet ide: {cim or bcc}?", "Küldés "
-                         "megerősítése", wx.YES_NO | wx.ICON_QUESTION,
-                         self) != wx.YES:
+        if MC.altalanos_betolt().get("kuldes_kerdes", True):
+            d = KuldesKerdesDialog(self, cim or bcc, self.main)
+            valasz = d.ShowModal()
+            ne_kerdezze = d.pipa.GetValue()
+            d.Destroy()
+            if valasz != wx.ID_YES:
+                return
+            if ne_kerdezze:
+                cfg = MC.altalanos_betolt()
+                cfg["kuldes_kerdes"] = False
+                MC.altalanos_ment(cfg)
+                _mondd(self.main, "Rendben, többé nem kérdezem meg. A "
+                       "Beállítások Általános fülén bármikor visszakapcsolhatod.")
+        # NAGY FÁJLOK: mielőtt nekifutnánk egy olyan küldésnek, amit a
+        # kiszolgáló úgyis visszadob, felajánljuk a megoldást.
+        if not self._nagy_fajl_rendez():
             return
-        msg = MC.level_epit(MC.felado_fejlec(self.fiok), cim, self.targy.GetValue(),
-                            self.torzs.GetValue(), self.masolat.GetValue(),
-                            self._csatolmanyok, self.valasz_id, titkos=bcc)
+        # A FIX ZÁRÓSOR a levél legaljára. Az aláírás NEM kerül be újra: az
+        # már a szerkesztőben van (nyitáskor beillesztve), és ha a felhasználó
+        # átírta vagy törölte, az az ő döntése – nem írjuk felül.
+        torzs = MC.torzs_zarosorral(self.torzs.GetValue())
+        # HTML-levél CSAK akkor, ha tényleg van benne hivatkozás vagy kép –
+        # fölösleges HTML-t nem gyártunk (a sima szöveg jobban is kézbesül).
+        if self._kepek or MC.van_html_jeloles(torzs):
+            msg = MC.level_epit_html(
+                MC.felado_fejlec(self.fiok), cim, self.targy.GetValue(), torzs,
+                self.masolat.GetValue(), self._csatolmanyok, self.valasz_id,
+                titkos=bcc, kepek=self._kepek)
+        else:
+            msg = MC.level_epit(MC.felado_fejlec(self.fiok), cim,
+                                self.targy.GetValue(), torzs,
+                                self.masolat.GetValue(), self._csatolmanyok,
+                                self.valasz_id, titkos=bcc)
         # a címzetteket felvesszük a címjegyzékbe (auto-tanulás)
         for mezo in (self.cimzett, self.masolat, self.titkos):
             try:
@@ -809,6 +1508,7 @@ class LevelIroDialog(wx.Dialog):
                    lambda ex: self._hiba(ex))
 
     def _kesz(self):
+        self._kuldve = True          # elküldve: bezáráskor nincs piszkozat-kérdés
         _mondd(self.main, "A levél elment!")
         self.EndModal(wx.ID_OK)
 
@@ -1408,6 +2108,31 @@ class BeallitasokDialog(wx.Dialog):
         self.alt_szel.SetName("Mi történjen a lista szélén")
         v.Add(self.alt_szel, 0, wx.LEFT | wx.TOP, 12)
 
+        self.alt_kuldes_kerdes = wx.CheckBox(
+            p, label="&Küldés előtt kérdezzen rá")
+        self.alt_kuldes_kerdes.SetValue(bool(cfg.get("kuldes_kerdes", True)))
+        self.alt_kuldes_kerdes.SetName("Küldés előtt kérdezzen rá – ha a "
+                                       "küldés-párbeszédben kikapcsoltad, itt "
+                                       "bármikor visszakapcsolhatod")
+        v.Add(self.alt_kuldes_kerdes, 0, wx.LEFT | wx.TOP, 12)
+
+        # --- ALÁÍRÁS ---
+        v.Add(wx.StaticText(p, label=(
+            "&Aláírás (a levél végére kerül; szabadon átírható, akár teljesen "
+            "törölhető). A levél legaljára minden esetben odakerül még egy "
+            "sor: „%s”" % MC.FIX_ZAROSOR)), 0, wx.LEFT | wx.TOP, 8)
+        self.alt_alairas = wx.TextCtrl(
+            p, style=wx.TE_MULTILINE, size=(-1, 90),
+            value=str(cfg.get("alairas", MC.ALAP_ALAIRAS)))
+        self.alt_alairas.SetName("Aláírás szövege")
+        v.Add(self.alt_alairas, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 12)
+        ab = wx.Button(p, label="Alap&értelmezett aláírás visszaállítása")
+        ab.Bind(wx.EVT_BUTTON,
+                lambda e: (self.alt_alairas.SetValue(MC.ALAP_ALAIRAS),
+                           _mondd(self.main, "Alapértelmezett aláírás "
+                                  "visszaállítva. Mentés a Mentés gombbal.")))
+        v.Add(ab, 0, wx.LEFT | wx.TOP, 12)
+
         mb = wx.Button(p, label="&Mentés")
         mb.Bind(wx.EVT_BUTTON, self._alt_ment)
         v.Add(mb, 0, wx.ALL, 8)
@@ -1419,7 +2144,9 @@ class BeallitasokDialog(wx.Dialog):
                 "ellenoriz_perc": int(self.alt_perc.GetValue()),
                 "lista_limit": int(self.alt_limit.GetValue()),
                 "lista_szel": ("bling" if self.alt_szel.GetSelection() == 0
-                               else "beszed")}
+                               else "beszed"),
+                "kuldes_kerdes": bool(self.alt_kuldes_kerdes.GetValue()),
+                "alairas": self.alt_alairas.GetValue().strip()}
         for kulcs, cb in getattr(self, "alt_lista_mezok", {}).items():
             adat[kulcs] = bool(cb.GetValue())
         MC.altalanos_ment(adat)
