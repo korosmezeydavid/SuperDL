@@ -980,3 +980,40 @@ class SmtpKuldo:
                 s.starttls(context=ctx)
                 self._belep(s)
                 s.send_message(msg)
+
+
+# ---------------------------------------------------------------------------
+# ÖSSZES BEJÖVŐ – az egyesített nézet segédei (wx-mentes, tesztelhető)
+# ---------------------------------------------------------------------------
+
+OSSZES_MAPPA = "\x00OSSZES"        # ál-mappanév: sosem ütközik valódi IMAP-névvel
+OSSZES_NEV = "Összes bejövő (minden fiók)"
+
+
+def datum_kulcs(info) -> float:
+    """Egy levél rendezési kulcsa: a küldés ideje másodpercben (UTC).
+
+    Miért kell? Az egyesített nézetben a levelek eddig FIÓKONKÉNT, egymás után
+    kerültek a listába (előbb az első fiók 30 levele, aztán a másodiké…), ami
+    tíz fiókkal nem egyesített postaláda, hanem tíz egymás alá ragasztott lista.
+    Hiányzó vagy értelmezhetetlen dátum → 0.0, vagyis a lista végére kerül (a
+    dátum nélküli levelet nem tesszük a friss levelek elé)."""
+    nyers = (info or {}).get("datum") or ""
+    try:
+        d = email.utils.parsedate_to_datetime(nyers)
+    except (TypeError, ValueError):
+        return 0.0
+    if d is None:
+        return 0.0
+    try:
+        if d.tzinfo is None:            # időzóna nélküli fejléc: helyi időnek vesszük
+            d = d.astimezone()
+        return d.timestamp()
+    except (OverflowError, OSError, ValueError):
+        return 0.0
+
+
+def rendez_ido_szerint(lista) -> list:
+    """A legfrissebb levél elöl. Stabil: az azonos idejűek megtartják a
+    beérkezési sorrendjüket, így a lista nem ugrál frissítésenként."""
+    return sorted(list(lista or []), key=datum_kulcs, reverse=True)

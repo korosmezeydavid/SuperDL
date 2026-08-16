@@ -81,6 +81,13 @@ _SUGO = (
     "IMAP/SMTP-n; ha elutasít, a fiókodnál keress rá az app-jelszó "
     "létrehozására.\n\n"
     "MENÜSÁV (minden művelet itt, szépen rendezve – Alt-tal is elérhető)\n"
+    "• ÖSSZES BEJÖVŐ: ha egynél több fiókod van, a MAPPÁK LISTÁJÁNAK legelső "
+    "eleme az „Összes bejövő (minden fiók)” – minden fiók beérkezett levele EGY "
+    "listában, IDŐRENDBEN (a legfrissebb elöl), soronként a fiók nevével. "
+    "(A Fiók menüből is elérhető.)\n"
+    "• A LISTA SZÉLÉN (a tetején felfelé, az alján lefelé) a program nem "
+    "olvassa fel újra ugyanazt a sort: rövid hangjelzés szól. A Beállítások → "
+    "Általános fülön átállítható, hogy inkább mondja ki.\n"
     "• Fiók: Fiók hozzáadása/törlése, Összes bejövő (minden fiók egy listában), "
     "Frissítés (F5), Keresés, Bezárás.\n"
     "• Levél: Új levél (N), Megnyitás külön ablakban (Enter), Válasz (R), Válasz "
@@ -1389,6 +1396,18 @@ class BeallitasokDialog(wx.Dialog):
             v.Add(cb, 0, wx.LEFT | wx.TOP, 12)
             self.alt_lista_mezok[kulcs] = cb
 
+        # --- mi történjen a lista SZÉLÉN? ---
+        v.Add(wx.StaticText(p, label=(
+            "Ha a lista tetején vagy alján tovább nyilaznál (hogy ne olvassa "
+            "fel újra ugyanazt a sort):")), 0, wx.LEFT | wx.TOP, 8)
+        self.alt_szel = wx.RadioBox(
+            p, label="A lista &szélén", majorDimension=1,
+            choices=["Rövid hangjelzés (bling)", "Mondja ki (A lista teteje)"])
+        self.alt_szel.SetSelection(
+            0 if str(cfg.get("lista_szel", "bling")) == "bling" else 1)
+        self.alt_szel.SetName("Mi történjen a lista szélén")
+        v.Add(self.alt_szel, 0, wx.LEFT | wx.TOP, 12)
+
         mb = wx.Button(p, label="&Mentés")
         mb.Bind(wx.EVT_BUTTON, self._alt_ment)
         v.Add(mb, 0, wx.ALL, 8)
@@ -1398,7 +1417,9 @@ class BeallitasokDialog(wx.Dialog):
     def _alt_ment(self, e):
         adat = {"auto_ellenoriz": bool(self.alt_auto.GetValue()),
                 "ellenoriz_perc": int(self.alt_perc.GetValue()),
-                "lista_limit": int(self.alt_limit.GetValue())}
+                "lista_limit": int(self.alt_limit.GetValue()),
+                "lista_szel": ("bling" if self.alt_szel.GetSelection() == 0
+                               else "beszed")}
         for kulcs, cb in getattr(self, "alt_lista_mezok", {}).items():
             adat[kulcs] = bool(cb.GetValue())
         MC.altalanos_ment(adat)
@@ -1533,6 +1554,9 @@ class MailFrame(wx.Frame):
         self.mappa_lista = wx.ListBox(p, size=(200, -1))
         self.mappa_lista.SetName("Mappák")
         self.mappa_lista.Bind(wx.EVT_LISTBOX, self._mappa_valt)
+        self.mappa_lista.Bind(
+            wx.EVT_KEY_DOWN, lambda e: self._lista_szel(e, self.mappa_lista,
+                                                        "mappa"))
         bal.Add(self.mappa_lista, 1, wx.EXPAND)
         közép.Add(bal, 0, wx.EXPAND | wx.RIGHT, 8)
         # levéllista
@@ -1543,6 +1567,9 @@ class MailFrame(wx.Frame):
         self.level_lista = wx.ListBox(p, style=wx.LB_EXTENDED)
         self.level_lista.SetName("Levéllista")
         self.level_lista.Bind(wx.EVT_LISTBOX, self._level_valt)
+        self.level_lista.Bind(
+            wx.EVT_KEY_DOWN, lambda e: self._lista_szel(e, self.level_lista,
+                                                        "level"))
         self.level_lista.Bind(wx.EVT_LISTBOX_DCLICK, lambda e: self._megnyit())
         # Helyi menü (Alkalmazások-billentyű / Shift+F10 / jobbklikk) minden levélen
         self.level_lista.Bind(wx.EVT_CONTEXT_MENU, self._level_menu)
@@ -1702,10 +1729,12 @@ class MailFrame(wx.Frame):
         if not self._aktiv:
             return
         if self._aktiv.get("protokoll") == "pop":
-            self._mappak_raw = ["INBOX"]
-            self.mappa_lista.Set(["Beérkezett (POP3)"])
-            self.mappa_lista.SetSelection(0)
+            self._mappak_raw = self._mappakkal_osszes(["INBOX"])
+            self.mappa_lista.Set([MC.OSSZES_NEV if m == MC.OSSZES_MAPPA
+                                  else "Beérkezett (POP3)"
+                                  for m in self._mappak_raw])
             self._mappa = "INBOX"
+            self._mappa_kijelol("INBOX")
             self._frissit()
             return
         self._mond("Mappák betöltése…")
@@ -1722,12 +1751,25 @@ class MailFrame(wx.Frame):
             return
         # a NYERS neveket megőrizzük (ezekkel megy az IMAP select/fetch),
         # de a DEKÓDOLT (felolvasható) neveket jelenítjük meg; a Beérkezett felül
-        mappak = self._mappak_rendez(mappak)
+        mappak = self._mappakkal_osszes(self._mappak_rendez(mappak))
         self._mappak_raw = mappak
-        self.mappa_lista.Set([MC.mappa_display(m) for m in mappak])
-        self.mappa_lista.SetSelection(0)          # a Beérkezett mindig legfelül
-        self._mappa = mappak[0] if mappak else "INBOX"
+        self.mappa_lista.Set([MC.OSSZES_NEV if m == MC.OSSZES_MAPPA
+                              else MC.mappa_display(m) for m in mappak])
+        # A Beérkezett a kiinduló nézet (az Összes bejövő fölötte áll, de azt a
+        # felhasználó válassza – ne töltsünk le magától minden fiókot).
+        elso = next((m for m in mappak if m != MC.OSSZES_MAPPA), "INBOX")
+        self._mappa = elso
+        self._mappa_kijelol(elso)
         self._frissit()
+
+    def _mappakkal_osszes(self, mappak):
+        """Az „Összes bejövő" ÁL-MAPPA a lista LEGELEJÉRE, ha egynél több fiók
+        van. A felhasználó egyesített MAPPÁT várt (mint a Thunderbirdben), nem
+        egy menüpontot – így a mappák közt nyilazva magától rátalál."""
+        mappak = list(mappak or [])
+        if len(getattr(self, "_fiokok", []) or []) > 1:
+            return [MC.OSSZES_MAPPA] + mappak
+        return mappak
 
     @staticmethod
     def _mappak_rendez(mappak):
@@ -1750,7 +1792,12 @@ class MailFrame(wx.Frame):
     def _mappa_valt(self, e):
         i = self.mappa_lista.GetSelection()
         raw = getattr(self, "_mappak_raw", [])
-        self._mappa = raw[i] if 0 <= i < len(raw) else "INBOX"
+        valasztott = raw[i] if 0 <= i < len(raw) else "INBOX"
+        if valasztott == MC.OSSZES_MAPPA:      # az egyesített ÁL-MAPPA
+            self._osszes_bejovo(None)
+            return
+        self._osszesitett = False
+        self._mappa = valasztott
         self._frissit()
 
     def _frissit(self, csendes=False):
@@ -1779,29 +1826,60 @@ class MailFrame(wx.Frame):
         _hatterben(munka, self._lista_kesz, self._halo_hiba)
 
     def _osszes_bejovo(self, e):
-        """Minden fiók bejövő (INBOX) leveleit egy listába gyűjti, fiók-jelöléssel."""
+        """Minden fiók bejövő (INBOX) leveleit EGY listába gyűjti, fiók-jelöléssel.
+
+        Három dolgot javítottunk itt a felhasználó jelzésére („nem dob be egy
+        egyesített mappába, ahol minden levelemet látom"):
+          • a levelek IDŐRENDBE kerülnek (eddig fiókonként egymás UTÁN jöttek,
+            ami tíz fiókkal nem egyesített postaláda, hanem tíz egymás alá
+            ragasztott lista);
+          • a fiókonkénti darabszám a beállított listaméretet követi (eddig fix
+            30/40 volt);
+          • ha egy fiók nem válaszol, azt KIMONDJUK (eddig csendben kimaradt)."""
         if not self._fiokok:
             return
         self._osszesitett = True
+        self._mappa = MC.OSSZES_MAPPA
+        self._mappa_kijelol(MC.OSSZES_MAPPA)
         self._mond("Minden fiók bejövő leveleinek betöltése…")
         fiokok = list(self._fiokok)
+        limit = int(MC.altalanos_betolt().get("lista_limit", 50))
+        self._osszes_fiok_db = len(fiokok)
+        self._osszes_hibas = []
 
         def munka():
-            egyben = []
+            egyben, hibas = [], []
             for fiok in fiokok:
+                nev = fiok.get("nev") or fiok.get("email") or "ismeretlen fiók"
                 try:
                     k = _kliens(fiok).kapcsolodik()
-                    lista = (k.lista(40) if isinstance(k, MC.Pop3Kliens)
-                             else k.lista("INBOX", 30))
+                    lista = (k.lista(limit) if isinstance(k, MC.Pop3Kliens)
+                             else k.lista("INBOX", limit))
                     k.bezar()
                     for it in lista:
                         it["_fiok"] = fiok
                         it["_mappa"] = "INBOX"
                     egyben.extend(lista)
                 except Exception:
-                    continue
-            return egyben
-        _hatterben(munka, self._lista_kesz, self._halo_hiba)
+                    hibas.append(nev)
+            return MC.rendez_ido_szerint(egyben), hibas
+
+        def kesz(eredmeny):
+            lista, hibas = eredmeny
+            self._osszes_hibas = hibas
+            self._lista_kesz(lista)
+
+        _hatterben(munka, kesz, self._halo_hiba)
+
+    def _mappa_kijelol(self, raw_nev: str) -> None:
+        """A mappalistában kijelöli a megadott (nyers nevű) mappát, ha ott van –
+        így a menüből indított Összes bejövő is látszik a mappák közt."""
+        raw = getattr(self, "_mappak_raw", [])
+        if raw_nev in raw:
+            try:
+                self.mappa_lista.SetSelection(raw.index(raw_nev))
+            except Exception:
+                pass
 
     def _frissit_aktualis(self):
         """A jelenlegi nézetet frissíti (aggregált vagy egy-fiók)."""
@@ -1861,9 +1939,18 @@ class MailFrame(wx.Frame):
             return
         tobb = (not self._osszesitett
                 and len(lista) >= int(getattr(self, "_utolso_limit", 50)))
+        self._tovabb_van = bool(tobb)     # a lista alján ezt is odamondjuk
         if self._osszesitett:
-            self._mond(f"{len(lista)} levél az összes fiók bejövőjéből, "
-                       "mindegyiknél a fiók nevével.")
+            hibas = getattr(self, "_osszes_hibas", [])
+            szoveg = ("%d levél %d fiók bejövőjéből, időrendben, a legfrissebb "
+                      "elöl; mindegyiknél a fiók nevével."
+                      % (len(lista), getattr(self, "_osszes_fiok_db", 0)))
+            if hibas:
+                # NEM némán hagyjuk ki a hibás fiókot: eddig egy `continue`
+                # elnyelte, és a felhasználónak csak kevesebb levele lett.
+                szoveg += (" Figyelem: %d fiók nem válaszolt: %s."
+                           % (len(hibas), ", ".join(hibas)))
+            self._mond(szoveg)
         else:
             self._mond(f"{len(lista)} levél a(z) "
                        f"{MC.mappa_display(self._mappa)} mappában."
@@ -1958,6 +2045,51 @@ class MailFrame(wx.Frame):
         # levél KÜLÖN ablakban az Enterrel (vagy dupla kattintással) nyílik.
         if e:
             e.Skip()
+
+    # ---- a lista SZÉLE (felhasználói kérés) ----------------------------
+
+    def _lista_szel(self, e, lista, fajta):
+        """A lista TETEJÉN a felfelé nyíl (és az alján a lefelé) ELNYELŐDIK.
+
+        Miért? Mert a szélen a nyíl „lefut", de nem mozdul semmi – a
+        képernyőolvasó viszont ÚJRA FELOLVASSA ugyanazt a sort, és ez gyors
+        nyilazásnál végtelen ismétlésnek hallatszik. Ha nem engedjük tovább a
+        billentyűt, nincs mit újramondani; helyette egy rövid „bling" jelzi a
+        szélet (vagy egy tömör mondat, ha a felhasználó azt kérte)."""
+        kod = e.GetKeyCode()
+        fel = kod in (wx.WXK_UP, wx.WXK_NUMPAD_UP, wx.WXK_PAGEUP,
+                      wx.WXK_NUMPAD_PAGEUP)
+        le = kod in (wx.WXK_DOWN, wx.WXK_NUMPAD_DOWN, wx.WXK_PAGEDOWN,
+                     wx.WXK_NUMPAD_PAGEDOWN)
+        if not (fel or le) or e.ShiftDown() or e.ControlDown():
+            e.Skip()                      # a kijelölés-bővítést nem bántjuk
+            return
+        n = lista.GetCount()
+        i = lista.GetSelection()
+        if n == 0:
+            e.Skip()
+            return
+        if fel and i <= 0:
+            self._szel_jelzes(True, fajta)
+            return                        # NEM Skip: itt áll meg a billentyű
+        if le and i >= n - 1:
+            self._szel_jelzes(False, fajta)
+            return
+        e.Skip()
+
+    def _szel_jelzes(self, teteje: bool, fajta: str) -> None:
+        hol = "teteje" if teteje else "vége"
+        szoveg = ("A mappalista %s." if fajta == "mappa"
+                  else "A levéllista %s.") % hol
+        if not teteje and fajta == "level" and getattr(self, "_tovabb_van", False):
+            szoveg += " A B betűvel tölthetsz be továbbiakat."
+        self._allapot_uzenet(szoveg)
+        mod = str(MC.altalanos_betolt().get("lista_szel", "bling"))
+        if mod == "bling":
+            from . import hangok
+            if hangok.bling(teteje):
+                return                    # sikerült a hang – mondat nem kell
+        self._mond(szoveg)
 
     def _kivalasztott(self):
         """A (fő) kijelölt levél info-dictje (fiókkal/mappával), vagy None."""
