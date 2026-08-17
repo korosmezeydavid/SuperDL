@@ -33,14 +33,14 @@
       "id": "mediatools",
       "name": "Média-eszközök",
       "category": "Média",
-      "description": "Médiakészítő és -elemző eszközök egy csomagban: kötegelt médiakonvertáló, beszélő médiaelemző (LUFS/EBU R128), iPhone csengőhang-készítő, videókészítő (kép+zene) és videóvágó-összefűző.",
+      "description": "Médiakészítő és -elemző eszközök egy csomagban: kötegelt médiakonvertáló, beszélő médiaelemző (LUFS/EBU R128), iPhone csengőhang-készítő, videókészítő (kép+zene) és videóvágó-összefűző. ÚJ: a DVD-s VOB (és a többi DVD/AVCHD formátum: m2v, m2ts, mts) mostantól MAPPÁBÓL is bekerül a listába, nem csak fájlonként kiválasztva; és a DVD több VOB-darabját (VTS_01_1, VTS_01_2 …) kérésre EGY filmmé fűzi össze, a menü-fájlt kihagyva.",
       "latest": {
-        "version": "1.4.7",
+        "version": "1.4.8",
         "min_core_api": "1.0",
         "min_core_version": "4.0.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.7/mediatools-1.4.7.zip",
-        "sha256": "75cdcfe1881ea4bd0ff86206f57994dffdade82f9e825f13474caf790918bc65",
-        "size": 41502
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.8/mediatools-1.4.8.zip",
+        "sha256": "3a071c99a4cacc6d346899fb6b9c2e22679b0802a8cad13e9fd160c3a6992d90",
+        "size": 43941
       }
     },
     {

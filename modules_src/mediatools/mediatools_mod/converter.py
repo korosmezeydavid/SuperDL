@@ -12,6 +12,7 @@ egyszerű előbeállítás adja (hang-bitráta; videónál ésszerű x264-minős
 """
 
 import os
+import re
 import subprocess
 import threading
 from dataclasses import dataclass
@@ -54,6 +55,8 @@ MODES = ("audio", "video", "extract")
 @dataclass
 class ConvertJob:
     src: str
+    reszek: list = None            # ha több VOB-darab tartozik egy filmhez
+    nev: str = ""                  # a kimeneti fájl neve (csoportnál a DVD-cím)
     status: str = "várakozik"      # várakozik / folyamatban / kész / hiba / leállítva
     out: str = ""
     error: str = ""
@@ -111,10 +114,16 @@ def unique_path(out_dir: str, stem: str, ext: str) -> str:
 
 
 def build_command(ff: str, src: str, out: str, mode: str, fmt: str,
-                  bitrate: str, vcodec: str, acodec: str) -> list[str]:
+                  bitrate: str, vcodec: str, acodec: str,
+                  lista_fajl: str = "") -> list[str]:
     """Az ffmpeg-parancs összeállítása az okos remux/újrakódolás döntéssel.
-    `vcodec`/`acodec` a FORRÁS kodekjei (a remux-döntéshez)."""
-    cmd = [ff, "-y", "-i", src]
+    `vcodec`/`acodec` a FORRÁS kodekjei (a remux-döntéshez).
+    `lista_fajl`: ha meg van adva, a bemenet egy CONCAT-lista (a DVD több
+    VOB-darabja EGY filmmé fűzve)."""
+    if lista_fajl:
+        cmd = [ff, "-y", "-f", "concat", "-safe", "0", "-i", lista_fajl]
+    else:
+        cmd = [ff, "-y", "-i", src]
 
     if mode == "extract":                 # videó → hang (csak a hangsáv)
         tcodec, _ext, native = AUDIO_TARGETS[fmt]
@@ -154,13 +163,83 @@ def build_command(ff: str, src: str, out: str, mode: str, fmt: str,
     return cmd
 
 
+
+# ---------------------------------------------------------------------------
+# DVD VOB-DARABOK ÖSSZEFŰZÉSE
+# ---------------------------------------------------------------------------
+#
+# Egy DVD-n a film NEM egy fájl: a lemez 1 GB-os darabokra vágja
+# (VTS_01_1.VOB, VTS_01_2.VOB …). Ezeket külön-külön konvertálni értelmetlen –
+# a felhasználó egy filmet szeretne. A `VTS_xx_0.VOB` a MENÜ, azt kihagyjuk
+# (kivéve, ha csak az van).
+
+_VOB_MINTA = re.compile(r"^(?P<cim>VTS_\d+)_(?P<resz>\d+)\.vob$", re.IGNORECASE)
+
+
+def vob_csoportok(fajlok):
+    """A fájllistából (nev, [utak]) párok: az összetartozó VOB-darabok EGY
+    elemmé fűzve, minden más változatlanul, az eredeti sorrendben.
+    TISZTA függvény – hálózat és ffmpeg nélkül tesztelhető."""
+    csoportok, sorrend, egyeb = {}, [], []
+    for ut in fajlok or []:
+        nev = os.path.basename(ut)
+        m = _VOB_MINTA.match(nev)
+        if not m:
+            egyeb.append(("egyeb", ut))
+            continue
+        kulcs = (os.path.dirname(ut), m.group("cim").upper())
+        if kulcs not in csoportok:
+            csoportok[kulcs] = []
+            sorrend.append(kulcs)
+        csoportok[kulcs].append((int(m.group("resz")), ut))
+        egyeb.append(("vob", kulcs))
+
+    kesz, mar_volt = [], set()
+    for fajta, adat in egyeb:
+        if fajta == "egyeb":
+            kesz.append((Path(adat).stem, [adat]))
+            continue
+        if adat in mar_volt:
+            continue
+        mar_volt.add(adat)
+        reszek = sorted(csoportok[adat])
+        # a _0 a MENÜ – csak akkor tartjuk meg, ha nincs más darab
+        filmreszek = [u for r, u in reszek if r != 0] or [u for _r, u in reszek]
+        kesz.append((adat[1], filmreszek))
+    return kesz
+
+
+def concat_lista(fajlok, munkamappa: str) -> str:
+    """Az ffmpeg `concat` demuxeréhez való listafájl. Az útvonalakat idézőjelbe
+    tesszük és a benne lévő aposztrófot védjük – ékezetes/szóközös nevek is
+    mennek."""
+    ut = os.path.join(munkamappa, "vob_lista.txt")
+    with open(ut, "w", encoding="utf-8") as f:
+        for x in fajlok:
+            biztos = os.path.abspath(x).replace("'", r"'\''")
+            f.write("file '%s'\n" % biztos)
+    return ut
+
+
 class Converter:
     """Egy vagy több fájl kötegelt átalakítása, sorban, megszakíthatóan."""
 
     def __init__(self, files, out_dir: str, mode: str, fmt: str,
                  bitrate: str = "192", on_status=None, on_progress=None,
                  ff_progress=None):
-        self.jobs = [ConvertJob(src=f) for f in files]
+        self.jobs = []
+        for f in files:
+            # A bemenet lehet sima útvonal VAGY („VTS_01", [darab1, darab2…])
+            # csoport: a DVD több VOB-darabja, amit EGY filmmé fűzünk.
+            if (isinstance(f, (tuple, list)) and len(f) == 2
+                    and isinstance(f[1], (tuple, list))):
+                reszek = list(f[1])
+                self.jobs.append(
+                    ConvertJob(src=reszek[0],
+                               reszek=reszek if len(reszek) > 1 else None,
+                               nev=str(f[0])))
+            else:
+                self.jobs.append(ConvertJob(src=f))
         self.out_dir = out_dir
         self.mode = mode
         self.fmt = fmt
@@ -229,11 +308,23 @@ class Converter:
             self._emit_status(i, job)
             return
 
-        stem = Path(src).stem
+        stem = job.nev or Path(src).stem
         out = unique_path(self.out_dir, stem, ext)
         job.out = out
+        # TÖBB VOB-DARAB: az ffmpeg concat-demuxerével egyetlen filmmé fűzzük.
+        # A listafájl a kimeneti mappába kerül, és a végén töröljük.
+        lista_fajl = ""
+        if job.reszek:
+            try:
+                lista_fajl = concat_lista(job.reszek, self.out_dir)
+            except OSError as e:
+                job.status = "hiba"
+                job.error = f"a darabok listája nem írható: {e}"
+                self.failed += 1
+                self._emit_status(i, job)
+                return
         cmd = build_command(ff, src, out, self.mode, self.fmt,
-                            self.bitrate, vcodec, acodec)
+                            self.bitrate, vcodec, acodec, lista_fajl)
         # -nostdin: az ablakos (konzol nélküli) exében az örökölt stdin
         # érvénytelen; e nélkül az ffmpeg beragadhat indításkor (se kimenet, se
         # haladás). A stdin=DEVNULL ráadás biztosíték.
@@ -275,6 +366,11 @@ class Converter:
                 tail.append(line)
         rc = self._proc.wait()
         procutil.close_pipes(self._proc)      # a stdout bezárása fájlonként (MK4)
+        if lista_fajl:                        # a concat-listafájl nem szemét
+            try:
+                os.remove(lista_fajl)
+            except OSError:
+                pass
 
         if self._stop.is_set():
             job.status = "leállítva"

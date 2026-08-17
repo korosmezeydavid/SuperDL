@@ -14,8 +14,9 @@ import wx
 from . import videoedit as VE               # a vágó-motor a MODULBAN
 from superdl.audioengine import Player       # megosztott lejátszó a Core-ból
 
-VIDEO_WILDCARD = ("Videók (*.mp4;*.mkv;*.avi;*.mov;*.webm;*.m4v)|"
-                  "*.mp4;*.mkv;*.avi;*.mov;*.webm;*.m4v|Minden fájl|*.*")
+VIDEO_WILDCARD = ("Videók (*.mp4;*.mkv;*.avi;*.mov;*.webm;*.m4v;*.vob;*.mpg)|"
+                  "*.mp4;*.mkv;*.avi;*.mov;*.webm;*.m4v;*.vob;*.mpg;*.mpeg;"
+                  "*.m2ts;*.mts;*.m2v|Minden fájl|*.*")
 
 HELP = """VIDEÓVÁGÓ ÉS ÖSSZEFŰZŐ
 

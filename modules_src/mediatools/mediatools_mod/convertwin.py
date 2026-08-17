@@ -12,9 +12,14 @@ import wx
 from . import converter as C                # konverter-motor a MODULBAN
 from superdl import sounds                   # megosztott earconok a Core-ból
 
+# FONTOS: ez a lista szűri a MAPPÁBÓL beolvasott fájlokat is. Egy tesztelő
+# jelezte, hogy a DVD-s .VOB fájlokat egyesével ki lehetett választani (és a
+# konvertálás ment is), mappából viszont kimaradtak – mert ez a lista nem
+# tartalmazta. A DVD/AVCHD-család ezért most itt van.
 MEDIA_EXTS = (".mp3", ".m4a", ".aac", ".wav", ".flac", ".ogg", ".opus",
               ".wma", ".mp4", ".mkv", ".avi", ".webm", ".mov", ".wmv",
-              ".flv", ".m4v", ".mpg", ".mpeg", ".ts", ".3gp")
+              ".flv", ".m4v", ".mpg", ".mpeg", ".ts", ".3gp",
+              ".vob", ".m2v", ".mpe", ".m2ts", ".mts")
 MEDIA_WILDCARD = ("Médiafájlok|" + ";".join(f"*{e}" for e in MEDIA_EXTS)
                   + "|Minden fájl|*.*")
 MODE_LABELS = [("Hang → hang (átkódolás)", "audio"),
@@ -152,6 +157,16 @@ class BatchConvertFrame(wx.Frame):
         h.Add(out_btn, 0)
         v.Add(h, 0, wx.EXPAND | wx.ALL, 8)
 
+        # DVD: a film több VOB-darabban van (VTS_01_1, VTS_01_2 …) – ezeket
+        # külön-külön konvertálni értelmetlen, a felhasználó EGY filmet szeretne.
+        self.vob_chk = wx.CheckBox(
+            p, label="A DVD &VOB-darabjait fűzze össze egy filmmé")
+        self.vob_chk.SetName("A DVD VOB-darabjait (VTS_01_1, VTS_01_2 és így "
+                             "tovább) egyetlen filmmé fűzi össze; a menü-fájlt "
+                             "kihagyja")
+        self.vob_chk.SetValue(True)
+        v.Add(self.vob_chk, 0, wx.LEFT | wx.BOTTOM, 8)
+
         # indítás + folyamat
         r = wx.BoxSizer(wx.HORIZONTAL)
         self.go_btn = wx.Button(p, label="Kon&vertálás indítása")
@@ -274,7 +289,20 @@ class BatchConvertFrame(wx.Frame):
         mode = self._mode()
         fmt = self._fmt_keys[self.fmt_ch.GetSelection()]
         bitrate = C.AUDIO_BITRATES[self.br_ch.GetSelection()]
-        total = len(self.files)
+        # DVD VOB-darabok összefűzése (ha kérték): a lista elemei ilyenkor
+        # („VTS_01", [darab1, darab2…]) csoportok is lehetnek.
+        bemenet = list(self.files)
+        if self.vob_chk.GetValue():
+            csoportok = C.vob_csoportok(bemenet)
+            osszefuzott = [(nev, f) for nev, f in csoportok if len(f) > 1]
+            if osszefuzott:
+                bemenet = csoportok
+                self._announce(
+                    "%d DVD-film darabjait fűzöm össze: %s."
+                    % (len(osszefuzott),
+                       ", ".join("%s (%d darab)" % (nev, len(f))
+                                 for nev, f in osszefuzott)))
+        total = len(bemenet)
 
         self._running = True
         self.go_btn.Disable()
@@ -285,7 +313,7 @@ class BatchConvertFrame(wx.Frame):
         self._announce(f"Konvertálás indul: {total} fájl…")
 
         self._converter = C.Converter(
-            list(self.files), out_dir, mode, fmt, bitrate,
+            bemenet, out_dir, mode, fmt, bitrate,
             on_status=lambda i, job: wx.CallAfter(self._on_status, i, job,
                                                   total),
             on_progress=lambda i, fr: wx.CallAfter(self._on_progress, i, fr,
