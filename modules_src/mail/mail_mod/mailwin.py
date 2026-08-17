@@ -1813,6 +1813,8 @@ class LevelOlvasoFrame(wx.Frame):
         d.Destroy()
         if not rendben:
             return
+        if motor == "offline" and not self._offline_modell(honnan):
+            return
         _mondd(self.main, "Fordítás folyamatban…")
 
         def munka():
@@ -1834,6 +1836,43 @@ class LevelOlvasoFrame(wx.Frame):
                 wx.MessageBox(str(ex), "Fordítás", wx.OK | wx.ICON_ERROR, self)
 
         _hatterben(munka, kesz, hiba)
+
+    def _offline_modell(self, honnan: str) -> bool:
+        """A helyben fordításhoz nyelvenként EGYSZER le kell tölteni egy
+        csomagot. Nagy fájl, ezért RÁKÉRDEZÜNK – és megmondjuk, mekkora, meg
+        hogy utána örökre offline megy."""
+        from superdl import offlineford
+        try:
+            hianyzik = offlineford.hianyzo(honnan, "hu")
+        except Exception as ex:
+            _mondd(self.main, "A nyelvi csomagok listája nem érhető el: %s" % ex)
+            return False
+        if not hianyzik:
+            return True
+        nevek = ", ".join("%s→%s" % (p["from_code"], p["to_code"])
+                          for p in hianyzik)
+        pivot = ("" if len(hianyzik) < 2 else
+                 " (ehhez a nyelvhez angolon keresztül fordítunk, ezért két "
+                 "csomag kell)")
+        kerdes = ("A helyben fordításhoz le kell tölteni a nyelvi csomagot: %s%s. "
+                  "Nagyjából 80 megabájt csomagonként, de EGYSZER kell: utána "
+                  "internet nélkül is működik, és a leveleid nem hagyják el a "
+                  "gépet.\n\nLetöltsem most?" % (nevek, pivot))
+        _mondd(self.main, kerdes.replace("\n", " "))
+        if wx.MessageBox(kerdes, "Nyelvi csomag letöltése",
+                         wx.YES_NO | wx.ICON_QUESTION, self) != wx.YES:
+            return False
+        for p in hianyzik:
+            _mondd(self.main, "Letöltés: %s→%s…" % (p["from_code"], p["to_code"]))
+            try:
+                offlineford.letolt(p)
+            except Exception as ex:
+                _mondd(self.main, "A nyelvi csomag letöltése nem sikerült: %s" % ex)
+                wx.MessageBox(str(ex), "Nyelvi csomag", wx.OK | wx.ICON_ERROR, self)
+                return False
+        _mondd(self.main, "A nyelvi csomag megvan. Mostantól ez a nyelv "
+               "internet nélkül is fordítható.")
+        return True
 
     # ---- válasz a levelezőlistára --------------------------------------
 
@@ -1859,14 +1898,19 @@ class ForditasDialog(wx.Dialog):
     def __init__(self, parent, main, felismert=""):
         super().__init__(parent, title="Fordítás magyarra")
         v = wx.BoxSizer(wx.VERTICAL)
+        van_offline = FORD.offline_elerheto()
         fig = wx.StaticText(self, label=(
-            "FIGYELEM: a fordításhoz a levél szövege elhagyja a gépet, és "
-            "elmegy a választott fordítóhoz. Bizalmas levélnél gondold meg."))
+            ("A HELYBEN fordítás a gépeden fut: a levél szövege nem megy "
+             "sehová. A másik két fordítónál viszont ELHAGYJA a gépet – "
+             "bizalmas levélnél gondold meg." if van_offline else
+             "FIGYELEM: a fordításhoz a levél szövege elhagyja a gépet, és "
+             "elmegy a választott fordítóhoz. Bizalmas levélnél gondold meg.")))
         fig.Wrap(520)
         fig.SetName(fig.GetLabel())
         v.Add(fig, 0, wx.ALL, 12)
+        self._motorok = FORD.motorok()
         self._motor = wx.RadioBox(self, label="&Fordító", majorDimension=1,
-                                  choices=[n for _k, n in FORD.MOTOROK])
+                                  choices=[n for _k, n in self._motorok])
         v.Add(self._motor, 0, wx.LEFT | wx.RIGHT, 12)
         cimke = ("A felismert nyelv: %s. Ha nem stimmel, válassz másikat."
                  % FORD.nyelv_neve(felismert) if felismert
@@ -1890,7 +1934,7 @@ class ForditasDialog(wx.Dialog):
         wx.CallAfter(_mondd, main, fig.GetLabel() + " " + cimke)
 
     def motor(self):
-        return FORD.MOTOROK[self._motor.GetSelection()][0]
+        return self._motorok[self._motor.GetSelection()][0]
 
     def nyelv(self):
         return FORD.NYELVEK[self._nyelv.GetSelection()][0]

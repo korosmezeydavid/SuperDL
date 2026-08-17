@@ -42,6 +42,23 @@ hiddenimports += collect_submodules('fpdf')      # beépített PDF (dok.-konvert
 hiddenimports += collect_submodules('superdl')
 # A Super Media modul „Super Recorder" vokóder/harmonizer-e numpy-t használ.
 hiddenimports += collect_submodules('numpy')
+# OFFLINE FORDÍTÁS (superdl/offlineford.py): a CTranslate2 futtatókörnyezet és
+# a két szövegdaraboló. Ezért nem lehetett modul-frissítés: fordított (bináris)
+# csomagok, amiket egy modul-ZIP nem tud a fagyasztott programba telepíteni.
+# A NYELVI MODELLEKET nem csomagoljuk – azokat a felhasználó tölti le
+# nyelvenként egyszer (~80 MB), és utána offline mennek.
+# CSAK a FUTTATÁSHOZ kellő rész: a `collect_all('ctranslate2')` az
+# ÁTALAKÍTÓ almodulokon át behúzta a torch-ot (+365 MB!), ami a fordításhoz
+# nem kell – ezért kézzel vesszük a DLL-eket és a bővítményt.
+from PyInstaller.utils.hooks import collect_dynamic_libs
+binaries += collect_dynamic_libs('ctranslate2')
+hiddenimports += ['ctranslate2', 'ctranslate2._ext']
+tmp_ret = collect_all('sacremoses')     # tokenizáló + a hozzá tartozó adatfájlok
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+hiddenimports += collect_submodules('subword_nmt')
+hiddenimports += ['sentencepiece', 'sentencepiece._sentencepiece']
+binaries += collect_dynamic_libs('sentencepiece')
+
 tmp_ret = collect_all('sounddevice')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('edge_tts')
@@ -67,7 +84,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=['torch', 'transformers', 'ctranslate2.converters', ],
     noarchive=False,
     optimize=0,
 )

@@ -30,7 +30,8 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=['torch', 'transformers', 'ctranslate2', 'sentencepiece',
+              'sacremoses', 'subword_nmt', 'superdl.offlineford', ],
     noarchive=False,
     optimize=0,
 )

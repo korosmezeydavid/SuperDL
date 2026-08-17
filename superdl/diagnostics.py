@@ -140,6 +140,19 @@ def build_report(settings: dict | None = None,
         pass
     pend = Path.home() / ".superdl" / "update_pending.json"
     lines.append(f"Függő önfrissítés-jelző: {'VAN' if pend.exists() else 'nincs'}")
+    # OFFLINE FORDÍTÁS: hibajelentésnél az első kérdés, hogy a gépen egyáltalán
+    # elérhető-e a motor, és melyik nyelvi csomagok vannak letöltve.
+    try:
+        from . import offlineford
+        if offlineford.elerheto():
+            parok = ", ".join("%s→%s" % p for p in offlineford.telepitett_parok())
+            lines.append("Offline fordítás:  elérhető; nyelvi csomagok: "
+                         + (parok or "még egy sincs letöltve"))
+        else:
+            lines.append("Offline fordítás:  NINCS (a fordítómotor hiányzik "
+                         "ebből a verzióból)")
+    except Exception as e:
+        lines.append(f"Offline fordítás:  nem ellenőrizhető ({e})")
 
     lines += ["", "Telepített modulok:"]
     lines += _modules_lines()

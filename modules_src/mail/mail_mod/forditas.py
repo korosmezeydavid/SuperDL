@@ -30,10 +30,31 @@ MYMEMORY = "https://api.mymemory.translated.net/get"
 _MAX_DARAB = 480          # a szolgáltatás 500 karakteres kérést enged
 _FEJ = {"User-Agent": "SuperDL-mail/1.0"}
 
-MOTOROK = [
+_MOTOROK_ALAP = [
     ("mymemory", "Ingyenes fordító (kulcs nélkül, a szöveg elhagyja a gépet)"),
     ("ai", "AI-fordítás a saját kulcsoddal (jobb minőség)"),
 ]
+_OFFLINE = ("offline", "Helyben, a gépeden (a szöveg EL SEM HAGYJA a gépet)")
+
+
+def offline_elerheto() -> bool:
+    """Van-e a programban offline fordítómotor? (SuperDL 4.5.0-tól.) Régebbi
+    programverzióval a modul szépen visszalép az online fordításra."""
+    try:
+        from superdl import offlineford
+        return bool(offlineford.elerheto())
+    except Exception:
+        return False
+
+
+def motorok() -> list:
+    """A választható fordítók – az OFFLINE elöl, mert az a legvédettebb: a
+    levél szövege el sem hagyja a gépet."""
+    return ([_OFFLINE] if offline_elerheto() else []) + _MOTOROK_ALAP
+
+
+# visszafelé kompatibilis név (a régi kód és a tesztek ezt használják)
+MOTOROK = _MOTOROK_ALAP
 
 NYELVEK = [("hu", "magyar"), ("en", "angol"), ("de", "német"), ("pl", "lengyel"),
            ("sk", "szlovák"), ("ro", "román"), ("hr", "horvát"), ("sr", "szerb"),
@@ -186,11 +207,20 @@ def fordit(szoveg: str, hova: str = "hu", motor: str = "mymemory",
         raise ValueError("Nem sikerült felismerni a levél nyelvét.")
     if honnan == hova:
         raise ValueError("A levél már %s nyelvű." % nyelv_neve(hova))
-    if motor == "ai":
+    if motor == "offline":
+        from superdl import offlineford
+        kesz = offlineford.fordit(szoveg, honnan, hova, halad)
+    elif motor == "ai":
         kesz = ai_fordit(szoveg, honnan, hova)
     else:
         kesz = mymemory_fordit(szoveg, honnan, hova, halad)
     return {"szoveg": kesz, "motor": motor, "honnan": honnan, "hova": hova}
+
+
+def motor_neve(kulcs: str) -> str:
+    if kulcs == "offline":
+        return "helyben, a gépeden"
+    return "AI, a saját kulcsoddal" if kulcs == "ai" else "ingyenes fordítóval"
 
 
 def megjelenites(eredeti: str, forditas: dict) -> str:
@@ -198,7 +228,6 @@ def megjelenites(eredeti: str, forditas: dict) -> str:
     megmarad alatta, mert azt is látni kell (nevek, számok, linkek)."""
     fejlec = ("=== FORDÍTÁS (%s nyelvről %s nyelvre, %s) ==="
               % (nyelv_neve(forditas["honnan"]), nyelv_neve(forditas["hova"]),
-                 "AI, a saját kulcsoddal" if forditas["motor"] == "ai"
-                 else "ingyenes fordítóval"))
+                 motor_neve(forditas["motor"])))
     return "%s\n\n%s\n\n=== AZ EREDETI LEVÉL ===\n\n%s" % (
         fejlec, forditas["szoveg"], eredeti)
