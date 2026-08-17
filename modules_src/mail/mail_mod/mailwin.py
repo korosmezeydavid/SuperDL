@@ -14,6 +14,7 @@ from pathlib import Path
 import wx
 
 from . import ailevel as AI
+from . import forditas as FORD
 
 from . import mail_core as MC
 # OAuth eltávolítva: kizárólag app-jelszavas hitelesítés (lásd a súgót).
@@ -144,6 +145,17 @@ _SUGO = (
     "• VÁLASZNÁL a kurzor egyből a levél szövegének elejére kerül (az idézet "
     "fölé), tehát csak írni kell. Új levélnél és továbbításnál a Címzett mezőn "
     "indulsz, mert ott azt kell először kitölteni.\n"
+    "• LEVELEZŐLISTA: ha a levél listáról jött, a program ezt megnyitáskor ki "
+    "is mondja, és az L betűvel (vagy a Levél menüből) a LISTÁRA válaszolsz, "
+    "nem a feladónak – a lista címét a levél fejléce adja, nem kell beírni. A "
+    "küldés-megerősítés ilyenkor figyelmeztet, hogy a levél a lista minden "
+    "tagjához megy.\n"
+    "• FORDÍTÁS (F9 a megnyitott levélben): idegen nyelvű levél lefordítása "
+    "magyarra. A nyelvet magától felismeri. Két fordító közül választhatsz: az "
+    "ingyenes, kulcs nélküli szolgáltatás, vagy – ha van AI-kulcsod – az "
+    "AI-fordítás (jobb minőség). MINDKETTŐNÉL elhagyja a levél szövege a gépet, "
+    "ezért a program előbb figyelmeztet. A fordítás a levél elejére kerül, az "
+    "eredeti alatta marad.\n"
     "• PISZKOZAT: ha félkész levéllel zárnád be az ablakot, a program "
     "rákérdez, és a szolgáltatód Piszkozatok mappájába menti (így a telefonodon "
     "is ott lesz); ha az nem megy, a saját gépedre. Menet közben: Ctrl+S.\n"
@@ -1464,7 +1476,14 @@ class LevelIroDialog(wx.Dialog):
         if self._helyesiras_be():
             self._helyesiras_futtat(csendes=True)
         if MC.altalanos_betolt().get("kuldes_kerdes", True):
-            d = KuldesKerdesDialog(self, cim or bcc, self.main)
+            # LISTÁS VÁLASZNÁL kimondjuk, hogy ez mindenkihez megy – ezt a hibát
+            # mindenki elköveti egyszer az életében.
+            cimzett_szoveg = cim or bcc
+            if getattr(self, "listanev", ""):
+                cimzett_szoveg = ("a(z) %s LEVELEZŐLISTA – a levél a lista "
+                                  "MINDEN tagjához megy (%s)"
+                                  % (self.listanev, cim or bcc))
+            d = KuldesKerdesDialog(self, cimzett_szoveg, self.main)
             valasz = d.ShowModal()
             ne_kerdezze = d.pipa.GetValue()
             d.Destroy()
@@ -1647,11 +1666,14 @@ class LevelOlvasoFrame(wx.Frame):
         # átlépkedni – a fejléc külön mezőben ott marad (Shift+Tab).
         wx.CallAfter(self.olvaso.SetFocus)
         n = len(self._linkek)
+        lista = MC.lista_neve(msg) if MC.listas_level(msg) else ""
         wx.CallAfter(_mondd, self.main,
                      f"{fej['felado']}. Tárgy: {fej['targy']}. A szöveg a Levél "
                      "szövege mezőben. "
-                     + (f"{n} hivatkozás a levélben, lent a listában."
-                        if n else "Nincs hivatkozás a levélben."))
+                     + (f"{n} hivatkozás a levélben, lent a listában. "
+                        if n else "Nincs hivatkozás a levélben. ")
+                     + (f"Ez a levél a(z) {lista} listáról jött – válasz a "
+                        "listára: L betű." if lista else ""))
 
     def _menusav(self):
         mb = wx.MenuBar()
@@ -1663,6 +1685,9 @@ class LevelOlvasoFrame(wx.Frame):
         m = wx.Menu()
         mi(m, "&Válasz  (R vagy Ctrl+R)", lambda e: self._mf._valasz(
             msg=self._msg, fiok=self._fiok))
+        mi(m, "Válasz a &levelezőlistára  (L)",
+           lambda e: self._valasz_listara())
+        mi(m, "&Fordítás magyarra  (F9)", lambda e: self._forditas())
         mi(m, "Válasz min&denkinek  (Shift+R)", lambda e: self._mf._valasz(
             msg=self._msg, fiok=self._fiok, mind=True))
         mi(m, "&Továbbítás  (F vagy Ctrl+F)", lambda e: self._mf._tovabbit(
@@ -1764,12 +1789,111 @@ class LevelOlvasoFrame(wx.Frame):
             self._mf._tovabbit(msg=self._msg, fiok=self._fiok)
         elif ctrl and ch == "s":                   # Ctrl+S: csatolmány mentése
             self._mf._csat_ment_msg(self._msg)
+        elif k == wx.WXK_F9:                       # F9: fordítás magyarra
+            self._forditas()
+        elif ch == "l":                            # L: válasz a LISTÁRA
+            self._valasz_listara()
         else:
             e.Skip()
+
+    # ---- fordítás ------------------------------------------------------
+
+    def _forditas(self):
+        """F9: a levél lefordítása magyarra. A fordítás a szöveg FÖLÉ kerül, az
+        eredeti alatta marad – nevek, számok, linkek miatt azt is látni kell."""
+        eredeti = getattr(self, "_eredeti_torzs", None) or self.olvaso.GetValue()
+        self._eredeti_torzs = eredeti
+        nyelv, biztos = FORD.nyelv_felismer(eredeti)
+        if nyelv == "hu":
+            _mondd(self.main, "Ez a levél magyarul van.")
+            return
+        d = ForditasDialog(self, self.main, nyelv if biztos else "")
+        rendben = d.ShowModal() == wx.ID_OK
+        motor, honnan = d.motor(), d.nyelv()
+        d.Destroy()
+        if not rendben:
+            return
+        _mondd(self.main, "Fordítás folyamatban…")
+
+        def munka():
+            return FORD.fordit(eredeti, "hu", motor, honnan)
+
+        def kesz(eredmeny):
+            if self._closing:
+                return
+            self.olvaso.SetValue(FORD.megjelenites(eredeti, eredmeny))
+            self.olvaso.SetInsertionPoint(0)
+            self.olvaso.SetFocus()
+            _mondd(self.main, "Kész a fordítás %s nyelvről. A lefordított "
+                   "szöveg a levél elején van, alatta az eredeti."
+                   % FORD.nyelv_neve(eredmeny["honnan"]))
+
+        def hiba(ex):
+            if not self._closing:
+                _mondd(self.main, "A fordítás nem sikerült: %s" % ex)
+                wx.MessageBox(str(ex), "Fordítás", wx.OK | wx.ICON_ERROR, self)
+
+        _hatterben(munka, kesz, hiba)
+
+    # ---- válasz a levelezőlistára --------------------------------------
+
+    def _valasz_listara(self):
+        cim = MC.lista_cim(self._msg)
+        if not cim:
+            _mondd(self.main, "Ez a levél nem levelezőlistáról jött. Az R "
+                   "betűvel válaszolhatsz a feladónak.")
+            return
+        self._mf._valasz(msg=self._msg, fiok=self._fiok, listara=cim)
 
     def _on_close(self, e):
         self._closing = True
         e.Skip()
+
+
+class ForditasDialog(wx.Dialog):
+    """Fordítás előtti kérdés: melyik motorral, és milyen nyelvről.
+
+    Azért van külön párbeszéd, mert a felhasználónak TUDNIA kell, hogy a levele
+    szövege elhagyja a gépet – egy magánlevélnél ez nem apróság."""
+
+    def __init__(self, parent, main, felismert=""):
+        super().__init__(parent, title="Fordítás magyarra")
+        v = wx.BoxSizer(wx.VERTICAL)
+        fig = wx.StaticText(self, label=(
+            "FIGYELEM: a fordításhoz a levél szövege elhagyja a gépet, és "
+            "elmegy a választott fordítóhoz. Bizalmas levélnél gondold meg."))
+        fig.Wrap(520)
+        fig.SetName(fig.GetLabel())
+        v.Add(fig, 0, wx.ALL, 12)
+        self._motor = wx.RadioBox(self, label="&Fordító", majorDimension=1,
+                                  choices=[n for _k, n in FORD.MOTOROK])
+        v.Add(self._motor, 0, wx.LEFT | wx.RIGHT, 12)
+        cimke = ("A felismert nyelv: %s. Ha nem stimmel, válassz másikat."
+                 % FORD.nyelv_neve(felismert) if felismert
+                 else "A nyelvet nem sikerült biztosan felismerni – válaszd ki:")
+        v.Add(wx.StaticText(self, label=cimke), 0, wx.ALL, 12)
+        self._nyelv = wx.Choice(self, choices=["%s (%s)" % (n, k)
+                                               for k, n in FORD.NYELVEK])
+        self._nyelv.SetName("A levél nyelve")
+        kodok = [k for k, _n in FORD.NYELVEK]
+        self._nyelv.SetSelection(kodok.index(felismert) if felismert in kodok
+                                 else 1)
+        v.Add(self._nyelv, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 12)
+        gs = wx.BoxSizer(wx.HORIZONTAL)
+        ok = wx.Button(self, wx.ID_OK, "&Fordítás")
+        ok.SetDefault()
+        gs.Add(ok, 0, wx.RIGHT, 8)
+        gs.Add(wx.Button(self, wx.ID_CANCEL, "&Mégsem"), 0)
+        v.Add(gs, 0, wx.ALL | wx.ALIGN_CENTER, 12)
+        self.SetSizerAndFit(v)
+        self.CentreOnParent()
+        wx.CallAfter(_mondd, main, fig.GetLabel() + " " + cimke)
+
+    def motor(self):
+        return FORD.MOTOROK[self._motor.GetSelection()][0]
+
+    def nyelv(self):
+        return FORD.NYELVEK[self._nyelv.GetSelection()][0]
 
 
 class BeallitasokDialog(wx.Dialog):
@@ -2340,6 +2464,8 @@ class MailFrame(wx.Frame):
             lambda msg, f: self._valasz(msg=msg, fiok=f)))
         self._mi(m_level, "Válasz min&denkinek", lambda e: self._menu_level_akcio(
             lambda msg, f: self._valasz(msg=msg, fiok=f, mind=True)))
+        self._mi(m_level, "Válasz a &levelezőlistára  (L)",
+                 lambda e: self._menu_level_akcio(self._listara_valasz))
         self._mi(m_level, "&Továbbítás  (F vagy Ctrl+F)", lambda e: self._menu_level_akcio(
             lambda msg, f: self._tovabbit(msg=msg, fiok=f)))
         m_level.AppendSeparator()
@@ -2940,7 +3066,8 @@ class MailFrame(wx.Frame):
         if self._aktiv:
             LevelIroDialog(self, self.main, self._aktiv).ShowModal()
 
-    def _valasz(self, e=None, mind=False, msg=None, fiok=None):
+    def _valasz(self, e=None, mind=False, msg=None, fiok=None,
+                listara=""):
         msg = msg or getattr(self, "_aktiv_msg", None)
         fiok = fiok or getattr(self, "_aktiv_fiok", None) or self._aktiv
         if not (fiok and msg):
@@ -2949,15 +3076,33 @@ class MailFrame(wx.Frame):
         import email.utils
         cim = email.utils.parseaddr(msg.get("Reply-To") or fej["felado"])[1]
         cc = ", ".join(MC.cimzettek(msg.get("Cc", ""))) if mind else ""
+        if listara:
+            # LEVELEZŐLISTÁS VÁLASZ: a címzett maga a lista, nem a feladó –
+            # és a másolat-mezőt üresen hagyjuk, hogy senki ne kapja duplán.
+            cim, cc = listara, ""
+
         idezet = "\n\n> " + MC.level_szovegtorzs(msg).replace("\n", "\n> ")
         d = LevelIroDialog(self, self.main, fiok, cim,
                            "Re: " + fej["targy"], idezet,
                            msg.get("Message-ID"), torzsre=True)
         d.masolat.SetValue(cc)
+        if listara:
+            d.listanev = MC.lista_neve(msg) or listara
+            _mondd(self.main, "Válasz a(z) %s listára. A levél a lista MINDEN "
+                   "tagjához megy." % d.listanev)
         d.ShowModal()
 
     def _valasz_mind(self, e):
         self._valasz(mind=True)
+
+    def _listara_valasz(self, msg, fiok):
+        """Válasz a levelezőlistára: a címzett a lista, nem a feladó."""
+        cim = MC.lista_cim(msg)
+        if not cim:
+            self._mond("Ez a levél nem levelezőlistáról jött. Az R betűvel "
+                       "válaszolhatsz a feladónak.")
+            return
+        self._valasz(msg=msg, fiok=fiok, listara=cim)
 
     def _tovabbit(self, e=None, msg=None, fiok=None):
         msg = msg or getattr(self, "_aktiv_msg", None)
@@ -3284,6 +3429,9 @@ class MailFrame(wx.Frame):
         elif k == ord("F") and m in (0, wx.MOD_CONTROL):
             self._menu_level_akcio(
                 lambda msg, f: self._tovabbit(msg=msg, fiok=f))
+        elif k == ord("L") and m == 0:
+            # L = válasz a LEVELEZŐLISTÁRA (a lista címét a levél fejléce adja)
+            self._menu_level_akcio(self._listara_valasz)
         elif m == 0 and k == ord("B"):
             self._tovabb_betolt()                 # következő adag levél (lapozás)
         elif k == wx.WXK_F5:

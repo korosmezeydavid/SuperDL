@@ -1332,3 +1332,51 @@ def nagy_fajl_szoveg(feltoltott: list) -> str:
             sor += " – elérhető eddig: %s" % f["lejar"]
         sorok.append("• " + sor)
     return "\n".join(sorok) + "\n"
+
+
+# ---------------------------------------------------------------------------
+# LEVELEZŐLISTA – „válasz a listára"
+# ---------------------------------------------------------------------------
+#
+# Klasszikus helyzet: Karcsi ír a listára, te válaszolnál – de nem NEKI, hanem
+# a LISTÁNAK. Nem kell találgatni: a listamotorok (Mailman, Google Groups és a
+# magyar listaszolgáltatók is) 1998 óta megadják a lista címét a `List-Post`
+# fejlécben (RFC 2369), a lista nevét pedig a `List-Id`-ben (RFC 2919).
+
+def lista_cim(msg) -> str:
+    """A levelezőlista posta-címe, vagy üres sztring, ha a levél nem listáról
+    jött. Tartalék: sok lista a `Reply-To`-t állítja a saját címére."""
+    nyers = (msg.get("List-Post") or "").strip()
+    if nyers:
+        if "NO" in nyers.upper() and "mailto:" not in nyers.lower():
+            return ""                    # `List-Post: NO` = tiltott a válasz
+        m = re.search(r"mailto:([^>\s,?]+)", nyers, re.I)
+        if m:
+            return m.group(1).strip()
+    if msg.get("List-Id") or msg.get("List-Unsubscribe"):
+        # listáról jött, de nem adta meg a posta-címet → Reply-To, ha van és
+        # más, mint a feladó
+        rt = email.utils.parseaddr(msg.get("Reply-To", ""))[1]
+        felado = email.utils.parseaddr(msg.get("From", ""))[1]
+        if rt and rt.lower() != (felado or "").lower():
+            return rt
+    return ""
+
+
+def lista_neve(msg) -> str:
+    """A lista emberi neve a `List-Id`-ből (pl. „Jaws-lista”), vagy a címe."""
+    nyers = (msg.get("List-Id") or "").strip()
+    if nyers:
+        m = re.match(r'\s*"?([^"<]+?)"?\s*<', nyers)
+        if m and m.group(1).strip():
+            return m.group(1).strip()
+        m = re.search(r"<([^>]+)>", nyers)
+        if m:
+            return m.group(1).split(".")[0]
+        return nyers
+    cim = lista_cim(msg)
+    return cim.split("@")[0] if cim else ""
+
+
+def listas_level(msg) -> bool:
+    return bool(lista_cim(msg))

@@ -61,10 +61,22 @@ def test_az_alairas_beallitasa_ervenyesul():
 # ------------------------------------------------------- beállítások
 
 def test_az_uj_beallitasok_alapertekei():
+    """FONTOS: az ALAPÉRTÉKEKET nézzük, nem a felhasználó elmentett fájlját –
+    az első változat azt olvasta, és elbukott azon a gépen, ahol a felhasználó
+    (jogosan) átállította a küldés-kérdést."""
+    alap = MC._ALTALANOS_ALAP
+    assert alap["kuldes_kerdes"] is True, "alapból KÉRDEZZEN küldés előtt"
+    assert alap["alairas"] == MC.ALAP_ALAIRAS
+    assert alap["lista_szel"] == "bling"
+
+
+def test_a_mentett_beallitas_felulirja_az_alapot(tmp_path, monkeypatch):
+    monkeypatch.setattr(MC, "_ALTALANOS_FILE", tmp_path / "beall.json")
+    MC.altalanos_ment({"kuldes_kerdes": False, "alairas": "Saját"})
     cfg = MC.altalanos_betolt()
-    assert cfg["kuldes_kerdes"] is True, "alapból KÉRDEZZEN küldés előtt"
-    assert cfg["alairas"] == MC.ALAP_ALAIRAS
-    assert cfg["lista_szel"] in ("bling", "beszed")
+    assert cfg["kuldes_kerdes"] is False and cfg["alairas"] == "Saját"
+    assert cfg["lista_limit"] == MC._ALTALANOS_ALAP["lista_limit"], \
+        "amit nem mentettünk, az az alapértéket hozza"
 
 
 # --------------------------------------------------------- piszkozat
