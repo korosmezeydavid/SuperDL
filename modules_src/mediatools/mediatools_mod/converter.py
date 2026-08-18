@@ -115,12 +115,21 @@ def unique_path(out_dir: str, stem: str, ext: str) -> str:
 
 def build_command(ff: str, src: str, out: str, mode: str, fmt: str,
                   bitrate: str, vcodec: str, acodec: str,
-                  lista_fajl: str = "") -> list[str]:
+                  lista_fajl: str = "", reszek=None) -> list[str]:
     """Az ffmpeg-parancs összeállítása az okos remux/újrakódolás döntéssel.
     `vcodec`/`acodec` a FORRÁS kodekjei (a remux-döntéshez).
-    `lista_fajl`: ha meg van adva, a bemenet egy CONCAT-lista (a DVD több
-    VOB-darabja EGY filmmé fűzve)."""
-    if lista_fajl:
+    `reszek`: több VOB-darab EGY filmmé fűzve (bájtszintű `concat:` protokoll).
+    `lista_fajl`: concat-demuxer lista (más, önálló fájlok összefűzéséhez)."""
+    if reszek and len(reszek) > 1:
+        # DVD VOB-DARABOK: a `concat:` PROTOKOLL való ide, nem a concat-demuxer.
+        # A DVD a filmet EGY folytonos MPEG-PS adatfolyamként tárolja, csak
+        # fájlokra vágva – ezért BÁJTSZINTEN kell összefűzni. A demuxer külön
+        # álló fájlokra készült: valódi lemezen (eltérő sáv-szerkezet, NAV-
+        # csomagok, folytatódó időbélyegek) megállhat az első darab után, és a
+        # kész fájlban CSAK AZ ELSŐ RÉSZ marad – egy tesztelő pontosan ezt
+        # jelezte.
+        cmd = [ff, "-y", "-i", "concat:" + "|".join(reszek)]
+    elif lista_fajl:
         cmd = [ff, "-y", "-f", "concat", "-safe", "0", "-i", lista_fajl]
     else:
         cmd = [ff, "-y", "-i", src]
@@ -207,6 +216,23 @@ def vob_csoportok(fajlok):
         filmreszek = [u for r, u in reszek if r != 0] or [u for _r, u in reszek]
         kesz.append((adat[1], filmreszek))
     return kesz
+
+
+def hossz_hiany(kesz_hossz: float, varhato: float, darabszam: int) -> str:
+    """Üres sztring, ha a kész fájl rendben van; különben EMBERI magyarázat.
+
+    Miért kell? Egy tesztelő olyan „kész" fájlt kapott, amiben CSAK AZ ELSŐ
+    DARAB volt – a program pedig sikert jelentett. Néma féleredményt soha
+    többé: ha a kimenet érdemben rövidebb a darabok összegénél, megmondjuk."""
+    if not (kesz_hossz and varhato) or darabszam < 2:
+        return ""
+    if kesz_hossz >= varhato * 0.9:
+        return ""
+    return ("a kész fájl csak %.0f másodperc, pedig a %d darab együtt %.0f "
+            "másodperc – úgy tűnik, nem fűződött össze minden. A fájlt "
+            "meghagytam. Próbáld a darabokat külön konvertálni, vagy a "
+            "videóvágó-összefűzővel egyesíteni."
+            % (kesz_hossz, darabszam, varhato))
 
 
 def concat_lista(fajlok, munkamappa: str) -> str:
@@ -301,6 +327,13 @@ class Converter:
             return
 
         vcodec, acodec, dur = probe(src)
+        if job.reszek:
+            # a VÁRHATÓ hossz a darabok ÖSSZEGE – ez adja a helyes haladást, és
+            # ez alapján ellenőrizzük a végén, hogy tényleg minden benne van-e
+            osszeg = 0.0
+            for r in job.reszek:
+                osszeg += probe(r)[2]
+            dur = osszeg or dur
         if self.mode == "extract" and not acodec:
             job.status = "hiba"
             job.error = "a videóban nincs hangsáv"
@@ -324,7 +357,8 @@ class Converter:
                 self._emit_status(i, job)
                 return
         cmd = build_command(ff, src, out, self.mode, self.fmt,
-                            self.bitrate, vcodec, acodec, lista_fajl)
+                            self.bitrate, vcodec, acodec, lista_fajl,
+                            job.reszek)
         # -nostdin: az ablakos (konzol nélküli) exében az örökölt stdin
         # érvénytelen; e nélkül az ffmpeg beragadhat indításkor (se kimenet, se
         # haladás). A stdin=DEVNULL ráadás biztosíték.
@@ -380,9 +414,17 @@ class Converter:
             except OSError:
                 pass
         elif rc == 0 and os.path.isfile(out):
-            job.status = "kész"
-            job.progress = 1.0
-            self.done += 1
+            hiany = ""
+            if job.reszek and dur > 0:
+                hiany = hossz_hiany(probe(out)[2], dur, len(job.reszek))
+            if hiany:
+                job.status = "hiba"
+                job.error = hiany
+                self.failed += 1
+            else:
+                job.status = "kész"
+                job.progress = 1.0
+                self.done += 1
         else:
             job.status = "hiba"
             detail = "\n".join(tail).strip()

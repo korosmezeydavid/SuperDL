@@ -135,12 +135,24 @@ def test_az_aposztrofos_fajlnev_sem_tori_el(tmp_path):
     assert r"'\''" in sor
 
 
-def test_a_parancs_concat_demuxert_hasznal_tobb_darabnal(tmp_path):
-    lista = C.concat_lista([str(tmp_path / "a.vob")], str(tmp_path))
+def test_a_vob_darabokat_a_concat_PROTOKOLL_fuzi_ossze():
+    """A DVD a filmet EGY folytonos MPEG-PS folyamként tárolja, csak fájlokra
+    vágva – ezért BÁJTSZINTEN kell összefűzni (`concat:` protokoll). A
+    concat-DEMUXER önálló fájlokra való, és valódi lemezen megállhat az első
+    darab után: egy tesztelő pontosan ezt kapta (a kész fájlban csak az első
+    VOB volt)."""
     cmd = C.build_command("ffmpeg", "a.vob", "ki.mp4", "video", "mp4", "192",
-                          "mpeg2video", "ac3", lista)
-    assert "-f" in cmd and "concat" in cmd and lista in cmd
-    assert cmd.index("concat") < cmd.index(lista)
+                          "mpeg2video", "ac3", "", ["a.vob", "b.vob", "c.vob"])
+    be = cmd[cmd.index("-i") + 1]
+    assert be == "concat:a.vob|b.vob|c.vob"
+    assert "-f" not in cmd[:cmd.index("-i")], "itt NEM demuxert használunk"
+
+
+def test_a_demuxeres_ut_megmarad_mas_esetre(tmp_path):
+    lista = C.concat_lista([str(tmp_path / "a.mp4")], str(tmp_path))
+    cmd = C.build_command("ffmpeg", "a.mp4", "ki.mp4", "video", "mp4", "192",
+                          "h264", "aac", lista)
+    assert "concat" in cmd and lista in cmd
 
 
 def test_egy_darabnal_marad_a_sima_bemenet():
@@ -171,3 +183,29 @@ def test_egyelemu_csoportnal_nincs_osszefuzes():
     c = C.Converter([("nyaralas", ["nyaralas.vob"])], out_dir=".",
                     mode="video", fmt="mp4")
     assert c.jobs[0].reszek is None, "egy darabnál nincs mit összefűzni"
+
+
+# --------------------------------------- a féleredmény felismerése
+
+def test_a_rovid_kimenetet_MEGMONDJUK():
+    """Ez a tesztelő bejelentése: „a kész fájlban csak az első VOB van” – és a
+    program sikert jelentett. Mostantól szól."""
+    uz = C.hossz_hiany(kesz_hossz=600, varhato=3600, darabszam=3)
+    assert uz and "csak 600" in uz and "3 darab" in uz
+    assert "meghagytam" in uz, "a fájl ne vesszen el"
+    assert "videóvágó" in uz, "adjunk kiutat is"
+
+
+def test_a_teljes_hosszu_kimenetre_nincs_panasz():
+    assert C.hossz_hiany(3600, 3600, 3) == ""
+    assert C.hossz_hiany(3550, 3600, 3) == "", "pár másodperc eltérés normális"
+
+
+def test_egy_darabnal_nincs_mit_ellenorizni():
+    assert C.hossz_hiany(10, 3600, 1) == ""
+
+
+def test_ismeretlen_hossznal_nem_talalgatunk():
+    """Ha az ffprobe nem tud hosszt mondani, NEM kiáltunk hibát alaptalanul."""
+    assert C.hossz_hiany(0, 3600, 3) == ""
+    assert C.hossz_hiany(3600, 0, 3) == ""
