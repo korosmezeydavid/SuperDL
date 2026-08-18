@@ -81,21 +81,22 @@ def test_az_osszes_bejovo_almappa_neve_nem_utkozhet_valodi_mappaval():
     assert MC.OSSZES_NEV and MC.OSSZES_NEV != MC.OSSZES_MAPPA
 
 
-def test_az_almappa_csak_tobb_fioknal_jelenik_meg():
-    """Egy fióknál értelmetlen (és zavaró) az „összes fiók" nézet."""
+def test_az_osszes_bejovo_csak_tobb_fioknal_jelenik_meg():
+    """Egy fióknál értelmetlen (és zavaró) az „összes fiók" nézet.
+    (A felhasználó kérésére ez már NEM a mappalistában, hanem a
+    FIÓK-VÁLASZTÓBAN van – lásd tests/test_mail_osszes_a_valasztoban.py.)"""
     from mail_mod import mailwin as MW
 
     class Csak:
         _fiokok = []
-        _mappakkal_osszes = MW.MailFrame._mappakkal_osszes
+        _osszes_a_valasztoban = MW.MailFrame._osszes_a_valasztoban
 
     cs = Csak()
-    assert cs._mappakkal_osszes(["INBOX", "Sent"]) == ["INBOX", "Sent"]
+    assert cs._osszes_a_valasztoban() is False
     cs._fiokok = [{"email": "a@x.hu"}]
-    assert cs._mappakkal_osszes(["INBOX"]) == ["INBOX"]
+    assert cs._osszes_a_valasztoban() is False
     cs._fiokok = [{"email": "a@x.hu"}, {"email": "b@y.hu"}]
-    assert cs._mappakkal_osszes(["INBOX", "Sent"]) == [MC.OSSZES_MAPPA,
-                                                       "INBOX", "Sent"]
+    assert cs._osszes_a_valasztoban() is True
 
 
 # ------------------------------------------------------ szél-jelzőhang

@@ -658,7 +658,15 @@ _ALTALANOS_ALAP = {"auto_ellenoriz": True, "ellenoriz_perc": 3,
                    # ITT bármikor visszakapcsolható – sose legyen egyirányú utca)
                    "kuldes_kerdes": True,
                    # ALÁÍRÁS: szabadon szerkeszthető, akár teljesen törölhető
-                   "alairas": ALAP_ALAIRAS}
+                   "alairas": ALAP_ALAIRAS,
+                   # induláskor az „Összes bejövő" jöjjön-e (több fióknál)
+                   "indulo_osszes": True,
+                   "utolso_fiok": "",
+                   # az Összes bejövő nézet háttér-figyelése (perc)
+                   "osszes_perc": 3,
+                   # értesítő hang mindenkinek (MK3)
+                   "ertesito_hang_be": True,
+                   "ertesito_hang_fajl": ""}
 
 
 def altalanos_betolt():

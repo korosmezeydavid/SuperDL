@@ -85,10 +85,16 @@ _SUGO = (
     "IMAP/SMTP-n; ha elutasít, a fiókodnál keress rá az app-jelszó "
     "létrehozására.\n\n"
     "MENÜSÁV (minden művelet itt, szépen rendezve – Alt-tal is elérhető)\n"
-    "• ÖSSZES BEJÖVŐ: ha egynél több fiókod van, a MAPPÁK LISTÁJÁNAK legelső "
-    "eleme az „Összes bejövő (minden fiók)” – minden fiók beérkezett levele EGY "
-    "listában, IDŐRENDBEN (a legfrissebb elöl), soronként a fiók nevével. "
-    "(A Fiók menüből is elérhető.)\n"
+    "• ÖSSZES BEJÖVŐ: ha egynél több fiókod van, a FIÓK-VÁLASZTÓ legelső eleme "
+    "az „Összes bejövő (minden fiók)”, utána jönnek a fiókjaid. Minden fiók "
+    "beérkezett levele EGY listában, IDŐRENDBEN (a legfrissebb elöl), "
+    "soronként a fiók nevével. Ebben a nézetben a program MINDEN fiókot figyel "
+    "a háttérben – az időköz a Beállítások → Általános fülön állítható –, az "
+    "F5 pedig bármikor azonnali, teljes frissítést kér. Az induló nézet is "
+    "beállítható. (A Fiók menüből is elérhető.)\n"
+    "• ÚJ LEVÉL HANGJA: rövid jelzés szól, akkor is, ha fiókonként nem "
+    "állítottál be értesítőt. Kikapcsolható, és saját WAV-ra cserélhető "
+    "(Beállítások → Általános). Több egyszerre érkező levélre EGY hang szól.\n"
     "• A LISTA SZÉLÉN (a tetején felfelé, az alján lefelé) a program nem "
     "olvassa fel újra ugyanazt a sort: rövid hangjelzés szól. A Beállítások → "
     "Általános fülön átállítható, hogy inkább mondja ki.\n"
@@ -2276,6 +2282,54 @@ class BeallitasokDialog(wx.Dialog):
         self.alt_szel.SetName("Mi történjen a lista szélén")
         v.Add(self.alt_szel, 0, wx.LEFT | wx.TOP, 12)
 
+        hs3 = wx.BoxSizer(wx.HORIZONTAL)
+        hs3.Add(wx.StaticText(p, label="Az Össze&s bejövő figyelése "
+                              "percenként:"), 0,
+                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.alt_osszes_perc = wx.SpinCtrl(p, min=1, max=60,
+                                           initial=int(cfg.get("osszes_perc", 3)))
+        self.alt_osszes_perc.SetName("Az Összes bejövő nézet figyelése "
+                                     "percenként; itt MINDEN fiókot körbejárunk")
+        hs3.Add(self.alt_osszes_perc, 0)
+        v.Add(hs3, 0, wx.ALL, 8)
+        self.alt_indulo_osszes = wx.CheckBox(
+            p, label="&Induláskor az Összes bejövő nyíljon meg")
+        self.alt_indulo_osszes.SetValue(bool(cfg.get("indulo_osszes", True)))
+        v.Add(self.alt_indulo_osszes, 0, wx.LEFT | wx.BOTTOM, 12)
+
+        # --- ÚJ LEVÉL HANGJA (mindenkinek) ---
+        self.alt_ert_hang_be = wx.CheckBox(
+            p, label="Ú&j levélnél szóljon rövid hangjelzés")
+        self.alt_ert_hang_be.SetValue(bool(cfg.get("ertesito_hang_be", True)))
+        self.alt_ert_hang_be.SetName("Új levélnél rövid hangjelzés – akkor is, "
+                                     "ha fiókonként nem állítottál be értesítőt")
+        v.Add(self.alt_ert_hang_be, 0, wx.LEFT | wx.TOP, 12)
+        hs4 = wx.BoxSizer(wx.HORIZONTAL)
+        hs4.Add(wx.StaticText(p, label="Sa&ját hang (WAV, üresen a beépített):"),
+                0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.alt_ert_hang_fajl = wx.TextCtrl(
+            p, value=str(cfg.get("ertesito_hang_fajl", "") or ""))
+        self.alt_ert_hang_fajl.SetName("Saját értesítő hang fájlja")
+        tb = wx.Button(p, label="Tall&ózás…")
+
+        def hang_tallo(e):
+            with wx.FileDialog(self, "Értesítő hang",
+                               wildcard="Hangfájlok (*.wav)|*.wav",
+                               style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as d:
+                if d.ShowModal() == wx.ID_OK:
+                    self.alt_ert_hang_fajl.SetValue(d.GetPath())
+        tb.Bind(wx.EVT_BUTTON, hang_tallo)
+        pb = wx.Button(p, label="Meg&hallgatom")
+
+        def hang_proba(e):
+            from . import hangok
+            hangok.uj_level(self.alt_ert_hang_fajl.GetValue().strip())
+        pb.Bind(wx.EVT_BUTTON, hang_proba)
+        hs4.Add(self.alt_ert_hang_fajl, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        hs4.Add(tb, 0, wx.RIGHT, 6)
+        hs4.Add(pb, 0)
+        v.Add(hs4, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 12)
+
         self.alt_kuldes_kerdes = wx.CheckBox(
             p, label="&Küldés előtt kérdezzen rá")
         self.alt_kuldes_kerdes.SetValue(bool(cfg.get("kuldes_kerdes", True)))
@@ -2314,7 +2368,25 @@ class BeallitasokDialog(wx.Dialog):
                 "lista_szel": ("bling" if self.alt_szel.GetSelection() == 0
                                else "beszed"),
                 "kuldes_kerdes": bool(self.alt_kuldes_kerdes.GetValue()),
-                "alairas": self.alt_alairas.GetValue().strip()}
+                "alairas": self.alt_alairas.GetValue().strip(),
+                "osszes_perc": int(self.alt_osszes_perc.GetValue()),
+                "indulo_osszes": bool(self.alt_indulo_osszes.GetValue()),
+                "ertesito_hang_be": bool(self.alt_ert_hang_be.GetValue()),
+                "ertesito_hang_fajl": self.alt_ert_hang_fajl.GetValue().strip()}
+        # TÚL SŰRŰ LEKÉRDEZÉS: néhány szolgáltató (főleg a Gmail) a gyakori
+        # bejelentkezést ideiglenes letiltással bünteti – erre figyelmeztetünk,
+        # de nem tiltjuk meg: a felhasználó dönt.
+        surun = min(int(adat["ellenoriz_perc"]), int(adat["osszes_perc"]))
+        if surun < 2:
+            uzenet = ("%d percenkénti ellenőrzést állítottál be. Ez sűrű: egyes "
+                      "szolgáltatók (például a Gmail) a gyakori bejelentkezést "
+                      "ideiglenes letiltással büntetik. Ajánlott: legalább 3 "
+                      "perc. Így mentsem?" % surun)
+            _mondd(self.main, uzenet)
+            if wx.MessageBox(uzenet, "Sűrű ellenőrzés",
+                             wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING,
+                             self) != wx.YES:
+                return
         for kulcs, cb in getattr(self, "alt_lista_mezok", {}).items():
             adat[kulcs] = bool(cb.GetValue())
         MC.altalanos_ment(adat)
@@ -2359,15 +2431,21 @@ class MailFrame(wx.Frame):
         self._ertesito_timer_beallit()
 
     def _ertesito_timer_beallit(self):
-        """A háttér-ellenőrzés idejét/ki-be kapcsolását az Általános beállításból."""
+        """A háttér-ellenőrzés idejét/ki-be kapcsolását az Általános beállításból.
+        Az EGYESÍTETT nézetnek SAJÁT időköze van: ott minden fiókot körbejárunk,
+        ami tíz fióknál érdemi munka – ne percenként történjen."""
         cfg = MC.altalanos_betolt()
         try:
             self._ellenor_timer.Stop()
         except Exception:
             pass
-        if cfg.get("auto_ellenoriz", True):
+        if not cfg.get("auto_ellenoriz", True):
+            return
+        if self._osszesitett:
+            perc = max(1, int(cfg.get("osszes_perc", 3)))
+        else:
             perc = max(1, int(cfg.get("ellenoriz_perc", 3)))
-            self._ellenor_timer.Start(perc * 60000)
+        self._ellenor_timer.Start(perc * 60000)
 
     def _beallitasok(self, e=None, lap=0):
         dlg = BeallitasokDialog(self, self.main, self, lap=lap)
@@ -2384,8 +2462,17 @@ class MailFrame(wx.Frame):
         nem volt. Most: ha a Beérkezett van nyitva, egyszerűen ÚJRATÖLTJÜK a
         listát (ez az, amit a felhasználó „automatikus frissítésen" ért), és a
         hibát legalább az állapotsorban jelezzük."""
-        if (self._closing or not self._aktiv
-                or self._aktiv.get("protokoll") == "pop"):
+        if self._closing:
+            return
+        if self._osszesitett:
+            # EGYESÍTETT NÉZET: minden fiókot körbejárunk. Ütközés-védelem: ha
+            # az előző körbejárás még fut (tíz fióknál ez percekig tarthat), a
+            # következő időzítés NE indítson másodikat – egymásra torlódnának.
+            if getattr(self, "_osszes_fut", False):
+                return
+            self._osszes_bejovo(None, csendes=True)
+            return
+        if not self._aktiv or self._aktiv.get("protokoll") == "pop":
             return
         fiok = self._aktiv
         em = (fiok.get("email") or "").lower()
@@ -2575,14 +2662,37 @@ class MailFrame(wx.Frame):
                        "a Fiók hozzáadása gombbal.")
             self._fiok_add(None)
         else:
-            self.fiok_valaszto.SetSelection(0)
+            # INDULÓ NÉZET: alapból az „Összes bejövő" (ha van több fiók), de
+            # a Beállításokban kérhető, hogy inkább az utoljára használt fiók
+            # jöjjön – tíz fióknál az induló körbejárás időbe telik.
+            cfg = MC.altalanos_betolt()
+            hely = 0
+            if not (self._osszes_a_valasztoban() and cfg.get("indulo_osszes", True)):
+                utolso = cfg.get("utolso_fiok", "")
+                sorszam = next((i for i, f in enumerate(self._fiokok)
+                                if (f.get("email") or "") == utolso), 0)
+                hely = self._valaszto_index(sorszam)
+            self.fiok_valaszto.SetSelection(hely)
             self._fiok_valt(None)
 
+    def _osszes_a_valasztoban(self) -> bool:
+        """Az „Összes bejövő" a FIÓK-VÁLASZTÓ első eleme – de csak akkor, ha
+        egynél több fiók van (egy fióknál értelmetlen). A felhasználó kérése:
+        ez nem MAPPA, hanem NÉZET minden fiókra, ezért nem a mappák közt a
+        helye."""
+        return len(self._fiokok) > 1
+
     def _fiok_valaszto_feltolt(self):
-        self.fiok_valaszto.Set([f.get("nev") or f.get("email")
-                                for f in self._fiokok])
+        nevek = [f.get("nev") or f.get("email") for f in self._fiokok]
+        if self._osszes_a_valasztoban():
+            nevek = [MC.OSSZES_NEV] + nevek
+        self.fiok_valaszto.Set(nevek)
         self.osszes_gomb.Show(len(self._fiokok) > 1)
         self.Layout()
+
+    def _valaszto_index(self, fiok_index: int) -> int:
+        """Fiók-sorszám → a választóbeli hely (az Összes bejövő eltolja eggyel)."""
+        return fiok_index + (1 if self._osszes_a_valasztoban() else 0)
 
     # ---- fiókok ----
     def _fiok_add(self, e):
@@ -2617,19 +2727,35 @@ class MailFrame(wx.Frame):
 
     def _fiok_valt(self, e):
         i = self.fiok_valaszto.GetSelection()
+        if self._osszes_a_valasztoban():
+            if i == 0:                       # az ELSŐ elem: minden fiók együtt
+                self._osszes_nezet()
+                return
+            i -= 1                           # a többi elem eggyel odébb van
         if 0 <= i < len(self._fiokok):
+            self._osszesitett = False
             self._aktiv = self._fiokok[i]
+            cfg = MC.altalanos_betolt()
+            cfg["utolso_fiok"] = self._aktiv.get("email", "")
+            MC.altalanos_ment(cfg)
             self._mappak_betolt()
+
+    def _osszes_nezet(self):
+        """Az egyesített nézet: a mappalistában CSAK a „Beérkezett (minden
+        fiók)" marad, mert a többi mappa fiókfüggő – ott nem lenne értelme."""
+        self._aktiv = self._aktiv or (self._fiokok[0] if self._fiokok else None)
+        self._mappak_raw = [MC.OSSZES_MAPPA]
+        self.mappa_lista.Set([MC.OSSZES_NEV])
+        self.mappa_lista.SetSelection(0)
+        self._osszes_bejovo(None)
 
     # ---- mappák + lista ----
     def _mappak_betolt(self):
         if not self._aktiv:
             return
         if self._aktiv.get("protokoll") == "pop":
-            self._mappak_raw = self._mappakkal_osszes(["INBOX"])
-            self.mappa_lista.Set([MC.OSSZES_NEV if m == MC.OSSZES_MAPPA
-                                  else "Beérkezett (POP3)"
-                                  for m in self._mappak_raw])
+            self._mappak_raw = ["INBOX"]
+            self.mappa_lista.Set(["Beérkezett (POP3)"])
             self._mappa = "INBOX"
             self._mappa_kijelol("INBOX")
             self._frissit()
@@ -2648,49 +2774,20 @@ class MailFrame(wx.Frame):
             return
         # a NYERS neveket megőrizzük (ezekkel megy az IMAP select/fetch),
         # de a DEKÓDOLT (felolvasható) neveket jelenítjük meg; a Beérkezett felül
-        mappak = self._mappakkal_osszes(self._mappak_rendez(mappak))
+        mappak = self._mappak_rendez(mappak)
         self._mappak_raw = mappak
-        self.mappa_lista.Set([MC.OSSZES_NEV if m == MC.OSSZES_MAPPA
-                              else MC.mappa_display(m) for m in mappak])
-        # A Beérkezett a kiinduló nézet (az Összes bejövő fölötte áll, de azt a
-        # felhasználó válassza – ne töltsünk le magától minden fiókot).
-        elso = next((m for m in mappak if m != MC.OSSZES_MAPPA), "INBOX")
+        self.mappa_lista.Set([MC.mappa_display(m) for m in mappak])
+        elso = mappak[0] if mappak else "INBOX"
         self._mappa = elso
         self._mappa_kijelol(elso)
         self._frissit()
-
-    def _mappakkal_osszes(self, mappak):
-        """Az „Összes bejövő" ÁL-MAPPA a lista LEGELEJÉRE, ha egynél több fiók
-        van. A felhasználó egyesített MAPPÁT várt (mint a Thunderbirdben), nem
-        egy menüpontot – így a mappák közt nyilazva magától rátalál."""
-        mappak = list(mappak or [])
-        if len(getattr(self, "_fiokok", []) or []) > 1:
-            return [MC.OSSZES_MAPPA] + mappak
-        return mappak
-
-    @staticmethod
-    def _mappak_rendez(mappak):
-        """A Beérkezett (INBOX) MINDIG legfelül; utána a szokásos rendszer-mappák
-        (Elküldött, Piszkozatok, Kuka, Spam, Archívum), majd a többi ábécében."""
-        rendszer = ["sent", "elküld", "kimen", "draft", "piszkoz", "trash",
-                    "kuka", "deleted", "junk", "spam", "levélszem", "archiv",
-                    "archív"]
-
-        def kulcs(m):
-            ml = (m or "").lower()
-            if ml == "inbox":
-                return (0, "")
-            for r, nev in enumerate(rendszer):
-                if nev in ml:
-                    return (1, f"{r:02d}{ml}")
-            return (2, ml)
-        return sorted(mappak, key=kulcs)
 
     def _mappa_valt(self, e):
         i = self.mappa_lista.GetSelection()
         raw = getattr(self, "_mappak_raw", [])
         valasztott = raw[i] if 0 <= i < len(raw) else "INBOX"
-        if valasztott == MC.OSSZES_MAPPA:      # az egyesített ÁL-MAPPA
+        if valasztott == MC.OSSZES_MAPPA:
+            # az egyesített nézetben ez az EGYETLEN mappa – csak újratöltjük
             self._osszes_bejovo(None)
             return
         self._osszesitett = False
@@ -2722,7 +2819,7 @@ class MailFrame(wx.Frame):
             return lista
         _hatterben(munka, self._lista_kesz, self._halo_hiba)
 
-    def _osszes_bejovo(self, e):
+    def _osszes_bejovo(self, e, csendes=False):
         """Minden fiók bejövő (INBOX) leveleit EGY listába gyűjti, fiók-jelöléssel.
 
         Három dolgot javítottunk itt a felhasználó jelzésére („nem dob be egy
@@ -2737,8 +2834,13 @@ class MailFrame(wx.Frame):
             return
         self._osszesitett = True
         self._mappa = MC.OSSZES_MAPPA
-        self._mappa_kijelol(MC.OSSZES_MAPPA)
-        self._mond("Minden fiók bejövő leveleinek betöltése…")
+        if self._osszes_a_valasztoban():
+            self.fiok_valaszto.SetSelection(0)
+        self._osszes_fut = True              # ütközés-védelem a háttér-körhöz
+        self._csendes_frissites = bool(csendes)
+        if not csendes:
+            self._mond("Minden fiók bejövő leveleinek betöltése…")
+        self._ertesito_timer_beallit()       # ennek a nézetnek saját időköze van
         fiokok = list(self._fiokok)
         limit = int(MC.altalanos_betolt().get("lista_limit", 50))
         self._osszes_fiok_db = len(fiokok)
@@ -2762,11 +2864,35 @@ class MailFrame(wx.Frame):
             return MC.rendez_ido_szerint(egyben), hibas
 
         def kesz(eredmeny):
+            self._osszes_fut = False
             lista, hibas = eredmeny
             self._osszes_hibas = hibas
+            uj = self._uj_levelek_szama(lista)
             self._lista_kesz(lista)
+            if uj:
+                # ÚJ LEVÉL a háttér-körben: egyetlen jelzés az egészre, nem
+                # levelenként (öt levélre ne tilinkózzon ötször).
+                self._ertesit_osszes(uj)
 
-        _hatterben(munka, kesz, self._halo_hiba)
+        def hiba(ex):
+            self._osszes_fut = False
+            self._halo_hiba(ex)
+
+        _hatterben(munka, kesz, hiba)
+
+    def _uj_levelek_szama(self, lista) -> int:
+        """Hány ÚJ levél jött az előző körbejárás óta? A levelek azonosítója a
+        (fiók, mappa, uid) hármas; az első betöltés még nem „új"."""
+        most = set()
+        for it in lista or []:
+            f = it.get("_fiok") or {}
+            most.add(((f.get("email") or ""), it.get("_mappa", ""),
+                      str(it.get("uid", ""))))
+        elozo = getattr(self, "_osszes_latott", None)
+        self._osszes_latott = most
+        if elozo is None:
+            return 0                      # az első betöltés a kiindulási alap
+        return len(most - elozo)
 
     def _mappa_kijelol(self, raw_nev: str) -> None:
         """A mappalistában kijelöli a megadott (nyers nevű) mappát, ha ott van –
@@ -2819,6 +2945,18 @@ class MailFrame(wx.Frame):
     def _lista_kesz(self, lista):
         if self._closing:
             return
+        # A KIJELÖLÉS MEGŐRZÉSE a háttér-frissítésnél: vakon az a legrosszabb,
+        # ha olvasás közben kicsúszik a kurzor a levél alól. A levelet az
+        # azonosítója alapján keressük vissza az új listában, nem a sorszáma
+        # alapján – az új levelek beérkezésével a sorszám úgyis eltolódik.
+        elozo_kulcs = None
+        if getattr(self, "_lista", None):
+            i = self._lista_index(self.level_lista)
+            if 0 <= i < len(self._lista):
+                r = self._lista[i]
+                f = r.get("_fiok") or {}
+                elozo_kulcs = ((f.get("email") or ""), r.get("_mappa", ""),
+                               str(r.get("uid", "")))
         self._lista = lista
         # a feladókat felvesszük a címjegyzékbe (passzív tanulás, csak új címek)
         try:
@@ -2831,6 +2969,13 @@ class MailFrame(wx.Frame):
                 and (self._mappa or "").upper() == "INBOX"):
             self._uj_level_ellenoriz(self._aktiv, lista)
         self.level_lista.Set([self._sor_szoveg(info) for info in lista])
+        if elozo_kulcs:                      # a korábban olvasott levélre vissza
+            for uj_i, r in enumerate(lista):
+                f = r.get("_fiok") or {}
+                if ((f.get("email") or ""), r.get("_mappa", ""),
+                        str(r.get("uid", ""))) == elozo_kulcs:
+                    self.level_lista.SetSelection(uj_i)
+                    break
         if getattr(self, "_csendes_frissites", False):
             self._csendes_frissites = False     # háttér-frissítés: nem szövegel
             return
@@ -2917,8 +3062,31 @@ class MailFrame(wx.Frame):
         if elozo is not None and legujabb > elozo:      # tényleg új érkezett
             self._ertesit(fiok)
 
+    def _jelzo_hang(self) -> bool:
+        """Az ÁLTALÁNOS új-levél hang (mindenkinek, fiók-beállítás nélkül is).
+        NE TILINKÓZZON: két jelzés között legalább 5 másodperc szünet."""
+        import time as _ido
+        cfg = MC.altalanos_betolt()
+        if not cfg.get("ertesito_hang_be", True):
+            return False
+        most = _ido.monotonic()
+        if most - getattr(self, "_utolso_jelzes", 0) < 5:
+            return True                   # nemrég szólt – ne ismételjük
+        self._utolso_jelzes = most
+        from . import hangok
+        return hangok.uj_level(str(cfg.get("ertesito_hang_fajl", "") or ""))
+
+    def _ertesit_osszes(self, darab: int) -> None:
+        """Az egyesített nézet háttér-köre után: EGY jelzés az egészre."""
+        self._jelzo_hang()
+        self._mond("%d új levél érkezett." % darab if darab > 1
+                   else "Új leveled érkezett.")
+
     def _ertesit(self, fiok):
-        """A fiókhoz beállított értesítés: hang lejátszása VAGY szöveg felolvasása."""
+        """A fiókhoz beállított értesítés: hang lejátszása VAGY szöveg felolvasása.
+        Az ÁLTALÁNOS jelzőhang ettől függetlenül szól (ha be van kapcsolva), így
+        az is kap hallható visszajelzést, aki fiókonként nem állított be semmit."""
+        self._jelzo_hang()
         try:
             cfg = MC.ertesito_fiok(fiok.get("email", ""))
         except Exception:

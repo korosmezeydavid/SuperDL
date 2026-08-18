@@ -13,6 +13,7 @@ nem szakítja félbe a munkát, egy mondat viszont igen.
 from __future__ import annotations
 
 import math
+import os
 import struct
 import threading
 import wave
@@ -73,3 +74,55 @@ def bling(teteje: bool = True) -> bool:
 
     threading.Thread(target=jatszd, daemon=True).start()
     return True
+
+
+# ---------------------------------------------------------------------------
+# ÚJ LEVÉL – rövid, barátságos jelzés MINDENKINEK
+# ---------------------------------------------------------------------------
+#
+# Felhasználói kérés (2026-08-17): „legyen egy kis pici hang, ami akinek nincs
+# beállítva email-érkeztető hang, az is kapjon hangos visszajelzést – egy kis
+# tirariramm vagy pici rövid fanfár, ami hallható, de átállítható saját
+# hangokra és ki is kapcsolható, ha valaki nem akarja."
+#
+# Rövid és halk: ez ÉRTESÍTÉS, nem ébresztő. A képernyőolvasó bemondását nem
+# helyettesíti, csak megelőzi.
+
+_UJ_LEVEL = [(880, 0.055), (1175, 0.055), (1568, 0.11)]
+
+
+def uj_level_hang_fajl() -> Path:
+    _MAPPA.mkdir(parents=True, exist_ok=True)
+    ut = _MAPPA / "uj_level.wav"
+    if not ut.is_file() or ut.stat().st_size < 500:
+        adat = b"".join(_hullam(f, h, 0.26) for f, h in _UJ_LEVEL)
+        with wave.open(str(ut), "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(_MINTAVETEL)
+            w.writeframes(adat)
+    return ut
+
+
+def uj_level(sajat_fajl: str = "") -> bool:
+    """Az új levél jelzése. `sajat_fajl`: a felhasználó saját hangja (WAV);
+    ha nincs vagy nem szólal meg, a beépített jelzés jön. Hiba esetén csendben
+    False – a hang sosem viheti el az értesítést."""
+    import winsound
+    for ut in ([sajat_fajl] if sajat_fajl else []) + [None]:
+        try:
+            fajl = ut if ut else str(uj_level_hang_fajl())
+            if ut and not os.path.isfile(ut):
+                continue
+
+            def jatszd(f=fajl):
+                try:
+                    winsound.PlaySound(f, winsound.SND_FILENAME)
+                except Exception:
+                    pass
+
+            threading.Thread(target=jatszd, daemon=True).start()
+            return True
+        except Exception:
+            continue
+    return False
