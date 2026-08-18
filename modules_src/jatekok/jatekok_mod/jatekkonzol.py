@@ -14,10 +14,13 @@ AKADÁLYMENTESSÉG:
 """
 import queue
 import threading
+import time
 
 import wx
 
 from superdl import retrospeech as RS
+
+from . import brailab
 
 _HANG_CFG = "jatekok.json"                 # közös a Hangbeállítással
 
@@ -103,6 +106,23 @@ class RetroHang:
                 kulcs, tempo = beall
             else:
                 kulcs, tempo = beall, 1.0
+            if kulcs == brailab.KULCS:
+                # BraiLab: a motor MAGA szólal meg (nincs WAV), és nem jelzi a
+                # beszéd végét, ezért a BECSÜLT hosszig várunk – így a mondatok
+                # nem csúsznak egymásra. Az elnémítás (`nema`) közben kilép.
+                hossz = brailab.motor().mond(szoveg)
+                if not hossz:
+                    continue                     # nem szólalt meg – jöhet a többi
+                hatar = hossz
+                lepett = 0.0
+                while lepett < hatar:
+                    if self._stop or self._skip:
+                        self._skip = False
+                        brailab.motor().stop()
+                        break
+                    time.sleep(0.05)
+                    lepett += 0.05
+                continue
             try:
                 try:
                     path = RS.synth(szoveg, "", kulcs, tempo_szorzo=tempo)
@@ -136,6 +156,10 @@ class RetroHang:
                 self._player.stop()
             except Exception:
                 pass
+        try:
+            brailab.motor().stop()      # a BraiLab a saját motorján szól
+        except Exception:
+            pass
         self._done.set()
 
     def leallit(self):

@@ -1,0 +1,24 @@
+BraiLab-host – fordítás és próba
+================================
+
+Ez a mappa a 32 bites kísérő-folyamat FORRÁSA. A kész `brailab_host.exe` a
+játékok modulban (modules_src/jatekok/jatekok_mod/brailab/) és a RetróHang
+programban (Documents\RetroHang\brailab\) van, a motor fájljaival együtt.
+
+Újrafordítás (a Windows saját C#-fordítójával, külön eszköz nélkül):
+
+    csc /platform:x86 /target:exe /out:brailab_host.exe BrailabHost.cs
+
+A /platform:x86 KÖTELEZŐ: a TTS.dll 32 bites.
+
+Próbához másold ide a motor három fájlját (TTS.dll, BINADATA.BIN,
+BINAHANK.BIN) a modul brailab mappájából – a hostnak a saját mappájában kell
+lenniük. A készletet a repóban SZÁNDÉKOSAN csak egy helyen tartjuk.
+
+Protokoll (soronként, UTF-8, a válasz „OK” vagy „ERR <kód>”):
+    SPEAK <szöveg> | SPEAKFLAT <szöveg> | STOP | PITCH n | TEMPO n |
+    VOLUME n | RESET | GET (-> VALUES magasság tempó hangerő) | QUIT
+Induláskor a host „READY”-t ír ki.
+
+FONTOS (drágán megtanulva): a TTS_StartSay UTF-16 (wchar_t*) szöveget vár.
+ANSI-val a motor túlolvassa a memóriát, és hosszú, értelmetlen hablatyot mond.

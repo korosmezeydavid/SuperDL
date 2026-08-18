@@ -11,6 +11,7 @@ import wx
 
 from superdl import retrospeech as RS     # a Core SAJÁT formánsszintetizátora
 from superdl import store                 # a választott hang megőrzéséhez
+from . import brailab                     # az IGAZI BraiLab PC hang (külön motor)
 from . import katalogus
 
 _HANG_CFG = "jatekok.json"                 # a felhasználó hang+tempó beállítása
@@ -38,9 +39,18 @@ F1 – ez a súgó.  Ctrl+Tab – fülváltás.  Enter – a kijelölt játék i
 F8 – a kijelölt játék leírásának megismétlése.  Escape – hang leállítása.
 
 A RETRÓ HANGRÓL
-A hangot a SuperDL SAJÁT formáns-alapú motorja készíti, a korszak
-beszédszintézisének akusztikai jellemzői alapján. Nem tartalmaz és nem használ
-fel semmilyen eredeti gépi ROM-ot vagy idegen kódot."""
+A hangkarakterek nagy részét a SuperDL SAJÁT formáns-alapú motorja készíti, a
+korszak beszédszintézisének akusztikai jellemzői alapján; ezek nem tartalmaznak
+és nem használnak fel semmilyen eredeti gépi ROM-ot vagy idegen kódot.
+
+A hanglistában külön szerepel a „BraiLab PC – az IGAZI hang”: ez az EREDETI
+BraiLab PC beszédszintetizátor. Nála a hangmagasság, a tempó és a hangerő
+saját, fokozatos szabályzóval állítható (a motor csak ezeket a fokozatokat
+ismeri), és a hangpróba ugyanúgy működik.
+
+NÉVJEGY – KÖSZÖNET
+Hálás köszönettel Ujfalusi Zoltánnak, aki rendelkezésünkre bocsátotta ezt a
+hangot!"""
 
 
 class JatekokFrame(wx.Frame):
@@ -53,8 +63,19 @@ class JatekokFrame(wx.Frame):
         # Laci kérése: NE mindig az első hang legyen a modul indulásakor, hanem
         # amit a felhasználó egyszer beállított. A választást a store-ban őrizzük.
         cfg = store.load_json(store.CONFIG_DIR / _HANG_CFG, {})
-        kulcsok = [g.kulcs for g in RS.GEPEK]
+        # a választható hangok: a Core retró gépei + (ha megvan) az IGAZI BraiLab
+        self._hangok = [(g.kulcs, g.nev) for g in RS.GEPEK]
+        if brailab.elerheto():
+            self._hangok.append((brailab.KULCS, brailab.NEV))
+        kulcsok = [k for k, _ in self._hangok]
         self._hang = cfg.get("hang") if cfg.get("hang") in kulcsok else RS.ALAP_GEP
+        # a BraiLab FOKOZATAI (a motor csak szűk tartományt ismer)
+        self._bl_magassag = brailab.hatarol(cfg.get("brailab_magassag", 0),
+                                            brailab.MAGASSAGOK, 0)
+        self._bl_tempo = brailab.hatarol(cfg.get("brailab_tempo", 4),
+                                         brailab.TEMPOK, 4)
+        self._bl_hangero = brailab.hatarol(cfg.get("brailab_hangero", 0),
+                                           brailab.HANGEROK, 0)
         self._tempo_szazalek = int(cfg.get("tempo") or 100)
         if not 50 <= self._tempo_szazalek <= 160:
             self._tempo_szazalek = 100
@@ -135,22 +156,67 @@ class JatekokFrame(wx.Frame):
         v.Add(wx.StaticText(p, label="&Hangkarakter (fel/le nyíl):"), 0,
               wx.LEFT, 8)
         self.hang_lst = wx.ListBox(
-            p, choices=[x.nev for x in RS.GEPEK], style=wx.LB_SINGLE)
+            p, choices=[nev for _, nev in self._hangok], style=wx.LB_SINGLE)
         self.hang_lst.SetName("Retró hangkarakter")
-        kulcsok = [x.kulcs for x in RS.GEPEK]
+        kulcsok = [k for k, _ in self._hangok]
         self.hang_lst.SetSelection(kulcsok.index(self._hang)
                                    if self._hang in kulcsok else 0)
         self.hang_lst.Bind(wx.EVT_LISTBOX, lambda e: self._hang_valaszt())
         v.Add(self.hang_lst, 0, wx.EXPAND | wx.ALL, 8)
 
-        v.Add(wx.StaticText(
-            p, label="&Beszédtempó (nagyobb = gyorsabb):"), 0, wx.LEFT, 8)
+        # A BraiLab hangot Ujfalusi Zoltán bocsátotta a rendelkezésünkre – ez a
+        # köszönet a felületen IS ott van, nem csak a súgóban.
+        if brailab.elerheto():
+            kosz = wx.StaticText(
+                p, label="Hálás köszönettel Ujfalusi Zoltánnak, aki "
+                         "rendelkezésünkre bocsátotta ezt a hangot!")
+            kosz.SetName("Köszönet a BraiLab hangért")
+            v.Add(kosz, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+
+        # --- a SAJÁT retró motor tempója (százalék) ---
+        self.tempo_cim = wx.StaticText(
+            p, label="&Beszédtempó (nagyobb = gyorsabb):")
+        v.Add(self.tempo_cim, 0, wx.LEFT, 8)
         self.tempo_cs = wx.Slider(p, value=self._tempo_szazalek,
                                   minValue=50, maxValue=160,
                                   style=wx.SL_HORIZONTAL | wx.SL_LABELS)
         self.tempo_cs.SetName("Beszédtempó százalékban")
         self.tempo_cs.Bind(wx.EVT_SLIDER, lambda e: self._tempo_valaszt())
         v.Add(self.tempo_cs, 0, wx.EXPAND | wx.ALL, 8)
+
+        # --- a BraiLab SAJÁT fokozatai (a motor csak ezeket ismeri) ---
+        # Amikor nem a BraiLab a választott hang, ezek REJTVE vannak (nem
+        # letiltva): így a tabulátor-sorrend sem visz üresbe.
+        self.bl_elemek = []
+        if brailab.elerheto():
+            self.bl_mag_cim = wx.StaticText(p, label="BraiLab hang&magasság:")
+            v.Add(self.bl_mag_cim, 0, wx.LEFT, 8)
+            self.bl_mag = wx.Choice(p, choices=["Mély", "Alap", "Magas"])
+            self.bl_mag.SetName("BraiLab hangmagasság")
+            self.bl_mag.SetSelection(brailab.MAGASSAGOK.index(self._bl_magassag))
+            self.bl_mag.Bind(wx.EVT_CHOICE, lambda e: self._bl_valaszt())
+            v.Add(self.bl_mag, 0, wx.ALL, 8)
+
+            self.bl_tempo_cim = wx.StaticText(
+                p, label="BraiLab &tempó (0 a leglassabb, 5 a leggyorsabb):")
+            v.Add(self.bl_tempo_cim, 0, wx.LEFT, 8)
+            self.bl_tempo_v = wx.Choice(
+                p, choices=["0 – leglassabb", "1", "2", "3", "4 – alap",
+                            "5 – leggyorsabb"])
+            self.bl_tempo_v.SetName("BraiLab tempó")
+            self.bl_tempo_v.SetSelection(brailab.TEMPOK.index(self._bl_tempo))
+            self.bl_tempo_v.Bind(wx.EVT_CHOICE, lambda e: self._bl_valaszt())
+            v.Add(self.bl_tempo_v, 0, wx.ALL, 8)
+
+            self.bl_ero_cim = wx.StaticText(p, label="BraiLab hang&erő:")
+            v.Add(self.bl_ero_cim, 0, wx.LEFT, 8)
+            self.bl_ero = wx.Choice(p, choices=["Halk", "Alap", "Hangos"])
+            self.bl_ero.SetName("BraiLab hangerő")
+            self.bl_ero.SetSelection(brailab.HANGEROK.index(self._bl_hangero))
+            self.bl_ero.Bind(wx.EVT_CHOICE, lambda e: self._bl_valaszt())
+            v.Add(self.bl_ero, 0, wx.ALL, 8)
+            self.bl_elemek = [self.bl_mag_cim, self.bl_mag, self.bl_tempo_cim,
+                              self.bl_tempo_v, self.bl_ero_cim, self.bl_ero]
 
         v.Add(wx.StaticText(p, label="&Próbaszöveg:"), 0, wx.LEFT, 8)
         self.proba_txt = wx.TextCtrl(
@@ -168,6 +234,7 @@ class JatekokFrame(wx.Frame):
         v.Add(sor, 0, wx.ALL, 8)
         p.SetSizer(v)
         self.nb.AddPage(p, "Hangbeállítás")
+        self._hang_vezerlok()          # a választott hanghoz tartozó szabályzók
 
     # ---- akadálymentes visszajelzés -----------------------------------
 
@@ -246,12 +313,49 @@ class JatekokFrame(wx.Frame):
 
     # ---- retró hang ---------------------------------------------------
 
+    def _brailab_e(self) -> bool:
+        """Az IGAZI BraiLab motor a választott hang?"""
+        return self._hang == brailab.KULCS
+
+    def _hang_vezerlok(self):
+        """A választott hanghoz tartozó szabályzókat MUTATJUK, a többit REJTJÜK
+        (nem letiltjuk – így a tabulátor sem visz használhatatlan elemre)."""
+        bl = self._brailab_e()
+        for w in (self.tempo_cim, self.tempo_cs):
+            w.Show(not bl)
+        for w in self.bl_elemek:
+            w.Show(bl)
+        try:
+            self.tempo_cs.GetParent().Layout()
+        except Exception:
+            pass
+
     def _hang_valaszt(self):
         i = self.hang_lst.GetSelection()
-        if 0 <= i < len(RS.GEPEK):
-            self._hang = RS.GEPEK[i].kulcs
+        if 0 <= i < len(self._hangok):
+            self._hang, nev = self._hangok[i]
             self._save_hang_cfg()
-            self._announce(f"Hangkarakter: {RS.GEPEK[i].nev}", beszel=True)
+            self._hang_vezerlok()
+            if self._brailab_e():
+                # a fokozatokat MINDIG rátoltjuk a motorra, ha ő szól
+                brailab.motor().beallit(self._bl_magassag, self._bl_tempo,
+                                        self._bl_hangero)
+            self._announce(f"Hangkarakter: {nev}", beszel=True)
+
+    def _bl_valaszt(self):
+        """A BraiLab fokozatainak állítása (magasság, tempó, hangerő)."""
+        self._bl_magassag = brailab.MAGASSAGOK[max(0, self.bl_mag.GetSelection())]
+        self._bl_tempo = brailab.TEMPOK[max(0, self.bl_tempo_v.GetSelection())]
+        self._bl_hangero = brailab.HANGEROK[max(0, self.bl_ero.GetSelection())]
+        self._save_hang_cfg()
+        jo = brailab.motor().beallit(self._bl_magassag, self._bl_tempo,
+                                    self._bl_hangero)
+        szoveg = ("BraiLab: magasság %s, tempó %d, hangerő %s."
+                  % (self.bl_mag.GetStringSelection(), self._bl_tempo,
+                     self.bl_ero.GetStringSelection()))
+        if not jo:
+            szoveg += " A motor nem fogadta el mindegyik fokozatot."
+        self._announce(szoveg, beszel=True)
 
     def _tempo_valaszt(self):
         # a csúszka „sebesség %", ebből lesz az időtartam-szorzó (nagyobb
@@ -272,6 +376,9 @@ class JatekokFrame(wx.Frame):
             cfg["hang"] = self._hang
             cfg["tempo"] = self._tempo_szazalek
             cfg["retro_hang"] = bool(self._retro_hang)
+            cfg["brailab_magassag"] = self._bl_magassag
+            cfg["brailab_tempo"] = self._bl_tempo
+            cfg["brailab_hangero"] = self._bl_hangero
             store.save_json(p, cfg)
         except Exception:
             pass
@@ -292,7 +399,18 @@ class JatekokFrame(wx.Frame):
         self._retro_mond(szoveg)
 
     def _retro_mond(self, szoveg: str):
-        """A szöveg megszólaltatása a RETRÓ hangon, háttérben."""
+        """A szöveg megszólaltatása a választott hangon, háttérben."""
+        if self._brailab_e():
+            # A BraiLab MAGA szólal meg (nincs WAV-készítés), ezért nincs
+            # „hang készítése" fázis sem – csak elindítjuk.
+            m = brailab.motor()
+            m.beallit(self._bl_magassag, self._bl_tempo, self._bl_hangero)
+            if not m.mond(szoveg):
+                self._announce("A BraiLab hang nem szólalt meg"
+                               + (f": {m.hiba}" if m.hiba else "."), beszel=True)
+                return
+            self._announce("Szól a BraiLab hang. Leállítás: Escape.")
+            return
         if self._busy:
             self._announce("Egy hang már készül, várd meg a végét.")
             return
@@ -341,6 +459,10 @@ class JatekokFrame(wx.Frame):
                 self._player.stop()
         except Exception:
             pass
+        try:
+            brailab.motor().stop()      # a BraiLab a saját motorján szól
+        except Exception:
+            pass
         self._announce("Hang leállítva.")
 
     # ---- játék indítása ------------------------------------------------
@@ -358,6 +480,11 @@ class JatekokFrame(wx.Frame):
                 f"A(z) „{j.nev}” még készül – hamarosan játszható lesz.",
                 beszel=True)
             return
+        if self._brailab_e():
+            # a mentett fokozatok akkor is érvényesüljenek, ha a felhasználó
+            # most nem járt a Hangbeállítás fülön
+            brailab.motor().beallit(self._bl_magassag, self._bl_tempo,
+                                    self._bl_hangero)
         try:
             indit_jatek(self, j, lambda: (self._hang, self._tempo))
         except Exception as e:
@@ -389,6 +516,10 @@ class JatekokFrame(wx.Frame):
         try:
             if self._player:
                 self._player.stop()
+        except Exception:
+            pass
+        try:
+            brailab.motor().leallit()   # a 32 bites kísérő-folyamat is záruljon
         except Exception:
             pass
         if getattr(self.main, "_jatekok_win", None) is self:
