@@ -30,3 +30,8 @@ modules_src/csevej/csevej_mod/ably_kulcs_beepitett.txt
 
 # Super Mail – valódi OAuth kliens-ID-k (a ZIP-be kerülnek, de nem a repóba)
 modules_src/mail/mail_mod/oauth_kliens.json
+
+# BraiLab-készlet – NEM terjesztjük (feloldható retesz)
+modules_src/jatekok/jatekok_mod/brailab/
+tools/brailab_keszlet/
+tools/brailab_host/brailab_host.exe
