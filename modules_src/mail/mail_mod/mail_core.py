@@ -328,17 +328,52 @@ def mappa_display(raw):
 # ======================================================================
 
 def level_fejlec_info(msg):
-    """A lista-nézethez: feladó, tárgy, dátum, van-e csatolmány."""
+    """A lista-nézethez: feladó, tárgy, dátum, van-e csatolmány.
+
+    A SZABÁLYOKHOZ néhány további mező is kell (levelezőlista, hírlevél-jelleg,
+    másolat, azonosító). Ezek olcsók – ugyanabban a fejléc-letöltésben jönnek –,
+    és nélkülük a „minden erről a listáról" típusú szabály nem volna
+    megfogalmazható."""
     van_csat = any(
         (r.get_filename() or (r.get_content_disposition() == "attachment"))
         for r in msg.walk()) if msg.is_multipart() else bool(msg.get_filename())
+    lista_id = dekodol_fejlec(msg.get("List-Id", ""))
+    leiratkozas = dekodol_fejlec(msg.get("List-Unsubscribe", ""))
+    # „tömeges küldemény": a hírlevelek/reklámok szabvány szerint jelölik
+    # magukat – vagy leiratkozó fejléccel, vagy a Precedence/Auto-Submitted
+    # mezővel. Ez a jelölés a KÜLDŐÉ, tehát megbízhatóbb bármilyen
+    # szó-kitalálásnál (a „reklám" szóra keresés téves találatokat adna).
+    precedence = _norm_fejlec(msg.get("Precedence", ""))
+    marketing = bool(leiratkozas) or precedence in ("bulk", "list", "junk")
     return {
         "felado": dekodol_fejlec(msg.get("From", "")),
         "targy": dekodol_fejlec(msg.get("Subject", "(nincs tárgy)")),
         "datum": dekodol_fejlec(msg.get("Date", "")),
         "cimzett": dekodol_fejlec(msg.get("To", "")),
+        "masolat": dekodol_fejlec(msg.get("Cc", "")),
         "csatolmany": bool(van_csat),
+        "lista_id": lista_id,
+        "leiratkozas": leiratkozas,
+        "marketing": marketing,
+        "azonosito": (msg.get("Message-ID", "") or "").strip(),
+        "valaszcim": dekodol_fejlec(msg.get("Reply-To", "")),
+        "leiratkozas_post": dekodol_fejlec(
+            msg.get("List-Unsubscribe-Post", "")),
+        "valasz_erre": (msg.get("In-Reply-To", "") or "").strip(),
+        "hivatkozasok": (msg.get("References", "") or "").strip(),
     }
+
+
+def _norm_fejlec(ertek) -> str:
+    return str(ertek or "").strip().lower()
+
+
+def _meret_a_metabol(meta) -> int:
+    """A levél mérete bájtban, az IMAP válasz meta-részéből (RFC822.SIZE).
+    Ha a szerver nem adja meg, 0 – a méret-feltétel ilyenkor nem illeszkedik
+    (inkább ne tegyen semmit, mint hogy rosszul döntsön)."""
+    m = re.search(rb"RFC822\.SIZE (\d+)", meta or b"")
+    return int(m.group(1)) if m else 0
 
 
 def _resz_szoveg(resz):
@@ -377,6 +412,24 @@ def level_szovegtorzs(msg):
     if html:
         return html_to_szoveg(html)
     return ""
+
+
+def level_html_torzs(msg) -> str:
+    """A levél HTML része nyersen (üres, ha nincs).
+
+    A biztonsági ellenőrzéshez kell: a megtévesztő hivatkozás („OTP Bank” néven
+    egy orosz cím) CSAK a HTML-forrásban látszik – a szöveggé alakított
+    változatban már nem."""
+    if msg.is_multipart():
+        for resz in msg.walk():
+            if resz.is_multipart():
+                continue
+            if resz.get_content_disposition() == "attachment":
+                continue
+            if resz.get_content_type() == "text/html":
+                return _resz_szoveg(resz)
+        return ""
+    return _resz_szoveg(msg) if msg.get_content_type() == "text/html" else ""
 
 
 def csatolmanyok(msg):
@@ -432,6 +485,9 @@ def level_epit(felado, cimzett, targy, torzs, masolat="", csatolmanyok_lista=Non
     if titkos:
         m["Bcc"] = titkos           # a send_message a Bcc-t kiszedi, de elküldi
     m["Subject"] = targy or "(nincs tárgy)"
+    # SAJÁT AZONOSÍTÓ: enélkül a szerver adja, mi pedig nem tudnánk, melyik
+    # levélre jött vissza az olvasási visszaigazolás (tértivevény).
+    m["Message-ID"] = email.utils.make_msgid(domain=_domain(felado) or None)
     if valasz_id:
         m["In-Reply-To"] = valasz_id
         m["References"] = valasz_id
@@ -535,18 +591,39 @@ def cimjegyzek_megjelenit(c):
     return f"{nev} <{c['email']}>" if nev else c.get("email", "")
 
 
+def cimjegyzek_becenev(email_cim, becenev):
+    """BECENÉV egy címhez: „anyu”, „doki”, „lista”.
+
+    Vakon ez sokat ér: nem kell hosszú címet betűzni, elég a becenév. A
+    keresés a becenevet is nézi, és a becenévvel PONTOSAN egyező találat
+    kerül előre."""
+    em = (email_cim or "").strip().lower()
+    lista = cimjegyzek_betolt()
+    for c in lista:
+        if c.get("email", "").lower() == em:
+            c["becenev"] = (becenev or "").strip()
+            cimjegyzek_ment(lista)
+            return True
+    return False
+
+
 def cimjegyzek_kereses(reszlet, limit=30):
-    """A beírt szöveget TARTALMAZÓ címek (névben vagy e-mailben), gyakoriság +
-    frissesség szerint rendezve (üres részletnél a leggyakoribbak)."""
+    """A beírt szöveget TARTALMAZÓ címek (névben, e-mailben vagy BECENÉVBEN),
+    gyakoriság + frissesség szerint rendezve (üres részletnél a
+    leggyakoribbak). A becenévvel PONTOSAN egyező találat mindig legelöl van."""
     r = (reszlet or "").strip().lower()
     lista = cimjegyzek_betolt()
 
     def talalat(c):
         return (r in c.get("email", "").lower()
-                or r in c.get("nev", "").lower())
+                or r in c.get("nev", "").lower()
+                or r in (c.get("becenev", "") or "").lower())
+
+    def pontos_becenev(c):
+        return bool(r) and (c.get("becenev", "") or "").lower() == r
     szurt = [c for c in lista if (not r or talalat(c))]
-    szurt.sort(key=lambda c: (int(c.get("db", 0)), c.get("utoljara", 0)),
-               reverse=True)
+    szurt.sort(key=lambda c: (pontos_becenev(c), int(c.get("db", 0)),
+                              c.get("utoljara", 0)), reverse=True)
     return szurt[:limit]
 
 
@@ -666,7 +743,14 @@ _ALTALANOS_ALAP = {"auto_ellenoriz": True, "ellenoriz_perc": 3,
                    "osszes_perc": 3,
                    # értesítő hang mindenkinek (MK3)
                    "ertesito_hang_be": True,
-                   "ertesito_hang_fajl": ""}
+                   "ertesito_hang_fajl": "",
+                   # a szabályok automatikus futtatása az ÚJ leveleken
+                   "szabalyok_auto": True,
+                   # küldés visszavonása: ennyi másodpercig vár a levél
+                   "visszavonas_mp": 10,
+                   # tértivevény: kérjük-e, és mit tegyünk, ha tőlünk kérik
+                   "tertivevony_keres": False,
+                   "tertivevony_valasz": "kerdez"}
 
 
 def altalanos_betolt():
@@ -772,6 +856,35 @@ class ImapKliens:
                 ki.append(nev)
         return ki or ["INBOX"]
 
+    def mappa_letrehoz(self, nev):
+        """Mappa létrehozása (IMAP CREATE) – a szabályok ezzel tudnak új
+        mappába rendezni anélkül, hogy a felhasználónak előbb kézzel kellene
+        létrehoznia.
+
+        Ha a mappa MÁR LÉTEZIK, azt SIKERNEK vesszük: a hívó szándéka az, hogy
+        „legyen ilyen mappa”, és az teljesült. (A szerverek eltérő hibaszöveget
+        adnak erre, ezért a meglétet a mappalistából ellenőrizzük.)"""
+        nev = str(nev or "").strip()
+        if not nev:
+            raise ValueError("Üres mappanév.")
+        meglevo = {m.strip().strip('"').lower() for m in self.mappak()}
+        if nev.lower() in meglevo:
+            return nev
+        typ, adat = self.M.create(self._mappa_arg(nev))
+        if typ != "OK":
+            # Utolsó ellenőrzés: hátha versenyhelyzet volt, és közben létrejött.
+            if nev.lower() in {m.strip().strip('"').lower()
+                               for m in self.mappak()}:
+                return nev
+            uzenet = b" ".join(x for x in (adat or []) if isinstance(x, bytes))
+            raise RuntimeError("A mappa létrehozása nem sikerült: "
+                               + uzenet.decode("utf-8", "replace")[:200])
+        try:                       # a Gmail csak feliratkozás után mutatja
+            self.M.subscribe(self._mappa_arg(nev))
+        except Exception:
+            pass
+        return nev
+
     @staticmethod
     def _mappa_arg(nev):
         """A mappanevet IMAP-argumentumként idézőjelezi, ha kell (szóköz vagy
@@ -796,7 +909,10 @@ class ImapKliens:
         uidok = sorted((int(u) for u in adat[0].split()), reverse=True)
         return [str(u) for u in uidok[offset:offset + limit]]
 
-    _FEJLEC_FETCH = "(UID FLAGS BODY.PEEK[HEADER.FIELDS (FROM SUBJECT DATE TO)])"
+    _FEJLEC_FETCH = ("(UID FLAGS RFC822.SIZE BODY.PEEK[HEADER.FIELDS "
+                     "(FROM SUBJECT DATE TO CC MESSAGE-ID LIST-ID "
+                     "LIST-UNSUBSCRIBE LIST-UNSUBSCRIBE-POST PRECEDENCE REPLY-TO "
+                     "IN-REPLY-TO REFERENCES)])")
 
     def lista(self, mappa="INBOX", limit=50, offset=0):
         """A mappa leveleinek fejléc-infói (LEGÚJABB ELÖL), LAPOZÁSSAL.
@@ -834,9 +950,10 @@ class ImapKliens:
             msg = email.message_from_bytes(nyers)
             info = level_fejlec_info(msg)
             info["uid"] = uid
+            info["meret"] = _meret_a_metabol(meta)
             info["olvasott"] = b"\\Seen" in flags
             ki.append(info)
-        ki.reverse()          # a fetch NÖVEKVŐ szekvencia-sorrendben ad → legújabb elöl
+        ki.reverse()        # a fetch NÖVEKVŐ szekvencia-sorrendben ad → legújabb elöl
         return ki
 
     def _lista_uidokkal(self, mappa, limit, offset):
@@ -851,6 +968,7 @@ class ImapKliens:
             msg = email.message_from_bytes(nyers)
             info = level_fejlec_info(msg)
             info["uid"] = uid
+            info["meret"] = _meret_a_metabol(meta)
             info["olvasott"] = b"\\Seen" in flags
             ki.append(info)
         return ki
@@ -1223,6 +1341,7 @@ def level_epit_html(felado, cimzett, targy, torzs, masolat="",
     if titkos:
         m["Bcc"] = titkos
     m["Subject"] = targy or "(nincs tárgy)"
+    m["Message-ID"] = email.utils.make_msgid(domain=_domain(felado) or None)
     if valasz_id:
         m["In-Reply-To"] = valasz_id
         m["References"] = valasz_id

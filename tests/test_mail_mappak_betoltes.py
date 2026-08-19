@@ -72,14 +72,20 @@ def _beallitott_attributumok(forras):
     return nevek
 
 
-def test_minden_hivott_sajat_metodus_letezik():
+@pytest.mark.parametrize("fajl,modul", [
+    (FAJL, "mailwin"),
+    ("modules_src/mail/mail_mod/szabalywin.py", "szabalywin"),
+])
+def test_minden_hivott_sajat_metodus_letezik(fajl, modul):
     """EZ fogta volna meg az 1.0.14 hibáját: a `_mappak_rendez` hívása bent
-    maradt, a metódus viszont törlődött."""
-    forras = open(FAJL, encoding="utf-8").read()
+    maradt, a metódus viszont törlődött. Az ablak-fájlokra futtatjuk, mert ott
+    a hiba egy wx-visszahívásban némán elnyelődik."""
+    import importlib
+    m = importlib.import_module("mail_mod." + modul)
+    forras = open(fajl, encoding="utf-8").read()
     hivott = _hivott_metodusnevek(forras)
     beallitott = _beallitott_attributumok(forras)
-    osztalyok = [getattr(MW, n) for n in dir(MW)
-                 if isinstance(getattr(MW, n), type)]
+    osztalyok = [getattr(m, n) for n in dir(m) if isinstance(getattr(m, n), type)]
     hianyzik = sorted(
         nev for nev in hivott
         if not any(hasattr(o, nev) for o in osztalyok) and nev not in beallitott)

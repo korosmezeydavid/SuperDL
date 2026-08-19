@@ -9,14 +9,27 @@ csinál, és SEMMIT nem továbbít sehová. Az első indításkor hozzájárulá
 import os
 import re
 import threading
+import time as _ido
 from pathlib import Path
 
 import wx
+import wx.adv                     # a dátumválasztóhoz (időzített küldés)
 
 from . import ailevel as AI
+from . import beszelgetes as BESZ
+from . import biztonsag as BIZT
+from . import csatolmany as CS
+from . import emlekezteto as EM
+from . import export as EXP
+from . import gyorsitotar as GY
 from . import forditas as FORD
 
+from . import kimeno as KM
 from . import mail_core as MC
+from . import mdn as MDN
+from . import sablonok as SAB
+from . import szabalyok as SZ
+from . import szabalywin as SZW
 # OAuth eltávolítva: kizárólag app-jelszavas hitelesítés (lásd a súgót).
 
 
@@ -92,6 +105,95 @@ _SUGO = (
     "a háttérben – az időköz a Beállítások → Általános fülön állítható –, az "
     "F5 pedig bármikor azonnali, teljes frissítést kér. Az induló nézet is "
     "beállítható. (A Fiók menüből is elérhető.)\n"
+    "• KÜLDÉS VISSZAVONÁSA: a Küldés után a levél még néhány másodpercig NÁLAD "
+    "vár (alapból 10 mp, a Beállítások → Általános fülön állítható, 0 = "
+    "azonnali küldés). Addig a Ctrl+Z visszavonja. Őszintén: elküldött levelet "
+    "visszahívni NEM lehet – sem nálunk, sem a Gmailben; ez a néhány másodperc "
+    "az, ami valóban megmenthet egy elkapkodott levelet.\n"
+    "• IDŐZÍTETT KÜLDÉS (a levélírásban Ctrl+Shift+I vagy az Időzített küldés "
+    "gomb): a levél a megadott napon és órában megy el – például hajnalban "
+    "megírod, és reggel nyolckor érkezik. Bejelölheted, hogy MINDEN ÉVBEN "
+    "ugyanekkor menjen (születésnap, évforduló); ilyenkor a küldés előtti "
+    "napon a program rákérdez, hogy így jó-e, vagy idén hagyjuk ki. A "
+    "várakozó levél a SuperDL naptárában is megjelenik. Amíg vár, a Ctrl+Shift+K "
+    "(Levél menü → Kimenő) megmutatja, és ott azonnal el is küldheted vagy "
+    "visszavonhatod. A várakozó levél a gépeden, fájlban ül: áramszünet vagy "
+    "kilépés után is elmegy majd.\n"
+    "• BIZTONSÁG: a levél megnyitásakor a program KIMONDJA, ha valami nem "
+    "stimmel: ha a feladó neve ismert céget mutat, de a cím nem a "
+    "hivatalos (például „Magyar Posta” néven egy idegen címről), ha a cím "
+    "megtévesztően hasonlít egy valódira, ha a válasz máshova menne, ha a "
+    "levél jelszót vagy kártyaszámot kér és közben sürget, ha egy "
+    "hivatkozás máshova visz, mint amit mutat, vagy ha a csatolmány "
+    "megnyitáskor programot indítana. Ezek figyelmeztetések: a döntés a "
+    "tiéd, semmit nem tiltunk meg. Igazi bank vagy hivatal SOHA nem kér "
+    "jelszót levélben.\n"
+    "• LEIRATKOZÁS EGY BILLENTYŰVEL (Ctrl+U): hírlevélnél a program a "
+    "szabványos fejlécből tudja, hova kell szólni – nem kell a levél "
+    "végén vadászni az apró leiratkozó linkre. Megkérdezi, mit tegyen, és "
+    "elküldi a leiratkozó levelet, vagy megnyitja a leiratkozó oldalt.\n"
+    "• TÉRTIVEVÉNY: a levélírás ablakában bejelölheted, hogy visszajelzést "
+    "kérsz az elolvasásról; a Levél menü „Kért visszajelzések” pontja "
+    "megmutatja, melyikre jött válasz. ŐSZINTÉN: ez KÉRÉS, nem nyugta – a "
+    "címzett programja őt kérdezi meg, és ő nemet is mondhat, sok program "
+    "pedig meg sem kérdezi. Ha megjön, az biztos jel; ha nem jön meg, abból "
+    "nem következik, hogy nem olvasták el. Fordítva: ha TŐLED kérnek "
+    "visszajelzést, a program megkérdez, és soha nem küld a hátad mögött (a "
+    "Beállításokban átállítható). Rejtett képpel („követő pont”) SOHA nem "
+    "mérünk – az a címzett megfigyelése a tudta nélkül.\n"
+    "• EMLÉKEZTESS RÁ KÉSŐBB (Ctrl+H): a levél most eltűnik a Beérkezettből "
+    "(a Halasztott mappába kerül), és a választott időpontban – egy óra "
+    "múlva, ma este, holnap reggel, hétfőn, egy hét múlva – magától "
+    "visszajön. Küldéskor pedig bejelölheted, hogy szóljak, ha 5 napon belül "
+    "nem érkezik válasz; a választ a levelek szabványos hivatkozásaiból "
+    "ismerem fel, nem szövegből.\n"
+    "• IDŐPONT A NAPTÁRBA (Ctrl+D a megnyitott levélben): ha a levél időpontot "
+    "említ („kedden 14 órakor”, „július 11-én”), a program felajánlja, és egy "
+    "billentyűvel felveszi a SuperDL naptárába.\n"
+    "• CSATOLMÁNY FELOLVASÁSA (Ctrl+Shift+L a megnyitott levélben): a PDF, "
+    "Word, ODT, EPUB vagy szöveges csatolmány TARTALMA jelenik meg "
+    "felolvasható mezőben – nem kell másik programot nyitni hozzá. Ha a fájl "
+    "nem alakítható szöveggé (kép, hang, tömörített csomag), a program "
+    "megmondja, miért.\n"
+    "• BESZÉLGETÉSEK (Ctrl+Shift+B): a kijelölt levélhez tartozó összes levél "
+    "egy szálban – „3 levél ebben a beszélgetésben”. Az F5 visszahozza a "
+    "teljes mappát. IDÉZET-ÁTUGRÁS: ha egy válasz nagyrészt a beidézett "
+    "előzmény, alapból csak az ÚJ részt mutatjuk; a Ctrl+I odaadja a teljes "
+    "szöveget.\n"
+    "• PARANCSOK (Ctrl+K): a program MINDEN művelete egy listában, gépelve "
+    "szűrhetően. Aki nem akar negyven gyorsbillentyűt fejben tartani, annak "
+    "ez az út.\n"
+    "• TAKARÍTÁS (Szabályok menü): megszámolja, hány hírlevél, listás vagy "
+    "nagy levél van a mappában, megmondja, mi történne, és csak jóváhagyás "
+    "után rendez – utána visszavonható.\n"
+    "• OFFLINE OLVASÁS: ha nincs kapcsolat, a program a HELYI másolatot "
+    "mutatja (és megmondja, mikor mentette). A megnyitott leveleket elteszi, "
+    "így vonaton vagy nyaraláson is olvashatók. Küldeni és frissíteni "
+    "természetesen csak hálózattal lehet.\n"
+    "• BECENEVEK a címjegyzékben: „anyu”, „doki”, „lista” – beírod a becenevet, "
+    "és a program kiegészíti a címet.\n"
+    "• SABLONOK (Ctrl+Shift+T a levélírásban): kész levélszövegek kitölthető "
+    "helyekkel – „Kedves {nev}!” –, a program megkérdezi, mi kerüljön oda. A "
+    "{datum}, {ido}, {ev}, {sajat_cim} és {cimzett} helyeket magától tölti ki. "
+    "A mostani levél sablonként mentése: Ctrl+Shift+M.\n"
+    "• OKOS MAPPÁK (Ctrl+Shift+O): mentett szűrők a betöltött levelekre – "
+    "Olvasatlan, Csatolmányos, Hírlevelek, Levelezőlisták, Számlák, Nagy "
+    "levelek. Nem valódi mappák, hanem nézetek; az F5 visszahozza a teljes "
+    "mappát.\n"
+    "• POSTAFIÓK MENTÉSE (Fiók menü): a mappa teljes mentése SZABVÁNYOS "
+    "mbox-fájlba, amit bármelyik másik levelezőprogram be tud olvasni. Az "
+    "adatod a tiéd – nem kötünk magunkhoz.\n"
+    "• SZABÁLYOK (Szabályok menü): a levelek automatikus rendezése mappákba. "
+    "A LEGGYORSABB ÚT: állj rá egy levélre a listában, és nyomd meg a "
+    "Ctrl+Shift+R-t – a program felajánlja, hogy ezentúl minden ilyen levél "
+    "(ettől a feladótól, erről a levelezőlistáról, minden hírlevél…) hova "
+    "kerüljön; a mappát létre is hozza, ha még nincs. A szabályok kezelése "
+    "Ctrl+Shift+S: itt új szabályt írhatsz, sorrendbe rakhatod őket (Fel/Le), "
+    "a szóközzel ki-be kapcsolhatod, és a PRÓBA gombbal megnézheted, hány "
+    "levélre illene – anélkül, hogy bármi megmozdulna. A Ctrl+Shift+F a "
+    "mostani mappára futtatja a szabályokat, a rendezés pedig VISSZAVONHATÓ "
+    "(Szabályok menü). Egy szabály el is rejtheti a hírlevelek értesítő "
+    "hangját, olvasottnak jelölheti vagy Kukába teheti a levelet.\n"
     "• ÚJ LEVÉL HANGJA: rövid jelzés szól, akkor is, ha fiókonként nem "
     "állítottál be értesítőt. Kikapcsolható, és saját WAV-ra cserélhető "
     "(Beállítások → Általános). Több egyszerre érkező levélre EGY hang szól.\n"
@@ -965,6 +1067,75 @@ class KetMezosDialog(wx.Dialog):
         return self._m2.GetValue().strip()
 
 
+class IdozitesDialog(wx.Dialog):
+    """Küldés későbbre – dátum, idő, és „minden évben ugyanekkor”.
+
+    A születésnapi köszöntő miatt van az évente ismétlődés: a felhasználó
+    kérése szerint „például július 11. napján küldjön ide egy levelet”. Az
+    ismétlődő levélnél a program a küldés előtti napon rá is kérdez."""
+
+    def __init__(self, parent, main):
+        super().__init__(parent, title="Időzített küldés")
+        self.main = main
+        v = wx.BoxSizer(wx.VERTICAL)
+        sug = wx.StaticText(self, label=(
+            "A levél nem most megy el, hanem a megadott időpontban. Addig a "
+            "gépeden vár, és a Levél menü Kimenő pontjában bármikor "
+            "visszavonhatod."))
+        sug.Wrap(520)
+        v.Add(sug, 0, wx.ALL, 12)
+
+        s1 = wx.BoxSizer(wx.HORIZONTAL)
+        s1.Add(wx.StaticText(self, label="&Dátum:"), 0,
+               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
+        self.datum = wx.adv.DatePickerCtrl(self, style=wx.adv.DP_DROPDOWN)
+        self.datum.SetName("A küldés dátuma")
+        s1.Add(self.datum, 0)
+        v.Add(s1, 0, wx.ALL, 10)
+
+        s2 = wx.BoxSizer(wx.HORIZONTAL)
+        s2.Add(wx.StaticText(self, label="&Óra:"), 0,
+               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
+        self.ora = wx.SpinCtrl(self, min=0, max=23, initial=8)
+        self.ora.SetName("Óra")
+        s2.Add(self.ora, 0, wx.RIGHT, 12)
+        s2.Add(wx.StaticText(self, label="&Perc:"), 0,
+               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
+        self.perc = wx.SpinCtrl(self, min=0, max=59, initial=0)
+        self.perc.SetName("Perc")
+        s2.Add(self.perc, 0)
+        v.Add(s2, 0, wx.ALL, 10)
+
+        self.evente = wx.CheckBox(
+            self, label="&Minden évben ugyanekkor menjen el (születésnap, "
+                        "évforduló)")
+        self.evente.SetName("Minden évben ugyanekkor menjen el. A küldés "
+                            "előtti napon a program rákérdez.")
+        v.Add(self.evente, 0, wx.ALL, 10)
+
+        gs = wx.BoxSizer(wx.HORIZONTAL)
+        ok = wx.Button(self, wx.ID_OK, "&Időzítés")
+        ok.SetDefault()
+        gs.Add(ok, 0, wx.RIGHT, 8)
+        gs.Add(wx.Button(self, wx.ID_CANCEL, "&Mégsem"), 0)
+        v.Add(gs, 0, wx.ALL | wx.ALIGN_CENTER, 12)
+        self.SetSizerAndFit(v)
+        self.CentreOnParent()
+        self.datum.SetFocus()
+        wx.CallAfter(_mondd, main,
+                     "Időzített küldés. Add meg a dátumot és az időt. "
+                     "Bejelölheted, hogy minden évben ismétlődjön.")
+
+    def eredmeny(self):
+        """(időpont epoch-ban, ismétlődés) – ezt kapja a küldés."""
+        d = self.datum.GetValue()
+        mikor = _ido.mktime((d.GetYear(), d.GetMonth() + 1, d.GetDay(),
+                             self.ora.GetValue(), self.perc.GetValue(), 0,
+                             0, 0, -1))
+        ism = KM.ISM_EVENTE if self.evente.GetValue() else KM.ISM_NINCS
+        return mikor, ism
+
+
 class LevelIroDialog(wx.Dialog):
     def __init__(self, parent, main, fiok, cimzett="", targy="", torzs="",
                  valasz_id=None, torzsre=False):
@@ -1023,11 +1194,31 @@ class LevelIroDialog(wx.Dialog):
         cs.Bind(wx.EVT_BUTTON, self._csatol)
         kb = wx.Button(self, wx.ID_OK, "&Küldés  (Ctrl+Enter)")
         kb.Bind(wx.EVT_BUTTON, self._kuld)
+        self.valaszvaras = wx.CheckBox(
+            self, label="Szólj, ha 5 napon belül &nem érkezik válasz")
+        self.valaszvaras.SetName(
+            "Emlékeztető, ha öt napon belül nem érkezik válasz erre a levélre. "
+            "A választ a levelek szabványos hivatkozásaiból ismerjük fel.")
+        v.Add(self.valaszvaras, 0, wx.LEFT, 8)
+        self.tertivevony = wx.CheckBox(
+            self, label="&Tértivevény: kérek visszajelzést az elolvasásról")
+        self.tertivevony.SetValue(
+            bool(MC.altalanos_betolt().get("tertivevony_keres", False)))
+        self.tertivevony.SetName(
+            "Tértivevény. FIGYELEM: ez kérés, nem nyugta – a címzett programja "
+            "őt kérdezi meg, és ő nemet is mondhat. Ha megjön, az biztos jel; "
+            "ha nem jön meg, abból nem következik, hogy nem olvasta el.")
+        v.Add(self.tertivevony, 0, wx.LEFT | wx.BOTTOM, 8)
+        idb = wx.Button(self, label="🕗 &Időzített küldés…  (Ctrl+Shift+I)")
+        idb.SetName("Időzített küldés: a levél későbbi időpontban megy el, "
+                    "akár minden évben ugyanekkor")
+        idb.Bind(wx.EVT_BUTTON, lambda e: self._idozit())
         gs.Add(cj, 0, wx.RIGHT, 8)
         gs.Add(ai, 0, wx.RIGHT, 8)
         gs.Add(besz, 0, wx.RIGHT, 8)
         gs.Add(cs, 0, wx.RIGHT, 8)
         gs.Add(kb, 0, wx.RIGHT, 8)
+        gs.Add(idb, 0, wx.RIGHT, 8)
         gs.Add(wx.Button(self, wx.ID_CANCEL, "Mégsem"), 0)
         v.Add(gs, 0, wx.ALL | wx.ALIGN_CENTER, 10)
         self.SetSizer(v)
@@ -1108,10 +1299,97 @@ class LevelIroDialog(wx.Dialog):
         dlg.Destroy()
         return True
 
+    def _sablon_beszur(self):
+        """Kész válasz beszúrása, a kitöltendő helyek megkérdezésével."""
+        sablonok = SAB.sablonok_betolt()
+        if not sablonok:
+            if wx.MessageBox(
+                    "Még nincs sablonod.\n\nA sablon egy kész levélszöveg, "
+                    "amiben kitölthető helyek lehetnek, például:\n\n"
+                    "Kedves {nev}!\n\nA mai napon ({datum}) …\n\n"
+                    "Mentsem el a mostani levelet sablonként?",
+                    "Sablonok", wx.YES_NO | wx.ICON_QUESTION, self) == wx.YES:
+                self._sablon_ment()
+            return
+        d = wx.SingleChoiceDialog(self, "Melyik sablont szúrjam be?",
+                                  "Sablonok", [s.nev for s in sablonok])
+        if d.ShowModal() != wx.ID_OK:
+            d.Destroy()
+            return
+        s = sablonok[d.GetSelection()]
+        d.Destroy()
+        ertekek = {}
+        for hely in SAB.helyettesitok(s.targy + "\n" + s.torzs):
+            be = wx.TextEntryDialog(self, "Mi kerüljön ide: %s" % hely,
+                                    "Sablon kitöltése")
+            if be.ShowModal() != wx.ID_OK:
+                be.Destroy()
+                return
+            ertekek[hely] = be.GetValue()
+            be.Destroy()
+        sajat = self.fiok.get("email", "")
+        cimzett = self.cimzett.GetValue().strip()
+        if not self.targy.GetValue().strip():
+            self.targy.SetValue(SAB.kitolt(s.targy, ertekek, sajat, cimzett))
+        torzs = SAB.kitolt(s.torzs, ertekek, sajat, cimzett)
+        self.torzs.SetValue(torzs + "\n" + self.torzs.GetValue())
+        self.torzs.SetInsertionPoint(0)
+        _mondd(self.main, "Sablon beszúrva: %s" % s.nev)
+
+    def _sablon_ment(self):
+        """A mostani levél elmentése sablonként."""
+        d = wx.TextEntryDialog(self, "Mi legyen a sablon neve?", "Sablon "
+                               "mentése", self.targy.GetValue().strip())
+        if d.ShowModal() != wx.ID_OK:
+            d.Destroy()
+            return
+        nev = d.GetValue().strip()
+        d.Destroy()
+        if not nev:
+            return
+        sablonok = SAB.sablonok_betolt()
+        sablonok.append(SAB.Sablon(nev=nev, targy=self.targy.GetValue(),
+                                   torzs=self.torzs.GetValue()))
+        SAB.sablonok_ment(sablonok)
+        _mondd(self.main, "Sablon elmentve: %s. A Ctrl+Shift+T-vel bármikor "
+                          "beszúrhatod." % nev)
+
+    def _idozit(self):
+        """Küldés későbbre – akár évente ismétlődően (születésnap)."""
+        d = IdozitesDialog(self, self.main)
+        if d.ShowModal() != wx.ID_OK:
+            d.Destroy()
+            return
+        mikor, ism = d.eredmeny()
+        d.Destroy()
+        if mikor <= _ido.time():
+            # MÚLTBELI IDŐPONT: az évente ismétlődőnél ez természetes (idén már
+            # elmúlt a nap), ott jövőre tesszük. Egyszeri levélnél viszont
+            # kérdezünk – a néma azonnali küldés meglepetés volna.
+            if ism == KM.ISM_EVENTE:
+                mikor = KM.kovetkezo_ev(mikor)
+                _mondd(self.main, "Ez az időpont idén már elmúlt, ezért a "
+                                  "levél jövőre megy el először.")
+            else:
+                if wx.MessageBox(
+                        "A megadott időpont már elmúlt.\n\nElküldjem most?",
+                        "Időzített küldés", wx.YES_NO | wx.ICON_QUESTION,
+                        self) != wx.YES:
+                    return
+                mikor = _ido.time()
+        self._idozites = (mikor, ism)
+        self._kuld(None)
+
     def _iro_billentyu(self, e):
         k = e.GetKeyCode()
         if k in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER) and e.ControlDown():
             self._kuld(None)
+        elif k in (ord("I"), ord("i")) and e.ControlDown() and e.ShiftDown():
+            self._idozit()                    # Ctrl+Shift+I: időzített küldés
+        elif k in (ord("T"), ord("t")) and e.ControlDown() and e.ShiftDown():
+            self._sablon_beszur()             # Ctrl+Shift+T: sablon beszúrása
+        elif k in (ord("M"), ord("m")) and e.ControlDown() and e.ShiftDown():
+            self._sablon_ment()               # Ctrl+Shift+M: mentés sablonként
         elif k == wx.WXK_F7:               # F7 = helyesírás (mint az Office-ban)
             self._helyesiras_futtat()
         elif k in (ord("S"), ord("s")) and e.ControlDown():
@@ -1527,10 +1805,43 @@ class LevelIroDialog(wx.Dialog):
                 MC.cimjegyzek_felvesz_szovegbol(mezo.GetValue())
             except Exception:
                 pass
-        _mondd(self.main, "Küldés folyamatban…")
-        _hatterben(lambda: MC.SmtpKuldo(self.fiok).kuld(msg),
-                   lambda r: self._kesz(),
-                   lambda ex: self._hiba(ex))
+        if getattr(self, "valaszvaras", None) is not None \
+                and self.valaszvaras.GetValue():
+            EM.valaszt_var(msg.get("Message-ID", ""),
+                           self.fiok.get("email", ""), cim or bcc,
+                           self.targy.GetValue(), 5)
+        # TÉRTIVEVÉNY: csak KÉRÉS – a címzett programja őt kérdezi meg.
+        if getattr(self, "tertivevony", None) is not None \
+                and self.tertivevony.GetValue():
+            MDN.keres_beallit(msg, self.fiok.get("email", ""))
+            MDN.kerest_rogzit(msg.get("Message-ID", ""), cim or bcc,
+                              self.targy.GetValue())
+        # A KIMENŐN keresztül megy: így visszavonható, és így időzíthető is.
+        # (Ha a visszavonási idő 0, a kimenő azonnal továbbítja.)
+        keses = getattr(self, "_idozites", None)
+        if keses is None:
+            mp = int(MC.altalanos_betolt().get("visszavonas_mp",
+                                               KM.ALAP_VISSZAVONAS))
+            mikor, ismetles = _ido.time() + max(0, mp), KM.ISM_NINCS
+        else:
+            mikor, ismetles = keses
+        azon = KM.betesz(self.fiok.get("email", ""), msg, mikor, ismetles,
+                         cimzett=(cim or bcc), targy=self.targy.GetValue())
+        szulo = self.GetParent()
+        if hasattr(szulo, "_kimeno_inditas"):
+            szulo._kimeno_inditas(azon)
+        self._kuldve = True
+        hatra = max(0, int(mikor - _ido.time()))
+        if keses is None and hatra:
+            _mondd(self.main, "A levél %s megy el. Addig a Levél menü "
+                              "„Küldés visszavonása” pontjával megállíthatod."
+                   % KM.ido_szoveg(hatra))
+        elif keses is not None:
+            _mondd(self.main, "Időzítve: a levél %s megy el."
+                   % KM.ido_szoveg(hatra))
+        else:
+            _mondd(self.main, "A levél elment!")
+        self.EndModal(wx.ID_OK)
 
     def _kesz(self):
         self._kuldve = True          # elküldve: bezáráskor nincs piszkozat-kérdés
@@ -1647,9 +1958,19 @@ class LevelOlvasoFrame(wx.Frame):
         h.SetName("Levél fejléce")
         v.Add(h, 0, wx.EXPAND | wx.ALL, 8)
 
-        v.Add(wx.StaticText(p, label="Levél &szövege:"), 0, wx.LEFT, 8)
+        # IDÉZET-ÁTUGRÁS: ha a levél nagyrészt beidézett előzmény, alapból az
+        # ÚJ részt mutatjuk – a teljes szöveg egy billentyűvel (Ctrl+I)
+        # visszakapcsolható. Látva át lehet ugrani az idézetet; hallgatva nem.
+        self._teljes_torzs = torzs
+        self._uj_torzs = BESZ.uj_resz(torzs)
+        self._csak_uj = bool(self._uj_torzs
+                             and BESZ.idezet_aranya(torzs) >= 0.4)
+        cimke = ("Levél &szövege – csak az ÚJ rész (Ctrl+I: teljes szöveg):"
+                 if self._csak_uj else "Levél &szövege:")
+        v.Add(wx.StaticText(p, label=cimke), 0, wx.LEFT, 8)
         self.olvaso = wx.TextCtrl(
-            p, value=torzs, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2)
+            p, value=(self._uj_torzs if self._csak_uj else torzs),
+            style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2)
         self.olvaso.SetName("Levél szövege")
         self.olvaso.SetInsertionPoint(0)
         v.Add(self.olvaso, 1, wx.EXPAND | wx.ALL, 8)
@@ -1673,13 +1994,209 @@ class LevelOlvasoFrame(wx.Frame):
         wx.CallAfter(self.olvaso.SetFocus)
         n = len(self._linkek)
         lista = MC.lista_neve(msg) if MC.listas_level(msg) else ""
+        # BIZTONSÁGI FIGYELMEZTETÉS a levél ELEJÉN hangzik el – utólag, a
+        # szöveg meghallgatása után már késő volna.
+        self._figyelmeztetesek = self._biztonsag(fej, torzs, msg, csat)
+        if self._figyelmeztetesek:
+            fig = wx.TextCtrl(
+                p, value="⚠ " + "\n⚠ ".join(self._figyelmeztetesek),
+                size=(-1, 70),
+                style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2)
+            fig.SetName("Biztonsági figyelmeztetés")
+            v.Insert(0, fig, 0, wx.EXPAND | wx.ALL, 8)
+            p.Layout()
         wx.CallAfter(_mondd, self.main,
-                     f"{fej['felado']}. Tárgy: {fej['targy']}. A szöveg a Levél "
+                     ("FIGYELEM! " + " ".join(self._figyelmeztetesek) + " "
+                      if self._figyelmeztetesek else "")
+                     + f"{fej['felado']}. Tárgy: {fej['targy']}. A szöveg a Levél "
                      "szövege mezőben. "
+                     + (BESZ.bevezeto(torzs) + " " if BESZ.bevezeto(torzs) else "")
                      + (f"{n} hivatkozás a levélben, lent a listában. "
                         if n else "Nincs hivatkozás a levélben. ")
                      + (f"Ez a levél a(z) {lista} listáról jött – válasz a "
-                        "listára: L betű." if lista else ""))
+                        "listára: L betű. " if lista else "")
+                     + ("Erről a hírlevélről a Ctrl+U-val leiratkozhatsz."
+                        if BIZT.van_leiratkozas(self._info or {}) else ""))
+        # a tértivevény-kérdés a bemondás UTÁN jön, hogy ne vágjon a szavába
+        wx.CallAfter(self._tertivevony_kezel)
+        self._datumok = EM.datumok(torzs)
+        if self._datumok:
+            mikor, szo = self._datumok[0]
+            wx.CallAfter(
+                _mondd, self.main,
+                "Ez a levél időpontot említ: %s. A Ctrl+D-vel felveszem a "
+                "naptáradba." % mikor.strftime("%Y. %m. %d. %H:%M"))
+
+    def _idezet_valt(self):
+        """Váltás az ÚJ rész és a TELJES szöveg között (Ctrl+I)."""
+        if not getattr(self, "_uj_torzs", ""):
+            _mondd(self.main, "Ebben a levélben nincs idézett előzmény.")
+            return
+        self._csak_uj = not self._csak_uj
+        self.olvaso.SetValue(self._uj_torzs if self._csak_uj
+                             else self._teljes_torzs)
+        self.olvaso.SetInsertionPoint(0)
+        self.olvaso.SetFocus()
+        _mondd(self.main, "Csak az új rész." if self._csak_uj
+               else "A teljes szöveg, az idézett előzménnyel együtt.")
+
+    def _csat_felolvas(self):
+        """A csatolmány SZÖVEGE felolvasható mezőben – külön program nélkül.
+
+        Ez a SuperDL szerkezeti előnye: a dokumentum-feldolgozás ugyanabban a
+        programban van, mint a levelező."""
+        csat = MC.csatolmanyok(self._msg)
+        if not csat:
+            _mondd(self.main, "Ebben a levélben nincs csatolmány.")
+            return
+        if len(csat) == 1:
+            i = 0
+        else:
+            d = wx.SingleChoiceDialog(
+                self, "Melyik csatolmányt olvassam fel?", "Csatolmány",
+                ["%s%s" % (nev, "" if CS.olvashato_e(nev)
+                           else "  (nem szöveges)") for nev, _ in csat])
+            if d.ShowModal() != wx.ID_OK:
+                d.Destroy()
+                return
+            i = d.GetSelection()
+            d.Destroy()
+        nev, adat = csat[i]
+        if not CS.olvashato_e(nev):
+            uz = CS.miert_nem(nev)
+            _mondd(self.main, uz)
+            wx.MessageBox(uz, "Csatolmány", wx.OK | wx.ICON_INFORMATION, self)
+            return
+        _mondd(self.main, "A csatolmány feldolgozása…")
+
+        def munka():
+            return CS.szoveg(nev, adat)
+
+        def kesz(szoveg):
+            fej = CS.osszefoglalo(nev, szoveg)
+            keret = wx.Frame(self, title="Csatolmány – %s" % nev,
+                             size=(820, 620))
+            p = wx.Panel(keret)
+            v = wx.BoxSizer(wx.VERTICAL)
+            v.Add(wx.StaticText(p, label=fej), 0, wx.ALL, 8)
+            t = wx.TextCtrl(p, value=szoveg or "",
+                            style=wx.TE_MULTILINE | wx.TE_READONLY
+                            | wx.TE_RICH2)
+            t.SetName("A csatolmány szövege")
+            t.SetInsertionPoint(0)
+            v.Add(t, 1, wx.EXPAND | wx.ALL, 8)
+            b = wx.Button(p, wx.ID_CLOSE, "&Bezárás  (Escape)")
+            b.Bind(wx.EVT_BUTTON, lambda e: keret.Close())
+            v.Add(b, 0, wx.ALL | wx.ALIGN_CENTER, 8)
+            p.SetSizer(v)
+            keret.Bind(wx.EVT_CHAR_HOOK,
+                       lambda e: keret.Close()
+                       if e.GetKeyCode() == wx.WXK_ESCAPE else e.Skip())
+            keret.Show()
+            wx.CallAfter(t.SetFocus)
+            _mondd(self.main, fej)
+
+        def hiba(ex):
+            _mondd(self.main, "A csatolmányt nem sikerült szöveggé alakítani: "
+                              "%s" % ex)
+
+        _hatterben(munka, kesz, hiba)
+
+    def _naptarba(self):
+        """A levélben talált időpont felvétele a SuperDL naptárába (Ctrl+D)."""
+        talalatok = getattr(self, "_datumok", None) or []
+        if not talalatok:
+            _mondd(self.main, "Ebben a levélben nem találtam időpontot.")
+            return
+        if len(talalatok) == 1:
+            i = 0
+        else:
+            d = wx.SingleChoiceDialog(
+                self, "Melyik időpontot vegyem fel a naptárba?", "Naptár",
+                ["%s  (a levélben: %s)" % (mikor.strftime("%Y. %m. %d. %H:%M"),
+                                           szo) for mikor, szo in talalatok])
+            if d.ShowModal() != wx.ID_OK:
+                d.Destroy()
+                return
+            i = d.GetSelection()
+            d.Destroy()
+        mikor, _szo = talalatok[i]
+        fej = MC.level_fejlec_info(self._msg)
+        eid = EM.naptarba(mikor, fej.get("targy", "") or "Levél",
+                          "A levelet %s küldte." % fej.get("felado", ""))
+        if eid:
+            _mondd(self.main, "Felvettem a naptárba: %s, %s"
+                   % (mikor.strftime("%Y. %m. %d. %H:%M"),
+                      fej.get("targy", "")))
+        else:
+            _mondd(self.main, "A naptárba felvétel most nem sikerült.")
+
+    def _tertivevony_kezel(self):
+        """Ha TŐLÜNK kérnek visszajelzést: KÉRDEZÜNK. Soha nem küldünk a
+        felhasználó háta mögött – ez az ő adata, nem a feladóé.
+
+        Ha maga a levél egy visszaigazolás, azt csendben elkönyveljük."""
+        try:
+            if MDN.mdn_e(self._msg):
+                azon = MDN.mdn_eredeti_azonosito(self._msg)
+                if MDN.megjott(azon):
+                    _mondd(self.main, "Ez egy olvasási visszaigazolás: a "
+                                      "címzett megnyitotta a leveledet.")
+                return
+            kert = MDN.kertunk_e(self._msg)
+            if not kert:
+                return
+            mod = MC.altalanos_betolt().get("tertivevony_valasz", MDN.KERDEZ)
+            if mod == MDN.SOHA:
+                return
+            if mod == MDN.KERDEZ:
+                d = HaromValaszDialog(
+                    self, "Tértivevény",
+                    "A feladó (%s) visszajelzést kér arról, hogy elolvastad "
+                    "ezt a levelet.\n\nElküldjem?" % kert,
+                    "&Igen, elküldöm", "&Nem küldöm el", "&Soha ne kérdezd",
+                    self.main)
+                valasz = d.ShowModal()
+                d.Destroy()
+                if valasz == wx.ID_CANCEL:
+                    cfg = MC.altalanos_betolt()
+                    cfg["tertivevony_valasz"] = MDN.SOHA
+                    MC.altalanos_ment(cfg)
+                    _mondd(self.main, "Rendben, többé nem kérdezem, és nem is "
+                                      "küldök visszajelzést. A Beállítások "
+                                      "Általános fülén visszakapcsolhatod.")
+                    return
+                if valasz != wx.ID_YES:
+                    return
+            valasz_level = MDN.mdn_level(self._msg,
+                                         self._fiok.get("email", ""), kert)
+            _hatterben(lambda: MC.SmtpKuldo(self._fiok).kuld(valasz_level),
+                       lambda r: _mondd(self.main, "A visszajelzés elment."),
+                       lambda ex: _mondd(self.main,
+                                         "A visszajelzést nem sikerült "
+                                         "elküldeni: %s" % ex))
+        except Exception:
+            pass
+
+    def _biztonsag(self, fej, torzs, msg, csat):
+        """Amit a szem észrevenne, azt itt KIMONDJUK."""
+        try:
+            info = dict(self._info or {})
+            info.setdefault("felado", fej.get("felado", ""))
+            info.setdefault("valaszcim", (msg.get("Reply-To", "") or ""))
+            ki = BIZT.felado_gyanus(info)
+            ki += BIZT.tartalom_gyanus(fej.get("targy", ""), torzs)
+            try:
+                html = MC.level_html_torzs(msg)
+            except Exception:
+                html = ""
+            ki += BIZT.link_gyanus(html)
+            fig = BIZT.csatolmany_figyelmeztetes([c[0] for c in (csat or [])])
+            if fig:
+                ki.append(fig)
+            return ki
+        except Exception:
+            return []
 
     def _menusav(self):
         mb = wx.MenuBar()
@@ -1694,6 +2211,11 @@ class LevelOlvasoFrame(wx.Frame):
         mi(m, "Válasz a &levelezőlistára  (L)",
            lambda e: self._valasz_listara())
         mi(m, "&Fordítás magyarra  (F9)", lambda e: self._forditas())
+        mi(m, "Időpont a &naptárba  (Ctrl+D)", lambda e: self._naptarba())
+        mi(m, "Csatolmány &felolvasása  (Ctrl+Shift+L)",
+           lambda e: self._csat_felolvas())
+        mi(m, "&Idézett előzmény mutatása/elrejtése  (Ctrl+I)",
+           lambda e: self._idezet_valt())
         mi(m, "Válasz min&denkinek  (Shift+R)", lambda e: self._mf._valasz(
             msg=self._msg, fiok=self._fiok, mind=True))
         mi(m, "&Továbbítás  (F vagy Ctrl+F)", lambda e: self._mf._tovabbit(
@@ -1787,6 +2309,12 @@ class LevelOlvasoFrame(wx.Frame):
         elif (k in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER)
               and self.FindFocus() is self.link_lista):
             self._link_nyit()
+        elif ctrl and ch == "i":                   # Ctrl+I: idézet ki/be
+            self._idezet_valt()
+        elif ctrl and e.ShiftDown() and ch == "l":  # Ctrl+Shift+L: csatolmány
+            self._csat_felolvas()
+        elif ctrl and ch == "d":                   # Ctrl+D: naptárba a dátumot
+            self._naptarba()
         elif ch == "r" and e.ShiftDown():          # válasz MINDENKINEK
             self._mf._valasz(msg=self._msg, fiok=self._fiok, mind=True)
         elif ch == "r":                            # R vagy Ctrl+R: válasz
@@ -2297,6 +2825,50 @@ class BeallitasokDialog(wx.Dialog):
         self.alt_indulo_osszes.SetValue(bool(cfg.get("indulo_osszes", True)))
         v.Add(self.alt_indulo_osszes, 0, wx.LEFT | wx.BOTTOM, 12)
 
+        # --- KÜLDÉS VISSZAVONÁSA ---
+        hs5 = wx.BoxSizer(wx.HORIZONTAL)
+        hs5.Add(wx.StaticText(p, label="Küldés &visszavonására maradjon "
+                                       "(másodperc, 0 = azonnal megy):"),
+                0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.alt_visszavonas = wx.SpinCtrl(
+            p, min=0, max=120,
+            initial=int(cfg.get("visszavonas_mp", KM.ALAP_VISSZAVONAS)))
+        self.alt_visszavonas.SetName(
+            "Küldés után ennyi másodpercig még nálad vár a levél, és a "
+            "Ctrl+Z-vel visszavonhatod. Nulla esetén azonnal elmegy.")
+        hs5.Add(self.alt_visszavonas, 0)
+        v.Add(hs5, 0, wx.ALL, 8)
+
+        # --- TÉRTIVEVÉNY ---
+        self.alt_tv_keres = wx.CheckBox(
+            p, label="Új levélnél alapból &kérjek visszajelzést az elolvasásról")
+        self.alt_tv_keres.SetValue(bool(cfg.get("tertivevony_keres", False)))
+        self.alt_tv_keres.SetName(
+            "Tértivevény kérése alapból. Ez kérés, nem nyugta: a címzett "
+            "programja őt kérdezi meg, és ő nemet is mondhat.")
+        v.Add(self.alt_tv_keres, 0, wx.LEFT | wx.TOP, 12)
+        hs6 = wx.BoxSizer(wx.HORIZONTAL)
+        hs6.Add(wx.StaticText(p, label="Ha TŐLEM kérnek visszajelzést:"), 0,
+                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.alt_tv_valasz = wx.Choice(
+            p, choices=["kérdezzen meg", "mindig küldje el", "soha ne küldje"])
+        self.alt_tv_valasz.SetSelection(
+            {MDN.KERDEZ: 0, MDN.MINDIG: 1, MDN.SOHA: 2}.get(
+                cfg.get("tertivevony_valasz", MDN.KERDEZ), 0))
+        self.alt_tv_valasz.SetName("Mi történjen, ha tőlem kérnek olvasási "
+                                   "visszajelzést")
+        hs6.Add(self.alt_tv_valasz, 0)
+        v.Add(hs6, 0, wx.ALL, 8)
+
+        # --- SZABÁLYOK ---
+        self.alt_szab_auto = wx.CheckBox(
+            p, label="A &szabályok fussanak le magától az új leveleken")
+        self.alt_szab_auto.SetValue(bool(cfg.get("szabalyok_auto", True)))
+        self.alt_szab_auto.SetName(
+            "A szabályok automatikus futtatása az újonnan érkezett leveleken. "
+            "Kikapcsolva a szabályok csak a Szabályok menüből futnak.")
+        v.Add(self.alt_szab_auto, 0, wx.LEFT | wx.BOTTOM, 12)
+
         # --- ÚJ LEVÉL HANGJA (mindenkinek) ---
         self.alt_ert_hang_be = wx.CheckBox(
             p, label="Ú&j levélnél szóljon rövid hangjelzés")
@@ -2372,7 +2944,12 @@ class BeallitasokDialog(wx.Dialog):
                 "osszes_perc": int(self.alt_osszes_perc.GetValue()),
                 "indulo_osszes": bool(self.alt_indulo_osszes.GetValue()),
                 "ertesito_hang_be": bool(self.alt_ert_hang_be.GetValue()),
-                "ertesito_hang_fajl": self.alt_ert_hang_fajl.GetValue().strip()}
+                "ertesito_hang_fajl": self.alt_ert_hang_fajl.GetValue().strip(),
+                "szabalyok_auto": bool(self.alt_szab_auto.GetValue()),
+                "visszavonas_mp": int(self.alt_visszavonas.GetValue()),
+                "tertivevony_keres": bool(self.alt_tv_keres.GetValue()),
+                "tertivevony_valasz": [MDN.KERDEZ, MDN.MINDIG, MDN.SOHA][
+                    max(0, self.alt_tv_valasz.GetSelection())]}
         # TÚL SŰRŰ LEKÉRDEZÉS: néhány szolgáltató (főleg a Gmail) a gyakori
         # bejelentkezést ideiglenes letiltással bünteti – erre figyelmeztetünk,
         # de nem tiltjuk meg: a felhasználó dönt.
@@ -2464,6 +3041,10 @@ class MailFrame(wx.Frame):
         hibát legalább az állapotsorban jelezzük."""
         if self._closing:
             return
+        try:
+            self._emlekeztetok_ellenoriz()
+        except Exception:
+            pass
         if self._osszesitett:
             # EGYESÍTETT NÉZET: minden fiókot körbejárunk. Ütközés-védelem: ha
             # az előző körbejárás még fut (tíz fióknál ez percekig tarthat), a
@@ -2579,7 +3160,13 @@ class MailFrame(wx.Frame):
         self._mi(m_fiok, "&Frissítés  (F5)", lambda e: self._frissit_aktualis())
         self._mi(m_fiok, "További levelek &betöltése  (B)",
                  lambda e: self._tovabb_betolt())
+        self._mi(m_fiok, "&Parancsok – minden művelet egy helyen…  (Ctrl+K)",
+                 lambda e: self._parancspaletta())
         self._mi(m_fiok, "&Keresés…", self._keres)
+        self._mi(m_fiok, "&Okos mappák (mentett szűrők)…  (Ctrl+Shift+O)",
+                 lambda e: self._okos_mappa())
+        self._mi(m_fiok, "&Postafiók mentése fájlba (mbox)…",
+                 lambda e: self._postafiok_ment())
         self._mi(m_fiok, "⚙ &Beállítások (fiókok, értesítők, címjegyzék)…",
                  self._beallitasok)
         m_fiok.AppendSeparator()
@@ -2599,6 +3186,20 @@ class MailFrame(wx.Frame):
                  lambda e: self._menu_level_akcio(self._listara_valasz))
         self._mi(m_level, "&Továbbítás  (F vagy Ctrl+F)", lambda e: self._menu_level_akcio(
             lambda msg, f: self._tovabbit(msg=msg, fiok=f)))
+        m_level.AppendSeparator()
+        self._mi(m_level, "&Beszélgetés összefogása  (Ctrl+Shift+B)",
+                 lambda e: self._beszelgetes())
+        self._mi(m_level, "&Emlékeztess rá később…  (Ctrl+H)",
+                 lambda e: self._halaszt())
+        self._mi(m_level, "&Kért visszajelzések (tértivevény)…",
+                 lambda e: self._tertivevony_lista())
+        self._mi(m_level, "Leirat&kozás erről a hírlevélről  (Ctrl+U)",
+                 lambda e: self._leiratkozas())
+        m_level.AppendSeparator()
+        self._mi(m_level, "Küldés &visszavonása  (Ctrl+Z)",
+                 lambda e: self._kuldes_visszavon())
+        self._mi(m_level, "&Kimenő – várakozó levelek…  (Ctrl+Shift+K)",
+                 lambda e: self._kimeno_ablak())
         m_level.AppendSeparator()
         self._mi(m_level, "&Olvasottnak jelölés", lambda e: self._jelol(True))
         self._mi(m_level, "Ol&vasatlannak jelölés", lambda e: self._jelol(False))
@@ -2622,6 +3223,20 @@ class MailFrame(wx.Frame):
         self._mi(m_level, "Vé&gleges törlés  (Shift+Del)",
                  lambda e: self._torol(None, vegleges_kenyszer=True))
         mb.Append(m_level, "&Levél")
+
+        m_szab = wx.Menu()
+        self._mi(m_szab, "Szabály &ebből a levélből…  (Ctrl+Shift+R)",
+                 lambda e: self._szabaly_levelbol())
+        self._mi(m_szab, "&Szabályok kezelése…  (Ctrl+Shift+S)",
+                 lambda e: self._szabalyok_ablak())
+        m_szab.AppendSeparator()
+        self._mi(m_szab, "Szabályok &futtatása a mostani mappán  (Ctrl+Shift+F)",
+                 lambda e: self._szabalyok_futtat())
+        self._mi(m_szab, "&Takarítás – hírlevelek, listák, nagy levelek…",
+                 lambda e: self._takaritas())
+        self._mi(m_szab, "Az utolsó rendezés &visszavonása",
+                 lambda e: self._szabaly_visszavon())
+        mb.Append(m_szab, "S&zabályok")
 
         m_seg = wx.Menu()
         self._mi(m_seg, "&Súgó  (F1)", lambda e: self._sugo())
@@ -2657,6 +3272,13 @@ class MailFrame(wx.Frame):
                 return
         self._fiokok = MC.fiokok_betolt()
         self._fiok_valaszto_feltolt()
+        # Ha maradt várakozó levél (időzített vagy egy előző futásból), most
+        # indul a kimenő-figyelő – így az sem vész el, ha közben kiléptél.
+        try:
+            if KM.tetelek():
+                self._kimeno_inditas()
+        except Exception:
+            pass
         if not self._fiokok:
             self._mond("Üdv a Super Mailben! Előbb adj hozzá egy e-mail fiókot "
                        "a Fiók hozzáadása gombbal.")
@@ -2843,7 +3465,33 @@ class MailFrame(wx.Frame):
                 it["_fiok"] = fiok
                 it["_mappa"] = mappa
             return lista
-        _hatterben(munka, self._lista_kesz, self._halo_hiba)
+
+        def hiba(ex):
+            # OFFLINE MENTŐÖV: ha nincs kapcsolat, ne EGY HIBAÜZENET legyen a
+            # program, hanem a legutóbb látott levelek – olvashatóan.
+            self._offline_lista(fiok, mappa, ex)
+
+        _hatterben(munka, self._lista_kesz, hiba)
+
+    def _offline_lista(self, fiok, mappa, ex):
+        """Hálózati hiba után a HELYI másolat betöltése."""
+        if self._closing:
+            return
+        lista, mikor = GY.lista_betolt(fiok.get("email", ""), mappa)
+        if not lista:
+            self._halo_hiba(ex)
+            return
+        for it in lista:
+            it["_fiok"] = fiok
+            it["_mappa"] = mappa
+        self._offline = True
+        self._lista = lista
+        self.level_lista.Set([self._sor_szoveg(i) for i in lista])
+        self.level_lista.SetSelection(0)
+        self._mond("Most nincs kapcsolat a szerverrel, ezért a HELYI másolatot "
+                   "mutatom: %d levél, %s. Olvasni internet nélkül is tudsz; "
+                   "küldeni és frissíteni viszont csak hálózattal lehet."
+                   % (len(lista), GY.kor_szoveg(mikor)))
 
     def _osszes_bejovo(self, e, csendes=False):
         """Minden fiók bejövő (INBOX) leveleit EGY listába gyűjti, fiók-jelöléssel.
@@ -2984,6 +3632,14 @@ class MailFrame(wx.Frame):
                 elozo_kulcs = ((f.get("email") or ""), r.get("_mappa", ""),
                                str(r.get("uid", "")))
         self._lista = lista
+        self._offline = False
+        # OFFLINE OLVASÁS: a most látott listát elmentjük helyben, hogy
+        # hálózat nélkül is legyen mit olvasni
+        try:
+            if not self._osszesitett and self._aktiv:
+                GY.lista_ment(self._aktiv.get("email", ""), self._mappa, lista)
+        except Exception:
+            pass
         # a feladókat felvesszük a címjegyzékbe (passzív tanulás, csak új címek)
         try:
             MC.cimjegyzek_tanul([info.get("felado", "") for info in lista])
@@ -2994,6 +3650,11 @@ class MailFrame(wx.Frame):
                 and self._aktiv.get("protokoll") != "pop"
                 and (self._mappa or "").upper() == "INBOX"):
             self._uj_level_ellenoriz(self._aktiv, lista)
+            # a szabályok az ÚJ levelekre (a rendezés után magától frissít)
+            try:
+                self._szabalyok_ujakra(lista)
+            except Exception:
+                pass
         self.level_lista.Set([self._sor_szoveg(info) for info in lista])
         if elozo_kulcs:                      # a korábban olvasott levélre vissza
             for uj_i, r in enumerate(lista):
@@ -3075,6 +3736,775 @@ class MailFrame(wx.Frame):
             return lista
         _hatterben(munka, self._lista_hozzafuz, self._halo_hiba)
 
+    # ==================================================================
+    #  KIMENŐ – küldés visszavonása, időzített és ismétlődő levél
+    # ==================================================================
+
+    def _kimeno_inditas(self, azon=""):
+        """A kimenő-figyelő időzítő elindítása (ha még nem jár)."""
+        if getattr(self, "_kimeno_timer", None) is None:
+            self._kimeno_timer = wx.Timer(self)
+            self.Bind(wx.EVT_TIMER, lambda e: self._kimeno_ellenoriz(),
+                      self._kimeno_timer)
+        if not self._kimeno_timer.IsRunning():
+            self._kimeno_timer.Start(2000)
+
+    def _kimeno_ellenoriz(self):
+        if self._closing or getattr(self, "_kimeno_fut", False):
+            return
+        most = _ido.time()
+        # 1) amire rá kell kérdezni (évente ismétlődő, holnap esedékes)
+        for sor in KM.varakozo(most):
+            if KM.kerdezni_kell(sor, most):
+                KM.megkerdezve(sor["id"], most)
+                self._kimeno_rakerdez(sor)
+                return
+        # 2) ami esedékes: elküldjük
+        esedekes = KM.esedekes(most)
+        if not esedekes:
+            if not KM.tetelek():
+                self._kimeno_timer.Stop()
+            return
+        self._kimeno_fut = True
+        sor = esedekes[0]
+        fiok = next((f for f in self._fiokok
+                     if (f.get("email") or "") == sor.get("fiok")), None)
+        if fiok is None:
+            KM.torol(sor["id"])
+            self._kimeno_fut = False
+            self._mond("Egy időzített levél fiókja már nincs meg, ezért "
+                       "kivettem a kimenőből: " + KM.tetel_szoveg(sor, most))
+            return
+        try:
+            msg = KM.uzenet(sor["id"])
+        except OSError:
+            KM.torol(sor["id"])
+            self._kimeno_fut = False
+            return
+
+        def munka():
+            MC.SmtpKuldo(fiok).kuld(msg)
+            return True
+
+        def kesz(_r):
+            self._kimeno_fut = False
+            KM.naptarbol_torol(sor.get("naptar_id", ""))
+            KM.torol(sor["id"])
+            if sor.get("ismetles") == KM.ISM_EVENTE:
+                # a KÖVETKEZŐ évre új tétel (a naptárba is bekerül)
+                uj_mikor = KM.kovetkezo_ev(float(sor["mikor"]))
+                uj = KM.betesz(sor.get("fiok", ""), msg, uj_mikor,
+                               KM.ISM_EVENTE, sor.get("cimzett", ""),
+                               sor.get("targy", ""))
+                naptar_id = KM.naptarba(
+                    dict(sor, id=uj, mikor=uj_mikor))
+                if naptar_id:
+                    KM.frissit(uj, naptar_id=naptar_id)
+                self._mond("A levél elment. A következő alkalom: "
+                           + KM.tetel_szoveg(KM.tetelek()[-1], _ido.time()))
+            else:
+                self._mond("A levél elment: " + (sor.get("targy") or ""))
+
+        def hiba(ex):
+            self._kimeno_fut = False
+            # A levél MARAD a kimenőben: később újra megpróbáljuk. Vakon a
+            # legrosszabb az volna, ha csendben elveszne.
+            KM.frissit(sor["id"], mikor=_ido.time() + 120)
+            self._mond("A küldés most nem sikerült (%s). A levél a kimenőben "
+                       "marad, két perc múlva újra megpróbálom." % ex)
+
+        _hatterben(munka, kesz, hiba)
+
+    def _kimeno_rakerdez(self, sor):
+        """Évente ismétlődő levél a küldés előtti napon: Igen / Módosítom /
+        Idén kihagyom."""
+        # A harmadik gomb az ESCAPE-é is – ezért ott csak ÁRTALMATLAN válasz
+        # állhat. A törlés a Kimenő ablakban van, ahol nem lehet véletlen.
+        d = HaromValaszDialog(
+            self, "Időzített levél",
+            "Holnap megy el ez a levél:\n\n%s\n\nÍgy jó?"
+            % KM.tetel_szoveg(sor), "&Igen, mehet", "&Idén hagyd ki",
+            "&Most nem döntök", self.main)
+        valasz = d.ShowModal()
+        d.Destroy()
+        if valasz == wx.ID_NO:                      # idén kihagyjuk
+            uj = KM.kovetkezo_ev(float(sor["mikor"]))
+            KM.frissit(sor["id"], mikor=uj)
+            KM.naptarbol_torol(sor.get("naptar_id", ""))
+            naptar_id = KM.naptarba(dict(sor, mikor=uj))
+            KM.frissit(sor["id"], naptar_id=naptar_id)
+            self._mond("Idén kihagyjuk. A következő alkalom jövőre.")
+            return
+        if valasz == wx.ID_YES:
+            self._mond("Rendben, a levél megy a megadott időben.")
+        else:
+            self._mond("Rendben, most nem döntünk – a levél a megadott időben "
+                       "menne el; a Levél menü Kimenő pontjában bármikor "
+                       "módosíthatod.")
+
+    def _kimeno_ablak(self):
+        """A várakozó levelek: visszavonás vagy azonnali küldés."""
+        sorok = KM.tetelek()
+        if not sorok:
+            self._mond("A kimenő üres: nincs várakozó levél.")
+            return
+        most = _ido.time()
+        valasztek = [KM.tetel_szoveg(s, most) for s in sorok]
+        d = wx.SingleChoiceDialog(self, "Várakozó levelek. Válassz egyet, "
+                                  "majd döntsd el, mi legyen vele.",
+                                  "Kimenő", valasztek)
+        d.SetSize((760, 420))
+        if d.ShowModal() == wx.ID_OK:
+            sor = sorok[d.GetSelection()]
+            d.Destroy()
+            v = HaromValaszDialog(
+                self, "Kimenő levél", KM.tetel_szoveg(sor, _ido.time()),
+                "&Küldés most", "&Visszavonás (ne menjen el)", "&Marad így",
+                self.main).ShowModal()
+            if v == wx.ID_YES:
+                KM.frissit(sor["id"], mikor=_ido.time())
+                self._kimeno_inditas()
+                self._mond("Küldés most.")
+            elif v == wx.ID_NO:
+                KM.naptarbol_torol(sor.get("naptar_id", ""))
+                KM.torol(sor["id"])
+                self._mond("Visszavonva: a levél nem megy el. Piszkozatként a "
+                           "levélírókban nem maradt meg, de a szövegét "
+                           "visszakapod, ha újra megírod.")
+            return
+        d.Destroy()
+
+    def _kuldes_visszavon(self):
+        """A LEGUTÓBB küldött (még várakozó) levél visszavonása – Ctrl+Z."""
+        var = KM.varakozo()
+        if not var:
+            self._mond("Nincs visszavonható levél: minden elment.")
+            return
+        sor = max(var, key=lambda s: float(s.get("letrehozva", 0)))
+        KM.naptarbol_torol(sor.get("naptar_id", ""))
+        KM.torol(sor["id"])
+        self._mond("Visszavonva – ez a levél nem megy el: "
+                   + (sor.get("targy") or ""))
+
+    # ==================================================================
+    #  SZABÁLYOK – a levelek automatikus rendezése
+    # ==================================================================
+
+    def _szabalyok(self):
+        """A mentett szabályok (egyszer betöltve, memóriában tartva)."""
+        if getattr(self, "_szab_lista", None) is None:
+            self._szab_lista = SZ.betolt(SZ.alap_mappa())
+        return self._szab_lista
+
+    def _szabalyok_ment(self, szabalyok):
+        self._szab_lista = list(szabalyok)
+        SZ.ment(SZ.alap_mappa(), self._szab_lista)
+
+    def _szabaly_mappak(self):
+        """A célmappa-választóba: a fiók mappái, felolvasható néven."""
+        return [MC.mappa_display(m) for m in getattr(self, "_mappak_raw", [])
+                if m != MC.OSSZES_MAPPA]
+
+    def _szabalyok_ablak(self):
+        if self._osszesitett:
+            self._mond("A szabályokat egy fiókon belül kezeljük. Válassz egy "
+                       "fiókot a fiók-választóban.")
+            return
+        d = SZW.SzabalyokDialog(self, self.main, self._szabalyok(),
+                                self._szabaly_mappak(), self._fiokok,
+                                proba=self._szabaly_proba,
+                                futtat=self._szabalyok_futtat)
+        if d.ShowModal() == wx.ID_OK:
+            self._szabalyok_ment(d.szabalyok)
+            self._mond("%d szabály mentve." % len(d.szabalyok))
+        d.Destroy()
+
+    def _szabaly_levelbol(self):
+        """A KIJELÖLT levélből készít szabályt – ez a leggyorsabb út."""
+        info = self._kivalasztott()
+        if not info:
+            self._mond("Előbb válassz egy levelet a listából.")
+            return
+        d = SZW.SzabalyLevelbolDialog(self, self.main, info,
+                                      self._szabaly_mappak())
+        if d.ShowModal() == wx.ID_OK:
+            sz = d.eredmeny()
+            szabalyok = list(self._szabalyok()) + [sz]
+            self._szabalyok_ment(szabalyok)
+            self._mond("Szabály létrehozva: " + sz.leiras())
+            if wx.MessageBox(
+                    "Kész a szabály:\n\n%s\n\nLefuttassam most a mostani "
+                    "mappára is?" % sz.leiras(), "Szabály",
+                    wx.YES_NO | wx.ICON_QUESTION, self) == wx.YES:
+                self._szabalyok_futtat([sz])
+        d.Destroy()
+
+    def _szabaly_proba(self, szabaly):
+        """PRÓBA: megmondja, mi történne – de semmit nem mozdít."""
+        lista = [x for x in (getattr(self, "_lista", None) or [])]
+        if not lista:
+            self._mond("Nincs betöltött levél, amin próbálhatnám.")
+            return
+        em = (self._aktiv or {}).get("email", "")
+        terv = SZ.alkalmaz(lista, [szabaly], em)
+        if not terv:
+            uz = "Ez a szabály a mostani lista egyetlen levelére sem illik."
+            self._mond(uz)
+            wx.MessageBox(uz, "Próba", wx.OK | wx.ICON_INFORMATION, self)
+            return
+        peldak = "\n".join("• %s – %s" % (i.get("felado", ""), i.get("targy", ""))
+                           for i, _, _ in terv[:8])
+        tobb = ("\n… és még %d levél." % (len(terv) - 8)) if len(terv) > 8 else ""
+        uz = ("%d levélre illeszkedik a mostani listából.\n\n%s%s\n\n"
+              "MOST SEMMI NEM TÖRTÉNT – ez csak próba volt."
+              % (len(terv), peldak, tobb))
+        self._mond("%d levélre illeszkedik. Semmi nem mozdult." % len(terv))
+        wx.MessageBox(uz, "Próba", wx.OK | wx.ICON_INFORMATION, self)
+
+    def _szabalyok_futtat(self, szabalyok=None, lista=None, csendes=False):
+        """A szabályok VÉGREHAJTÁSA a megadott (alapból a betöltött) leveleken."""
+        if self._osszesitett or not self._aktiv:
+            if not csendes:
+                self._mond("A szabályok egy fiókon belül futnak. Válassz egy "
+                           "fiókot.")
+            return
+        if self._aktiv.get("protokoll") == "pop":
+            if not csendes:
+                self._mond("A szabályok IMAP-fiókkal működnek; a POP3 nem tud "
+                           "mappákat kezelni.")
+            return
+        szabalyok = szabalyok if szabalyok is not None else self._szabalyok()
+        lista = lista if lista is not None else (getattr(self, "_lista", None) or [])
+        em = (self._aktiv or {}).get("email", "")
+        terv = SZ.alkalmaz(lista, szabalyok, em)
+        if not terv:
+            if not csendes:
+                self._mond("Nincs mit rendezni: egyetlen levélre sem illik "
+                           "szabály.")
+            return
+        if not csendes:
+            self._mond("%d levél rendezése…" % len(terv))
+        fiok, forras = self._aktiv, self._mappa
+        raw = {MC.mappa_display(m): m
+               for m in getattr(self, "_mappak_raw", [])}
+
+        def munka():
+            k = _kliens(fiok).kapcsolodik()
+            mozgatott, hibak, letrejott = [], [], []
+            try:
+                for info, muveletek, _nevek in terv:
+                    uid = info.get("uid")
+                    if not uid:
+                        continue
+                    try:
+                        for kulcs in (SZ.MUV_MASOL, SZ.MUV_ATHELYEZ):
+                            cel = muveletek.get(kulcs)
+                            if not cel:
+                                continue
+                            cel_raw = raw.get(cel, cel)
+                            if cel_raw not in raw.values():
+                                k.mappa_letrehoz(cel_raw)
+                                letrejott.append(cel_raw)
+                                raw[cel] = cel_raw
+                            if kulcs == SZ.MUV_MASOL:
+                                k.masol(uid, cel_raw, forras)
+                            else:
+                                k.athelyez(uid, cel_raw, forras)
+                                mozgatott.append((info.get("azonosito", ""),
+                                                  cel_raw, forras))
+                        if muveletek.get(SZ.MUV_OLVASOTT):
+                            k.olvasottnak(uid, forras)
+                        if (muveletek.get(SZ.MUV_TOROL)
+                                and not muveletek.get(SZ.MUV_ATHELYEZ)):
+                            k.torol(uid, forras)
+                    except Exception as ex:
+                        hibak.append("%s: %s" % (info.get("targy", ""), ex))
+            finally:
+                try:
+                    k.bezar()
+                except Exception:
+                    pass
+            return mozgatott, hibak, sorted(set(letrejott))
+
+        def kesz(eredmeny):
+            mozgatott, hibak, letrejott = eredmeny
+            self._szabaly_utolso = mozgatott
+            reszek = []
+            if mozgatott:
+                reszek.append("%d levél elrendezve" % len(mozgatott))
+            if letrejott:
+                reszek.append("új mappa: " + ", ".join(letrejott))
+            if hibak:
+                reszek.append("%d levélnél hiba történt" % len(hibak))
+            uzenet = (". ".join(reszek) if reszek
+                      else "A szabályok lefutottak, mozgatni nem kellett semmit")
+            if mozgatott:
+                uzenet += ". A Szabályok menüben visszavonhatod"
+            self._mond(uzenet + ".")
+            self._frissit(csendes=True)
+
+        _hatterben(munka, kesz, self._halo_hiba)
+
+    def _szabaly_visszavon(self):
+        """Az utolsó szabály-futás áthelyezéseit teszi vissza.
+
+        A leveleket az AZONOSÍTÓJUK (Message-ID) alapján keressük vissza a
+        célmappában: az áthelyezéskor a UID megváltozik, a Message-ID nem."""
+        mozgatott = list(getattr(self, "_szabaly_utolso", []) or [])
+        if not mozgatott:
+            self._mond("Nincs mit visszavonni.")
+            return
+        if not self._aktiv:
+            return
+        fiok = self._aktiv
+        self._mond("%d levél visszahelyezése…" % len(mozgatott))
+
+        def munka():
+            k = _kliens(fiok).kapcsolodik()
+            vissza, nem_talalt = 0, 0
+            try:
+                celok = {}
+                for azon, cel, forras in mozgatott:
+                    celok.setdefault(cel, []).append((azon, forras))
+                for cel, tetelek in celok.items():
+                    jelenlegi = k.lista(cel, 200)
+                    index = {(x.get("azonosito") or ""): x.get("uid")
+                             for x in jelenlegi}
+                    for azon, forras in tetelek:
+                        uid = index.get(azon)
+                        if not azon or not uid:
+                            nem_talalt += 1
+                            continue
+                        k.athelyez(uid, forras, cel)
+                        vissza += 1
+            finally:
+                try:
+                    k.bezar()
+                except Exception:
+                    pass
+            return vissza, nem_talalt
+
+        def kesz(eredmeny):
+            vissza, nem_talalt = eredmeny
+            self._szabaly_utolso = []
+            uz = "%d levél visszakerült." % vissza
+            if nem_talalt:
+                uz += (" %d levelet nem találtam a célmappában – azok ott "
+                       "maradtak." % nem_talalt)
+            self._mond(uz)
+            self._frissit(csendes=True)
+
+        _hatterben(munka, kesz, self._halo_hiba)
+
+    def _szabalyok_ujakra(self, lista):
+        """Automatikus rendezés a Beérkezettben – csak ÚJ leveleken.
+
+        Miért csak újakon: ha minden frissítéskor az egészre futna, a
+        felhasználó által SZÁNDÉKOSAN visszahozott levelet a szabály azonnal
+        újra elvinné."""
+        if not MC.altalanos_betolt().get("szabalyok_auto", True):
+            return
+        if self._osszesitett or not self._aktiv:
+            return
+        if (self._mappa or "").upper() != "INBOX":
+            return
+        latott = getattr(self, "_szab_latott", None)
+        kulcsok = {str(x.get("uid", "")) for x in lista}
+        if latott is None:                 # az első betöltés a kiindulási alap
+            self._szab_latott = kulcsok
+            return
+        ujak = [x for x in lista if str(x.get("uid", "")) not in latott]
+        self._szab_latott = kulcsok
+        if ujak:
+            self._szabalyok_futtat(lista=ujak, csendes=True)
+
+    # ==================================================================
+    #  OKOS MAPPÁK (mentett szűrők) és POSTAFIÓK-MENTÉS
+    # ==================================================================
+
+    def _parancsok(self):
+        """A program MINDEN műveletének listája – felolvasva, gépeléssel
+        szűrhetően. Aki nem akar negyven gyorsbillentyűt fejben tartani,
+        annak ez az út: Ctrl+K, beírod, hogy „szabály”, és ott van."""
+        return [
+            ("Új levél", lambda: self._uj(None)),
+            ("Válasz", lambda: self._menu_level_akcio(
+                lambda msg, f: self._valasz(msg=msg, fiok=f))),
+            ("Válasz mindenkinek", lambda: self._menu_level_akcio(
+                lambda msg, f: self._valasz(msg=msg, fiok=f, mind=True))),
+            ("Válasz a levelezőlistára", lambda: self._menu_level_akcio(
+                self._listara_valasz)),
+            ("Továbbítás", lambda: self._menu_level_akcio(
+                lambda msg, f: self._tovabbit(msg=msg, fiok=f))),
+            ("Frissítés", self._frissit_aktualis),
+            ("Keresés a levelek közt", lambda: self._keres(None)),
+            ("Beszélgetés összefogása", self._beszelgetes),
+            ("Okos mappák", self._okos_mappa),
+            ("Szabály ebből a levélből", self._szabaly_levelbol),
+            ("Szabályok kezelése", self._szabalyok_ablak),
+            ("Szabályok futtatása most", lambda: self._szabalyok_futtat()),
+            ("Takarítás (hírlevelek, listák, nagy levelek)", self._takaritas),
+            ("Emlékeztess rá később", self._halaszt),
+            ("Leiratkozás erről a hírlevélről", lambda: self._leiratkozas()),
+            ("Kimenő – várakozó levelek", self._kimeno_ablak),
+            ("Küldés visszavonása", self._kuldes_visszavon),
+            ("Kért visszajelzések (tértivevény)", self._tertivevony_lista),
+            ("Postafiók mentése fájlba (mbox)", self._postafiok_ment),
+            ("Olvasottnak jelölés", lambda: self._jelol(True)),
+            ("Olvasatlannak jelölés", lambda: self._jelol(False)),
+            ("Törlés – Kukába", lambda: self._torol(None)),
+            ("Beállítások", lambda: self._beallitasok()),
+            ("Súgó", self._sugo),
+        ]
+
+    def _parancspaletta(self):
+        parancsok = self._parancsok()
+        d = wx.SingleChoiceDialog(
+            self, "Mit szeretnél csinálni? Gépelj a szűréshez, vagy nyilazz "
+                  "a listában.", "Parancsok  (Ctrl+K)",
+            [nev for nev, _ in parancsok])
+        d.SetSize((640, 520))
+        if d.ShowModal() == wx.ID_OK:
+            i = d.GetSelection()
+            d.Destroy()
+            nev, muvelet = parancsok[i]
+            self._mond(nev)
+            wx.CallAfter(muvelet)
+            return
+        d.Destroy()
+
+    def _takaritas(self):
+        """Tömeges takarítás – de csak azután, hogy PONTOSAN megmondtuk, mi
+        történne, és a felhasználó jóváhagyta. A művelet visszavonható."""
+        lista = getattr(self, "_lista", None) or []
+        if not lista:
+            self._mond("Előbb tölts be egy mappát.")
+            return
+        if self._osszesitett or not self._aktiv \
+                or self._aktiv.get("protokoll") == "pop":
+            self._mond("A takarítás IMAP-fiókban, egy mappán belül működik.")
+            return
+        csoportok = [
+            ("Hírlevelek és reklámok",
+             [SZ.Feltetel(SZ.MEZO_MARKETING, SZ.VISZ_IGAZ)]),
+            ("Levelezőlisták levelei",
+             [SZ.Feltetel(SZ.MEZO_LISTA, SZ.VISZ_IGAZ)]),
+            ("Nagy levelek (5 megabájt fölött)",
+             [SZ.Feltetel(SZ.MEZO_MERET, SZ.VISZ_NAGYOBB, "5120")]),
+        ]
+        valasztek, ervenyes = [], []
+        for nev, feltetelek in csoportok:
+            sz = SZ.Szabaly(nev=nev, feltetelek=feltetelek)
+            db = len(SZ.alkalmaz(lista, [SZ.Szabaly(
+                nev=nev, feltetelek=feltetelek,
+                muveletek={SZ.MUV_OLVASOTT: True})]))
+            if db:
+                valasztek.append("%s – %d levél" % (nev, db))
+                ervenyes.append((nev, feltetelek, db))
+        if not ervenyes:
+            self._mond("Ebben a mappában most nincs mit takarítani.")
+            return
+        d = wx.SingleChoiceDialog(
+            self, "Mit takarítsunk ki a betöltött %d levélből?\n\nA "
+                  "következő lépésben megmondom, mi történne, és csak akkor "
+                  "csinálom meg, ha jóváhagyod." % len(lista),
+            "Takarítás", valasztek)
+        if d.ShowModal() != wx.ID_OK:
+            d.Destroy()
+            return
+        nev, feltetelek, db = ervenyes[d.GetSelection()]
+        d.Destroy()
+        v = HaromValaszDialog(
+            self, "Takarítás",
+            "%s: %d levél.\n\nMi legyen velük?" % (nev, db),
+            "Á&thelyezés mappába", "&Kukába", "&Mégsem", self.main).ShowModal()
+        if v == wx.ID_CANCEL:
+            self._mond("Rendben, nem nyúlok hozzájuk.")
+            return
+        if v == wx.ID_YES:
+            be = wx.TextEntryDialog(self, "Melyik mappába kerüljenek? (Ha "
+                                    "nincs ilyen mappa, létrehozom.)",
+                                    "Takarítás", nev)
+            if be.ShowModal() != wx.ID_OK:
+                be.Destroy()
+                return
+            cel = be.GetValue().strip()
+            be.Destroy()
+            if not cel:
+                return
+            muveletek = {SZ.MUV_ATHELYEZ: cel}
+        else:
+            muveletek = {SZ.MUV_TOROL: True}
+        szabaly = SZ.Szabaly(nev=nev, feltetelek=feltetelek,
+                             muveletek=muveletek)
+        self._szabalyok_futtat([szabaly], lista)
+
+    def _beszelgetes(self):
+        """A kijelölt levél BESZÉLGETÉSE: hány levél tartozik hozzá, kik írták."""
+        lista = getattr(self, "_lista", None) or []
+        info = self._kivalasztott()
+        if not info or not lista:
+            self._mond("Előbb válassz egy levelet a listából.")
+            return
+        szalak = BESZ.szalak(lista)
+        sajat = None
+        for szal in szalak:
+            if any(x is info for x in szal):
+                sajat = szal
+                break
+        if not sajat or len(sajat) < 2:
+            self._mond("Ehhez a levélhez nem találtam több levelet a "
+                       "betöltöttek között – ez egy önálló levél.")
+            return
+        self._szurt_nezet = "beszélgetés"
+        self._lista = list(reversed(sajat))          # legfrissebb elöl
+        self.level_lista.Set([self._sor_szoveg(i) for i in self._lista])
+        self.level_lista.SetSelection(0)
+        self._mond(BESZ.szal_szoveg(sajat)
+                   + ". Az F5 visszahozza a teljes mappát.")
+
+    def _okos_mappa(self):
+        """Mentett szűrő a BETÖLTÖTT levelekre – nem IMAP-mappa, hanem nézet."""
+        lista = getattr(self, "_lista", None) or []
+        if not lista:
+            self._mond("Előbb tölts be egy mappát.")
+            return
+        nezetek = SAB.nezetek_betolt()
+        d = wx.SingleChoiceDialog(
+            self, "Melyik okos mappát nyissam meg? A szűrés a most betöltött "
+                  "%d levélre vonatkozik." % len(lista),
+            "Okos mappák", [n.leiras() for n in nezetek])
+        if d.ShowModal() != wx.ID_OK:
+            d.Destroy()
+            return
+        n = nezetek[d.GetSelection()]
+        d.Destroy()
+        if n.nev == "Olvasatlan":
+            talalt = [x for x in lista if not x.get("olvasott")]
+        else:
+            talalt = SAB.szur(lista, n)
+        if not talalt:
+            self._mond("Ebbe az okos mappába most egy levél sem esik.")
+            return
+        self._szurt_nezet = n.nev
+        self.level_lista.Set([self._sor_szoveg(i) for i in talalt])
+        self._lista = talalt
+        self.level_lista.SetSelection(0)
+        self._mond("%s: %d levél. Az F5 visszahozza a teljes mappát."
+                   % (n.nev, len(talalt)))
+
+    def _postafiok_ment(self):
+        """A mappa mentése SZABVÁNYOS mbox-fájlba – az adatod a tiéd."""
+        if self._osszesitett or not self._aktiv:
+            self._mond("Válassz egy fiókot és egy mappát a mentéshez.")
+            return
+        fiok, mappa = self._aktiv, self._mappa
+        alap = EXP.fajlnev(fiok.get("email", ""), MC.mappa_display(mappa))
+        d = wx.FileDialog(self, "Postafiók mentése", "", alap,
+                          "Levél-archívum (*.mbox)|*.mbox",
+                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+        if d.ShowModal() != wx.ID_OK:
+            d.Destroy()
+            return
+        ut = d.GetPath()
+        d.Destroy()
+        limit = 5000
+        self._mond("Mentés indul. Ez sok levélnél percekbe telhet – szólok, "
+                   "ha kész.")
+
+        def munka():
+            k = _kliens(fiok).kapcsolodik()
+            try:
+                fejlecek = k.lista(mappa, limit)
+                with EXP.MboxIro(ut) as iro:
+                    for info in fejlecek:
+                        uid = info.get("uid")
+                        if not uid:
+                            continue
+                        try:
+                            iro.ir(k.teljes(uid, mappa))
+                        except Exception:
+                            continue
+                    return iro.darab
+            finally:
+                try:
+                    k.bezar()
+                except Exception:
+                    pass
+
+        def kesz(db):
+            meret = 0
+            try:
+                meret = os.path.getsize(ut)
+            except OSError:
+                pass
+            self._mond("Kész: %d levél mentve, %s. A fájl szabványos mbox – "
+                       "bármelyik másik levelezőprogram be tudja olvasni."
+                       % (db, EXP.meret_szoveg(meret)))
+
+        _hatterben(munka, kesz, self._halo_hiba)
+
+    # ==================================================================
+    #  EMLÉKEZTETŐK – halasztás, „nem válaszoltak”
+    # ==================================================================
+
+    HALASZTOTT_MAPPA = "Halasztott"
+
+    def _halaszt(self):
+        """„Emlékeztess rá később”: a levél most eltűnik, és a megadott
+        időpontban visszakerül a Beérkezettbe."""
+        info = self._kivalasztott()
+        if not info:
+            self._mond("Előbb válassz egy levelet a listából.")
+            return
+        if self._osszesitett or not self._aktiv \
+                or self._aktiv.get("protokoll") == "pop":
+            self._mond("A halasztás IMAP-fiókban, egy fiókon belül működik.")
+            return
+        d = wx.SingleChoiceDialog(
+            self, "Mikor emlékeztesselek erre a levélre?\n\nA levél addig a "
+                  "Halasztott mappában vár, és magától visszajön a "
+                  "Beérkezettbe.", "Emlékeztess rá később",
+            [c for c, _ in EM.HALASZTASOK])
+        if d.ShowModal() != wx.ID_OK:
+            d.Destroy()
+            return
+        mikor = EM.halasztas_ideje(d.GetSelection())
+        d.Destroy()
+        fiok, forras, uid = self._aktiv, self._mappa, info.get("uid")
+
+        def munka():
+            k = _kliens(fiok).kapcsolodik()
+            try:
+                k.mappa_letrehoz(self.HALASZTOTT_MAPPA)
+                k.athelyez(uid, self.HALASZTOTT_MAPPA, forras)
+            finally:
+                try:
+                    k.bezar()
+                except Exception:
+                    pass
+            return True
+
+        def kesz(_r):
+            EM.halaszt(info.get("azonosito", ""), fiok.get("email", ""),
+                       info.get("targy", ""), info.get("felado", ""), mikor)
+            self._mond("Elhalasztva. A levél %s jön vissza a Beérkezettbe."
+                       % KM.ido_szoveg(int(mikor - _ido.time())))
+            self._frissit(csendes=True)
+
+        _hatterben(munka, kesz, self._halo_hiba)
+
+    def _emlekeztetok_ellenoriz(self):
+        """Esedékes halasztások visszahozása + „nem válaszoltak” jelzése."""
+        if self._closing or not self._aktiv:
+            return
+        esedekes = EM.esedekes()
+        if not esedekes:
+            return
+        fiok = self._aktiv
+        vissza = [t for t in esedekes if t.get("fajta") == EM.HALASZT
+                  and t.get("fiok") == fiok.get("email")]
+        varas = [t for t in esedekes if t.get("fajta") == EM.VALASZ_VARAS]
+        for t in varas:
+            self._mond("Emlékeztető: " + EM.tetel_szoveg(t))
+            EM.levesz(t)
+        if not vissza:
+            return
+
+        def munka():
+            k = _kliens(fiok).kapcsolodik()
+            db = 0
+            try:
+                jelenlegi = k.lista(self.HALASZTOTT_MAPPA, 200)
+                index = {(x.get("azonosito") or ""): x.get("uid")
+                         for x in jelenlegi}
+                for t in vissza:
+                    uid = index.get(t.get("azonosito", ""))
+                    if uid:
+                        k.athelyez(uid, "INBOX", self.HALASZTOTT_MAPPA)
+                        db += 1
+            finally:
+                try:
+                    k.bezar()
+                except Exception:
+                    pass
+            return db
+
+        def kesz(db):
+            for t in vissza:
+                EM.levesz(t)
+            if db:
+                self._mond("%d elhalasztott leveled visszakerült a "
+                           "Beérkezettbe." % db)
+                self._frissit(csendes=True)
+
+        _hatterben(munka, kesz, lambda ex: None)
+
+    def _tertivevony_lista(self):
+        """Melyik levelemre jött visszaigazolás, és melyikre nem."""
+        sorok = MDN.osszesito()
+        if not sorok:
+            self._mond("Még nem kértél visszajelzést egyetlen levélre sem. "
+                       "A levélírás ablakában találod a Tértivevény jelölőt.")
+            return
+        d = wx.SingleChoiceDialog(
+            self, "Kért visszajelzések.\n\n" + MDN.FIGYELMEZTETES,
+            "Tértivevény", sorok)
+        d.SetSize((820, 460))
+        d.ShowModal()
+        d.Destroy()
+
+    def _leiratkozas(self, info=None):
+        """Leiratkozás a hírlevélről EGY billentyűvel (Ctrl+U).
+
+        A leiratkozó link megkeresése a levél szövegében vakon kínszenvedés –
+        a szabvány szerinti List-Unsubscribe fejléc viszont pontos."""
+        info = info or self._kivalasztott()
+        if not info:
+            self._mond("Előbb válassz egy levelet a listából.")
+            return
+        m = BIZT.leiratkozas_lehetosegek(info)
+        if not (m["http"] or m["mailto"]):
+            self._mond("Ehhez a levélhez a feladó nem adott meg leiratkozási "
+                       "lehetőséget. Készíthetsz rá szabályt a Ctrl+Shift+R-rel, "
+                       "hogy ezentúl külön mappába kerüljön.")
+            return
+        felado = BIZT.cim_resz(info.get("felado", ""))
+        if m["mailto"]:
+            if wx.MessageBox(
+                    "Leiratkozás erről: %s\n\nA program küld egy leiratkozó "
+                    "levelet ide: %s\n\nElküldjem?" % (felado, m["mailto"]),
+                    "Leiratkozás", wx.YES_NO | wx.ICON_QUESTION,
+                    self) != wx.YES:
+                return
+            cim = m["mailto"].split("?")[0]
+            targy = "unsubscribe"
+            if "subject=" in m["mailto"]:
+                targy = m["mailto"].split("subject=")[-1].split("&")[0]
+            msg = MC.level_epit(MC.felado_fejlec(self._aktiv), cim, targy,
+                                "unsubscribe", "", [], "")
+            _hatterben(lambda: MC.SmtpKuldo(self._aktiv).kuld(msg),
+                       lambda r: self._mond(
+                           "A leiratkozó levél elment. A hírlevelek "
+                           "leállásához néhány nap kellhet."),
+                       self._halo_hiba)
+            return
+        # csak webes leiratkozás van
+        if wx.MessageBox(
+                "Leiratkozás erről: %s\n\nA leiratkozás ezen az oldalon "
+                "lehetséges:\n%s\n\nMegnyissam a böngészőben?"
+                % (felado, m["http"]), "Leiratkozás",
+                wx.YES_NO | wx.ICON_QUESTION, self) == wx.YES:
+            import webbrowser
+            webbrowser.open(m["http"])
+            self._mond("Megnyitottam a leiratkozó oldalt a böngészőben.")
+
+    def _nema_level(self, info) -> bool:
+        """Igaz, ha erre a levélre szabály tiltja az értesítő hangot."""
+        em = (self._aktiv or {}).get("email", "")
+        terv = SZ.alkalmaz([info], self._szabalyok(), em)
+        return bool(terv and terv[0][1].get(SZ.MUV_NINCS_HANG))
+
     def _uj_level_ellenoriz(self, fiok, lista):
         """Új levél észlelése a legfrissebb INBOX-UID alapján; ha nőtt, értesít."""
         em = (fiok.get("email") or "").lower()
@@ -3086,6 +4516,16 @@ class MailFrame(wx.Frame):
         elozo = self._utolso_uid.get(em)
         self._utolso_uid[em] = legujabb
         if elozo is not None and legujabb > elozo:      # tényleg új érkezett
+            # Ha az ÚJ levelekre mind olyan szabály illik, ami tiltja az
+            # értesítést (hírlevelek), akkor csendben maradunk – a felhasználó
+            # pont ezért kérte a „ne szóljon rá hang” műveletet.
+            try:
+                ujak = [x for x in lista
+                        if x.get("uid") and int(x["uid"]) > int(elozo)]
+                if ujak and all(self._nema_level(x) for x in ujak):
+                    return
+            except Exception:
+                pass
             self._ertesit(fiok)
 
     def _jelzo_hang(self) -> bool:
@@ -3255,13 +4695,34 @@ class MailFrame(wx.Frame):
         if not info or not fiok:
             return
 
+        uid = info.get("uid") or info.get("szam")
+
         def munka():
             k = _kliens(fiok).kapcsolodik()
             msg = (k.teljes(info["szam"]) if isinstance(k, MC.Pop3Kliens)
                    else k.teljes(info["uid"], mappa))
             k.bezar()
             return msg
-        _hatterben(munka, lambda m: kesz(m, fiok), self._halo_hiba)
+
+        def megvan(m):
+            # OFFLINE OLVASÁS: amit egyszer megnyitottunk, azt eltesszük –
+            # csak azt, amit a felhasználó tényleg megnézett.
+            try:
+                GY.level_ment(fiok.get("email", ""), uid, m)
+            except Exception:
+                pass
+            kesz(m, fiok)
+
+        def hiba(ex):
+            m = GY.level_betolt(fiok.get("email", ""), uid)
+            if m is None:
+                self._halo_hiba(ex)
+                return
+            self._mond("Nincs kapcsolat, ezért a levél HELYI másolatát nyitom "
+                       "meg. Válaszolni és továbbítani csak hálózattal lehet.")
+            kesz(m, fiok)
+
+        _hatterben(munka, megvan, hiba)
 
     def _jelol(self, olvasott):
         """A kijelölt levelet olvasottnak/olvasatlannak jelöli (IMAP)."""
@@ -3670,6 +5131,26 @@ class MailFrame(wx.Frame):
         elif k == ord("L") and m == 0:
             # L = válasz a LEVELEZŐLISTÁRA (a lista címét a levél fejléce adja)
             self._menu_level_akcio(self._listara_valasz)
+        elif m == wx.MOD_CONTROL and k == ord("H"):
+            self._halaszt()                       # emlékeztess rá később
+        elif m == wx.MOD_CONTROL and k == ord("K"):
+            self._parancspaletta()                # minden művelet egy helyen
+        elif m == wx.MOD_CONTROL and k == ord("U"):
+            self._leiratkozas()                   # leiratkozás a hírlevélről
+        elif m == wx.MOD_CONTROL and k == ord("Z"):
+            self._kuldes_visszavon()              # az utolsó küldés visszavonása
+        elif m == (wx.MOD_CONTROL | wx.MOD_SHIFT) and k == ord("B"):
+            self._beszelgetes()
+        elif m == (wx.MOD_CONTROL | wx.MOD_SHIFT) and k == ord("O"):
+            self._okos_mappa()
+        elif m == (wx.MOD_CONTROL | wx.MOD_SHIFT) and k == ord("K"):
+            self._kimeno_ablak()
+        elif m == (wx.MOD_CONTROL | wx.MOD_SHIFT) and k == ord("R"):
+            self._szabaly_levelbol()              # szabály a KIJELÖLT levélből
+        elif m == (wx.MOD_CONTROL | wx.MOD_SHIFT) and k == ord("S"):
+            self._szabalyok_ablak()
+        elif m == (wx.MOD_CONTROL | wx.MOD_SHIFT) and k == ord("F"):
+            self._szabalyok_futtat()
         elif m == 0 and k == ord("B"):
             self._tovabb_betolt()                 # következő adag levél (lapozás)
         elif k == wx.WXK_F5:
