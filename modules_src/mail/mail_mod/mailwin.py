@@ -2769,17 +2769,43 @@ class MailFrame(wx.Frame):
             return m
         _hatterben(munka, self._mappak_kesz, self._halo_hiba)
 
+    @staticmethod
+    def _mappak_rendez(mappak):
+        """A Beérkezett (INBOX) MINDIG legfelül; utána a szokásos rendszer-mappák
+        (Elküldött, Piszkozatok, Kuka, Spam, Archívum), majd a többi ábécében."""
+        rendszer = ["sent", "elküld", "kimen", "draft", "piszkoz", "trash",
+                    "kuka", "deleted", "junk", "spam", "levélszem", "archiv",
+                    "archív"]
+
+        def kulcs(m):
+            ml = (m or "").lower()
+            if ml == "inbox":
+                return (0, "")
+            for r, nev in enumerate(rendszer):
+                if nev in ml:
+                    return (1, f"{r:02d}{ml}")
+            return (2, ml)
+        return sorted(mappak, key=kulcs)
+
     def _mappak_kesz(self, mappak):
         if self._closing:
             return
         # a NYERS neveket megőrizzük (ezekkel megy az IMAP select/fetch),
         # de a DEKÓDOLT (felolvasható) neveket jelenítjük meg; a Beérkezett felül
-        mappak = self._mappak_rendez(mappak)
-        self._mappak_raw = mappak
-        self.mappa_lista.Set([MC.mappa_display(m) for m in mappak])
-        elso = mappak[0] if mappak else "INBOX"
-        self._mappa = elso
-        self._mappa_kijelol(elso)
+        #
+        # A try/except NEM dísz: ez a függvény wx.CallAfter-ből fut, ahol a
+        # kivétel NÉMÁN elnyelődik – a felhasználó csak annyit lát, hogy a
+        # mappalista sosem frissül. (Pontosan ez történt az 1.0.14-ben.)
+        try:
+            mappak = self._mappak_rendez(mappak)
+            self._mappak_raw = mappak
+            self.mappa_lista.Set([MC.mappa_display(m) for m in mappak])
+            elso = mappak[0] if mappak else "INBOX"
+            self._mappa = elso
+            self._mappa_kijelol(elso)
+        except Exception as ex:
+            self._mond(f"A mappák megjelenítése nem sikerült: {ex}")
+            return
         self._frissit()
 
     def _mappa_valt(self, e):
