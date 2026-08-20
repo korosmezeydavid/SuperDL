@@ -33,14 +33,14 @@
       "id": "mediatools",
       "name": "Média-eszközök",
       "category": "Média",
-      "description": "Médiakészítő és -elemző eszközök egy csomagban: kötegelt médiakonvertáló, beszélő médiaelemző (LUFS/EBU R128), iPhone csengőhang-készítő, videókészítő (kép+zene) és videóvágó-összefűző. ÚJ: a DVD-s VOB (és a többi DVD/AVCHD formátum: m2v, m2ts, mts) mostantól MAPPÁBÓL is bekerül a listába, nem csak fájlonként kiválasztva; és a DVD több VOB-darabját (VTS_01_1, VTS_01_2 …) kérésre EGY filmmé fűzi össze (bájtszintű összefűzéssel, ahogy a DVD-hez való), a menü-fájlt kihagyva – és a végén ELLENŐRZI a kész film hosszát, hogy soha ne kapj néma féleredményt.",
+      "description": "ÚJ FORMÁTUMOK (Miki jelzésére): a konvertáló és a médiaelemző mostantól látja a ritkább hangformátumokat is – .ape (Monkey's Audio), .wv, .tta, .tak, .mpc, .dsf, .dff, .aiff, .au, .amr, .caf, .spx, .ac3, .dts, .mka, .oga, .w64 –, tehát nem kell az „összes fájl” kerülőút. Ha a Windows fájlválasztója összeomlik a gépeden (idegen bővítmény miatt), a konvertáló a SuperDL beépített, biztonságos fájlválasztóját használja. Médiakészítő és -elemző eszközök egy csomagban: kötegelt médiakonvertáló, beszélő médiaelemző (LUFS/EBU R128), iPhone csengőhang-készítő, videókészítő (kép+zene) és videóvágó-összefűző. ÚJ: a DVD-s VOB (és a többi DVD/AVCHD formátum: m2v, m2ts, mts) mostantól MAPPÁBÓL is bekerül a listába, nem csak fájlonként kiválasztva; és a DVD több VOB-darabját (VTS_01_1, VTS_01_2 …) kérésre EGY filmmé fűzi össze (bájtszintű összefűzéssel, ahogy a DVD-hez való), a menü-fájlt kihagyva – és a végén ELLENŐRZI a kész film hosszát, hogy soha ne kapj néma féleredményt.",
       "latest": {
-        "version": "1.4.9",
+        "version": "1.4.10",
         "min_core_api": "1.0",
         "min_core_version": "4.0.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.9/mediatools-1.4.9.zip",
-        "sha256": "cb768b7694e6f06168dbe3dd962d52ea6efee7cce4966f04edf3af895c053270",
-        "size": 44884
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.10/mediatools-1.4.10.zip",
+        "sha256": "ad5aa377a79f2e80cab5d9750416018b64b9e6e98c002592310b1663264ecbc7",
+        "size": 46168
       }
     },
     {

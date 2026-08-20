@@ -12,7 +12,10 @@ import wx
 from . import mediaanalyze as MA
 
 WILDCARD = ("Média (hang/videó)|*.mp3;*.wav;*.flac;*.m4a;*.aac;*.ogg;*.opus;"
-            "*.mp4;*.mkv;*.avi;*.mov;*.webm;*.m4v;*.m4b;*.vob;*.mpg;*.mpeg;*.m2ts;*.mts|Minden fájl|*.*")
+            "*.wma;*.ape;*.wv;*.tta;*.tak;*.mpc;*.dsf;*.dff;*.aiff;*.aif;"
+            "*.au;*.amr;*.caf;*.spx;*.ac3;*.dts;*.mka;*.oga;*.w64;"
+            "*.mp4;*.mkv;*.avi;*.mov;*.webm;*.m4v;*.m4b;*.vob;*.mpg;*.mpeg;"
+            "*.m2ts;*.mts|Minden fájl|*.*")
 
 
 HELP = """BESZÉLŐ MÉDIAELEMZŐ

@@ -97,8 +97,12 @@ class NetTestDialog(wx.Dialog):
         self.b_masol.SetName("A jelentés vágólapra másolása")
         self.b_naplo = wx.Button(p, label="Ko&rábbi mérések")
         self.b_naplo.SetName("Korábbi mérések listája")
+        self.b_wifi = wx.Button(p, label="&Wi-Fi jelerősség figyelése…")
+        self.b_wifi.SetName("Wi-Fi jelerősség figyelése dBm-ben – "
+                            "mesh-hálózat építéséhez, járkálás közben is")
+        self.b_wifi.Bind(wx.EVT_BUTTON, lambda e: self._wifi_figyelo())
         b_zar = wx.Button(p, wx.ID_CANCEL, "&Bezárás")
-        for b in (self.b_ip, self.b_masol, self.b_naplo, b_zar):
+        for b in (self.b_ip, self.b_masol, self.b_naplo, self.b_wifi, b_zar):
             sor2.Add(b, 0, wx.RIGHT, 6)
         v.Add(sor2, 0, wx.ALL, 8)
 
@@ -135,6 +139,11 @@ class NetTestDialog(wx.Dialog):
                      "a nyilakkal olvashatod.")
 
     # ------------------------------------------------------------ bemondás
+
+    def _wifi_figyelo(self) -> None:
+        """A mesh-hálózat építéséhez: folyamatos jelerősség-figyelés dBm-ben."""
+        from . import wifiwin
+        wifiwin.mutasd(self, self._mondd)
 
     def _mondd(self, szoveg: str) -> None:
         """KÖTELEZŐ SORREND: előbb a képernyőolvasó, utána a némítás-vizsgálat és

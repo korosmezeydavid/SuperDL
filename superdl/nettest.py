@@ -149,6 +149,8 @@ class Halozat:
     ipv6: bool = False
     wifi_halozat: str = ""
     wifi_jel: int = 0              # 0–100
+    wifi_dbm: int = 0              # valódi jelerősség (dBm) – mesh-hez
+    wifi_dbm_mert: bool = False    # True: mért; False: százalékból számolt
     wifi_sav: str = ""             # „2,4 GHz" / „5 GHz" / „6 GHz"
     wifi_csatorna: int = 0
     wifi_le_mbps: float = 0.0
@@ -441,6 +443,85 @@ def _sav_csatornabol(csatorna: int) -> str:
     return "6 GHz"
 
 
+# A Windows RSSI-lekérdezésének kódja (wlan_intf_opcode_rssi).
+_OPCODE_RSSI = 0x10000102
+
+
+def _rssi(wlan, kezelo, guid):
+    """A VALÓDI jelerősség dBm-ben. Visszaad: (dBm, mért-e).
+
+    Ha a rendszer nem adja meg (régebbi illesztőprogram), a hívó a
+    jelminőségből becsül – de akkor ezt ki is írjuk, hogy senki ne higgye
+    mérésnek."""
+    meret = ctypes.c_ulong()
+    adat = ctypes.c_void_p()
+    try:
+        if wlan.WlanQueryInterface(kezelo, ctypes.byref(guid), _OPCODE_RSSI,
+                                   None, ctypes.byref(meret),
+                                   ctypes.byref(adat), None) != 0:
+            return 0, False
+    except Exception:
+        return 0, False
+    try:
+        ertek = int(ctypes.cast(adat, ctypes.POINTER(ctypes.c_long)).contents.value)
+    except Exception:
+        return 0, False
+    finally:
+        try:
+            wlan.WlanFreeMemory(adat)
+        except Exception:
+            pass
+    # épeszű tartomány: a wifi RSSI −100 és −10 dBm közé esik
+    return (ertek, True) if -110 <= ertek <= -5 else (0, False)
+
+
+def dbm_becsles(jel_szazalek: int) -> int:
+    """A Windows jelminőség-százalékából dBm. A Microsoft leírása szerint a
+    0% = −100 dBm, a 100% = −50 dBm, közte egyenletesen."""
+    try:
+        j = max(0, min(100, int(jel_szazalek)))
+    except (TypeError, ValueError):
+        return 0
+    return int(round(j / 2.0 - 100))
+
+
+JEL_FOKOZATOK = (
+    (-55, "kiváló", "Itt minden gond nélkül megy a videó és a hívás is."),
+    (-65, "jó", "Ez bőven elég mindenre."),
+    (-72, "elfogadható", "Böngészésre, levelezésre jó; nagy letöltésnél "
+                         "lassulhat."),
+    (-80, "gyenge", "Itt már akadozhat a videó és a hívás. Mesh-hálózatnál "
+                    "ide érdemes még egy egységet tenni."),
+    (-200, "használhatatlan", "Ezen a helyen a kapcsolat gyakorlatilag "
+                              "megszakad."),
+)
+
+
+def jel_minosites(dbm: int) -> tuple:
+    """(fokozat, magyarázat) – a dBm önmagában semmit nem mond a
+    felhasználónak; a szöveges fokozat igen."""
+    try:
+        d = int(dbm)
+    except (TypeError, ValueError):
+        return "", ""
+    for hatar, nev, magyarazat in JEL_FOKOZATOK:
+        if d >= hatar:
+            return nev, magyarazat
+    return JEL_FOKOZATOK[-1][1], JEL_FOKOZATOK[-1][2]
+
+
+def jel_szoveg(dbm: int, jel_szazalek: int = 0, mert: bool = True) -> str:
+    """Felolvasható mondat a jelerősségről."""
+    if not dbm:
+        return "A Wi-Fi jelerősségét nem sikerült megállapítani."
+    fokozat, magyarazat = jel_minosites(dbm)
+    honnan = "" if mert else " (a jelminőségből számolva)"
+    resz = ("%d dBm%s – %s" % (dbm, honnan, fokozat))
+    if jel_szazalek:
+        resz += ", jelminőség %d százalék" % int(jel_szazalek)
+    return resz + ". " + magyarazat
+
+
 def wifi() -> dict:
     """Az AKTÍV Wi-Fi kapcsolat adatai (hálózat neve, jelerősség, sáv, sebesség).
     Vakon ez aranyat ér: a „lassú a net" panaszok jó része valójában gyenge
@@ -486,6 +567,13 @@ def wifi() -> dict:
                       "fel_mbps": a.ulTxRate / 1000.0, "csatorna": 0}
             finally:
                 wlan.WlanFreeMemory(adat)
+            # VALÓDI jelerősség dBm-ben (mesh-hálózat építéséhez ez az igazi
+            # mérőszám, nem a százalék). A százalékból számolt becslés ettől
+            # érdemben eltérhet: egy gépen 88% mellett a valódi −49 dBm volt,
+            # a képletből −56 jött volna ki. [felhasználói kérés, 2026-08-20]
+            ki["dbm"], ki["dbm_mert"] = _rssi(wlan, kezelo, guid)
+            if not ki["dbm"]:                    # nincs valódi mérés: becslés
+                ki["dbm"] = dbm_becsles(ki["jel"])
             csat = ctypes.c_ulong()
             adat2 = ctypes.c_void_p()
             if wlan.WlanQueryInterface(kezelo, ctypes.byref(guid), 8, None,
@@ -560,6 +648,8 @@ def halozat_adatok() -> Halozat:
     if w:
         h.wifi_halozat = w.get("halozat", "")
         h.wifi_jel = int(w.get("jel", 0))
+        h.wifi_dbm = int(w.get("dbm", 0))
+        h.wifi_dbm_mert = bool(w.get("dbm_mert", False))
         h.wifi_sav = w.get("sav", "")
         h.wifi_csatorna = int(w.get("csatorna", 0))
         h.wifi_le_mbps = round(w.get("le_mbps", 0.0), 1)
@@ -1145,9 +1235,21 @@ def sorok(e: Eredmeny, teljes_ip: bool = False) -> list:
         ki.append("A hálókártya sávszélessége: %s megabit" % _szam(h.link_mbps))
     if h.wifi_halozat:
         ki.append("Wi-Fi hálózat: %s" % h.wifi_halozat)
-        ki.append("Wi-Fi jelerősség: %d százalék%s"
-                  % (h.wifi_jel, " – gyenge, ez lassíthat" if h.wifi_jel < 50
-                     else (" – közepes" if h.wifi_jel < 70 else " – jó")))
+        # A dBm a szakmai mérőszám (mesh-hálózat építéséhez ez kell), a
+        # százalék pedig a hétköznapi – ezért mindkettőt kiírjuk, magyarázattal.
+        if h.wifi_dbm:
+            fokozat, magyarazat = jel_minosites(h.wifi_dbm)
+            ki.append("Wi-Fi jelerősség: %d dBm%s – %s (jelminőség: %d "
+                      "százalék)"
+                      % (h.wifi_dbm,
+                         "" if h.wifi_dbm_mert else " (számolva)",
+                         fokozat, h.wifi_jel))
+            ki.append("   %s" % magyarazat)
+        else:
+            ki.append("Wi-Fi jelerősség: %d százalék%s"
+                      % (h.wifi_jel, " – gyenge, ez lassíthat"
+                         if h.wifi_jel < 50 else
+                         (" – közepes" if h.wifi_jel < 70 else " – jó")))
         if h.wifi_sav:
             ki.append("Wi-Fi sáv: %s (csatorna: %d)" % (h.wifi_sav, h.wifi_csatorna))
         if h.wifi_le_mbps:
@@ -1266,3 +1368,121 @@ def naplo_atlag(darab: int = 10) -> str:
         return ""
     return ("Az utolsó %d mérés átlaga: %s megabit letöltés."
             % (len(le), _szam(statistics.fmean(le))))
+
+
+# ======================================================================
+#  WI-FI JELERŐSSÉG-FIGYELŐ  (mesh-hálózat építéséhez)
+# ======================================================================
+#
+# Felhasználói kérés (2026-08-20): „olyan eszközt keresnék, ami kiírná, hogy
+# milyen jelerősségű az épp használt wifi-kapcsolat, a dBm értéket megadva…
+# mesh hálót építek éppen ki, jó lenne látnom laptopon is, hogy hol milyen
+# erős még a kapcsolat.”
+#
+# A dBm kiírása önmagában kevés lenne: a mesh-építés közben az ember JÁRKÁL a
+# lakásban, és közben nem tud a képernyőt nézni – vakon pedig végképp nem.
+# Ezért a figyelő folyamatosan mér, és a változást KIMONDJA, illetve egy
+# hangmagassággal is jelzi (minél erősebb a jel, annál magasabb a hang).
+
+JEL_HANG_ALSO_HZ = 220.0        # −85 dBm
+JEL_HANG_FELSO_HZ = 1320.0      # −35 dBm
+
+
+def jel_frekvencia(dbm: int) -> float:
+    """A jelerősséghez tartozó hangmagasság. Járkálás közben ez a leggyorsabb
+    visszajelzés: nem kell megvárni a bemondást, a fül azonnal hallja, hogy
+    erősödik vagy gyengül."""
+    try:
+        d = float(dbm)
+    except (TypeError, ValueError):
+        return JEL_HANG_ALSO_HZ
+    d = max(-85.0, min(-35.0, d))
+    arany = (d + 85.0) / 50.0                     # 0.0 … 1.0
+    # zenei (logaritmikus) lépték: a fül így hallja egyenletesnek
+    return JEL_HANG_ALSO_HZ * (JEL_HANG_FELSO_HZ / JEL_HANG_ALSO_HZ) ** arany
+
+
+class JelNaplo:
+    """A bejárás naplója: mérések, megjelölt pontok, összesítés.
+
+    Szándékosan wx-mentes, hogy tesztelhető legyen: az időzítést és a
+    bemondást a felület intézi."""
+
+    def __init__(self, valtozas_kuszob: int = 3):
+        self.meresek = []           # [(dbm, jel_szazalek)]
+        self.pontok = []            # [(nev, dbm, jel_szazalek)]
+        self.kuszob = max(1, int(valtozas_kuszob))
+        self._utoljara_mondott = None
+
+    # ---- mérés
+    def hozzaad(self, dbm: int, jel_szazalek: int = 0) -> bool:
+        """Új mérés. Igaz, ha ÉRDEMES kimondani (elég nagyot változott).
+
+        Miért kell küszöb: a jel másodpercenként ingadozik 1-2 dBm-et. Ha
+        minden rezdülést bemondanánk, a program folyamatosan beszélne, és a
+        felhasználó nem hallaná a lényeget."""
+        self.meresek.append((int(dbm), int(jel_szazalek or 0)))
+        if self._utoljara_mondott is None \
+                or abs(int(dbm) - self._utoljara_mondott) >= self.kuszob:
+            self._utoljara_mondott = int(dbm)
+            return True
+        return False
+
+    # ---- statisztika
+    def legjobb(self) -> int:
+        return max((m[0] for m in self.meresek), default=0)
+
+    def leggyengebb(self) -> int:
+        return min((m[0] for m in self.meresek), default=0)
+
+    def atlag(self) -> int:
+        if not self.meresek:
+            return 0
+        return int(round(statistics.fmean(m[0] for m in self.meresek)))
+
+    # ---- megjelölt pontok
+    def pont(self, nev: str) -> tuple:
+        """A mostani helyszín megjelölése („konyha”, „hálószoba”)."""
+        if not self.meresek:
+            return ("", 0, 0)
+        dbm, jel = self.meresek[-1]
+        tetel = (str(nev or "").strip() or "névtelen pont", dbm, jel)
+        self.pontok.append(tetel)
+        return tetel
+
+    def pont_szoveg(self, tetel) -> str:
+        nev, dbm, jel = tetel
+        fokozat, _ = jel_minosites(dbm)
+        return "%s: %d dBm – %s" % (nev, dbm, fokozat)
+
+    # ---- összefoglalás
+    def osszefoglalo(self) -> str:
+        if not self.meresek:
+            return "Nem történt mérés."
+        sorok = ["%d mérés. Legerősebb: %d dBm, leggyengébb: %d dBm, "
+                 "átlag: %d dBm." % (len(self.meresek), self.legjobb(),
+                                     self.leggyengebb(), self.atlag())]
+        if self.pontok:
+            sorok.append("Megjelölt helyek:")
+            sorok.extend("  " + self.pont_szoveg(p) for p in self.pontok)
+            gyenge = [p for p in self.pontok if p[1] < -72]
+            if gyenge:
+                sorok.append("Ezeken a helyeken gyenge a jel, ide érdemes még "
+                             "egy mesh-egységet tenni: "
+                             + ", ".join(p[0] for p in gyenge) + ".")
+            else:
+                sorok.append("A megjelölt helyeken mindenhol legalább "
+                             "elfogadható a jel.")
+        return "\n".join(sorok)
+
+    def mentheto_szoveg(self, halozat: str = "") -> str:
+        """A bejárás fájlba menthető jegyzőkönyve."""
+        fej = ["SuperDL – Wi-Fi jelerősség-bejárás"]
+        if halozat:
+            fej.append("Hálózat: %s" % halozat)
+        fej.append("")
+        fej.append(self.osszefoglalo())
+        fej.append("")
+        fej.append("Minden mérés (dBm):")
+        fej.append(", ".join(str(m[0]) for m in self.meresek))
+        return "\n".join(fej)

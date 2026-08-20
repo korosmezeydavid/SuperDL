@@ -19,9 +19,58 @@ from superdl import sounds                   # megosztott earconok a Core-ból
 MEDIA_EXTS = (".mp3", ".m4a", ".aac", ".wav", ".flac", ".ogg", ".opus",
               ".wma", ".mp4", ".mkv", ".avi", ".webm", ".mov", ".wmv",
               ".flv", ".m4v", ".mpg", ".mpeg", ".ts", ".3gp",
-              ".vob", ".m2v", ".mpe", ".m2ts", ".mts")
+              ".vob", ".m2v", ".mpe", ".m2ts", ".mts",
+              # RITKÁBB HANGFORMÁTUMOK – a beépített ffmpeg mindet olvassa.
+              # Miki jelzésére (2026-08-20): egy .ape fájl nem volt a listában,
+              # ezért kellett a „minden fájl" kerülőút. Inkább legyen benne
+              # minden, amit tényleg meg tudunk nyitni.
+              ".ape", ".wv", ".tta", ".tak", ".mpc", ".shn", ".dsf", ".dff",
+              ".aiff", ".aif", ".aifc", ".au", ".amr", ".caf", ".spx",
+              ".ra", ".ac3", ".dts", ".mka", ".m4b", ".oga", ".w64")
 MEDIA_WILDCARD = ("Médiafájlok|" + ";".join(f"*{e}" for e in MEDIA_EXTS)
                   + "|Minden fájl|*.*")
+
+
+def _jegyzet(szoveg):
+    """Nyom az összeomlás-naplóban (régebbi Core-on egyszerűen nem csinál
+    semmit – a modul így is működik)."""
+    try:
+        from superdl import osszeomlas
+        osszeomlas.jegyzet(szoveg)
+    except Exception:
+        pass
+
+
+def _beepitett_valaszto_kell() -> bool:
+    """Használjuk-e a saját fájlválasztónkat a Windowsé helyett?
+
+    Igen, ha a felhasználó ezt kérte a Beállításokban, VAGY ha a naplóból
+    látszik, hogy a programot korábban natív összeomlás vitte el – akkor
+    ugyanis nagy eséllyel épp a rendszer fájlválasztója a hibás, és nem
+    engedjük még egyszer elszállni."""
+    try:
+        import json
+        from pathlib import Path
+        adat = json.loads((Path.home() / ".superdl.json").read_text(
+            encoding="utf-8"))
+        if bool(adat.get("beepitett_fajlvalaszto")):
+            return True
+    except Exception:
+        pass
+    try:
+        from superdl import osszeomlas
+        return bool(osszeomlas.volt_osszeomlas())
+    except Exception:
+        return False
+
+
+def _beepitett_fajlvalaszto(szulo, kiterjesztesek):
+    try:
+        from superdl import fajlvalaszto
+    except Exception:
+        return []
+    return fajlvalaszto.valassz_fajlokat(
+        szulo, "Fájlok hozzáadása", kiterjesztesek, tobb=True)
 MODE_LABELS = [("Hang → hang (átkódolás)", "audio"),
                ("Videó → videó (konténer/kódolás)", "video"),
                ("Videó → hang (hangsáv kivonása)", "extract")]
@@ -232,13 +281,28 @@ class BatchConvertFrame(wx.Frame):
         return 1
 
     def _add_files(self, e):
+        # NYOM A NAPLÓBAN: egy felhasználónál a program a Windows
+        # fájlválasztójában, könyvtár megnyitásakor natívan kilépett. Ilyenkor
+        # nincs Python-hiba, amit elkapnánk – de a napló utolsó sorából
+        # kiderül, hogy pont itt tartott. [Miki jelzése, 2026-08-20]
+        if _beepitett_valaszto_kell():
+            _jegyzet("Beépített fájlválasztó megnyitása (médiakonvertáló)")
+            utak = _beepitett_fajlvalaszto(self, MEDIA_EXTS)
+            _jegyzet("Beépített fájlválasztó bezárva")
+            if utak:
+                self.add_paths(utak)
+            return
+        _jegyzet("Windows fájlválasztó megnyitása (médiakonvertáló)")
         dlg = wx.FileDialog(self, "Fájlok hozzáadása",
                             wildcard=MEDIA_WILDCARD,
                             style=wx.FD_OPEN | wx.FD_MULTIPLE
                             | wx.FD_FILE_MUST_EXIST)
-        if dlg.ShowModal() == wx.ID_OK:
-            self.add_paths(dlg.GetPaths())
-        dlg.Destroy()
+        try:
+            if dlg.ShowModal() == wx.ID_OK:
+                self.add_paths(dlg.GetPaths())
+        finally:
+            dlg.Destroy()
+            _jegyzet("Windows fájlválasztó bezárva")
 
     def _add_folder(self, e):
         dlg = wx.DirDialog(self, "Mappa hozzáadása (az összes médiafájl)")

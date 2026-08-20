@@ -161,7 +161,8 @@ KEYS_TEXT = (
     "  Ctrl+F   – médiakereső (keresés, lejátszás, letöltés)\n"
     "  Ctrl+Shift+R – internetes rádió\n"
     "  Ctrl+U   – frissítések keresése\n"
-    "  Ctrl+Alt+I – Internet-teszt (sebesség, késleltetés, wifi, IP-cím)\n"
+    "  Ctrl+Alt+I – Internet-teszt (sebesség, késleltetés, IP-cím, és a Wi-Fi\n"
+    "               jelerőssége dBm-ben – mesh-hálózat építéséhez is)\n"
     "  Delete   – futó letöltés leállítása; befejezett/hibás elem törlése\n"
     "  Shift+Delete – a kijelölt elem eltávolítása a listából\n"
     "  Ctrl+Shift+S – minden letöltés leállítása\n"
@@ -2855,6 +2856,15 @@ def _start_show_listener(frame) -> None:
 
 
 def main():
+    # ÖSSZEOMLÁS-NAPLÓ: ha a program natívan kilép (nem Python-hiba, hanem
+    # például egy külső bővítmény a Windows fájlválasztójában), maradjon nyom.
+    # Enélkül a felhasználó annyit lát, hogy „eltűnt a program", mi pedig
+    # semmit. [Miki jelzése, 2026-08-20]
+    try:
+        from superdl import osszeomlas
+        osszeomlas.bekapcsol()
+    except Exception:
+        pass
     # a telepítő (vagy haladó felhasználó) csendben be/kikapcsolhatja a
     # fájltársításokat – GUI nélkül, azonnal kilépve
     if "--register-file-assoc" in sys.argv or \

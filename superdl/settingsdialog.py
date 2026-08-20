@@ -357,6 +357,21 @@ class SettingsDialog(wx.Dialog):
         self.c_hide_url.SetValue(bool(self.s.get("hide_url_row", False)))
         v.Add(self.c_hide_url, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
 
+        # BEÉPÍTETT FÁJLVÁLASZTÓ: a Windows fájlválasztójába idegen bővítmények
+        # épülnek be (kodek-csomag, felhő-szinkron, vírusirtó); ha azok egyike
+        # elszáll, viszi az egész programot – ezt Pythonból nem lehet elkapni.
+        # A miénk semmilyen ilyen bővítményt nem használ. [Miki jelzése]
+        self.c_sajatfv = wx.CheckBox(
+            p, label="Beépített &fájlválasztó használata a Windowsé helyett "
+                     "(ha a fájl megnyitásakor kilép a program)")
+        self.c_sajatfv.SetName(
+            "Beépített fájlválasztó. Kapcsold be, ha a Windows fájlválasztója "
+            "összeomlik a gépeden – a beépített nem használ "
+            "rendszerbővítményeket, és teljesen billentyűzetről kezelhető.")
+        self.c_sajatfv.SetValue(bool(self.s.get("beepitett_fajlvalaszto",
+                                                False)))
+        v.Add(self.c_sajatfv, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+
         self.c_startsig = wx.CheckBox(
             p, label="&Induló szignál (hangjelzés a program indulásakor, a "
                      "teljes némítás mellett is)")
@@ -529,6 +544,7 @@ class SettingsDialog(wx.Dialog):
             "selfvoice_off": self.c_sv_off.GetValue(),
             "hide_url_row": self.c_hide_url.GetValue(),
             "startup_signal": self.c_startsig.GetValue(),
+            "beepitett_fajlvalaszto": self.c_sajatfv.GetValue(),
             "selfvoice_voice":
                 self._sv_voice_pairs[self.c_svvoice.GetSelection()][1],
             "selfvoice_rate": self.c_svrate.GetValue(),
