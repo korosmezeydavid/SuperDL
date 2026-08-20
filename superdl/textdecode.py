@@ -102,10 +102,63 @@ def decode_score(text: str) -> int:
     return good - bad
 
 
+def _utf16_jelolt(data: bytes) -> str | None:
+    """UTF-16 (és UTF-32) felismerés – BOM-mal ÉS BOM nélkül.
+
+    MIÉRT KELL: a Windows Jegyzettömb és sok régi program „Unicode" néven
+    UTF-16-ot ment. Ilyenkor minden betű után egy NULLA-bájt áll. Ha ezt
+    egybájtos kódlappal fejtjük meg, a szöveg így néz ki: „1 9 9 3 - b a n" –
+    vagyis a felhasználó szerint „szóközöket tett a betűk közé". (Laci
+    hibajelentése, 2026-08-19.)
+
+    A BOM egyértelmű; BOM nélkül a nulla-bájtok POZÍCIÓJA árulkodik: ha a
+    nullák szinte mind a páratlan helyeken vannak, az UTF-16 LE, ha a párosokon,
+    akkor BE."""
+    if len(data) < 2:
+        return None
+    # 1) BOM alapján (a UTF-32 BOM-ja az UTF-16 LE BOM-jával kezdődik, ezért ez előbb)
+    for bom, enc in ((b"\xff\xfe\x00\x00", "utf-32"),
+                     (b"\x00\x00\xfe\xff", "utf-32"),
+                     (b"\xff\xfe", "utf-16"),
+                     (b"\xfe\xff", "utf-16")):
+        if data.startswith(bom):
+            try:
+                return data.decode(enc)
+            except (UnicodeDecodeError, LookupError):
+                return None
+    # 2) BOM nélkül: a nulla-bájtok elhelyezkedése dönt
+    minta = data[:4096]
+    nullak = minta.count(0)
+    if nullak < len(minta) * 0.20:          # kevés nulla → nem UTF-16
+        return None
+    paratlan = sum(1 for i in range(1, len(minta), 2) if minta[i] == 0)
+    paros = sum(1 for i in range(0, len(minta), 2) if minta[i] == 0)
+    if paratlan >= nullak * 0.9:
+        enc = "utf-16-le"
+    elif paros >= nullak * 0.9:
+        enc = "utf-16-be"
+    else:
+        return None
+    try:
+        szoveg = data.decode(enc)
+    except UnicodeDecodeError:
+        try:
+            szoveg = data[:len(data) // 2 * 2].decode(enc, errors="replace")
+        except Exception:
+            return None
+    # Csak akkor fogadjuk el, ha értelmes szöveg lett belőle: a rossz tipp
+    # rosszabb, mint a régi viselkedés.
+    return szoveg if decode_score(szoveg) > 0 else None
+
+
 def auto_decode(data: bytes) -> str:
-    """A bájtokat a legvalószínűbb kódlappal fejti meg: előbb szigorú UTF-8
-    (ha tiszta), aztán a jelöltek közül a `decode_score` szerinti LEGJOBB.
-    Kezeli a CWI→CP1250→UTF-8 kettős kódolást is (érvényes UTF-8, de kacat)."""
+    """A bájtokat a legvalószínűbb kódlappal fejti meg: előbb az UTF-16/32
+    (BOM-mal vagy nulla-bájt-minta alapján), aztán szigorú UTF-8 (ha tiszta),
+    végül a jelöltek közül a `decode_score` szerinti LEGJOBB. Kezeli a
+    CWI→CP1250→UTF-8 kettős kódolást is (érvényes UTF-8, de kacat)."""
+    szeles = _utf16_jelolt(data)
+    if szeles is not None:
+        return szeles
     utf = None
     for enc in ("utf-8-sig", "utf-8"):
         try:

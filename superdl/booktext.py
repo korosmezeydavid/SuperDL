@@ -27,10 +27,28 @@ class Book:
 
 
 def _clean(t: str) -> str:
+    """FELOLVASÁSHOZ való tisztítás: a soron belüli szóköz- és tabulátor-
+    sorozatok egyetlen szóközzé olvadnak. Beszédnél ez helyes – a képernyő-
+    olvasó és a beszédmotor nem tud mit kezdeni a tagoló szóközökkel."""
     t = t.replace("\r\n", "\n").replace("\r", "\n")
     t = re.sub(r"[ \t]+", " ", t)
     t = re.sub(r"\n{3,}", "\n\n", t)
     return t.strip()
+
+
+def clean_structured(t: str) -> str:
+    """SZERKEZET-TARTÓ tisztítás: a tabulátorok és a sorkezdő behúzás
+    MEGMARADNAK.
+
+    Miért kell külön: egy műsorlistában, táblázatos jegyzetben vagy programban
+    a tabulátor maga a tartalom – ha szóközre cseréljük, a tagolás elvész.
+    Felolvasáshoz továbbra is a `_clean` való; fájl→fájl konvertáláshoz ez.
+    (Laci jelzése nyomán, 2026-08-19.)"""
+    t = t.replace("\r\n", "\n").replace("\r", "\n")
+    # soron belül csak a SOR VÉGI felesleget vágjuk le
+    t = "\n".join(sor.rstrip() for sor in t.split("\n"))
+    t = re.sub(r"\n{3,}", "\n\n", t)
+    return t.strip("\n")
 
 
 def _from_txt(path: Path) -> Book:

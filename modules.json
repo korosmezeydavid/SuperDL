@@ -6,14 +6,14 @@
       "id": "docconvert",
       "name": "Dokumentum-konverter",
       "category": "Könyvek",
-      "description": "Dokumentumok átalakítása formátumok közt (TXT, DOCX, EPUB, PDF, HTML, RTF, ODT, Markdown…), beépített PDF-fel és OCR-rel. ÚJ: kötegelt mód – több fájl vagy egy egész mappa egyszerre, mindegyik a saját fájljába VAGY egyetlen fájlba összefűzve.",
+      "description": "JAVÍTVA (Laci jelzésére): az UTF-16 kódolású szövegfájlok (a Jegyzettömb „Unicode” mentése) eddig úgy jöttek át, hogy a betűk közé szóköz került; mostantól a program felismeri őket, BOM-mal és anélkül is. A fájl→fájl átalakításnál a TABULÁTOROS TAGOLÁS és a sorkezdő behúzás is megmarad (műsorlisták, táblázatos jegyzetek). Dokumentumok átalakítása formátumok közt (TXT, DOCX, EPUB, PDF, HTML, RTF, ODT, Markdown…), beépített PDF-fel és OCR-rel. ÚJ: kötegelt mód – több fájl vagy egy egész mappa egyszerre, mindegyik a saját fájljába VAGY egyetlen fájlba összefűzve.",
       "latest": {
-        "version": "1.3.2",
+        "version": "1.3.3",
         "min_core_api": "1.0",
         "min_core_version": "4.0.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-docconvert-1.3.2/docconvert-1.3.2.zip",
-        "sha256": "ad08af4f5e000a7eecac5c950355f2320ac104b09fbc40ed89d663dcfa759347",
-        "size": 16301
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-docconvert-1.3.3/docconvert-1.3.3.zip",
+        "sha256": "6d9673c057cc22ff1dadbb45068520158be6f2272167ebf32f6222305cc33176",
+        "size": 16736
       }
     },
     {

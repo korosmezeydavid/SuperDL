@@ -106,7 +106,12 @@ def _read_txt(path: Path, in_encoding):
             else data.decode(in_encoding, errors="replace")
     else:
         text = _auto_decode(data)
-    return booktext.Book(title=path.stem, sections=[booktext._clean(text)])
+    # SZERKEZET-TARTÓ tisztítás: fájl→fájl átalakításnál a tabulátor és a
+    # behúzás maga a tartalom (műsorlista, táblázat) – nem szabad szóközzé
+    # olvasztani. A régebbi Core-okon nincs meg ez a függvény, ott marad a
+    # korábbi viselkedés.
+    tisztito = getattr(booktext, "clean_structured", booktext._clean)
+    return booktext.Book(title=path.stem, sections=[tisztito(text)])
 
 
 def _read_html(path: Path):
