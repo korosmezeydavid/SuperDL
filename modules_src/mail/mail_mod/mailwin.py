@@ -119,6 +119,12 @@ _SUGO = (
     "(Levél menü → Kimenő) megmutatja, és ott azonnal el is küldheted vagy "
     "visszavonhatod. A várakozó levél a gépeden, fájlban ül: áramszünet vagy "
     "kilépés után is elmegy majd.\n"
+    "• VÁLASZ UTÁN AZ EREDETI ABLAK: ha külön ablakban nyitottál meg egy "
+    "levelet és válaszolsz rá, az eredeti alapból NYITVA MARAD (így válasz "
+    "közben vissza tudsz olvasni belőle). Ha neked az a kényelmes, hogy "
+    "bezáruljon, pipáld be a Beállítások → Általános fülön: „Válasz után "
+    "záruljon be az eredeti levél ablaka”. Ugyanúgy működik a Válasz "
+    "mindenkinek és a levelezőlistára válasz esetén is.\n"
     "• BIZTONSÁG: a levél megnyitásakor a program KIMONDJA, ha valami nem "
     "stimmel: ha a feladó neve ismert céget mutat, de a cím nem a "
     "hivatalos (például „Magyar Posta” néven egy idegen címről), ha a cím "
@@ -2206,7 +2212,7 @@ class LevelOlvasoFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, kez, it)
 
         m = wx.Menu()
-        mi(m, "&Válasz  (R vagy Ctrl+R)", lambda e: self._mf._valasz(
+        mi(m, "&Válasz  (R vagy Ctrl+R)", lambda e: self._valaszol(
             msg=self._msg, fiok=self._fiok))
         mi(m, "Válasz a &levelezőlistára  (L)",
            lambda e: self._valasz_listara())
@@ -2216,7 +2222,7 @@ class LevelOlvasoFrame(wx.Frame):
            lambda e: self._csat_felolvas())
         mi(m, "&Idézett előzmény mutatása/elrejtése  (Ctrl+I)",
            lambda e: self._idezet_valt())
-        mi(m, "Válasz min&denkinek  (Shift+R)", lambda e: self._mf._valasz(
+        mi(m, "Válasz min&denkinek  (Shift+R)", lambda e: self._valaszol(
             msg=self._msg, fiok=self._fiok, mind=True))
         mi(m, "&Továbbítás  (F vagy Ctrl+F)", lambda e: self._mf._tovabbit(
             msg=self._msg, fiok=self._fiok))
@@ -2316,9 +2322,9 @@ class LevelOlvasoFrame(wx.Frame):
         elif ctrl and ch == "d":                   # Ctrl+D: naptárba a dátumot
             self._naptarba()
         elif ch == "r" and e.ShiftDown():          # válasz MINDENKINEK
-            self._mf._valasz(msg=self._msg, fiok=self._fiok, mind=True)
+            self._valaszol(msg=self._msg, fiok=self._fiok, mind=True)
         elif ch == "r":                            # R vagy Ctrl+R: válasz
-            self._mf._valasz(msg=self._msg, fiok=self._fiok)
+            self._valaszol(msg=self._msg, fiok=self._fiok)
         elif ch == "f":                            # F vagy Ctrl+F: továbbítás
             self._mf._tovabbit(msg=self._msg, fiok=self._fiok)
         elif ctrl and ch == "s":                   # Ctrl+S: csatolmány mentése
@@ -2408,7 +2414,26 @@ class LevelOlvasoFrame(wx.Frame):
                "internet nélkül is fordítható.")
         return True
 
-    # ---- válasz a levelezőlistára --------------------------------------
+    # ---- válasz (és a beállítható ablak-bezárás) -----------------------
+
+    def _valaszol(self, **kw):
+        """Válasz a levélre – és ha a felhasználó úgy kérte, az EREDETI levél
+        ablaka be is záródik.
+
+        Miért beállítás és nem fix viselkedés: van, akinek jól jön, hogy az
+        eredeti ott marad (össze tudja vetni válasz közben), és van, akinek
+        útban van a sok nyitott ablak. A pipa a Beállítások → Általános fülön
+        van; alapból KIKAPCSOLVA, tehát a megszokott viselkedés nem változik.
+        [felhasználói kérés, 2026-08-20]"""
+        zarjuk = bool(MC.altalanos_betolt().get("valasz_zarja_eredetit", False))
+        if zarjuk:
+            # ELŐBB zárunk, csak UTÁNA nyitjuk a választ: a levélíró ablak
+            # modális, tehát amíg az nyitva van, ez az ablak nem tudna
+            # bezáródni – a felhasználó meg két ablakot kapna egyszerre.
+            self.Close()
+            wx.CallAfter(self._mf._valasz, **kw)
+            return
+        self._mf._valasz(**kw)
 
     def _valasz_listara(self):
         cim = MC.lista_cim(self._msg)
@@ -2416,7 +2441,7 @@ class LevelOlvasoFrame(wx.Frame):
             _mondd(self.main, "Ez a levél nem levelezőlistáról jött. Az R "
                    "betűvel válaszolhatsz a feladónak.")
             return
-        self._mf._valasz(msg=self._msg, fiok=self._fiok, listara=cim)
+        self._valaszol(msg=self._msg, fiok=self._fiok, listara=cim)
 
     def _on_close(self, e):
         self._closing = True
@@ -2839,6 +2864,17 @@ class BeallitasokDialog(wx.Dialog):
         hs5.Add(self.alt_visszavonas, 0)
         v.Add(hs5, 0, wx.ALL, 8)
 
+        # --- VÁLASZ UTÁN AZ EREDETI ABLAK ---
+        self.alt_valasz_zar = wx.CheckBox(
+            p, label="Válasz &után záruljon be az eredeti levél ablaka")
+        self.alt_valasz_zar.SetValue(
+            bool(cfg.get("valasz_zarja_eredetit", False)))
+        self.alt_valasz_zar.SetName(
+            "Ha bepipálod, a Válasz gombra az eredeti levél külön ablaka "
+            "bezárul, és csak a válasz marad nyitva. Kikapcsolva az eredeti "
+            "nyitva marad – így válasz közben is vissza tudsz olvasni belőle.")
+        v.Add(self.alt_valasz_zar, 0, wx.LEFT | wx.TOP, 12)
+
         # --- TÉRTIVEVÉNY ---
         self.alt_tv_keres = wx.CheckBox(
             p, label="Új levélnél alapból &kérjek visszajelzést az elolvasásról")
@@ -2949,7 +2985,9 @@ class BeallitasokDialog(wx.Dialog):
                 "visszavonas_mp": int(self.alt_visszavonas.GetValue()),
                 "tertivevony_keres": bool(self.alt_tv_keres.GetValue()),
                 "tertivevony_valasz": [MDN.KERDEZ, MDN.MINDIG, MDN.SOHA][
-                    max(0, self.alt_tv_valasz.GetSelection())]}
+                    max(0, self.alt_tv_valasz.GetSelection())],
+                "valasz_zarja_eredetit": bool(
+                    self.alt_valasz_zar.GetValue())}
         # TÚL SŰRŰ LEKÉRDEZÉS: néhány szolgáltató (főleg a Gmail) a gyakori
         # bejelentkezést ideiglenes letiltással bünteti – erre figyelmeztetünk,
         # de nem tiltjuk meg: a felhasználó dönt.

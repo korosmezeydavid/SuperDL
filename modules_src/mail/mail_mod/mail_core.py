@@ -750,7 +750,9 @@ _ALTALANOS_ALAP = {"auto_ellenoriz": True, "ellenoriz_perc": 3,
                    "visszavonas_mp": 10,
                    # tértivevény: kérjük-e, és mit tegyünk, ha tőlünk kérik
                    "tertivevony_keres": False,
-                   "tertivevony_valasz": "kerdez"}
+                   "tertivevony_valasz": "kerdez",
+                   # válasz után bezáruljon-e az eredeti levél ablaka
+                   "valasz_zarja_eredetit": False}
 
 
 def altalanos_betolt():
