@@ -119,6 +119,11 @@ _SUGO = (
     "(Levél menü → Kimenő) megmutatja, és ott azonnal el is küldheted vagy "
     "visszavonhatod. A várakozó levél a gépeden, fájlban ül: áramszünet vagy "
     "kilépés után is elmegy majd.\n"
+    "• CSATOLMÁNY-JELZÉS: ha a levélhez melléklet tartozik, a listasor "
+    "végén elhangzik a „csatolmány” szó, ÉS az új levél érkezésekor is "
+    "kimondjuk. A levél testébe ágyazott képeket (hírlevelek logója) és a "
+    "digitális aláírásokat NEM jelezzük mellékletként – ha azokat is "
+    "jeleznénk, a jelzés elértéktelenedne.\n"
     "• VÁLASZ UTÁN AZ EREDETI ABLAK: ha külön ablakban nyitottál meg egy "
     "levelet és válaszolsz rá, az eredeti alapból NYITVA MARAD (így válasz "
     "közben vissza tudsz olvasni belőle). Ha neked az a kényelmes, hogy "
@@ -3580,11 +3585,23 @@ class MailFrame(wx.Frame):
             lista, hibas = eredmeny
             self._osszes_hibas = hibas
             uj = self._uj_levelek_szama(lista)
+            # az ÚJ levelek közül hányban van melléklet? (ezt a jelzésben
+            # kimondjuk – enélkül „elsikkad a melléklet")
+            csat = 0
+            try:
+                latott = getattr(self, "_osszes_csat_latott", None) or set()
+                mostani = {(str((x.get("_fiok") or {}).get("email", "")),
+                            str(x.get("uid", ""))) for x in lista
+                           if x.get("csatolmany")}
+                csat = len(mostani - latott) if latott else 0
+                self._osszes_csat_latott = mostani
+            except Exception:
+                csat = 0
             self._lista_kesz(lista)
             if uj:
                 # ÚJ LEVÉL a háttér-körben: egyetlen jelzés az egészre, nem
                 # levelenként (öt levélre ne tilinkózzon ötször).
-                self._ertesit_osszes(uj)
+                self._ertesit_osszes(uj, csat)
 
         def hiba(ex):
             self._osszes_fut = False
@@ -4557,14 +4574,16 @@ class MailFrame(wx.Frame):
             # Ha az ÚJ levelekre mind olyan szabály illik, ami tiltja az
             # értesítést (hírlevelek), akkor csendben maradunk – a felhasználó
             # pont ezért kérte a „ne szóljon rá hang” műveletet.
+            csatolmanyos = 0
             try:
                 ujak = [x for x in lista
                         if x.get("uid") and int(x["uid"]) > int(elozo)]
                 if ujak and all(self._nema_level(x) for x in ujak):
                     return
+                csatolmanyos = sum(1 for x in ujak if x.get("csatolmany"))
             except Exception:
                 pass
-            self._ertesit(fiok)
+            self._ertesit(fiok, csatolmanyos)
 
     def _jelzo_hang(self) -> bool:
         """Az ÁLTALÁNOS új-levél hang (mindenkinek, fiók-beállítás nélkül is).
@@ -4580,16 +4599,21 @@ class MailFrame(wx.Frame):
         from . import hangok
         return hangok.uj_level(str(cfg.get("ertesito_hang_fajl", "") or ""))
 
-    def _ertesit_osszes(self, darab: int) -> None:
+    def _ertesit_osszes(self, darab: int, csatolmanyos: int = 0) -> None:
         """Az egyesített nézet háttér-köre után: EGY jelzés az egészre."""
         self._jelzo_hang()
-        self._mond("%d új levél érkezett." % darab if darab > 1
-                   else "Új leveled érkezett.")
+        csat = self._csat_szoveg(csatolmanyos)
+        self._mond(("%d új levél érkezett." % darab if darab > 1
+                    else "Új leveled érkezett.")
+                   + ((" " + csat) if csat else ""))
 
-    def _ertesit(self, fiok):
+    def _ertesit(self, fiok, csatolmanyos=0):
         """A fiókhoz beállított értesítés: hang lejátszása VAGY szöveg felolvasása.
         Az ÁLTALÁNOS jelzőhang ettől függetlenül szól (ha be van kapcsolva), így
-        az is kap hallható visszajelzést, aki fiókonként nem állított be semmit."""
+        az is kap hallható visszajelzést, aki fiókonként nem állított be semmit.
+
+        `csatolmanyos`: hány érkezett levélben van MELLÉKLET. Ezt kimondjuk –
+        egy felhasználó jelezte, hogy enélkül „elsikkad a melléklet”."""
         self._jelzo_hang()
         try:
             cfg = MC.ertesito_fiok(fiok.get("email", ""))
@@ -4598,12 +4622,26 @@ class MailFrame(wx.Frame):
         tipus = cfg.get("tipus", "szoveg")
         if tipus == "nincs":
             return
+        csat_szoveg = self._csat_szoveg(csatolmanyos)
         if tipus == "hang" and cfg.get("hang"):
             siker, _uz = ertesito_hang(cfg["hang"])
             if siker:
+                if csat_szoveg:          # a hang után a MELLÉKLETET kimondjuk
+                    self._mond(csat_szoveg)
                 return
         # szöveg (vagy ha a hang nem szólalt meg): felolvasás
-        self._mond(cfg.get("szoveg") or "Új leveled érkezett.")
+        self._mond((cfg.get("szoveg") or "Új leveled érkezett.")
+                   + ((" " + csat_szoveg) if csat_szoveg else ""))
+
+    @staticmethod
+    def _csat_szoveg(darab: int) -> str:
+        """Felolvasható mondat a mellékletről (üres, ha nincs)."""
+        darab = int(darab or 0)
+        if darab <= 0:
+            return ""
+        if darab == 1:
+            return "Csatolmány van benne."
+        return "%d levélben csatolmány is van." % darab
 
     def _ertesito_beallit(self, e=None):
         """Az értesítők a Beállítások Értesítők-fülén állíthatók."""

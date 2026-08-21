@@ -368,6 +368,69 @@ def _norm_fejlec(ertek) -> str:
     return str(ertek or "").strip().lower()
 
 
+_ALAIRAS_TIPUSOK = ("PKCS7-SIGNATURE", "PKCS7-MIME", "PGP-SIGNATURE",
+                    "X-PKCS7-SIGNATURE", "PGP-KEYS")
+
+
+def csatolmany_a_szerkezetbol(nyers) -> bool:
+    """Van-e CSATOLMÁNY a levélben – a levél SZERKEZETE (IMAP BODYSTRUCTURE)
+    alapján, a teljes levél letöltése nélkül.
+
+    MIÉRT KELL: a listához csak a fejléceket töltjük le (gyors, keveset
+    forgalmaz), a csatolmány viszont a levél TESTÉBEN van. Emiatt a lista
+    eddig SOSEM tudta, hogy van-e melléklet – egy felhasználó jelezte, hogy
+    így „elsikkad a melléklet”. A BODYSTRUCTURE viszont pont a szerkezetet
+    írja le, és ugyanabban a lekérésben megkapható.
+
+    Amit csatolmánynak veszünk:
+      • aminek a szerkezete „attachment” elhelyezést jelöl;
+      • a nevesített (fájlnevet kapott) alkalmazás-részek – ezeket a
+        levelezők is mellékletként mutatják.
+    Amit NEM: a levél testébe ágyazott képek (inline, cid:) és a digitális
+    aláírások – ezek nem melléklet, és ha jeleznénk őket, a jelzés
+    elértéktelenedne."""
+    if not nyers:
+        return False
+    if isinstance(nyers, (bytes, bytearray)):
+        nyers = bytes(nyers).decode("utf-8", "replace")
+    nagy = str(nyers).upper()
+    if "BODYSTRUCTURE" not in nagy and "BODY (" not in nagy:
+        return False
+
+    # RÉSZENKÉNT vizsgálunk, nem az egész szövegben keresünk: egy aláírt
+    # levélben ugyanis az aláírás-rész is „APPLICATION", fájlnévvel – ha
+    # globálisan néznénk, minden aláírt levélre csatolmányt jeleznénk.
+    for i in _reszek_kezdetei(nagy, '("APPLICATION"'):
+        resz = nagy[i:i + 400]
+        altipus = ""
+        m = re.match(r'\("APPLICATION"\s+"([^"]+)"', resz)
+        if m:
+            altipus = m.group(1)
+        if any(a in altipus for a in _ALAIRAS_TIPUSOK):
+            continue                       # digitális aláírás: nem melléklet
+        if ('"ATTACHMENT"' in resz or '"NAME"' in resz
+                or '"FILENAME"' in resz):
+            return True
+
+    # nem alkalmazás-típusú melléklet (kép, hang, szöveg csatolmányként):
+    # ilyenkor az „attachment" elhelyezés-jelölés a döntő – a levél testébe
+    # ágyazott képek ugyanis „inline" jelölést kapnak
+    for i in _reszek_kezdetei(nagy, '"ATTACHMENT"'):
+        elozmeny = nagy[max(0, i - 300):i]
+        if not any(a in elozmeny for a in _ALAIRAS_TIPUSOK):
+            return True
+    return False
+
+
+def _reszek_kezdetei(szoveg: str, minta: str):
+    """A minta összes előfordulásának kezdőpozíciója."""
+    hely, ki = szoveg.find(minta), []
+    while hely >= 0:
+        ki.append(hely)
+        hely = szoveg.find(minta, hely + 1)
+    return ki
+
+
 def _meret_a_metabol(meta) -> int:
     """A levél mérete bájtban, az IMAP válasz meta-részéből (RFC822.SIZE).
     Ha a szerver nem adja meg, 0 – a méret-feltétel ilyenkor nem illeszkedik
@@ -914,7 +977,7 @@ class ImapKliens:
     _FEJLEC_FETCH = ("(UID FLAGS RFC822.SIZE BODY.PEEK[HEADER.FIELDS "
                      "(FROM SUBJECT DATE TO CC MESSAGE-ID LIST-ID "
                      "LIST-UNSUBSCRIBE LIST-UNSUBSCRIBE-POST PRECEDENCE REPLY-TO "
-                     "IN-REPLY-TO REFERENCES)])")
+                     "IN-REPLY-TO REFERENCES)] BODYSTRUCTURE)")
 
     def lista(self, mappa="INBOX", limit=50, offset=0):
         """A mappa leveleinek fejléc-infói (LEGÚJABB ELÖL), LAPOZÁSSAL.
@@ -953,6 +1016,9 @@ class ImapKliens:
             info = level_fejlec_info(msg)
             info["uid"] = uid
             info["meret"] = _meret_a_metabol(meta)
+            # CSATOLMÁNY a levél szerkezetéből: a listához nem töltjük le a
+            # levél testét, ezért enélkül a melléklet SOSEM látszana.
+            info["csatolmany"] = csatolmany_a_szerkezetbol(meta)
             info["olvasott"] = b"\\Seen" in flags
             ki.append(info)
         ki.reverse()        # a fetch NÖVEKVŐ szekvencia-sorrendben ad → legújabb elöl
@@ -971,6 +1037,9 @@ class ImapKliens:
             info = level_fejlec_info(msg)
             info["uid"] = uid
             info["meret"] = _meret_a_metabol(meta)
+            # CSATOLMÁNY a levél szerkezetéből: a listához nem töltjük le a
+            # levél testét, ezért enélkül a melléklet SOSEM látszana.
+            info["csatolmany"] = csatolmany_a_szerkezetbol(meta)
             info["olvasott"] = b"\\Seen" in flags
             ki.append(info)
         return ki
