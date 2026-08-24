@@ -163,6 +163,7 @@ KEYS_TEXT = (
     "  Ctrl+U   – frissítések keresése\n"
     "  Ctrl+Alt+I – Internet-teszt (sebesség, késleltetés, IP-cím, és a Wi-Fi\n"
     "               jelerőssége dBm-ben – mesh-hálózat építéséhez is)\n"
+    "  Ctrl+Alt+M – Teljes mentés és visszaállítás (költözés új gépre)\n"
     "  Delete   – futó letöltés leállítása; befejezett/hibás elem törlése\n"
     "  Shift+Delete – a kijelölt elem eltávolítása a listából\n"
     "  Ctrl+Shift+S – minden letöltés leállítása\n"
@@ -209,6 +210,14 @@ PRIVACY_TEXT = (
     "TITKOK – az AI-/TTS-kulcsok és más bizalmas adatok a gépeden, Windows "
     "DPAPI-val TITKOSÍTVA tárolódnak; ha a titkosítás nem érhető el, a program "
     "inkább nem menti el, mint hogy nyíltan tárolja.\n\n"
+    "TELJES MENTÉS (Súgó menü, Ctrl+Alt+M) – egyetlen fájlba menti az egész "
+    "SuperDL-t: beállítások, feliratkozások, könyvjelzők, naptár, címjegyzék, "
+    "a levelező szabályai, ÉS a bizalmas adatok (e-mail jelszavak, "
+    "AI-kulcsok) is. Ez a fájl SEHOVA nem megy: oda mented, ahova te akarod. "
+    "Mivel jelszavakat tartalmaz, JELSZÓ nélkül nem készül el, és a tartalma "
+    "teljes egészében titkosítva van (AES-256-GCM, scrypt kulcsképzéssel) – "
+    "még a fájlnevek sem olvashatók belőle. A jelszót nem lehet pótolni: ha "
+    "elveszik, a mentés nem nyitható ki.\n\n"
     "FÁJLOK – a letöltött fájlok a célmappádba kerülnek; a beállítások és a "
     "letöltési sor a felhasználói .superdl mappádban; a megnyitott .torrent "
     "fájlokat beolvassa.\n\n"
@@ -637,6 +646,11 @@ class MainFrame(wx.Frame):
             wx.ID_ANY, "AI-&kulcsok beszerzése…",
             "Hol és hogyan szerezhetsz API-kulcsot a 4 szolgáltatóhoz")
         m_help.AppendSeparator()
+        mi_mentes = m_help.Append(
+            wx.ID_ANY, "&Teljes mentés és visszaállítás…\tCtrl+Alt+M",
+            "MINDEN egy fájlba: beállítások, feliratkozások, könyvjelzők, "
+            "naptár, e-mail jelszavak, AI-kulcsok – új gépre költözéshez")
+        m_help.AppendSeparator()
         mi_upd = m_help.Append(wx.ID_ANY, "&Frissítések keresése\tCtrl+U",
                                "A letöltőmotorok új verzióinak keresése")
         mi_diag = m_help.Append(
@@ -681,6 +695,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_ai_keys_help, mi_aikeys)
         self.Bind(wx.EVT_MENU, self._on_check_updates, mi_upd)
         self.Bind(wx.EVT_MENU, self._on_diagnostics, mi_diag)
+        self.Bind(wx.EVT_MENU, self._on_mentes, mi_mentes)
         self.Bind(wx.EVT_MENU, self._on_search_window, mi_search)
         self.Bind(wx.EVT_MENU, self._on_modmgr_window, mi_modmgr)
         self.Bind(wx.EVT_MENU, self._on_nettest, mi_nettest)
@@ -1887,6 +1902,20 @@ class MainFrame(wx.Frame):
         dlg = SupportDialog(self)
         dlg.ShowModal()
         dlg.Destroy()
+
+    def _on_mentes(self, event=None):
+        """Teljes mentés és visszaállítás (Súgó menü, Ctrl+Alt+M).
+
+        Egy fájlban MINDEN: beállítások, feliratkozások, könyvjelzők, naptár,
+        címjegyzék, a levelező szabályai – és a bizalmas adatok (e-mail
+        jelszavak, AI-kulcsok) is. Új gépre költözésnél ez az egy fájl elég.
+        [felhasználói kérés, 2026-08-20]"""
+        try:
+            from superdl import menteswin
+            menteswin.mutasd(self, self)
+        except Exception as ex:
+            self._announce("A mentés ablakát nem sikerült megnyitni: %s" % ex,
+                           ok=False)
 
     def _on_diagnostics(self, event=None):
         """Titok-mentes diagnosztikai jelentés a VÁGÓLAPRA (hibajelentéshez).
