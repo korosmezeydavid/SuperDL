@@ -122,7 +122,23 @@ class TvMusorFrame(wx.Frame):
         self._csat_lista.SetName("Csatornák")
         self._csat_lista.Bind(wx.EVT_LISTBOX, lambda e: self._csatorna_valt())
         s.Add(self._csat_lista, 1, wx.EXPAND | wx.ALL, 6)
-        s.Add(wx.StaticText(lap, label="A csatorna &műsora (mostantól):"),
+
+        # NAP-VÁLASZTÓ (Laci kérése): ne csak „mostantól" lehessen nézni a
+        # műsort, hanem a holnapit vagy a holnaputánit is – a forrás ugyanis
+        # több napra előre ad adatot.
+        napsor = wx.BoxSizer(wx.HORIZONTAL)
+        napsor.Add(wx.StaticText(lap, label="&Nap:"), 0,
+                   wx.ALIGN_CENTER_VERTICAL | wx.LEFT | wx.RIGHT, 6)
+        self._nap_valaszto = wx.Choice(lap, choices=["mostantól"])
+        self._nap_valaszto.SetSelection(0)
+        self._nap_valaszto.SetName(
+            "Melyik nap műsora – mostantól, ma, holnap, és ameddig a forrás "
+            "adatot ad")
+        self._nap_valaszto.Bind(wx.EVT_CHOICE, lambda e: self._csatorna_valt())
+        napsor.Add(self._nap_valaszto, 0, wx.ALIGN_CENTER_VERTICAL)
+        s.Add(napsor, 0, wx.TOP, 4)
+
+        s.Add(wx.StaticText(lap, label="A csatorna &műsora:"),
               0, wx.LEFT | wx.TOP, 6)
         self._nap_lista = wx.ListBox(lap, style=wx.LB_SINGLE)
         self._nap_lista.SetName("A csatorna műsora")
@@ -599,21 +615,52 @@ class TvMusorFrame(wx.Frame):
         if self._este_sorok:
             self._este_lista.SetSelection(0)
 
+    def _napok_frissit(self, cid):
+        """A nap-választó feltöltése ahhoz a csatornához, ami ki van jelölve.
+
+        Csatornánként külön kérdezzük le: a források nem adnak minden
+        csatornára ugyanannyi napot (van, amelyik négy napra előre, van,
+        amelyik csak holnapig)."""
+        import datetime as dt
+        ma = dt.date.today()
+        self._napok = [n for n in self._tv.elerheto_napok(cid) if n >= ma]
+        cimkek = ["mostantól"] + [self._tv.nap_neve(n, ma) for n in self._napok]
+        elozo = self._nap_valaszto.GetSelection()
+        self._nap_valaszto.Set(cimkek)
+        self._nap_valaszto.SetSelection(
+            elozo if 0 <= elozo < len(cimkek) else 0)
+
     def _csatorna_valt(self):
         i = self._csat_lista.GetSelection()
         if not (0 <= i < len(self._csatornak)):
             return
         cid, nev = self._csatornak[i]
-        musorok = self._tv.naprend(cid, darab=40)
+        self._napok_frissit(cid)
+        nap_i = self._nap_valaszto.GetSelection()
+        napok = getattr(self, "_napok", [])
+        if nap_i <= 0 or nap_i > len(napok):
+            musorok = self._tv.naprend(cid, darab=40)
+            fejlec = "mostantól"
+        else:
+            nap = napok[nap_i - 1]
+            musorok = self._tv.nap_musora(cid, nap)
+            fejlec = self._tv.nap_neve(nap)
         self._nap_sorok = [(nev, m) for m in musorok]
         self._nap_lista.Set([m.felolvasva() for m in musorok])
-        if musorok:
-            self._nap_lista.SetSelection(0)
+        if not musorok:
+            self._mond("%s – erre a napra nincs műsoradat ehhez a "
+                       "csatornához." % nev)
+            return
+        self._nap_lista.SetSelection(0)
+        if nap_i <= 0:
             futo, kov = self._tv.most_kovetkezo(cid)
             if futo:
                 self._mond("%s – most: %s. Utána: %s."
                            % (nev, futo.cim,
                               kov.cim if kov else "nincs adat"))
+        else:
+            self._mond("%s – %s: %d műsor. Az első: %s."
+                       % (nev, fejlec, len(musorok), musorok[0].cim))
 
     def _keres(self):
         kif = (self._keres_mezo.GetValue() or "").strip()
@@ -672,7 +719,15 @@ class TvMusorFrame(wx.Frame):
         "LAPFÜLEK (Ctrl+Tab vált köztük)\n"
         "• Mi megy most? – minden csatorna ÉPP FUTÓ műsora.\n"
         "• Ma este – a 20:00–23:00 közti főműsoridő, kezdés szerint.\n"
-        "• Csatornák – válassz csatornát, alatta a műsora mostantól.\n"
+        "• Csatornák – válassz csatornát, alatta a műsora. A NAP mezőben "
+        "beállíthatod, melyik nap érdekel: „mostantól” (a most futó és a "
+        "későbbi műsorok), vagy egy konkrét nap – ma, holnap, holnapután, és "
+        "ameddig a forrás adatot ad. Ilyenkor a nap TELJES műsora látszik, a "
+        "reggeliekkel együtt. A választék csatornánként változhat: a források "
+        "nem minden csatornára adnak ugyanannyi napot (a nagyobbaknál "
+        "általában ma és még 3-4 nap, néhány kisebbnél csak holnapig). A "
+        "hajnalig tartó filmek az ELŐZŐ naphoz tartoznak – ahogy a tévénéző is "
+        "gondolja.\n"
         "• Keresés – írd be egy film/műsor címét (ékezet nélkül is jó), és "
         "megmondja, MIKOR és MELYIK csatornán adják.\n"
         "• KEDVENCEK – írd be a kedvenc filmjeid, sorozataid címét (akár többet "

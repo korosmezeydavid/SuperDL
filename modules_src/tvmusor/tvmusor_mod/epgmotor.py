@@ -266,6 +266,59 @@ class TvMusor:
         mikor = mikor or _dt.datetime.now()
         return [m for m in (self.musorok.get(cid) or []) if m.veg > mikor][:darab]
 
+    # ---- NAPRA BONTÁS (Laci kérése, 2026-08-24) -----------------------
+    #
+    # „Hány napra előre tudnál megjeleníteni egy csatorna műsorát? Lehetne
+    # napot állítani a csatornalistában, ha nem az aktuálisra kíváncsi az
+    # ember.” – Eddig csak MOSTANTÓL előre lehetett nézni a műsort; így a
+    # holnaputáni film megkeresése végignyilazást jelentett.
+
+    def elerheto_napok(self, cid: str = "") -> list:
+        """Mely NAPOKRA van egyáltalán adat? (dátumok, növekvő sorrendben)
+
+        Ha `cid` meg van adva, csak arra a csatornára néz – a források ugyanis
+        nem minden csatornára adnak ugyanannyit: van, amelyik négy napra
+        előre, van, amelyik csak holnapig."""
+        listak = ([self.musorok.get(cid) or []] if cid
+                  else list(self.musorok.values()))
+        napok = set()
+        for lista in listak:
+            for m in lista:
+                napok.add(m.kezd.date())
+        return sorted(napok)
+
+    def nap_musora(self, cid: str, nap=None, hajnal_ora: int = 5) -> list:
+        """Egy csatorna EGÉSZ napi műsora – nem csak mostantól.
+
+        A `hajnal_ora` azért kell, mert a tévénézők fejében a nap nem éjfélkor
+        ér véget: a „ma esti" film, ami hajnali fél egykor kezdődik, MÉG a mai
+        naphoz tartozik. Ezért a nap 5:00-tól másnap 5:00-ig tart."""
+        nap = nap or _dt.date.today()
+        kezdet = _dt.datetime.combine(nap, _dt.time(hajnal_ora, 0))
+        veg = kezdet + _dt.timedelta(days=1)
+        return [m for m in (self.musorok.get(cid) or [])
+                if kezdet <= m.kezd < veg]
+
+    @staticmethod
+    def nap_neve(nap, ma=None) -> str:
+        """A nap FELOLVASHATÓ neve: „ma", „holnap", vagy „csütörtök, 08. 28."."""
+        ma = ma or _dt.date.today()
+        kulonbseg = (nap - ma).days
+        if kulonbseg == 0:
+            elotag = "ma"
+        elif kulonbseg == 1:
+            elotag = "holnap"
+        elif kulonbseg == 2:
+            elotag = "holnapután"
+        elif kulonbseg == -1:
+            elotag = "tegnap"
+        else:
+            elotag = ""
+        napnevek = ("hétfő", "kedd", "szerda", "csütörtök", "péntek",
+                    "szombat", "vasárnap")
+        alap = "%s, %s" % (napnevek[nap.weekday()], nap.strftime("%m. %d."))
+        return ("%s – %s" % (elotag, alap)) if elotag else alap
+
     def mi_megy_most(self, mikor=None) -> list:
         """MINDEN csatorna épp futó műsora: (csatornanév, Musor) párok."""
         mikor = mikor or _dt.datetime.now()

@@ -461,9 +461,36 @@ def _installer_script(setup: Path, pid: int, log: Path, exe: Path) -> str:
          # fájlokat, mielőtt a telepítő nekiállna
          f'"{sys32}\\ping.exe" -n 3 127.0.0.1 >NUL',
          f'echo [INST] telepito inditasa: {setup} >> "%LOG%" 2>&1',
-         f'"{setup}" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART '
-         f'/FORCECLOSEAPPLICATIONS >> "%LOG%" 2>&1',
-         'echo [INST] telepito vegzett (kod %ERRORLEVEL%) >> "%LOG%" 2>&1',
+         # A `start /wait` KELL: az Inno Setup.exe egy indító, ami kicsomagol
+         # és ÚJRAINDÍTJA magát egy .tmp segédként – enélkül a kötegfájl
+         # azonnal továbbmenne, „0" kóddal, miközben a telepítés még javában
+         # tart. (Élesben pontosan ez történt: a napló sikert írt, a program
+         # mégis a régi verzió maradt.)
+         f'start "" /wait "{setup}" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART '
+         f'/FORCECLOSEAPPLICATIONS',
+         'set "KOD=%ERRORLEVEL%"',
+         'echo [INST] telepito vegzett (kod %KOD%) >> "%LOG%" 2>&1',
+         # BIZTOS, AMI BIZTOS: megvárjuk, amíg a telepítő segédfolyamata is
+         # eltűnik. Ha ilyenkor indítanánk vissza a SuperDL-t, az
+         # egypéldány-mutexe MEGÖLNÉ a még futó telepítést – ez volt a hiba
+         # gyökere. [élesben reprodukálva, 2026-08-24]
+         'set /a t=0',
+         ':varj_telepitore',
+         f'"{sys32}\\tasklist.exe" /FI "IMAGENAME eq SuperDL-Setup-*" 2>NUL | '
+         f'"{sys32}\\find.exe" /I "SuperDL-Setup" >NUL',
+         'if errorlevel 1 goto telepito_kesz',
+         'set /a t+=1',
+         'if %t% GEQ 120 goto telepito_kesz',      # max ~4 perc
+         f'"{sys32}\\ping.exe" -n 3 127.0.0.1 >NUL',
+         'goto varj_telepitore',
+         ':telepito_kesz',
+         # A TÉNYLEGES eredmény a naplóba: melyik verzió van most telepítve.
+         # Ha nem változott, a felhasználó legalább LÁTJA, hogy nem sikerült.
+         'for /f "tokens=2,*" %%A in (\'reg query '
+         '"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\'
+         '{B8F2A1C4-7E3D-4A9B-9C2E-5D1F6A0B3C7E}_is1" /v DisplayVersion '
+         '2^>NUL ^| "' + sys32 + '\\find.exe" "DisplayVersion"\') do '
+         'echo [INST] telepitett verzio: %%B >> "%LOG%" 2>&1',
          # AV-nyugvás, majd a SuperDL ÚJRAINDÍTÁSA a saját mappájából (a
          # telepítő ugyanoda telepít – azonos AppId), felhasznaloi jogokkal
          f'"{sys32}\\ping.exe" -n 8 127.0.0.1 >NUL',
