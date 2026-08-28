@@ -327,6 +327,93 @@ def mappa_display(raw):
 #  Levél-elemzés (email.message → emberi mezők)
 # ======================================================================
 
+# ======================================================================
+#  FONTOSSÁG (prioritás)
+# ======================================================================
+#
+# Felhasználói kérés (2026-08-24): „legyen a levélen belül egy prioritás-
+# választó… a leveleknél mondja is be… a beállításokban ki- és bekapcsolási
+# lehetőség, hogy mondja-e a sürgősséget.”
+#
+# Szabvány nincs rá EGY darab: három fejléc él egymás mellett a világban, és a
+# levelezőprogramok más-mást néznek. Ezért KÜLDÉSKOR mind a hármat kitesszük
+# (így minden kliens látja), OLVASÁSKOR pedig mind a hármat elfogadjuk.
+
+PRIO_ALACSONY, PRIO_NORMAL, PRIO_MAGAS, PRIO_SURGOS = (
+    "alacsony", "normal", "magas", "surgos")
+
+# (kulcs, felületi név, X-Priority, Importance, Priority)
+PRIORITASOK = (
+    (PRIO_ALACSONY, "alacsony", "5 (Lowest)", "Low", "non-urgent"),
+    (PRIO_NORMAL, "közepes (alapértelmezett)", "", "", ""),
+    (PRIO_MAGAS, "magas", "2 (High)", "High", "urgent"),
+    (PRIO_SURGOS, "nagyon sürgős", "1 (Highest)", "High", "urgent"),
+)
+PRIO_NEVEK = {k: n for k, n, _x, _i, _p in PRIORITASOK}
+
+# Amit a listasorban és a bemondásban használunk (a „közepes" nem szólal meg –
+# az az alapeset, nem hír).
+PRIO_JELZES = {
+    PRIO_SURGOS: "NAGYON SÜRGŐS",
+    PRIO_MAGAS: "fontos",
+    PRIO_ALACSONY: "alacsony fontosságú",
+}
+
+
+def prioritas_beallit(msg, szint: str) -> None:
+    """A kimenő levél fontosság-fejlécei. `szint`: a PRIORITASOK kulcsa."""
+    for fejlec in ("X-Priority", "Importance", "Priority", "X-MSMail-Priority"):
+        if fejlec in msg:
+            del msg[fejlec]
+    for kulcs, _nev, xprio, fontos, prio in PRIORITASOK:
+        if kulcs != (szint or PRIO_NORMAL):
+            continue
+        if not xprio:                     # közepes: NEM teszünk ki fejlécet
+            return
+        msg["X-Priority"] = xprio
+        msg["Importance"] = fontos
+        msg["Priority"] = prio
+        # az Outlook ezt a sajátját nézi elsőként
+        msg["X-MSMail-Priority"] = ("High" if fontos == "High" else "Low")
+        return
+
+
+def prioritas_a_fejlecbol(fejlecek) -> str:
+    """A levél fontossága a fejlécekből. `fejlecek`: e-mail üzenet VAGY
+    szótár (a lista-nézet infója).
+
+    A három szabvány közül a legerősebb jelzés nyer: ha bármelyik sürgőset
+    mond, sürgős. Ismeretlen érték esetén normál – tévesen sürgetni rosszabb,
+    mint nem jelezni."""
+    def olvas(nev):
+        try:
+            ertek = fejlecek.get(nev, "")
+        except Exception:
+            ertek = ""
+        return str(ertek or "").strip().lower()
+
+    xprio = olvas("X-Priority") or olvas("x_priority") or olvas("xprio")
+    fontos = olvas("Importance") or olvas("importance")
+    prio = olvas("Priority") or olvas("priority")
+    szam = 0
+    for jel in xprio.replace("(", " ").split():
+        if jel.isdigit():
+            szam = int(jel)
+            break
+    if szam == 1:
+        return PRIO_SURGOS
+    if szam == 2 or fontos.startswith("high") or prio.startswith("urgent"):
+        return PRIO_MAGAS
+    if szam in (4, 5) or fontos.startswith("low") or prio.startswith("non-urgent"):
+        return PRIO_ALACSONY
+    return PRIO_NORMAL
+
+
+def prioritas_szoveg(szint: str) -> str:
+    """Felolvasható jelzés (üres a normálnál – azt nem mondjuk be)."""
+    return PRIO_JELZES.get(szint or PRIO_NORMAL, "")
+
+
 def level_fejlec_info(msg):
     """A lista-nézethez: feladó, tárgy, dátum, van-e csatolmány.
 
@@ -357,6 +444,8 @@ def level_fejlec_info(msg):
         "marketing": marketing,
         "azonosito": (msg.get("Message-ID", "") or "").strip(),
         "valaszcim": dekodol_fejlec(msg.get("Reply-To", "")),
+        # FONTOSSÁG: a három elterjedt fejléc közül amelyik jött
+        "prioritas": prioritas_a_fejlecbol(msg),
         "leiratkozas_post": dekodol_fejlec(
             msg.get("List-Unsubscribe-Post", "")),
         "valasz_erre": (msg.get("In-Reply-To", "") or "").strip(),
@@ -815,7 +904,9 @@ _ALTALANOS_ALAP = {"auto_ellenoriz": True, "ellenoriz_perc": 3,
                    "tertivevony_keres": False,
                    "tertivevony_valasz": "kerdez",
                    # válasz után bezáruljon-e az eredeti levél ablaka
-                   "valasz_zarja_eredetit": False}
+                   "valasz_zarja_eredetit": False,
+                   # a levél fontosságát jelezzük-e (lista + bemondás)
+                   "prioritas_jelzes": True}
 
 
 def altalanos_betolt():
@@ -977,7 +1068,8 @@ class ImapKliens:
     _FEJLEC_FETCH = ("(UID FLAGS RFC822.SIZE BODY.PEEK[HEADER.FIELDS "
                      "(FROM SUBJECT DATE TO CC MESSAGE-ID LIST-ID "
                      "LIST-UNSUBSCRIBE LIST-UNSUBSCRIBE-POST PRECEDENCE REPLY-TO "
-                     "IN-REPLY-TO REFERENCES)] BODYSTRUCTURE)")
+                     "IN-REPLY-TO REFERENCES X-PRIORITY IMPORTANCE PRIORITY)] "
+                     "BODYSTRUCTURE)")
 
     def lista(self, mappa="INBOX", limit=50, offset=0):
         """A mappa leveleinek fejléc-infói (LEGÚJABB ELÖL), LAPOZÁSSAL.

@@ -60,6 +60,34 @@ def telefon_konyvek_betolt():
     return set(store.load_json(_TELEFON_KONYVEK_FILE, []))
 
 
+def mappa_fajljai(mappa_ut, csak_hang=True, konyv_is=False):
+    """Egy elküldött mappa fájljainak TELJES útjai – a nyilvántartáshoz.
+
+    Ugyanazt a gyűjtést használja, mint a küldés, hogy pontosan az kerüljön a
+    nyilvántartásba, ami tényleg átment."""
+    return [teljes for teljes, _reldir in
+            _mappa_fa((mappa_ut or "").rstrip("/\\"), csak_hang=csak_hang,
+                      konyv_is=konyv_is)]
+
+
+def telefon_konyvek_hozzaad(nevek):
+    """ÚJ könyveket vesz fel a nyilvántartásba – a meglévők megtartásával.
+
+    MIÉRT KELL: a nyilvántartást eddig csak a telefon OLVASÁSI POZÍCIÓIBÓL
+    írtuk, méghozzá FELÜLÍRVA. Emiatt két hiba állt elő:
+      • az imént átküldött könyv nem került bele (hiszen a telefonon még meg
+        sem nyitották, tehát pozíciója sincs) – a Könyvolvasó ezért mondta rá,
+        hogy „nincs a telefonon”, pedig ott volt;
+      • egy korábban felvett könyv KI is esett a listából a következő
+        szinkronnál.
+    [felhasználói hibajelzés, 2026-08-24]"""
+    megvan = telefon_konyvek_betolt()
+    ujak = {os.path.basename((n or "").replace("\\", "/")).strip().lower()
+            for n in (nevek or []) if (n or "").strip()}
+    telefon_konyvek_ment(sorted(megvan | ujak))
+    return megvan | ujak
+
+
 # ---- URL-ek --------------------------------------------------------------
 
 def portal_url(ip, port=ALAP_PORT):
@@ -501,7 +529,15 @@ def pc_konyvjelzo_androidra(rekordok):
             pms = int(r.get("pos_ms", 0) or 0)
         except (ValueError, TypeError):
             pms = 0
-        ki.append({"bookPath": r.get("book", ""),
+        # A telefon FÁJLNÉV szerint azonosítja a könyvet. Eddig a PC TELJES
+        # útvonalát küldtük (C:\Users\…\konyv.epub) – abból a telefon nem tudta
+        # kitalálni, melyik könyvről van szó (a Windows-os visszaperjelek miatt
+        # a fájlnevet sem tudta leválasztani), ezért mondta azt, hogy „ez a
+        # könyv nincs a telefonon”. A teljes utat külön mezőben visszük, mert
+        # a PC-oldali visszaszinkronnál hasznos. [hibajelzés, 2026-08-24]
+        teljes_ut = r.get("book", "") or ""
+        ki.append({"bookPath": _fajlnev(teljes_ut) or teljes_ut,
+                   "pcPath": teljes_ut,
                    "bookTitle": r.get("title", ""),
                    "charOffset": off, "preview": r.get("preview", ""),
                    "createdAt": cre,

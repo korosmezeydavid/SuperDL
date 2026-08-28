@@ -160,46 +160,107 @@ def jatek_atomvad(ctx):
 
 
 # ==================================================================== BRAILLE
-_BRAILLE = {
+#
+# A MAGYAR Braille-ábécé – nem az angol! A kettő NEM ugyanaz, és pont a
+# leggyakrabban gyakorolt betűknél tér el:
+#
+#     z  =  1 2 6      (az angolban 1 3 5 6)
+#     q  =  1 2 3 4 6  (az angolban 1 2 3 4 5)
+#
+# Korábban az angol tábla volt beépítve, ékezetes betűk nélkül – vagyis a
+# játék ROSSZ értékeket tanított. [felhasználói jelzés, 2026-08-24]
+#
+# FORRÁS – két, egymástól független hiteles forrás, amelyek MINDENBEN egyeznek:
+#   • a liblouis magyar tábla (`hu-chardefs.cti`, `hu-hu-g1.ctb`), amit az
+#     INFOALAP gondoz, és amit az NVDA képernyőolvasó is használ;
+#   • a magyar Braille-ábécé nyilvános táblája (lexiq.hu), Unicode
+#     Braille-jelekkel – a jeleket pontszámokra váltva minden érték egyezik.
+#
+# A dz és a dzs NEM külön jel: két, illetve három cellával íródik (d+z,
+# d+zs), ezért nincs a táblában.
+
+# alapbetűk (az a–p és az r–y a nemzetközivel azonos; a q és a z MAGYAR)
+_BRAILLE_ALAP = {
     "a": "1", "b": "12", "c": "14", "d": "145", "e": "15", "f": "124",
     "g": "1245", "h": "125", "i": "24", "j": "245", "k": "13", "l": "123",
-    "m": "134", "n": "1345", "o": "135", "p": "1234", "q": "12345",
+    "m": "134", "n": "1345", "o": "135", "p": "1234", "q": "12346",
     "r": "1235", "s": "234", "t": "2345", "u": "136", "v": "1236",
-    "w": "2456", "x": "1346", "y": "13456", "z": "1356",
+    "w": "2456", "x": "1346", "y": "13456", "z": "126",
 }
+
+# ékezetes magánhangzók – ezek a magyar pontírás sajátjai
+_BRAILLE_EKEZETES = {
+    "á": "4", "é": "16", "í": "34", "ó": "246", "ö": "12345",
+    "ő": "12456", "ú": "346", "ü": "12356", "ű": "23456",
+}
+
+# kétjegyű mássalhangzók – MINDEGYIK EGYETLEN cellával íródik
+_BRAILLE_KETJEGYU = {
+    "cs": "146", "gy": "1456", "ly": "456", "ny": "1246",
+    "sz": "156", "ty": "1256", "zs": "345",
+}
+
+_BRAILLE = dict(_BRAILLE_ALAP)
+_BRAILLE.update(_BRAILLE_EKEZETES)
+_BRAILLE.update(_BRAILLE_KETJEGYU)
+
+_BRAILLE_KESZLETEK = (
+    ("alapbetűk (a-tól z-ig)", _BRAILLE_ALAP),
+    ("ékezetes magánhangzók", _BRAILLE_EKEZETES),
+    ("kétjegyű mássalhangzók", _BRAILLE_KETJEGYU),
+    ("a teljes magyar ábécé", _BRAILLE),
+)
 
 
 def _pontok(s):
     return "".join(sorted(ch for ch in (s or "") if ch in "123456"))
 
 
+def braille_jel(pontok: str) -> str:
+    """A pontszámokból Unicode Braille-jel (⠵), hogy a Braille-kijelzőn és a
+    képernyőn is látszódjon, amiről szó van."""
+    kod = 0
+    for ch in _pontok(pontok):
+        kod |= 1 << (int(ch) - 1)
+    return chr(0x2800 + kod)
+
+
 def jatek_braille(ctx):
+    yield ctx.mond("Braille gyakorlat a MAGYAR pontírás szerint. "
+                   "Figyelem: a magyar ábécé néhány betűnél eltér az "
+                   "angoltól – a z például 1, 2, 6.")
+    v = yield ctx.kerdez(
+        "Mit gyakorolsz? 1 = alapbetűk, 2 = ékezetes magánhangzók, "
+        "3 = kétjegyű mássalhangzók, 4 = a teljes ábécé")
+    keszlet_nev, keszlet = _BRAILLE_KESZLETEK[(szam(v, 1, 4) or 1) - 1]
     v = yield ctx.kerdez("Hány kérdést kérsz? (például 5)")
     db = szam(v, 1, 50) or 5
     v = yield ctx.kerdez("Mód: 1 = betűből pontok, 2 = pontokból betű")
     mod = szam(v, 1, 2) or 1
-    betuk = list(_BRAILLE)
+    yield ctx.mond("Gyakorlás: %s, %d kérdés." % (keszlet_nev, db))
+    betuk = list(keszlet)
     jo = 0
     for i in range(db):
         b = valaszt(betuk)
+        pontok = keszlet[b]
         if mod == 1:
             v = yield ctx.kerdez(
-                f"{i + 1}. Milyen pontokból áll a(z) „{b}” betű? "
+                f"{i + 1}. Milyen pontokból áll a(z) „{b}”? "
                 "(a pontszámok, például 1 3 5)")
-            if _pontok(v) == _pontok(_BRAILLE[b]):
+            if _pontok(v) == _pontok(pontok):
                 jo += 1
                 yield ctx.mond("Helyes!")
             else:
-                yield ctx.mond(f"Nem. A(z) {b} pontjai: "
-                               f"{' '.join(_BRAILLE[b])}.")
+                yield ctx.mond("Nem. A(z) %s pontjai: %s. %s"
+                               % (b, " ".join(pontok), braille_jel(pontok)))
         else:
             v = yield ctx.kerdez(f"{i + 1}. Melyik betű ez a pontkombináció: "
-                                 f"{' '.join(_BRAILLE[b])}?")
+                                 f"{' '.join(pontok)}?")
             if egyezik(v, b):
                 jo += 1
                 yield ctx.mond("Helyes!")
             else:
-                yield ctx.mond(f"Nem. Ez a(z) {b} betű.")
+                yield ctx.mond("Nem. Ez a(z) %s. %s" % (b, braille_jel(pontok)))
     yield ctx.mond(f"Vége. {jo} helyes válasz {db}-ből.")
     yield ctx.vege("Köszönöm a játékot!")
 

@@ -119,6 +119,17 @@ _SUGO = (
     "(Levél menü → Kimenő) megmutatja, és ott azonnal el is küldheted vagy "
     "visszavonhatod. A várakozó levél a gépeden, fájlban ül: áramszünet vagy "
     "kilépés után is elmegy majd.\n"
+    "• FONTOSSÁG (prioritás): a levélírás ablakában beállíthatod, mennyire "
+    "sürgős a levél – alacsony, közepes, magas vagy nagyon sürgős. A "
+    "címzett levelezőprogramja ezt jelzi neki (a legtöbb kliens fel is "
+    "kiáltójelezi). Fordítva: a beérkező fontos és sürgős leveleknél a "
+    "jelzés a listasor ELEJÉN hangzik el – nem a végén, ahol a hosszú "
+    "tárgy után elsikkadna –, érkezéskor pedig a program ki is mondja, "
+    "hogy „SÜRGŐS levél!”. A megnyitott levélnél a fontosság a feladó "
+    "ELŐTT hangzik el, mert az befolyásolja, hogy most akarod-e olvasni. "
+    "A közepes fontosság sosem hangzik el: az az alapeset, nem hír. Az "
+    "egészet kikapcsolhatod: Beállítások → Általános → „Mondja be és "
+    "jelezze a levél fontosságát”.\n"
     "• CSATOLMÁNY-JELZÉS: ha a levélhez melléklet tartozik, a listasor "
     "végén elhangzik a „csatolmány” szó, ÉS az új levél érkezésekor is "
     "kimondjuk. A levél testébe ágyazott képeket (hírlevelek logója) és a "
@@ -1205,6 +1216,21 @@ class LevelIroDialog(wx.Dialog):
         cs.Bind(wx.EVT_BUTTON, self._csatol)
         kb = wx.Button(self, wx.ID_OK, "&Küldés  (Ctrl+Enter)")
         kb.Bind(wx.EVT_BUTTON, self._kuld)
+        # FONTOSSÁG: a címzett programja ebből tudja, mennyire sürgős a levél
+        # (a nagy levelezőprogramok fel is kiáltójelezik). [kérés: 2026-08-24]
+        psor = wx.BoxSizer(wx.HORIZONTAL)
+        psor.Add(wx.StaticText(self, label="&Fontosság:"), 0,
+                 wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
+        self._prio_kulcsok = [k for k, _n, _x, _i, _p in MC.PRIORITASOK]
+        self.prioritas = wx.Choice(
+            self, choices=[n for _k, n, _x, _i, _p in MC.PRIORITASOK])
+        self.prioritas.SetSelection(self._prio_kulcsok.index(MC.PRIO_NORMAL))
+        self.prioritas.SetName(
+            "A levél fontossága: alacsony, közepes, magas vagy nagyon sürgős. "
+            "A címzett levelezőprogramja ezt jelzi neki.")
+        psor.Add(self.prioritas, 0, wx.ALIGN_CENTER_VERTICAL)
+        v.Add(psor, 0, wx.LEFT | wx.TOP, 8)
+
         self.valaszvaras = wx.CheckBox(
             self, label="Szólj, ha 5 napon belül &nem érkezik válasz")
         self.valaszvaras.SetName(
@@ -1816,6 +1842,10 @@ class LevelIroDialog(wx.Dialog):
                 MC.cimjegyzek_felvesz_szovegbol(mezo.GetValue())
             except Exception:
                 pass
+        # FONTOSSÁG-fejlécek a kimenő levélre
+        if getattr(self, "prioritas", None) is not None:
+            i = max(0, self.prioritas.GetSelection())
+            MC.prioritas_beallit(msg, self._prio_kulcsok[i])
         if getattr(self, "valaszvaras", None) is not None \
                 and self.valaszvaras.GetValue():
             EM.valaszt_var(msg.get("Message-ID", ""),
@@ -2016,9 +2046,19 @@ class LevelOlvasoFrame(wx.Frame):
             fig.SetName("Biztonsági figyelmeztetés")
             v.Insert(0, fig, 0, wx.EXPAND | wx.ALL, 8)
             p.Layout()
+        # A FONTOSSÁG a levél megnyitásakor is elhangzik – a feladó előtt, mert
+        # ez befolyásolja, hogy egyáltalán most akarod-e olvasni.
+        prio = ""
+        if MC.altalanos_betolt().get("prioritas_jelzes", True):
+            prio = MC.prioritas_szoveg(
+                MC.prioritas_a_fejlecbol(msg)
+                or (self._info or {}).get("prioritas", ""))
+            if prio:
+                prio = prio + " levél. "
         wx.CallAfter(_mondd, self.main,
                      ("FIGYELEM! " + " ".join(self._figyelmeztetesek) + " "
                       if self._figyelmeztetesek else "")
+                     + prio
                      + f"{fej['felado']}. Tárgy: {fej['targy']}. A szöveg a Levél "
                      "szövege mezőben. "
                      + (BESZ.bevezeto(torzs) + " " if BESZ.bevezeto(torzs) else "")
@@ -2869,6 +2909,16 @@ class BeallitasokDialog(wx.Dialog):
         hs5.Add(self.alt_visszavonas, 0)
         v.Add(hs5, 0, wx.ALL, 8)
 
+        # --- FONTOSSÁG (prioritás) ---
+        self.alt_prio = wx.CheckBox(
+            p, label="Mondja be és &jelezze a levél fontosságát")
+        self.alt_prio.SetValue(bool(cfg.get("prioritas_jelzes", True)))
+        self.alt_prio.SetName(
+            "A levél fontossága: a sürgős és a fontos levelek a lista elején "
+            "jelzést kapnak, és a program érkezéskor ki is mondja. "
+            "Kikapcsolva semmilyen fontosság-jelzés nem hangzik el.")
+        v.Add(self.alt_prio, 0, wx.LEFT | wx.TOP, 12)
+
         # --- VÁLASZ UTÁN AZ EREDETI ABLAK ---
         self.alt_valasz_zar = wx.CheckBox(
             p, label="Válasz &után záruljon be az eredeti levél ablaka")
@@ -2992,7 +3042,8 @@ class BeallitasokDialog(wx.Dialog):
                 "tertivevony_valasz": [MDN.KERDEZ, MDN.MINDIG, MDN.SOHA][
                     max(0, self.alt_tv_valasz.GetSelection())],
                 "valasz_zarja_eredetit": bool(
-                    self.alt_valasz_zar.GetValue())}
+                    self.alt_valasz_zar.GetValue()),
+                "prioritas_jelzes": bool(self.alt_prio.GetValue())}
         # TÚL SŰRŰ LEKÉRDEZÉS: néhány szolgáltató (főleg a Gmail) a gyakori
         # bejelentkezést ideiglenes letiltással bünteti – erre figyelmeztetünk,
         # de nem tiltjuk meg: a felhasználó dönt.
@@ -3647,6 +3698,14 @@ class MailFrame(wx.Frame):
         olvasó könnyen elhallgat)."""
         cfg = MC.altalanos_betolt()
         reszek = []
+        # FONTOSSÁG a sor ELEJÉN: vakon az számít, ami ELŐSZÖR elhangzik – ha a
+        # végére tennénk, a hosszú tárgy után sikkadna el. Látva ugyanez a
+        # jelzés a sor elején rögtön szembetűnik. A „közepes" nem jelenik meg:
+        # az az alapeset, nem hír. [kérés: 2026-08-24]
+        if cfg.get("prioritas_jelzes", True):
+            jelzes = MC.prioritas_szoveg(info.get("prioritas", ""))
+            if jelzes:
+                reszek.append(jelzes)
         if cfg.get("lista_allapot", True) and not info.get("olvasott"):
             reszek.append("olvasatlan")
         if self._osszesitett:
@@ -4574,16 +4633,19 @@ class MailFrame(wx.Frame):
             # Ha az ÚJ levelekre mind olyan szabály illik, ami tiltja az
             # értesítést (hírlevelek), akkor csendben maradunk – a felhasználó
             # pont ezért kérte a „ne szóljon rá hang” műveletet.
-            csatolmanyos = 0
+            csatolmanyos, surgos = 0, 0
             try:
                 ujak = [x for x in lista
                         if x.get("uid") and int(x["uid"]) > int(elozo)]
                 if ujak and all(self._nema_level(x) for x in ujak):
                     return
                 csatolmanyos = sum(1 for x in ujak if x.get("csatolmany"))
+                surgos = sum(1 for x in ujak
+                             if x.get("prioritas") in (MC.PRIO_SURGOS,
+                                                       MC.PRIO_MAGAS))
             except Exception:
                 pass
-            self._ertesit(fiok, csatolmanyos)
+            self._ertesit(fiok, csatolmanyos, surgos)
 
     def _jelzo_hang(self) -> bool:
         """Az ÁLTALÁNOS új-levél hang (mindenkinek, fiók-beállítás nélkül is).
@@ -4607,7 +4669,21 @@ class MailFrame(wx.Frame):
                     else "Új leveled érkezett.")
                    + ((" " + csat) if csat else ""))
 
-    def _ertesit(self, fiok, csatolmanyos=0):
+    @staticmethod
+    def _surgos_szoveg(darab: int) -> str:
+        """Felolvasható jelzés a sürgős levelekről (üres, ha nincs ilyen).
+
+        Csak akkor szólal meg, ha a felhasználó kérte a fontosság-jelzést."""
+        if not MC.altalanos_betolt().get("prioritas_jelzes", True):
+            return ""
+        darab = int(darab or 0)
+        if darab <= 0:
+            return ""
+        if darab == 1:
+            return "SÜRGŐS levél!"
+        return "%d SÜRGŐS levél!" % darab
+
+    def _ertesit(self, fiok, csatolmanyos=0, surgos=0):
         """A fiókhoz beállított értesítés: hang lejátszása VAGY szöveg felolvasása.
         Az ÁLTALÁNOS jelzőhang ettől függetlenül szól (ha be van kapcsolva), így
         az is kap hallható visszajelzést, aki fiókonként nem állított be semmit.
@@ -4623,14 +4699,19 @@ class MailFrame(wx.Frame):
         if tipus == "nincs":
             return
         csat_szoveg = self._csat_szoveg(csatolmanyos)
+        surgos_szoveg = self._surgos_szoveg(surgos)
+        # A SÜRGŐSSÉG ELŐRE kerül: ha valami tényleg sürgős, azt hallja meg
+        # először a felhasználó, ne a melléklet-jelzés után.
+        raadas = " ".join(x for x in (surgos_szoveg, csat_szoveg) if x)
         if tipus == "hang" and cfg.get("hang"):
             siker, _uz = ertesito_hang(cfg["hang"])
             if siker:
-                if csat_szoveg:          # a hang után a MELLÉKLETET kimondjuk
-                    self._mond(csat_szoveg)
+                if raadas:               # a hang után a LÉNYEGET kimondjuk
+                    self._mond(raadas)
                 return
         # szöveg (vagy ha a hang nem szólalt meg): felolvasás
-        self._mond((cfg.get("szoveg") or "Új leveled érkezett.")
+        self._mond(((surgos_szoveg + " ") if surgos_szoveg else "")
+                   + (cfg.get("szoveg") or "Új leveled érkezett.")
                    + ((" " + csat_szoveg) if csat_szoveg else ""))
 
     @staticmethod

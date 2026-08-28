@@ -365,7 +365,11 @@ class AtjaroFrame(wx.Frame):
             pc_utak = [b.path for b in getattr(lib, "items", [])]
         egyezes = AC.konyv_egyezes(poz, pc_utak)
         self._gyogyszerek = gy          # az importhoz eltesszük
-        AC.telefon_konyvek_ment(list(poz.keys()))   # a Könyvolvasó tudja, mi van a telefonon
+        # BŐVÍTJÜK, nem felülírjuk: a telefonra átküldött, de ott még meg
+        # nem nyitott könyvnek nincs olvasási pozíciója – felülírásnál
+        # kiesne, és a Könyvolvasó azt mondaná rá, hogy „nincs a
+        # telefonon”. [hibajelzés, 2026-08-24]
+        AC.telefon_konyvek_hozzaad(list(poz.keys()))
 
         reszek = [f"A telefonon {len(gy)} bekapcsolt gyógyszer-emlékeztető van."]
         for g in gy[:10]:
@@ -468,9 +472,8 @@ class AtjaroFrame(wx.Frame):
         be = AC.android_konyvjelzo_be(telefon)
         # a telefon-könyvcache bővítése a könyvjelzők könyveivel (nincs-a-telefonon őr)
         try:
-            megvan = AC.telefon_konyvek_betolt()
-            megvan |= {r["book"] for r in be if r.get("book")}
-            AC.telefon_konyvek_ment(list(megvan))
+            AC.telefon_konyvek_hozzaad(
+                [r["book"] for r in be if r.get("book")])
         except Exception:
             pass
         uj = store.merge(be)                                  # a PC-re bekerülők
@@ -544,6 +547,13 @@ class AtjaroFrame(wx.Frame):
             if hiba:
                 self._mond(f"„{cim}” küldése nem sikerült: {hiba}")
             else:
+                # bekerül a telefon-nyilvántartásba, hogy ne kérdezzük meg
+                # újra ugyanerre a könyvre („nincs a telefonon”)
+                try:
+                    AC.telefon_konyvek_hozzaad(
+                        AC.mappa_fajljai(ut) if is_dir else [ut])
+                except Exception:
+                    pass
                 self._mond(f"„{cim}” átküldve ({db} fájl).")
             wx.CallAfter(self._kuld_kovetkezo_konyv, lista, ip, pin)
 
@@ -591,6 +601,10 @@ class AtjaroFrame(wx.Frame):
             return
         AC.beallitas_ment(ip)
         self._utolso_mf = -1
+        # az imént küldött fájlok – siker esetén ezek KERÜLNEK BE a telefonon
+        # lévő könyvek nyilvántartásába (lásd `_kuldes_kesz`)
+        self._utolso_kuldes = list(utak)
+        self._utolso_dest = dest
         self._mond(f"{len(utak)} fájl küldése a telefonra…")
         _hatterben(lambda: AC.feltolt_egyenkent(ip, pin, utak, dest=dest,
                                                 on_progress=self._kuldes_halad),
@@ -621,8 +635,23 @@ class AtjaroFrame(wx.Frame):
         db, hiba = eredmeny
         if hiba:
             self._mond("A küldés nem sikerült: " + hiba)
-        else:
-            self._mond(f"Kész! {db} fájl a telefonra került.")
+            return
+        # A SIKERESEN ÁTKÜLDÖTT KÖNYVEK BEKERÜLNEK A NYILVÁNTARTÁSBA.
+        # Enélkül a Könyvolvasó továbbra is azt mondta, hogy „ez a könyv nincs
+        # a telefonon” – pedig épp az imént küldtük át. A pozíció-alapú lista
+        # ugyanis csak azokat ismerte, amiket a telefonon már meg is NYITOTTAK.
+        # [felhasználói hibajelzés, 2026-08-24]
+        self._konyvek_nyilvantartasba()
+        self._mond(f"Kész! {db} fájl a telefonra került.")
+
+    def _konyvek_nyilvantartasba(self):
+        """Az utoljára elküldött KÖNYVEK felvétele a telefon-nyilvántartásba."""
+        if getattr(self, "_utolso_dest", "") != AC.DEST_KONYV:
+            return                      # zenét, csengőhangot nem tartunk nyilván
+        try:
+            AC.telefon_konyvek_hozzaad(getattr(self, "_utolso_kuldes", []))
+        except Exception:
+            pass
 
     def _zene(self, e):
         self._kuldes(AC.DEST_ZENE, "Zene küldése a telefonra",
