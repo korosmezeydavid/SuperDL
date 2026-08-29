@@ -55,15 +55,26 @@ _SUGO = (
     "nyilvántartásában maradhat egy üres helye, amíg a telefon magától rendbe "
     "nem teszi.\n\n"
     "ZENE FELTÖLTÉSE A TELEFONRA\n"
-    "A Zenék lap tetején: megkérdezi, MELYIK alkalmazásba kerüljön a zene, "
-    "aztán kiválasztod a fájlokat a gépről. Ennyi.\n"
-    "Miért nem a gyári Zene alkalmazásba? Mert oda az Apple kívülről nem "
-    "enged zenét betenni. Kipróbáltuk: a bejegyzés egy ideig megvan, aztán a "
-    "telefon saját zene-szolgáltatása felülírja, és a szám eltűnik. Nem "
-    "építünk be olyat, ami csak néha működik – ezért a zene egy LEJÁTSZÓ "
-    "alkalmazás saját mappájába kerül, ahonnan nem tűnhet el. Ha még nincs "
-    "ilyen a telefonon, tegyél fel egyet az App Store-ból (a VLC ingyenes és "
-    "VoiceOverrel jól használható), indítsd el egyszer, majd itt Frissítés."
+    "A Zenék lap tetején. A program megkérdezi, HOVA kerüljön a zene – két út "
+    "közül választhatsz:\n\n"
+    "1. A GYÁRI ZENE ALKALMAZÁSBA. A szám előbb a gép Apple Music könyvtárába "
+    "kerül, onnan pedig az Apple Devices viszi át a telefonra. Ez az igazi: a "
+    "zene ott lesz, ahol keresed. Feltétel: legyen fent az Apple Music és az "
+    "Apple Devices, a telefon csatlakozzon USB-n, és legyen FELOLDVA – ha az "
+    "Apple Devices nem látja a telefont, semmi nem történik (a program ezt "
+    "meg is mondja). FONTOS: ilyenkor a telefon zenéje a GÉPI könyvtárhoz "
+    "igazodik, tehát ami a gépi Apple Music könyvtárban nincs benne, az "
+    "lekerülhet a telefonról. A program ezt a művelet előtt megkérdezi.\n\n"
+    "2. EGY LEJÁTSZÓ ALKALMAZÁSBA (például VLC). Egyszerűbb és megbízhatóbb, "
+    "mert csak a mi dolgunk: a fájl az alkalmazás saját mappájába kerül, és "
+    "onnan nem tűnhet el. Cserébe nem a gyári appban szól. Ha nincs ilyen "
+    "alkalmazás a telefonon, tegyél fel egyet az App Store-ból (a VLC ingyenes "
+    "és VoiceOverrel jól használható), indítsd el egyszer, majd itt Frissítés."
+    "\n\n"
+    "Amit NEM csinálunk: közvetlenül a telefon zene-adatbázisába írni. Azt a "
+    "telefon saját szolgáltatása birtokolja, és a kívülről írt bejegyzést "
+    "előbb-utóbb felülírja – megmértük, a szám egy idő után eltűnt. Ilyet nem "
+    "építünk be, mert ami csak néha működik, az rosszabb a semminél."
 )
 
 
@@ -334,34 +345,48 @@ class ZeneLap(_Lap):
         self.Layout()
 
     def _zene_feltoltes(self, e):
-        """Zene FEL a telefonra – egy lejátszó alkalmazás mappájába.
+        """Zene FEL a telefonra – KÉT út közül választhatsz.
 
-        A gyári Zene alkalmazásba kívülről NEM lehet zenét betenni: annak a
-        könyvtárát a telefon saját szolgáltatása birtokolja, és a kívülről írt
-        bejegyzéseket felülírja (ezt élőben megmértük, ezért nem ígérünk olyat,
-        ami csak néha működne). Egy lejátszó app saját mappája viszont marad."""
-        appok = getattr(self.frame.app, "appok", [])
-        if not appok:
+        1. A GYÁRI Zene alkalmazásba, az Apple saját programjain keresztül
+           (Apple Music könyvtár → Apple Devices szinkron). Ez az igazi: a szám
+           ott lesz, ahol keresed. Cserébe több minden kell hozzá, és az Apple
+           felületének változásaira érzékeny.
+        2. Egy LEJÁTSZÓ alkalmazás saját mappájába. Egyszerűbb és
+           megbízhatóbb, de nem a gyári appban szól.
+
+        Közvetlenül a telefon zene-adatbázisába írni NEM lehet: azt a telefon
+        szolgáltatása birtokolja, és a kívülről írt bejegyzést felülírja –
+        élesben megmértük, ezért nem is kínáljuk fel.
+        """
+        from . import applemusic as AM
+
+        utak_appok = getattr(self.frame.app, "appok", [])
+        valaszthato = []
+        if AM.elerheto():
+            valaszthato.append(("apple",
+                                "A gyári Zene alkalmazásba (Apple Musicon át)"))
+        for a in utak_appok:
+            valaszthato.append(("app:" + a["bundle"],
+                                "A(z) %s alkalmazásba" % a["nev"]))
+        if not valaszthato:
             wx.MessageBox(
-                "Egyetlen olyan alkalmazást sem látok a telefonon, ami engedné "
-                "a fájlok fogadását.\n\n"
-                "Tegyél fel egy lejátszót az App Store-ból – a VLC ingyenes és "
-                "VoiceOverrel jól használható –, indítsd el egyszer, majd itt "
-                "nyomd meg a Frissítés gombot.",
+                "Nincs hova feltöltenem.\n\n"
+                "Vagy telepítsd a Microsoft Store-ból az Apple Music "
+                "alkalmazást (akkor a gyári Zene appba tudok küldeni), vagy "
+                "tegyél fel a telefonra egy lejátszót – a VLC ingyenes és "
+                "VoiceOverrel jól használható.",
                 "Nincs hova feltölteni", wx.OK | wx.ICON_INFORMATION, self)
-            self._mond("Nincs a telefonon olyan alkalmazás, ami fogadni tudná "
-                       "a zenét. A súgó megmondja, mit tegyél.")
+            self._mond("Nincs hova feltöltenem. A súgó megmondja, mit tegyél.")
             return
-        nevek = [a["nev"] for a in appok]
-        with wx.SingleChoiceDialog(
-                self, "Melyik alkalmazásba kerüljön a zene?\n\n"
-                      "A gyári Zene alkalmazásba az Apple nem enged kívülről "
-                      "zenét betenni – a súgó elmagyarázza, miért.",
-                "Hova töltsem fel?", nevek) as d:
+
+        with wx.SingleChoiceDialog(self, "Hova kerüljön a zene?",
+                                   "Feltöltés a telefonra",
+                                   [nev for _k, nev in valaszthato]) as d:
             if d.ShowModal() != wx.ID_OK:
                 self._mond("A feltöltés megszakítva.")
                 return
-            app = appok[d.GetSelection()]
+            mod, mod_nev = valaszthato[d.GetSelection()]
+
         with wx.FileDialog(
                 self, "Melyik zenéket küldjem a telefonra?",
                 wildcard="Hangfájlok|*.mp3;*.m4a;*.m4b;*.aac;*.wav|"
@@ -373,15 +398,61 @@ class ZeneLap(_Lap):
             utak = d.GetPaths()
         if not utak:
             return
+
+        if mod == "apple" and not self._apple_figyelmeztetes(len(utak)):
+            return
+
         import os as _os
         self.munka_indul("Feltöltés", len(utak),
                          sum(_os.path.getsize(u) for u in utak
                              if _os.path.isfile(u)))
         halad = self._halad_jelzo("Feltöltés")
-        bundle, nev = app["bundle"], app["nev"]
-        _hatterben(lambda: self.frame.telefon().app_feltolt(
-                       bundle, utak, halad, self._bajt_jelzo(), self._stop_e),
-                   lambda r: self._feltolt_kesz(r, nev), self.frame._hiba)
+        if mod == "apple":
+            _hatterben(lambda: AM.teljes_lanc(utak, halad, self._stop_e),
+                       self._apple_kesz, self.frame._hiba)
+        else:
+            bundle = mod.split(":", 1)[1]
+            _hatterben(lambda: self.frame.telefon().app_feltolt(
+                           bundle, utak, halad, self._bajt_jelzo(),
+                           self._stop_e),
+                       lambda r: self._feltolt_kesz(r, mod_nev),
+                       self.frame._hiba)
+
+    def _apple_figyelmeztetes(self, darab) -> bool:
+        """A gyári úthoz a telefon zenéje a GÉPI könyvtárhoz igazodik – ezt a
+        felhasználónak értenie kell, mielőtt igent mond."""
+        valasz = wx.MessageBox(
+            "%d számot küldök a telefon gyári Zene alkalmazásába.\n\n"
+            "Ez az Apple saját útján megy: a szám előbb a gép Apple Music "
+            "könyvtárába kerül, onnan pedig az Apple Devices viszi át a "
+            "telefonra.\n\n"
+            "FONTOS: ilyenkor a telefon zenéje a GÉPI könyvtárhoz igazodik. "
+            "Ami a gépi Apple Music könyvtárban nincs benne, az lekerülhet a "
+            "telefonról.\n\n"
+            "Feltétel: a telefon USB-n csatlakozzon és legyen feloldva. "
+            "Folytassam?" % darab,
+            "Feltöltés a gyári Zene alkalmazásba",
+            wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING, self)
+        if valasz != wx.YES:
+            self._mond("A feltöltés megszakítva.")
+            return False
+        return True
+
+    def _apple_kesz(self, r):
+        if self.frame._closing:
+            return
+        sz = "Kész. %d szám a gép Apple Music könyvtárába került." % r["behozva"]
+        if r["hibak"]:
+            sz += " %d nem sikerült." % len(r["hibak"])
+        if r["szinkron"] == "elindult":
+            sz += (" A telefonra másolás elindult – a gyári Zene "
+                   "alkalmazásban fog megjelenni.")
+        elif r["szinkron"]:
+            sz += " A telefonra másolás viszont nem indult el: " + r["szinkron"]
+        self.munka_vege(sz)
+        if r["hibak"]:
+            wx.MessageBox("\n".join(r["hibak"][:6]), "Feltöltés",
+                          wx.OK | wx.ICON_WARNING, self)
 
     def _feltolt_kesz(self, r, app_nev=""):
         if self.frame._closing:
