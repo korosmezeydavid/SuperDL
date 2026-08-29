@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import re
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -153,9 +154,39 @@ def darabol(szoveg: str, meret: int = _MAX_DARAB) -> list:
 
 
 def _lekerdez(url: str, timeout: int = 30) -> dict:
+    """Egy kérés az ingyenes fordítóhoz.
+
+    A korlát TÖBBFÉLEKÉPPEN érkezhet: néha rendes válaszban („LIMIT”), néha
+    viszont a szolgáltató egyszerűen elzavar egy 429-es HTTP-hibával. Ez utóbbi
+    KIVÉTELKÉNT jön, tehát a válasz-vizsgálatig el sem jutnánk – a felhasználó
+    pedig egy nyers „HTTP Error 429: Too Many Requests” üzenetet kapna, ami
+    semmit nem mond meg arról, mit tegyen. (Farkas István jelezte, 2026-08-29.)
+    """
     keres = urllib.request.Request(url, headers=_FEJ)
-    with urllib.request.urlopen(keres, timeout=timeout) as v:
-        return json.loads(v.read().decode("utf-8", "replace"))
+    try:
+        with urllib.request.urlopen(keres, timeout=timeout) as v:
+            return json.loads(v.read().decode("utf-8", "replace"))
+    except urllib.error.HTTPError as ex:
+        if ex.code == 429:
+            raise RuntimeError(
+                "Az ingyenes fordító mára nem fogad több kérést tőled "
+                "(a napi keret kimerült, vagy túl sűrűn ment a fordítás). "
+                "Próbáld pár óra múlva vagy holnap. Ha nem szeretnél várni: a "
+                "Beállításokban válaszd a helyben futó fordítást (a szöveg el "
+                "sem hagyja a gépet), vagy az AI-fordítást a saját kulcsoddal."
+            ) from ex
+        if ex.code in (500, 502, 503, 504):
+            raise RuntimeError(
+                "Az ingyenes fordító most nem elérhető (a szolgáltató oldalán "
+                "van a hiba). Próbáld később, vagy válts a helyben futó "
+                "fordításra.") from ex
+        raise RuntimeError(
+            "A fordító nem válaszolt rendben (hibakód: %d)." % ex.code) from ex
+    except urllib.error.URLError as ex:
+        raise RuntimeError(
+            "Nincs kapcsolat a fordítóval. Ellenőrizd az internetet – vagy "
+            "használd a helyben futó fordítást, amihez nem kell hálózat."
+        ) from ex
 
 
 def mymemory_fordit(szoveg: str, honnan: str, hova: str = "hu",
