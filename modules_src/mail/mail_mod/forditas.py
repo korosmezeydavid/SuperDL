@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import re
+import threading
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -38,12 +39,51 @@ _MOTOROK_ALAP = [
 _OFFLINE = ("offline", "Helyben, a gépeden (a szöveg EL SEM HAGYJA a gépet)")
 
 
+def _ct2_behoz():
+    """A CTranslate2 futtatókörnyezet behozása – a MÁR TELEPÍTETT programban is.
+
+    Miért nem sima `import ctranslate2`: a kész (fagyasztott) programból
+    szándékosan kimarad a `ctranslate2.converters` alcsomag, mert az a torch-ot
+    húzná be (+365 MB), a fordításhoz viszont semmi köze. A csomag
+    `__init__.py`-ja viszont feltétel nélkül importálja, ezért a kész
+    programban az `import ctranslate2` ImportError-ral elszállt – és a helyben
+    futó fordítás CSENDBEN eltűnt az F9 listájából, pedig ott volt a gépen.
+    Forrásból futtatva sosem látszott a hiba. [Dávid jelezte, 2026-08-30]
+
+    Ezt a Core-ban is javítottuk (`offlineford.ct2()`), de a javítás csak új
+    programverzióval jut el a felhasználóhoz. Itt, a modulban ezért MEGISMÉTELJÜK:
+    így a mostani telepített programban is visszakerül a helyben futó fordító –
+    modulfrissítéssel, a program újraépítése nélkül."""
+    from superdl import offlineford
+    ct2 = getattr(offlineford, "ct2", None)
+    if callable(ct2):                      # újabb Core: ott már meg van oldva
+        return ct2()
+    import sys
+    import types
+    try:
+        import ctranslate2
+        return ctranslate2
+    except ImportError:
+        pass
+    # üres pótlék a kihagyott alcsomag helyére, majd újra
+    sys.modules.setdefault("ctranslate2.converters",
+                           types.ModuleType("ctranslate2.converters"))
+    sys.modules.pop("ctranslate2", None)
+    import ctranslate2
+    return ctranslate2
+
+
 def offline_elerheto() -> bool:
     """Van-e a programban offline fordítómotor? (SuperDL 4.5.0-tól.) Régebbi
     programverzióval a modul szépen visszalép az online fordításra."""
     try:
-        from superdl import offlineford
-        return bool(offlineford.elerheto())
+        from superdl import offlineford      # 4.5.0 előtti Core-ban nincs
+        _ = offlineford.modell_mappa
+    except Exception:
+        return False
+    try:
+        _ct2_behoz()
+        return True
     except Exception:
         return False
 
@@ -56,6 +96,124 @@ def motorok() -> list:
 
 # visszafelé kompatibilis név (a régi kód és a tesztek ezt használják)
 MOTOROK = _MOTOROK_ALAP
+
+
+# ---------------------------------------------------------------------------
+# ALAPÉRTELMEZETT FORDÍTÓ  [felhasználói kérés, 2026-08-29]
+#
+# Eddig MINDEN fordításnál feljött a kérdés, hogy melyik motorral fordítsunk.
+# Akinek megvan a döntése („nekem a helyben futó kell, kész”), annak ez napi
+# tíz fölösleges párbeszéd. Ezért a Beállítások → Általános lapon kiválasztható
+# egy alapértelmezett fordító; ilyenkor az F9 kérdés nélkül fordít.
+#
+# A „kérdezzen rá” marad az ALAPÉRTELMEZÉS: aki nem nyúl a beállításhoz, annak
+# semmi nem változik – és a levél szövege sosem hagyja el a gépet a háta mögött,
+# mert a döntést egyszer, tudatosan ő hozza meg.
+# ---------------------------------------------------------------------------
+
+BEALLITAS_KULCS = "forditas_motor"
+KERDEZ = "kerdez"
+
+
+def motor_ervenyes(kulcs: str) -> str:
+    """A tárolt beállítás ELLENŐRZÉSE a mostani géppel.
+
+    Miért kell: a beállítás a felhasználó gépén marad, a program viszont
+    frissülhet (vagy visszafelé is: régebbi Core-ban nincs offline motor).
+    Ha a beállított motor most nem elérhető, NEM hibázunk – visszalépünk a
+    kérdésre, hogy a felhasználó lássa, mi történik."""
+    kulcs = (kulcs or "").strip() or KERDEZ
+    if kulcs == KERDEZ:
+        return KERDEZ
+    if kulcs == "offline":
+        return "offline" if offline_elerheto() else KERDEZ
+    if kulcs in [k for k, _n in _MOTOROK_ALAP]:
+        return kulcs
+    return KERDEZ
+
+
+def alap_motor(cfg=None) -> str:
+    """A beállított alapértelmezett fordító kulcsa, vagy KERDEZ."""
+    try:
+        ertek = (cfg or {}).get(BEALLITAS_KULCS, "")
+    except Exception:
+        ertek = ""
+    return motor_ervenyes(ertek)
+
+
+def valaszthato_motorok() -> list:
+    """A beállítás legördülő listájához – az elején a „kérdezzen rá”."""
+    return [(KERDEZ, "Kérdezzen rá minden fordításnál (ez az alapértelmezés)")] \
+        + motorok()
+
+
+# ---------------------------------------------------------------------------
+# NYELVI CSOMAGOK – csendben, a háttérben
+# ---------------------------------------------------------------------------
+
+_letoltes_zar = threading.Lock()
+_folyamatban = set()          # (honnan, hova) – nehogy kétszer induljon
+
+
+def offline_kesz(honnan: str, hova: str = "hu") -> bool:
+    """Megvan-e MÁR helyben ez a nyelvpár? HÁLÓZAT NÉLKÜL eldönthető –
+    ezért hívható a felületi szálról is, nem akasztja meg az ablakot."""
+    if not offline_elerheto():
+        return False
+    try:
+        from superdl import offlineford
+        megvan = set(offlineford.telepitett_parok())
+    except Exception:
+        return False
+    if (honnan, hova) in megvan:
+        return True
+    # a nyílt modellek angol-központúak: a pivot két csomagot jelent
+    return (honnan, "en") in megvan and ("en", hova) in megvan
+
+
+def letolt_csendben(nyelvek, hova: str = "hu", kesz=None) -> bool:
+    """A helyben futó fordításhoz kellő nyelvi csomagok letöltése HÁTTÉRBEN.
+
+    „Szépen csendben”: nincs párbeszédablak, nincs folyamatjelző, a program
+    közben végig használható. A hibát sem dobjuk a felhasználó arcába – ha a
+    letöltés nem sikerül, a fordítás akkor is működik (online motorral), csak
+    később megint megpróbáljuk.
+
+    Visszaad: elindult-e egyáltalán letöltés."""
+    if not offline_elerheto():
+        return False
+    nyelvek = [n for n in (nyelvek or []) if n and n != hova]
+    if not nyelvek:
+        return False
+
+    def munka():
+        from superdl import offlineford
+        letoltve, hiba = [], None
+        for ny in nyelvek:
+            kulcs = (ny, hova)
+            with _letoltes_zar:
+                if kulcs in _folyamatban:
+                    continue
+                _folyamatban.add(kulcs)
+            try:
+                for p in offlineford.hianyzo(ny, hova):
+                    offlineford.letolt(p)
+                    letoltve.append((p["from_code"], p["to_code"]))
+            except Exception as ex:                    # hálózat, hely, jog…
+                hiba = ex
+            finally:
+                with _letoltes_zar:
+                    _folyamatban.discard(kulcs)
+        if kesz:
+            try:
+                kesz(letoltve, hiba)
+            except Exception:
+                pass
+
+    threading.Thread(target=munka, daemon=True,
+                     name="superdl-fordito-letoltes").start()
+    return True
+
 
 NYELVEK = [("hu", "magyar"), ("en", "angol"), ("de", "német"), ("pl", "lengyel"),
            ("sk", "szlovák"), ("ro", "román"), ("hr", "horvát"), ("sr", "szerb"),

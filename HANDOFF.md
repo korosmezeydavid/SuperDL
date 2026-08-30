@@ -35,8 +35,12 @@ VASSZABÁLYOK, és pontosan HOL TARTUNK. Aki dolgozik rajta, a végén **frissí
 
 **SuperDL** – akadálymentes, többfunkciós letöltő + médiaközpont Windowsra
 (wxPython, Python 3.14, PyInstaller). Egy **Core** (letöltő + AI-eszközök +
-futtatókörnyezet + modulrendszer) + **9 telepíthető modul** (a bővebb funkciók).
+futtatókörnyezet + modulrendszer) + **17 telepíthető modul** (a bővebb funkciók).
 GitHub: `korosmezeydavid/SuperDL`.
+
+> **Testvérprojekt:** a SuperDL Androidra is létezik (Super Digital Lounge, akadálymentes
+> launcher, Kotlin) – forrás: `C:\Users\msn\Documents\SuperDL-Android`, belépő doksi ott:
+> `AI_START_HERE.md`. Külön termék, közös filozófia (lean core + letölthető modulbolt).
 
 ---
 
@@ -49,8 +53,8 @@ Minden a **`C:\Users\msn\Documents\Audacity\SuperDownloader`** mappában.
 | **Core forrás (csomag)** | `superdl\` (pl. `coremod.py` = modul-host/menük, `selfupdate.py` = önfrissítés, `searchwin.py` = Médiakereső, `store.py` = beállítás/kulcs-tár, `manager.py` = letöltéskezelő) |
 | **Fő GUI belépő** | `superdl_gui.py` (a `MainFrame` osztály) |
 | **CLI belépő** | `superdl.py` |
-| **Verziószám** | `superdl\__init__.py` → `__version__` (most: `3.29.1`) |
-| **Modulok forrása** | `modules_src\<id>\manifest.json` + `modules_src\<id>\<id>_mod\` (9 db: docconvert, konyvek, szervezes, mediatools, supermedia, iptv, radio, hangalamondas, p2p) |
+| **Verziószám** | `superdl\__init__.py` → `__version__` (most: `4.5.5`) |
+| **Modulok forrása** | `modules_src\<id>\manifest.json` + `modules_src\<id>\<id>_mod\` (17 db – lásd a listát lent) |
 | **Modul-csomagoló** | `tools\build_module.py` (ZIP + SHA + modules.json-bejegyzés) |
 | **Modul-katalógus (a „bolt")** | `modules.json` (repó gyökér) – a program ebből tudja, milyen modulok/verziók vannak |
 | **Build-specek** | `SuperDL.spec` (onefile GUI), `SuperDL-cli.spec` (CLI), `SuperDL-onedir.spec` (telepítőhöz) |
@@ -59,6 +63,28 @@ Minden a **`C:\Users\msn\Documents\Audacity\SuperDownloader`** mappában.
 | **Kimenetek** | `dist\SuperDL.exe`, `dist\SuperDL-cli.exe`, `dist\SuperDL\` (onedir), `installer\SuperDL-Setup-<verzió>.exe`, `dist_modules\<id>-<verzió>.zip` |
 | **Hírlevél a listának** | `C:\Users\msn\Documents\superdllistara.txt` |
 | **Claude saját memóriája** | `C:\Users\msn\.claude\projects\C--Users-msn-Documents-Audacity\memory\` (ez CLAUDE-specifikus; Grok NEM éri el – ezért van EZ a HANDOFF.md a repóban) |
+
+### 2.1 A 17 modul (a `modules.json` szerint, 2026-08-29)
+
+| id | verzió | kategória | név |
+|----|--------|-----------|-----|
+| docconvert | 1.3.3 | Könyvek | Dokumentum-konverter |
+| konyvek | 1.2.1 | Könyvek | Könyvek (hangoskönyv-lejátszó, könyvjelzők) |
+| mediatools | 1.4.10 | Média | Média-eszközök (DVD/VOB, hangformátumok) |
+| supermedia | 1.3.3 | Média | Super Media |
+| felolvaso | 1.4.8 | Média | Felirat-felolvasó lejátszó |
+| radio | 1.1.8 | Média | Internetes rádió (+ időzített felvétel) |
+| iptv | 1.0.8 | Média | Internetes TV |
+| tvmusor | 1.2.1 | Média | TV műsor (tévéújság, EPG, kedvenc-figyelő) |
+| jatekok | 1.15.2 | Játékok | Játékok (37+ retró port, saját játékok, online) |
+| mail | 1.2.1 | Kommunikáció | Super Mail (e-mail) |
+| csevej | 1.6.0 | Kommunikáció | Csevejcenter (térbeli hang, közös zene) |
+| tavsegitseg | 1.0.1 | Kommunikáció | Távsegítség (távvezérlés, P2P) |
+| p2p | 1.1.3 | Eszközök | Fájlküldés gépről gépre (P2P) |
+| atjaro | 1.0.2 | Eszközök | Átjáró (telefon, könyvjelző-szinkron) |
+| iphone | 1.1.0 | Eszközök | iPhone (zene, fotó, videó) |
+| szervezes | 1.3.2 | Szervezés | Szervezés (naptár, jegyzet) |
+| hangalamondas | 1.0.6 | AI | AI hangalámondás |
 
 **Build-interpreter (FONTOS, mindig ezt használd, ne a sima `python`-t):**
 `C:\Users\msn\AppData\Local\Python\pythoncore-3.14-64\python.exe`
@@ -132,7 +158,211 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-07-17 · dolgozott: Claude (3.29.11 KIADVA ✅)
+**Utolsó frissítés:** 2026-08-30 · dolgozott: Claude
+
+---
+
+### 🔨 tvmusor 1.2.2 – MEGÉPÍTVE, MÉG NEM PUBLIKÁLVA (2026-08-30, este)
+
+**LACI JELEZTE:** „Megpróbáltam emlékeztetőt beállítani a Vuk című rajzfilmhez, de azt írja
+a program, hogy »A naptár most nem érhető el… A Szervezés modul naptára kell hozzá.«
+Nem értem a dolgot, fel van telepítve a szervezés modul.”
+
+**GYÖKÉR (nem a Szervezés modul!):** a naptár KEZELŐJE (`OrganizerManager`) a CORE-ban él –
+a `MainFrame.__init__` feltétel nélkül létrehozza (`self._organizer`), hogy az emlékeztetők
+zárt ablak mellett is elsüljenek. A Szervezés modul csak az ABLAKOT adja hozzá. A
+`tvmusorwin._emlekezteto_hozzaad()` viszont `getattr(self.core, "main")`-en át kereste a
+főablakot – a `CoreContext` pedig `main_frame` (és `frame`) néven adja, **`main` néven SOHA**.
+A `getattr` alapértelmezése elnyelte a hiányt → `org is None` → a funkció **a megjelenése óta
+halott volt, MINDENKINÉL**, és a hibaüzenet ráadásul rossz helyre küldte a felhasználót.
+⚠️ **Ez a MÁSODIK ilyen névelcsúszás:** a `modkit.py` `frame`-aliasa mellett ott a
+megjegyzés, hogy az volt a „Napi infó nem indul” gyökér-oka.
+
+**JAVÍTÁS (modul-oldali, Core-build NEM kell):**
+- új `_naptar_kezelo()`: végigpróbálja az összes ismert útvonalat (`core.organizer`,
+  `core._organizer`, `main_frame`, `frame`, `main`), majd mentőövként a **saját szülő-ablakát**
+  (a `register_window` megnyitója a főablakot adja szülőnek: `factory(self.frame)`), végül a
+  `wx.GetApp().GetTopWindow()`-ot. Property-hibán sem szakad meg (`_biztos_attr`).
+- **a hibaüzenet átírva:** nem a Szervezés modult kéri számon; ha tényleg nincs kezelő, kimondja,
+  hogy ez a program hibája, nem a felhasználóé.
+- **a valódi hiba nem mosódik össze a „nincs naptár”-ral:** eddig az `add_event` kivétele is
+  ugyanazt a `None`-t adta. Új `_naptar_hiba` mező + `_naptar_hiba_szoveg()`.
+
+**Kimenetek:** `dist_modules\tvmusor-1.2.2.zip` (SHA-256
+`b66048996f29106ca8ba4bcb26a396c99e53925904734a7a67507ed2ba42e061`, 19 093 byte).
+Teszt: **1506 pytest zöld** (a két SAPI-teszt kihagyva – az a RÉGI natív összeomlás, független).
+Új teszt: `tests\test_tvmusor_naptar.py` (7 eset; a regressziós őr kimondottan azt rögzíti,
+hogy a CoreContextnek **nincs** `main`-je, mégis meg kell találni a kezelőt).
+Kulcs-szken **TISZTA** (184 fájl, kilépési kód 0).
+
+**➡️ KÖVETŐ: NÉVELCSÚSZÁS-AUDIT az ÖSSZES modulra (2026-08-30, este) – EREDMÉNY: TISZTA.**
+Kérdés volt: hol kér még modul olyan Core-attribútumot, ami nem létezik? Új eszköz
+(`tools\attr_audit.py`) AST-ből összeveti, mit ADNAK a `CoreContext`/`WxHost`/`MainFrame`
+azzal, amit a modulok KÉRNEK (`getattr(core, "…")` és közvetlen `core.X` / `main.X`).
+**Több ilyen hiba NINCS** – a tvmusor volt az egyetlen. Két false positive tisztázva:
+- `main._module_host` (könyvek modul, Átjáró-küldés): **létezik**, csak nem a MainFrame
+  törzsében – a `coremod.py:489` teszi rá kívülről. Az auditor ezért a `superdl\`-t és a
+  `superdl_gui.py`-t is átnézi `main.X = …` értékadásokért.
+- **23 db `main._<modul>_win = None` takarítás** 15 modulban: a `register_window` óta a Core
+  tartja nyilván az ablakokat (`WxHost._windows`), így ezeket a neveket SENKI nem állítja be.
+  **HOLT, de ÁRTALMATLAN** kód (`getattr(..., None) is self` sosem igaz). NEM javítottuk:
+  15 modul-kiadás nulla felhasználói haszonért. **Takarítsuk ki modulonként, amikor az a
+  modul úgyis kiadásra kerül valami valódiért.**
+
+Az őr **állandó teszt** lett: `tests\test_modul_core_szerzodes.py` – és nem csak azt
+ellenőrzi, hogy ma tiszta, hanem **azt is, hogy tényleg elkapná a régi tvmusor-kódot**
+(enélkül az őr dísz volna). Kézi triázshoz: `tools\attr_audit2.py` (tág, zajos, sosem ad
+hibás kilépési kódot).
+**Teszt a kör végén: 1510 pytest zöld.** Kulcs-szken TISZTA (728 fájl). Modul-forrás NEM
+változott ebben a körben → a `tvmusor-1.2.2.zip` érvényes, nem kell újraépíteni.
+
+**HÁTRA:** `modules.json` tvmusor-bejegyzés frissítése, majd „publikálás”-ra a
+`mod-tvmusor-1.2.2` release. **Válaszlevél Lacinak még nem készült.**
+**NYITOTT (Core, külön döntés):** a rendszerszintű javítás – vagy `main` alias a
+`CoreContext`-be (olcsó, de a harmadik szinonima), vagy egy rendes **`core.organizer`
+szolgáltatás**, hogy a moduloknak soha ne kelljen a főablakon átnyúlniuk. A második a tiszta,
+és a W6 „figyelő”-nek amúgy is kelleni fog.
+
+---
+
+### 🔨 4.5.5 – MEGÉPÍTVE, MÉG NEM PUBLIKÁLVA (2026-08-30)
+
+**Téma: a Super Mail fordítói.** Két dolog készült el egy körben.
+
+**1. HIBA – a helyben futó fordító sosem látszott a kész programban.** Az F9 csak két
+fordítót ajánlott fel, mindkettőnél elhagyja a levél a gépet. Ok: a fagyasztott programból
+szándékosan kimarad a `ctranslate2.converters` alcsomag (a torch miatt: +365 MB), a
+CTranslate2 `__init__.py`-ja viszont FELTÉTEL NÉLKÜL importálja → `import ctranslate2`
+ImportError → `offlineford.elerheto()` hamis → a motor csendben eltűnt a listáról.
+**Forrásból futtatva sosem látszott** (ott a converters megvan) – ezért élt hetekig.
+Javítás három helyen:
+- `superdl/offlineford.py` → új `ct2()`: ha az import a hiányzó converters miatt hasal el,
+  üres pótmodult ad be a helyére és újrapróbál; a `_Motor` is ezt használja;
+- `SuperDL-onedir.spec` → a `models`/`specs` alcsomag kézi kérése (a converters kizárása
+  után az elemző nem jutna el hozzájuk);
+- **a mail modulban is megismételve** (`forditas._ct2_behoz`), hogy a javítás Core-build
+  nélkül, puszta modulfrissítéssel is eljusson a felhasználóhoz. Ez élesben BEVÁLT:
+  Dávid gépén a 1.2.3 modul telepítése + újraindítás után megjelent a helyben futó fordító.
+
+**2. ÚJ – alapértelmezett fordító (Dávid kérése).** Beállítások → Általános → legördülő
+lista: *kérdezzen rá* (ez marad az alapértelmezés) / helyben / ingyenes / saját AI-kulcs.
+Beállított motorral az F9 kérdés nélkül fordít – de csak ha a nyelvet BIZTOSAN felismerte;
+bizonytalan nyelvnél feljön a régi párbeszéd, a beállított motorral előre kiválasztva.
+A nyelvi csomagok CSENDBEN töltődnek: mentéskor az `en→hu` (minden más nyelv ezen át
+fordul), fordításkor a hiányzó nyelvé a munkaszálon. Nincs párbeszéd, nincs hibaablak –
+sikertelen letöltésnél az online motor viszi tovább. Tárolás: `forditas_motor` kulcs.
+
+**Kimenetek (megvannak a lemezen, feltöltés NINCS):** `dist\SuperDL.exe` (193,1 MB),
+`dist\SuperDL-cli.exe` (133,8 MB), `dist\SuperDL\` onedir, `installer\SuperDL-Setup-4.5.5.exe`
+(141,5 MB), `dist_modules\mail-1.2.3.zip`
+(SHA-256 `02b8111d75c93dbd21223d502b6ff83163cfe8d37222963a94cf831af1f182f6`, 184 653 byte).
+yt-dlp 2026.08.19. Kulcs-szken **TISZTA** (319 fájl, kilépési kód 0). Teszt zöld (a
+felolvasó SAPI-tesztje összeomlik egy natív kivétellel – RÉGI és független ettől).
+A friss csomagban ellenőrizve: ctranslate2 + models/specs/logging/version/extensions,
+superdl.offlineford, subword_nmt, sentencepiece, sacremoses mind bent van, converters nincs.
+
+**HÁTRA:** `modules.json` mail-bejegyzés frissítése, majd „publikálás”-ra: `v4.5.5` Core-release
+(+ verzió nélküli `SuperDL-Setup.exe` alias) és `mod-mail-1.2.3` release.
+
+---
+
+> ⚠️ **MULASZTÁS-JAVÍTÁS (2026-08-29).** Ez a szakasz 2026-07-17 óta (v3.29.11) NEM volt
+> frissítve, miközben a fejlesztés v4.5.4-ig jutott – kb. 200 commit és 7 új modul maradt
+> ki belőle. Az alábbi „JELENLEGI ÁLLAPOT" a lemez és a GitHub valós állapotából készült
+> (git log, `modules.json`, `gh release list`). A 2026-07-17 alatti bejegyzések innentől
+> **ARCHÍVUM**. TANULSÁG: a §0 stafétaprotokoll utolsó pontját (átadáskor frissíts) tartani
+> kell, különben egy új AI hetekkel korábbi állapotot lát.
+
+**KIADVA ÉS SZINKRONBAN ✅ (2026-08-29).** Core **v4.5.4** „Latest"; a munkafa tiszta
+(egyetlen követetlen mappa: `tools/brailab_hangolas/`), `origin/main` előtt 0 commit,
+minden modul kiadva. Utolsó release: `mod-iphone-1.1.0` (2026-08-29).
+
+### Mi történt 3.29.11 → 4.5.4 (a fő szálak)
+
+**7 ÚJ MODUL:**
+- **jatekok** (1.0 → 1.15.2) – a legnagyobb szál. 37 hű Homelab retró-port (Kisvarga Zsolt,
+  Sédi Gábor, Halmágyi István, Csapó Endre, Ócsvári Áron nyomán), SAJÁT jogtiszta játékok
+  (Milliomos kvíz, Szerencsekerék, Ország-Város-Fiú-Lány – Mezei Géza ötlete, Póker,
+  Blackjack, UNO), majd **ONLINE** változatok host-hiteles fejetlen motorral (UNO, Blackjack,
+  Ország-Város, Póker, Szerencsekerék; `NetPanelMixin` közös bázis). 1.15.0: az EREDETI
+  BraiLab PC hang feloldható retesz alatt; 1.15.2: magyar Braille-tábla.
+- **mail** – Super Mail (1.0 → 1.2.1): egyesített bejövő, szabályok, időzítés, piszkozat,
+  aláírás, HTML, AI-levélírás, helyesírás-ellenőrző, levél-fontosság, offline mód.
+- **csevej** – Csevejcenter (1.0 → 1.6.0): akadálymentes valós idejű csevegő, **térbeli hang**
+  (helyi hálón és interneten STUN + UDP hole-punching), admin-jogok, közös zenehallgatás.
+- **tavsegitseg** – Távsegítség 1.0.1: távvezérlés általános P2P UDP transzporton
+  (STUN + hole-punch), billentyű-elkapás, rendszerhang-bridge (WASAPI loopback), biztonsági
+  megerősítésekkel (Laci ötlete).
+- **tvmusor** – TV műsor (1.0 → 1.2.1): akadálymentes tévéújság XMLTV EPG-motorral,
+  kedvenc-figyelő, naptári emlékeztető, nap-választó.
+- **atjaro** – Átjáró 1.0.2: telefon-kapcsolat, könyv- és hangoskönyv-küldés,
+  könyvjelző-szinkron (közös alap: `superdl.bookmarks`).
+- **iphone** – iPhone 1.1.0: zene, fotó, videó mentése ÉS feltöltés a gyári Zene alkalmazásba.
+
+**CORE (3.29.11 → 4.5.4) – a fő újdonságok:**
+- **Saját magyar formáns-szintetizátor** (eSpeak nélkül, csatorna-vokóder) + BraiLab-stílusú
+  retró hang; Gépi ének eszköz (a szintetizátor dallamra énekel).
+- **Képernyőolvasó-elsőbbség**: minden egyéb program-beszéd elnémítható; közvetlen
+  **NVDA-vezérlés** (Tolk helyett).
+- **OFFLINE FORDÍTÁS** (4.5.0) – a levél szövege el sem hagyja a gépet.
+- **TELJES MENTÉS ÉS VISSZAÁLLÍTÁS** (4.5.3) – költözés egy fájllal.
+- Internet-teszt a főablakban (Ctrl+Alt+I, 4.4.0); programszintű akadálymentes internet-jelzés.
+- Wifi-jelerősség dBm-ben, beépített fájlválasztó, összeomlás-napló (4.5.2);
+  UTF-16 szövegfájlok felismerése (4.5.1); önfrissítés-javítás (4.5.4).
+- Automatikus háttérindítás a Windows-szal (időzített felvételekhez); periodikus
+  frissítés-ellenőrzés; Modulkezelő „Összes frissítése”.
+- **F1 részletes súgó MINDEN ablakhoz** + kezdőképernyő (szakmai visszajelzés nyomán).
+- Fájltársítások (zene → Super M, videó → felolvasó), HKCU, admin nélkül, visszavonható.
+
+**BIZTONSÁGI/MINŐSÉGI AUDIT (KV1–KV20, 2026-07-23):** közös `URLPolicy` (SSRF- és
+méretvédelem), DPAPI-titkosítás a naptár-címre, felhő-AI beleegyezés + prompt-injection
+határ, atomikus média-export (`.part` → ellenőrzés → csere), lemez-alapú felvétel (a 8 órás
+felvétel sem eszi meg a memóriát), ReadEngine munkamenet-generáció, Pandoc ellátási lánc
+rögzített verzióval és hash-sel, közös magyar szöveg-dekódoló. Ezt követte a hiba-audit
+MK1–MK4 (SAPI-COM gyökér-fix, `_closing` wx-guard 13 modul-ablakban, alfolyamat-életciklus).
+
+**KÖZÖSSÉG / VISSZAJELZŐK:** Laci (rádiófelvétel, némítás, Modulkezelő gombnév, bemondás-
+sorrend, Távsegítség ötlete), István (levél-csatolmány), Barbi és Herman Tibor (audit),
+Mezei Géza (Ország-Város társszerző). A hivatalos honlap a Névjegyben: **super-dl.com**.
+
+### ➡️ ZSIGA-JELZÉS (2026-08-29) – DIAGNOSZTIZÁLVA, JAVÍTÁS MÉG NEM KÉSZÜLT
+Válaszlevél megírva: `C:\Users\msn\Documents\zsiganak.txt`. Kód NEM módosult
+(nem hangzott el a „create maxima”). Három dolog, mindhárom gyökere megtalálva:
+
+1. **DIGEST LEVELEK – a program csak az elejéig jut.** (Jaws- és mobil-info lista
+   összevont módban.) GYÖKÉR: `modules_src\mail\mail_mod\mail_core.py`,
+   `level_szovegtorzs()` – a `msg.walk()`-ban az ELSŐ `text/plain` részt veszi
+   (`if plain is None`), és kész. Egy `multipart/digest` levélnél az első text/plain
+   éppen a Mailman-tartalomjegyzék, a `message/rfc822` részekbe csomagolt VALÓDI
+   levelek pedig kimaradnak. TERV: ismerjük fel a digestet, és fűzzük össze az
+   összes beágyazott levelet, mindegyik elé egy hallható elválasztóval
+   (hányadik, kitől, tárgy) – ne egy végtelen szövegfolyam legyen.
+2. **AZ AI-FORDÍTÓ CSONKOLJA A HOSSZÚ LEVELET.** GYÖKÉR:
+   `modules_src\mail\mail_mod\forditas.py` → `ai_fordit()` egyetlen
+   `aiclient.chat(...)` hívást tesz, és a `chat()` alapértelmezett
+   `max_tokens=2000` (superdl\aiclient.py:118). A válasz elfogy a korlátnál, és
+   ezt SEMMI nem jelzi – a felhasználó némán kap félbevágott fordítást.
+   TERV: darabolás mondathatáron (a `darabol()` már megvan a mymemory-hoz,
+   csak nagyobb darabmérettel), darabonkénti fordítás, és HALLHATÓ jelzés,
+   ha mégis csonka marad. A néma csonkolás a rosszabbik hiba.
+3. **AZ OFFLINE FORDÍTÓ MEGTALÁLHATATLAN.** NEM hiba: működik (ellenőrizve –
+   `ctranslate2` benne van a kiadott exe-ben, a fejlesztő gépén az `en→hu` és
+   `pl→en` csomag már le is van töltve). DE: az EGYETLEN belépési pontja a levél
+   F9-fordítás párbeszédének első rádiógombja. Nincs se menüpont, se beállítás,
+   se előzetes csomag-letöltés. Maga a fejlesztő sem találta meg.
+   TERV: Beállítások fül – nyelvi csomagok előzetes letöltése/törlése + az
+   alapértelmezett fordító kiválasztása, hogy ne kelljen levelenként újraválasztani.
+
+### HÁTRA / NYITOTT
+- **Hírlevél**: a `superdllistara.txt` a 3.29.11 óta eltelt kiadásokról MÉG NEM ment ki –
+  ez a legrégebbi nyitott szál.
+- `tools/brailab_hangolas/` követetlen a gitben – eldönteni: commit vagy `.gitignore`.
+- Elhalasztva: AI hang-szinkron (ElevenLabs) a felolvasóban (M3).
+- Nem verifikált élesben: a dupla-kattintásos fájltársítás valós telepített gépen.
+
+---
+
+## 6/A. ARCHÍVUM (2026-07-17 és korábbi bejegyzések)
 
 **3.29.11 KIADVA ✅ (2026-07-17).** Core `v3.29.11` „Latest" (4 asset) + `mod-felolvaso-1.2.0`
 (`--latest=false`) + modules.json; kulcs-szken TISZTA; minden link 200. TARTALOM: (1) a radiorec

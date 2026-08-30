@@ -906,7 +906,11 @@ _ALTALANOS_ALAP = {"auto_ellenoriz": True, "ellenoriz_perc": 3,
                    # válasz után bezáruljon-e az eredeti levél ablaka
                    "valasz_zarja_eredetit": False,
                    # a levél fontosságát jelezzük-e (lista + bemondás)
-                   "prioritas_jelzes": True}
+                   "prioritas_jelzes": True,
+                   # ALAPÉRTELMEZETT FORDÍTÓ (F9). "kerdez" = minden
+                   # fordításnál kérdezzen; "offline" = helyben, a gépen;
+                   # "mymemory" = ingyenes online; "ai" = saját AI-kulccsal
+                   "forditas_motor": "kerdez"}
 
 
 def altalanos_betolt():

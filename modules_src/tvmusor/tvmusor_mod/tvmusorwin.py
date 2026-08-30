@@ -17,6 +17,14 @@ import wx
 from . import epgmotor as EM
 
 
+def _biztos_attr(obj, nev):
+    """getattr, ami property-hibán sem szakad meg (None-t ad)."""
+    try:
+        return getattr(obj, nev, None)
+    except Exception:
+        return None
+
+
 def _hatterben(munka, kesz, hiba=None):
     """Egy hosszú műveletet háttérszálon futtat, az eredményt a fő szálra adja."""
     def fut():
@@ -35,6 +43,7 @@ class TvMusorFrame(wx.Frame):
         super().__init__(parent, title="TV műsor", size=(820, 600))
         self.core = core
         self._closing = False
+        self._naptar_hiba = ""        # miért nem sikerült az utolsó emlékeztető
         self._tv = EM.TvMusor()
         self._csatornak = []          # (cid, nev) az aktuális listában
         self._talalatok = []          # (nev, Musor) a keresésben
@@ -382,15 +391,68 @@ class TvMusorFrame(wx.Frame):
         except Exception:
             pass
 
+    def _naptar_kezelo(self):
+        """A Core naptárkezelője (`OrganizerManager`), vagy None.
+
+        FONTOS: a kezelő a CORE-ban él (`MainFrame._organizer`), és a program
+        indulásakor MINDIG létrejön – azért, hogy az emlékeztetők akkor is
+        elsüljenek, ha a naptár ablaka zárva van. A Szervezés modul csak az
+        ABLAKOT adja hozzá, a kezelőt nem.
+
+        Ezt eddig `self.core.main`-en át kerestük – csakhogy a CoreContext a
+        főablakot `main_frame` (és `frame`) néven adja, `main` néven SOHA.
+        A `getattr` alapértelmezése elnyelte, a keresés mindig üres kézzel tért
+        vissza, és a felhasználó azt a hamis üzenetet kapta, hogy hiányzik a
+        Szervezés modul. (Ugyanez a névelcsúszás volt a „Napi infó nem indul"
+        gyökér-oka is – lásd a modkit `frame`-aliasát.) Ezért itt MINDEN ismert
+        útvonalat végigpróbálunk, és a legvégén a saját szülő-ablakunkat is:
+        a `register_window` megnyitója a FŐABLAKOT adja szülőnek.
+        """
+        jeloltek = [_biztos_attr(self.core, "organizer"),
+                    _biztos_attr(self.core, "_organizer")]
+        for nev in ("main_frame", "frame", "main"):
+            jeloltek.append(_biztos_attr(self.core, nev))
+        jeloltek.append(self.GetParent())
+        try:
+            app = wx.GetApp()
+            jeloltek.append(app.GetTopWindow() if app else None)
+        except Exception:
+            pass
+        for j in jeloltek:
+            if j is None:
+                continue
+            if hasattr(j, "add_event"):          # maga a kezelő
+                return j
+            mgr = _biztos_attr(j, "_organizer")
+            if mgr is not None and hasattr(mgr, "add_event"):
+                return mgr
+        return None
+
+    def _naptar_hiba_szoveg(self):
+        """Mit mondjunk, ha nem sikerült az emlékeztető.
+
+        A régi szöveg a Szervezés modult kérte számon – rossz helyre küldte a
+        felhasználót, mert a naptár KEZELŐJE a Core-ban van (a Szervezés csak
+        az ablakát adja). Ha tényleg nincs kezelő, az a program hibája, nem a
+        felhasználóé; ha pedig más hiba történt, mondjuk meg, mi.
+        """
+        hiba = getattr(self, "_naptar_hiba", "") or "nincs-naptar"
+        if hiba == "nincs-naptar":
+            return ("A naptárkezelő most nem érhető el, ezért nem tudok "
+                    "emlékeztetőt beállítani. Ez a program hibája, nem a "
+                    "tiéd – indítsd újra a SuperDL-t, és ha így is marad, "
+                    "jelezd a fejlesztőnek.")
+        return ("Nem sikerült beállítani az emlékeztetőt. A hiba: %s. "
+                "A kedvenceid megmaradtak, próbáld újra." % hiba)
+
     def _emlekezteto_hozzaad(self, nev, m):
         """Egy műsorra naptári emlékeztetőt tesz (a Core közös naptárába).
-        Visszaad: True, ha most tettük be; False, ha már volt / nem sikerült."""
-        org = getattr(self.core, "organizer", None) or \
-            getattr(self.core, "_organizer", None)
+        Visszaad: True, ha most tettük be; False, ha már volt; None, ha nem
+        sikerült (ilyenkor a `_naptar_hiba` mondja meg, miért)."""
+        self._naptar_hiba = ""
+        org = self._naptar_kezelo()
         if org is None:
-            main = getattr(self.core, "main", None)
-            org = getattr(main, "_organizer", None) if main else None
-        if org is None:
+            self._naptar_hiba = "nincs-naptar"
             return None                      # nincs naptár – a hívó jelzi
         kulcs = "%s|%s|%s" % (m.kezd.date().isoformat(), m.idopont,
                               (m.cim or "")[:60])
@@ -414,7 +476,10 @@ class TvMusorFrame(wx.Frame):
                 ("Most kezdődik a kedvenced: %s, a(z) %s csatornán."
                  % (m.cim or "műsor", nev)))
             org.add_event(ev)
-        except Exception:
+        except Exception as exc:
+            # NE mossuk össze a „nincs naptár"-ral: az eddigi közös None miatt
+            # egy valódi hiba is úgy hangzott, mintha hiányozna a naptár.
+            self._naptar_hiba = str(exc) or exc.__class__.__name__
             return None
         meglevo.add(kulcs)
         self._emlek_kulcsok_ment(meglevo)
@@ -428,9 +493,7 @@ class TvMusorFrame(wx.Frame):
         nev, m = self._kedvenc_sorok[i]
         eredmeny = self._emlekezteto_hozzaad(nev, m)
         if eredmeny is None:
-            self._mond("A naptár most nem érhető el, ezért nem tudok "
-                       "emlékeztetőt beállítani. (A Szervezés modul naptára "
-                       "kell hozzá.)")
+            self._mond(self._naptar_hiba_szoveg())
         elif eredmeny:
             self._mond("Emlékeztető beállítva: %s, %s csatorna, %s %s-kor – "
                        "%d perccel előtte szólok."
@@ -468,8 +531,7 @@ class TvMusorFrame(wx.Frame):
             mar += 0 if e else 1
         if nincs_naptar:
             if not csendes:
-                self._mond("A naptár most nem érhető el, ezért nem tudok "
-                           "emlékeztetőt beállítani.")
+                self._mond(self._naptar_hiba_szoveg())
             return
         if csendes and not uj:
             return

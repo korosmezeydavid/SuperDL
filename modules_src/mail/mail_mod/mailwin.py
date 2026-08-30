@@ -2392,17 +2392,42 @@ class LevelOlvasoFrame(wx.Frame):
         if nyelv == "hu":
             _mondd(self.main, "Ez a levél magyarul van.")
             return
-        d = ForditasDialog(self, self.main, nyelv if biztos else "")
-        rendben = d.ShowModal() == wx.ID_OK
-        motor, honnan = d.motor(), d.nyelv()
-        d.Destroy()
-        if not rendben:
-            return
-        if motor == "offline" and not self._offline_modell(honnan):
-            return
-        _mondd(self.main, "Fordítás folyamatban…")
+        # ALAPÉRTELMEZETT FORDÍTÓ: ha a felhasználó a Beállítások → Általános
+        # lapon egyszer eldöntötte, melyik motorral fordítson, nem kérdezünk
+        # újra. A nyelvet viszont csak akkor fogadjuk el kérdés nélkül, ha
+        # BIZTOSAN felismertük – rossz nyelvvel a fordítás értelmetlen, és a
+        # felhasználó nem tudná, miért. [felhasználói kérés, 2026-08-29]
+        alap = FORD.alap_motor(MC.altalanos_betolt())
+        automata = bool(alap != FORD.KERDEZ and biztos and nyelv)
+        if automata:
+            motor, honnan = alap, nyelv
+        else:
+            d = ForditasDialog(self, self.main, nyelv if biztos else "", alap)
+            rendben = d.ShowModal() == wx.ID_OK
+            motor, honnan = d.motor(), d.nyelv()
+            d.Destroy()
+            if not rendben:
+                return
+            if motor == "offline" and not self._offline_modell(honnan):
+                return
+        # Automata módban a hiányzó nyelvi csomag CSENDBEN, a fordítás
+        # munkaszálán töltődik le – nem kérdezünk rá, csak megmondjuk, hogy
+        # ezért tart tovább. (A `offline_kesz` hálózat nélkül dönt, ezért
+        # nyugodtan hívható itt, a felületi szálon.)
+        toltunk = bool(automata and motor == "offline"
+                       and not FORD.offline_kesz(honnan, "hu"))
+        if toltunk:
+            _mondd(self.main, "Fordítás folyamatban. Ehhez a nyelvhez most "
+                   "töltődik le egyszer a nyelvi csomag – ez pár percig "
+                   "tarthat, utána már internet nélkül is megy.")
+        else:
+            _mondd(self.main, "Fordítás folyamatban…")
 
         def munka():
+            if toltunk:
+                from superdl import offlineford
+                for p in offlineford.hianyzo(honnan, "hu"):
+                    offlineford.letolt(p)
             return FORD.fordit(eredeti, "hu", motor, honnan)
 
         def kesz(eredmeny):
@@ -2499,7 +2524,7 @@ class ForditasDialog(wx.Dialog):
     Azért van külön párbeszéd, mert a felhasználónak TUDNIA kell, hogy a levele
     szövege elhagyja a gépet – egy magánlevélnél ez nem apróság."""
 
-    def __init__(self, parent, main, felismert=""):
+    def __init__(self, parent, main, felismert="", alap=""):
         super().__init__(parent, title="Fordítás magyarra")
         v = wx.BoxSizer(wx.VERTICAL)
         van_offline = FORD.offline_elerheto()
@@ -2515,6 +2540,11 @@ class ForditasDialog(wx.Dialog):
         self._motorok = FORD.motorok()
         self._motor = wx.RadioBox(self, label="&Fordító", majorDimension=1,
                                   choices=[n for _k, n in self._motorok])
+        # Ha van beállított alapértelmezett fordító, az legyen KIVÁLASZTVA –
+        # akkor is, ha most azért kérdezünk, mert a nyelv nem volt biztos.
+        _mk = [k for k, _n in self._motorok]
+        if alap in _mk:
+            self._motor.SetSelection(_mk.index(alap))
         v.Add(self._motor, 0, wx.LEFT | wx.RIGHT, 12)
         cimke = ("A felismert nyelv: %s. Ha nem stimmel, válassz másikat."
                  % FORD.nyelv_neve(felismert) if felismert
@@ -2951,6 +2981,33 @@ class BeallitasokDialog(wx.Dialog):
         hs6.Add(self.alt_tv_valasz, 0)
         v.Add(hs6, 0, wx.ALL, 8)
 
+        # --- ALAPÉRTELMEZETT FORDÍTÓ (F9) ---
+        # Miért kell: eddig minden F9 egy párbeszéddel indult („melyik
+        # motorral?”). Akinek megvan a döntése, annak ez napi tíz fölösleges
+        # kérdés. A „kérdezzen rá” marad az alapértelmezés, tehát aki nem nyúl
+        # hozzá, annál semmi nem változik. [felhasználói kérés, 2026-08-29]
+        v.Add(wx.StaticText(p, label=(
+            "&Alapértelmezett fordító (F9). Ha nem a „kérdezzen rá” van "
+            "kiválasztva, az F9 azonnal fordít, párbeszéd nélkül:")),
+            0, wx.LEFT | wx.TOP, 8)
+        self._ford_motorok = FORD.valaszthato_motorok()
+        self.alt_ford = wx.Choice(
+            p, choices=[n for _k, n in self._ford_motorok])
+        _fk = [k for k, _n in self._ford_motorok]
+        _mostani = FORD.alap_motor(cfg)
+        self.alt_ford.SetSelection(_fk.index(_mostani) if _mostani in _fk else 0)
+        self.alt_ford.SetName(
+            "Alapértelmezett fordító. A helyben futó fordításnál a levél "
+            "szövege el sem hagyja a gépet; a másik kettőnél elmegy a "
+            "szolgáltatóhoz. Ha a helyben futót választod, a nyelvi csomagok "
+            "a háttérben, magukat töltik le.")
+        v.Add(self.alt_ford, 0, wx.LEFT | wx.TOP, 12)
+        if not FORD.offline_elerheto():
+            v.Add(wx.StaticText(p, label=(
+                "   (A helyben futó fordítás ebben a programverzióban nem "
+                "érhető el – SuperDL 4.5.0-tól van meg.)")),
+                0, wx.LEFT | wx.BOTTOM, 12)
+
         # --- SZABÁLYOK ---
         self.alt_szab_auto = wx.CheckBox(
             p, label="A &szabályok fussanak le magától az új leveleken")
@@ -3043,7 +3100,9 @@ class BeallitasokDialog(wx.Dialog):
                     max(0, self.alt_tv_valasz.GetSelection())],
                 "valasz_zarja_eredetit": bool(
                     self.alt_valasz_zar.GetValue()),
-                "prioritas_jelzes": bool(self.alt_prio.GetValue())}
+                "prioritas_jelzes": bool(self.alt_prio.GetValue()),
+                "forditas_motor": [k for k, _n in self._ford_motorok][
+                    max(0, self.alt_ford.GetSelection())]}
         # TÚL SŰRŰ LEKÉRDEZÉS: néhány szolgáltató (főleg a Gmail) a gyakori
         # bejelentkezést ideiglenes letiltással bünteti – erre figyelmeztetünk,
         # de nem tiltjuk meg: a felhasználó dönt.
@@ -3070,6 +3129,45 @@ class BeallitasokDialog(wx.Dialog):
         except Exception:
             pass
         _mondd(self.main, "Az általános beállítások elmentve.")
+        if adat.get("forditas_motor") == "offline":
+            self._offline_ford_elokeszit()
+
+    def _offline_ford_elokeszit(self):
+        """A helyben futó fordítás alapértelmezetté tételekor a nyelvi csomag
+        CSENDBEN, a háttérben töltődik le.
+
+        Miért az ANGOL csomagot töltjük le előre: a nyílt modellek
+        angol-központúak, tehát minden más nyelv angolon KERESZTÜL fordul
+        magyarra – az angol→magyar csomag nélkül egyetlen nyelv sem menne
+        helyben. A többi nyelv csomagja majd az első olyan levélnél jön le,
+        magától.
+
+        „Csendben”: nincs párbeszéd, nincs folyamatjelző, a levelező közben
+        végig használható. Egyetlen rövid mondatot mondunk az elején és egyet a
+        végén – vak felhasználónál a néma háttérmunka nem megnyugtató, hanem
+        ijesztő; a lényeg, hogy ne KÉRDEZZÜNK és ne akasszuk meg a munkát."""
+        if not FORD.offline_elerheto():
+            return
+        if FORD.offline_kesz("en", "hu"):        # már megvan, nincs teendő
+            return
+
+        def kesz(letoltve, hiba):
+            if letoltve:
+                wx.CallAfter(_mondd, self.main,
+                             "A helyben futó fordítás készen áll: a nyelvi "
+                             "csomag letöltődött. Mostantól a leveleid "
+                             "fordítása el sem hagyja a gépet.")
+            elif hiba is not None:
+                # NEM dobjuk fel hibaablakban: a fordítás enélkül is működik
+                # (online motorral), és legközelebb újra megpróbáljuk.
+                wx.CallAfter(_mondd, self.main,
+                             "A nyelvi csomag letöltése most nem sikerült – "
+                             "később magától újra próbálja.")
+
+        if FORD.letolt_csendben(["en"], "hu", kesz):
+            _mondd(self.main, "A helyben futó fordítás a háttérben készül elő "
+                   "(egyszeri, kb. 80 megabájtos letöltés). Nyugodtan "
+                   "dolgozhatsz tovább, szólok, ha kész.")
 
 
 class MailFrame(wx.Frame):

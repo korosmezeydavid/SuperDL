@@ -45,10 +45,45 @@ def modell_mappa() -> Path:
     return Path.home() / ".superdl" / "forditomodellek"
 
 
+def ct2():
+    """A CTranslate2 futtatókörnyezet behozása – a KÉSZ programban is.
+
+    Miért nem elég a sima `import ctranslate2`:
+
+    A fagyasztott (PyInstaller) programból SZÁNDÉKOSAN kihagyjuk a
+    `ctranslate2.converters` alcsomagot, mert az a torch-ot húzná be
+    (+365 megabájt), a fordításhoz viszont semmi köze – az csak modellek
+    ÁTALAKÍTÁSÁHOZ kell, mi meg kész modelleket töltünk le.
+
+    Csakhogy a csomag `__init__.py`-ja FELTÉTEL NÉLKÜL importálja
+    (`from ctranslate2 import converters, models, specs`), ezért a kész
+    programban a sima `import ctranslate2` ImportError-ral elszállt. Innen a
+    hiba, amit Dávid látott: az F9 csak KÉT fordítót ajánlott fel, a helyben
+    futó – ami pedig ott van a gépen – csendben eltűnt a listából, mert az
+    `elerheto()` hamisat adott. Forrásból futtatva sosem látszott, ott
+    ugyanis a converters megvan. [2026-08-30]
+
+    Megoldás: ha az import a hiányzó converters miatt hasal el, beadunk a
+    helyére egy ÜRES pótmodult, és újrapróbáljuk. A DLL-betöltést és a
+    `_ext` bővítményt így is a csomag saját `__init__`-je végzi el."""
+    import sys
+    import types
+    try:
+        import ctranslate2
+        return ctranslate2
+    except ImportError:
+        pass
+    sys.modules.setdefault("ctranslate2.converters",
+                           types.ModuleType("ctranslate2.converters"))
+    sys.modules.pop("ctranslate2", None)
+    import ctranslate2
+    return ctranslate2
+
+
 def elerheto() -> bool:
     """Van-e a programban fordító-futtatókörnyezet? (Régi Core-ban nincs.)"""
     try:
-        import ctranslate2                       # noqa: F401
+        ct2()
         return True
     except Exception:
         return False
@@ -156,7 +191,7 @@ class _Motor:
     csomagok kétfélét használnak (`bpe.model` vagy `sentencepiece.model`)."""
 
     def __init__(self, mappa: Path, honnan: str, hova: str):
-        import ctranslate2
+        ctranslate2 = ct2()          # a kész programban is működő behozás
         self.honnan, self.hova = honnan, hova
         self.ford = ctranslate2.Translator(str(mappa / "model"), device="cpu")
         self.bpe = self.sp = None

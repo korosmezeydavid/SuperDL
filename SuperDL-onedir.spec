@@ -53,6 +53,16 @@ hiddenimports += collect_submodules('numpy')
 from PyInstaller.utils.hooks import collect_dynamic_libs
 binaries += collect_dynamic_libs('ctranslate2')
 hiddenimports += ['ctranslate2', 'ctranslate2._ext']
+# A `converters` alcsomagot kihagyjuk (lásd az `excludes`-t), viszont a csomag
+# __init__.py-ja a MODELS és SPECS alcsomagot is importálja – ezeket kézzel
+# kérjük, mert a converters kizárása után az elemző nem jut el hozzájuk.
+# Enélkül a kész programban `import ctranslate2` elszáll, és a helyben futó
+# fordítás csendben eltűnik az F9 listájából. (A kódoldali biztosíték az
+# `superdl/offlineford.ct2()`.) [2026-08-30]
+hiddenimports += collect_submodules('ctranslate2.models')
+hiddenimports += collect_submodules('ctranslate2.specs')
+hiddenimports += ['ctranslate2.logging', 'ctranslate2.version',
+                  'ctranslate2.extensions']
 tmp_ret = collect_all('sacremoses')     # tokenizáló + a hozzá tartozó adatfájlok
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 hiddenimports += collect_submodules('subword_nmt')
