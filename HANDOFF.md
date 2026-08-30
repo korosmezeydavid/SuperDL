@@ -158,11 +158,66 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-08-30 · dolgozott: Claude
+**Utolsó frissítés:** 2026-08-30 (késő este) · dolgozott: Claude
 
 ---
 
-### 🔨 tvmusor 1.2.2 – MEGÉPÍTVE, MÉG NEM PUBLIKÁLVA (2026-08-30, este)
+### ✅ KIADVA 2026-08-30 (este): v4.5.5 + mail 1.2.3 + tvmusor 1.2.2 + mail 1.2.4
+
+**Minden kint van, minden link 200, a repó szinkronban.**
+
+| Kiadás | Tag | Megjegyzés |
+|---|---|---|
+| Core **4.5.5** | `v4.5.5` | **„Latest"**; assetek: `SuperDL.exe`, `SuperDL-cli.exe`, `SuperDL-Setup-4.5.5.exe` + verzió nélküli `SuperDL-Setup.exe` alias |
+| Super Mail **1.2.3** | `mod-mail-1.2.3` | `--latest=false` |
+| TV műsor **1.2.2** | `mod-tvmusor-1.2.2` | `--latest=false` |
+| Super Mail **1.2.4** | `mod-mail-1.2.4` | `--latest=false` · POP3-kör, lásd lent |
+
+Sorrend a bevált szabály szerint: **modulok előbb, a Core utoljára `--latest`-tel** –
+nem volt latest-csapda. `modules.json` frissítve és pusholva (új eszközzel, lásd lent),
+forrás pusholva: `b077b04` (4.5.5-kör) és `ce122a8` (mail 1.2.4).
+Kulcs-szken a feltöltés előtt **TISZTA** (909 fájl, a három binárissal együtt).
+
+**HÍRLEVÉL MEGÍRVA, MÉG NEM MENT KI:** `C:\Users\msn\Documents\superdllistara-4.5.5.txt`
+(a 3.29.11 → 4.5.5 út: 7 új modul, offline fordítás, teljes mentés, saját szintetizátor,
+F1-súgó, audit, és a két friss javítás). ⚠️ A régi `superdllistara.txt` **érintetlen** –
+abban az iPhone-modul hírlevele van, ami szintén nem ment ki.
+
+---
+
+### 🔨 mail 1.2.4 – POP3-kör (2026-08-30, késő este) – KIADVA
+
+**DÁVID JELEZTE:** „a pop3 fiókoknál csak a bejövő leveleket listázza, a többit nem, a
+többi mappát. Több szolgáltatónál is teszteltem. Továbbá ha bejelölöd hogy pop3 akkor az
+imap adat bekérések tünjenek el.”
+
+**1. A mappák – NEM a mi hibánk, de a hallgatás igen.** A POP3 protokoll nem ismer
+mappákat: a szolgáltatónál EGYETLEN postaláda van, az Elküldött/Piszkozatok/Kuka
+IMAP-fogalmak. A kód eddig is helyesen egyetlen sort mutatott – csak **nem mondta meg,
+miért**, ezért ment el a felhasználó több szolgáltatót végigpróbálni.
+- `mail_core.pop3_mappa_magyarazat(fiok)` + `mail_core.POP3_MAPPA_NEV`;
+- `mailwin._mappak_betolt` **fiókonként EGYSZER** mondja el (`_pop3_elmondva` halmaz) –
+  a lista minden frissítésekor ismételgetni fárasztó volna;
+- ha ismerjük a szolgáltató `imap_host`-ját, a szöveg meg is mondja a nevét.
+
+**2. A fiók-párbeszéd mezői.** POP3 → eltűnik az IMAP szerver+port; IMAP → eltűnik a
+POP3 szerver+port; **az SMTP MINDIG marad** (a küldés mindkettőnél SMTP).
+- `FiokDialog.mezok_protokollhoz(pop)`: a döntés **wx nélkül**, hogy tesztelhető legyen;
+- a `sor()` helper eltárolja a sor-sizert ÉS a címkét (`_sorok`), így a mező a
+  címkéjével együtt tűnik el, és a sor össze is csukódik (`Sizer.Show(..., recursive=True)`);
+- a rejtett mezők ÉRTÉKE megmarad (az auto-konfig nem vész el visszaváltáskor);
+- váltáskor a program kimondja, mit rejtett el.
+
+**Kimenet:** `dist_modules\mail-1.2.4.zip` (SHA-256
+`17f7c43fcd25c16c086ceb0d2a30cdae0745e7049c41ce732a3b9c792c10762b`, 186 562 byte).
+Új teszt: `tests\test_mail_pop3_mappak.py` (8 eset). **1518 pytest zöld.**
+
+**MEGJEGYZÉS a piszkozatról:** POP3-nál eddig is helyesen működött – a program a gépre
+menti `.eml`-ként, és ki is mondja, hova. Ezen nem kellett változtatni.
+
+---
+
+### 🔨 tvmusor 1.2.2 (2026-08-30, este) – KIADVA
 
 **LACI JELEZTE:** „Megpróbáltam emlékeztetőt beállítani a Vuk című rajzfilmhez, de azt írja
 a program, hogy »A naptár most nem érhető el… A Szervezés modul naptára kell hozzá.«
@@ -216,8 +271,7 @@ hibás kilépési kódot).
 **Teszt a kör végén: 1510 pytest zöld.** Kulcs-szken TISZTA (728 fájl). Modul-forrás NEM
 változott ebben a körben → a `tvmusor-1.2.2.zip` érvényes, nem kell újraépíteni.
 
-**HÁTRA:** `modules.json` tvmusor-bejegyzés frissítése, majd „publikálás”-ra a
-`mod-tvmusor-1.2.2` release. **Válaszlevél Lacinak még nem készült.**
+**KIADVA** (`mod-tvmusor-1.2.2`, 2026-08-30). **Válaszlevél Lacinak még nem készült.**
 **NYITOTT (Core, külön döntés):** a rendszerszintű javítás – vagy `main` alias a
 `CoreContext`-be (olcsó, de a harmadik szinonima), vagy egy rendes **`core.organizer`
 szolgáltatás**, hogy a moduloknak soha ne kelljen a főablakon átnyúlniuk. A második a tiszta,
@@ -225,7 +279,7 @@ szolgáltatás**, hogy a moduloknak soha ne kelljen a főablakon átnyúlniuk. A
 
 ---
 
-### 🔨 4.5.5 – MEGÉPÍTVE, MÉG NEM PUBLIKÁLVA (2026-08-30)
+### 🔨 4.5.5 (2026-08-30) – KIADVA
 
 **Téma: a Super Mail fordítói.** Két dolog készült el egy körben.
 
@@ -261,8 +315,7 @@ felolvasó SAPI-tesztje összeomlik egy natív kivétellel – RÉGI és függet
 A friss csomagban ellenőrizve: ctranslate2 + models/specs/logging/version/extensions,
 superdl.offlineford, subword_nmt, sentencepiece, sacremoses mind bent van, converters nincs.
 
-**HÁTRA:** `modules.json` mail-bejegyzés frissítése, majd „publikálás”-ra: `v4.5.5` Core-release
-(+ verzió nélküli `SuperDL-Setup.exe` alias) és `mod-mail-1.2.3` release.
+**KIADVA** (`v4.5.5` + `mod-mail-1.2.3`, 2026-08-30).
 
 ---
 
@@ -354,8 +407,11 @@ Válaszlevél megírva: `C:\Users\msn\Documents\zsiganak.txt`. Kód NEM módosul
    alapértelmezett fordító kiválasztása, hogy ne kelljen levelenként újraválasztani.
 
 ### HÁTRA / NYITOTT
-- **Hírlevél**: a `superdllistara.txt` a 3.29.11 óta eltelt kiadásokról MÉG NEM ment ki –
-  ez a legrégebbi nyitott szál.
+- **Hírlevél**: MEGÍRVA (`superdllistara-4.5.5.txt`), de **még nem ment ki** a listákra.
+  A régi `superdllistara.txt` (iPhone-modul) szintén kiküldetlen – eldöntendő, hogy az
+  külön megy-e, vagy beleolvad.
+- **Válaszlevél Lacinak** a tévéújság-hibáról (a `lacinak.txt` mintájára).
+- **A 23 holt `_<modul>_win` takarítás** kitakarítása, modulonként, alkalomadtán.
 - `tools/brailab_hangolas/` követetlen a gitben – eldönteni: commit vagy `.gitignore`.
 - Elhalasztva: AI hang-szinkron (ElevenLabs) a felolvasóban (M3).
 - Nem verifikált élesben: a dupla-kattintásos fájltársítás valós telepített gépen.
