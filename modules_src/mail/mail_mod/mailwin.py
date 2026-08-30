@@ -567,6 +567,8 @@ class FiokDialog(wx.Dialog):
         # FONTOS (akadálymentesség): a címke-StaticText MINDIG a mező ELŐTT jön
         # létre (z-sorrend) – különben a képernyőolvasó ELTOLVA olvassa a
         # címkéket (a mező a KÖVETKEZŐ címkét kapná). Plusz explicit SetName.
+        self._sorok = {}          # mező -> (sor-sizer, címke) a mutatáshoz
+
         def sor(cimke, **kw):
             s = wx.BoxSizer(wx.HORIZONTAL)
             st = wx.StaticText(self, label=cimke)          # ELŐBB a címke
@@ -575,6 +577,7 @@ class FiokDialog(wx.Dialog):
             s.Add(st, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
             s.Add(ctrl, 1)
             v.Add(s, 0, wx.EXPAND | wx.ALL, 6)
+            self._sorok[ctrl] = (s, st)
             return ctrl
 
         # Az E-MAIL CÍM az elsődleges, egyértelmű mező (elöl); a név opcionális.
@@ -611,6 +614,12 @@ class FiokDialog(wx.Dialog):
         self.smtp_host = sor("SMTP szerver:")
         self.smtp_port = sor("SMTP port (alap: 465 SSL vagy 587 STARTTLS):")
 
+        # A KÉT PROTOKOLL MEZŐI KIZÁRJÁK EGYMÁST (Dávid kérése, 2026-08-30):
+        # IMAP-nál a POP3-szerver és -port teljesen felesleges, és fordítva.
+        # Vakon ez nem esztétika, hanem munka: minden felesleges mező egy
+        # lépés a nyíllal, és egy „ezt is ki kell tölteni?” kérdés.
+        self.protokoll.Bind(wx.EVT_RADIOBOX, self._protokoll_mezok)
+
         gs = wx.BoxSizer(wx.HORIZONTAL)
         teszt = wx.Button(self, label="Kapcsolat &tesztelése")
         teszt.Bind(wx.EVT_BUTTON, self._teszt)
@@ -623,6 +632,45 @@ class FiokDialog(wx.Dialog):
         self.SetSizer(v)
         if fiok:
             self._betolt(fiok)
+        self._protokoll_mezok(None, csendes=True)
+
+    # ---- protokoll-függő mezők ----------------------------------------
+
+    @staticmethod
+    def mezok_protokollhoz(pop: bool) -> dict:
+        """Melyik szerver-mező kell, ha POP3 (True) vagy IMAP (False)?
+
+        Külön, wx nélküli függvény, hogy tesztelhető legyen. Az SMTP MINDIG
+        kell: a küldés mindkét protokollnál SMTP-vel megy."""
+        return {"imap_host": not pop, "imap_port": not pop,
+                "pop_host": pop, "pop_port": pop,
+                "smtp_host": True, "smtp_port": True}
+
+    def _sor_mutat(self, ctrl, mutat: bool) -> None:
+        s, st = self._sorok[ctrl]
+        ctrl.Show(mutat)
+        st.Show(mutat)
+        self.GetSizer().Show(s, mutat, recursive=True)
+
+    def _protokoll_mezok(self, e=None, csendes: bool = False) -> None:
+        pop = self.protokoll.GetSelection() == 1
+        kell = self.mezok_protokollhoz(pop)
+        for nev, ctrl in (("imap_host", self.imap_host),
+                          ("imap_port", self.imap_port),
+                          ("pop_host", self.pop_host),
+                          ("pop_port", self.pop_port),
+                          ("smtp_host", self.smtp_host),
+                          ("smtp_port", self.smtp_port)):
+            self._sor_mutat(ctrl, kell[nev])
+        self.Layout()
+        if not csendes:
+            _mondd(self.main,
+                   "POP3 kiválasztva – az IMAP szerver és port mezőt elrejtettem, "
+                   "azokra itt nincs szükség." if pop else
+                   "IMAP kiválasztva – a POP3 szerver és port mezőt elrejtettem, "
+                   "azokra itt nincs szükség.")
+        if e:
+            e.Skip()
 
     def _betolt(self, f):
         self.nev.SetValue(f.get("nev", ""))
@@ -3180,6 +3228,8 @@ class MailFrame(wx.Frame):
         self._aktiv = None
         self._mappa = "INBOX"
         self._mappak_raw = []          # a mappák NYERS (IMAP) nevei
+        self._pop3_elmondva = set()    # melyik POP3-fióknál mondtuk már el,
+        #                                hogy ott nincs több mappa
         self._lista = []               # a jelenlegi levéllista info-dictjei
         self._osszesitett = False      # „Összes bejövő" nézet aktív?
         self._aktiv_fiok = None        # a MEGNYITOTT levél fiókja
@@ -3568,10 +3618,19 @@ class MailFrame(wx.Frame):
         if not self._aktiv:
             return
         if self._aktiv.get("protokoll") == "pop":
+            # POP3-nál NINCS több mappa – de ezt eddig nem MONDTUK, csak
+            # megjelent egyetlen sor. Dávid emiatt több szolgáltatót is
+            # végigpróbált, hátha nálunk a hiba. Fiókonként EGYSZER elmondjuk,
+            # miért van így és mit lehet tenni (a lista minden frissítésekor
+            # ismételgetni viszont fárasztó volna).
             self._mappak_raw = ["INBOX"]
-            self.mappa_lista.Set(["Beérkezett (POP3)"])
+            self.mappa_lista.Set([MC.POP3_MAPPA_NEV])
             self._mappa = "INBOX"
             self._mappa_kijelol("INBOX")
+            kulcs = self._aktiv.get("email", "")
+            if kulcs not in self._pop3_elmondva:
+                self._pop3_elmondva.add(kulcs)
+                self._mond(MC.pop3_mappa_magyarazat(self._aktiv))
             self._frissit()
             return
         self._mond("Mappák betöltése…")

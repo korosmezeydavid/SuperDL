@@ -360,6 +360,34 @@ PRIO_JELZES = {
 }
 
 
+POP3_MAPPA_NEV = "Beérkezett (POP3 – a szolgáltatónál csak ez az egy van)"
+
+
+def pop3_mappa_magyarazat(fiok: dict) -> str:
+    """Miért csak egy mappa látszik POP3-nál – és mit lehet tenni.
+
+    Dávid jelezte (2026-08-30), hogy POP3-fióknál csak a Beérkezett listázódik,
+    és több szolgáltatónál is így van. Így is van, és NEM a mi hibánk: a POP3
+    protokoll nem ismeri a mappákat, csak EGY postaláda van benne. Az Elküldött,
+    a Piszkozatok és a Kuka IMAP-fogalmak.
+
+    A hiba az volt, hogy ezt a program nem MONDTA – a felhasználó pedig több
+    szolgáltatót végigpróbált, hátha nálunk van a baj. Ez a szöveg ezt zárja le.
+    """
+    imap = (fiok or {}).get("imap_host") or ""
+    alap = ("Ennél a fióknál POP3 van beállítva, a POP3 pedig nem ismeri a "
+            "mappákat: a szolgáltatónál egyetlen postaláda van, a Beérkezett. "
+            "Az Elküldött, a Piszkozatok és a Kuka IMAP-fogalmak. Ez nem hiba, "
+            "és nem is a szolgáltatódon múlik.")
+    if imap:
+        return (alap + " Ha látni szeretnéd a többi mappát is, állítsd át a "
+                "fiókot IMAP-ra: Fiókok, a fiók szerkesztése, Protokoll: IMAP. "
+                "A szervert már tudjuk, ez lesz az: %s." % imap)
+    return (alap + " Ha látni szeretnéd a többi mappát is, állítsd át a fiókot "
+            "IMAP-ra a fiók szerkesztésénél – ehhez a szolgáltatód IMAP "
+            "szerverének a címe kell.")
+
+
 def prioritas_beallit(msg, szint: str) -> None:
     """A kimenő levél fontosság-fejlécei. `szint`: a PRIORITASOK kulcsa."""
     for fejlec in ("X-Priority", "Importance", "Priority", "X-MSMail-Priority"):
