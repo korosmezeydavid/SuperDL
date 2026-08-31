@@ -178,10 +178,13 @@ nem volt latest-csapda. `modules.json` frissítve és pusholva (új eszközzel, 
 forrás pusholva: `b077b04` (4.5.5-kör) és `ce122a8` (mail 1.2.4).
 Kulcs-szken a feltöltés előtt **TISZTA** (909 fájl, a három binárissal együtt).
 
-**HÍRLEVÉL MEGÍRVA, MÉG NEM MENT KI:** `C:\Users\msn\Documents\superdllistara-4.5.5.txt`
-(a 3.29.11 → 4.5.5 út: 7 új modul, offline fordítás, teljes mentés, saját szintetizátor,
-F1-súgó, audit, és a két friss javítás). ⚠️ A régi `superdllistara.txt` **érintetlen** –
-abban az iPhone-modul hírlevele van, ami szintén nem ment ki.
+**HÍRLEVÉL MEGÍRVA:** `C:\Users\msn\Documents\superdllistara.txt` (a szokott néven és
+helyen, 212 sor) – a 3.29.11 → 4.5.5 út: 7 új modul, offline fordítás, teljes mentés,
+saját szintetizátor, F1-súgó, audit, és a két friss javítás.
+ℹ️ **Tisztázva (Dávid, 2026-08-30):** a hírlevelek KIMENNEK, csak nem mindig kapok róla
+visszajelzést – tehát a korábbi „még nem ment ki" bejegyzések félrevezetők voltak. Az
+iPhone-hírlevél is kiment; a mostani ezért csak utal rá, nem meséli újra. A fájlt szabad
+felülírni, nem archívum.
 
 ---
 
@@ -407,9 +410,9 @@ Válaszlevél megírva: `C:\Users\msn\Documents\zsiganak.txt`. Kód NEM módosul
    alapértelmezett fordító kiválasztása, hogy ne kelljen levelenként újraválasztani.
 
 ### HÁTRA / NYITOTT
-- **Hírlevél**: MEGÍRVA (`superdllistara-4.5.5.txt`), de **még nem ment ki** a listákra.
-  A régi `superdllistara.txt` (iPhone-modul) szintén kiküldetlen – eldöntendő, hogy az
-  külön megy-e, vagy beleolvad.
+- **Hírlevél**: MEGÍRVA, `C:\Users\msn\Documents\superdllistara.txt`. A kiküldés Dávidnál
+  van; a hírlevelek ki szoktak menni, csak nem mindig kapunk róla visszajelzést, ezért
+  ide NE írjunk többé „nem ment ki"-t, ha nem tudjuk biztosan.
 - **Válaszlevél Lacinak** a tévéújság-hibáról (a `lacinak.txt` mintájára).
 - **A 23 holt `_<modul>_win` takarítás** kitakarítása, modulonként, alkalomadtán.
 - `tools/brailab_hangolas/` követetlen a gitben – eldönteni: commit vagy `.gitignore`.
