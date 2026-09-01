@@ -1,0 +1,7 @@
+{
+  "megjegyzes": "A SuperDL mobil legfrissebb verziója. A telefon naponta kétszer ránéz erre a fájlra, és szól, ha újabb van. Kiadáskor EZT a fájlt kell frissíteni.",
+  "verzio": "1.56.0",
+  "letoltes": "https://github.com/korosmezeydavid/SuperDL-Android/releases/latest/download/SuperDL.apk",
+  "kiadva": "2026-09-01",
+  "ujdonsagok": "Beállítás varázsló friss telepítéshez: végigvezet minden engedélyen, és minden lépés előtt elmondja, mire kell. A rádió- és diktafon-felvételek a Felvételek mappába kerülnek, ahol a fájlkezelő és a számítógép is látja őket. Fájlkezelő: csoportos kijelölés, törlés, mozgatás, mappa-műveletek. Névjegyzék beállítások, mentés és visszatöltés. Könyv, zeneszám és kedvenc rádió törlése. Javítva egy összeomlás a podcast importálásnál, és a podcast lista meg keresés."
+}
