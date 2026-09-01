@@ -162,6 +162,44 @@ nyers bájtként keresi a fájlokban.)
 
 ---
 
+### 🔨 LETÖLTŐ-MOTOR MK2 – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-08-31)
+
+**A letöltés túléli a kapcsolatkimaradást.** Eddig ha elment a net, a letöltés „hiba"
+lett és ott ragadt. **A hiba és a várakozás nem ugyanaz:** a „hiba" azt üzeni, hogy
+TENNED KELL valamit; a „várakozik a hálózatra" azt, hogy nem kell.
+
+- **Új állapot: `DownloadManager.HALOZATRA_VAR`** („várakozik a hálózatra"). Benne van a
+  `RESUMABLE`-ben → mentődik és újraindítás után is folytatódik; a GUI „aktív vagy
+  várakozó" számlálója is számolja; a per-elem hibabemondás NEM sül el rá (az csak
+  kész/hiba/seedelés esetén szól), tehát nincs hamis hibajelzés.
+- **A besorolás KÉT feltételes, és ez szándékos.** `halozati_eredetu(uzenet)` =
+  `netcheck.looks_like_offline(uzenet)` **ÉS** tényleges mérés (`online(force=True)`).
+  A szövegfelismerés önmagában kevés: a minták közt ott az „ssl" és a „timeout" is, amit
+  egy lassú szerver is kivált, miközben a net tökéletes. Ilyenkor HIBÁT kell mondani,
+  különben a felhasználó a végtelenségig várna valamire, ami nem jön el.
+- **A figyelő (`_halozat_tick`)** csak akkor mér, ha van várakozó elem (ne nyitogassunk
+  TCP-t feleslegesen); az offline jelzés EGYSZER szól; 10 másodpercenként néz rá;
+  visszatéréskor egy mondat, majd minden várakozó elem újraindul. **A folytatás magukban
+  a letöltőkben van** (`.sdlstate`, aria2 vezérlőfájl, `.part`) – nekünk csak újra kell
+  indítani őket (közös `_ujraindit()` az újrapróbával).
+- **A jelzés megnyugtat, nem ijeszt:** „…3 letöltés várakozik. **Nem kell tenned semmit:**
+  amint visszajön a net, magától folytatódnak."
+- **A két gépezet nem lép egymásra:** az újrapróba csak „hiba"-ra fut, a hálózatfigyelő
+  csak a várakozókra.
+
+**Ellenőrizve:** **1561 pytest zöld**; új teszt `tests\test_halozat_visszateres.py`
+(15 eset, köztük két végponttól végpontig futó a `_run_job` besorolására).
+compileall tiszta, attr_audit 0, kulcs-szken tiszta. Commit: `9fa8e3c`.
+
+**HÁTRA (MK4 maradéka, külön kör):** a szegmentált és a yt-dlp motor SAJÁT belső
+újrapróbáit (5 exponenciális, illetve 5+5) egységesíteni a közös politikára, és a próbák
+számát megmutatni a sorban. **Most szándékosan nem nyúltam hozzá:** a job-szintű
+újrapróba ráhúzása duplázna, mert azok a motorok belül már próbálkoznak — a hálózati
+esetet pedig ez a kör lefedi.
+**ÉLESBEN MÉG NEM MÉRVE:** WiFi kikapcsolása letöltés közben, majd visszakapcsolás.
+
+---
+
 ### 🔨 LETÖLTŐ-MOTOR MK1 + MK4 + MK8-részlet – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-08-31)
 
 **Cél (MK1):** ha egy torrent le- vagy feltöltése nem lett kitörölve, a program indításkor
