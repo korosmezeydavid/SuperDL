@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from itertools import count
 
+from . import netcheck
 from . import retrypolicy
 from . import store
 from .media import MediaDownloader, is_media_url
@@ -98,9 +99,16 @@ class DownloadManager:
     """Egyszerre legfeljebb `parallel` letöltés fut, mindegyik
     `connections` kapcsolattal."""
 
+    # MK2: nem „hiba", hanem VÁRAKOZÁS. A kettő különbsége vakon a legnagyobb:
+    # a „hiba" azt jelenti, hogy tenned kell valamit; ez azt, hogy nem kell.
+    HALOZATRA_VAR = "várakozik a hálózatra"
+    # milyen sűrűn nézzük, visszajött-e a net (a netcheck maga is gyorsítótáraz)
+    HALO_ELLENORZES_SEC = 10
+
     # ezekben az állapotokban érdemes a sort menteni / újraindításkor folytatni
     # a hibára futott letöltéseket NEM ajánljuk fel folytatásra (értelmetlen)
-    RESUMABLE = ("várakozik", "ütemezve", "letöltés", "leállítva")
+    RESUMABLE = ("várakozik", "ütemezve", "letöltés", "leállítva",
+                 HALOZATRA_VAR)
 
     def __init__(self, out_dir: str, parallel: int = 3, connections: int = 8,
                  audio_only: bool = False, limit_bps: int = 0,
@@ -127,6 +135,9 @@ class DownloadManager:
         self.persist = persist
         # a felület ide köthet be egy felolvasó visszahívást (újrapróba-jelzés)
         self.on_notice = None
+        # MK2: hálózatfigyelő állapota
+        self._halo_offline = False
+        self._halo_ellenorizve = 0.0
         # közös korlát: az összes letöltés együtt sem lépi túl
         self.limiter = RateLimiter(limit_bps)
         self.pool = ThreadPoolExecutor(max_workers=parallel)
@@ -215,14 +226,27 @@ class DownloadManager:
                     progress=job.progress, limiter=self.limiter)
             job.downloader.run()
         except Exception as exc:
-            # a letöltők többsége már beállítja a job.progress.error mezőt, de
-            # ha NEM (pl. már a letöltő-objektum létrehozása elszállt), itt
-            # gondoskodunk róla, hogy a hiba látszódjon és NAPLÓZÓDJON
-            if job.progress.status not in ("hiba", "leállítva"):
-                job.progress.status = "hiba"
-                if not job.progress.error:
-                    job.progress.error = str(exc)
-            _log.exception("Letöltési feladat hibája: %s", job.url)
+            uzenet = job.progress.error or str(exc)
+            if (job.progress.status != "leállítva"
+                    and self.halozati_eredetu(uzenet)):
+                # MK2: NEM hiba, hanem VÁRAKOZÁS. Ha elment a net, a felhasználó
+                # nem tud mit tenni – és ha „hibát" mondunk, azzal azt üzenjük,
+                # hogy tennie kellene. Vakon ez a legrosszabb: a program megáll,
+                # semmi nem szól érte, és órákkal később derül ki, hogy nem
+                # történt semmi. A hálózatfigyelő innen veszi át.
+                job.progress.status = self.HALOZATRA_VAR
+                job.progress.error = ""
+                job.next_retry_at = None
+                _log.info("Hálózat-kimaradás, várakozás: %s", job.url)
+            else:
+                # a letöltők többsége már beállítja a job.progress.error mezőt, de
+                # ha NEM (pl. már a letöltő-objektum létrehozása elszállt), itt
+                # gondoskodunk róla, hogy a hiba látszódjon és NAPLÓZÓDJON
+                if job.progress.status not in ("hiba", "leállítva"):
+                    job.progress.status = "hiba"
+                    if not job.progress.error:
+                        job.progress.error = str(exc)
+                _log.exception("Letöltési feladat hibája: %s", job.url)
         finally:
             self._save()
 
@@ -238,10 +262,66 @@ class DownloadManager:
                     job.progress.status = "várakozik"
                     self._launch(job)
                 self._retry_tick(job, now)
+            self._halozat_tick(now)
             if self._allow_autosave and now - last_save >= 3:
                 last_save = now
                 self._save()
             time.sleep(1)
+
+    # ---- MK2: hálózat-visszatérés -------------------------------------
+
+    @staticmethod
+    def halozati_eredetu(uzenet: str) -> bool:
+        """Hálózat-kimaradás okozta-e a hibát?
+
+        KÉT feltétel, és mindkettő kell. A hibaszöveg felismerése önmagában
+        kevés: a `looks_like_offline` mintái közt ott az „ssl" és a „timeout"
+        is, amit egy lassú vagy rosszul beállított szerver is kiválthat úgy,
+        hogy közben a net tökéletes. Ezért utána MEG IS MÉRJÜK. Ha van net, ez
+        valódi hiba – és akkor hibaként kell megjelennie, nem várakozásként,
+        különben a felhasználó a végtelenségig várna valamire, ami nem jön el.
+        """
+        if not netcheck.looks_like_offline(uzenet):
+            return False
+        return not netcheck.online(force=True)
+
+    @staticmethod
+    def halozat_elment_uzenet(db: int) -> str:
+        return ("Megszakadt az internetkapcsolat, %d letöltés várakozik. "
+                "Nem kell tenned semmit: amint visszajön a net, magától "
+                "folytatódnak." % db)
+
+    HALOZAT_VISSZAJOTT = "Visszatért a kapcsolat, a letöltések folytatódnak."
+
+    def _halozat_tick(self, now: float) -> None:
+        varok = [j for j in self.jobs
+                 if j.progress.status == self.HALOZATRA_VAR]
+        if not varok:
+            self._halo_offline = False
+            return
+        if not self._halo_offline:
+            self._halo_offline = True
+            self._jelez(self.halozat_elment_uzenet(len(varok)), varok[0])
+        if now - self._halo_ellenorizve < self.HALO_ELLENORZES_SEC:
+            return
+        self._halo_ellenorizve = now
+        if not netcheck.online():
+            return
+        self._halo_offline = False
+        self._jelez(self.HALOZAT_VISSZAJOTT, varok[0])
+        for job in varok:
+            # a folytatás magukban a letöltőkben van: a szegmentált fájl a
+            # .sdlstate-ből, a torrent az aria2 vezérlőfájlból, a yt-dlp a
+            # .part-ból folytatódik – nekünk csak újra kell indítani őket
+            self._ujraindit(job)
+
+    def _ujraindit(self, job: Job) -> None:
+        """Egy job újraindítása a helyéről (újrapróba és hálózat-visszatérés)."""
+        job.downloader = None
+        job.submitted = False
+        job.progress.error = ""
+        job.progress.status = "várakozik"
+        self._launch(job)
 
     def _retry_tick(self, job: Job, now: float) -> None:
         """Újrapróba növekvő szünetekkel (MK1 döntés + MK4 közös politika).
@@ -269,11 +349,7 @@ class DownloadManager:
             return
         job.retries += 1
         job.next_retry_at = None
-        job.downloader = None
-        job.submitted = False
-        job.progress.error = ""
-        job.progress.status = "várakozik"
-        self._launch(job)
+        self._ujraindit(job)
 
     def _jelez(self, szoveg: str, job: Job) -> None:
         """Felolvasandó jelzés a felületnek. A kezelő nem ismeri a wx-et, ezért

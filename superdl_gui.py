@@ -1811,8 +1811,9 @@ class MainFrame(wx.Frame):
         active = 0
         if self.mgr:
             active = sum(1 for j in self.mgr.jobs
-                         if j.progress.status in ("letöltés", "seedelés",
-                                                  "várakozik", "ütemezve"))
+                         if j.progress.status in (
+                             "letöltés", "seedelés", "várakozik", "ütemezve",
+                             DownloadManager.HALOZATRA_VAR))
         msg = (f"{active} aktív vagy várakozó letöltés van."
                if active else "Jelenleg nincs aktív letöltés.")
         wx.CallLater(2600, lambda: self.speaker.speak(msg)
