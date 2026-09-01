@@ -1,7 +1,7 @@
 {
   "megjegyzes": "A SuperDL mobil legfrissebb verziója. A telefon naponta kétszer ránéz erre a fájlra, és szól, ha újabb van. Kiadáskor EZT a fájlt kell frissíteni.",
-  "verzio": "1.56.0",
+  "verzio": "1.57.0",
   "letoltes": "https://github.com/korosmezeydavid/SuperDL-Android/releases/latest/download/SuperDL.apk",
   "kiadva": "2026-09-01",
-  "ujdonsagok": "Beállítás varázsló friss telepítéshez: végigvezet minden engedélyen, és minden lépés előtt elmondja, mire kell. A rádió- és diktafon-felvételek a Felvételek mappába kerülnek, ahol a fájlkezelő és a számítógép is látja őket. Fájlkezelő: csoportos kijelölés, törlés, mozgatás, mappa-műveletek. Névjegyzék beállítások, mentés és visszatöltés. Könyv, zeneszám és kedvenc rádió törlése. Javítva egy összeomlás a podcast importálásnál, és a podcast lista meg keresés."
+  "ujdonsagok": "FONTOS JAVÍTÁS: az S.O.S. eddig el tudta vágni azt a hívást, ami sikerült, mert nem nézte, felvették-e. Ha az S.O.S.-re számítasz, frissíts. Új: az S.O.S. mostantól azonnal SMS-t küld a helyzeteddel mind a négy számra, kattintható térkép-linkkel, akkor is, ha felveszik a hívást. Két kör után a 112 következik. Új: felület elforgatása a beállításokban, azoknak, akik balra-jobbra söprögetnek fel-le helyett. Mindenhol érvényes, a képernyőolvasóban is. Továbbá: a varázsló billentyűzet-lépése javítva, fájlkezelő átnevezés, rádió időzített felvétel."
 }
