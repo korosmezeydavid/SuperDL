@@ -146,9 +146,17 @@ class SettingsDialog(wx.Dialog):
             next((i for i, (_, val) in enumerate(SAMPLERATES) if val == cur_sr),
                  0))
         self._row(p, v, "&Mintavétel (kHz):", self.c_asr)
+        self.c_seedfor = wx.CheckBox(
+            p, label="A kész torrent &kézi leállításig ossza meg "
+                     "(ilyenkor a seed-arány nem számít)")
+        self.c_seedfor.SetValue(bool(self.s.get("seed_forever", True)))
+        v.Add(self.c_seedfor, 0, wx.ALL, 10)
         self.c_seed = wx.TextCtrl(p, value=str(self.s.get("seed_ratio", "1.0")))
         self._row(p, v, "Seed-&arány (torrent):", self.c_seed,
                   name="Torrent megosztási arány")
+        self.c_uplimit = wx.TextCtrl(p, value=str(self.s.get("upload_limit", "")))
+        self._row(p, v, "&Feltöltési sávkorlát (pl. 500K, 2M; üres = nincs):",
+                  self.c_uplimit, name="Feltöltési sávkorlát")
         self.c_playlist = wx.CheckBox(p, label="Lejátszási &lista külön, "
                                       "sorszámozott mappába")
         self.c_playlist.SetValue(bool(self.s.get("playlist_folders", True)))
@@ -529,6 +537,8 @@ class SettingsDialog(wx.Dialog):
                                   if self.c_rrsplit.GetSelection() == 1 else 0),
             },
             "seed_ratio": self.c_seed.GetValue().strip() or "1.0",
+            "seed_forever": self.c_seedfor.GetValue(),
+            "upload_limit": self.c_uplimit.GetValue().strip(),
             "playlist_folders": self.c_playlist.GetValue(),
             "cookies": self.c_cookies.GetStringSelection() or "Nincs",
             "cookies_file": self.cookies_file or "",

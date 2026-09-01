@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from itertools import count
 
+from . import retrypolicy
 from . import store
 from .media import MediaDownloader, is_media_url
 from .segment import Progress, RateLimiter, SegmentDownloader
@@ -74,13 +75,23 @@ class Job:
     submitted: bool = False        # már elindítottuk-e
     overwrite: bool = False         # torrent: meglévő fájl felülírása
     verify: bool = False            # torrent: meglévő fájl ellenőrzése + seed
+    # A FELHASZNÁLÓ állította-e le (MK1). Ezt SOHA nem a státuszszóból
+    # következtetjük vissza: a kilépéskori stop_all() ugyanúgy „leállítva"-t
+    # ír, mint a kézi leállítás, és a kettőnek ELLENTÉTES a jelentése.
+    # Enélkül a torrent vagy sosem folytatódik, vagy a kézzel leállított
+    # indul el magától – és nincs az az állapotszó, amiből ez kiderülne.
+    user_stopped: bool = False
+    # újrapróba (MK4): hány sikertelen próba volt, és mikor jöhet a következő
+    retries: int = 0
+    next_retry_at: float | None = None
 
     def to_record(self) -> dict:
         return {"url": self.url, "kind": self.kind, "out_dir": self.out_dir,
                 "audio_only": self.audio_only, "start_at": self.start_at,
                 "status": self.progress.status,
                 "filename": self.progress.filename,
-                "overwrite": self.overwrite, "verify": self.verify}
+                "overwrite": self.overwrite, "verify": self.verify,
+                "user_stopped": self.user_stopped}
 
 
 class DownloadManager:
@@ -94,6 +105,7 @@ class DownloadManager:
     def __init__(self, out_dir: str, parallel: int = 3, connections: int = 8,
                  audio_only: bool = False, limit_bps: int = 0,
                  seed_ratio: float = 1.0, persist: bool = True,
+                 seed_forever: bool = True, upload_limit_bps: int = 0,
                  audio_format: str = "mp3", video_format: str | None = None,
                  audio_bitrate: str = "192", audio_samplerate: str = "",
                  cookies_browser: str | None = None,
@@ -110,7 +122,11 @@ class DownloadManager:
         self.cookies_file = cookies_file
         self.playlist_folders = playlist_folders
         self.seed_ratio = seed_ratio
+        self.seed_forever = seed_forever
+        self.upload_limit_bps = upload_limit_bps
         self.persist = persist
+        # a felület ide köthet be egy felolvasó visszahívást (újrapróba-jelzés)
+        self.on_notice = None
         # közös korlát: az összes letöltés együtt sem lépi túl
         self.limiter = RateLimiter(limit_bps)
         self.pool = ThreadPoolExecutor(max_workers=parallel)
@@ -178,7 +194,9 @@ class DownloadManager:
                 job.downloader = TorrentDownloader(
                     job.url, out_dir, progress=job.progress,
                     seed_ratio=self.seed_ratio, limit_bps=self.limiter.bps,
-                    allow_overwrite=job.overwrite, check_integrity=job.verify)
+                    allow_overwrite=job.overwrite, check_integrity=job.verify,
+                    seed_forever=self.seed_forever,
+                    upload_limit_bps=self.upload_limit_bps)
             elif job.kind == "media":
                 job.downloader = MediaDownloader(
                     job.url, out_dir, connections=self.connections,
@@ -219,18 +237,72 @@ class DownloadManager:
                         and job.start_at and job.start_at <= now):
                     job.progress.status = "várakozik"
                     self._launch(job)
+                self._retry_tick(job, now)
             if self._allow_autosave and now - last_save >= 3:
                 last_save = now
                 self._save()
             time.sleep(1)
 
+    def _retry_tick(self, job: Job, now: float) -> None:
+        """Újrapróba növekvő szünetekkel (MK1 döntés + MK4 közös politika).
+
+        A hibára futott TORRENT a sorban marad, és magától újrapróbálkozik
+        1, 2, 5, 10 perc, majd 15 percenként. Miért épp a torrentnél a
+        legfontosabb: a torrent órákig-napokig fut, tehát biztosan „átalussza"
+        a hálózat megbicsaklását – és vakon ezt a legnehezebb észrevenni,
+        mert semmi nem szól érte.
+
+        A kézzel leállított elem SOHA nem próbálkozik újra (`user_stopped`).
+        """
+        if job.kind != "torrent" or job.user_stopped:
+            return
+        if job.progress.status != "hiba":
+            return
+        if job.progress.conflict:
+            return          # a „fájl már létezik" DÖNTÉST vár, nem újrapróbát
+        if job.next_retry_at is None:
+            job.next_retry_at = now + retrypolicy.szunet(job.retries)
+            self._jelez(retrypolicy.uzenet(
+                job.retries, int(job.next_retry_at - now)), job)
+            return
+        if now < job.next_retry_at:
+            return
+        job.retries += 1
+        job.next_retry_at = None
+        job.downloader = None
+        job.submitted = False
+        job.progress.error = ""
+        job.progress.status = "várakozik"
+        self._launch(job)
+
+    def _jelez(self, szoveg: str, job: Job) -> None:
+        """Felolvasandó jelzés a felületnek. A kezelő nem ismeri a wx-et, ezért
+        csak egy visszahívást hív, ha a felület beállított egyet."""
+        if not szoveg:
+            return
+        cb = getattr(self, "on_notice", None)
+        if cb is None:
+            return
+        try:
+            cb(szoveg, job)
+        except Exception:
+            _log.exception("a jelzés-visszahívás hibája")
+
     def _persistable(self, job: Job) -> bool:
-        """Elmentendő-e a sorba? A folytatható állapotok igen; a torrentnél a
-        seedelés is. A KÉSZ és HIBA elemeket (a torrenteket is) NEM mentjük,
-        hogy újraindításkor ne kerüljenek vissza és ne induljanak el feleslegesen."""
-        if job.progress.status in self.RESUMABLE:
+        """Elmentendő-e a sorba?
+
+        A folytatható állapotok igen. A TORRENT viszont MINDIG marad – „hiba"
+        és „kész" állapotban is –, mert:
+          * a hibára futott torrent eddig nyomtalanul eltűnt a sorból egy
+            hálózatkimaradás után (MK1 4. pont), pedig épp ilyenkor kellene
+            magától újrapróbálkoznia;
+          * a készre töltött torrent a döntés szerint KÉZI LEÁLLÍTÁSIG seedel,
+            tehát nem szabad eldobni.
+        A torrentet CSAK a törlés veszi ki a sorból.
+        """
+        if job.kind == "torrent":
             return True
-        return job.kind == "torrent" and job.progress.status == "seedelés"
+        return job.progress.status in self.RESUMABLE
 
     def _save(self) -> None:
         if not self.persist or not self._allow_autosave:
@@ -253,21 +325,42 @@ class DownloadManager:
             if not url:
                 continue
             status = r.get("status", "")
-            # a már befejezett vagy hibára futott elemeket egyáltalán nem
-            # töltjük vissza az aktív sorba
-            if status in ("kész", "hiba"):
+            kind = r.get("kind")
+            user_stopped = bool(r.get("user_stopped", False))
+            # A már befejezett vagy hibára futott elemeket nem töltjük vissza –
+            # DE A TORRENTET IGEN. FIGYELEM: ez a szűrő a `_persistable()`
+            # TESTVÉRE; ha csak az egyiket javítjuk, a mentés megtörténik, a
+            # visszatöltés viszont némán eldobja – vagyis a teszt zöld, a
+            # felhasználónál mégsem működik. Mindkét helyen javítani kell.
+            if kind != "torrent" and status in ("kész", "hiba"):
                 continue
-            # a leállított elemeket NEM indítjuk újra magától (autostart=False);
-            # a többi (letöltés/várakozik) folytatható, az ütemezett az idejére vár
-            autostart = status != "leállítva"
+            if kind == "torrent":
+                # MK1: a torrent akkor és CSAK akkor nem indul magától, ha a
+                # FELHASZNÁLÓ állította le. A „leállítva" státusz önmagában
+                # semmit nem jelent: a kilépéskori stop_all() is azt írja be.
+                autostart = not user_stopped
+                if status == "kész" and not self.seed_forever:
+                    # A „kész" itt azt jelenti, hogy a MEGOSZTÁSI ARÁNY is
+                    # teljesült – a felhasználó pedig épp azt kérte, hogy addig
+                    # seedeljen, ne tovább. Ilyenkor a sorban marad (látja és
+                    # kézzel újraindíthatja), de magától NEM kezd újra seedelni.
+                    # Enélkül minden programindítás újraindítaná a megosztást,
+                    # szemben a beállításával.
+                    autostart = False
+            else:
+                # a leállított elemeket NEM indítjuk újra magától; a többi
+                # (letöltés/várakozik) folytatható, az ütemezett az idejére vár
+                autostart = status != "leállítva"
             # SEEDELŐ torrent: az adat már kész a lemezen, de a .aria2 vezérlő-
             # fájl a befejezéskor eltűnt. Újra hozzáadva az aria2 „a fájl már
             # létezik"-et dobna, és a seedelés némán megszakadna – ami akár
             # tracker-kizárást is okozhat. Ezért induláskor AUTOMATIKUSAN
             # ellenőrzés+seed (verify) módban tesszük vissza: az aria2 leellenőrzi
             # a meglévő fájlt és MAGÁTÓL folytatja a seedelést, kérdés nélkül.
+            # A „kész" is ide tartozik: a készre töltött torrent adata megvan a
+            # lemezen, vezérlőfájl nélkül – ugyanaz a helyzet, mint a seedelőnél.
             verify = bool(r.get("verify", False)) or (
-                r.get("kind") == "torrent" and status == "seedelés")
+                kind == "torrent" and status in ("seedelés", "kész"))
             job = self.add(
                 url, kind=r.get("kind"), out_dir=r.get("out_dir"),
                 audio_only=r.get("audio_only"),
@@ -275,23 +368,71 @@ class DownloadManager:
                 overwrite=bool(r.get("overwrite", False)),
                 verify=verify,
                 autostart=autostart)
+            job.user_stopped = user_stopped
             if r.get("filename"):
                 job.progress.filename = r["filename"]
             restored.append(job)
         return restored
 
+    def resume_summary(self, restored: list[Job]) -> str:
+        """Egy MONDAT a folytatott torrentekről – nem kérdés, közlés.
+
+        A torrentet nem kérdezzük meg, csak elmondjuk: „2 torrent folytatódik:
+        1 letöltés, 1 megosztás." Vakon egy lista végigléptetése ehhez sok."""
+        torrentek = [j for j in restored if j.kind == "torrent"]
+        if not torrentek:
+            return ""
+        megoszt = sum(1 for j in torrentek
+                      if j.progress.status in ("seedelés", "kész")
+                      or j.verify)
+        tolt = len(torrentek) - megoszt
+        reszek = []
+        if tolt:
+            reszek.append("%d letöltés" % tolt)
+        if megoszt:
+            reszek.append("%d megosztás" % megoszt)
+        return "%d torrent folytatódik: %s." % (len(torrentek),
+                                                ", ".join(reszek))
+
     # ---- vezérlés -----------------------------------------------------
 
-    def stop(self, job: Job) -> None:
+    def stop(self, job: Job, felhasznaloi: bool = True) -> None:
+        """Leállítás. `felhasznaloi=True` = a FELHASZNÁLÓ akarta.
+
+        A kettő közti különbség az MK1 lényege: a kilépéskori leállítás nem
+        szándék, hanem takarítás. A szándékot NEM a státuszszóból olvassuk
+        vissza – az mindkét esetben „leállítva" lesz –, hanem itt jegyezzük fel.
+        """
+        if felhasznaloi:
+            job.user_stopped = True
+            job.next_retry_at = None        # kézi leállítás: nincs újrapróba
         if job.downloader is not None:
             job.downloader.stop()
         elif job.progress.status in ("várakozik", "ütemezve"):
             job.progress.status = "leállítva"
         self._save()
 
-    def stop_all(self) -> None:
+    def stop_all(self, felhasznaloi: bool = True) -> None:
+        """`felhasznaloi=False`: kilépéskori takarítás (lásd `stop`)."""
         for job in self.jobs:
-            self.stop(job)
+            self.stop(job, felhasznaloi=felhasznaloi)
+
+    def start(self, job: Job) -> None:
+        """Kézi (újra)indítás. Ez a `stop()` párja: visszavonja a felhasználói
+        leállítást, és nullázza az újrapróba-számlálót.
+
+        Enélkül a kézzel leállított torrent VÉGLEG leállt volna: a `user_stopped`
+        örökre igaz marad, és a `restore()` sosem indítaná el többé."""
+        job.user_stopped = False
+        job.retries = 0
+        job.next_retry_at = None
+        job.downloader = None
+        job.submitted = False
+        p = job.progress
+        p.error = ""
+        p.status = "várakozik"
+        self._launch(job)
+        self._save()
 
     def remove(self, job: Job) -> None:
         """Eltávolítja a sorból (leállítja, ha fut)."""

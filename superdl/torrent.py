@@ -255,12 +255,21 @@ def _is_exists_conflict(msg: str) -> bool:
 class TorrentDownloader:
     def __init__(self, url: str, out_dir: str, progress: Progress | None = None,
                  seed_ratio: float = 1.0, limit_bps: int = 0,
-                 allow_overwrite: bool = False, check_integrity: bool = False):
+                 allow_overwrite: bool = False, check_integrity: bool = False,
+                 seed_forever: bool = False, upload_limit_bps: int = 0):
         self.url = url
         self.out_dir = str(Path(out_dir).resolve())
         self.progress = progress or Progress()
         self.seed_ratio = max(0.0, seed_ratio)
+        # ÖRÖK SEEDELÉS kézi leállításig (MK1 döntés, 2026-08-30).
+        # FIGYELEM, ITT EGY CSAPDA VAN: az aria2-nél a `seed-ratio=0.0`
+        # ÖRÖK seedelést jelent, a mi kódunkban viszont a `seed_ratio == 0`
+        # eddig azt jelentette, hogy EGYÁLTALÁN NE seedeljen (ezért tettünk
+        # mellé `seed-time=0`-t). A két jelentés pont egymás ellentéte, ezért
+        # kell külön kapcsoló – a 0 értéket nem szabad túlterhelni.
+        self.seed_forever = seed_forever
         self.limit_bps = limit_bps
+        self.upload_limit_bps = upload_limit_bps
         self.allow_overwrite = allow_overwrite  # meglévő fájl felülírása
         self.check_integrity = check_integrity  # meglévő fájl ellenőrzése+seed
         self._stop = threading.Event()
@@ -270,14 +279,31 @@ class TorrentDownloader:
     def stop(self) -> None:
         self._stop.set()
 
-    def _add(self) -> str:
-        opts = {"dir": self.out_dir,
-                "seed-ratio": str(self.seed_ratio),
-                "bt-max-peers": "120"}
-        if self.seed_ratio == 0:
-            opts["seed-time"] = "0"
+    def aria2_opciok(self) -> dict:
+        """A seedelés/sávkorlát aria2-opciói – KÜLÖN, hogy tesztelhető legyen
+        aria2 és hálózat nélkül (ez a rész könnyen elromlik némán)."""
+        opts = {"dir": self.out_dir, "bt-max-peers": "120"}
+        if self.seed_forever:
+            # az aria2-nél a 0.0 arány = ÖRÖKKÉ; seed-time NEM kerül mellé,
+            # így csak a kézi leállítás (aria2.remove) állítja meg
+            opts["seed-ratio"] = "0.0"
+        else:
+            opts["seed-ratio"] = str(self.seed_ratio)
+            if self.seed_ratio == 0:
+                # a mi jelentésünk: EGYÁLTALÁN ne seedeljen
+                opts["seed-time"] = "0"
         if self.limit_bps:
             opts["max-download-limit"] = str(self.limit_bps)
+        if self.upload_limit_bps:
+            # MK8: eddig CSAK letöltési korlát volt. Seedelés közben a torrent
+            # megehette a teljes feltöltési sávot, amitől minden más belassul –
+            # a saját letöltéseidet is beleértve, mert a nyugtázó csomagok is
+            # ezen a sávon mennek. Ez néhány sor, és nagyot javít.
+            opts["max-upload-limit"] = str(self.upload_limit_bps)
+        return opts
+
+    def _add(self) -> str:
+        opts = self.aria2_opciok()
         if self.allow_overwrite:
             opts["allow-overwrite"] = "true"
         if self.check_integrity:

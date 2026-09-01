@@ -158,7 +158,70 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-08-30 (késő este) · dolgozott: Claude
+**Utolsó frissítés:** 2026-08-31 · dolgozott: Claude
+
+---
+
+### 🔨 LETÖLTŐ-MOTOR MK1 + MK4 + MK8-részlet – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-08-31)
+
+**Cél (MK1):** ha egy torrent le- vagy feltöltése nem lett kitörölve, a program indításkor
+NE kérdezzen – folytassa, vagy végezze a seed-kötelezettséget, **kézi leállításig**.
+
+**Lemez-ellenőrzés előbb:** a terv mind a négy akadási pontja igazolódott (a W0-val
+ellentétben itt nem tévedett a terv). **Egy dolgot viszont a terv kihagyott**, és fél
+javítást eredményezett volna: a `restore()`-ban van egy MÁSODIK szűrő
+(`if status in ("kész","hiba"): continue`) a `_persistable()` mellett. Csak az egyiket
+javítva a mentés megtörténik, a visszatöltés viszont némán eldobja – a teszt zöld, a
+felhasználónál mégsem működik. **Mindkét helyen javítva.**
+
+**Amit a kód csinál:**
+- **Új mentett mező: `Job.user_stopped`.** A SZÁNDÉKOT nem a státuszszóból következtetjük
+  vissza – a kilépés és a kézi leállítás ugyanazt írja be, és a kettőnek ELLENTÉTES a
+  jelentése. `stop(job, felhasznaloi=True|False)`, `stop_all(felhasznaloi=…)`; a GUI
+  kilépéskor `felhasznaloi=False`-szal hív. **Ez egyben a 3. pont versenyhelyzetét is
+  megszünteti**, mert nincs mit visszakövetkeztetni a mentés pillanatában.
+- **`restore()`:** torrentnél `autostart = not user_stopped`; a „kész" torrent verify
+  módban jön vissza (vezérlőfájl nélkül az aria2 „már létezik"-et dobna).
+  **Új él, amit a terv nem fedett:** ha a felhasználó KIKAPCSOLTA az örök seedelést, a
+  „kész" azt jelenti, hogy az arány teljesült – ilyenkor a torrent a sorban marad, de
+  NEM kezd magától újra seedelni (különben minden indítás felülírná a beállítását).
+- **`_persistable()`:** a torrent MINDIG marad (hiba és kész állapotban is); csak a
+  törlés veszi ki.
+- **`_offer_resume()` kettévált:** a torrentek szó nélkül folytatódnak, csak közlés megy
+  ki (`resume_summary()`: „2 torrent folytatódik: 1 letöltés, 1 megosztás."); a kérdés
+  CSAK a nem-torrent elemekre vonatkozik, és a „nem" CSAK azokat dobja el.
+- **Új `start(job)`** – a `stop()` párja: visszavonja a felhasználói leállítást.
+  Enélkül a kézzel leállított torrent VÉGLEG leállt volna (a `user_stopped` örökre igaz).
+- **`seed_forever` külön kapcsoló (CSAPDA!):** az aria2-nél a `seed-ratio=0.0` ÖRÖK
+  seedelést jelent, a mi kódunkban a `seed_ratio == 0` eddig azt, hogy EGYÁLTALÁN NE
+  seedeljen (`seed-time=0`). A két jelentés egymás ellentéte – a 0-t nem szabad
+  túlterhelni. Az opció-építés kiemelve `TorrentDownloader.aria2_opciok()`-ba, hogy
+  aria2 és hálózat nélkül tesztelhető legyen.
+  ⚠️ **Alapértelmezés: BE** (ez a tervezőszobai döntés) – vagyis meglévő telepítéseknél
+  is megváltozik a viselkedés: a kész torrent kézi leállításig seedel. Kikapcsolható:
+  Beállítások → „A kész torrent kézi leállításig ossza meg".
+- **MK4 – közös újrapróba-politika** (`superdl/retrypolicy.py`): 1, 2, 5, 10 perc, utána
+  15 percenként; **felolvasható mondattal** („Második próbálkozás, öt perc múlva.") és
+  EMBERI idővel („negyed óra", nem „00:15:00"). A hibára futott torrent a sorban marad és
+  magától újrapróbálkozik; a kézzel leállított SOHA nem, és a „fájl már létezik" ütközés
+  sem (az DÖNTÉST vár, nem újrapróbát – különben 15 percenként ugyanabba a falba futna).
+  A jelzés a `DownloadManager.on_notice` visszahíváson át jut a felolvasóhoz (a kezelő
+  nem ismeri a wx-et). **Ebben a körben CSAK a torrentre kötve** – a másik két motor az
+  MK2/MK4 teljes körében jön.
+- **MK8-részlet: `max-upload-limit`.** Eddig CSAK letöltési korlát volt; seedelés közben
+  a torrent megehette a teljes feltöltési sávot, amitől a saját letöltéseid is
+  belassulnak. Új beállítás: „Feltöltési sávkorlát". Ez a párja az örök seedelésnek.
+- **CLI:** `--seed-ratio-hasznal` és `--upload-limit`; a `--resume` ugyanazt a
+  torrent-viselkedést és összefoglalót kapja, mint a GUI (a két felület ne térjen el).
+
+**Ellenőrizve:** **1546 pytest zöld** (a két SAPI-teszt kihagyva). Új teszt:
+`tests\test_torrent_resume_mk1.py` (28 eset). `compileall` tiszta, a CLI súgó rendben,
+a névelcsúszás-audit 0 találat, kulcs-szken TISZTA.
+
+**HÁTRA:** Core-build (ez MAG-változás: `manager.py`, `torrent.py`, `superdl_gui.py`,
+`superdl.py`), majd „publikálás". **ÉLESBEN MÉG NEM MÉRVE:** valódi torrenttel a
+kilépés → újraindítás → kérdés nélküli folytatás, és a növekvő szünetes újrapróba
+hálózat-kihúzással.
 
 ---
 

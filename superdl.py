@@ -170,6 +170,13 @@ def main() -> int:
                     help="torrent: a már létező cél fájl felülírása")
     ap.add_argument("--verify-seed", action="store_true",
                     help="torrent: a már létező fájl ellenőrzése és megosztása")
+    ap.add_argument("--seed-ratio-hasznal", action="store_true",
+                    help="torrent: a --seed-ratio szerint seedeljen, és "
+                         "álljon le, ha elérte (alapból KÉZI LEÁLLÍTÁSIG "
+                         "seedel)")
+    ap.add_argument("--upload-limit", metavar="SEBESSÉG", default="",
+                    help="feltöltési sávkorlát, pl. '500K' vagy '2M' "
+                         "(üres = nincs korlát)")
     ap.add_argument("--plain", action="store_true",
                     help="képernyőolvasó-barát kimenet: folyamatjelző sáv "
                          "helyett sima szöveges állapotsorok")
@@ -330,6 +337,8 @@ def main() -> int:
                           connections=args.connections,
                           audio_only=args.audio,
                           limit_bps=limit, seed_ratio=args.seed_ratio,
+                          seed_forever=not args.seed_ratio_hasznal,
+                          upload_limit_bps=parse_limit(args.upload_limit or "0"),
                           audio_format=args.audio_format,
                           cookies_browser=args.cookies_from_browser,
                           cookies_file=args.cookies,
@@ -339,6 +348,11 @@ def main() -> int:
     # ---- félbeszakadtak folytatása ----------------------------------
     if args.resume:
         restored = mgr.restore()
+        # a torrentek kérdés nélkül folytatódnak – a GUI-val AZONOS viselkedés,
+        # hogy a két felület ne térjen el (MK1)
+        osszefoglalo = mgr.resume_summary(restored)
+        if osszefoglalo:
+            print(osszefoglalo)
         print(f"Folytatás: {len(restored)} korábbi letöltés visszatöltve.")
 
     # ---- új podcast-epizódok letöltése ------------------------------

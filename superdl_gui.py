@@ -1016,15 +1016,24 @@ class MainFrame(wx.Frame):
                 audio_only=self.audio_chk.GetValue(),
                 limit_bps=parse_limit(s.get("limit", "") or "0"),
                 seed_ratio=self._seed_ratio(), audio_format=fmt,
+                seed_forever=bool(s.get("seed_forever", True)),
+                upload_limit_bps=parse_limit(s.get("upload_limit", "") or "0"),
                 video_format=vfmt, audio_bitrate=abr, audio_samplerate=asr,
                 cookies_browser=ck_browser, cookies_file=ck_file,
                 playlist_folders=bool(s.get("playlist_folders", True)))
+            # az újrapróba-jelzés felolvasása („Második próbálkozás, öt perc
+            # múlva.") – a kezelő nem ismeri a wx-et, ezért visszahíváson át szól
+            self.mgr.on_notice = lambda szoveg, job: wx.CallAfter(
+                self._announce, szoveg, False)
         else:
             self.mgr.out_dir = self.dir_entry.GetValue()
             self.mgr.connections = s.get("connections", 8)
             self.mgr.audio_only = self.audio_chk.GetValue()
             self.mgr.limiter.bps = parse_limit(s.get("limit", "") or "0")
             self.mgr.seed_ratio = self._seed_ratio()
+            self.mgr.seed_forever = bool(s.get("seed_forever", True))
+            self.mgr.upload_limit_bps = parse_limit(
+                s.get("upload_limit", "") or "0")
             self.mgr.audio_format = fmt
             self.mgr.video_format = vfmt
             self.mgr.audio_bitrate = abr
@@ -1342,25 +1351,56 @@ class MainFrame(wx.Frame):
     # ---- folytatás induláskor -----------------------------------------
 
     def _offer_resume(self):
+        """Induláskori folytatás – a TORRENT kivétel a kérdés alól (MK1).
+
+        Eddig egyetlen igen/nem vonatkozott MINDENRE, és a „nem" ága
+        `save_queue([])`-vel a torrenteket is kidobta. Ez két okból rossz:
+        a torrentnél a folytatás nem ízlés kérdése (a megosztási kötelezettség
+        akkor is fennáll, ha ma nem akarsz épp letölteni), és egy elejtett
+        seedelés akár tracker-kizárást is okozhat.
+
+        Mostantól: a torrentek SZÓ NÉLKÜL folytatódnak, csak közlést kapsz
+        róluk; a kérdés CSAK a nem-torrent elemekre vonatkozik, és a „nem"
+        CSAK azokat dobja el.
+        """
         from superdl import store
         saved = store.load_queue()
-        pending = [r for r in saved
-                   if r.get("url") and r.get("status") not in ("kész", "hiba")]
-        if not pending:
+        torrentek = [r for r in saved
+                     if r.get("url") and r.get("kind") == "torrent"]
+        egyeb = [r for r in saved
+                 if r.get("url") and r.get("kind") != "torrent"
+                 and r.get("status") not in ("kész", "hiba")]
+        if not torrentek and not egyeb:
             return
-        if wx.MessageBox(
-                f"{len(pending)} félbeszakadt vagy időzített letöltés található "
+
+        kerdes_ok = True
+        if egyeb:
+            kerdes_ok = wx.MessageBox(
+                f"{len(egyeb)} félbeszakadt vagy időzített letöltés található "
                 f"a legutóbbi munkamenetből.\n\nFolytatod őket?",
                 "SuperDL – folytatás", wx.YES_NO | wx.ICON_QUESTION,
-                self) != wx.YES:
-            store.save_queue([])      # elvetjük, hogy ne ajánlja fel újra
-            self._announce("A korábbi befejezetlen letöltések elvetve.")
-            return
+                self) == wx.YES
+            if not kerdes_ok:
+                # CSAK a nem-torrent elemeket vetjük el; a torrentek maradnak
+                store.save_queue(torrentek)
+                if not torrentek:
+                    self._announce("A korábbi befejezetlen letöltések elvetve.")
+
         mgr = self._ensure_mgr()
         restored = mgr.restore()
         for job in restored:
             self._row_for(job)
-        self._announce(f"{len(restored)} korábbi letöltés folytatása.")
+        uzenetek = []
+        if not kerdes_ok and torrentek:
+            uzenetek.append("A korábbi befejezetlen letöltések elvetve.")
+        osszefoglalo = mgr.resume_summary(restored)
+        if osszefoglalo:
+            uzenetek.append(osszefoglalo)
+        egyeb_db = sum(1 for j in restored if j.kind != "torrent")
+        if egyeb_db:
+            uzenetek.append(f"{egyeb_db} korábbi letöltés folytatása.")
+        if uzenetek:
+            self._announce(" ".join(uzenetek))
 
     # ---- feliratkozások -----------------------------------------------
 
@@ -2312,7 +2352,12 @@ class MainFrame(wx.Frame):
                 event.Veto()
                 return
         if self.mgr:
-            self.mgr.stop_all()
+            # KILÉPÉS, NEM FELHASZNÁLÓI LEÁLLÍTÁS (MK1). Enélkül a kilépés
+            # ugyanolyan „leállítva"-t írna, mint a kézi leállítás, és a
+            # torrentek soha többé nem indulnának el maguktól. Ez egyben a
+            # versenyhelyzetet is megszünteti: a szándékot nem a mentés
+            # pillanatában érvényes állapotszóból következtetjük vissza.
+            self.mgr.stop_all(felhasznaloi=False)
             self.mgr.close()       # elmenti a sort a folytatáshoz
         from superdl.torrent import shutdown_aria2
         shutdown_aria2()
