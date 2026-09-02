@@ -158,7 +158,46 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-08-31 · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-01 · dolgozott: Claude
+
+---
+
+### 🔨 csevej 1.6.1 – HANGERŐ – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-09-01)
+
+**DÁVID JELEZTE:** „halkan lehet hallani a másikat! microphone boost … illetve mindenki
+a saját hangerejét is tudja állítani ha halkan hallatszódik."
+
+**Három külön oka volt, és egyik sem az, hogy „kevés a hangerő".**
+
+1. **Nem volt SEMMILYEN erősítés-fokozat.** `volume`/`gain`/`hangero`: **nulla találat**
+   az egész modulban. A mikrofon jele változatlanul ment a hálózatra, a keverő nem
+   szorzott semmivel. Ha a mikrofon halk volt, **nem volt hol felhozni.**
+2. **A közép 3 dB-je.** Az egyenlő-teljesítményű panorámázás közepén `cos(45°) = 0,707`,
+   és az `ulesek()` EGY résztvevőnél középre ültet → kettesben MINDKETTEN 0,707-tel
+   szóltatok. Új `KOZEP_KOMPENZACIO = √2`.
+3. **A klipp-védelem az EGÉSZ keveréket lehúzta** (`ki /= cs` blokkonként): ha bárki –
+   akár egy pattanás – túlcsordult, arra a 20 ms-ra **mindenki** halkult, majd
+   visszaugrott. Ez **pumpált**: egy hangosabb ember folyamatosan lenyomta a halkabbat,
+   és **minél nagyobb a társaság, annál halkabb lett mindenki.** Új `_limiter_lepes()`:
+   azonnali lehúzás, fokozatos (~0,25 s) visszaengedés.
+
+⚠️ **A SORREND SZÁMÍTOTT:** a 3. pont nélkül a szabályzók **hatástalanok** lettek volna,
+mert a keverő pont annyit vesz vissza, amennyit a boost ad.
+
+**Amit a felhasználó kap:** mikrofon-erősítés (Ctrl+M, 50–800%, erősítés UTÁN **lágy**
+limiterrel – a kemény vágás recseg) · fő hangerő (Ctrl+Shift+H) · **résztvevőnkénti
+hangerő (Ctrl+G)** – ha csak EGY valakit hallasz halkan, ŐT hozod fel; **névre mentve** ·
+**„Halljam magam" (F8)** – vakon az EGYETLEN mód megtudni, mit hallanak a többiek ·
+**„Milyen a szintem?" (F9)** – kimondja, jó szinten vagy-e, ÉS azt is, mit tegyél.
+
+**DÖNTÉS:** a Windows rendszer-szintű mikrofon-boostja **most nem készül**. A fülnek
+ugyanazt adja az alkalmazáson belüli erősítés; a rendszer-boosthoz nincs meg az alapunk
+(W0: `pycaw`/WASAPI nulla találat). Ha megépül, **a W1 hangkeverővel egyszer**.
+
+**Ellenőrizve:** **1575 pytest zöld**; új teszt `tests\test_csevej_hangero.py` (14 eset).
+compileall tiszta, attr_audit 0, kulcs-szken tiszta (918 fájl).
+ZIP: `csevej-1.6.1.zip`, SHA-256 `09cf5755…46e3`. Commit `451e9a6`.
+**ÉLESBEN MÉG NEM MÉRVE:** két géppel, valódi beszélgetésben.
 
 ---
 
