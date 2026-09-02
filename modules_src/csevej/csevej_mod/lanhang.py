@@ -78,6 +78,35 @@ class HangHalozat:
     def elerheto(self) -> bool:
         return self.th.elerheto()
 
+    # ---- hangerő (a felület EGY objektummal beszél) --------------------
+    # Dávid jelzése (2026-09-01): „halkan lehet hallani a másikat". A tényleges
+    # munka a `terhang`-ban van; ezek csak átvezetések, hogy a csevejwin-nek ne
+    # kelljen a `.th`-n keresztül nyúlkálnia.
+
+    def set_mikrofon_eros(self, ertek: float) -> float:
+        return self.th.set_mikrofon_eros(ertek)
+
+    def mikrofon_eros(self) -> float:
+        return self.th.mikrofon_eros()
+
+    def mikrofon_csucs(self) -> float:
+        return self.th.mikrofon_csucs()
+
+    def set_monitor(self, ertek: bool) -> None:
+        self.th.set_monitor(ertek)
+
+    def set_hangero(self, nev: str, ertek: float) -> float:
+        return self.th.set_hangero(nev, ertek)
+
+    def hangero(self, nev: str) -> float:
+        return self.th.hangero(nev)
+
+    def set_fo_hangero(self, ertek: float) -> float:
+        return self.th.set_fo_hangero(ertek)
+
+    def fo_hangero(self) -> float:
+        return self.th.fo_hangero()
+
     # ---- bind + STUN --------------------------------------------------
     def _bind_stun(self, port: int) -> list:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

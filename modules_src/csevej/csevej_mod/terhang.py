@@ -19,6 +19,7 @@ Rétegek:
 Beszédhez 16 kHz mono bőven elég (kis sávszél), 20 ms-os kockákkal.
 """
 import collections
+import math
 import threading
 
 import numpy as np
@@ -26,6 +27,59 @@ import numpy as np
 FS = 16000              # mintavételi frekvencia (Hz) – beszédhez elég
 BLOKK = 320             # 20 ms @ 16 kHz (egy hang-kocka mérete mintában)
 _PUFFER_MAX = 25        # résztvevőnként max ennyi kocka a jitter-pufferben (~0,5 s)
+
+# ---- HANGERŐ (Dávid jelzése, 2026-09-01: „halkan lehet hallani a másikat") --
+#
+# A modulban EDDIG EGYETLEN erősítés-fokozat sem volt: a mikrofon jele
+# változatlanul ment a hálózatra, a keverő pedig nem szorzott semmivel. Ha a
+# mikrofon halk volt, nem volt hol felhozni.
+
+MIK_EROS_MIN, MIK_EROS_MAX = 0.5, 8.0      # kb. -6 … +18 dB
+HANGERO_MAX = 2.0                          # résztvevőnként és főhangerőn: 200%
+
+# A KÖZÉP-KOMPENZÁCIÓ. Az egyenlő-teljesítményű panorámázás közepén (pan 0) a
+# szorzó cos(45°) = 0,707 – vagyis 3 decibellel HALKABB, mint a szélen. És az
+# `ulesek()` EGY résztvevőnél középre ültet, tehát kettesben beszélgetve
+# MINDKETTEN 0,707-tel szóltok. Ez nem hiba, hanem a panorámázás ára; ezzel a
+# szorzóval a közép lesz az egységnyi (a szél így +3 dB, amit a limiter fog).
+KOZEP_KOMPENZACIO = math.sqrt(2.0)
+
+# A limiter visszaengedése blokkonként (20 ms). ~0,25 s időállandó: elég gyors,
+# hogy ne „ragadjon le", és elég lassú, hogy ne pumpáljon.
+_LIMIT_VISSZA = 0.08
+_LIMIT_KUSZOB = 0.7        # eddig lineáris, felette lágy térd (mikrofon)
+
+
+def lagy_limit(x: np.ndarray, kuszob: float = _LIMIT_KUSZOB) -> np.ndarray:
+    """Lágy térdű limiter: `kuszob` alatt ÉRINTETLEN, felette simán 1,0 felé
+    lapul. Kemény vágás helyett ez kell, mert az erősítés utáni kemény vágás
+    RECSEG – és torz hangot erősíteni rosszabb, mint halkat hallgatni."""
+    x = np.asarray(x, dtype=np.float32)
+    abs_x = np.abs(x)
+    tul = abs_x > kuszob
+    if not np.any(tul):
+        return x
+    ki = x.copy()
+    tartalek = 1.0 - kuszob
+    ki[tul] = np.sign(x[tul]) * (
+        kuszob + tartalek * np.tanh((abs_x[tul] - kuszob) / tartalek))
+    return ki.astype(np.float32)
+
+
+def szint_tanacs(csucs: float) -> str:
+    """Mit mondjunk a mikrofon szintjéről? Vakon szintmérőt nem lehet nézni,
+    tehát a program mondja meg – és mondja meg azt is, MIT tegyen a felhasználó."""
+    if csucs < 0.02:
+        return ("Nem hallok semmit. Ellenőrizd, hogy a megfelelő mikrofon van-e "
+                "kiválasztva, és hogy nincs-e némítva.")
+    if csucs < 0.08:
+        return "Nagyon halk vagy. Emeld a mikrofon-erősítést."
+    if csucs < 0.2:
+        return "Halk vagy, érdemes még emelni a mikrofon-erősítést."
+    if csucs <= 0.85:
+        return "A mikrofonod jó szinten van."
+    return ("Túl hangos vagy, ez már torzíthat. Vedd lejjebb a "
+            "mikrofon-erősítést, vagy ülj kicsit távolabb.")
 
 
 def _pan(mono: np.ndarray, pan: float) -> np.ndarray:
@@ -60,11 +114,40 @@ class Kevero:
     def __init__(self):
         self._pufferek: dict = {}          # nev -> deque[np.ndarray mono]
         self._pan: dict = {}               # nev -> pan (-1..+1)
+        self._hangero: dict = {}           # nev -> szorzó (0..HANGERO_MAX)
+        self._fo_hangero = 1.0             # mindenkire ható fő hangerő
+        self._limit_g = 1.0                # a limiter aktuális erősítése
         self._lock = threading.Lock()
 
     def set_ulesek(self, pan_map: dict):
         with self._lock:
             self._pan = dict(pan_map or {})
+
+    # ---- hangerő ------------------------------------------------------
+
+    def set_hangero(self, nev: str, ertek: float) -> float:
+        """EGY résztvevő hangereje (0 = néma, 1 = eredeti, 2 = kétszeres).
+
+        Ez a kérés magva: ha valaki halkan hallatszik, ŐT hozod fel, nem az
+        egészet – így a többiek nem lesznek fájdalmasan hangosak."""
+        e = float(max(0.0, min(HANGERO_MAX, ertek)))
+        with self._lock:
+            self._hangero[nev] = e
+        return e
+
+    def hangero(self, nev: str) -> float:
+        with self._lock:
+            return self._hangero.get(nev, 1.0)
+
+    def set_fo_hangero(self, ertek: float) -> float:
+        e = float(max(0.0, min(HANGERO_MAX, ertek)))
+        with self._lock:
+            self._fo_hangero = e
+        return e
+
+    def fo_hangero(self) -> float:
+        with self._lock:
+            return self._fo_hangero
 
     def add(self, nev: str, mono: np.ndarray):
         mono = np.asarray(mono, dtype=np.float32).reshape(-1)
@@ -83,6 +166,7 @@ class Kevero:
         """`n` mintányi kevert sztereó (float32, [-1,1] köré vágva)."""
         ki = np.zeros((n, 2), dtype=np.float32)
         with self._lock:
+            fo = self._fo_hangero
             for nev, dq in self._pufferek.items():
                 if not dq:
                     continue
@@ -91,12 +175,33 @@ class Kevero:
                     mono = np.pad(mono, (0, n - mono.shape[0]))
                 elif mono.shape[0] > n:
                     mono = mono[:n]
+                g = self._hangero.get(nev, 1.0) * fo * KOZEP_KOMPENZACIO
+                if g != 1.0:
+                    mono = mono * g
                 ki += _pan(mono, self._pan.get(nev, 0.0))
-        # lágy klipp-védelem: ha túlcsordul, arányosan visszaskálázzuk
-        cs = float(np.max(np.abs(ki))) if ki.size else 0.0
-        if cs > 1.0:
-            ki /= cs
-        return ki
+            self._limit_g = _limiter_lepes(ki, self._limit_g)
+            ki *= self._limit_g
+        return np.clip(ki, -1.0, 1.0)
+
+
+def _limiter_lepes(blokk: np.ndarray, elozo_g: float) -> float:
+    """A limiter új erősítése egy blokkra: GYORS lehúzás, LASSÚ visszaengedés.
+
+    A RÉGI kód blokkonként osztott a csúccsal (`ki /= cs`). Ez azt jelentette,
+    hogy ha BÁRKI – akár egyetlen pattanás – túlcsordult, arra a 20
+    ezredmásodpercre MINDENKI halkult, majd a következő blokkban visszaugrott.
+    Ez pumpált: egy hangosabb ember folyamatosan lenyomta a halkabbat, és minél
+    többen voltak a szobában, annál valószínűbb volt a túlcsordulás – vagyis
+    minél nagyobb a társaság, annál halkabb lett mindenki.
+
+    Itt a lehúzás azonnali (nem engedünk át torzítást), a visszaengedés viszont
+    fokozatos, így a hangkép nem lélegzik.
+    """
+    cs = float(np.max(np.abs(blokk))) if blokk.size else 0.0
+    cel = 1.0 / cs if cs > 1.0 else 1.0
+    if cel < elozo_g:
+        return cel                                   # azonnali lehúzás
+    return elozo_g + (cel - elozo_g) * _LIMIT_VISSZA  # lassú visszaengedés
 
 
 def _to_int16(f: np.ndarray) -> bytes:
@@ -125,6 +230,33 @@ class TerbeliHang:
         self._ki = None
         self._on_kimeno = None
         self._nemit = False
+        self._mik_eros = 1.0        # mikrofon-erősítés (MIK_EROS_MIN..MAX)
+        self._csucs = 0.0           # a mikrofon utóbbi csúcsszintje (0..1)
+        self._monitor = False       # „halljam magam": a saját hang visszahallgatása
+        self._monitor_nev = "(te magad)"
+
+    # ---- mikrofon-erősítés és szintmérés ------------------------------
+
+    def set_mikrofon_eros(self, ertek: float) -> float:
+        e = float(max(MIK_EROS_MIN, min(MIK_EROS_MAX, ertek)))
+        self._mik_eros = e
+        return e
+
+    def mikrofon_eros(self) -> float:
+        return self._mik_eros
+
+    def mikrofon_csucs(self) -> float:
+        """Az ERŐSÍTÉS UTÁNI csúcsszint (0..1) – ezt hallják a többiek."""
+        return self._csucs
+
+    def set_monitor(self, ertek: bool) -> None:
+        """„Halljam magam": a saját mikrofon a saját fülünkbe is bekerül.
+
+        Vakon ez az EGYETLEN mód arra, hogy tudd, mit hallanak a többiek –
+        szintmérőt nem lehet nézni. Fejhallgató kell hozzá, különben visszacsatol."""
+        self._monitor = bool(ertek)
+        if not ertek:
+            self.kevero.elenged(self._monitor_nev)
 
     def elerheto(self) -> bool:
         try:
@@ -135,6 +267,19 @@ class TerbeliHang:
 
     def set_ulesek(self, pan_map: dict):
         self.kevero.set_ulesek(pan_map)
+
+    # a hangerő-vezérlés átvezetése a keverőre (a felületnek EGY objektum kell)
+    def set_hangero(self, nev: str, ertek: float) -> float:
+        return self.kevero.set_hangero(nev, ertek)
+
+    def hangero(self, nev: str) -> float:
+        return self.kevero.hangero(nev)
+
+    def set_fo_hangero(self, ertek: float) -> float:
+        return self.kevero.set_fo_hangero(ertek)
+
+    def fo_hangero(self) -> float:
+        return self.kevero.fo_hangero()
 
     def fogad(self, nev: str, pcm16: bytes):
         try:
@@ -159,7 +304,17 @@ class TerbeliHang:
                 if mono.ndim > 1:
                     mono = mono.mean(axis=1)
                 if self._nemit:
+                    self._csucs = 0.0
                     return
+                # ERŐSÍTÉS, majd LÁGY limiter. A sorrend számít: erősítünk,
+                # aztán fogjuk vissza a csúcsokat – így a halk beszéd feljön,
+                # a hangos szótagok viszont nem recsegnek.
+                if self._mik_eros != 1.0:
+                    mono = lagy_limit(mono * self._mik_eros)
+                self._csucs = float(np.max(np.abs(mono))) if mono.size else 0.0
+                if self._monitor:
+                    # a saját hang a saját keverőnkbe is – hogy halld magad
+                    self.kevero.add(self._monitor_nev, mono)
                 if self._on_kimeno:
                     self._on_kimeno(_to_int16(mono))
             except Exception:

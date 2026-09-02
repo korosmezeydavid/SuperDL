@@ -117,12 +117,26 @@ class CsevejFrame(wx.Frame):
         self._mi_zene_eng = hg.Append(
             wx.ID_ANY, "Admin: a tagok is tölthetnek zenét", kind=wx.ITEM_CHECK)
         hg.AppendSeparator()
+        # HANGERŐ (Dávid jelzése: „halkan lehet hallani a másikat")
+        mi_mik = hg.Append(wx.ID_ANY, "&Mikrofon-erősítés…\tCtrl+M")
+        mi_fo = hg.Append(wx.ID_ANY, "&Fő hangerő…\tCtrl+Shift+H")
+        mi_egyeni = hg.Append(
+            wx.ID_ANY, "Egy résztvevő han&gereje…\tCtrl+G")
+        self._mi_monitor = hg.Append(
+            wx.ID_ANY, "Halljam ma&gam (mikrofon-próba)\tF8", kind=wx.ITEM_CHECK)
+        mi_szint = hg.Append(wx.ID_ANY, "Milyen a mikrofonom &szintje?\tF9")
+        hg.AppendSeparator()
         mi_demo = hg.Append(wx.ID_ANY, "&Térhang bemutató (körbejáró hang)\tF6")
         mb.Append(hg, "&Hang")
         h = wx.Menu()
         mi_sugo = h.Append(wx.ID_ANY, "&Súgó\tF1")
         mb.Append(h, "&Súgó")
         self.SetMenuBar(mb)
+        self.Bind(wx.EVT_MENU, lambda e: self._mikrofon_eros_allit(), mi_mik)
+        self.Bind(wx.EVT_MENU, lambda e: self._fo_hangero_allit(), mi_fo)
+        self.Bind(wx.EVT_MENU, lambda e: self._resztvevo_hangero(), mi_egyeni)
+        self.Bind(wx.EVT_MENU, lambda e: self._monitor_valt(), self._mi_monitor)
+        self.Bind(wx.EVT_MENU, lambda e: self._szint_mond(), mi_szint)
         self.Bind(wx.EVT_MENU, lambda e: self._terhang_bemutato(), mi_demo)
         self.Bind(wx.EVT_MENU, lambda e: self._hely_valaszt(), mi_hely)
         self.Bind(wx.EVT_MENU, lambda e: self._admin_nemit(), mi_nemit)
@@ -574,6 +588,149 @@ class CsevejFrame(wx.Frame):
         else:
             self._mond("Rajtad kívül még senki nincs a szobában.")
 
+    # ---- HANGERŐ ------------------------------------------------------
+    #
+    # Dávid jelzése (2026-09-01): „halkan lehet hallani a másikat". Három oka
+    # volt, és a legfontosabb a keverőben ült (lásd terhang.py) – de a
+    # szabályzók nélkül a javítás fele lenne csak meg: ha valakinek eleve halk
+    # a mikrofonja, azt máshonnan nem lehet felhozni.
+
+    _MIK_LEPES = 0.5            # egy lépés a mikrofon-erősítésben
+    _HANGERO_LEPES = 0.1
+
+    def _hang_beall_betolt(self):
+        """A mentett hangerő-beállítások (mikrofon, fő hangerő, résztvevőnként)."""
+        try:
+            return dict(self.core.store.load("csevej_hangero", {}) or {})
+        except Exception:
+            return {}
+
+    def _hang_beall_ment(self, adat: dict):
+        try:
+            self.core.store.save("csevej_hangero", adat)
+        except Exception:
+            pass
+
+    def _hang_kell(self) -> bool:
+        if self._hang is None:
+            self._mond("Előbb kapcsold be az élő hangot: Beszéd, F4.")
+            return False
+        return True
+
+    def _mikrofon_eros_allit(self):
+        """A saját mikrofon erősítése. Ez a KÜLDÉSI oldal: ettől hallanak
+        téged hangosabban a többiek."""
+        if not self._hang_kell():
+            return
+        from .terhang import MIK_EROS_MIN, MIK_EROS_MAX
+        akt = self._hang.mikrofon_eros()
+        ertek = wx.GetNumberFromUser(
+            "Mennyivel erősítsük a mikrofonodat?\n\n"
+            "100 százalék az eredeti. Ha halkan hallanak, emeld. A program a "
+            "csúcsokat lágyan visszafogja, tehát nem fog recsegni.\n\n"
+            "Tipp: az F8 – Halljam magam – bekapcsolásával meg is hallgathatod "
+            "magad, az F9 pedig megmondja, jó szinten vagy-e.",
+            "Erősítés (százalék):", "Mikrofon-erősítés",
+            int(round(akt * 100)), int(MIK_EROS_MIN * 100),
+            int(MIK_EROS_MAX * 100), self)
+        if ertek < 0:
+            return
+        uj = self._hang.set_mikrofon_eros(ertek / 100.0)
+        b = self._hang_beall_betolt()
+        b["mikrofon"] = uj
+        self._hang_beall_ment(b)
+        self._mond("Mikrofon-erősítés: %d százalék." % round(uj * 100))
+
+    def _fo_hangero_allit(self):
+        """A FŐ hangerő: mindenkire hat, akit hallasz."""
+        if not self._hang_kell():
+            return
+        from .terhang import HANGERO_MAX
+        akt = self._hang.fo_hangero()
+        ertek = wx.GetNumberFromUser(
+            "Milyen hangosan szóljon a többiek hangja?\n\n"
+            "100 százalék az eredeti. Ha CSAK EGY valakit hallasz halkan, ne "
+            "ezt emeld, hanem az ő hangerejét külön (Ctrl+G) – így a többiek "
+            "nem lesznek fájdalmasan hangosak.",
+            "Fő hangerő (százalék):", "Fő hangerő",
+            int(round(akt * 100)), 0, int(HANGERO_MAX * 100), self)
+        if ertek < 0:
+            return
+        uj = self._hang.set_fo_hangero(ertek / 100.0)
+        b = self._hang_beall_betolt()
+        b["fo"] = uj
+        self._hang_beall_ment(b)
+        self._mond("Fő hangerő: %d százalék." % round(uj * 100))
+
+    def _resztvevo_hangero(self):
+        """EGY résztvevő hangereje – a kérés magva. Névre mentve, tehát
+        legközelebb is annyi lesz."""
+        if not self._hang_kell():
+            return
+        nev = self._valassz_resztvevo("Kinek a hangerejét állítod?")
+        if not nev:
+            return
+        from .terhang import HANGERO_MAX
+        akt = self._hang.hangero(nev)
+        ertek = wx.GetNumberFromUser(
+            "Milyen hangosan szóljon %s?\n\n"
+            "100 százalék az eredeti, 0 elnémítja. A beállítás megjegyződik, "
+            "tehát legközelebb is ennyi lesz." % nev,
+            "Hangerő (százalék):", "%s hangereje" % nev,
+            int(round(akt * 100)), 0, int(HANGERO_MAX * 100), self)
+        if ertek < 0:
+            return
+        uj = self._hang.set_hangero(nev, ertek / 100.0)
+        b = self._hang_beall_betolt()
+        tagok = dict(b.get("tagok", {}))
+        tagok[nev] = uj
+        b["tagok"] = tagok
+        self._hang_beall_ment(b)
+        self._mond("%s hangereje: %d százalék."
+                   % (nev, round(uj * 100))
+                   + (" Elnémítva." if uj == 0 else ""))
+
+    def _monitor_valt(self):
+        """„Halljam magam" – vakon ez az EGYETLEN mód arra, hogy tudd, mit
+        hallanak a többiek. Szintmérőt nem lehet nézni."""
+        if self._hang is None:
+            self._mi_monitor.Check(False)
+            self._mond("Előbb kapcsold be az élő hangot: Beszéd, F4.")
+            return
+        be = self._mi_monitor.IsChecked()
+        self._hang.set_monitor(be)
+        if be:
+            self._mond("Halljam magam bekapcsolva: most a saját hangodat is "
+                       "hallod, úgy, ahogy a többiek. FEJHALLGATÓ kell hozzá, "
+                       "különben a hangszóró visszasípol.")
+        else:
+            self._mond("Halljam magam kikapcsolva.")
+
+    def _szint_mond(self):
+        """Kimondja, jó szinten van-e a mikrofon – és MIT tegyen a felhasználó."""
+        if not self._hang_kell():
+            return
+        from .terhang import szint_tanacs
+        cs = self._hang.mikrofon_csucs()
+        self._mond(szint_tanacs(cs)
+                   + " (Mikrofon-erősítés: %d százalék.)"
+                   % round(self._hang.mikrofon_eros() * 100))
+
+    def _hangero_visszaallit(self):
+        """A mentett hangerő-beállítások visszatöltése az élő hangra."""
+        if self._hang is None:
+            return
+        b = self._hang_beall_betolt()
+        try:
+            if "mikrofon" in b:
+                self._hang.set_mikrofon_eros(float(b["mikrofon"]))
+            if "fo" in b:
+                self._hang.set_fo_hangero(float(b["fo"]))
+            for nev, ertek in (b.get("tagok") or {}).items():
+                self._hang.set_hangero(nev, float(ertek))
+        except Exception:
+            pass
+
     def _terhang_bemutato(self):
         """A térbeli hang ÉLMÉNY-bemutatója (hálózat nélkül): egy hang körbejár
         a fejed körül – ez mutatja, hogy a konferenciában mindenki onnan szól
@@ -646,6 +803,9 @@ class CsevejFrame(wx.Frame):
         # hostként: az élőben belépő új kliensek jelöltjeire is punch-olunk
         self.szoba.on_hang_tag = lambda ki, cc: wx.CallAfter(self._on_hang_tag, ki, cc)
         self._hang.set_resztvevok(tagok, self.szoba.helyek())
+        # a korábban beállított hangerők visszatöltése – enélkül minden
+        # bekapcsoláskor elölről kellene beállítani, ami vakon sok lépés
+        self._hangero_visszaallit()
         self._beszed_sync(True)
 
     def _on_hang_tag(self, ki, cimek):
@@ -672,6 +832,10 @@ class CsevejFrame(wx.Frame):
             except Exception:
                 pass
             self._hang = None
+        try:
+            self._mi_monitor.Check(False)   # a mikrofon-próba is véget ér
+        except Exception:
+            pass
         self._mond("Élő hang kikapcsolva.")
         self._beszed_sync(False)
 
