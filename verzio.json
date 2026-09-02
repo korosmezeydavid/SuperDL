@@ -1,7 +1,7 @@
 {
   "megjegyzes": "A SuperDL mobil legfrissebb verziója. A telefon naponta kétszer ránéz erre a fájlra, és szól, ha újabb van. Kiadáskor EZT a fájlt kell frissíteni.",
-  "verzio": "1.57.0",
+  "verzio": "1.58.0",
   "letoltes": "https://github.com/korosmezeydavid/SuperDL-Android/releases/latest/download/SuperDL.apk",
-  "kiadva": "2026-09-01",
-  "ujdonsagok": "FONTOS JAVÍTÁS: az S.O.S. eddig el tudta vágni azt a hívást, ami sikerült, mert nem nézte, felvették-e. Ha az S.O.S.-re számítasz, frissíts. Új: az S.O.S. mostantól azonnal SMS-t küld a helyzeteddel mind a négy számra, kattintható térkép-linkkel, akkor is, ha felveszik a hívást. Két kör után a 112 következik. Új: felület elforgatása a beállításokban, azoknak, akik balra-jobbra söprögetnek fel-le helyett. Mindenhol érvényes, a képernyőolvasóban is. Továbbá: a varázsló billentyűzet-lépése javítva, fájlkezelő átnevezés, rádió időzített felvétel."
+  "kiadva": "2026-09-02",
+  "ujdonsagok": "FONTOS JAVÍTÁS: a program összeomlott azoknál, akiknél még nem volt megadva a névjegy-engedély — bekapcsoláskor és a napi névjegy-frissítéskor, vagyis minden friss telepítőnél. Ez a hiba a másnapi ébresztőt is el tudta némítani, mert az indulási lépések egy közös blokkban futottak. Javítva. Új: az elolvasott levélnél jobbra söpréssel előjön a válasz, továbbítás, feladó mentése — a válasznál a címzett és a tárgy magától kitöltődik, tehát csak a szöveget kell diktálni. Az e-mail menü átrendezve. A gesztus-iskola mostantól követi a felület elforgatását. A hibajelentés kiírja, mikor és melyik verzióban történt az összeomlás."
 }
