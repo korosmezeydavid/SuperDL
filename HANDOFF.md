@@ -162,7 +162,32 @@ nyers bájtként keresi a fájlokban.)
 
 ---
 
-### 🟡 4.6.0 – MEGÉPÍTVE, KULCS-SZKEN TISZTA, **MÉG NEM PUBLIKÁLT** (2026-09-03)
+### ✅ 4.6.0 KIADVA (2026-09-03) – EBBEN MINDEN BENNE VAN, AMI ALATTA ÁLL
+
+**Kiadás megtörtént.** `git push origin main` (commit `ceed233`, 23 fájl,
++3968/−216), majd `gh release create v4.6.0 … --latest`. **Core-only kiadás:**
+ebben a körben egyetlen modul sem változott, tehát nincs modul-tag, és a
+`modules.json` érintetlen — a kiadási sorrend „előbb a modulok" szabálya itt
+üresen fut.
+
+**A négy asset fent van, `state: uploaded`:** `SuperDL-Setup-4.6.0.exe` (148,5 MB) ·
+`SuperDL-Setup.exe` (verziótlan alias, **azonos SHA-256**) · `SuperDL.exe` (202,5 MB) ·
+`SuperDL-cli.exe` (140,4 MB).
+
+**Ellenőrizve kiadás után:** mind a **6 URL 200** (a négy verziós + a két
+`releases/latest/download/` állandó link) · `gh release list` → `SuperDL 4.6.0
+Latest`, a 4.5.6-ról a „Latest" jelölés lekerült.
+
+**Hírlevél kiírva:** `C:\Users\msn\Documents\superdllistara.txt` — tizenegy pont,
+és külön kérés négy élesben figyelendő dologra.
+
+⚠️ **Feltöltési tanulság:** a `gh release create` a nagy assetek feltöltése alatt
+**„Draft"-ként látszik** a `gh release list`-ben, és az `assets` tömb üres. Ez
+NEM hiba — kb. 8 perc után magától átvált „Latest"-re. Ne indítsd újra.
+
+**Az alábbi rész a kiadás ELŐTTI állapotot rögzíti (buildelési napló):**
+
+#### 4.6.0 – a build menete (2026-09-03)
 
 A felhasználó döntése: „be akarom fejezni ezt a mérföld sorozatot, akkor akarom
 publikálni egybe, aztán ha hiba jön, majd orvosoljuk." Ezért a 4.6.0 **egyben**
@@ -181,11 +206,8 @@ hozza az MK3, MK5, MK6, MK7, MK8, MK9 (sávszélesség-ütemezés) és MK10 kör
 **Modul-zipek: NINCS ÚJ.** Ez a kör végig **Core**-t érintett, tehát a kiadás
 Core-only: nincs modul-tag, és a `modules.json` sem változik.
 
-**Ami hátravan (CSAK „publikálás" jelszóra):**
-1. Verziótlan alias: `installer\SuperDL-Setup-4.6.0.exe` → `SuperDL-Setup.exe`.
-2. `gh release create v4.6.0 … --latest` a 4 assettel (setup + alias + GUI + CLI).
-3. A 6 letöltési URL ellenőrzése (mind 200).
-4. Hírlevél a `C:\Users\msn\Documents\superdllistara.txt`-be (piszkozat kész).
+**Ez a négy lépés MEGTÖRTÉNT** (alias · `gh release create` · 6 URL ellenőrzése ·
+hírlevél). **Nincs függő kiadási teendő.**
 
 **Buildelési tanulságok ebből a körből (mindkettő új):**
 - **A build túllépi az eszköz ~60 mp-es válaszidejét.** Megoldás:
@@ -203,7 +225,7 @@ Core-only: nincs modul-tag, és a `modules.json` sem változik.
 
 ---
 
-### 🔨 LETÖLTŐ-MOTOR MK8 · MK9 · MK10 – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-09-03)
+### ✅ LETÖLTŐ-MOTOR MK8 · MK9 · MK10 – KIADVA a 4.6.0-ban (2026-09-03)
 
 **MK8 – kilépés és megrekedt letöltések.** A lemez-ellenőrzés egy **adatvesztő**
 hibát talált, amit a terv nem említett: a kilépés `stop_all()` után AZONNAL
@@ -254,7 +276,7 @@ tiszta, attr_audit 0 találat.
 
 ---
 
-### 🔨 LETÖLTŐ-MOTOR MK7 – LINK-BEVITEL – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-09-03)
+### ✅ LETÖLTŐ-MOTOR MK7 – LINK-BEVITEL – KIADVA a 4.6.0-ban (2026-09-03)
 
 **A lemez-ellenőrzés KÉTSZER cáfolta a tervet, ELLENTÉTES irányba.**
 
@@ -329,7 +351,7 @@ forrásból nem is próbálható).
 
 ---
 
-### 🔨 LETÖLTŐ-MOTOR MK6 – SOR-NAVIGÁCIÓ – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-09-03)
+### ✅ LETÖLTŐ-MOTOR MK6 – SOR-NAVIGÁCIÓ – KIADVA a 4.6.0-ban (2026-09-03)
 
 **A lemez-ellenőrzés itt nem abban fogta meg a tervet, hogy MI létezik, hanem
 hogy amit használni akar, az MINDENHOL működik-e.**
@@ -411,7 +433,7 @@ képernyőolvasóval; egy torrent- és egy sima fájlletöltés-hiba magyarul.
 
 ---
 
-### 🔨 LETÖLTŐ-MOTOR MK5 – HANGZÓ ÁLLAPOT – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-09-03)
+### ✅ LETÖLTŐ-MOTOR MK5 – HANGZÓ ÁLLAPOT – KIADVA a 4.6.0-ban (2026-09-03)
 
 **A lemez-ellenőrzés NÉGYBŐL KETTŐBEN megcáfolta a tervet.** A terv szerint a
 hangzó előrehaladás építőkockái megvannak, és a „mi a helyzet?" billentyű
@@ -471,7 +493,7 @@ letöltés mellett.
 
 ---
 
-### 🔨 LETÖLTŐ-MOTOR MK3 – CÉLFÁJL ÉPSÉGE – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-09-03)
+### ✅ LETÖLTŐ-MOTOR MK3 – CÉLFÁJL ÉPSÉGE – KIADVA a 4.6.0-ban (2026-09-03)
 
 **A lemez-ellenőrzés négyből háromban igazolta a tervet, EGYBEN VISZONT
 TÉVEDETT – és pont abban, amit a terv a legsürgősebbnek mondott.**
