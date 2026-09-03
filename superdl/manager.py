@@ -1,18 +1,23 @@
 """Letöltési sor: több feladat párhuzamos futtatása, időzítéssel,
 és a sor megőrzésével program-újraindítás után is."""
 
+import json
 import logging
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from itertools import count
+from pathlib import Path
 
+from . import hibaszoveg
+from . import lemezhely
 from . import netcheck
 from . import retrypolicy
+from . import savszelesseg
 from . import store
 from .media import MediaDownloader, is_media_url
-from .segment import Progress, RateLimiter, SegmentDownloader
+from .segment import Progress, RateLimiter, SegmentDownloader, parse_limit
 from .torrent import TorrentDownloader, is_torrent_url
 
 _ids = count(1)
@@ -138,6 +143,9 @@ class DownloadManager:
         # MK2: hálózatfigyelő állapota
         self._halo_offline = False
         self._halo_ellenorizve = 0.0
+        # MK9: időzített sebességkorlát (pl. „22:00-06:00=0; 06:00-22:00=500K")
+        self.savszelesseg_rend = ""
+        self._savszelesseg_elozo = None
         # közös korlát: az összes letöltés együtt sem lépi túl
         self.limiter = RateLimiter(limit_bps)
         self.pool = ThreadPoolExecutor(max_workers=parallel)
@@ -200,6 +208,16 @@ class DownloadManager:
         # mentett mappában bennragadt egy szóköz). Egy közös csomópont véd.
         out_dir = str(job.out_dir or self.out_dir).strip()
         audio = self.audio_only if job.audio_only is None else job.audio_only
+        # MK8 (az MK3 maradéka): hely-figyelmeztetés a yt-dlp és a torrent
+        # motorra is. Ezek indulás előtt NEM ismerik a méretet, ezért nem
+        # tarthatjuk vissza a letöltést – de a majdnem tele lemezt ki tudjuk
+        # mondani, amíg tenni lehet valamit. A szegmentált motor a saját,
+        # PONTOS ellenőrzését végzi a `_probe()` után (MK3); ott ez a durvább
+        # figyelmeztetés fölösleges volna.
+        if job.kind in ("torrent", "media"):
+            uzenet = lemezhely.indulas_elott(out_dir)
+            if uzenet:
+                self._jelez(uzenet, job)
         try:
             if job.kind == "torrent":
                 job.downloader = TorrentDownloader(
@@ -227,7 +245,24 @@ class DownloadManager:
             job.downloader.run()
         except Exception as exc:
             uzenet = job.progress.error or str(exc)
-            if (job.progress.status != "leállítva"
+            # MK8: KILÉPÉSKOR NINCS HIBA, csak leállítás.
+            # A bezárás kirántja az aria2-t a futó torrent alól; a szál ebből
+            # kivételt kap, és eddig HIBÁNAK könyvelte el. A `finally` mentés
+            # pedig a `close()` UTÁN futott le, tehát a hibás állapot lett a
+            # mentett állapot — a felhasználó a KÖVETKEZŐ indításkor látta,
+            # hogy „hibás a torrent", holott csak bezárta a programot.
+            # (Az MK6 óta ez rosszabb: az F6 oda is küldi, egy nem létező
+            # hibához.) A leállítás-jelző itt a mérvadó, nem a kivétel.
+            leallt = (self._closing.is_set()
+                      or (job.downloader is not None
+                          and getattr(job.downloader, "_stop", None) is not None
+                          and job.downloader._stop.is_set()))
+            if leallt:
+                job.progress.status = "leállítva"
+                job.progress.error = ""
+                job.next_retry_at = None
+                _log.info("Leállítás közbeni kivétel elnyelve: %s", job.url)
+            elif (job.progress.status != "leállítva"
                     and self.halozati_eredetu(uzenet)):
                 # MK2: NEM hiba, hanem VÁRAKOZÁS. Ha elment a net, a felhasználó
                 # nem tud mit tenni – és ha „hibát" mondunk, azzal azt üzenjük,
@@ -246,6 +281,15 @@ class DownloadManager:
                     job.progress.status = "hiba"
                     if not job.progress.error:
                         job.progress.error = str(exc)
+                # MK6: a hibaszöveg emberi nyelvre fordítása MINDEN motorra.
+                # ⚠️ A SORREND KÖTÖTT: ez CSAK a hálózati besorolás UTÁN
+                # futhat. A `halozati_eredetu()` az ANGOL nyers szövegben
+                # keres mintát („failed to establish", „getaddrinfo"); ha
+                # előbb fordítanánk, a minta nem illene, és a hálózat-
+                # kimaradásból megint HIBA lenne – vagyis az MK2-t
+                # csendben visszacsinálnánk.
+                if job.progress.status == "hiba":
+                    job.progress.error = hibaszoveg.emberi(job.progress.error)
                 _log.exception("Letöltési feladat hibája: %s", job.url)
         finally:
             self._save()
@@ -262,11 +306,138 @@ class DownloadManager:
                     job.progress.status = "várakozik"
                     self._launch(job)
                 self._retry_tick(job, now)
+                self._hely_tick(job)
+                self._kuzd_tick(job)
             self._halozat_tick(now)
+            self._savszelesseg_tick()
             if self._allow_autosave and now - last_save >= 3:
                 last_save = now
                 self._save()
             time.sleep(1)
+
+    # ---- MK6: melyik elem igényel FIGYELMET ---------------------------
+
+    # Hányadik újrapróba után mondjuk, hogy ez már emberi beavatkozást kér.
+    # Az első néhány bukás gyakran magától rendbe jön (pillanatnyi
+    # szerverhiba); a sokadik viszont már nem fog.
+    MAKACS_PROBA = 3
+
+    @staticmethod
+    def figyelmet_igenyel(job) -> bool:
+        """Van-e ezzel az elemmel VALÓDI teendő?
+
+        Három eset, és mindháromnál a felhasználó tud tenni valamit:
+
+        1. **hiba** – meg kell nézni, mi történt;
+        2. **ütközés** (`p.conflict`, a cél fájl már létezik) – DÖNTÉSRE vár, és
+           az MK4-ben külön kimondtuk, hogy ez NEM kap újrapróbát: magától
+           soha nem oldódik meg;
+        3. **makacsul újrapróbálkozó elem** – ami már sokadszor bukott el,
+           az valószínűleg nem fog magától megjavulni.
+
+        ⚠️ **AMI SZÁNDÉKOSAN KIMARAD, és ez a lényeg:**
+
+        - **`várakozik a hálózatra`** – az MK2 egész értelme az volt, hogy ez
+          NEM igényel beavatkozást („nem kell tenned semmit"). Ha idesorolnánk,
+          a felhasználót olyasmihez küldenénk, amit nem tud megjavítani –
+          vagyis csendben visszacsinálnánk az MK2-t.
+        - **`várakozik` / `ütemezve`** – ez a sor normális működése.
+        - **`leállítva`** – ezt ő maga kérte. A saját döntést problémának
+          nevezni bosszantó és bizalomromboló.
+        """
+        p = job.progress
+        # A KIZÁRÁS ÁLL ELÖL, és ez nem stílus kérdése.
+        # Az első változatban a „makacs újrapróba" ág volt a végén, feltétellel
+        # („nem kész és nem leállítva") – és ÁTENGEDTE a hálózatra várakozó
+        # elemet, ha az sokat próbálkozott. A teszt fogta meg. Így a szabály
+        # csendben visszacsinálta volna az MK2-t: a felhasználót olyasmihez
+        # küldtük volna, amit nem tud megjavítani. Egyetlen listán, elöl.
+        if p.status in (DownloadManager.HALOZATRA_VAR, "kész", "leállítva"):
+            return False
+        if getattr(p, "conflict", False):
+            return True
+        if p.status == "hiba":
+            return True
+        if getattr(job, "retries", 0) >= DownloadManager.MAKACS_PROBA:
+            return True
+        return False
+
+    def figyelmet_igenylok(self) -> list:
+        """A figyelmet igénylő elemek, a SORRENDBEN, ahogy a listában állnak.
+
+        A sorrend nem esztétika: vakon a lista sorrendje az egyetlen térkép.
+        Ha a navigáció más sorrendben lépkedne, mint amit a képernyőolvasó
+        felolvas, a felhasználó elveszne benne."""
+        return [j for j in self.jobs if self.figyelmet_igenyel(j)]
+
+    # ---- MK9: időzített sebességkorlát --------------------------------
+
+    def _savszelesseg_tick(self) -> None:
+        """Az órarend szerinti sebességkorlát érvényesítése.
+
+        A korlát a KÖZÖS `limiter`-en él, tehát az összes letöltésre együtt
+        vonatkozik — ahogy a kézzel beállított is. Váltáskor SZÓLUNK: a
+        hirtelen lelassuló letöltés magától nem érthető, és a felhasználó azt
+        hinné, elromlott valami vagy gyenge a net."""
+        rend = getattr(self, "savszelesseg_rend", "") or ""
+        if not rend:
+            return
+        korlat = savszelesseg.korlat_most(rend)
+        if korlat is None:
+            return
+        if korlat == getattr(self, "_savszelesseg_elozo", None):
+            return
+        self._savszelesseg_elozo = korlat
+        try:
+            self.limiter.bps = parse_limit(korlat)
+        except Exception:
+            return
+        self._jelez(savszelesseg.valtas_mondat(korlat), None)
+
+    # ---- MK8: a letöltés menet közben küzd ----------------------------
+
+    # Ennyi belső újrapróba után szólunk. Az első kettő teljesen normális
+    # (egy szerver ejt egy kapcsolatot, és kész); a harmadiktól viszont már
+    # nem véletlen, és a felhasználó észreveszi, hogy „lassú" – csak azt nem
+    # tudja, miért.
+    KUZD_KUSZOB = 3
+
+    def _kuzd_tick(self, job: Job) -> None:
+        """Egyszeri jelzés, ha egy letöltés MENET KÖZBEN sokat újrapróbál.
+
+        Eddig ez teljesen néma volt: a szegmentált letöltő ötször
+        újrapróbálkozott szegmensenként, a felhasználó pedig annyit
+        érzékelt, hogy lassú. **Vakon a lassú és az akadozó között nincs
+        különbség** — pedig az egyik normális, a másik nem, és a kettőre
+        más a helyes válasz (várni vs. leállítani és később újrakezdeni)."""
+        p = job.progress
+        if p.status != "letöltés":
+            return
+        if getattr(p, "belso_probak", 0) < self.KUZD_KUSZOB:
+            return
+        if getattr(job, "_kuzd_szolt", False):
+            return
+        job._kuzd_szolt = True
+        self._jelez(retrypolicy.kuzd_uzenet(p.belso_probak), job)
+
+    # ---- MK3: fogyó lemezhely -----------------------------------------
+
+    def _hely_tick(self, job: Job) -> None:
+        """A letöltő által felírt hely-figyelmeztetés felolvastatása.
+
+        A letöltő maga NEM tud a felolvasóról (és nem is szabad, hogy tudjon),
+        ezért csak beírja a `progress.figyelmeztetes` mezőbe; a kimondás itt
+        történik. Elemenként EGYSZER: a figyelmeztetés kiürül, miután
+        elhangzott, és a letöltő már nem írja újra (ő is csak egyszer teszi).
+
+        Ez FIGYELMEZTETÉS, nem hiba: a letöltés fut tovább. Lehet, hogy
+        közben felszabadul a hely – egy futó letöltés megölése miatta
+        biztosan rosszabb volna, mint egy mondat."""
+        uzenet = job.progress.figyelmeztetes
+        if not uzenet:
+            return
+        job.progress.figyelmeztetes = ""
+        self._jelez(uzenet, job)
 
     # ---- MK2: hálózat-visszatérés -------------------------------------
 
@@ -493,6 +664,37 @@ class DownloadManager:
         for job in self.jobs:
             self.stop(job, felhasznaloi=felhasznaloi)
 
+    # Meddig várunk kilépéskor a futó letöltőszálakra. Az aria2 RPC-időkorlátja
+    # 15 másodperc, de a felhasználót nem várakoztatjuk annyit egy bezárásnál:
+    # 6 másodperc alatt a szálak a szokásos esetben bőven megállnak.
+    LEALLAS_VARAKOZAS = 6.0
+
+    def varj_leallasra(self, masodperc: float = None) -> bool:
+        """Megvárja, hogy a futó letöltőszálak TÉNYLEG megálljanak (MK8).
+
+        **Miért kell.** Kilépéskor eddig ez történt: `stop_all()` beállította a
+        leállítás-jelzőt, majd AZONNAL jött a `close()` és az aria2 kilövése —
+        a torrent-szál viszont másodpercenként néz a jelzőre, és épp egy
+        `tellStatus` hívás közepén lehetett. Az alóla kirántott aria2 kivételt
+        dobott, amit a szál HIBÁNAK könyvelt el, a `finally: self._save()` pedig
+        a `close()` UTÁN még egyszer kimentette a sort — immár „hiba"
+        státusszal.
+
+        **A felhasználó ebből annyit lát, hogy a következő indításkor a torrent
+        hibás.** Az MK6 óta ez rosszabb: az F6 oda is küldi, egy nem létező
+        hibához. Egy sima bezárásból így lett volna teendő.
+
+        Igaz, ha minden szál megállt; hamis, ha lejárt az idő."""
+        hatarido = time.monotonic() + float(
+            self.LEALLAS_VARAKOZAS if masodperc is None else masodperc)
+        while time.monotonic() < hatarido:
+            if not any(j.progress.status in ("letöltés", "seedelés",
+                                             "előkészítés")
+                       for j in list(self.jobs)):
+                return True
+            time.sleep(0.2)
+        return False
+
     def start(self, job: Job) -> None:
         """Kézi (újra)indítás. Ez a `stop()` párja: visszavonja a felhasználói
         leállítást, és nullázza az újrapróba-számlálót.
@@ -510,26 +712,93 @@ class DownloadManager:
         self._launch(job)
         self._save()
 
-    def remove(self, job: Job) -> None:
-        """Eltávolítja a sorból (leállítja, ha fut)."""
+    def takarithato(self, job: Job) -> list:
+        """A jobhoz tartozó félkész fájlok (.part és .sdlstate) – MK3.
+
+        **Az azonosítás elsősorban az állapotfájlban tárolt URL alapján
+        történik, nem névegyezéssel.** Két letöltés célneve könnyen ütközhet
+        (`video.mp4` mindenhol van), és egy törléskor a MÁSIK letöltés
+        félkész fájlját kitörölni olyan kár, amit nem lehet visszacsinálni.
+
+        Az állapotfájl nélküli, csupasz `.part` csak akkor kerül a listára, ha
+        a neve pontosan ezé a letöltésé: a régi (MK3 előtti) egyszálú
+        letöltések nem hagytak állapotfájlt, azoknak ez az egyetlen esélyük."""
+        mappa = Path(job.out_dir or ".")
+        talalt: list = []
+        if not mappa.is_dir():
+            return talalt
+        try:
+            allapotok = sorted(mappa.glob("*.sdlstate"))
+        except OSError:
+            allapotok = []
+        for sp in allapotok:
+            try:
+                adat = json.loads(sp.read_text())
+            except (OSError, ValueError):
+                continue
+            if adat.get("url") != job.url:
+                continue
+            talalt.append(sp)
+            part = sp.with_suffix("")          # …kit.sdlstate → …kit
+            part = part.with_suffix(part.suffix + ".part")
+            if part.exists():
+                talalt.append(part)
+        nev = (job.progress.filename or "").strip()
+        if nev:
+            csupasz = mappa / (nev + ".part")
+            if csupasz.exists() and csupasz not in talalt:
+                talalt.append(csupasz)
+        return talalt
+
+    def remove(self, job: Job, fajlokat_is: bool = False) -> list:
+        """Eltávolítja a sorból (leállítja, ha fut).
+
+        `fajlokat_is=True` esetén a félkész fájlokat is törli. **Ez alapból
+        KIKAPCSOLT és marad is:** a sorból kivétel és a letöltött adat
+        megsemmisítése két különböző szándék, és a másodikat nem szabad az
+        elsőből következtetni. A hívó (felület vagy CLI) kérdezze meg.
+
+        Visszaadja azoknak a fájloknak a listáját, amiket NEM sikerült
+        törölni – hallgatni róla ugyanaz a hiba volna, mint eddig: a
+        felhasználó azt hinné, takarítottunk."""
         self.stop(job)
+        maradt: list = []
+        if fajlokat_is:
+            # a letöltőszál még írhat: megvárjuk, amíg tényleg megáll,
+            # különben a törlés után újra létrejönne a fájl
+            hatarido = time.monotonic() + 5.0
+            while (job.progress.status == "letöltés"
+                   and time.monotonic() < hatarido):
+                time.sleep(0.2)
+            for ut in self.takarithato(job):
+                try:
+                    ut.unlink()
+                except OSError:
+                    maradt.append(ut)
         with self._lock:
             if job in self.jobs:
                 self.jobs.remove(job)
         self._save()
+        return maradt
 
     def resolve_conflict(self, job: Job, mode: str) -> Job:
         """A 'fájl már létezik' ütközés feloldása ugyanazon az elemen.
         mode: 'overwrite' = felülírás, 'verify' = ellenőrzés + megosztás."""
-        job.overwrite = (mode == "overwrite")
-        job.verify = (mode == "verify")
-        job.downloader = None
-        job.submitted = False
-        p = job.progress
-        p.conflict = False
-        p.error = ""
-        p.status = "várakozik"
-        p.downloaded = p.total = 0
+        # MK3: a job mezőinek átírása ZÁR ALATT. A `_tick` szál ugyanezeket
+        # olvassa, és félig átírt állapotot látva vagy hibát mondana egy
+        # induló elemre, vagy kétszer indítaná el. A `_launch()` és a
+        # `_save()` a záron KÍVÜL marad – azok maguk is zárat kérnek.
+        with self._lock:
+            job.overwrite = (mode == "overwrite")
+            job.verify = (mode == "verify")
+            job.downloader = None
+            job.submitted = False
+            p = job.progress
+            p.conflict = False
+            p.error = ""
+            p.status = "várakozik"
+            p.total = 0
+        p.nullaz()
         self._launch(job)
         self._save()
         return job

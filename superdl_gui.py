@@ -11,7 +11,11 @@ Narrátor is hibátlanul felolvassa. Minden funkció elérhető billentyűzetrő
   Ctrl+L   feliratkozások kezelése
   Ctrl+D   letöltési lista fókuszálása
   Ctrl+E   eseménynapló fókuszálása
-  Ctrl+J   összefoglaló felolvasása (mennyi van hátra)
+  Ctrl+Shift+J  „Mi a helyzet?" – a letöltések állapota egy mondatban
+  Ctrl+Shift+V  több hivatkozás hozzáadása egyszerre
+  F6       ugrás a következő figyelmet igénylő elemre
+  Ctrl+F6  a kijelölt elem javításának megkísérlése
+  Ctrl+J   napi infó (dátum, névnap, időjárás, letöltések)
   Ctrl+F   médiakereső (keresés, lejátszás, letöltés)
   Delete   futó letöltés leállítása; befejezett/hibás elem törlése
   Shift+Del  a kijelölt elem eltávolítása a listából
@@ -39,7 +43,7 @@ from superdl.media import is_media_url
 from superdl.segment import parse_limit
 from superdl.torrent import is_torrent_url
 from superdl.feeds import FeedManager
-from superdl.report import build_summary
+from superdl.report import build_summary, befejezes_mondat, seed_mondat
 from superdl.speech import VoiceSpeaker
 from superdl.selfvoice import SelfVoice
 from superdl import updater, selfupdate, sounds, __version__
@@ -56,6 +60,11 @@ from superdl.organizer import OrganizerManager
 from superdl.radiorec import RecordManager
 from superdl import dayinfo, weather, search, store, aiclient, mediaai, netcheck
 from superdl import autostart
+from superdl import elozmenyek
+from superdl import hibaszoveg
+from superdl import lemezhely
+from superdl import linkek
+from superdl import rendezes
 from superdl.settingsdialog import SettingsDialog
 from superdl.aiwin import run_ai, run_ai_progress
 # A Napi infó ABLAK MOSTANTÓL a „Szervezés" MODULban (az üdvözlés-backend a Core-ban).
@@ -157,7 +166,15 @@ KEYS_TEXT = (
     "  Ctrl+L   – feliratkozások kezelése\n"
     "  Ctrl+D   – a letöltési lista fókuszálása\n"
     "  Ctrl+E   – az eseménynapló fókuszálása\n"
-    "  Ctrl+J   – hangos összefoglaló (mennyi van hátra)\n"
+    "  Ctrl+Shift+J – „Mi a helyzet?\": a letöltések állapota egy mondatban,\n"
+    "               azonnal, hálózat nélkül\n"
+    "  Ctrl+H   – letöltési előzmények (kereshetően)\n"
+    "  Ctrl+Shift+V – több hivatkozás hozzáadása egyszerre (beillesztett\n"
+    "               szövegből is kikeresi őket)\n"
+    "  F6       – ugrás a következő figyelmet igénylő elemre (hiba vagy\n"
+    "               döntésre váró ütközés), és mit tegyél vele\n"
+    "  Ctrl+F6  – a kijelölt elem javításának megkísérlése\n"
+    "  Ctrl+J   – napi infó (dátum, névnap, időjárás, és a letöltések)\n"
     "  Ctrl+F   – médiakereső (keresés, lejátszás, letöltés)\n"
     "  Ctrl+Shift+R – internetes rádió\n"
     "  Ctrl+U   – frissítések keresése\n"
@@ -243,18 +260,123 @@ def beep(ok: bool = True) -> None:
 
 
 class UrlDropTarget(wx.TextDropTarget):
-    """Böngészőből idehúzott hivatkozások fogadása."""
+    """Böngészőből idehúzott hivatkozások fogadása.
+
+    MK7: a felismerést és a kérdést a KÖZÖS út végzi. Eddig ez az osztály maga
+    döntötte el, mi számít linknek — és NÉMÁN adott hozzá akárhányat. Egy húsz
+    linkes lista beejtése így húsz letöltést indított, szó nélkül."""
 
     def __init__(self, callback):
         super().__init__()
         self.callback = callback
 
     def OnDropText(self, x, y, data):
-        for line in data.strip().splitlines():
-            if line.strip().lower().startswith(
-                    ("http://", "https://", "magnet:")):
-                self.callback(line.strip())
+        self.callback(data or "")
         return True
+
+
+class TorrentFileDropTarget(wx.FileDropTarget):
+    """Fájlkezelőből idehúzott `.torrent` fájlok fogadása (MK7).
+
+    Eddig CSAK szöveget lehetett beejteni: egy `.torrent` fájlt a Fájlkezelőből
+    ráhúzni nem lehetett, pedig ez a legkézenfekvőbb mozdulat. A szűrést itt is
+    a közös út végzi, tehát a nem-torrent fájlok némán kimaradnak."""
+
+    def __init__(self, callback):
+        super().__init__()
+        self.callback = callback
+
+    def OnDropFiles(self, x, y, filenames):
+        self.callback("\n".join(filenames or []))
+        return True
+
+
+class HistoryDialog(wx.Dialog):
+    """Kereshető letöltési előzmények (MK10).
+
+    Vakon a lista sorrendje és a keresőmező az egyetlen fogódzó — ezért a
+    keresőmező kapja az induló fókuszt, és a lista MINDIG mutat valamit
+    (üres keresőszóra a teljes előzményt)."""
+
+    def __init__(self, parent):
+        super().__init__(parent, title="Letöltési előzmények",
+                         size=(760, 480),
+                         style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        v = wx.BoxSizer(wx.VERTICAL)
+        sor = wx.BoxSizer(wx.HORIZONTAL)
+        cimke = wx.StaticText(self, label="&Keresés a névben és a linkben:")
+        self.kereso = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.kereso.SetName("Keresés az előzményekben")
+        sor.Add(cimke, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 6)
+        sor.Add(self.kereso, 1, wx.EXPAND | wx.ALL, 6)
+        v.Add(sor, 0, wx.EXPAND)
+
+        self.lista = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
+        self.lista.SetName("Előzmények")
+        for i, (cim, w) in enumerate((("Név", 300), ("Mikor", 110),
+                                      ("Méret", 110), ("Mappa", 220))):
+            self.lista.InsertColumn(i, cim, width=w)
+        v.Add(self.lista, 1, wx.EXPAND | wx.ALL, 6)
+
+        gombok = wx.BoxSizer(wx.HORIZONTAL)
+        self.b_ujra = wx.Button(self, label="&Letöltés újra")
+        self.b_mappa = wx.Button(self, label="&Mappa megnyitása")
+        b_zar = wx.Button(self, wx.ID_CLOSE, "&Bezárás")
+        for b in (self.b_ujra, self.b_mappa, b_zar):
+            gombok.Add(b, 0, wx.ALL, 6)
+        v.Add(gombok, 0, wx.ALIGN_RIGHT)
+        self.SetSizer(v)
+
+        self.kereso.Bind(wx.EVT_TEXT, lambda e: self._frissit())
+        self.kereso.Bind(wx.EVT_TEXT_ENTER, lambda e: self.lista.SetFocus())
+        self.b_ujra.Bind(wx.EVT_BUTTON, self._on_ujra)
+        self.b_mappa.Bind(wx.EVT_BUTTON, self._on_mappa)
+        b_zar.Bind(wx.EVT_BUTTON, lambda e: self.EndModal(wx.ID_CLOSE))
+        self._tetelek: list = []
+        self._frissit()
+        self.kereso.SetFocus()
+
+    def _frissit(self):
+        try:
+            self._tetelek = elozmenyek.keres(self.kereso.GetValue())
+        except Exception:
+            self._tetelek = []
+        self.lista.DeleteAllItems()
+        for t in self._tetelek:
+            r = self.lista.InsertItem(self.lista.GetItemCount(),
+                                      str(t.get("nev") or t.get("url") or ""))
+            mikor = float(t.get("mikor") or 0)
+            self.lista.SetItem(r, 1, time.strftime("%Y.%m.%d.",
+                                                   time.localtime(mikor))
+                               if mikor else "")
+            meret = int(t.get("meret") or 0)
+            self.lista.SetItem(r, 2, human(meret) if meret else "")
+            self.lista.SetItem(r, 3, str(t.get("mappa") or ""))
+
+    def _kivalasztott(self):
+        r = self.lista.GetFirstSelected()
+        if r < 0 or r >= len(self._tetelek):
+            return None
+        return self._tetelek[r]
+
+    def _on_ujra(self, event=None):
+        t = self._kivalasztott()
+        if not t:
+            return
+        self.EndModal(wx.ID_CLOSE)
+        # a szülő SAJÁT útján megy tovább: így a duplikátum-kérdés is elsül,
+        # és a felhasználó tudatosan mondja rá, hogy mégis kell
+        wx.CallAfter(self.GetParent()._on_add, url=t.get("url", ""))
+
+    def _on_mappa(self, event=None):
+        t = self._kivalasztott()
+        mappa = str((t or {}).get("mappa") or "").strip()
+        if not mappa:
+            return
+        try:
+            wx.LaunchDefaultApplication(mappa)
+        except Exception:
+            pass
 
 
 class _SuperDLTrayIcon(wx.adv.TaskBarIcon):
@@ -329,6 +451,8 @@ class MainFrame(wx.Frame):
         self._started: set = set()               # melyik kezdett már letöltődni
         self._beeper = sounds.ProgressBeeper()    # százalék-pittyegés (M12)
         self._beep_job = None                     # melyik letöltést pittyegjük
+        self._tickelo = sounds.MennyisegBeeper()  # ismeretlen méretű (MK8)
+        self._tick_job = None
         self._cart_checkout = None                 # Médiakereső-kosár checkout-figyelő
         self._last_clip = ""
 
@@ -352,7 +476,15 @@ class MainFrame(wx.Frame):
             on_remind=lambda ev, kind:
                 wx.CallAfter(self._on_organizer_remind, ev, kind))
 
+        # MK7: az ABLAK szöveget fogad (böngészőből húzott link), a LISTA
+        # pedig fájlt (.torrent a Fájlkezelőből). Egy vezérlőnek csak EGY
+        # ejtési célja lehet, ezért kell a kettő külön helyre.
         self.SetDropTarget(UrlDropTarget(self._on_drop_url))
+        try:
+            self.dl_list.SetDropTarget(
+                TorrentFileDropTarget(self._on_drop_url))
+        except Exception:
+            pass          # ejtési cél nélkül is működjön minden más
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._on_tick, self.timer)
         self.timer.Start(700)
@@ -418,6 +550,13 @@ class MainFrame(wx.Frame):
                 menu, "&Fájltársítások (zene/videó)…", self._on_media_switch,
                 help="A SuperDL nyissa-e meg a zene- és videófájlokat "
                      "(dupla kattintásra)")
+            # MK7: KÜLÖN kapcsoló. Aki torrentezik, nem feltétlenül akarja a
+            # SuperDL-t zenelejátszónak is – és fordítva.
+            host.add_menu_item(
+                menu, "&Torrent-társítások (.torrent, magnet)…",
+                self._on_torrent_switch,
+                help="A SuperDL kezelje-e a .torrent fájlokat és a "
+                     "magnet-hivatkozásokat")
         except Exception:
             pass
 
@@ -448,6 +587,42 @@ class MainFrame(wx.Frame):
                            "a SuperDL-ben nyílik.", toast=True)
         except Exception as e:
             wx.MessageBox(f"A művelet nem sikerült: {e}", "Fájltársítások",
+                          wx.OK | wx.ICON_ERROR, self)
+
+    def _on_torrent_switch(self, event=None):
+        """`.torrent` és `magnet:` társítás ki/be (MK7)."""
+        from superdl import fileassoc
+        on = fileassoc.torrent_registered()
+        if on:
+            msg = ("A SuperDL MOSTANTÓL kezeli a torrenteket: a .torrent "
+                   "fájlra kattintva és a magnet-hivatkozásra kattintva a "
+                   "letöltés ide kerül.\n\nBe van kapcsolva. Kikapcsolod?")
+        else:
+            msg = ("Bekapcsolod, hogy a SuperDL kezelje a .torrent fájlokat "
+                   "és a magnet-hivatkozásokat?\n\nEttől a böngészőben egy "
+                   "magnet-linkre kattintva a letöltés egyből a SuperDL "
+                   "sorába kerül. Csak a saját felhasználói beállításodat "
+                   "írjuk, bármikor visszavonható; a Windows a végső döntést "
+                   "néha külön megerősítteti.")
+        dlg = wx.MessageDialog(self, msg, "Torrent-társítások",
+                               wx.YES_NO | wx.ICON_QUESTION)
+        dlg.SetYesNoLabels("Kikapcsolom" if on else "Bekapcsolom", "Mégse")
+        do = dlg.ShowModal() == wx.ID_YES
+        dlg.Destroy()
+        if not do:
+            return
+        try:
+            if on:
+                fileassoc.unregister_torrent()
+            else:
+                fileassoc.register_torrent()
+            self._announce(
+                "Torrent-társítások kikapcsolva." if on else
+                "Torrent-társítások bekapcsolva – a .torrent fájlok és a "
+                "magnet-hivatkozások mostantól a SuperDL-ben nyílnak.",
+                toast=True)
+        except Exception as e:
+            wx.MessageBox(f"A művelet nem sikerült: {e}", "Torrent-társítások",
                           wx.OK | wx.ICON_ERROR, self)
 
     def _add_autostart_switch(self):
@@ -535,8 +710,24 @@ class MainFrame(wx.Frame):
         mi_remove = m_dl.Append(
             wx.ID_ANY, "Eltá&volítás a listából\tShift+Del",
             "A kijelölt elem eltávolítása a listából (és a mentett sorból)")
+        mi_history = m_dl.Append(
+            wx.ID_ANY, "Letöltési &előzmények…\tCtrl+H",
+            "Mit töltöttél le korábban – kereshetően")
+        mi_batch = m_dl.Append(
+            wx.ID_ANY, "Több hivatkozás hozzáadása…\tCtrl+Shift+V",
+            "Linklista beillesztése egyszerre (a program kikeresi a "
+            "hivatkozásokat a szövegből)")
         mi_stopall = m_dl.Append(wx.ID_ANY, "Összes leállítá&sa\tCtrl+Shift+S")
         m_dl.AppendSeparator()
+        mi_status = m_dl.Append(
+            wx.ID_ANY, "&Mi a helyzet?\tCtrl+Shift+J",
+            "A letöltések állapota egy mondatban, azonnal")
+        mi_next_problem = m_dl.Append(
+            wx.ID_ANY, "&Következő teendő\tF6",
+            "Ugrás a következő figyelmet igénylő elemre, és mit tegyél vele")
+        mi_fix = m_dl.Append(
+            wx.ID_ANY, "&Javítás megkísérlése\tCtrl+F6",
+            "A kijelölt hibás elem újraindítása, ütközésnél a döntés kérése")
         mi_speak = m_dl.Append(wx.ID_ANY, "Összefoglaló &felolvasása\tCtrl+J",
                                "Az aktuális állapot felolvasása egy mondatban")
         self.mi_tts = m_dl.AppendCheckItem(
@@ -680,6 +871,11 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_remove_selected, mi_remove)
         self.Bind(wx.EVT_MENU, self._on_stop_all, mi_stopall)
         self.Bind(wx.EVT_MENU, self._on_speak_summary, mi_speak)
+        self.Bind(wx.EVT_MENU, self._on_status_now, mi_status)
+        self.Bind(wx.EVT_MENU, self._on_batch_paste, mi_batch)
+        self.Bind(wx.EVT_MENU, self._on_history, mi_history)
+        self.Bind(wx.EVT_MENU, self._on_next_problem, mi_next_problem)
+        self.Bind(wx.EVT_MENU, self._on_fix_selected, mi_fix)
         self.Bind(wx.EVT_MENU, self._on_subscribe, mi_subnew)
         self.Bind(wx.EVT_MENU, self._on_manage_subs, mi_submng)
         self.Bind(wx.EVT_MENU, self._on_channel_subscribe, mi_chan_new)
@@ -1008,6 +1204,10 @@ class MainFrame(wx.Frame):
         abr = str(s.get("audio_bitrate", "192"))
         asr = str(s.get("audio_samplerate", ""))
         ck_browser, ck_file = self._cookies_config()
+        # MK3: a hely-ellenőrzés modulszintű kapcsoló – itt frissítjük, hogy a
+        # Beállításokban tett változás AZONNAL érvényes legyen, ne csak
+        # újraindítás után (a felhasználó különben azt hinné, nem működik)
+        lemezhely.BEKAPCSOLVA = bool(s.get("hely_ellenorzes", True))
         if self.mgr is None:
             self.mgr = DownloadManager(
                 self.dir_entry.GetValue(),
@@ -1041,6 +1241,8 @@ class MainFrame(wx.Frame):
             self.mgr.cookies_browser = ck_browser
             self.mgr.cookies_file = ck_file
             self.mgr.playlist_folders = bool(s.get("playlist_folders", True))
+        # MK9: az időzített sebességkorlát mindkét ágon (új és meglévő kezelő)
+        self.mgr.savszelesseg_rend = str(s.get("savszelesseg_rend", "") or "")
         return self.mgr
 
     def _on_add(self, event=None, url: str | None = None):
@@ -1055,6 +1257,12 @@ class MainFrame(wx.Frame):
             return
         if not url_is_new(self.mgr, url):
             self._announce("Ez az URL már a listában van.", ok=False)
+            return
+        # MK10: duplikátum-figyelmeztetés. A sorban nincs benne, DE lehet, hogy
+        # korábban már letöltötte – és a mappában ez nem látszik. A névütközés
+        # csak a letöltés VÉGÉN derülne ki, addigra elment a sáv és az idő.
+        if not self._duplikatum_ok(url):
+            self._announce("Rendben, nem töltöm le újra.")
             return
         self.url_entry.Clear()
         self.SetStatusText("URL vizsgálata...")
@@ -1103,8 +1311,37 @@ class MainFrame(wx.Frame):
             self._known_rows[job.id] = row
         return row
 
-    def _on_drop_url(self, url: str):
-        self._on_add(url=url)
+    def _on_drop_url(self, szoveg: str):
+        """MK7: a beejtett szöveg (vagy fájlnév-lista) a KÖZÖS úton megy át —
+        ugyanaz a felismerés és ugyanaz a kérdés, mint a vágólapnál. Eddig a
+        két út máshogy viselkedett ugyanarra a tartalomra."""
+        self._linkeket_felvesz(szoveg, honnan="a beejtett tartalomban")
+
+    def _on_batch_paste(self, event=None):
+        """Kötegelt beillesztés (Ctrl+Shift+V) — MK7.
+
+        **Vakon EZ a fő út, nem a fogd-és-vidd.** Egy linklistát egérrel
+        áthúzni képernyőolvasóval körülményes; beilleszteni egy mezőbe viszont
+        természetes. A mező TÖBBSOROS, és az egész tartalmán a közös felismerő
+        fut — tehát vegyesen lehet benne http-link, magnet és torrent-útvonal,
+        sőt körülöttük szöveg is (egy kimásolt e-mail bekezdés is elég)."""
+        dlg = wx.TextEntryDialog(
+            self, "Illeszd be a hivatkozásokat (soronként vagy egybefüggő "
+                  "szövegben – a program kikeresi őket):",
+            "Több hivatkozás hozzáadása", style=wx.TE_MULTILINE | wx.OK
+            | wx.CANCEL)
+        dlg.SetSize((640, 400))
+        try:
+            if dlg.ShowModal() != wx.ID_OK:
+                return
+            szoveg = dlg.GetValue()
+        finally:
+            dlg.Destroy()
+        db = self._linkeket_felvesz(szoveg, honnan="a beillesztett szövegben")
+        if db == 0 and (szoveg or "").strip():
+            # a hallgatás itt azt üzenné, hogy a program elromlott
+            self._announce("Nem találtam hivatkozást a beillesztett "
+                           "szövegben.", ok=False)
 
     def _on_pick_dir(self, event):
         dlg = wx.DirDialog(self, "Célmappa kiválasztása",
@@ -1173,12 +1410,37 @@ class MainFrame(wx.Frame):
 
     def _remove_job(self, job):
         name = job.progress.filename or job.url
+        maradt = []
         if self.mgr:
-            self.mgr.remove(job)          # leállítja, törli a sorból + mentésből
+            # MK3: ha maradt félkész fájl, MEGKÉRDEZZÜK. A sorból kivétel és a
+            # letöltött adat megsemmisítése két különböző szándék: aki egy
+            # elemet kiszed a listából, nem feltétlenül akarja eldobni a fél
+            # gigányi letöltést is. A törlés visszafordíthatatlan, ezért nem
+            # következtetjük ki – de a kérdés csak akkor jön, ha van mit
+            # törölni, és az alapértelmezett válasz a MEGTARTÁS.
+            szemet = self.mgr.takarithato(job)
+            fajlokat_is = False
+            if szemet:
+                valasz = wx.MessageBox(
+                    f"Töröljem a(z) {name} félkész fájljait is?\n\n"
+                    f"{len(szemet)} fájl tartozik hozzá. Ha megtartod őket, "
+                    "a letöltés később folytatható onnan, ahol abbamaradt. "
+                    "Ha törlöd, a már letöltött rész véglegesen elvész.",
+                    "Félkész fájlok törlése",
+                    wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION, self)
+                fajlokat_is = (valasz == wx.YES)
+            maradt = self.mgr.remove(job, fajlokat_is=fajlokat_is)
         self._remove_row(job)
         self._conflict_asked.discard(job.id)
         self._reported.pop(job.id, None)
-        self._announce(f"Eltávolítva a listából: {name}")
+        if maradt:
+            # a hallgatás itt hazugság volna: a felhasználó azt hinné, tiszta
+            self._announce(
+                f"Eltávolítva a listából: {name}. {len(maradt)} félkész fájlt "
+                "nem sikerült törölni, valószínűleg használja egy másik "
+                "program.", ok=False)
+        else:
+            self._announce(f"Eltávolítva a listából: {name}")
 
     def _on_stop_all(self, event=None):
         if self.mgr:
@@ -1654,6 +1916,99 @@ class MainFrame(wx.Frame):
         self._speak_dayinfo(toast=True, beep=True)
 
     # ---- napi infó: dátum, névnap, időjárás --------------------------
+
+    def _on_status_now(self, event=None):
+        """„Mi a helyzet?" (Ctrl+Shift+J) – MK5.
+
+        **Miért kell külön a Ctrl+J mellé.** A Ctrl+J a NAPI INFÓ: dátum,
+        névnap, időjárás, és csak a végén a letöltések. Az időjárást hálózatról
+        kéri le, tehát a válasz KÉSIK, és a lényeg egy köszöntő végén jön.
+        Aki csak azt kérdezi, „hol tartanak a letöltéseim", annak ez rossz
+        csere: várakozás és bőbeszédűség egy egymondatos kérdésre.
+
+        Ez a billentyű SEMMILYEN hálózatot nem használ: a sor pillanatnyi
+        állapotából azonnal mondatot csinál."""
+        szoveg = build_summary(self.mgr.jobs if self.mgr else [])
+        self._announce(szoveg)
+        if self.speaker.available:
+            self.speaker.speak(szoveg)
+
+    # ---- MK6: ugrás a figyelmet igénylő elemre ------------------------
+
+    def _select_job_row(self, job) -> None:
+        """Kijelöli és fókuszba viszi a job sorát – hogy a képernyőolvasó
+        MAGÁTÓL felolvassa. Enélkül a bemondás és a kijelölés szétcsúszna:
+        hallanám, mi a baj, de a Delete másik elemre vonatkozna."""
+        row = self._row_for(job)
+        self.dl_list.SetFocus()
+        for r in range(self.dl_list.GetItemCount()):
+            self.dl_list.Select(r, 0)
+        self.dl_list.Select(row, 1)
+        self.dl_list.Focus(row)
+        self.dl_list.EnsureVisible(row)
+
+    def _on_next_problem(self, event=None):
+        """F6 – ugrás a következő figyelmet igénylő elemre (MK6).
+
+        **Körbefordul**, és kimondja, hányadiknál tartunk hányból. Vakon a
+        „hányadik hányból" nem díszítés: enélkül nem tudni, hogy körbeértünk-e,
+        és a felhasználó a végtelenségig nyomkodná a billentyűt abban a hitben,
+        hogy még jön valami."""
+        gondok = self.mgr.figyelmet_igenylok() if self.mgr else []
+        if not gondok:
+            self._announce("Nincs olyan letöltés, amivel most tenned kellene "
+                           "valamit.")
+            return
+        jelenlegi = self._selected_job()
+        kovetkezo = gondok[0]
+        if jelenlegi is not None:
+            azonositok = [j.id for j in gondok]
+            if jelenlegi.id in azonositok:
+                i = azonositok.index(jelenlegi.id)
+                kovetkezo = gondok[(i + 1) % len(gondok)]
+        self._select_job_row(kovetkezo)
+        p = kovetkezo.progress
+        hol = f"{gondok.index(kovetkezo) + 1}. a {len(gondok)}-ból."
+        mondat = hibaszoveg.gond_mondat(
+            p.filename or kovetkezo.url, p.status, p.error,
+            utkozes=bool(p.conflict), probak=getattr(kovetkezo, "retries", 0))
+        # a javítás-billentyűt CSAK ott ajánljuk fel, ahol tényleg van mit
+        # tenni egy gombbal – a hamis ígéret rosszabb, mint a hallgatás
+        if p.conflict or p.status == "hiba":
+            mondat += " Javítás megkísérlése: Ctrl+F6."
+        self._announce(f"{hol} {mondat}", ok=False)
+        if self.speaker.available:
+            self.speaker.speak(f"{hol} {mondat}")
+
+    def _on_fix_selected(self, event=None):
+        """Ctrl+F6 – a kijelölt elem javításának megkísérlése (MK6)."""
+        job = self._selected_job()
+        if job is None or not self.mgr:
+            self._announce("Nincs kijelölt letöltés.")
+            return
+        p = job.progress
+        # MK8: a seedelő torrentnél a „javítás" nem értelmes, viszont épp
+        # ilyenkor a legnehezebb megtudni, mi történik – a lista oszlopa
+        # `1.2 MB/s (0.87)`, ami kimondva semmit nem mond. Itt mondatot adunk.
+        if p.status == "seedelés":
+            szoveg = seed_mondat(p.filename or job.url, p.uploaded, p.ratio,
+                                 p.peers, p.up_speed)
+            self._announce(szoveg)
+            if self.speaker.available:
+                self.speaker.speak(szoveg)
+            return
+        if p.conflict:
+            # az ütközés DÖNTÉST vár: ugyanaz a párbeszéd, ami magától is jön
+            if job.id not in self._conflict_showing:
+                self._conflict_showing.add(job.id)
+                self._ask_conflict(job)
+            return
+        if p.status == "hiba":
+            self.mgr.start(job)
+            self._announce(f"Újraindítva: {p.filename or job.url}")
+            return
+        self._announce("Ezzel az elemmel most nincs mit tenni: "
+                       f"{p.status}.")
 
     def _download_status_phrase(self) -> str:
         s = build_summary(self.mgr.jobs if self.mgr else [])
@@ -2160,6 +2515,7 @@ class MainFrame(wx.Frame):
             return
         active = 0
         beep_target = None              # az első aktív, ismert hosszú letöltés
+        tick_target = None              # …és az első ISMERETLEN méretű (MK8)
         for j in self.mgr.jobs:
             p = j.progress
             row = self._row_for(j)      # visszatöltött/podcast elemekhez is
@@ -2167,6 +2523,12 @@ class MainFrame(wx.Frame):
                 active += 1
             if p.status == "letöltés" and p.total and beep_target is None:
                 beep_target = j
+            # MK8 (az MK5 maradéka): ISMERETLEN méretnél nincs százalék, tehát
+            # a hangmagasság-alapú pittyegés néma marad – pedig vakon épp
+            # ilyenkor a legkevesebb a visszajelzés (se csík, se szám, se hang).
+            if (p.status == "letöltés" and not p.total
+                    and tick_target is None):
+                tick_target = j
             if p.status == "letöltés" and j.id not in self._started:
                 self._started.add(j.id)
                 self._sfx("start")
@@ -2190,7 +2552,18 @@ class MainFrame(wx.Frame):
                     self._reported.get(j.id) != p.status:
                 self._reported[j.id] = p.status
                 if p.status == "kész":
-                    msg = f"Elkészült: {p.filename or j.url}"
+                    # MK10: rendezés (ha kérték) MÉG a bemondás előtt, hogy a
+                    # mondat már a VÉGLEGES helyet mondja – különben a
+                    # felhasználó a régi helyen keresné.
+                    rendezve = self._rendez_kesz(j)
+                    # MK5: a MÉRET is elhangzik. Vakon ez az egyetlen
+                    # visszajelzés arról, hogy a várt fájl jött-e le, és nem
+                    # egy néhány kilobájtos hibaoldal a fájl helyett.
+                    msg = befejezes_mondat(p.filename or j.url,
+                                           p.total or p.downloaded)
+                    if rendezve:
+                        msg += " " + rendezve
+                    self._elozmenybe(j)
                     self._announce(msg, toast=True, sound="done")
                     self.selfvoice.announce("download", "done")
                     feed = self._feed_pending.pop(j.id, None)
@@ -2198,8 +2571,11 @@ class MainFrame(wx.Frame):
                         self.fm.mark_seen(feed[0], feed[1])
                     self.cm.on_video_downloaded(j.url)
                 elif p.status == "seedelés":
+                    # MK5: SAJÁT hang. A seedelés nem lezárás – fut tovább, és
+                    # sávszélességet használ; a „done" hang azt üzente, hogy
+                    # vége, pedig nincs vége.
                     msg = f"Letöltve, seedelés folyamatban: {p.filename or j.url}"
-                    self._announce(msg, toast=True, sound="done")
+                    self._announce(msg, toast=True, sound="seed")
                     self.selfvoice.announce("download", "done")
                 else:
                     msg = f"Hiba: {p.filename or j.url} – {p.error}"
@@ -2216,11 +2592,33 @@ class MainFrame(wx.Frame):
         # százalék-pittyegés: az első aktív, ismert hosszú letöltést követjük
         if beep_target is not None:
             if self._beep_job != beep_target.id:
+                # MK5: HA VÁLT, MEGMONDJUK, MELYIKRE.
+                # A pittyegés egyetlen letöltést követ, de eddig némán váltott
+                # másikra, amikor az addig követett befejeződött. Több
+                # letöltésnél a hang így értelmezhetetlen volt: emelkedett,
+                # majd hirtelen visszaesett, és a felhasználó nem tudhatta,
+                # hogy ez visszalépés-e vagy másik fájl. Csak akkor szólunk,
+                # ha VOLT előző – az első indulásnál a „start" hang már szólt.
+                elozo = self._beep_job
                 self._beep_job = beep_target.id
                 self._beeper.reset()
+                if elozo is not None:
+                    nev = (beep_target.progress.filename or beep_target.url)
+                    self._announce(f"A haladásjelző hang mostantól ezt követi: "
+                                   f"{nev}.")
             self._beeper.update(beep_target.progress.percent)
         else:
             self._beep_job = None
+        # MK8: ismeretlen méretű letöltés – adagonként EGY kattanás. CSAK
+        # akkor, ha nincs százalékos követés: a kétféle hang egyszerre
+        # zavaros volna, és a felhasználó nem tudná, melyik mit jelent.
+        if tick_target is not None and beep_target is None:
+            if self._tick_job != tick_target.id:
+                self._tick_job = tick_target.id
+                self._tickelo.reset()
+            self._tickelo.update(tick_target.progress.downloaded)
+        else:
+            self._tick_job = None
         title = "SuperDL – akadálymentes médiaközpont"
         if active:
             title = f"SuperDL – {active} letöltés fut"
@@ -2268,6 +2666,103 @@ class MainFrame(wx.Frame):
             except Exception:
                 logging.getLogger("superdl").exception("kosár on_cleared hiba")
 
+    # ---- MK10: előzmények, rendezés, duplikátum -----------------------
+
+    def _job_mappaja(self, job) -> str:
+        return str(getattr(job, "out_dir", "") or self.dir_entry.GetValue())
+
+    def _rendez_kesz(self, job) -> str:
+        """A kész fájl áthelyezése a típusa szerinti almappába, HA kérték.
+
+        Alapból KIKAPCSOLT: fájlt mozgatni visszafordíthatatlan, és ha a
+        felhasználó nem találja meg, az rosszabb, mint a rendetlenség."""
+        if not self.settings.get("auto_rendezes"):
+            return ""
+        p = job.progress
+        nev = (p.filename or "").strip()
+        if not nev:
+            return ""
+        mappa = self._job_mappaja(job)
+        uj, hiba = rendezes.rendez(Path(mappa) / nev, mappa)
+        if hiba:
+            # NEM a letöltés hibája: a fájl megvan, csak a helyén maradt
+            self._announce(hiba, ok=False)
+            return ""
+        if uj:
+            job.out_dir = str(Path(uj).parent)
+            return rendezes.rendez_mondat(nev, Path(uj).parent.name)
+        return ""
+
+    def _elozmenybe(self, job) -> None:
+        """A kész letöltés felvétele az előzményekbe (a duplikátum-kérdéshez)."""
+        try:
+            p = job.progress
+            lista = elozmenyek.rogzit(
+                job.url, p.filename or "", p.total or p.downloaded,
+                self._job_mappaja(job))
+            elozmenyek.ment(elozmenyek.takarit(lista))
+        except Exception:
+            logging.getLogger("superdl").exception("előzmény-mentés hiba")
+
+    def _duplikatum_ok(self, url: str) -> bool:
+        """Igaz, ha mehet a letöltés. Ha már megvan, EGY kérdést teszünk fel.
+
+        Vakon a legdrágább hiba a második letöltés: a mappában nem látszik,
+        hogy már ott van, és a névütközés csak a VÉGÉN derülne ki."""
+        if not self.settings.get("duplikatum_kerdes", True):
+            return True
+        try:
+            regi = elozmenyek.mar_letoltve(url)
+        except Exception:
+            return True
+        if not regi:
+            return True
+        return wx.MessageBox(elozmenyek.duplikatum_kerdes(regi),
+                             "Ezt már letöltötted",
+                             wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION,
+                             self) == wx.YES
+
+    def _on_history(self, event=None):
+        """Kereshető előzmények (Ctrl+H) – MK10."""
+        HistoryDialog(self).ShowModal()
+
+    def _linkeket_felvesz(self, szoveg: str, honnan: str = "a szövegben",
+                          vagolap: bool = False) -> int:
+        """A KÖZÖS bemeneti út (MK7): vágólap, fogd-és-vidd, kötegelt beillesztés.
+
+        Eddig a három út háromféleképpen döntötte el, mi számít linknek, és
+        mindegyik NÉMÁN adott hozzá. Egyetlen linknél ez rendben van — de
+        többnél nem: egy harminc soros másolás némán harminc letöltést
+        indítana, és vakon ez ijesztő. Ezért **egynél több linktől kérdezünk**,
+        egyetlen kérdéssel; egyetlen linknél marad a megszokott néma felvétel.
+
+        Visszaadja a ténylegesen felvett linkek számát."""
+        talalt = linkek.kigyujt(szoveg)
+        if not talalt:
+            return 0
+        ujak = linkek.ujak(talalt, [j.url for j in self.mgr.jobs]
+                           if self.mgr else [])
+        if not ujak:
+            # a vágólap-figyelőnél ez a NORMÁLIS eset (ugyanaz a szöveg marad
+            # a vágólapon), ezért ott némán megyünk tovább; kézi bevitelnél
+            # viszont a hallgatás azt üzenné, hogy elromlott valami
+            if not vagolap:
+                self._announce("Ezek a hivatkozások már a sorban vannak.")
+            return 0
+        if linkek.kerdezzunk(len(ujak)):
+            valasz = wx.MessageBox(
+                linkek.kerdes_szoveg(ujak, honnan), "Több hivatkozás",
+                wx.YES_NO | wx.YES_DEFAULT | wx.ICON_QUESTION, self)
+            if valasz != wx.YES:
+                self._announce("Rendben, egyet sem adtam hozzá.")
+                return 0
+        for u in ujak:
+            self._on_add(url=u)
+        if len(ujak) > 1:
+            self._announce(f"{len(ujak)} hivatkozás hozzáadva a sorhoz.",
+                           sound="results")
+        return len(ujak)
+
     def _check_clipboard(self):
         text = ""
         if wx.TheClipboard.Open():
@@ -2279,9 +2774,10 @@ class MainFrame(wx.Frame):
         if text == self._last_clip:
             return
         self._last_clip = text
-        if text.lower().startswith(("http://", "https://", "magnet:")) \
-                and "\n" not in text and url_is_new(self.mgr, text):
-            self._on_add(url=text)
+        # MK7: a többsoros vágólapot eddig egy külön feltétel (`"\n" not in
+        # text`) SZÁNDÉKOSAN eldobta. Most a közös felismerő dolgozik, ami
+        # egy sorban több linket is megtalál – és a mennyiség miatt kérdez.
+        self._linkeket_felvesz(text, honnan="a vágólapon", vagolap=True)
 
     # ---- háttérmód / rendszertálca --------------------------------------
 
@@ -2359,6 +2855,14 @@ class MainFrame(wx.Frame):
             # versenyhelyzetet is megszünteti: a szándékot nem a mentés
             # pillanatában érvényes állapotszóból következtetjük vissza.
             self.mgr.stop_all(felhasznaloi=False)
+            # MK8: MEGVÁRJUK, hogy a szálak tényleg megálljanak — és csak
+            # UTÁNA mentünk és lőjük ki az aria2-t. A régi sorrendben az
+            # aria2 kirántása egy futó torrent alól kivételt dobott, a szál
+            # azt HIBÁNAK könyvelte el, a `finally` mentése pedig a `close()`
+            # UTÁN futott: a hibás állapot lett a MENTETT állapot. A
+            # felhasználó a következő indításkor látta, hogy hibás a torrent,
+            # holott csak bezárta a programot.
+            self.mgr.varj_leallasra()
             self.mgr.close()       # elmenti a sort a folytatáshoz
         from superdl.torrent import shutdown_aria2
         shutdown_aria2()
@@ -2922,7 +3426,12 @@ def _start_show_listener(frame) -> None:
                 path = ""
             try:
                 wx.CallAfter(frame._show_from_tray)
-                if path and os.path.isfile(path):
+                # MK7: az átadott dolog LEHET magnet-link is, ami NEM fájl –
+                # az `isfile` szűrő eddig némán eldobta volna
+                if path and linkek.letoltendo(["", path]):
+                    wx.CallAfter(frame._linkeket_felvesz, path,
+                                 "a megnyitott hivatkozásban")
+                elif path and os.path.isfile(path):
                     wx.CallAfter(frame.open_media_file, path)
             except Exception:
                 pass
@@ -2942,24 +3451,42 @@ def main():
         pass
     # a telepítő (vagy haladó felhasználó) csendben be/kikapcsolhatja a
     # fájltársításokat – GUI nélkül, azonnal kilépve
-    if "--register-file-assoc" in sys.argv or \
-            "--unregister-file-assoc" in sys.argv:
+    _ASSOC_KAPCSOLOK = ("--register-file-assoc", "--unregister-file-assoc",
+                        "--register-torrent-assoc",
+                        "--unregister-torrent-assoc")
+    if any(k in sys.argv for k in _ASSOC_KAPCSOLOK):
         try:
             from superdl import fileassoc
+            # MK7: a torrent-társítás KÜLÖN kapcsolókra jár, és külön ÁGON —
+            # aki torrentezik, nem feltétlenül akar zenelejátszót is cserélni.
+            # Ha a torrent-ág a média-ágba lenne ágyazva, a
+            # `--register-torrent-assoc` önmagában NEM sülne el.
             if "--register-file-assoc" in sys.argv:
                 fileassoc.register()
-            else:
+            elif "--unregister-file-assoc" in sys.argv:
                 fileassoc.unregister()
+            if "--register-torrent-assoc" in sys.argv:
+                fileassoc.register_torrent()
+            elif "--unregister-torrent-assoc" in sys.argv:
+                fileassoc.unregister_torrent()
         except Exception:
             pass
         return
     _maybe_wormhole()
+    # MK7: a LETÖLTENDŐ hivatkozás ELŐBB — a torrent-társításból és a
+    # magnet-kezelőből így érkezik. A `.torrent` fájl is FÁJL, tehát a lenti
+    # média-szűrőn átmenne, és a program zenelejátszót nyitna rá; ezért kell
+    # kizárni belőle.
+    letoltes_arg = linkek.letoltendo(sys.argv)
     media_arg = next((a for a in sys.argv[1:]
-                      if not a.startswith("-") and os.path.isfile(a)), None)
+                      if not a.startswith("-") and os.path.isfile(a)
+                      and a != letoltes_arg), None)
     # EGY PÉLDÁNY: ha már fut egy SuperDL, azt hozzuk elő (és adjuk át neki a
     # megnyitandó fájlt), majd lépjünk ki – ne induljon két RecordManager.
     if not _instance_is_first():
-        _signal_existing_to_show(media_arg or "")
+        # a magnet/torrent is átadandó, különben a MÁSODIK kattintás némán
+        # elveszne (az első példány már fut, a link meg sehova nem kerül)
+        _signal_existing_to_show(letoltes_arg or media_arg or "")
         return
     background = autostart.is_background_launch()
     app = wx.App()
@@ -2992,6 +3519,11 @@ def main():
     # a megfelelő modul-ablak nyissa meg (hang → Super M, videó → felolvasó).
     if media_arg:
         wx.CallLater(600, lambda: frame.open_media_file(media_arg))
+    # MK7: torrent-társításból vagy magnet-kezelőből indulva a hivatkozás
+    # egyenesen a letöltési sorba megy – EGY link, tehát kérdés nélkül
+    if letoltes_arg:
+        wx.CallLater(600, lambda: frame._linkeket_felvesz(
+            letoltes_arg, honnan="a megnyitott hivatkozásban"))
     app.MainLoop()
 
 

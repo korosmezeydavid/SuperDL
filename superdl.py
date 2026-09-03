@@ -177,6 +177,21 @@ def main() -> int:
     ap.add_argument("--upload-limit", metavar="SEBESSÉG", default="",
                     help="feltöltési sávkorlát, pl. '500K' vagy '2M' "
                          "(üres = nincs korlát)")
+    ap.add_argument("--linkek-fajlbol", metavar="FÁJL",
+                    help="hivatkozások beolvasása egy szövegfájlból – a "
+                         "program kikeresi belőle a linkeket (MK7)")
+    ap.add_argument("--elozmenyek", metavar="SZÓ", nargs="?", const="",
+                    help="letöltési előzmények keresése (üres szó = mind)")
+    ap.add_argument("--teendok", action="store_true",
+                    help="a figyelmet igénylő letöltések kiírása (hiba vagy "
+                         "döntésre váró ütközés), és mit tegyél velük")
+    ap.add_argument("--hely-ellenorzes", dest="hely_ellenorzes",
+                    action="store_true", default=True,
+                    help="szabad hely ellenőrzése indulás előtt (alapból BE)")
+    ap.add_argument("--nincs-hely-ellenorzes", dest="hely_ellenorzes",
+                    action="store_false",
+                    help="a szabad hely ellenőrzésének kikapcsolása "
+                         "(hálózati meghajtónál lehet rá szükség)")
     ap.add_argument("--plain", action="store_true",
                     help="képernyőolvasó-barát kimenet: folyamatjelző sáv "
                          "helyett sima szöveges állapotsorok")
@@ -213,6 +228,30 @@ def main() -> int:
     ap.add_argument("--update", action="store_true",
                     help="a letöltőmotorok frissítése a legújabb verzióra")
     args = ap.parse_args()
+
+    # MK3: a hely-ellenőrzés egyetlen modulszintű kapcsoló, hogy a CLI és a
+    # felület ne tudjon eltérni egymástól
+    from superdl import lemezhely
+    lemezhely.BEKAPCSOLVA = bool(getattr(args, "hely_ellenorzes", True))
+
+    # MK10: előzmény-keresés – GUI nélkül, azonnal kilépve
+    if getattr(args, "elozmenyek", None) is not None:
+        from superdl import elozmenyek as _el
+        from superdl import report as _rep
+        import time as _t
+        talalt = _el.keres(args.elozmenyek)
+        if not talalt:
+            print("Nincs találat az előzményekben.")
+            return 1
+        print(f"{len(talalt)} találat:")
+        for t in talalt:
+            mikor = float(t.get("mikor") or 0)
+            datum = _t.strftime("%Y.%m.%d.", _t.localtime(mikor)) if mikor \
+                else "—"
+            meret = int(t.get("meret") or 0)
+            print(f"  {datum}  {t.get('nev') or t.get('url')}"
+                  + (f"  ({_rep.mondott_meret(meret)})" if meret else ""))
+        return 0
 
     if getattr(args, "diagnose", False):
         from superdl import diagnostics
@@ -355,6 +394,24 @@ def main() -> int:
             print(osszefoglalo)
         print(f"Folytatás: {len(restored)} korábbi letöltés visszatöltve.")
 
+    # ---- MK6: teendők kiírása (a GUI F6-jának CLI-párja) -------------
+    if getattr(args, "teendok", False):
+        if not args.resume:
+            mgr.restore()          # teendő csak akkor van, ha van mit nézni
+        from superdl import hibaszoveg
+        gondok = mgr.figyelmet_igenylok()
+        if not gondok:
+            print("Nincs olyan letöltés, amivel most tenned kellene valamit.")
+        else:
+            print(f"{len(gondok)} letöltés igényel figyelmet:")
+            for i, j in enumerate(gondok, 1):
+                p = j.progress
+                print(f"  {i}. " + hibaszoveg.gond_mondat(
+                    p.filename or j.url, p.status, p.error,
+                    utkozes=bool(p.conflict),
+                    probak=getattr(j, "retries", 0)))
+        return 0
+
     # ---- új podcast-epizódok letöltése ------------------------------
     feed_jobs = []          # (FeedManager, Subscription, Episode, Job)
     if args.check_feeds:
@@ -373,6 +430,27 @@ def main() -> int:
     if args.list:
         urls += [line.strip() for line in Path(args.list).read_text().splitlines()
                  if line.strip() and not line.startswith("#")]
+
+    # ---- MK7: hivatkozások szövegfájlból (a kötegelt beillesztés CLI-párja) --
+    # A `--list` soronként EGY nyers URL-t vár. Ez a kapcsoló viszont a közös
+    # felismerőt hívja: kikeresi a linkeket akkor is, ha szöveg van körülöttük
+    # (egy kimásolt e-mail vagy chat-részlet is elég), és a duplikátumot kiszűri.
+    if getattr(args, "linkek_fajlbol", None):
+        from superdl import linkek as _linkek
+        try:
+            szoveg = Path(args.linkek_fajlbol).read_text(encoding="utf-8",
+                                                         errors="replace")
+        except OSError as e:
+            print(f"Nem sikerült beolvasni a hivatkozás-fájlt: {e}")
+            return 3
+        talalt = _linkek.ujak(_linkek.kigyujt(szoveg), urls)
+        if not talalt:
+            print("Nem találtam új hivatkozást a fájlban.")
+        else:
+            print(f"{len(talalt)} hivatkozás a fájlból:")
+            for u in talalt:
+                print(f"  {u}")
+            urls += talalt
 
     if not urls and not args.resume and not args.check_feeds:
         ap.print_help()

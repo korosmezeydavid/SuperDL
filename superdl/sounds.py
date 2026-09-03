@@ -32,6 +32,12 @@ EARCONS = {
     "start":   [(587, 0.10)],
     "done":    [(784, 0.08), (1047, 0.13)],
     "error":   [(440, 0.12), (311, 0.18)],
+    # MK5: a seedelés SAJÁT hangot kap. Eddig a készre töltött torrent
+    # ugyanazt a „done" hangot szólaltatta meg, mint a lezárult letöltés –
+    # holott az egyik VÉGET ért, a másik még fut és sávszélességet használ.
+    # Vakon a hang az egyetlen különbség: szándékosan NEM felfutó (nem
+    # lezárás), hanem egy visszatérő, nyitva hagyott kvint.
+    "seed":    [(659, 0.09), (523, 0.09), (659, 0.11)],
 }
 
 _ready = False
@@ -124,6 +130,67 @@ class ProgressBeeper:
         if q != self._last:
             self._last = q
             progress_beep(q * self.step)
+
+
+# ---- ismeretlen méretű letöltés (MK8, az MK5 maradéka) -----------------
+#
+# Ha a szerver nem mondja meg a méretet, NINCS százalék – tehát nincs mihez
+# kötni a hangmagasságot, és a `ProgressBeeper` néma marad. Vakon épp ilyenkor
+# van a LEGKEVESEBB visszajelzés: se csík, se szám, se hang.
+#
+# A megoldás nem a hangmagasság, hanem a RITMUS: adatmennyiséghez kötött,
+# AZONOS magasságú kattanás. Nem azt mondja meg, hol tartunk (azt nem tudjuk),
+# hanem azt, hogy HALAD — és a sűrűsége érzékelteti, milyen gyorsan.
+
+ADAG = 4 * 1024 * 1024                     # 4 MB-onként egy kattanás
+_TIK_FREKVENCIA = 660.0
+
+
+def tick() -> None:
+    """Egyetlen halk kattanás – „még megy". Magassága ÁLLANDÓ: itt nincs
+    előrehaladás, amit közölhetnénk, és egy emelkedő hang azt hazudná."""
+    if not _progress["enabled"] or winsound is None:
+        return
+    f = SOUND_DIR / "tick.wav"
+    try:
+        if not f.exists():
+            SOUND_DIR.mkdir(parents=True, exist_ok=True)
+            data = _tone(_TIK_FREKVENCIA, 0.045,
+                         amp=_progress["amp"] * 0.6)
+            with wave.open(str(f), "wb") as w:
+                w.setnchannels(1)
+                w.setsampwidth(2)
+                w.setframerate(RATE)
+                w.writeframes(data)
+        winsound.PlaySound(str(f), winsound.SND_FILENAME
+                           | winsound.SND_ASYNC | winsound.SND_NODEFAULT)
+    except Exception:
+        pass
+
+
+class MennyisegBeeper:
+    """Ismeretlen méretű letöltés hangja: adagonként EGY kattanás.
+
+    A `ProgressBeeper` párja arra az esetre, amikor nincs százalék. Nem a
+    haladás MÉRTÉKÉT mondja (azt nem tudjuk), hanem azt, hogy VAN haladás —
+    és ha elhallgat, az önmagában információ: elakadt."""
+
+    def __init__(self, adag: int = ADAG):
+        self.adag = max(1, int(adag))
+        self._last = -1
+
+    def reset(self) -> None:
+        self._last = -1
+
+    def update(self, letoltve: float) -> None:
+        q = int(letoltve) // self.adag
+        if q != self._last:
+            elso = self._last < 0
+            self._last = q
+            # az ELSŐ hívásnál nem szólunk: az indulást a „start" earcon
+            # már bemondta, és két hang egymás után zavaró
+            if not elso and q > 0:
+                tick()
 
 
 def _ensure() -> None:

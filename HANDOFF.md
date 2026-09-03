@@ -158,11 +158,424 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-09-01 · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-03 · dolgozott: Claude
 
 ---
 
-### 🔨 csevej 1.6.1 – HANGERŐ – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-09-01)
+### 🟡 4.6.0 – MEGÉPÍTVE, KULCS-SZKEN TISZTA, **MÉG NEM PUBLIKÁLT** (2026-09-03)
+
+A felhasználó döntése: „be akarom fejezni ezt a mérföld sorozatot, akkor akarom
+publikálni egybe, aztán ha hiba jön, majd orvosoljuk." Ezért a 4.6.0 **egyben**
+hozza az MK3, MK5, MK6, MK7, MK8, MK9 (sávszélesség-ütemezés) és MK10 köröket.
+
+**Verzió:** `superdl/__init__.py` → `__version__ = "4.6.0"`.
+
+**Állapot a lemezen (mind friss, 2026-09-03):**
+- ✅ `dist\SuperDL\` onedir – 09:29
+- ✅ `installer\SuperDL-Setup-4.6.0.exe` (148,5 MB) – 09:32
+- ✅ `dist\SuperDL-cli.exe` (140,4 MB) – 09:34
+- ✅ `dist\SuperDL.exe` onefile GUI (202,5 MB) – 09:48
+- ✅ **Kulcs-szken TISZTA**: 2 kulcs, 336 fájl, 0 találat, kilépési kód **0**
+  (a forrás + `dist_modules` + mindhárom exe + a telepítő).
+
+**Modul-zipek: NINCS ÚJ.** Ez a kör végig **Core**-t érintett, tehát a kiadás
+Core-only: nincs modul-tag, és a `modules.json` sem változik.
+
+**Ami hátravan (CSAK „publikálás" jelszóra):**
+1. Verziótlan alias: `installer\SuperDL-Setup-4.6.0.exe` → `SuperDL-Setup.exe`.
+2. `gh release create v4.6.0 … --latest` a 4 assettel (setup + alias + GUI + CLI).
+3. A 6 letöltési URL ellenőrzése (mind 200).
+4. Hírlevél a `C:\Users\msn\Documents\superdllistara.txt`-be (piszkozat kész).
+
+**Buildelési tanulságok ebből a körből (mindkettő új):**
+- **A build túllépi az eszköz ~60 mp-es válaszidejét.** Megoldás:
+  `Start-Process … -RedirectStandardOutput … -WindowStyle Hidden -PassThru`,
+  majd rövid `Wait-Process -Timeout 50` hívásokkal pollozni.
+- **`-NoNewWindow` KEVÉS.** A híd bontásakor a szülő PowerShell-lel együtt a
+  gyerek PyInstaller is meghalt (a GUI onefile build a hidden-import elemzés
+  közepén állt le, a log ott is szakadt meg). `-WindowStyle Hidden` (új konzol)
+  mellett a bontás már nem vitte magával. **Sorrend továbbra is:** onedir →
+  telepítő → CLI → onefile GUI.
+- **A `keyscan.py` elhasal átirányított kimeneten**, mert a ✅ jelet cp1250-re
+  próbálja kódolni → `UnicodeEncodeError`, és a kilépési kód 1 lesz akkor is, ha
+  a szken TISZTA. Amíg nem javítjuk: `cmd`-ből, `set PYTHONIOENCODING=utf-8`
+  mellett kell futtatni. (Kis javítanivaló a backlogba.)
+
+---
+
+### 🔨 LETÖLTŐ-MOTOR MK8 · MK9 · MK10 – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-09-03)
+
+**MK8 – kilépés és megrekedt letöltések.** A lemez-ellenőrzés egy **adatvesztő**
+hibát talált, amit a terv nem említett: a kilépés `stop_all()` után AZONNAL
+`close()`-t hívott, ami kirántotta az aria2-t a futó torrent-szál alól. A
+keletkező kivételt a `_run_job` „hibá"-nak könyvelte el, a szál `finally:
+self._save()`-je pedig a `close()` UTÁN futott – vagyis **a hamis hibaállapot
+lett a MENTETT állapot**. A felhasználó a következő indításkor egy nem létező
+torrent-hibát látott volna, és az MK6 F6-ja pont oda navigálta volna.
+
+- `manager.LEALLAS_VARAKOZAS = 6.0` + `varj_leallasra()`; a `superdl_gui._on_close`
+  ezt hívja `stop_all()` és `close()` KÖZÖTT.
+- `_run_job`: ha `_closing` be van állítva vagy a letöltő `_stop`-ja meg van
+  húzva, az állapot „leállítva", és **nincs hibaszöveg**.
+- Megrekedt letöltések: `MAKACS_PROBA = 3`, `figyelmet_igenyel()` /
+  `figyelmet_igenylok()`, `KUZD_KUSZOB = 3` + `_kuzd_tick()`.
+- `lemezhely.indulas_elott(ut, kell=0, nev="")` – azoknak a motoroknak, amelyek
+  előre nem tudják a méretet (`INDULAS_KUSZOB = 2 GB`).
+
+**Itt bukott meg a saját tesztem, és jó, hogy megbukott:** a „makacs újrapróba"
+ág átengedte a `HALOZATRA_VAR` állapotot, vagyis a szabály, amit az MK2 védelmére
+írtam, **visszacsinálta volna az MK2-t**. Javítás: a kizárás **egy helyre való,
+legelöl** – a `figyelmet_igenyel()` első sora a kizáró lista.
+
+**MK9 – sávszélesség-ütemezés.** Új `superdl/savszelesseg.py`: időhöz kötött
+korlát, pl. `"22:00-06:00=0; 06:00-22:00=500K"`. `elemez()`, `_benne_van()`
+(az **éjfélen átnyúló** sáv a lényeg, ez a tipikus eset), `korlat_most()`,
+`emberi()`, `valtas_mondat()`. A manager `_savszelesseg_tick()`-je váltáskor
+mondja is be, mi lépett életbe.
+
+**Amit SZÁNDÉKOSAN nem építettem meg:** munkalopás (work stealing) és adaptív
+szálszám. Ezek átírnák a szegmenslistát, amit a `.sdlstate` eltárol – egy hiba
+ott nem összeomlás, hanem **csendben elrontott fájl**. Egy nagy, élesben még nem
+mért kiadás előtt ez rossz csere. Marad a backlogban.
+
+**MK10 – előzmények és rendezés.** A lemez-ellenőrzés itt is cáfolt: az
+`organizer.py` **nem** fájlrendező, hanem a naptár/teendők/jegyzetek kezelője, a
+terv „már megvan" premisszája téves volt; előzmény pedig egyáltalán nem létezett.
+
+- `superdl/elozmenyek.py`: `MEGORZES_NAP = 365`, `MAX_TETEL = 5000`, `rogzit()`,
+  `keres()`, `takarit()`, `mar_letoltve()` (**csak akkor szól, ha a fájl még
+  létezik** – különben hazudna), `duplikatum_kerdes()`. GUI: Ctrl+H.
+- `superdl/rendezes.py`: befejezett letöltések típus szerinti almappákba
+  (Videók/Zene/Képek/Dokumentumok/Csomagok/Egyéb). **Soha nem ír felül**,
+  `(uj_ut, hiba)`-t ad vissza. Alapból **KI** van kapcsolva.
+
+**Tesztek:** `tests/test_mk8_mk10.py`. Teljes futás: **1698 zöld**, compileall
+tiszta, attr_audit 0 találat.
+
+---
+
+### 🔨 LETÖLTŐ-MOTOR MK7 – LINK-BEVITEL – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-09-03)
+
+**A lemez-ellenőrzés KÉTSZER cáfolta a tervet, ELLENTÉTES irányba.**
+
+1. **A „fogd és vidd" MÁR MEGVOLT**, és több linket is kezelt (`UrlDropTarget`
+   soronként végigment a beejtett szövegen). A terv új funkcióként sorolta.
+2. **A `fileassoc.py` viszont NEM arra való, amire a terv mondta.** Megvan, de
+   **zene- és videófájlokra** (`AUDIO_EXTS`, `VIDEO_EXTS`, `SuperDL.Audio`,
+   `SuperDL.Video`); **`.torrent` és `magnet`: nulla találat.** Az
+   infrastruktúra (HKCU, ProgID, visszavonhatóság) újrahasznosítható, a
+   torrent-rész viszont nulláról épült.
+
+**Két további dolog, amit a terv nem említett:**
+
+- A vágólap-figyelőben ott volt egy **szándékos** korlát: `and "\n" not in
+  text` — vagyis a többsoros vágólapot kifejezetten eldobta. Ez nem hiányosság
+  volt, hanem meghozott döntés, amit felül kellett írni.
+- **A terv „egyetlen kérdéssel" fogalmazott, mintha ma több kérdés lenne.
+  Valójában NULLA kérdés volt: a figyelő némán adott hozzá.** Ez egy linknél
+  elmegy — de többsorosnál egy harminc soros másolás **némán harminc letöltést
+  indítana**. Vakon ijesztő és nehezen visszacsinálható. **A kérdés tehát nem
+  díszítés, hanem a FELTÉTELE annak, hogy a többsorosat bevezethessük.**
+
+**Amit a kód csinál:**
+
+- **Új modul `superdl\linkek.py`** — a KÖZÖS felismerő. Eddig a három bemeneti
+  út háromféleképpen döntötte el, mi számít linknek: a vágólap http/https/magnet
+  egy sorban, a fogd-és-vidd ugyanaz soronként, az `_on_add` ezeken felül a
+  `.torrent` útvonalat is. **Egy sorban több link** is előkerül (egy chat- vagy
+  e-mail-részlet bőven ad kettőt), a duplikátum kiesik, a **sorrend marad**.
+- **A záró írásjelet levágja**, mert egy mondat végéről másolt link a ponttal
+  404-re futna — a felhasználó meg nem értené, hisz a böngészőben működik.
+  ⚠️ **A SORREND SZÁMÍT:** előbb a NYITÓ jelek, csak utána a záró zárójel.
+  Fordítva a `(https://a.hu/x)` alakban a zárójel párosnak látszik és bent
+  ragad. **A teszt fogta meg** (a Wikipédia-linkek valódi zárójele — `_(film)`
+  — viszont bent kell hogy maradjon).
+- **`.torrent` útvonal CSAK ha a fájl létezik** — az elírt név ne induljon el.
+  A **szóközös** Windows-útvonalat egyben kezeljük (a szóköz menti darabolás
+  szétvágná).
+- **Egy közös GUI-út (`_linkeket_felvesz`)**: vágólap, fogd-és-vidd, kötegelt
+  beillesztés, parancssori hivatkozás. **Kettőtől kérdez**, egyetlen linknél
+  marad a megszokott néma felvétel.
+- **Új `TorrentFileDropTarget`**: `.torrent` fájl a Fájlkezelőből ráhúzható a
+  listára. Eddig csak SZÖVEGET lehetett beejteni.
+- **Ctrl+Shift+V — kötegelt beillesztés.** **Vakon EZ a fő út**, nem a
+  fogd-és-vidd: egy linklistát egérrel áthúzni képernyőolvasóval körülményes.
+- **`fileassoc`: `.torrent` társítás + `magnet:` protokoll-kezelő**, KÜLÖN
+  kapcsolóval (aki torrentezik, nem feltétlenül akar zenelejátszót is cserélni).
+  ⚠️ **A magnet NEM fájlkiterjesztés:** a kulcs a séma nevén áll, és kötelező
+  benne egy üres `URL Protocol` érték — enélkül a Windows nem is ajánlja fel.
+  Ezért külön függvény, nem paraméter. **Kikapcsoláskor a magnet-kulcsot csak
+  akkor töröljük, ha tényleg a MI parancsunk van benne** — egy időközben
+  beállított másik torrentprogramot kilőni sokkal rosszabb, mint egy ott
+  maradt kulcs.
+- **🔴 A TÁRSÍTÁS ÖNMAGÁBAN FÉL JAVÍTÁS LETT VOLNA, ami ROSSZUL viselkedik.**
+  A program `os.path.isfile()` szűrővel kereste a parancssori argumentumot:
+  a **`magnet:` ezen fennakadt** (nem fájl) → a felhasználó kattint, elindul a
+  program, és **nem történik semmi**; a **`.torrent` viszont fájl**, tehát
+  átment → a program **médiafájlként** próbálta volna megnyitni
+  (zenelejátszó/felolvasó). Új `linkek.letoltendo(argv)`, a média-szűrőből
+  kizárva, és **az egy-példány átadás is viszi** (különben a második kattintás
+  némán elveszne).
+- **A telepítő-kapcsoló külön ÁGON:** a `--register-torrent-assoc` a média-ágba
+  ágyazva önmagában nem sült volna el.
+- **CLI: `--linkek-fajlbol`** — a `--list` soronként EGY nyers URL-t vár; ez a
+  közös felismerőt hívja, tehát szöveg közül is kiszedi a linkeket.
+
+**Ellenőrizve:** **1669 pytest zöld** (1648 → +21); új teszt
+`tests\test_linkek_mk7.py`. compileall tiszta, attr_audit 0.
+**ÉLESBEN MÉG NEM MÉRVE:** valódi magnet-kattintás böngészőből (a társítás csak
+a TELEPÍTETT exénél él — `available()` a fagyasztott futásra szűr, tehát
+forrásból nem is próbálható).
+
+---
+
+### 🔨 LETÖLTŐ-MOTOR MK6 – SOR-NAVIGÁCIÓ – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-09-03)
+
+**A lemez-ellenőrzés itt nem abban fogta meg a tervet, hogy MI létezik, hanem
+hogy amit használni akar, az MINDENHOL működik-e.**
+
+A `media.friendly_error()` megvan és kiváló (korhatár, bot-ellenőrzés, privát
+videó, tagság, régiózár, törölt videó, premier, 403, 429, ffmpeg, jogosultság)
+— **de CSAK a yt-dlp motorhoz volt bekötve.** A `manager.py`-ban, a
+`segment.py`-ban és a `torrent.py`-ban sehol. Egy fájlletöltés vagy torrent
+hibája nyers angol kivételszövegként került a `progress.error`-ba, és a
+felolvasó AZT mondta be. **Az MK6 ígérete („mondd meg, mit tegyél") háromból
+egy motoron teljesült volna.** Ugyanaz a minta, mint a tvmusornál: jó
+szolgáltatás, egyetlen hívóval.
+
+**Egy ponton a terv SZÖVEGÉVEL sem értettem egyet**, és ezt a kód is tükrözi:
+a terv „hibás vagy **várakozó**" elemre ugrana. A várakozó kimaradt — az MK2
+egész értelme az volt, hogy a hálózatra várakozás NEM igényel beavatkozást.
+
+**Amit a kód csinál:**
+
+- **Új modul `superdl\hibaszoveg.py`** — közös fordító MINDEN motorra.
+  Sorrend, és mindegyik lépésnek oka van: (1) a saját magyar mondatainkhoz
+  (MK2/MK3/MK4) **nem nyúlunk**; (2) előbb a torrent/szegmens saját hibái
+  (aria2-indítás, RPC, magnet, nincs megosztó, tracker, Range) — mert a
+  `friendly_error` általános mintái ráillenének és ROSSZABB tanácsot adnának;
+  (3) végül a `media.friendly_error`. **Ha egyik minta sem illik, az EREDETI
+  szöveg marad** — kitalálni egy magyarázatot rosszabb a nyers hibánál (ez volt
+  a tvmusor tanulsága).
+- ⚠️ **A BEKÖTÉS SORRENDJE KÖTÖTT.** A fordítás CSAK a hálózati besorolás UTÁN
+  fut a `_run_job`-ban. A `halozati_eredetu()` az ANGOL nyers szövegben keres
+  mintát („failed to establish", „getaddrinfo"); ha előbb fordítanánk, a minta
+  nem illene, és a hálózat-kimaradásból megint HIBA lenne — **az MK2-t csendben
+  visszacsinálnánk.**
+- **`DownloadManager.figyelmet_igenyel(job)`** — három eset: hiba · **ütközés**
+  (DÖNTÉSRE vár, és az MK4 szerint nem is kap újrapróbát, tehát magától soha nem
+  oldódik meg) · **makacsul újrapróbálkozó** (3 bukás fölött).
+  **KIMARAD:** `várakozik a hálózatra`, `várakozik`, `ütemezve`, `leállítva`,
+  `kész`, `letöltés`.
+- **🔴 A TESZT ELKAPTA A SAJÁT HIBÁMAT.** Az első változatban a „makacs
+  újrapróba" ág a végén állt, feltétellel („nem kész és nem leállítva") — és
+  **ÁTENGEDTE a hálózatra várakozó elemet**, ha az sokat próbálkozott. Vagyis
+  a szabály, amit épp az MK2 védelmére írtam, **maga csinálta volna vissza az
+  MK2-t.** Javítva: a kizárás áll elöl, egyetlen listán.
+- **F6 — ugrás a következő teendőre**, körbeforduló léptetéssel, és **kimondja,
+  hányadik hányból**. Vakon ez nem díszítés: enélkül nem tudni, körbeértünk-e,
+  és a felhasználó a végtelenségig nyomkodná a billentyűt.
+- **A sor kijelölése ÉS fókuszálása**, hogy a képernyőolvasó magától felolvassa
+  — enélkül a bemondás és a kijelölés szétcsúszna, és a Delete másik elemre
+  vonatkozna.
+- **Ctrl+F6 — javítás megkísérlése:** hibánál `start(job)`, ütközésnél a
+  meglévő döntés-párbeszéd. **A billentyűt csak ott ajánljuk fel, ahol tényleg
+  van mit tenni** — a hamis ígéret rosszabb a hallgatásnál.
+- **CLI: `--teendok`** — ugyanaz kiírva, hogy a két felület ne térjen el.
+
+**MK6/6 – A KIEMELÉS IS MEGTÖRTÉNT (ugyanaznap, nem külön körben).**
+A `friendly_error` és három segédfüggvénye (`_looks_offline`, `_is_bot_check`,
+`_is_cookie_error`) **átköltözött** a `media.py`-ból a `hibaszoveg.py`-ba —
+148 sor, a media.py 535 → 387 sorra fogyott.
+
+- **SZKRIPT költöztette, nem kézi másolás.** A `friendly_error` több mint száz
+  sor gondosan fogalmazott magyar szöveg; kézzel átgépelve egyetlen elrontott
+  karakter is némán elronthatott volna egy tanácsot. Az egyszer futó eszköz a
+  munka után törölve — egy soha többé le nem futtatható migrációs szkript a
+  `tools`-ban csak félrevezetné a következő fejlesztőt.
+- **A `media.friendly_error` VISSZAFELÉ KOMPATIBILIS alias marad** (`from
+  .hibaszoveg import …`), mert a `searchwin.py` és a régi kód így hívja.
+  Teszt igazolja, hogy **ugyanaz a függvényobjektum**.
+- **Megszűnt a körkörös függés:** a `media` importálja a `hibaszoveg`-et, nem
+  fordítva. **Teszt őrzi**, hogy a `hibaszoveg` betöltése NE húzza be a
+  `media`-t (azzal a yt-dlp is betöltődne — lassú, és visszahozná pont azt a
+  törékenységet, ami miatt a refaktor készült).
+- **Teszt őrzi, hogy a SZÖVEGEK változatlanul jöttek át** („KORHATÁROS",
+  „PRIVÁT", „régiózár", „hotspot") — a költöztetés célja nem az átírás volt.
+
+**Ellenőrizve:** **1648 pytest zöld** (1623 → +25); új teszt
+`tests\test_hibaszoveg_mk6.py`. compileall tiszta, attr_audit 0.
+**Az MK6-ban nem maradt hátra semmi.**
+**ÉLESBEN MÉG NEM MÉRVE:** valódi hibás elemek közti F6-lépkedés
+képernyőolvasóval; egy torrent- és egy sima fájlletöltés-hiba magyarul.
+
+---
+
+### 🔨 LETÖLTŐ-MOTOR MK5 – HANGZÓ ÁLLAPOT – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-09-03)
+
+**A lemez-ellenőrzés NÉGYBŐL KETTŐBEN megcáfolta a tervet.** A terv szerint a
+hangzó előrehaladás építőkockái megvannak, és a „mi a helyzet?" billentyű
+hiányzik. **Valójában mindkettő MEGVAN és MŰKÖDIK** — csak nem jól. Nem építeni
+kellett, hanem javítani, és ez egészen más munka.
+
+1. **A hangzó előrehaladás kész és be van kötve** (`sounds.progress_beep`,
+   `ProgressBeeper`, `_on_tick`). **De:** csak az ELSŐ ismert méretű letöltést
+   követi, és **némán vált másikra**, amikor az befejeződik. Több letöltésnél a
+   hang értelmezhetetlen: emelkedik, majd hirtelen visszaesik, és a felhasználó
+   nem tudja, ez visszalépés-e vagy másik fájl.
+2. **A „Ctrl+J összefoglaló" NEM a letöltések összefoglalója.** Az a NAPI INFÓ:
+   dátum, névnap, **hálózatról lekért időjárás**, és csak a végén a letöltések.
+   Aki azt kérdezi, „hol tartanak a letöltéseim", **várakozást és egy köszöntőt
+   kap** egy egymondatos kérdésre.
+3. **Az emberi idő KÉTFÉLE volt.** `retrypolicy.emberi_ido()` „negyed órát"
+   mond, `report.human_time()` „körülbelül 15 percet" — ugyanarra a fogalomra
+   két szókincs, és a felhasználó azt hiszi, két különböző dologról van szó.
+4. **ÉS EGY VALÓDI HIBA, amit a terv nem is említett:** a `report.human_bytes()`
+   **tizedesPONTtal** ad vissza méretet („5.3 MB"), és ez a **kimondott**
+   mondatba került. A felolvasó a tizedespontot mondatvégi pontnak mondja.
+5. **A `report.py`-t EGYETLEN teszt sem védte** — pedig ez gyártja azt a
+   mondatot, amit a vak felhasználó a leggyakrabban hall.
+
+**Amit a kód csinál:**
+
+- **Egységes szókincs.** A `report.py` mostantól a `retrypolicy.emberi_ido()`-ra
+  és a `lemezhely.emberi_meret()`-re épül. Új `mondott_meret()` a FÜLNEK
+  („5,3 megabájt"); a `human_bytes()` marad a SZEMNEK, a lista oszlopába — a
+  kettő külön feladat, és a docstring most már ki is mondja.
+- **Új „Mi a helyzet?" — Ctrl+Shift+J.** Csak a letöltések, egy mondatban,
+  **hálózat nélkül, azonnal**. A Ctrl+J (napi infó) érintetlen marad: nem
+  elvettünk egy funkciót, hanem kettéválasztottuk a két különböző kérdést.
+- **A leglassabb elem külön mondatot kap.** Az EGYÜTTES hátralévő idő
+  félrevezet: ha kettőből az egyik egy perc múlva végez, a másik egy óra múlva,
+  az átlagból rosszul tervez a felhasználó — és vakon nem tudja szemmel
+  végigfutni a listát, hogy ezt észrevegye. **Egyetlen letöltésnél hallgat**
+  (a fölösleges szöveg vakon fárasztó).
+- **Befejezéskor elhangzik a MÉRET is.** Vakon ez az egyetlen visszajelzés
+  arról, hogy a várt fájl jött-e le, és nem egy néhány kilobájtos hibaoldal.
+- **A seedelés SAJÁT earcont kapott.** Eddig a „done" szólt rá — pedig a
+  letöltés VÉGET ért, a seedelés viszont FUT és sávszélességet használ.
+  Az új hang szándékosan **nem felfutó**: visszatér a kiinduló hangra, tehát
+  „nyitva hagyott", nem lezárás. Teszt is védi ezt a különbséget.
+- **A pittyegés váltását kimondjuk.** Ha a követett letöltés befejeződik és a
+  hang másikra vált, egy mondat megmondja, melyikre. Az első indulásnál nem
+  szól (ott a „start" hang már megvolt).
+
+**Ellenőrizve:** **1623 pytest zöld** (1605 → +18); új teszt
+`tests\test_report_mk5.py` — **a `report.py` első tesztjei.**
+compileall tiszta, attr_audit 0.
+**HÁTRA:** az ismeretlen méretű letöltés továbbra sem pittyeg (nincs mihez
+kötni a hangmagasságot) — pedig ott a leghasznosabb volna. Külön kör: idő- vagy
+adatmennyiség-alapú ritmus.
+**ÉLESBEN MÉG NEM MÉRVE:** a hangok valódi felolvasóval, több párhuzamos
+letöltés mellett.
+
+---
+
+### 🔨 LETÖLTŐ-MOTOR MK3 – CÉLFÁJL ÉPSÉGE – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-09-03)
+
+**A lemez-ellenőrzés négyből háromban igazolta a tervet, EGYBEN VISZONT
+TÉVEDETT – és pont abban, amit a terv a legsürgősebbnek mondott.**
+
+A terv szerint az egyszálú ágon a folytatás „gyakorlatilag halott", és az MK2
+óta a „folytatódik" valójában „elölről kezdi". **Ez nem volt igaz:** a
+`_download_single` küld `Range` fejlécet, és mivel az `unique_path` csak a KÉSZ
+fájlt nézi (a `.part`-ot nem), a szokásos esetben megtalálja a saját `.part`-ját
+és rendesen folytat. **A terv szerint kódolva működő kódot írtam volna újra** –
+ez a W0 tanulsága fordítva. A valódi lyuk szűkebb, de csúnyább (lásd lent).
+
+**Ami igazolódott:** `shutil.disk_usage` az EGÉSZ `superdl` csomagban **nulla
+találat** · SHA-256 van (`selfupdate`, `modkit`, `extratools`), de a felhasználó
+letöltéseihez egy sor sem · a `remove()` mindössze `stop` + listából kivétel,
+a `.part`/`.sdlstate` **örökre ott marad**.
+
+**Amit a kód csinál:**
+
+- **Új modul `superdl\lemezhely.py`** – tiszta függvények, wx és letöltő nélkül,
+  valódi lemez nélkül tesztelhetők. Ellenőrzés a `_probe()` UTÁN, az első bájt
+  ELŐTT. **Csak azt kéri számon, ami MÉG hiányzik** (folytatásnál a meglévő
+  `.part` már a lemezen van – kétszer beszámítani hamis riasztás volna).
+  ⚠️ **Két eset szándékosan ÁTENGED: ismeretlen méret és megállapíthatatlan
+  szabad hely.** Egy hamis „nincs hely" megbénítaná a programot; a
+  bizonytalanság nem hiba. Hálózati meghajtón kikapcsolható.
+- **A hibaüzenet HÁROM számot mond** (kell / van / hiányzik). A harmadik a
+  fontos: abból derül ki, elég-e egy fájlt törölni, vagy másik meghajtó kell.
+- **Futás közbeni figyelés** a sebességmérő szálban, 10 másodpercenként,
+  **egyszer szól** (mint az MK2 offline jelzése). Ez FIGYELMEZTETÉS, nem hiba:
+  új `Progress.figyelmeztetes` mező, mert az `error`-ba írni ugyanaz a kár
+  volna, mint a hálózati várakozást hibának mondani.
+- **Az egyszálú folytatás KÉT valódi lyuka.** (1) A régi feltétel
+  `existing and self.progress.total` volt: **ismeretlen méretnél hamis lett, és a
+  meglévő `.part`-ot NÉMÁN felülírta** – nem elölről kezdett, hanem eldobta az
+  adatot. (2) Az egyszálú ág nem írt `.sdlstate`-et, így ha a célnevet egy kész
+  fájl foglalta, a `név (1).kit.part` árván maradt.
+- **Az állapotfájl MÓDOT kapott** (`egyszalu` / `szegmentalt`). Enélkül a
+  szegmentált ág felvehetné az egyszálú állapotot, aminek ÜRES a szegmenslistája
+  → „minden kész" → azonnal késznek nyilvánítana egy féllé letöltött fájlt.
+  A régi, mód nélküli állapotfájlok szegmentáltnak számítanak (frissítés után is
+  folytathatók).
+- **A TESZT EGY TOVÁBBI HIBÁT TALÁLT, amit a terv sem látott:** a
+  `_find_resumable_target` csak LÉTEZŐ célfájlokat járt végig, a folytatandó
+  `név (1).kit` viszont maga nem létezik – csak a `.part`-ja. Az árva félkész
+  letöltés így **soha** nem került elő. Most az állapotfájlokból is származtat
+  jelöltet.
+- **Ellenőrző összeg** (`vart_ujjlenyomat` + `fajl_sha256`): URL-töredékből
+  (`#sha256=…`) és `Digest`/`Repr-Digest` fejlécből. **MD5-öt és SHA-1-et
+  SZÁNDÉKOSAN nem fogadunk el** – a törött ellenőrzés rosszabb a semminél, mert
+  biztonságérzetet ad. Csak akkor számolunk, ha van mihez hasonlítani (egy 4 GB-os
+  fájl végigolvasása semmiért perceket venne el). **Eltérésnél NEM nevezzük át:**
+  a fájl `.part` marad, mert a késznek mutatott romlott fájl a legrosszabb kimenet.
+- **Takarítás KÉRDÉSSEL.** `remove(job, fajlokat_is=False)` – alapból KIKAPCSOLT,
+  és az is marad: a sorból kivétel és az adat megsemmisítése két külön szándék.
+  A `takarithato()` **az állapotfájl URL-je alapján válogat, nem névre**
+  (`video.mp4` mindenhol van; névre törölve egy MÁSIK letöltés félkész fájlját
+  semmisítenénk meg). A felület csak akkor kérdez, ha van mit törölni, az
+  alapértelmezett válasz a MEGTARTÁS, és **ami nem törlődött, azt kimondjuk**.
+- **A két zár nélküli írás:** új `Progress.nullaz()` (a `downloaded = 0` a
+  sebességmérő szállal versenyzett – utána a százalék és a hátralévő idő
+  hazudhatott), és a `resolve_conflict` mezőírásai zár alá kerültek.
+- **Egyetlen modulszintű kapcsoló** (`lemezhely.BEKAPCSOLVA`), nem paraméter
+  három rétegen át – így a felület és a CLI nem tud eltérni. CLI:
+  `--nincs-hely-ellenorzes`; Beállítások: „Szabad hely ellenőrzése…", és a
+  változás AZONNAL érvényes (nem csak újraindítás után).
+
+**Ellenőrizve:** **1605 pytest zöld** (1575 → +30); új teszt
+`tests\test_lemezhely_mk3.py`. compileall tiszta, attr_audit 0.
+**HÁTRA:** a hely-ellenőrzés ma csak a szegmentált/HTTP motorra vonatkozik – a
+yt-dlp és a torrent indulás előtt nem ismeri a méretet. A W6 éjszakai figyelőhöz
+ez még kell.
+**ÉLESBEN MÉG NEM MÉRVE:** valódi teli lemez, és megszakadt egyszálú letöltés
+folytatása ismeretlen méretű forrásból.
+
+---
+
+### ✅ 4.5.6 KIADVA (2026-09-02) – EBBEN MINDEN BENNE VAN, AMI ALATTA ÁLL
+
+**Egy kiadás, négy javítás.** A `mod-csevej-1.6.1` (`--latest=false`) ment ki előbb, a
+Core `v4.5.6` (`--latest`) utána – a szokásos sorrend, hogy ne legyen „latest-csapda".
+
+**Assetek:** `SuperDL.exe` 193,1 MB · `SuperDL-cli.exe` 133,9 MB ·
+`SuperDL-Setup-4.5.6.exe` 141,5 MB · `SuperDL-Setup.exe` (verziótlan alias, az állandó
+link) · `csevej-1.6.1.zip` 130 445 bájt, SHA-256 `09cf5755…46e3`.
+
+**Ellenőrizve kiadás után:** mind a 6 URL **200** · `gh release list` → `SuperDL 4.5.6
+Latest` · az ÉLES `modules.json`: `tvmusor 1.2.2 | mail 1.2.4 | csevej 1.6.1`.
+Kulcs-szken **tiszta** (922 fájl, benne mindhárom bináris) – a build UTÁN, feltöltés
+ELŐTT futott. `modules.json` frissítve (`tools\modules_json_frissit.py csevej`),
+commit `b84dc7c`, tolva (`f4a9d23..b84dc7c main -> main`).
+
+**Hírlevél:** `C:\Users\msn\Documents\superdllistara.txt` (188 sor) – mind a négy
+javításról, benne a nyílt figyelmeztetés, hogy **a kész torrent mostantól kézi
+leállításig seedel**, és hogy ez a Beállításokban kikapcsolható.
+
+**Amit ez a kiadás tartalmaz:** csevej 1.6.1 hangerő · letöltő-motor MK1 + MK2 + MK4
++ MK8-részlet · tvmusor 1.2.2 (Laci naptár-hibája) · mail 1.2.4 (POP3).
+
+⚠️ **Változatlanul igaz:** ezekből ÉLESBEN egyik sincs mérve – lásd az alábbi
+szakaszok végén az „élesben még nem mérve" pontokat. A kiadás nem méréspótlék.
+
+---
+
+### ✅ csevej 1.6.1 – HANGERŐ – KIADVA (2026-09-02, megépült 2026-09-01)
 
 **DÁVID JELEZTE:** „halkan lehet hallani a másikat! microphone boost … illetve mindenki
 a saját hangerejét is tudja állítani ha halkan hallatszódik."
@@ -201,7 +614,7 @@ ZIP: `csevej-1.6.1.zip`, SHA-256 `09cf5755…46e3`. Commit `451e9a6`.
 
 ---
 
-### 🔨 LETÖLTŐ-MOTOR MK2 – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-08-31)
+### ✅ LETÖLTŐ-MOTOR MK2 – KIADVA a 4.5.6-ban (2026-09-02, megépült 2026-08-31)
 
 **A letöltés túléli a kapcsolatkimaradást.** Eddig ha elment a net, a letöltés „hiba"
 lett és ott ragadt. **A hiba és a várakozás nem ugyanaz:** a „hiba" azt üzeni, hogy
@@ -239,7 +652,7 @@ esetet pedig ez a kör lefedi.
 
 ---
 
-### 🔨 LETÖLTŐ-MOTOR MK1 + MK4 + MK8-részlet – MEGÉPÍTVE, NEM PUBLIKÁLT (2026-08-31)
+### ✅ LETÖLTŐ-MOTOR MK1 + MK4 + MK8-részlet – KIADVA a 4.5.6-ban (2026-09-02, megépült 2026-08-31)
 
 **Cél (MK1):** ha egy torrent le- vagy feltöltése nem lett kitörölve, a program indításkor
 NE kérdezzen – folytassa, vagy végezze a seed-kötelezettséget, **kézi leállításig**.

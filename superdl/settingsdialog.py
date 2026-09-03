@@ -157,6 +157,42 @@ class SettingsDialog(wx.Dialog):
         self.c_uplimit = wx.TextCtrl(p, value=str(self.s.get("upload_limit", "")))
         self._row(p, v, "&Feltöltési sávkorlát (pl. 500K, 2M; üres = nincs):",
                   self.c_uplimit, name="Feltöltési sávkorlát")
+        self.c_hely = wx.CheckBox(
+            p, label="Szabad &hely ellenőrzése a letöltés indítása előtt")
+        self.c_hely.SetValue(bool(self.s.get("hely_ellenorzes", True)))
+        self.c_hely.SetToolTip(
+            "Ha nincs elég hely, a letöltés el sem indul, és a program "
+            "megmondja, mennyi hiányzik. Hálózati vagy virtuális meghajtón "
+            "előfordul, hogy a szabad hely rosszul látszik – akkor kapcsold ki.")
+        v.Add(self.c_hely, 0, wx.ALL, 10)
+        # MK9: időzített sebességkorlát
+        self.c_savrend = wx.TextCtrl(
+            p, value=str(self.s.get("savszelesseg_rend", "")))
+        self._row(p, v, "&Időzített sebességkorlát (pl. 22:00-06:00=0; "
+                        "06:00-22:00=500K):", self.c_savrend,
+                  name="Időzített sebességkorlát")
+        self.c_savrend.SetToolTip(
+            "Pontosvesszővel elválasztott szabályok. A 0 korlátlant jelent. "
+            "Az éjfélen átnyúló sáv (22:00-06:00) az éjszakát jelenti. "
+            "Üresen hagyva nincs időzítés, csak a fenti állandó korlát.")
+        # MK10
+        self.c_dup = wx.CheckBox(
+            p, label="&Kérdezzen rá, ha ezt már letöltöttem egyszer")
+        self.c_dup.SetValue(bool(self.s.get("duplikatum_kerdes", True)))
+        self.c_dup.SetToolTip(
+            "A mappában nem látszik, hogy a fájl már ott van, a névütközés "
+            "pedig csak a letöltés végén derülne ki – addigra elment a "
+            "sávszélesség és az idő.")
+        v.Add(self.c_dup, 0, wx.ALL, 10)
+        self.c_rendez = wx.CheckBox(
+            p, label="Kész letöltés &rendezése típus szerinti almappába "
+                     "(Videók, Zene, Képek, Dokumentumok, Csomagok)")
+        self.c_rendez.SetValue(bool(self.s.get("auto_rendezes", False)))
+        self.c_rendez.SetToolTip(
+            "A program a kész fájlt a célmappán BELÜL rakja almappába, és "
+            "kimondja, hova. Meglévő fájlt soha nem ír felül. Alapból ki van "
+            "kapcsolva: a fájlmozgatás nem vonható vissza.")
+        v.Add(self.c_rendez, 0, wx.ALL, 10)
         self.c_playlist = wx.CheckBox(p, label="Lejátszási &lista külön, "
                                       "sorszámozott mappába")
         self.c_playlist.SetValue(bool(self.s.get("playlist_folders", True)))
@@ -539,6 +575,10 @@ class SettingsDialog(wx.Dialog):
             "seed_ratio": self.c_seed.GetValue().strip() or "1.0",
             "seed_forever": self.c_seedfor.GetValue(),
             "upload_limit": self.c_uplimit.GetValue().strip(),
+            "hely_ellenorzes": self.c_hely.GetValue(),
+            "savszelesseg_rend": self.c_savrend.GetValue().strip(),
+            "duplikatum_kerdes": self.c_dup.GetValue(),
+            "auto_rendezes": self.c_rendez.GetValue(),
             "playlist_folders": self.c_playlist.GetValue(),
             "cookies": self.c_cookies.GetStringSelection() or "Nincs",
             "cookies_file": self.cookies_file or "",

@@ -34,6 +34,41 @@ def szunet(probak: int) -> int:
     return ISMETLODO
 
 
+# ---- BELSŐ újrapróba: a letöltésen BELÜL, másodperces léptékben (MK8) ----
+#
+# ⚠️ **A fenti, PERCES politikát NEM szabad ráhúzni a motorok belső
+# újrapróbájára, és ez nem lustaság, hanem szándék.** A `SZUNETEK` a JOB
+# szintjén él: ott egy bukás azt jelenti, hogy az egész letöltés elhasalt, és
+# egy perc várakozás olcsó. A szegmentált letöltőben viszont EGY DARAB
+# szegmens akad meg egy 8 szálas letöltésből — ha arra várnánk egy percet, a
+# letöltés a töredékére lassulna, miközben a másik hét szál dolgozik.
+#
+# Két különböző fogalom, két különböző lépték. Amit egységesíteni ÉRDEMES, az
+# nem az időzítés, hanem hogy EGY helyen legyen leírva, és hogy a felhasználó
+# MEGTUDJA: ez a letöltés épp küzd.
+BELSO_SZUNETEK: tuple[int, ...] = (1, 2, 4, 8, 16)
+BELSO_MAX = len(BELSO_SZUNETEK)
+
+
+def belso_szunet(probak: int) -> int:
+    """Hány másodperc múlva jöjjön a következő BELSŐ próba (szegmens, darab)."""
+    if probak < 0:
+        probak = 0
+    if probak < len(BELSO_SZUNETEK):
+        return BELSO_SZUNETEK[probak]
+    return BELSO_SZUNETEK[-1]
+
+
+def kuzd_uzenet(probak: int) -> str:
+    """Amit a felhasználó HALL, ha egy letöltés belül küzd.
+
+    Eddig ez teljesen néma volt: a szegmens ötször újrapróbált, a felhasználó
+    pedig annyit érzékelt, hogy „lassú". Vakon a lassú és az akadozó között
+    nincs különbség — pedig az egyik normális, a másik nem."""
+    return ("Ez a letöltés akadozik: %s újrapróbálkozás menet közben. "
+            "Nem kell tenned semmit, magától folytatódik." % sorszam(probak))
+
+
 def probalkozhat(probak: int, max_proba: int = VEGTELEN) -> bool:
     return max_proba == VEGTELEN or probak < max_proba
 
