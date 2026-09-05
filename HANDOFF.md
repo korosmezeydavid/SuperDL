@@ -162,6 +162,43 @@ nyers bájtként keresi a fájlokban.)
 
 ---
 
+### ✅ A CI VÉGRE ZÖLD (2026-09-05) – commit `35f148b`
+
+**A CI legalább 2026-08-28 óta MINDEN pushnál elbukott** — a 4.5.6, a 4.6.0 és a
+4.6.1 kiadásánál is. Az utolsó tizenkét futás mind `failure`. Most futott le
+először sikeresen.
+
+**Az ok egyetlen hiányzó sor volt:** `8 failed, 1705 passed, 5 skipped`, és mind a
+nyolc a `tests/test_mentes.py`-ból, mind ugyanattól:
+`ModuleNotFoundError: No module named 'cryptography'`. A csomagot a
+`superdl/mentes.py` használja (AES-GCM), de a `requirements.txt` **nem sorolta
+fel**. A fejlesztői gépen véletlenül telepítve volt (49.0.0), ezért helyben
+minden zöld — és a PyInstaller be is csomagolta, tehát **a kiadott exék rendben
+vannak**, a titkosított mentés a felhasználóknál működik.
+
+⚠️ **A veszélyes rész nem a piros CI volt, hanem ez:** `cryptography` nélkül a
+mentés **nem omlik össze**, hanem udvariasan lefokozza magát („a titkosító réteg
+nem érhető el ezen a gépen"). Egy tiszta gépen épült program **csendben** nem
+tudna mentést készíteni. **Ugyanaz a hibaosztály, mint a 4.6.1-ben a néma DHT:
+nem hibaüzenet, hanem hallgatás.**
+
+**Bekerült még a `pywin32`** (SAPI-beszéd, képernyőolvasó-vezérlés, `store.py`
+DPAPI/`win32crypt`) — eddig CSAK a CI yml-jében szerepelt kézzel hozzátoldva.
+Platform-jelölővel, hogy nem-Windowson ne próbálja telepíteni.
+
+**Új eszköz: `tools\fuggoseg_audit.py`.** Kilistázza, melyik külső csomagot
+importálja a forrás úgy, hogy a `requirements.txt` nem sorolja fel. A
+szándékosan opcionálisakat (fordítómodell-csomagok, `wormhole`, `comtypes`)
+**külön, INDOKLÁSSAL** mutatja — ⚠️ egy hamis riasztásokkal teli jelentést
+ugyanúgy átlapoznánk, mint a mindig piros CI-t. Mai állapot: „Minden KÖTELEZŐ
+külső csomag szerepel a requirements.txt-ben."
+
+**Tanulság:** **egy állandóan piros CI rosszabb, mint a semmilyen** — megtanítja,
+hogy a jelzést figyelmen kívül hagyjuk, és pont akkor nem szól, amikor tényleg
+baj van. Mostantól a zöld CI valódi jelzés; **ha elpirul, azt meg kell nézni.**
+
+---
+
 ### ✅ 4.6.1 KIADVA (2026-09-05)
 
 **Kiadás megtörtént.** Commit `ed99719` (9 fájl, +574/−7), push, majd
