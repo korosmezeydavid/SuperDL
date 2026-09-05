@@ -220,10 +220,17 @@ class DownloadManager:
                 self._jelez(uzenet, job)
         try:
             if job.kind == "torrent":
+                # A kényszerített újraindítás EGYETLEN indításra kér
+                # ellenőrzést (a meglévő adat megtartásához). Átmeneti jelző,
+                # nem mentett mező: különben minden későbbi induláskor is
+                # ellenőrizne, ami nagy torrentnél percekig tart.
+                kenyszer = bool(getattr(job, "kenyszer_ujra", False))
+                job.kenyszer_ujra = False
                 job.downloader = TorrentDownloader(
                     job.url, out_dir, progress=job.progress,
                     seed_ratio=self.seed_ratio, limit_bps=self.limiter.bps,
-                    allow_overwrite=job.overwrite, check_integrity=job.verify,
+                    allow_overwrite=job.overwrite,
+                    check_integrity=job.verify or kenyszer,
                     seed_forever=self.seed_forever,
                     upload_limit_bps=self.upload_limit_bps)
             elif job.kind == "media":
@@ -308,6 +315,7 @@ class DownloadManager:
                 self._retry_tick(job, now)
                 self._hely_tick(job)
                 self._kuzd_tick(job)
+                self._elakadas_tick(job)
             self._halozat_tick(now)
             self._savszelesseg_tick()
             if self._allow_autosave and now - last_save >= 3:
@@ -357,6 +365,16 @@ class DownloadManager:
         if getattr(p, "conflict", False):
             return True
         if p.status == "hiba":
+            return True
+        # NEGYEDIK eset (Laci hibajelentése, 2026-09-05): ELAKADT, de „aktív”.
+        # Ez volt a rendszer vakfoltja. A torrent státusza „letöltés”, kivétel
+        # nincs, újrapróba nincs – tehát a fenti három ág egyike sem fogta meg,
+        # és a felhasználó egy órán át nézett egy listát, amely azt állította,
+        # hogy minden rendben. **A hamis megnyugtatás rosszabb, mint a néma
+        # hiba**, mert a felhasználó nem is kezd keresni.
+        # ⚠️ A kizárás fent VÁLTOZATLAN: a hálózatra várakozó elem NEM lehet
+        # elakadt (ott a letöltő le sem fut), tehát az MK2-t ez sem érinti.
+        if getattr(p, "elakadt", False):
             return True
         if getattr(job, "retries", 0) >= DownloadManager.MAKACS_PROBA:
             return True
@@ -419,6 +437,70 @@ class DownloadManager:
             return
         job._kuzd_szolt = True
         self._jelez(retrypolicy.kuzd_uzenet(p.belso_probak), job)
+
+    # ---- elakadt, de „aktív” letöltés (Laci, 2026-09-05) --------------
+
+    def _elakadas_tick(self, job: Job) -> None:
+        """EGYSZERI jelzés arról, hogy egy futó letöltés régóta nem halad.
+
+        Miért egyszeri: az elakadás percekig-órákig eltarthat, és egy
+        percenként ismételt bemondás használhatatlanná tenné a programot.
+        Egyszer szólunk, utána az F6 és a lista oszlopa tartja számon.
+
+        A mondat KIMONDJA a teendőt is. Egy jelzés, ami csak a bajt nevezi
+        meg, vakon alig ér többet a csendnél: a felhasználó tudja, hogy baj
+        van, de nem tudja, mit tehet."""
+        p = job.progress
+        if not getattr(p, "elakadt", False):
+            job._elakadas_szolt = False      # újraindulhat a jelzés, ha megint
+            return
+        if getattr(job, "_elakadas_szolt", False):
+            return
+        job._elakadas_szolt = True
+        nev = p.filename or job.url
+        ok = getattr(p, "elakadas_oka", "") or "Nem érkezik adat."
+        self._jelez(
+            f"Elakadt: {nev}. {ok} Kényszerített újraindítás: Control F6.", job)
+
+    def kenyszeritett_ujrainditas(self, job: Job,
+                                  varakozas: float = 6.0) -> bool:
+        """Torrent kényszerített újraindítása a MEGLÉVŐ adat megtartásával.
+
+        Ezt Laci kérte, más kliensek mintájára, és igaza volt: amikor egy
+        torrent áll, a felhasználónak kell egy kapaszkodó. Eddig nem volt —
+        a Ctrl+F6 annyit mondott, hogy „nincs mit tenni”.
+
+        **Amit csinál:** leállítja a futó aria2-munkát, megvárja, hogy tényleg
+        megálljon, majd `check-integrity`-vel újra hozzáadja. Ez a torrent
+        hash-ei alapján ellenőrzi a már meglévő darabokat, a jókat MEGTARTJA,
+        és csak a hiányzókat tölti — közben pedig újra bejelentkezik a
+        trackerekhez, és nulláról indítja a peer-keresést. **Nem kezdi elölről
+        a letöltést**, és pontosan ez a lényeg: egy órányi letöltést eldobni
+        rosszabb volna, mint az elakadás.
+
+        ⚠️ A `verify` mezőt SZÁNDÉKOSAN nem írjuk át: az MENTŐDIK, és akkor
+        minden későbbi indulás ellenőrizne — ami nagy fájlnál percekig tart.
+        Ez a kérés egyetlen indításra szól, ezért átmeneti jelzőt használunk.
+        """
+        if job.kind != "torrent":
+            return False
+        dl = job.downloader
+        if dl is not None and getattr(dl, "_stop", None) is not None:
+            dl.stop()
+            # MK8 tanulsága: a szálat MEG KELL VÁRNI. Ha az újraindítás
+            # ráindulna a még futó régire, két szál kezelné ugyanazt a jobot.
+            hatarido = time.monotonic() + float(varakozas)
+            while (time.monotonic() < hatarido
+                   and job.progress.status in ("letöltés", "seedelés",
+                                               "előkészítés")):
+                time.sleep(0.2)
+        p = job.progress
+        p.elakadt = False
+        p.elakadas_oka = ""
+        job._elakadas_szolt = False
+        job.kenyszer_ujra = True             # egyszeri check-integrity
+        self.start(job)
+        return True
 
     # ---- MK3: fogyó lemezhely -----------------------------------------
 

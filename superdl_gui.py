@@ -1971,11 +1971,15 @@ class MainFrame(wx.Frame):
         hol = f"{gondok.index(kovetkezo) + 1}. a {len(gondok)}-ból."
         mondat = hibaszoveg.gond_mondat(
             p.filename or kovetkezo.url, p.status, p.error,
-            utkozes=bool(p.conflict), probak=getattr(kovetkezo, "retries", 0))
+            utkozes=bool(p.conflict), probak=getattr(kovetkezo, "retries", 0),
+            elakadt=bool(getattr(p, "elakadt", False)),
+            elakadas_oka=getattr(p, "elakadas_oka", ""))
         # a javítás-billentyűt CSAK ott ajánljuk fel, ahol tényleg van mit
         # tenni egy gombbal – a hamis ígéret rosszabb, mint a hallgatás
         if p.conflict or p.status == "hiba":
             mondat += " Javítás megkísérlése: Ctrl+F6."
+        elif getattr(p, "elakadt", False) and kovetkezo.kind == "torrent":
+            mondat += " Kényszerített újraindítás: Ctrl+F6."
         self._announce(f"{hol} {mondat}", ok=False)
         if self.speaker.available:
             self.speaker.speak(f"{hol} {mondat}")
@@ -2006,6 +2010,34 @@ class MainFrame(wx.Frame):
         if p.status == "hiba":
             self.mgr.start(job)
             self._announce(f"Újraindítva: {p.filename or job.url}")
+            return
+        # Laci hibajelentése (2026-09-05): egy ÁLLÓ torrentre eddig ez a
+        # függvény azt felelte, hogy „nincs mit tenni: letöltés" – miközben
+        # egy órája nem haladt semmi. A torrent az egyetlen motor, ahol a
+        # kényszerített újraindításnak önálló értelme van: újra bejelentkezik
+        # a trackerekhez, és nulláról indítja a peer-keresést, a már letöltött
+        # adatot pedig a hash-ellenőrzés megtartja.
+        if job.kind == "torrent" and p.status in ("letöltés", "előkészítés"):
+            nev = p.filename or job.url
+            if not getattr(p, "elakadt", False):
+                # NEM akadt el – megkérdezzük, mert a futó letöltés
+                # megszakítása és újraellenőrzése percekbe telhet
+                dlg = wx.MessageDialog(
+                    self, f"Ez a torrent most fut: {nev}.\n\n"
+                    "Kényszerítetten újraindítod? A már letöltött adat "
+                    "megmarad (a program ellenőrzi), de az újraellenőrzés "
+                    "nagy fájlnál eltarthat egy ideig.",
+                    "Kényszerített újraindítás", wx.YES_NO | wx.ICON_QUESTION)
+                dlg.SetYesNoLabels("Újraindítom", "Mégse")
+                do = dlg.ShowModal() == wx.ID_YES
+                dlg.Destroy()
+                if not do:
+                    return
+            self._announce(f"Kényszerített újraindítás: {nev}. "
+                           "A meglévő adat megmarad.")
+            threading.Thread(
+                target=lambda: self.mgr.kenyszeritett_ujrainditas(job),
+                daemon=True).start()
             return
         self._announce("Ezzel az elemmel most nincs mit tenni: "
                        f"{p.status}.")
@@ -2538,7 +2570,13 @@ class MainFrame(wx.Frame):
                 feltoltes = f"{human(p.up_speed)}/s ({p.ratio:.2f})"
             else:
                 feltoltes = ""
-            values = (p.filename or j.url, p.status, halad,
+            # Laci hibajelentése (2026-09-05): egy álló torrent státusza
+            # „letöltés" volt, tehát a lista ugyanazt mutatta, mint egy
+            # egészségesnél. Vakon a lista az EGYETLEN térkép – ha az hazudik,
+            # nincs másik forrás. Az állapotszó mondja ki, hogy áll.
+            allapot = ("letöltés – elakadt" if getattr(p, "elakadt", False)
+                       else p.status)
+            values = (p.filename or j.url, allapot, halad,
                       f"{human(p.speed)}/s"
                       if p.status in ("letöltés", "seedelés") else "",
                       feltoltes,

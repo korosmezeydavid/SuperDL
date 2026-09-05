@@ -21,7 +21,89 @@ from pathlib import Path
 
 import requests
 
+from . import store
 from .segment import Progress
+
+# ---------------------------------------------------------------------------
+# PEER-FELDERÍTÉS (Laci hibajelentése, 2026-09-05)
+#
+# Eddig az aria2c-t MINDEN BitTorrent-hálózati beállítás nélkül indítottuk.
+# Ez a gyakorlatban azt jelentette, hogy amint a tracker által adott peerek
+# elfogytak, a programnak NEM VOLT SEMMILYEN MÓDJA újat találni – a letöltés
+# megállt, miközben ugyanaz a torrent más kliensben végigment.
+#
+# ⚠️ A csapda az, hogy a DHT az aria2-ben ALAPBÓL BE VAN KAPCSOLVA, tehát a
+# kódot olvasva minden rendben lévőnek látszik. Csakhogy az aria2-nek NINCS
+# beépített DHT belépési pontja: `dht-entry-point` alapból üres, friss gépen
+# `dht.dat` sincs, tehát az útválasztó tábla ÜRES MARAD. A DHT papíron megy,
+# valójában egyetlen peert sem hoz. Ez a fajta hiba a legrosszabb: nem
+# hibaüzenet, hanem csend.
+# ---------------------------------------------------------------------------
+
+# A DHT hálózatra való belépés pontja. Az aria2 ebből EGYET fogad el (skalár
+# opció), ezért a tartósságot nem több belépési pont adja, hanem az, hogy a
+# megtanult útválasztó táblát KIMENTJÜK (lásd `dht-file-path`): a második
+# indítástól kezdve a belépési pont már csak tartalék.
+DHT_BELEPO = "router.bittorrent.com:6881"
+
+# Kiegészítő, nyílt trackerek. NEM ezek a fő forrás – a torrent (vagy a
+# magnet) saját announce-listája az –, ezek csak akkor számítanak, amikor az
+# elfogy vagy nem válaszol. Az aria2 a torrent saját listájához FŰZI hozzá.
+TRACKEREK = (
+    "udp://tracker.opentrackr.org:1337/announce",
+    "udp://open.tracker.cl:1337/announce",
+    "udp://tracker.openbittorrent.com:6969/announce",
+    "udp://exodus.desync.com:6969/announce",
+    "udp://tracker.torrent.eu.org:451/announce",
+    "udp://open.demonii.com:1337/announce",
+)
+
+
+def halozati_kapcsolok(dht_fajl=None) -> list[str]:
+    """Az aria2c BitTorrent-hálózati kapcsolói, KÜLÖN függvényben.
+
+    Miért külön: ez a rész aria2 és hálózat nélkül is ellenőrizhető kell hogy
+    legyen. Pontosan az a fajta beállítás, ami NÉMÁN romlik el – ha egy
+    kapcsoló kimarad vagy elgépeljük, semmi nem jelez, csak fél évvel később
+    egy felhasználó ír, hogy „nálam megáll, más kliensben meg megy”.
+    """
+    if dht_fajl is None:
+        try:
+            dht_fajl = Path(store.CONFIG_DIR) / "dht.dat"
+        except Exception:
+            dht_fajl = Path.home() / ".superdl" / "dht.dat"
+    dht_fajl = Path(dht_fajl)
+    try:
+        dht_fajl.parent.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        pass
+    return [
+        # --- DHT: a peer-keresés gerince ---------------------------------
+        "--enable-dht=true",
+        f"--dht-entry-point={DHT_BELEPO}",
+        # A MEGTANULT tábla kimentése. Enélkül minden indulás nulláról
+        # bootstrapel, és percekbe telik, mire egyáltalán van kihez fordulni.
+        f"--dht-file-path={dht_fajl}",
+        "--dht-listen-port=6881-6999",
+        # --- a többi felderítési csatorna ---------------------------------
+        # PEX: alapból be van kapcsolva, de KIMONDJUK. Egy alapérték, amire
+        # némán támaszkodunk, előbb-utóbb megváltozik a lábunk alatt.
+        "--enable-peer-exchange=true",
+        # LPD (helyi felderítés): alapból KI volt. Otthoni hálózaton, ahol két
+        # gép ugyanazt tölti, ez ingyen sebesség.
+        "--bt-enable-lpd=true",
+        "--listen-port=6881-6999",
+        f"--bt-tracker={','.join(TRACKEREK)}",
+        # --- magnet: a metaadat ne vesszen el ------------------------------
+        # Enélkül MINDEN újraindítás újra letölti a metaadatot, mielőtt
+        # egyáltalán elkezdene tölteni. Laci pontosan ezt látta: „újraindításra
+        # egy kicsit megy, majd újra elakad”.
+        "--bt-save-metadata=true",
+        "--bt-load-saved-metadata=true",
+        # Ha a torrent ennél lassabb, az aria2 új peereket keres. Az alapérték
+        # 50K – vagyis egy döcögő letöltésnél be sem indult a keresés.
+        "--bt-request-peer-speed-limit=2M",
+    ]
 
 
 def is_torrent_url(url: str) -> bool:
@@ -152,7 +234,7 @@ class Aria2Client:
                 [exe, "--enable-rpc", f"--rpc-listen-port={self.port}",
                  f"--rpc-secret={self.secret}", "--rpc-listen-all=false",
                  "--quiet", "--bt-detach-seed-only=true",
-                 "--summary-interval=0"],
+                 "--summary-interval=0", *halozati_kapcsolok()],
                 creationflags=flags,
                 stdout=subprocess.DEVNULL, stderr=self._errf)
             if self._wait_ready():
@@ -326,6 +408,31 @@ class TorrentDownloader:
             "downloadSpeed", "uploadSpeed", "connections", "numSeeders",
             "errorMessage", "followedBy", "bittorrent", "files"]
 
+    # Ennyi ideig tűrjük, hogy egy „aktív” torrent egyetlen bájtot se haladjon.
+    # Három perc szándékosan bőkezű: egy torrent normálisan is állhat egy-két
+    # percet (peer-váltás, lassú tracker), és a hamis riasztás rosszabb, mint a
+    # késői – a felhasználó megtanulná figyelmen kívül hagyni.
+    ELAKADAS_MASODPERC = 180.0
+
+    @staticmethod
+    def elakadas_oka(peers: int, kapcsolatok: int) -> str:
+        """MIÉRT áll. Nem elég azt mondani, hogy elakadt – abból a felhasználó
+        nem tudja, rajta múlik-e valami.
+
+        A három eset háromféle választ kíván: a seeder hiánya kivárás vagy
+        feladás kérdése; a kapcsolat nélküli állapot rendszerint hálózati
+        akadály; a „vannak peerek, mégsem jön adat” pedig az, amikor érdemes
+        kényszerítetten újraindítani."""
+        if peers <= 0 and kapcsolatok <= 0:
+            return ("Nem találok senkit, akitől tölthetnék: sem seeder, sem "
+                    "kapcsolat. Lehet, hogy ehhez a torrenthez most nincs "
+                    "elérhető forrás.")
+        if peers <= 0:
+            return ("Van kapcsolatom, de egyetlen teljes forrás (seeder) "
+                    "sincs, csak részletek. Így a letöltés nem tud befejeződni.")
+        return ("Vannak forrásaim, mégsem érkezik adat. Ilyenkor a "
+                "kényszerített újraindítás szokott segíteni.")
+
     def run(self) -> None:
         p = self.progress
         try:
@@ -335,6 +442,9 @@ class TorrentDownloader:
             p.status, p.error = "hiba", str(e)
             raise
         p.status = "letöltés"
+        # elakadás-figyelés: mikor nőtt utoljára a letöltött mennyiség
+        utolso_haladas = time.monotonic()
+        utolso_kesz = -1
 
         while True:
             if self._stop.is_set():
@@ -397,4 +507,27 @@ class TorrentDownloader:
                 raise RuntimeError(p.error)
             if status == "active":
                 p.status = "seedelés" if total and done >= total else "letöltés"
+
+            # ---- elakadás-figyelés ------------------------------------
+            # A seedelést SZÁNDÉKOSAN kihagyjuk: ott a `completedLength` már
+            # nem is nőhet, tehát minden seedelő torrent azonnal „elakadtnak”
+            # látszana. Ez pontosan az a fajta hamis riasztás, amitől a
+            # felhasználó megtanulja figyelmen kívül hagyni a jelzést.
+            if p.status == "letöltés":
+                if done > utolso_kesz:
+                    utolso_kesz = done
+                    utolso_haladas = time.monotonic()
+                    if p.elakadt:
+                        # magától megindult: a jelzést VISSZAVONJUK, különben
+                        # a lista hazudna, és az F6 oda küldene, ahol már
+                        # nincs teendő
+                        p.elakadt = False
+                        p.elakadas_oka = ""
+                elif (time.monotonic() - utolso_haladas
+                        >= self.ELAKADAS_MASODPERC):
+                    p.elakadt = True
+                    p.elakadas_oka = self.elakadas_oka(p.peers, p.connections)
+            else:
+                p.elakadt = False
+                p.elakadas_oka = ""
             time.sleep(1)

@@ -92,6 +92,15 @@ class Progress:
     # Vakon a lassú és az akadozó között nincs különbség – pedig az egyik
     # normális, a másik nem.
     belso_probak: int = 0
+    # W-hibajelentés (Laci, 2026-09-05): a torrent ÁLL, de „aktív".
+    # A letöltés fut, a státusz „letöltés", a sebesség nulla, és semmi nem
+    # szól érte. Ez NEM hiba (nincs kivétel, nincs mit megjavítani egy
+    # újrapróbával), de NEM is normális működés – vagyis a meglévő két
+    # kategória egyikébe sem fért bele, és ezért volt LÁTHATATLAN: az F6 nem
+    # találta meg, a Ctrl+F6 azt mondta rá, hogy „nincs mit tenni”.
+    # A `figyelmet_igenyel()` innen tudja meg, hogy mégis van.
+    elakadt: bool = False
+    elakadas_oka: str = ""
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
 
     def add(self, n: int) -> None:

@@ -108,7 +108,8 @@ def emberi(uzenet: str) -> str:
 
 
 def gond_mondat(nev: str, allapot: str, uzenet: str, utkozes: bool = False,
-                probak: int = 0) -> str:
+                probak: int = 0, elakadt: bool = False,
+                elakadas_oka: str = "") -> str:
     """Az MK6 ugrás után elhangzó EGY mondat: mi a baj, és mit tegyél.
 
     A név elöl van, mert vakon először azt kell tudni, MELYIK elemről beszélünk
@@ -119,6 +120,14 @@ def gond_mondat(nev: str, allapot: str, uzenet: str, utkozes: bool = False,
         return (f"{nev}: a cél fájl már létezik, és ez DÖNTÉSRE vár – "
                 "magától nem oldódik meg. Kihagyhatod, felülírhatod, vagy "
                 "ellenőrizve megoszthatod.")
+    if elakadt:
+        # Az elakadás az ÜTKÖZÉS után, de a hiba ELŐTT áll: nincs hibaszöveg,
+        # amit felolvashatnánk (kivétel sem történt), ezért ha ide nem külön
+        # ág jönne, a mondat annyi lenne, hogy „állapota: letöltés” – vagyis
+        # a program pont azt állítaná, hogy minden rendben. Ez volt Laci
+        # egyórás élménye, mondatba öntve.
+        ok = (elakadas_oka or "Régóta nem érkezik adat.").strip()
+        return (f"{nev}: elakadt, bár a letöltés fut. {ok}")
     reszek = [f"{nev}:"]
     if probak:
         reszek.append(f"{probak} sikertelen próbálkozás után.")

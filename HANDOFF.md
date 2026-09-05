@@ -158,7 +158,72 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-09-03 · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-05 · dolgozott: Claude
+
+---
+
+### 🟡 4.6.1 – MEGÉPÍTVE, KULCS-SZKEN TISZTA, **MÉG NEM PUBLIKÁLT** (2026-09-05)
+
+**Laci hibajelentése a 4.6.0-ra — az első valódi visszajelzés, és pont arra a pontra
+érkezett, amit tudatosan nyitva hagytunk** (MK8: „peer-felderítés: DHT, PEX, LPD
+tudatos beállítása"). Részletes napló: `claude/windows-torrent-elakadas-laci.md`.
+
+**Három hiba, egy körben javítva.**
+
+**1. A peer-felderítés gyakorlatilag halott volt — EZ volt a valódi ok.**
+Az aria2c-t **egyetlen BitTorrent-hálózati kapcsoló nélkül** indítottuk.
+⚠️ **A csapda, amiért ezt kódolvasásból soha nem vennénk észre:** a DHT az aria2-ben
+**alapból be van kapcsolva** — de nincs beépített belépési pontja (`dht-entry-point`
+üres), friss gépen `dht.dat` sincs, tehát **az útválasztó tábla üres marad**. A DHT
+papíron megy, valójában egyetlen peert sem hoz. Nem hibaüzenet: **csend.**
+→ Új, **tesztelhető** `torrent.halozati_kapcsolok()`: DHT belépési pont,
+`dht-file-path` a `~/.superdl` alá (a tábla két indítás között megmarad), LPD be,
+PEX kimondva, hat nyílt tracker EGYETLEN vesszős `--bt-tracker`-ben (külön
+kapcsolókként csak az utolsó élne — és ezt sem jelezné semmi), `bt-save-metadata`
+(magnetnél nincs több metaadat-újratöltés), `bt-request-peer-speed-limit=2M`.
+
+**2. Az elakadt torrent LÁTHATATLAN volt.** Státusza „letöltés", kivétel nincs,
+újrapróba nincs → a `figyelmet_igenyel()` három ága közül egyik sem fogta meg, az F6
+nem talált rá, a Ctrl+F6 azt mondta: *„nincs mit tenni: letöltés"*. **A program azt
+állította, hogy minden rendben, miközben egy órája nem haladt** — ugyanaz a hibaosztály,
+mint a tvmusor félrevezető üzenete.
+→ `Progress.elakadt` + `elakadas_oka`; a torrent-hurok figyeli, hány másodperce nem nőtt
+a letöltött mennyiség (`ELAKADAS_MASODPERC = 180`). **A seedelés kimarad** (ott a
+`completedLength` nem is nőhet → minden seedelő „elakadtnak" látszana). Haladáskor a
+jelzés **visszavonódik**. `manager._elakadas_tick()` egyszer szól, és kimondja a teendőt.
+A lista oszlopa: **„letöltés – elakadt"**.
+⚠️ A `figyelmet_igenyel()` **negyedik ága a kizárás UTÁN** van — külön teszt védi, hogy
+a hálózatra várakozó akkor se csússzon be, ha elakadtnak jelölnék (MK2).
+
+**3. Kényszerített újraindítás (Laci ötlete).** `manager.kenyszeritett_ujrainditas()`:
+leállítás → **a szál bevárása** (MK8 tanulsága) → újra hozzáadás
+`check-integrity=true`-val. A meglévő adat megmarad, csak a hiányzó darabok töltődnek,
+közben új tracker-bejelentkezés és nulláról induló peer-keresés.
+⚠️ A `verify` mezőt **nem** írjuk át (az MENTŐDIK → minden későbbi indulás ellenőrizne);
+átmeneti `job.kenyszer_ujra` jelző, amit a `_run_job` elhasznál.
+**Ctrl+F6 egy torrenten** ezt csinálja; ha az elem nem akadt el, előbb **kérdez**.
+
+**4. A torrent-társítás kapcsolója a Beállításokba került** (letöltési fül).
+Eddig csak a **Média** menüben volt — ⚠️ **a 4.6.0 hírlevele viszont azt írta, hogy a
+Beállításokban van, és Laci pontosan ott kereste.** A hibát a hírlevél írója követte el.
+A kapcsoló **nem** kerül a beállítás-szótárba: a registry az igazság forrása, a duplán
+tárolt állapot szétcsúszna.
+
+**Ellenőrizve:** `tests\test_torrent_elakadas.py` (15 eset), **1713 pytest zöld**,
+compileall tiszta, attr_audit 0.
+
+**Állapot a lemezen (2026-09-05):** onedir · `installer\SuperDL-Setup-4.6.1.exe` ·
+`dist\SuperDL-cli.exe` · `dist\SuperDL.exe` · **kulcs-szken TISZTA** (336 fájl, 0
+találat, kilépési kód 0). **Modul nem változott** → Core-only kiadás lesz.
+
+**Hátra (CSAK „publikálás"-ra):** verziótlan alias · commit + push ·
+`gh release create v4.6.1 … --latest` · a 6 URL ellenőrzése · rövid hírlevél.
+
+**Tanulság a munkarendbe:** **az alapértelmezés nem beállítás.** Ha egy külső eszköz
+viselkedésére támaszkodunk, azt ki kell mondani a parancssorban, és tesztelni, hogy ott
+is maradt. **És van egy NEGYEDIK bajtípus:** eddig hibát és várakozást ismertünk, Laci
+hozta a harmadikat — **fut, de halott**. Végig kell gondolni a szegmentált és a yt-dlp
+motorra is.
 
 ---
 

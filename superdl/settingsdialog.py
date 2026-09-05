@@ -197,6 +197,28 @@ class SettingsDialog(wx.Dialog):
                                       "sorszámozott mappába")
         self.c_playlist.SetValue(bool(self.s.get("playlist_folders", True)))
         v.Add(self.c_playlist, 0, wx.ALL, 10)
+        # Laci hibajelentése (2026-09-05): ez a kapcsoló EDDIG IS LÉTEZETT, de
+        # a Média menüben lapult – vagyis egy torrent-beállítás a zenelejátszás
+        # menüjében. Laci a Beállításokban kereste (a hírlevél is oda küldte),
+        # és egy órát töltött vele. A menüpont marad, de a helye ITT van, a
+        # többi torrent-beállítás mellett.
+        self.c_torrentassoc = None
+        try:
+            from . import fileassoc
+            if fileassoc.available():
+                self.c_torrentassoc = wx.CheckBox(
+                    p, label="A &torrentfájlokat és magnet-hivatkozásokat a "
+                             "SuperDL nyissa meg")
+                self.c_torrentassoc.SetValue(fileassoc.torrent_registered())
+                self.c_torrentassoc.SetToolTip(
+                    "Ettől a böngészőben egy magnet-linkre kattintva a "
+                    "letöltés egyből a SuperDL-ben indul, és a .torrent fájl "
+                    "is itt nyílik meg. Csak a saját felhasználói fiókodat "
+                    "érinti, bármikor visszavonható. Ez a kapcsoló független "
+                    "a zene- és videótársítástól.")
+                v.Add(self.c_torrentassoc, 0, wx.ALL, 10)
+        except Exception:
+            self.c_torrentassoc = None
         p.SetSizer(v)
         return p
 
@@ -556,6 +578,22 @@ class SettingsDialog(wx.Dialog):
     # ---- mentés -------------------------------------------------------
 
     def _on_ok(self, evt):
+        # A torrent-társítás NEM kerül a beállítás-szótárba: a Windows
+        # rendszerleíró adatbázisa az igazság forrása, nem a mi fájlunk. Ha
+        # duplán tárolnánk, a kettő szétcsúszhatna – és a felhasználó egy
+        # bepipált négyzetet látna olyasmiről, ami valójában ki van kapcsolva.
+        # Csak akkor nyúlunk hozzá, ha a felhasználó VÁLTOZTATOTT rajta.
+        if self.c_torrentassoc is not None:
+            try:
+                from . import fileassoc
+                kert = self.c_torrentassoc.GetValue()
+                if kert != fileassoc.torrent_registered():
+                    (fileassoc.register_torrent() if kert
+                     else fileassoc.unregister_torrent())
+            except Exception as e:
+                wx.MessageBox(
+                    f"A torrent-társítás beállítása nem sikerült: {e}",
+                    "Torrent-társítás", wx.OK | wx.ICON_ERROR, self)
         self.result_settings = {
             "connections": self.c_conn.GetValue(),
             "parallel": self.c_par.GetValue(),
