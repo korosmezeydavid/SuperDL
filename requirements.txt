@@ -10,6 +10,20 @@ ebooklib>=0.18
 pypdf>=4.0
 fpdf2>=2.7
 beautifulsoup4>=4.12
+# A TITKOSÍTOTT MENTÉSHEZ (superdl/mentes.py, AES-GCM). Ez a csomag eddig
+# HIÁNYZOTT innen, pedig a kód használja: a fejlesztői gépen véletlenül
+# telepítve volt, ezért helyben minden zöld volt, a CI viszont MINDEN pushnál
+# elbukott rajta (8 teszt, legalább 2026-08-28 óta).
+# ⚠️ És ami ennél rosszabb: enélkül a mentés NEM omlik össze, hanem udvariasan
+# lefokozza magát („a titkosító réteg nem érhető el ezen a gépen"). Egy tiszta
+# gépen épült program tehát CSENDBEN nem tudna mentést készíteni. Ugyanaz a
+# hibaosztály, mint a 4.6.1-ben a néma DHT: nem hibaüzenet, hanem hallgatás.
+cryptography>=42.0
+# pywin32: a beszéd (SAPI), a képernyőolvasó-vezérlés és a `store.py` DPAPI-s
+# kulcstárolása (`win32crypt`) használja. Eddig CSAK a CI-ban szerepelt, kézzel
+# hozzátoldva — a requirements-ben nem, pedig a program futásához kell.
+# A jelölő miatt nem-Windowson nem próbálja telepíteni.
+pywin32>=306; sys_platform == "win32"
 # IANA időzóna-adatbázis (Windowson nincs beépítve) – az ICS TZID
 # helyes értelmezéséhez KELL, különben órákkal téves emlékeztetők.
 tzdata>=2024.1
