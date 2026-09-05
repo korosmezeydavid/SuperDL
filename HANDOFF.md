@@ -162,7 +162,24 @@ nyers bájtként keresi a fájlokban.)
 
 ---
 
-### 🟡 4.6.1 – MEGÉPÍTVE, KULCS-SZKEN TISZTA, **MÉG NEM PUBLIKÁLT** (2026-09-05)
+### ✅ 4.6.1 KIADVA (2026-09-05)
+
+**Kiadás megtörtént.** Commit `ed99719` (9 fájl, +574/−7), push, majd
+`gh release create v4.6.1 … --latest`. **Core-only**: modul nem változott, a
+`modules.json` érintetlen. A négy asset `state: uploaded`
+(`SuperDL-Setup-4.6.1.exe` · `SuperDL-Setup.exe` alias, **azonos SHA-256** ·
+`SuperDL.exe` · `SuperDL-cli.exe`), **mind a 6 URL 200**, a 4.6.0-ról a „Latest"
+jelölés lekerült. Hírlevél kiírva: `C:\Users\msn\Documents\superdllistara.txt` —
+benne a hírlevél-hiba nyílt helyreigazítása is (a kapcsoló nem a Beállításokban
+volt, ahogy a 4.6.0 levele írta).
+
+**Feltöltési idő:** ~1 perc (a 4.6.0-nál 8 volt) — a „Draft"-ként látszó
+köztes állapot most fel sem tűnt. A 4.6.0-nál leírt szabály áll: ha üres az
+asset-lista, VÁRJ, ne indítsd újra.
+
+**Az alábbi rész a kiadás ELŐTTI állapotot rögzíti:**
+
+#### 4.6.1 – mit javít (2026-09-05)
 
 **Laci hibajelentése a 4.6.0-ra — az első valódi visszajelzés, és pont arra a pontra
 érkezett, amit tudatosan nyitva hagytunk** (MK8: „peer-felderítés: DHT, PEX, LPD
@@ -216,8 +233,8 @@ compileall tiszta, attr_audit 0.
 `dist\SuperDL-cli.exe` · `dist\SuperDL.exe` · **kulcs-szken TISZTA** (336 fájl, 0
 találat, kilépési kód 0). **Modul nem változott** → Core-only kiadás lesz.
 
-**Hátra (CSAK „publikálás"-ra):** verziótlan alias · commit + push ·
-`gh release create v4.6.1 … --latest` · a 6 URL ellenőrzése · rövid hírlevél.
+**Ez mind MEGTÖRTÉNT** (alias · commit + push · kiadás · 6 URL · hírlevél).
+**Nincs függő kiadási teendő.**
 
 **Tanulság a munkarendbe:** **az alapértelmezés nem beállítás.** Ha egy külső eszköz
 viselkedésére támaszkodunk, azt ki kell mondani a parancssorban, és tesztelni, hogy ott
