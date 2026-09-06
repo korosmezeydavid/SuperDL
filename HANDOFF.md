@@ -162,7 +162,14 @@ nyers bájtként keresi a fájlokban.)
 
 ---
 
-### 🟡 4.6.2 – MEGÉPÍTVE, KULCS-SZKEN TISZTA, **MÉG NEM PUBLIKÁLT** (2026-09-06)
+### ✅ 4.6.2 KIADVA (2026-09-06)
+
+**Kiadás megtörtént.** Commit `5094554` (5 fájl, +377/−11), push, majd
+`gh release create v4.6.2 … --latest`. **Core-only.** A négy asset fent,
+**mind a 6 URL 200**, a 4.6.1-ről a „Latest" lekerült. Hírlevél kiírva:
+`C:\Users\msn\Documents\superdllistara.txt` — benne az is, HOL keresse Barbi a
+régi fájljait (`t` nevű mappa a program indítási könyvtára alatt), és annak
+indoklása, miért NEM lett csak olvasható a mező.
 
 **Barbi hibajelentése:** a főablak célmappa-mezőjéből egyetlen „t" betű lett, és
 a letöltései eltűntek. Napló: `claude/windows-celmappa-elgepeles-barbi.md`.
@@ -212,8 +219,13 @@ A cél nem az, hogy ne lehessen írni, hanem hogy egy véletlen leütés ne okoz
 · `dist\SuperDL-cli.exe` · `dist\SuperDL.exe` · **kulcs-szken TISZTA**
 (342 fájl, 0 találat, kilépési kód 0). **Modul nem változott** → Core-only.
 
-**Hátra (CSAK „publikálás"-ra):** verziótlan alias · commit + push ·
-`gh release create v4.6.2 … --latest` · a 6 URL · hírlevél.
+**Ez mind MEGTÖRTÉNT.** Nincs függő kiadási teendő.
+
+**Egy hét, négy kiadás, három felhasználói hibajelentés** (Laci: torrent-elakadás
+és elrejtett kapcsoló; a CI: hiányzó `cryptography`; Barbi: célmappa) — és
+**mindhárom ugyanabból a családból való: a program nem hazudott, csak hallgatott.**
+Ez mostantól önálló ellenőrzési szempont: minden új funkciónál fel kell tenni a
+kérdést, hogy **van-e olyan állapota, amiben nem működik, de nem is szól.**
 
 ---
 
