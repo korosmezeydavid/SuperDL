@@ -92,6 +92,18 @@
       "meret": 269463,
       "fajl": "temak/tema-elena.json",
       "minAlkalmazasVerzio": "1.63.0"
+    },
+    {
+      "id": "tema-proba_torles_alatt",
+      "nev": "Próba téma",
+      "kategoria": "megjelenes",
+      "tipus": "soundtheme",
+      "szerzo": "Teszt Elek",
+      "verzio": 1,
+      "leiras": "Ez egy próba. Sok üres sorral és nagyon hosszú szöveggel nagyon hosszú szöveggel nagyon hosszú szöveggel nagyon hosszú szöveggel nagyon hosszú szöveggel nagyon hosszú szöveggel nagyon hosszú szöveggel nagyon hosszú szöveggel nagyon hosszú s",
+      "meret": 74411,
+      "fajl": "temak/tema-proba_torles_alatt.json",
+      "minAlkalmazasVerzio": "1.63.0"
     }
   ]
 }
