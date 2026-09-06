@@ -1,17 +1,30 @@
 {
   "schema_version": 2,
   "platform": "android",
-  "frissitve": "2026-08-04",
+  "frissitve": "2026-09-06",
   "megjegyzes": "A SuperDL mobil (Android) katalógusa. A modulok ADATOK (kérdéssor, szólista, állomáslista, útmutató) — NEM futtatható kód. A motorjuk a SuperDL alkalmazásban van, így új tartalomhoz nem kell új alkalmazás-verzió.",
-
   "kategoriak": [
-    { "id": "jatekok",    "nev": "Játékok és szórakozás" },
-    { "id": "tanulas",    "nev": "Tanulás és tudás" },
-    { "id": "media",      "nev": "Média és rádió" },
-    { "id": "mindennapi", "nev": "Mindennapi segítség" },
-    { "id": "megjelenes", "nev": "Hangzás és megjelenés" }
+    {
+      "id": "jatekok",
+      "nev": "Játékok és szórakozás"
+    },
+    {
+      "id": "tanulas",
+      "nev": "Tanulás és tudás"
+    },
+    {
+      "id": "media",
+      "nev": "Média és rádió"
+    },
+    {
+      "id": "mindennapi",
+      "nev": "Mindennapi segítség"
+    },
+    {
+      "id": "megjelenes",
+      "nev": "Hangzás és megjelenés"
+    }
   ],
-
   "modules": [
     {
       "id": "kviz-magyarorszag",
@@ -67,6 +80,18 @@
       "meret": 900,
       "fajl": "modulok/media/radio-magyar.json",
       "minAlkalmazasVerzio": "1.55.0"
+    },
+    {
+      "id": "tema-elena",
+      "nev": "Elena",
+      "kategoria": "megjelenes",
+      "tipus": "soundtheme",
+      "szerzo": "Kőrösmezey Dávid",
+      "verzio": 1,
+      "leiras": "A beépített alaptéma hat hangja. Innen bármikor visszatöltheted, ha felülvetted valamelyiket. Meghallgatható letöltés előtt.",
+      "meret": 269463,
+      "fajl": "temak/tema-elena.json",
+      "minAlkalmazasVerzio": "1.63.0"
     }
   ]
 }
