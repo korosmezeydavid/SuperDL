@@ -162,6 +162,61 @@ nyers bájtként keresi a fájlokban.)
 
 ---
 
+### 🟡 4.6.2 – MEGÉPÍTVE, KULCS-SZKEN TISZTA, **MÉG NEM PUBLIKÁLT** (2026-09-06)
+
+**Barbi hibajelentése:** a főablak célmappa-mezőjéből egyetlen „t" betű lett, és
+a letöltései eltűntek. Napló: `claude/windows-celmappa-elgepeles-barbi.md`.
+
+**A mechanizmus NEM elgépelés volt — csapda.** A `dir_entry` közönséges
+`wx.TextCtrl` volt, **fókusz-kezelő nélkül** (`EVT_SET_FOCUS`,
+`SetInsertionPointEnd`: nulla találat az egész fájlban). ⚠️ **A wx Windowson
+tabulátorral fókuszálva KIJELÖLI a mező teljes tartalmát**, tehát egyetlen
+leütött betű az EGÉSZ útvonalat kicseréli — és a képernyőolvasó ebből annyit
+mond, hogy „t". Sem a kijelölésről, sem a törlésről nincs jelzés.
+
+**A `t` RELATÍV útvonal**, tehát a program munkakönyvtárához képest értendő: a
+letöltések egy `t` nevű mappába kerültek a program indítási könyvtára alatt.
+Keresés az egész forrásra `is_absolute`/`isabs`: **nulla találat** — semmi nem
+ellenőrizte. A `_save_settings` pedig fenntartás nélkül elmentette, tehát
+**egy véletlen billentyűleütésből tartós, újraindítást túlélő állapot lett.**
+
+**Amit a javítás csinál — négy réteg, mert egy nem elég:**
+
+1. **Új `superdl\celmappa.py`** (tiszta függvények, wx nélkül tesztelhető):
+   `ervenyes()` (üres / **nem abszolút** / nem hozható létre), `ellenoriz()`
+   (visszaesés tartalékra + **a MIÉRT kimondása**), `alapertelmezett()`,
+   `valtozas_mondat()`.
+   ⚠️ **A NEM LÉTEZŐ mappa szándékosan ÉRVÉNYES**: egy új, még üres célmappa
+   jogos kérés, a letöltő eddig is létrehozta. Csak azt nézzük, létre lehet-e.
+2. **`EVT_SET_FOCUS` → a kurzor a szöveg VÉGÉRE, kijelölés nélkül.** Ettől egy
+   véletlen betű **hozzáfűződik** (látszik és javítható), nem cserél ki.
+   **Ez maga a hiba gyökere.** `wx.CallAfter` kell hozzá: a wx a kijelölést a
+   fókusz-esemény UTÁN végzi, helyben törölve visszajelölné.
+3. **`EVT_KILL_FOCUS` → ellenőrzés + BEMONDÁS.** Hibásnál visszaáll az utolsó jó
+   mappára és megmondja, miért; jónál bemondja: „Célmappa: …". Eddig **semmilyen
+   visszajelzés nem volt** a változásról — ezért telhetett el észrevétlenül az
+   idő, amíg a letöltések rossz helyre mentek.
+4. **Egy közös kapu: `_celmappa()`.** MINDEN letöltés-indítás ezen megy át
+   (kézi hozzáadás, feliratkozás-epizód, csatorna-videó, kosár, **rádiófelvétel**
+   is). `_save_settings` csak ÉRVÉNYES értéket ment; `_apply_settings`
+   induláskor ellenőriz, és ha a mentett érték rossz volt, **ki is mondja**.
+
+**Barbi javaslata a csak olvasható mezőre TUDATOSAN nem valósult meg:** elvenné a
+gépelés és beillesztés lehetőségét, ami vakon gyakran gyorsabb a tallózásnál.
+A cél nem az, hogy ne lehessen írni, hanem hogy egy véletlen leütés ne okozzon kárt.
+
+**Ellenőrizve:** `tests\test_celmappa.py` (12 eset), **teljes futás zöld**
+(1725), compileall tiszta, attr_audit 0, függőség-audit rendben.
+
+**Állapot a lemezen (2026-09-06):** onedir · `installer\SuperDL-Setup-4.6.2.exe`
+· `dist\SuperDL-cli.exe` · `dist\SuperDL.exe` · **kulcs-szken TISZTA**
+(342 fájl, 0 találat, kilépési kód 0). **Modul nem változott** → Core-only.
+
+**Hátra (CSAK „publikálás"-ra):** verziótlan alias · commit + push ·
+`gh release create v4.6.2 … --latest` · a 6 URL · hírlevél.
+
+---
+
 ### ✅ A CI VÉGRE ZÖLD (2026-09-05) – commit `35f148b`
 
 **A CI legalább 2026-08-28 óta MINDEN pushnál elbukott** — a 4.5.6, a 4.6.0 és a

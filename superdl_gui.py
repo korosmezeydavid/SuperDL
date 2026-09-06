@@ -60,6 +60,7 @@ from superdl.organizer import OrganizerManager
 from superdl.radiorec import RecordManager
 from superdl import dayinfo, weather, search, store, aiclient, mediaai, netcheck
 from superdl import autostart
+from superdl import celmappa
 from superdl import elozmenyek
 from superdl import hibaszoveg
 from superdl import lemezhely
@@ -465,7 +466,10 @@ class MainFrame(wx.Frame):
         # rádiófelvétel-kezelő: az időzített felvételek akkor is elindulnak,
         # ha a rádió-ablak épp zárva van (a program fusson)
         self._record_mgr = RecordManager(
-            lambda: self.dir_entry.GetValue(),
+            # a rádiófelvétel is a KÖZÖS kapun kérje a mappát: egy elrontott
+            # útvonal miatt egy időzített felvétel is elveszhetne, és azt a
+            # felhasználó csak órákkal később venné észre
+            lambda: self._celmappa(),
             on_event=lambda text, level:
                 wx.CallAfter(self._on_record_event, text, level),
             options_getter=lambda: self.settings.get("radiorec", {}))
@@ -512,6 +516,11 @@ class MainFrame(wx.Frame):
         wx.CallLater(1200, self._startup_greeting)
         # BIZTONSÁG: nem hivatalos frissítési forrás → hangos figyelmeztetés
         wx.CallLater(1600, self._repo_security_notice)
+        # Barbi (2026-09-05): ha a MENTETT célmappa volt hibás, azt induláskor
+        # ki KELL mondani. Egy csendben kicserélt célmappa ugyanaz a hiba, mint
+        # amit javítunk — a felhasználó azt hinné, ott van, ahol hagyta.
+        if getattr(self, "_dir_indulas_uzenet", ""):
+            wx.CallLater(2000, self._dir_indulas_szol)
 
         # induló fókusz: a BARÁTSÁGOS ÜDVÖZLŐ fogad, nem a letöltési lista –
         # így egy kezdő felhasználót nem „dob be" rögtön a letöltésekbe.
@@ -954,6 +963,17 @@ class MainFrame(wx.Frame):
         lbl_dir = wx.StaticText(sb, label="&Célmappa:")
         self.dir_entry = wx.TextCtrl(sb, size=(320, -1))
         self.dir_entry.SetName("Célmappa")
+        # Barbi hibajelentése (2026-09-05): a mezőbe egyetlen „t" betű került,
+        # és a letöltések egy `t` nevű mappába mentek a program mellé.
+        # ⚠️ A CSAPDA: a wx TABULÁTORRAL fókuszálva KIJELÖLI a mező teljes
+        # tartalmát, tehát egyetlen leütött betű az EGÉSZ útvonalat kicseréli —
+        # és a képernyőolvasó ebből annyit mond, hogy „t". Sem a kijelölésről,
+        # sem a törlésről nincs jelzés. Ez nem elgépelés, hanem csapda.
+        # A kurzort ezért a szöveg VÉGÉRE tesszük, kijelölés nélkül: így egy
+        # véletlen betű HOZZÁFŰZŐDIK (látszik és javítható), nem cserél ki.
+        self.dir_entry.Bind(wx.EVT_SET_FOCUS, self._on_dir_focus)
+        self.dir_entry.Bind(wx.EVT_KILL_FOCUS, self._on_dir_leave)
+        self._dir_utolso_jo = ""
         btn_dir = wx.Button(sb, label="Tall&ózás...")
         self.audio_chk = wx.CheckBox(sb, label="Csak &hang")
         self.audio_chk.SetName("Médiaoldalról csak a hangsáv letöltése")
@@ -1046,7 +1066,16 @@ class MainFrame(wx.Frame):
         # A célmappa vezető/záró szóközét kimossuk (öngyógyítás): egy bennragadt
         # „ C:\\…" szóköz Windowson WinError 123-at okoz, és minden letöltés
         # elhasal. A Downloader is véd ellene, de a beállítást is kitisztítjuk.
-        self.dir_entry.SetValue(str(s.get("out_dir", "")).strip())
+        # Barbi hibajelentése (2026-09-05): a HIBÁS érték túlélte az
+        # újraindítást is, mert a mentés fenntartás nélkül eltette. Induláskor
+        # tehát ELLENŐRIZZÜK, és ha rossz, visszaesünk egy értelmes mappára —
+        # a `_kesobb_mondjuk` sorban pedig ki is mondjuk, MIÉRT. Egy csendben
+        # kicserélt célmappa ugyanaz a hiba, mint amit javítunk.
+        _cel, _cel_uzenet = celmappa.ellenoriz(s.get("out_dir", ""))
+        self.dir_entry.SetValue(_cel)
+        self._dir_utolso_jo = _cel
+        if _cel_uzenet:
+            self._dir_indulas_uzenet = _cel_uzenet
         # „Csak hang" ALAPBÓL: induláskor a mentett állapotot állítjuk vissza,
         # így nem kell minden indításkor újra bepipálni (Maxi jelezte)
         self.audio_chk.SetValue(bool(s.get("audio_only", False)))
@@ -1073,7 +1102,16 @@ class MainFrame(wx.Frame):
     def _save_settings(self):
         # a fő ablak által birtokolt értékek; a többit a Beállítások-ablak
         # már beleírta a self.settings-be
-        self.settings["out_dir"] = self.dir_entry.GetValue().strip()
+        # ⚠️ CSAK ÉRVÉNYES célmappát mentünk. Barbinál a hibás érték azért lett
+        # tartós, mert a mentés fenntartás nélkül eltette — egy véletlen
+        # billentyűleütésből így lett állapot, ami az újraindítást is túlélte.
+        _cel = self.dir_entry.GetValue().strip()
+        _jo, _ = celmappa.ervenyes(_cel)
+        if _jo:
+            self.settings["out_dir"] = _cel
+            self._dir_utolso_jo = _cel
+        elif self._dir_utolso_jo:
+            self.settings["out_dir"] = self._dir_utolso_jo
         self.settings["tts"] = self.mi_tts.IsChecked()
         self.settings["sounds"] = self.mi_sounds.IsChecked()
         self.settings["audio_only"] = self.audio_chk.GetValue()   # „csak hang" megjegyzése
@@ -1210,7 +1248,7 @@ class MainFrame(wx.Frame):
         lemezhely.BEKAPCSOLVA = bool(s.get("hely_ellenorzes", True))
         if self.mgr is None:
             self.mgr = DownloadManager(
-                self.dir_entry.GetValue(),
+                self._celmappa(),
                 parallel=s.get("parallel", 3),
                 connections=s.get("connections", 8),
                 audio_only=self.audio_chk.GetValue(),
@@ -1226,7 +1264,7 @@ class MainFrame(wx.Frame):
             self.mgr.on_notice = lambda szoveg, job: wx.CallAfter(
                 self._announce, szoveg, False)
         else:
-            self.mgr.out_dir = self.dir_entry.GetValue()
+            self.mgr.out_dir = self._celmappa()
             self.mgr.connections = s.get("connections", 8)
             self.mgr.audio_only = self.audio_chk.GetValue()
             self.mgr.limiter.bps = parse_limit(s.get("limit", "") or "0")
@@ -1347,7 +1385,11 @@ class MainFrame(wx.Frame):
         dlg = wx.DirDialog(self, "Célmappa kiválasztása",
                            self.dir_entry.GetValue())
         if dlg.ShowModal() == wx.ID_OK:
+            # a tallózóból mindig teljes útvonal jön, de a bemondás és a mentés
+            # ITT is a közös úton menjen – egy helyen dőljön el, mi a célmappa
             self.dir_entry.SetValue(dlg.GetPath())
+            self._dir_utolso_jo = ""          # hogy a változás BE IS mondódjon
+            self._on_dir_leave(wx.CommandEvent())
         dlg.Destroy()
 
     def _on_open_torrent(self, event):
@@ -1374,8 +1416,80 @@ class MainFrame(wx.Frame):
                               wx.OK | wx.ICON_ERROR, self)
         dlg.Destroy()
 
+    # ---- célmappa: a mező védelme (Barbi, 2026-09-05) -----------------
+
+    def _on_dir_focus(self, event):
+        """A kurzor a szöveg VÉGÉRE, kijelölés NÉLKÜL.
+
+        A wx tabulátoros fókuszáláskor kijelöli az egész tartalmat, és onnantól
+        egyetlen leütött billentyű kicseréli az útvonalat — jelzés nélkül.
+        A `wx.CallAfter` kell: a kijelölést a wx a fókusz-esemény UTÁN végzi el,
+        tehát ha itt helyben törölnénk, visszajelölné."""
+        event.Skip()
+        wx.CallAfter(self._dir_kurzor_vegre)
+
+    def _dir_indulas_szol(self):
+        """A mentett célmappa hibás volt – egyszer, indulás után elmondjuk."""
+        uzenet = getattr(self, "_dir_indulas_uzenet", "")
+        if not uzenet:
+            return
+        self._dir_indulas_uzenet = ""
+        self._announce(uzenet, ok=False)
+        if self.speaker.available:
+            self.speaker.speak(uzenet)
+
+    def _dir_kurzor_vegre(self):
+        try:
+            if self.dir_entry:
+                self.dir_entry.SetInsertionPointEnd()
+                self.dir_entry.SetSelection(0, 0)
+        except RuntimeError:          # az ablak közben bezárult
+            pass
+
+    def _on_dir_leave(self, event):
+        """A mező elhagyásakor ELLENŐRZÜNK, és ki is mondjuk, mi lett belőle.
+
+        Két baj volt egyszerre: (1) a hibás útvonalat a program elfogadta, (2)
+        semmi nem szólt a változásról. Vakon a második a súlyosabb — Barbinál
+        addig mentek rossz helyre a letöltések, amíg fel nem tűnt."""
+        event.Skip()
+        ertek = self.dir_entry.GetValue().strip()
+        jo, uzenet = celmappa.ellenoriz(ertek, self._dir_utolso_jo)
+        if uzenet:
+            # hibás: visszaállunk, és MEGMONDJUK, miért
+            self.dir_entry.SetValue(jo)
+            self._dir_utolso_jo = jo
+            self._save_settings()
+            self._announce(uzenet, ok=False)
+            if self.speaker.available:
+                self.speaker.speak(uzenet)
+            return
+        if jo != self._dir_utolso_jo:
+            self._dir_utolso_jo = jo
+            if self.mgr:
+                self.mgr.out_dir = jo
+            self._save_settings()
+            self._announce(celmappa.valtozas_mondat(jo))
+
+    def _celmappa(self) -> str:
+        """A HASZNÁLANDÓ célmappa – minden letöltés ezen a kapun megy át.
+
+        Ha a mezőben hibás érték áll (mert a felhasználó épp beleírt, és még nem
+        lépett ki belőle), itt is elkapjuk: nem indítunk letöltést egy olyan
+        helyre, amit a felhasználó nem talál meg."""
+        jo, uzenet = celmappa.ellenoriz(self.dir_entry.GetValue(),
+                                        self._dir_utolso_jo)
+        if uzenet:
+            self.dir_entry.SetValue(jo)
+            self._dir_utolso_jo = jo
+            self._save_settings()
+            self._announce(uzenet, ok=False)
+            if self.speaker.available:
+                self.speaker.speak(uzenet)
+        return jo
+
     def _on_open_folder(self, event):
-        path = Path(self.dir_entry.GetValue())
+        path = Path(self._celmappa())
         path.mkdir(parents=True, exist_ok=True)
         wx.LaunchDefaultApplication(str(path))
 
@@ -1677,7 +1791,7 @@ class MainFrame(wx.Frame):
         dlg.Destroy()
 
     def _do_subscribe(self, url: str):
-        out_dir = self.dir_entry.GetValue()
+        out_dir = self._celmappa()
         audio = self.audio_chk.GetValue()
         self._announce(f"Feliratkozás vizsgálata: {url}")
 
@@ -1748,7 +1862,7 @@ class MainFrame(wx.Frame):
                 self.fm.mark_seen(sub, ep)
                 continue
             job = mgr.add(ep.url,
-                          out_dir=sub.out_dir or self.dir_entry.GetValue(),
+                          out_dir=sub.out_dir or self._celmappa(),
                           audio_only=sub.audio_only)
             job.progress.filename = ep.title
             self._row_for(job)
@@ -1824,7 +1938,7 @@ class MainFrame(wx.Frame):
         """Egy URL letöltése a sorba (a podcast-epizód / csatorna-videó
         böngészőkből hívva)."""
         mgr = self._ensure_mgr()
-        job = mgr.add(url, out_dir=self.dir_entry.GetValue(),
+        job = mgr.add(url, out_dir=self._celmappa(),
                       audio_only=self.audio_chk.GetValue())
         if title:
             job.progress.filename = title
@@ -2707,7 +2821,7 @@ class MainFrame(wx.Frame):
     # ---- MK10: előzmények, rendezés, duplikátum -----------------------
 
     def _job_mappaja(self, job) -> str:
-        return str(getattr(job, "out_dir", "") or self.dir_entry.GetValue())
+        return str(getattr(job, "out_dir", "") or self._celmappa())
 
     def _rendez_kesz(self, job) -> str:
         """A kész fájl áthelyezése a típusa szerinti almappába, HA kérték.
