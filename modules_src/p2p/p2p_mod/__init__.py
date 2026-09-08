@@ -22,11 +22,31 @@ def register(core):
         help="Nagy fájl küldése egy másik gépre felhő nélkül, bemondható "
              "kóddal, titkosítva")
     _state["item"] = item
+
+    # MÁSODIK belépő (2026-09-06): egyenesen a mappaküldésbe.
+    # Eredetileg a Core fájlválasztójába terveztük — a lemez-ellenőrzés viszont
+    # kiderítette, hogy a `fajlvalaszto.py` VÁLASZTÓ párbeszéd, nem fájlkezelő
+    # (az Androidon a fájlKEZELŐből indul a megosztás, itt olyan nincs).
+    # Egy második menüpont a természetes windowsos megfelelője — és így a
+    # funkció MODULFRISSÍTÉSSEL kimehet, Core-kiadás nélkül.
+    from .p2pwin import mappa_kuldes_inditasa
+
+    def mappa_menu(*_a):
+        opener()
+        mappa_kuldes_inditasa()
+
+    _state["mappa"] = core.add_menu_item(
+        menu, "&Mappa küldése és megosztás…\tCtrl+Shift+M", mappa_menu,
+        help="Egy egész mappa becsomagolása és elküldése – gépről gépre vagy "
+             "ideiglenes tárhelyre")
     core.log.info("p2p modul betöltve")
 
 
 def unregister(core):
-    item = _state.pop("item", None)
-    if item is not None:
-        core.remove_menu_item(item)
+    # MINDKÉT menüpontot le kell szerelni – egy ottfelejtett menüpont a modul
+    # eltávolítása után hibára futna, és a felhasználó azt hinné, elromlott.
+    for kulcs in ("item", "mappa"):
+        item = _state.pop(kulcs, None)
+        if item is not None:
+            core.remove_menu_item(item)
     core.log.info("p2p modul leszerelve")
