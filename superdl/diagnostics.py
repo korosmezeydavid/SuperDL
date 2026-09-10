@@ -10,6 +10,7 @@ minden előfordulását kimaszkoljuk, a felhasználónevet ~-re cseréljük.
 import json
 import platform
 import sys
+import time
 from pathlib import Path
 
 # a beállításokból CSAK ez a fehérlista kerül a jelentésbe (értékkel);
@@ -104,12 +105,86 @@ def _ytdlp_line() -> str:
         return f"(nem tölthető be: {e})"
 
 
+def _sor_allapot(manager) -> list[str]:
+    """A LETÖLTÉSI SOR állapota (Karcsi, 2026-09-09).
+
+    ⚠️ Eddig a jelentésben EGYETLEN SZÓ SEM volt a letöltésekről — holott a
+    hibajelentések nagy része róluk szól. A felhasználó elküldte a
+    diagnosztikát, mi meg megtudtuk belőle a wxPython verzióját, azt viszont
+    nem, hogy melyik letöltés hibás és miért.
+
+    Az `utolso_hiba` azért van itt, mert az TÚLÉLI a program bezárását: a
+    felhasználó másnap is el tudja küldeni azt, ami tegnap történt."""
+    if manager is None:
+        return ["  (a letöltéskezelő nem érhető el)"]
+    try:
+        jobs = list(manager.jobs)
+    except Exception as e:
+        return ["  (a sor nem olvasható: %s)" % e]
+    if not jobs:
+        return ["  (a sor üres)"]
+    out = []
+    for j in jobs:
+        p = j.progress
+        nev = p.filename or j.url
+        jelzok = ["állapot: %s" % p.status]
+        if p.total:
+            jelzok.append("%d%%" % round(p.percent))
+        if getattr(p, "elakadt", False):
+            jelzok.append("ELAKADT")
+        if getattr(p, "conflict", False):
+            jelzok.append("ütközés (döntésre vár)")
+        if getattr(j, "retries", 0):
+            jelzok.append("%d sikertelen próba" % j.retries)
+        out.append("  [%s] %s" % (j.kind, nev))
+        out.append("      " + " · ".join(jelzok))
+        # a NYERS hibaszövegek – ezekért készül az egész jelentés
+        if p.error:
+            out.append("      élő hiba: %s" % p.error)
+        korabbi = getattr(j, "utolso_hiba", "")
+        if korabbi and korabbi != p.error:
+            mikor = getattr(j, "utolso_hiba_ideje", None)
+            ido = ""
+            if mikor:
+                try:
+                    ido = time.strftime(" (%Y-%m-%d %H:%M)",
+                                        time.localtime(float(mikor)))
+                except Exception:
+                    ido = ""
+            out.append("      korábbi hiba%s: %s" % (ido, korabbi))
+    return out
+
+
+def _motor_sorok() -> list[str]:
+    """A torrent-motor tényei. Hibánál sem dobunk kivételt: egy hibajelentés
+    összeállítása nem hasalhat el azon, amiről jelentést írna."""
+    try:
+        from . import torrent
+        adat = torrent.motor_allapot()
+    except Exception as e:
+        return ["  (a motor állapota nem lekérdezhető: %s)" % e]
+    out = ["  aria2c: %s" % adat.get("aria2c", "?"),
+           "  fut: %s" % ("igen" if adat.get("fut") else "NEM")]
+    for kulcs, cimke in (("verzio", "aria2 verzió"), ("port", "vezérlő port"),
+                         ("aktiv", "aktív letöltés"),
+                         ("varakozo", "várakozó"), ("leallt", "leállt")):
+        if kulcs in adat:
+            out.append("  %s: %s" % (cimke, adat[kulcs]))
+    if adat.get("megjegyzes"):
+        out.append("  megjegyzés: %s" % adat["megjegyzes"])
+    for h in adat.get("hibak", []):
+        out.append("  MOTOR-HIBAÜZENET: %s" % h)
+    return out
+
+
 def build_report(settings: dict | None = None,
-                 log_lines: list[str] | None = None) -> str:
+                 log_lines: list[str] | None = None,
+                 manager=None) -> str:
     """A teljes, titok-mentes diagnosztikai jelentés összeállítása.
 
     `settings`: a futó program beállítás-szótára (ha None, a mentett fájlból
-    olvassuk); `log_lines`: az ablak utolsó napló-sorai (a GUI adja át)."""
+    olvassuk); `log_lines`: az ablak utolsó napló-sorai (a GUI adja át);
+    `manager`: a futó letöltéskezelő, a sor állapotához."""
     from superdl import __version__
     try:
         from .modkit import CORE_API
@@ -167,9 +242,52 @@ def build_report(settings: dict | None = None,
         if settings.get(k):
             lines.append(f"  {label}: megadva (értéke nem része a jelentésnek)")
 
+    # ---- AMIÉRT AZ EGÉSZ JELENTÉS KÉSZÜL (Karcsi, 2026-09-09) -----------
+    # A sorrend szándékos: a LETÖLTÉSEK állapota elöl. Aki hibát jelent, az
+    # szinte mindig egy letöltésről beszél – eddig viszont a jelentésben
+    # ebből semmi nem volt benne, és a wxPython-verzió után kellett volna
+    # kitalálnunk, mi történt.
+    lines += ["", "Letöltési sor:"]
+    lines += _sor_allapot(manager)
+
+    lines += ["", "Torrent-motor:"]
+    lines += _motor_sorok()
+
     if log_lines:
-        lines += ["", f"Utolsó napló-sorok ({len(log_lines)}):"]
+        lines += ["", f"Utolsó események az ablakban ({len(log_lines)}):"]
         lines += ["  " + ln for ln in log_lines]
+
+    # ---- A NAPLÓFÁJL VÉGE ------------------------------------------------
+    # Ez az, ami eddig egyáltalán nem létezett: a `logging`-hoz nem tartozott
+    # kezelő, tehát minden `_log.exception(...)` a semmibe ment. Az ablak
+    # eseménynaplója CSAK a kimondott mondatokat tartalmazza; itt viszont ott
+    # a nyers motorüzenet és a teljes hibaverem is.
+    try:
+        from . import naplo
+        vege = naplo.utolso_sorok(200)
+        if vege.strip():
+            lines += ["", "Naplófájl vége (%s, %d bájt):"
+                          % (naplo.FAJL.name, naplo.meret())]
+            lines += ["  " + ln for ln in vege.splitlines()]
+        else:
+            lines += ["", "Naplófájl: még üres (ebben a munkamenetben nem "
+                          "történt naplózandó esemény)"]
+    except Exception as e:
+        lines += ["", "Naplófájl: nem olvasható (%s)" % e]
+
+    # ---- NATÍV ÖSSZEOMLÁS -------------------------------------------------
+    # Az `osszeomlas.py` évek óta megvan, és a saját dokumentációja szerint
+    # „a diagnosztikai ablakhoz és a hibajelentéshez" készült – de SOHA nem
+    # volt bekötve ide. Ugyanaz a minta, mint az MK6-nál: egy jó szolgáltatás,
+    # amit senki nem hív.
+    try:
+        from . import osszeomlas
+        if osszeomlas.volt_osszeomlas():
+            lines += ["", "⚠️ ÖSSZEOMLÁS-NAPLÓ (natív hiba nyoma):"]
+            lines += ["  " + ln for ln
+                      in osszeomlas.naplo_szoveg(80).splitlines()]
+    except Exception:
+        pass
 
     lines += ["", "(A jelentés nem tartalmaz API-kulcsot, jelszót vagy "
                   "süti-tartalmat; a felhasználói mappa ~ jellel szerepel.)"]

@@ -2537,16 +2537,63 @@ class MainFrame(wx.Frame):
             self._announce("A mentés ablakát nem sikerült megnyitni: %s" % ex,
                            ok=False)
 
+    def _osszeomlas_utan_szol(self):
+        """Ha a program LEGUTÓBB összeomlott, mondjuk meg — és ajánljuk fel a
+        jelentést (Dávid, 2026-09-10).
+
+        **Miért nem elég feljegyezni.** A nyomot évek óta gondosan mentjük, a
+        4.6.4 óta a hibajelentés csatolja is — de mindez csak akkor ér
+        valamit, ha a felhasználónak eszébe jut jelentést írni. Márpedig aki
+        azt tapasztalja, hogy „csak bezáródott a program", az nem hibát lát,
+        hanem bosszúságot: újraindítja, és megy tovább. Az adat pedig, ami
+        megmagyarázná, ott marad a gépén.
+
+        **Egyszer szól, és csak ÚJ összeomlásra.** Egy figyelmeztetés, ami
+        minden induláskor megszólal ugyanarra a régi esetre, pontosan annyit
+        ér, mint a néma program — a felhasználó egy hét alatt megtanulja
+        elengedni a füle mellett."""
+        try:
+            from superdl import osszeomlas
+            if not osszeomlas.uj_osszeomlas():
+                return
+        except Exception:
+            return
+        self._announce(
+            "A SuperDL a legutóbbi futásakor váratlanul bezárult. A nyoma "
+            "megvan, és el tudod küldeni nekünk.", ok=False, toast=True)
+        dlg = wx.MessageDialog(
+            self,
+            "A SuperDL a legutóbbi futásakor váratlanul bezárult.\n\n"
+            "Ez nem a te hibád, és nem veszett el semmi: a letöltési sor "
+            "megmaradt. A program feljegyezte, mi történt.\n\n"
+            "Elkészítsem most a hibajelentést? A vágólapra kerül, és onnan "
+            "egy Control V-vel beilleszthető egy levélbe.\n\n"
+            "(A jelentés nem tartalmaz jelszót, kulcsot vagy személyes "
+            "adatot.)",
+            "A program legutóbb váratlanul bezárult",
+            wx.YES_NO | wx.ICON_INFORMATION)
+        dlg.SetYesNoLabels("&Jelentés a vágólapra", "&Most nem")
+        valasz = dlg.ShowModal()
+        dlg.Destroy()
+        if valasz == wx.ID_YES:
+            self._on_diagnostics()
+
     def _on_diagnostics(self, event=None):
         """Titok-mentes diagnosztikai jelentés a VÁGÓLAPRA (hibajelentéshez).
         A vak felhasználónak így nem kell adatokat vadásznia: Ctrl+V a levélbe."""
         from superdl import diagnostics
         try:
-            tail = self.log.GetValue().splitlines()[-25:]
+            # 25 helyett 60: Karcsi hibája elé több esemény vezetett, mint
+            # amennyi belefért – az ablak naplója ráadásul bezáráskor
+            # törlődik, tehát ami ide nem fér be, az végleg elveszik.
+            tail = self.log.GetValue().splitlines()[-60:]
         except Exception:
             tail = []
+        # A KEZELŐT is átadjuk: enélkül a jelentés egy szót sem tudna mondani
+        # arról, ami miatt a felhasználó egyáltalán jelentést ír.
         report = diagnostics.build_report(settings=self.settings,
-                                          log_lines=tail)
+                                          log_lines=tail,
+                                          manager=self.mgr)
         ok = False
         if wx.TheClipboard.Open():
             try:
@@ -3685,6 +3732,17 @@ def main():
         osszeomlas.bekapcsol()
     except Exception:
         pass
+    # ALKALMAZÁS-NAPLÓ (Karcsi, 2026-09-09). A `logging`-hoz eddig EGYETLEN
+    # kezelő sem tartozott, tehát minden `_log.exception(...)` a semmibe ment
+    # — köztük az is, amelyik a letöltés elhasalásakor fut. A hibajelentés
+    # nem azért volt hiányos, mert nem küldtük el a naplót, hanem mert nem
+    # is készült. ELŐBB, mint bármi más: ami ez előtt hasal el, arról megint
+    # nem tudnánk semmit.
+    try:
+        from superdl import naplo
+        naplo.bekapcsol()
+    except Exception:
+        pass
     # a telepítő (vagy haladó felhasználó) csendben be/kikapcsolhatja a
     # fájltársításokat – GUI nélkül, azonnal kilépve
     _ASSOC_KAPCSOLOK = ("--register-file-assoc", "--unregister-file-assoc",
@@ -3760,6 +3818,12 @@ def main():
     if letoltes_arg:
         wx.CallLater(600, lambda: frame._linkeket_felvesz(
             letoltes_arg, honnan="a megnyitott hivatkozásban"))
+    # ÖSSZEOMLÁS UTÁN SZÓLUNK (Dávid, 2026-09-10). A nyomot évek óta
+    # feljegyezzük, de aki azt látja, hogy „csak bezáródott a program", annak
+    # eszébe sem jut hibajelentést írni – a napló tehát örökre a gépén marad.
+    # Késleltetve, hogy ne az indulás zajába vesszen.
+    if not background:
+        wx.CallLater(2500, frame._osszeomlas_utan_szol)
     app.MainLoop()
 
 

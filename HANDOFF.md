@@ -162,10 +162,64 @@ nyers bájtként keresi a fájlokban.)
 
 ---
 
-### 🔨 4.6.3 MEGÉPÜLT, KIADÁSRA VÁR (2026-09-10) – Karcsi jelentése
+### 🔨 4.6.4 MEGÉPÜLT (2026-09-10) – „mi a fene történik a háttérben?"
 
-**A verzió `superdl\__init__.py`-ban már 4.6.3. Kiadva NINCS: se build, se
-push, se release — az a „publikálás" jelszóra vár.**
+**Dávid kérdése**, miután a 4.6.3 kiment: van diagnosztika-menüpont, akkor
+miért nem csatol naplót, mint az androidos változat?
+
+**A válasz: mert napló NEM VOLT.** A teljes kódban **egyetlen `logging`
+kezelő sem szerepelt** — se fájl, se konzol. Vagyis minden
+`_log.exception(...)` a semmibe íródott, köztük a `manager._run_job`
+hibaága is. A program szorgalmasan naplózott egy nem létező naplóba.
+⚠️ **Ez a fajta hiba a kódot olvasva LÁTHATATLAN:** minden hívási hely
+helyesnek látszik, csak épp senki nem veszi át, amit írnak.
+
+**Mi lett belőle:**
+
+1. **Új `superdl\naplo.py`** — forgó naplófájl (`~/.superdl/naplo.txt`,
+   2 MB × 3). Fejléc minden induláskor. ⚠️ A GYÖKÉR logger csak WARNING-tól
+   naplóz (a yt-dlp/requests INFO-ja percek alatt kiforgatná a mi sorainkat);
+   a `superdl` névtér INFO-tól.
+2. **`sys.excepthook` ÉS `threading.excepthook`** — az utóbbi nélkül pont a
+   letöltő háttérszálak hibái maradtak volna némák.
+3. **`torrent.motor_allapot()`** — aria2 verzió, fut-e, port, aktív/leállt,
+   és a leállt letöltések NYERS hibaüzenetei.
+4. **`diagnostics`**: új „Letöltési sor" és „Torrent-motor" szakasz, a
+   naplófájl vége (200 sor), és az összeomlás-napló. Az ablak-eseményekből
+   25 helyett 60 sor. A jelentés **1261 → 5437 karakter**.
+5. **Indulás után szólunk, ha legutóbb összeomlott** —
+   `osszeomlas.uj_osszeomlas()` + `_OLVASVA` jelölőfájl (bájt-eltolás).
+   ⚠️ A jelölő a fejléc kiírása ELŐTT ugrik a fájl végére, különben a saját
+   „SuperDL indult" sorunk minden induláskor újdonságnak látszana.
+
+**⚠️ ÉLŐ LELET Dávid gépén (2026-09-10, 4.6.2, KÉTSZER: 05:30 és 20:01):**
+```
+Windows fatal exception: code 0x8001010d
+Current thread (most recent call first):
+  File "wx\core.py", line 2254 in MainLoop
+```
+`0x8001010d` = `RPC_E_CANTCALLOUT_ININPUTSYNCCALL` (COM). A **fő szál** akadt
+el a wx üzenethurokban. Ez illik Karcsi „a főablak nem érhető el, a
+modulablak megy" leírására — a NEGYEDIK bajtípus windowsos alakja.
+**Gyanú, NEM bizonyíték** (egy gép, két minta). Erős jelölt a `comtypes`-on
+keresztüli SAPI-felolvasás háttérszálból. **A vizsgálat SZÁNDÉKOSAN vár**,
+amíg más gépekről is jön nyom — épp ez a kiadás hozza majd.
+
+**Új:** `tests\test_naplo_diagnosztika.py` (15 teszt). Teljes pytest
+**EXITCODE=0**.
+
+---
+
+### ✅ 4.6.3 KIADVA (2026-09-10) – Karcsi jelentése
+
+**Kiadás megtörtént.** Commit `4e467ae` (7 fájl, +529/−6), push, majd
+`gh release create v4.6.3 … --latest`. **Core-only.** Kulcs-szken tiszta
+(342 fájl), a négy asset fent, **mind a 6 URL 200**. Két levél elment:
+Karcsinak személyesen (a válaszlevél-szálban) és a listára.
+
+⚠️ A `modules_src\mail\*` munkapéldány-változásokat SZÁNDÉKOSAN kihagytam a
+commitból: azok a KÜLÖN e-mail témához tartoznak, nem ehhez a kiadáshoz.
+Ha ott dolgozol, azok érintetlenül a working tree-ben vannak.
 
 **Mi volt a panasz.** Karcsi (npkarcse@gmail.com, 2026-09-09, majd a
 válaszlevélben pontosítva): torrentek azonnal hibára futnak, csak hang jelzi,

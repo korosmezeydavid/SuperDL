@@ -9,6 +9,7 @@ Csak legális tartalomhoz használd - seedeléskor te magad is terjesztő vagy!
 
 import base64
 import json
+import logging
 import random
 import secrets
 import socket
@@ -23,6 +24,8 @@ import requests
 
 from . import store
 from .segment import Progress
+
+_log = logging.getLogger("superdl.torrent")
 
 # ---------------------------------------------------------------------------
 # PEER-FELDERÍTÉS (Laci hibajelentése, 2026-09-05)
@@ -319,6 +322,43 @@ class Aria2Client:
             pass
 
 
+def motor_allapot() -> dict:
+    """A torrent-motor TÉNYEI a hibajelentéshez (Karcsi, 2026-09-09).
+
+    Eddig a diagnosztika egy szót sem szólt a torrentekről, holott a
+    jelentések fele róluk szól. Ez a függvény szándékosan MINDIG visszaad
+    valamit: ha a motor nem is fut, az is válasz — sőt, épp az a válasz.
+
+    Hálózatot nem használ és nem indít motort: egy hibajelentés összeállítása
+    nem változtathat a program állapotán."""
+    adat: dict = {"aria2c": find_aria2c() or "(nem található)"}
+    inst = Aria2Client._instance
+    if inst is None:
+        adat["fut"] = False
+        adat["megjegyzes"] = ("a motor ebben a munkamenetben még nem indult "
+                              "el (ez normális, ha nem volt torrent)")
+        return adat
+    adat["fut"] = bool(inst.alive())
+    adat["port"] = getattr(inst, "port", "?")
+    if not adat["fut"]:
+        adat["megjegyzes"] = "a motor elindult, de MÁR NEM FUT"
+        return adat
+    try:
+        adat["verzio"] = inst.call("aria2.getVersion").get("version", "?")
+        adat["aktiv"] = len(inst.call("aria2.tellActive", ["gid"]))
+        adat["varakozo"] = len(inst.call("aria2.tellWaiting", 0, 50, ["gid"]))
+        leallt = inst.call("aria2.tellStopped", 0, 50, ["status",
+                                                        "errorMessage"])
+        adat["leallt"] = len(leallt)
+        # A LEÁLLT, HIBÁS letöltések üzenetei — ez az, ami eddig sehol nem
+        # volt előszedhető, és amiért Karcsi hiába keresgélt.
+        adat["hibak"] = [x.get("errorMessage", "") for x in leallt
+                         if x.get("status") == "error" and x.get("errorMessage")]
+    except Exception as e:
+        adat["megjegyzes"] = "a motor nem válaszol a vezérlésre: %s" % e
+    return adat
+
+
 def shutdown_aria2() -> None:
     """A közös aria2c folyamat leállítása (kilépéskor hívandó)."""
     with Aria2Client._ilock:
@@ -517,6 +557,11 @@ class TorrentDownloader:
             if status == "error":
                 p.status = "hiba"
                 raw = st.get("errorMessage", "ismeretlen aria2 hiba")
+                # A NYERS motorüzenet a naplóba (Karcsi, 2026-09-09). A
+                # felolvasásra fordított változat megy, de a pontos szöveg
+                # nélkül utólag semmit nem lehet kideríteni — és eddig
+                # pontosan ez veszett el minden egyes alkalommal.
+                _log.error("aria2 hiba [%s]: %s", p.filename or self.url, raw)
                 if _is_exists_conflict(raw):
                     p.conflict = True
                     p.error = ("A cél fájl már létezik ebben a mappában. "
