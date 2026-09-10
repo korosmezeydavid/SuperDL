@@ -158,7 +158,70 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-09-05 · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-10 · dolgozott: Claude
+
+---
+
+### 🔨 4.6.3 MEGÉPÜLT, KIADÁSRA VÁR (2026-09-10) – Karcsi jelentése
+
+**A verzió `superdl\__init__.py`-ban már 4.6.3. Kiadva NINCS: se build, se
+push, se release — az a „publikálás" jelszóra vár.**
+
+**Mi volt a panasz.** Karcsi (npkarcse@gmail.com, 2026-09-09, majd a
+válaszlevélben pontosítva): torrentek azonnal hibára futnak, csak hang jelzi,
+és *„nem tudod meg, hogy a hiba miért keletkezett, és mi a hiba egyáltalán"*.
+Verziója **4.6.2**, tehát a 4.6.1 két javítása nála MÁR benne volt. `.torrent`
+fájlból indít. Ctrl+F6 után **kb. 1 másodperc, majd „hiba"**.
+
+**Mérés (aria2c 1.37.0, Dávid gépén, 2026-09-10) – ez döntötte el:**
+
+| kísérlet | eredmény |
+|---|---|
+| addTorrent → remove → azonnal újra | OK |
+| addTorrent → remove → 1 mp múlva újra | OK |
+| addTorrent → **a régi még aktív** → újra check-integrity-vel | **hiba 2 mp-en belül:** `InfoHash … is already registered.` |
+
+Tehát NEM időzítési verseny: az ütközés akkor jön, ha az infohash még él.
+A `remove` azonnal felszabadít.
+
+**Az öt javítás:**
+
+1. `Job.utolso_hiba` + `utolso_hiba_ideje` — a hiba oka **MENTŐDIK**, és
+   túléli a bezárást. A `to_record()` eddig az állapotot mentette, az okot
+   nem. A visszatöltés SOHA nem írja a `progress.error`-ba: az azt jelentené,
+   hogy a sor MOST hibás.
+2. **Shift+F6 = „Miért?"** — a KIJELÖLT sor baja, a korábbi hibával együtt.
+   Akkor is felel, ha nincs baj. (Hiba-oszlop szándékosan NINCS: egy
+   nyolcadik oszlop minden sor bejárását meghosszabbítaná.)
+3. `hibaszoveg.olvashato()` — a FELOLVASOTT mondat sosem nyers angol.
+   Ismeretlennél: „…olyan hibát jelzett, amit még nem ismerünk fel, a pontos
+   szöveg a naplóban van: Control E." Az `emberi()` **változatlanul** a
+   nyerset adja: a naplóba az kell, az küldhető tovább.
+4. Az `InfoHash … is already registered` fordítása + **megelőzés**:
+   `_mar_fut_e()` nem engedi ugyanazt a torrentet kétszer elindulni, a
+   `kenyszeritett_ujrainditas()` pedig megkérdezi a motort (`regisztralt()`),
+   és **nem indít újra**, amíg az tartja. Eddig a Ctrl+F6 az elakadt
+   letöltésből VÉGLEG hibásat csinált.
+5. Az elakadás-mondat kimondja a legutóbbi hibaüzenetet is.
+
+**Érintett fájlok:** `superdl\manager.py`, `superdl\torrent.py`,
+`superdl\hibaszoveg.py`, `superdl_gui.py`, `superdl\__init__.py`,
+új: `tests\test_hiba_oka.py` (18 teszt).
+
+**Teszt:** teljes pytest **EXITCODE=0** (a repo konfigja elnyeli az
+összegző sort — az exit kód a mérvadó, ne a hiányzó „passed" szöveget keresd).
+
+⚠️ **Buktató, amibe ebben a körben is beleléptem:** a magyar záró idézőjel
+helyett ASCII `"` került egy `"…"` sztringbe (`superdl_gui.py` súgószöveg) →
+`SyntaxError`, és ettől **négy, látszólag független teszt-fájl bukott el**
+(autostart, feeds_seen, modul_core_szerzodes, screenreader_only). Ha ilyen
+szórt hibát látsz, ELŐSZÖR `ast.parse` a módosított fájlokra.
+
+⚠️ **Két dolog SZÁNDÉKOSAN kimaradt**, ne hidd, hogy elfelejtettük:
+* a **holt fő ablak** („nem érhető el", miközben a modulablak megy) — a
+  NEGYEDIK bajtípus, önálló kör;
+* a **~30 mp után hibára futás** — ehhez Karcsi hibaüzenete kell, amit épp
+  ez a kiadás tesz megszerezhetővé.
 
 ---
 

@@ -14,6 +14,7 @@ Narrátor is hibátlanul felolvassa. Minden funkció elérhető billentyűzetrő
   Ctrl+Shift+J  „Mi a helyzet?" – a letöltések állapota egy mondatban
   Ctrl+Shift+V  több hivatkozás hozzáadása egyszerre
   F6       ugrás a következő figyelmet igénylő elemre
+  Shift+F6 „Miért?" – mi baja a KIJELÖLT elemnek (korábbi hibával együtt)
   Ctrl+F6  a kijelölt elem javításának megkísérlése
   Ctrl+J   napi infó (dátum, névnap, időjárás, letöltések)
   Ctrl+F   médiakereső (keresés, lejátszás, letöltés)
@@ -174,6 +175,9 @@ KEYS_TEXT = (
     "               szövegből is kikeresi őket)\n"
     "  F6       – ugrás a következő figyelmet igénylő elemre (hiba vagy\n"
     "               döntésre váró ütközés), és mit tegyél vele\n"
+    "  Shift+F6 – Miért? – mi baja a KIJELÖLT elemnek. Akkor is felel, ha\n"
+    "               nincs baja, és elmondja a korábbi hibáját is – azt, ami\n"
+    "               a program bezárása előtt történt vele\n"
     "  Ctrl+F6  – a kijelölt elem javításának megkísérlése\n"
     "  Ctrl+J   – napi infó (dátum, névnap, időjárás, és a letöltések)\n"
     "  Ctrl+F   – médiakereső (keresés, lejátszás, letöltés)\n"
@@ -734,6 +738,10 @@ class MainFrame(wx.Frame):
         mi_next_problem = m_dl.Append(
             wx.ID_ANY, "&Következő teendő\tF6",
             "Ugrás a következő figyelmet igénylő elemre, és mit tegyél vele")
+        mi_miert = m_dl.Append(
+            wx.ID_ANY, "M&iért? A kijelölt elem baja\tShift+F6",
+            "Megmondja, mi van a KIJELÖLT letöltéssel – és mi volt vele "
+            "korábban, akkor is, ha közben újraindítottad a programot")
         mi_fix = m_dl.Append(
             wx.ID_ANY, "&Javítás megkísérlése\tCtrl+F6",
             "A kijelölt hibás elem újraindítása, ütközésnél a döntés kérése")
@@ -884,6 +892,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_batch_paste, mi_batch)
         self.Bind(wx.EVT_MENU, self._on_history, mi_history)
         self.Bind(wx.EVT_MENU, self._on_next_problem, mi_next_problem)
+        self.Bind(wx.EVT_MENU, self._on_miert, mi_miert)
         self.Bind(wx.EVT_MENU, self._on_fix_selected, mi_fix)
         self.Bind(wx.EVT_MENU, self._on_subscribe, mi_subnew)
         self.Bind(wx.EVT_MENU, self._on_manage_subs, mi_submng)
@@ -2098,6 +2107,75 @@ class MainFrame(wx.Frame):
         if self.speaker.available:
             self.speaker.speak(f"{hol} {mondat}")
 
+    def _on_miert(self, event=None):
+        """Shift+F6 – „mi baja ENNEK a sornak?" (Karcsi, 2026-09-09).
+
+        **Miért kellett külön billentyű.** Az F6 a KÖVETKEZŐ problémás elemre
+        ugrik, a Ctrl+F6 megjavítani próbál. Arra, hogy „itt állok, mondd
+        meg, mi van vele", eddig nem volt semmi – Karcsi ezért kapott
+        összesítést („hány futott hibára") válasz helyett, és ezért írta,
+        hogy „nem tudod meg, mi a hiba egyáltalán".
+
+        **Miért nem hiba-oszlop.** Egy nyolcadik oszlop MINDEN sor bejárását
+        meghosszabbítaná, hogy egy ritkán kellő adatot mutasson: a listát
+        rontanánk el a magyarázatért. Egy billentyű addig nem kerül semmibe,
+        amíg nem nyomod meg.
+
+        **Mindig felel**, akkor is, ha nincs baj: a „nincs vele gond" is
+        válasz. A néma billentyűről nem tudni, hogy nincs baj, vagy hogy a
+        billentyű nem működik – vakon ez a kettő ugyanaz."""
+        job = self._selected_job()
+        if job is None:
+            self._announce("Nincs kijelölt letöltés.")
+            return
+        p = job.progress
+        nev = p.filename or job.url
+        if p.conflict or p.status == "hiba" or getattr(p, "elakadt", False):
+            mondat = hibaszoveg.gond_mondat(
+                nev, p.status, p.error,
+                utkozes=bool(p.conflict), probak=getattr(job, "retries", 0),
+                elakadt=bool(getattr(p, "elakadt", False)),
+                elakadas_oka=getattr(p, "elakadas_oka", ""))
+        else:
+            mondat = f"{nev}: állapota {p.status}, most nincs vele teendő."
+        # A KORÁBBI hiba akkor is elhangzik, ha most épp fut. Ez az egyetlen
+        # hely, ahol a program bezárását túlélő magyarázat előkerül – enélkül
+        # a mentés értelmetlen volna. Külön mondat, hogy össze ne keveredjen
+        # az élő állapottal: a múlt idő itt tájékoztat, nem riaszt.
+        korabbi = getattr(job, "utolso_hiba", "")
+        if korabbi and korabbi != p.error:
+            mikor = self._hiba_ideje(getattr(job, "utolso_hiba_ideje", None))
+            mondat += (f" Korábban{mikor} ez a hiba történt vele: "
+                       f"{hibaszoveg.olvashato(korabbi)}")
+            # a NYERS szöveg a naplóba megy, hogy továbbküldhető legyen
+            self._naplo(f"[{nev}] korábbi hiba nyers szövege: {korabbi}")
+        self._announce(mondat, ok=False)
+        if self.speaker.available:
+            self.speaker.speak(mondat)
+
+    @staticmethod
+    def _hiba_ideje(ido) -> str:
+        """Emberi időpont a hibához – SOHA nem időbélyeg (a felolvasó a
+        „1788975173"-at számjegyenként mondaná ki)."""
+        if not ido:
+            return ""
+        try:
+            return time.strftime(" (%m. %d. %H:%M)", time.localtime(float(ido)))
+        except Exception:
+            return ""
+
+    def _naplo(self, szoveg: str) -> None:
+        """CSAK az eseménynaplóba ír: se hang, se felolvasás, se állapotsor.
+
+        Ide a technikai pontosság való (nyers motorüzenet, hash), amit a
+        felhasználó továbbküldhet nekünk. A felolvasásba ugyanez nem mehet:
+        lásd `hibaszoveg.olvashato()`."""
+        try:
+            stamp = time.strftime("%H:%M:%S")
+            self.log.AppendText(f"[{stamp}] {szoveg}\n")
+        except Exception:
+            pass
+
     def _on_fix_selected(self, event=None):
         """Ctrl+F6 – a kijelölt elem javításának megkísérlése (MK6)."""
         job = self._selected_job()
@@ -2730,7 +2808,13 @@ class MainFrame(wx.Frame):
                     self._announce(msg, toast=True, sound="seed")
                     self.selfvoice.announce("download", "done")
                 else:
-                    msg = f"Hiba: {p.filename or j.url} – {p.error}"
+                    # Karcsi (2026-09-09): a FELOLVASOTT mondat sosem lehet
+                    # nyers motorüzenet (lásd hibaszoveg.olvashato), a NYERS
+                    # szöveg viszont menjen a naplóba, hogy továbbküldhesd.
+                    nev = p.filename or j.url
+                    msg = f"Hiba: {nev} – {hibaszoveg.olvashato(p.error)}"
+                    if p.error and not hibaszoveg.van_javaslat(p.error):
+                        self._naplo(f"[{nev}] nyers hibaszöveg: {p.error}")
                     self._announce(msg, ok=False, toast=True, sound="error")
                     self.selfvoice.announce("download", "error")
                     self._feed_pending.pop(j.id, None)

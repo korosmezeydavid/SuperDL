@@ -404,6 +404,26 @@ class TorrentDownloader:
             return self.client.call("aria2.addTorrent", blob, [], opts)
         return self.client.call("aria2.addUri", [self.url], opts)
 
+    def regisztralt(self) -> bool:
+        """Igaz, ha ez a torrent MÉG él az aria2-ben (aktív, várakozó vagy
+        szüneteltetett).
+
+        Mérve 2026-09-10 (aria2c 1.37.0): egy infohash CSAK EGYSZER lehet
+        regisztrálva. Amíg a régi példány él, az újra-hozzáadás egy
+        másodpercen belül `InfoHash … is already registered` hibára fut –
+        vagyis a „javítás" tenné tönkre azt, amit javítani akart. Ezért az
+        újraindítás előtt meg KELL kérdezni, hogy elengedte-e a motor.
+
+        Hibánál `False`: ha nem tudjuk megkérdezni, ne akadjunk el örökre –
+        a rosszabbik eset (egy elutasított hozzáadás) legalább megszólal."""
+        if not self.gid or self.client is None:
+            return False
+        try:
+            st = self.client.call("aria2.tellStatus", self.gid, ["status"])
+        except Exception:
+            return False
+        return st.get("status") in ("active", "waiting", "paused")
+
     KEYS = ["status", "totalLength", "completedLength", "uploadLength",
             "downloadSpeed", "uploadSpeed", "connections", "numSeeders",
             "errorMessage", "followedBy", "bittorrent", "files"]

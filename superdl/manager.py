@@ -90,6 +90,24 @@ class Job:
     # újrapróba (MK4): hány sikertelen próba volt, és mikor jöhet a következő
     retries: int = 0
     next_retry_at: float | None = None
+    # A LEGUTÓBBI hiba szövege és ideje (Karcsi, 2026-09-09).
+    # Miért külön mező, és miért nem a `progress.error`: a `progress` az ÉLŐ
+    # állapot, ami minden indításkor nullázódik – a hiba OKA viszont pont
+    # akkor kell, amikor már nem él. Eddig sehol nem maradt meg: a felhasználó
+    # újraindította a programot, és a magyarázat nyomtalanul eltűnt. Ez a mező
+    # MENTŐDIK, és SOHA nem befolyásolja a sor állapotát: nem hibásnak
+    # mutat semmit, csak megőrzi, mi hangzott el.
+    utolso_hiba: str = ""
+    utolso_hiba_ideje: float | None = None
+
+    def hibat_rogzit(self, uzenet: str) -> None:
+        """A hiba szövegének eltevése későbbre. Üres szöveggel NEM felejt:
+        egy újabb (sikeres) indítás nem törölheti el az előző magyarázatát."""
+        uzenet = (uzenet or "").strip()
+        if not uzenet:
+            return
+        self.utolso_hiba = uzenet
+        self.utolso_hiba_ideje = time.time()
 
     def to_record(self) -> dict:
         return {"url": self.url, "kind": self.kind, "out_dir": self.out_dir,
@@ -97,7 +115,10 @@ class Job:
                 "status": self.progress.status,
                 "filename": self.progress.filename,
                 "overwrite": self.overwrite, "verify": self.verify,
-                "user_stopped": self.user_stopped}
+                "user_stopped": self.user_stopped,
+                # a magyarázat is a sor része, nem csak az állapota
+                "utolso_hiba": self.utolso_hiba or self.progress.error,
+                "utolso_hiba_ideje": self.utolso_hiba_ideje}
 
 
 class DownloadManager:
@@ -199,6 +220,21 @@ class DownloadManager:
         else:
             self.pool.submit(self._run_job, job)
 
+    # Ezekben az állapotokban egy torrent ténylegesen ÉL az aria2-ben, tehát
+    # az infohash-e foglalt. A „hiba" és a „kész" NEM tartozik ide: azok már
+    # elengedték a motort, és épp ilyenkor akarhat a felhasználó újraindítani.
+    ELO_TORRENT = ("előkészítés", "letöltés", "seedelés")
+
+    def _mar_fut_e(self, job: Job) -> "Job | None":
+        """Fut-e MÁR ugyanez a torrent egy másik soron? Ha igen, azt adja
+        vissza – a hívó ebből tud emberi mondatot írni."""
+        for masik in list(self.jobs):
+            if masik is job or masik.kind != "torrent":
+                continue
+            if masik.url == job.url and masik.progress.status in self.ELO_TORRENT:
+                return masik
+        return None
+
     def _run_job(self, job: Job) -> None:
         if job.progress.status == "leállítva":
             return
@@ -220,6 +256,19 @@ class DownloadManager:
                 self._jelez(uzenet, job)
         try:
             if job.kind == "torrent":
+                # MEGELŐZÉS (Karcsi, 2026-09-09). Ha ugyanaz a torrent már fut
+                # egy MÁSIK soron, az aria2 az újat egy másodpercen belül
+                # elutasítja („InfoHash … is already registered"), és a
+                # felhasználó egy örökre hibás sort kap – miközben a letöltés
+                # valójában szépen megy néhány sorral feljebb. Ezt itt
+                # elkapjuk, MIELŐTT hibává válna, és megmondjuk, hol keresse.
+                masik = self._mar_fut_e(job)
+                if masik is not None:
+                    raise RuntimeError(
+                        "Ez a torrent már fut a listában "
+                        f"({masik.progress.filename or masik.url}) – "
+                        "ugyanazt kétszer nem lehet elindítani. Keresd meg a "
+                        "listában, és ott folytasd.")
                 # A kényszerített újraindítás EGYETLEN indításra kér
                 # ellenőrzést (a meglévő adat megtartásához). Átmeneti jelző,
                 # nem mentett mező: különben minden későbbi induláskor is
@@ -297,6 +346,11 @@ class DownloadManager:
                 # csendben visszacsinálnánk.
                 if job.progress.status == "hiba":
                     job.progress.error = hibaszoveg.emberi(job.progress.error)
+                    # Karcsi (2026-09-09): innentől a magyarázat TÚLÉLI a
+                    # program bezárását. A nyers szöveget tesszük el, nem a
+                    # fordítást: ha holnap felismerünk egy mintát, a régi
+                    # bejegyzés is értelmet nyer – fordítva sosem.
+                    job.hibat_rogzit(uzenet or job.progress.error)
                 _log.exception("Letöltési feladat hibája: %s", job.url)
         finally:
             self._save()
@@ -494,6 +548,28 @@ class DownloadManager:
                    and job.progress.status in ("letöltés", "seedelés",
                                                "előkészítés")):
                 time.sleep(0.2)
+            # Karcsi hibája (2026-09-09), mérve 2026-09-10: a státuszszó NEM
+            # elég. Az aria2 egy infohasht csak egyszer enged regisztrálni, és
+            # amíg a régi példányt el nem engedte, az új hozzáadás EGY
+            # MÁSODPERCEN BELÜL hibára fut – vagyis a Ctrl+F6 az elakadt
+            # letöltésből VÉGLEG hibásat csinált. A motort magát kérdezzük meg.
+            # `getattr`-ral: ha a letöltő-objektum nem tudja megmondani
+            # (régi példány, teszt-dublőr), NE akadjunk el – ilyenkor a
+            # korábbi, státusz alapú várakozás marad, ami eddig is volt.
+            def _meg_el() -> bool:
+                return bool(getattr(dl, "regisztralt", lambda: False)())
+
+            while time.monotonic() < hatarido and _meg_el():
+                time.sleep(0.2)
+            if _meg_el():
+                # NEM indítunk újra vakon: az biztos hiba volna. Megmondjuk,
+                # mi történt, és hogy nem veszett el semmi.
+                self._jelez(
+                    "A torrent-motor még nem engedte el ezt a letöltést, "
+                    "ezért most nem indítom újra. Várj néhány másodpercet, "
+                    "és próbáld meg újra – a letöltés addig sem vész el.",
+                    job)
+                return False
         p = job.progress
         p.elakadt = False
         p.elakadas_oka = ""
@@ -700,6 +776,13 @@ class DownloadManager:
             job.user_stopped = user_stopped
             if r.get("filename"):
                 job.progress.filename = r["filename"]
+            # A legutóbbi hiba MAGYARÁZATA visszakerül – de CSAK ide, a
+            # `progress.error`-ba SOHA. Az élő hibamezőbe írva a sor
+            # hibásnak látszana akkor is, ha most épp szépen fut: az pedig
+            # ugyanaz a hazugság, mint a hallgatás, csak fordítva.
+            if r.get("utolso_hiba"):
+                job.utolso_hiba = str(r["utolso_hiba"])
+                job.utolso_hiba_ideje = r.get("utolso_hiba_ideje")
             restored.append(job)
         return restored
 

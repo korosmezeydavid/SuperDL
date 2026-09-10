@@ -29,6 +29,11 @@ _SAJAT_KEZDETEK = (
     "ez a link egy weboldalra mutat",
     "a letöltött fájl mérete nem teljes",
     "hiányos letöltés",
+    # Karcsi (2026-09-09): a „már fut" mondatot MI írjuk, magyarul. Enélkül a
+    # saját, jó mondatunkat az `olvashato()` ismeretlennek hinné, és a
+    # „nem ismerjük fel" szövegre cserélné – vagyis pont azt a magyarázatot
+    # dobnánk el, amit most tettünk bele.
+    "ez a torrent már fut",
 )
 
 
@@ -56,6 +61,16 @@ def _torrent_es_szegmens(m: str) -> str:
         return ("Ez a magnet-link hibás vagy hiányos. Másold ki újra a "
                 "forrásoldalról – a teljes link a magnet kettőspont résszel "
                 "kezdődik.")
+    if "already registered" in m and "infohash" in m:
+        # Karcsi jelentése (2026-09-09), mérve 2026-09-10: az aria2 EGY
+        # infohasht csak egyszer enged regisztrálni, és a második hozzáadást
+        # egy másodpercen belül HIBÁRA futtatja. Eddig a nyers angol üzenet
+        # ment a felolvasóra – negyven hexa karakterrel együtt, ami vakon
+        # felolvasva pontosan annyit ér, mint a csend.
+        return ("Ez a torrent MÁR FUT a programban – ugyanazt kétszer nem "
+                "lehet hozzáadni. Keresd meg a listában (Control D), és ott "
+                "folytasd. Ha nincs ott, akkor egy korábbi példánya még nem "
+                "állt le: indítsd újra a programot.")
     if "no peers" in m or "no seeds" in m or "0 seeders" in m:
         return ("Ehhez a torrenthez jelenleg NINCS megosztó, ezért nem tud "
                 "haladni. Ez nem a te hibád és nem a programé: várni kell, "
@@ -107,6 +122,33 @@ def emberi(uzenet: str) -> str:
         return uzenet
 
 
+ISMERETLEN_MONDAT = (
+    "A letöltő-motor olyan hibát jelzett, amit még nem ismerünk fel. A pontos "
+    "szövege az eseménynaplóban van: Control E. Ha elküldöd, megnézzük.")
+
+
+def olvashato(uzenet: str) -> str:
+    """Amit a FELOLVASÓNAK adunk – sosem nyers angol motorüzenet.
+
+    Karcsi jelentése (2026-09-09) tette világossá, hogy a kettőt szét kell
+    választani. A napló dolga a pontosság: oda a nyers szöveg kell, hogy
+    utólag ki lehessen deríteni, mi történt. A felolvasás dolga a
+    HASZNÁLHATÓSÁG: egy negyven hexa karakteres angol mondat vakon nem
+    információ, hanem zaj – a felhasználó pontosan annyit tud utána, mint
+    előtte, csak fáradtabb. Ha nem tudjuk megmondani, MI a baj, azt mondjuk
+    meg ŐSZINTÉN, és megmondjuk, hol a pontos szöveg.
+
+    Kitalálni egy magyarázatot továbbra sem szabad: az órákat lop el
+    (ez volt a tvmusor tanulsága)."""
+    uzenet = (uzenet or "").strip()
+    if not uzenet:
+        return ""
+    # SZÁNDÉKOSAN a meglévő `van_javaslat()`-ot használjuk, nem egy saját,
+    # ugyanolyan vizsgálatot: két külön „ismerjük-e" válasz előbb-utóbb
+    # széttart, és akkor a felület mást hinne, mint a fordító.
+    return emberi(uzenet) if van_javaslat(uzenet) else ISMERETLEN_MONDAT
+
+
 def gond_mondat(nev: str, allapot: str, uzenet: str, utkozes: bool = False,
                 probak: int = 0, elakadt: bool = False,
                 elakadas_oka: str = "") -> str:
@@ -127,11 +169,20 @@ def gond_mondat(nev: str, allapot: str, uzenet: str, utkozes: bool = False,
         # a program pont azt állítaná, hogy minden rendben. Ez volt Laci
         # egyórás élménye, mondatba öntve.
         ok = (elakadas_oka or "Régóta nem érkezik adat.").strip()
-        return (f"{nev}: elakadt, bár a letöltés fut. {ok}")
+        mondat = f"{nev}: elakadt, bár a letöltés fut. {ok}"
+        # Karcsi jelentése (2026-09-09): az elakadás oka és a legutóbbi
+        # HIBAÜZENET két különböző dolog, és eddig a második sosem hangzott
+        # el ezen az ágon. Aki elakadt sorban ragadt, az soha nem tudta meg,
+        # hogy közben a motor jelzett-e valamit – pedig épp az árulná el,
+        # miért nem indul újra. Ha van ilyen, a mondat végére kerül.
+        korabbi = olvashato(uzenet)
+        if korabbi:
+            mondat += f" A legutóbbi hibaüzenet: {korabbi}"
+        return mondat
     reszek = [f"{nev}:"]
     if probak:
         reszek.append(f"{probak} sikertelen próbálkozás után.")
-    szoveg = emberi(uzenet)
+    szoveg = olvashato(uzenet)
     if szoveg:
         reszek.append(szoveg)
     elif allapot:
