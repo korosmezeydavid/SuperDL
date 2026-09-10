@@ -1,0 +1,3228 @@
+{
+ "id": "kviz-zene-opera-konnyu",
+ "nev": "Zene és opera — könnyebb",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "\"Mit csinálj\" a sörrel a Fonográf együttes slágerének címe szerint?",
+   "valaszok": [
+    "Döntsd be!",
+    "Lökd ide!",
+    "Fizesd ki!",
+    "Küld le!"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy Horváth Charlie-sláger címe?",
+   "valaszok": [
+    "Szódavíz buborékokkal",
+    "Tejeskávé két cukorral",
+    "Alkoholmentes sör habbal",
+    "Jég dupla whiskyvel"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy folytatódik Lehár Ferenc A mosoly országa című operettjének slágere: \"Vágyom …\"",
+   "valaszok": [
+    "egy ágy után",
+    "egy nő után",
+    "egy kis csendre",
+    "egy kis kimenőre"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy folytatódik Zerkovitz Béla slégere: \"Asszonykám, adj egy kis …\"",
+   "valaszok": [
+    "kimenőt",
+    "pihenőt",
+    "vacsorát",
+    "egérutat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy hívják a táncoskomikust a Csárdáskirálynő című operettben?",
+   "valaszok": [
+    "Póni",
+    "Bóni",
+    "Béni",
+    "Frédi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy hívják azt a kottát, amelyből a karmester vezényel?",
+   "valaszok": [
+    "tinktúra",
+    "partitúra",
+    "tortúra",
+    "matúra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan folytatódik a népszerű operett-sláger: \"Jaj cica, eszem azt a …\"",
+   "valaszok": [
+    "hegyes füled",
+    "csöpp kis szád",
+    "kökény szemed",
+    "kackiás bajszod"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan folytatódik ifj. Johann Strauss ismert operettjének címe. Egy éj …?",
+   "valaszok": [
+    "esküvő után",
+    "és más semmi",
+    "Velencében",
+    "a Velencei-tónál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol van a hegedűs a híres musical címe szerint?",
+   "valaszok": [
+    "felemás cipőben",
+    "a hegytetőn",
+    "a háztetőn",
+    "a pácban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki a címszereplője Huszka Jenő 1905-ben bemutatott híres operettjének?",
+   "valaszok": [
+    "Ali Baba",
+    "Gül Baba",
+    "Böbe baba",
+    "Zsebibaba"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki a főhőse a \"La Mancha lovagja\" című musicalnek?",
+   "valaszok": [
+    "Robin Hood",
+    "János vitéz",
+    "Don Quijote",
+    "Zorro"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kiről szólt a Szörényi-Bródy szerzőpáros első nagy sikerű rock-operája?",
+   "valaszok": [
+    "Pató Pálról",
+    "Ferenc Józsefről",
+    "István királyról",
+    "Háry Jánosról"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy hangszer neve?",
+   "valaszok": [
+    "nyitogató",
+    "csukogató",
+    "tárogató",
+    "zárogató"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy világhírű Hervé-operett címe?",
+   "valaszok": [
+    "Tiszavirág",
+    "Nebáncsvirág",
+    "Tátika",
+    "Mimóza"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik járműről elnevezett együttes tagja volt Zorán a 60-as években?",
+   "valaszok": [
+    "Villamos",
+    "HÉV",
+    "Autóbusz",
+    "Metró"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nap szerepel Seress Rezső híres dalának címében?",
+   "valaszok": [
+    "borongós hétfő",
+    "kedvetlen kedd",
+    "szerelem csütörtök",
+    "szomorú vasárnap"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik női ruhadarab nevét viseli egy magyar rockegyüttes?",
+   "valaszok": [
+    "Kombiné",
+    "Bikini",
+    "Alsószoknya",
+    "Kosztüm"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik zenekart vezeti a prímás?",
+   "valaszok": [
+    "a cigányzenekart",
+    "a macskazenekart",
+    "a tűzoltózenekart",
+    "tánczenekart"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik állat lett a címadója ifj. Johann Strauss egyik operettjének?",
+   "valaszok": [
+    "a pulyka",
+    "a csiga",
+    "a fóka",
+    "a denevér"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik édesség nevét viseli egy magyar együttes?",
+   "valaszok": [
+    "Puszedli",
+    "Bon Bon",
+    "Dra Zsé",
+    "Cso Ki"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Eisemann Mihály operettjének: \"Én és …\"",
+   "valaszok": [
+    "az öregapám",
+    "a dédanyám",
+    "a nagybácsim",
+    "a kisöcsém"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a foglalkozása Figarónak Rossini operájában?",
+   "valaszok": [
+    "ékszerész",
+    "borbély",
+    "bérkocsis",
+    "kottamásoló"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miből készült királyfiról írt táncjátékot Bartók Béla?",
+   "valaszok": [
+    "selyemből szőtt",
+    "papírból hajtogatott",
+    "fából faragott",
+    "gyurmából formált"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mik a \"lányok\" a Csárdáskirálynő című operett slágere szerint?",
+   "valaszok": [
+    "amazonok",
+    "angyalok",
+    "angolok",
+    "apácák"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mikor szakad meg majdnem Demjén Ferenc szíve híres dala szerint?",
+   "valaszok": [
+    "mikor az első villamos elindul",
+    "mikor elindul a vonat",
+    "éjjel az omnibusz tetején",
+    "amikor döcög az úthenger"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen \"királynőről\" írt operettet Kálmán Imre?",
+   "valaszok": [
+    "bál",
+    "csókos",
+    "csárdás",
+    "diszkó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"vásárról\" írt operettet Jacobi Viktor?",
+   "valaszok": [
+    "kutya",
+    "marha",
+    "leány",
+    "virág"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen Frédiről énekelt az Omega együttes?",
+   "valaszok": [
+    "Trombitás",
+    "Verklis",
+    "Üstdobos",
+    "Flinstone"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen déligyümölcs szerepel Bartók \"csodálatos\" táncjátékának címében?",
+   "valaszok": [
+    "füge",
+    "banán",
+    "mandarin",
+    "kókusz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen ital szerepel Horváth Charlie számának címében: \"Jég …\"",
+   "valaszok": [
+    "alkoholmentes sörrel",
+    "dupla kávéval",
+    "szimpla brandyvel",
+    "dupla whiskyvel"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen jármű szerepel Demjén Ferenc slágerének címében?",
+   "valaszok": [
+    "szellemhajó",
+    "boldogságtraktor",
+    "örömriksa",
+    "szerelemvonat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen különleges járműről énekel Kovács Kati?",
+   "valaszok": [
+    "Pop And Roller",
+    "SárkányRapülő",
+    "Rock And Roller",
+    "Blues Bicikli"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen különleges növény szerepel a Metro együttes egyik dalának címében?",
+   "valaszok": [
+    "dinnyeízű uborka",
+    "narancsízű kivi",
+    "eperízű ribizli",
+    "citromízű banán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen nevű hercegről írt operettet Huszka Jenő?",
+   "valaszok": [
+    "Bill",
+    "Bob",
+    "Joe",
+    "Sam"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nevű hotelről énekelt a Hungária együttes 1981-es lemezén?",
+   "valaszok": [
+    "Hotel Menthol",
+    "Hotel Ánizs",
+    "Hotel Gyömbér",
+    "Hotel Nugát"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen szakállú hercegről írt operát Bartók Béla?",
+   "valaszok": [
+    "ősz",
+    "kék",
+    "rőt",
+    "kecske"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen tengeralattjáró szerepel a Beatles együttes zenéjére készült rajzfilm címében?",
+   "valaszok": [
+    "sárga",
+    "lyukas",
+    "zöld",
+    "atom"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen állatok a címszereplői Andrew Lloyd Webber világhírű musicaljénel?",
+   "valaszok": [
+    "macskák",
+    "bolhák",
+    "pulykák",
+    "nünükék"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen állatok állóvizéről írt Csajkovszkij balettzenét?",
+   "valaszok": [
+    "pontyok",
+    "békák",
+    "hattyúk",
+    "kacsák"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen állatokról írt musicalt Andrew Lloyd Webber?",
+   "valaszok": [
+    "elefántokról",
+    "medvékről",
+    "macskákról",
+    "denevérekről"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen őrmester szerepel a Beatles híres lemezének címében?",
+   "valaszok": [
+    "Paprika",
+    "Bors",
+    "Fokhagyma",
+    "Chili"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mitől fáznak ritkán a lányok a Csárdáskirálynő című operett slágere szerint?",
+   "valaszok": [
+    "a bóktól",
+    "a hótól",
+    "a csóktól",
+    "a póktól"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A Beatles-együttes melyik tagja viselt szemüveget?",
+   "valaszok": [
+    "John Lennon",
+    "Paul McCartney",
+    "George Harrison",
+    "Ringo Starr"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Egy ház melyik részében játszódik Presser Gábor 1987-ben bemutatott musicalje?",
+   "valaszok": [
+    "a pincében",
+    "a garázsban",
+    "a padláson",
+    "a lépcsőházban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Folytassa a dalt! \"Mindig az a perc a legszebb perc, mit …\"",
+   "valaszok": [
+    "nincs időnk megélni",
+    "meg nem ád az élet",
+    "átalszik az ember",
+    "borral tölt a férfi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy folytatódik Eisemann Mihály híres operett-slágere: \"Én és a kisöcsém, …\"",
+   "valaszok": [
+    "fütyülünk a nőkre az idén",
+    "megnősülünk még idén",
+    "vágyunk egy nő után",
+    "hétre ma várjuk a Nemzetinél"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy hívják Kodály Zoltán daljátékának nagyotmondó hősét?",
+   "valaszok": [
+    "Hübele Balázs",
+    "Háry János",
+    "Pató Pál",
+    "Münchausen báró"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan folytatódik Eisemann Mihály ismert operettjének címe? \"Én és a …\"",
+   "valaszok": [
+    "nagymamám",
+    "kisöcsém",
+    "keresztanyám",
+    "sógornőm"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan folytatódik az operett-sláger: \"Hétre ma várom a Nemzetinél …\"",
+   "valaszok": [
+    "egy jó túrós csuszára",
+    "az omnibusz tetején",
+    "egy fess fiákeren",
+    "ott, ahol a hatos megáll"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki \"szupersztár\" Andrew Lloyd Webber híres musicaljének címe szerint?",
+   "valaszok": [
+    "Buddha",
+    "Mózes",
+    "Jézus Krisztus",
+    "Mohamed"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki a zeneszerzője a \"Jézus Krisztus szupersztár\" című rock-operának?",
+   "valaszok": [
+    "Leonard Bernstein",
+    "Presser Gábor",
+    "Galt McDermott",
+    "Andrew Lloyd Webber"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek az előadásában lett sláger a Sohase mondd! című dal?",
+   "valaszok": [
+    "Eszenyi Enikő",
+    "Hernádi Judit",
+    "Psota Irén",
+    "Törőcsik Mari"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiről énekelt a Pa-Dö-Dö együttes 1994-es albumán?",
+   "valaszok": [
+    "Szabó Jánosról",
+    "Tóth Lajosról",
+    "Kovács Józsefről",
+    "Kiss Béláról"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kit neveztek keringőkirálynak?",
+   "valaszok": [
+    "ifj. Johann Strausst",
+    "Lehár Ferencet",
+    "Frédéric Chopint",
+    "Liszt Ferencet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik egy mai együttes elnevezése?",
+   "valaszok": [
+    "Földönfutók",
+    "Kengyelfutók",
+    "Ámokfutók",
+    "Gátfutók"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik együttes tagjai játszották a Help! című film főszerepét?",
+   "valaszok": [
+    "Chicago",
+    "Beatles",
+    "Metallica",
+    "Police"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik feltaláló neve szerepel Fonográf együttes egyik lemezének címében?",
+   "valaszok": [
+    "Nobel",
+    "Edison",
+    "Bell",
+    "Morse"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik királyunkról írt rock-operát a Szörényi-Bródy szerzőpáros 1983-ban?",
+   "valaszok": [
+    "Szent Lászlóról",
+    "Szent Istvánról",
+    "Könyves Kálmánról",
+    "Mátyás királyról"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik musicalben hangzik el a \"Ha én gazdag lennék\" kezdetű híres dal?",
+   "valaszok": [
+    "Macskák",
+    "Hegedűs a háztetőn",
+    "My Fair Lady",
+    "Hair"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyiknek a grófja szerepel Lehár Ferenc nagy sikerű operettjének címében?",
+   "valaszok": [
+    "Belgium",
+    "Hollandia",
+    "Luxemburg",
+    "Monaco"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi Bartók zongoradarabjának címe?",
+   "valaszok": [
+    "Reggel a csángóknál",
+    "Dél a jászoknál",
+    "Este a székelyeknél",
+    "Éjjel a palócoknál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Fenyő Miklós egyik nagylemezének: \"Mr. …\"",
+   "valaszok": [
+    "Hip-Hop",
+    "Rythm and Blues",
+    "Heavy Metal",
+    "Rock and Roll"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a címe Wolfgang Amadeus Mozart híres operájának: \"Figaro …\"",
+   "valaszok": [
+    "borotvája",
+    "házassága",
+    "szerája",
+    "varázsfuvolája"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a foglalkozása Gedeon bácsinak, a \"nők bálványának\" Szécsi Pál slágerében?",
+   "valaszok": [
+    "sztárügyvéd",
+    "fodrász",
+    "masszőr",
+    "autóversenyző"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miből faragták a királyfit Bartók táncjátékában?",
+   "valaszok": [
+    "márványból",
+    "gránitból",
+    "elefántcsotból",
+    "fából"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miből van a Hold a Bergendy együttes híres slágerének címe szerint?",
+   "valaszok": [
+    "kifliből",
+    "kolbászból",
+    "sajtból",
+    "disznósajtból"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"Halottkémek\" néven vált ismertté egy zenekar?",
+   "valaszok": [
+    "Repülő",
+    "Zenélő",
+    "Vágtázó",
+    "Ordító"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"életről\" írt operát Giocomo Puccini?",
+   "valaszok": [
+    "csend",
+    "bohém",
+    "házas",
+    "magán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen \"özvegy\" szerepel Lehár Ferenc nagy sikerű operettjének címében?",
+   "valaszok": [
+    "kikapós",
+    "víg",
+    "szalma",
+    "széna"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen bál szerepel egy Verdi-opera címében?",
+   "valaszok": [
+    "farsangi bál",
+    "Anna-bál",
+    "gólyabál",
+    "álarcosbál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen bárónőről írt operettet Huszka Jenő?",
+   "valaszok": [
+    "Mici",
+    "Inci",
+    "Cili",
+    "Lili"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen bűvös lény Paff, a 100 Folk Celsius együttes dalának hőse?",
+   "valaszok": [
+    "sárkány",
+    "boszorkány",
+    "tündér",
+    "kobold"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen grófnőről írt nagy sikerű operettet Kálmán Imre?",
+   "valaszok": [
+    "Marica",
+    "Katica",
+    "Terike",
+    "Borika"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen hangszeren játszott Louis Armstrong?",
+   "valaszok": [
+    "trombonon",
+    "szaxofonon",
+    "pozanon",
+    "trombitán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen nevű hölgytől búcsúzik Aradszky László ismert slágerében: \"Isten véled édes …\"?",
+   "valaszok": [
+    "Piroskám",
+    "Irénkém",
+    "Zsuzsikám",
+    "Gizikém"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen szikláról énekelt Zorán az 1969-es táncdalfesztiválon?",
+   "valaszok": [
+    "magas",
+    "kemény",
+    "tarka",
+    "fehér"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen származású Yoko Ono, John Lennon második felesége?",
+   "valaszok": [
+    "kínai",
+    "maláj",
+    "indián",
+    "japán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen varázserejű hangszerről írt Mozart operát?",
+   "valaszok": [
+    "kürt",
+    "fagott",
+    "trombita",
+    "fuvola"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen virág szerepel Kálmán Imre operettjének címében?",
+   "valaszok": [
+    "nizzai nárcisz",
+    "marseille-i mimóza",
+    "párizsi pipacs",
+    "montmartre-i ibolya"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen építményről kapta nevét Som Lajos együttese?",
+   "valaszok": [
+    "dzsámi",
+    "türbe",
+    "citadella",
+    "piramis"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen ízű banánról énekelt a Metró együttes?",
+   "valaszok": [
+    "menta",
+    "kávé",
+    "csokoládé",
+    "citrom"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen órát szeretne megállítani Záray Márta híres slágere szerint?",
+   "valaszok": [
+    "atomórát",
+    "napórát",
+    "kvarcórát",
+    "homokórát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek a három éjszakájáról szól az ismert zenés tragédia?",
+   "valaszok": [
+    "egy szerelem",
+    "egy bűntény",
+    "egy utazás",
+    "egy szellem"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mire használják a zenészek a metronómot?",
+   "valaszok": [
+    "az üstdob hangolására",
+    "az ütem szabályozására",
+    "a húrok feszítésére",
+    "a kották tárolására"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire szólít fel Eisemann Mihály slágere: \"János, legyen, …\"",
+   "valaszok": [
+    "a Horváth-kertben Budán",
+    "hétre a Nemzetinél",
+    "fenn a János-hegyen",
+    "éjjel az omnibusz tetején"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit küldök néked Fényes Szabolcs slágere szerint?",
+   "valaszok": [
+    "egy nápolyi képeslapot",
+    "egy nápolyi hotelszámlát",
+    "egy nápolyi dalt",
+    "egy nápolyi szeletet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A ház melyik részének nevét választotta egy magyar együttes?",
+   "valaszok": [
+    "Alagsor",
+    "Földszint",
+    "Padlás",
+    "Első emelet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Egy faun mije szerepel Debussy zenekari művében?",
+   "valaszok": [
+    "fuvolája",
+    "délutánja",
+    "szerelme",
+    "élete"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan folytatódik az Illés együttes legendás dala: \"Amikor én még …\"?",
+   "valaszok": [
+    "kopasz voltam",
+    "kisded voltam",
+    "karcsú voltam",
+    "kissrác voltam"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol \"leszünk boldogok\" a Csárdáskirálynő című operett slágere szerint?",
+   "valaszok": [
+    "a Szivárványon túl",
+    "túl az Óperencián",
+    "túl az üveghegyen",
+    "Kukutyinban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol játszódik Huszka Jenő Bob herceg című operettje?",
+   "valaszok": [
+    "Bostonban",
+    "Dublinban",
+    "Londonban",
+    "Glasgowban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hová \"jöjjön ki\" egy jó túrós csuszára a régi sláger szerint?",
+   "valaszok": [
+    "Visegrádra",
+    "Hűvösvölgybe",
+    "a vásárba",
+    "Óbudára"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki játszotta az operettekben az elegáns világfi énekes-táncos szerepkörét?",
+   "valaszok": [
+    "az amorózó",
+    "az intrikus",
+    "a bonviván",
+    "a rezonőr"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki énekelte a \"Rock az óra körül\" című slágert?",
+   "valaszok": [
+    "Elvis Presley",
+    "Bill Haley",
+    "Bob Dylan",
+    "Szörényi Levente"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki énekli az alábbiak közül a Szerelem utolsó vérig című Presser-dalt?",
+   "valaszok": [
+    "Koncz Zsuzsa",
+    "Király Linda",
+    "Katona Klári",
+    "Szűcs Judit"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiről írt operát Bizet?",
+   "valaszok": [
+    "gyöngyhalász",
+    "orvhalász",
+    "bálnavadász",
+    "öreg halász"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyen nevű orosz katonától búcsúzik a Pa-Dö-Dö együttes?",
+   "valaszok": [
+    "Vlagyimír",
+    "Iván",
+    "Szása",
+    "Szergej"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik az ötödik szolmizációs hang?",
+   "valaszok": [
+    "la",
+    "fá",
+    "ré",
+    "szó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik dal nem az István, a király című rockoperában hangzik el?",
+   "valaszok": [
+    "Gyarló az ember",
+    "Unom a politikát",
+    "Nehéz az út",
+    "Szállj fel, szabad madár!"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik dallal búcsúzott egy európai várostól az Illés együttes?",
+   "valaszok": [
+    "Auf Wiedersehen, Berlin!",
+    "Arrivederci, Roma!",
+    "Good-bye, London!",
+    "Viszontlátásra, Budapest!"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy magyar rockzenekar neve?",
+   "valaszok": [
+    "Nehézbombázó",
+    "Gránátvető",
+    "Lángszóró",
+    "Tankcsapda"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik együttes slágere volt a \"Waterloo\"?",
+   "valaszok": [
+    "Boney M",
+    "Pussycat",
+    "ABBA",
+    "Bee Gees"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik együttes tagja Gáspár Győző?",
+   "valaszok": [
+    "Romantic",
+    "Ámokfutók",
+    "Animal Cannibals",
+    "Exotic"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik együttes énekelt a \"Limbó-hintó\"-ról?",
+   "valaszok": [
+    "Neoton",
+    "R-GO",
+    "Express",
+    "Hungária"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik földrészről énekelt Varga Miklós a 80-as években?",
+   "valaszok": [
+    "Afrika",
+    "Európa",
+    "Amerika",
+    "Ázsia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik hadvezérről írt indulót id. Johann Strauss?",
+   "valaszok": [
+    "Napóleon",
+    "Radetzky",
+    "Wallenstein",
+    "Kutuzov"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik hangszer előadóművésze Kocsis Zoltán?",
+   "valaszok": [
+    "zongora",
+    "trombita",
+    "hegedű",
+    "gordonka"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik király új ruhájáról szól Ránki György meseoperája?",
+   "valaszok": [
+    "Arthur",
+    "Pomádé",
+    "Burkus",
+    "Mátyás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik magyar táncdalénekesünknek voltak közös számai Hofi Gézával?",
+   "valaszok": [
+    "Koós János",
+    "Korda György",
+    "Aradszky László",
+    "Dobos Attila"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik meseregényből készített musicalt Geszti Péter és Dés László?",
+   "valaszok": [
+    "Micimackó",
+    "Végtelen történet",
+    "Alice csodaországban",
+    "A dzsungel könyve"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik musical zenéjét nem Andrew Lloyd Webber szerezte?",
+   "valaszok": [
+    "Jézus Krisztus Szupersztár",
+    "Az operaház fantomja",
+    "Macskák",
+    "West Side Story"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik operett egyik szerelmespárja Bóni gróf és Stázi?",
+   "valaszok": [
+    "Csárdáskirálynő",
+    "Víg özvegy",
+    "Mágnás Miska",
+    "Gül Baba"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik operettet játsszák hagyományosan szilveszterkor?",
+   "valaszok": [
+    "Egy éj Velencében",
+    "A víg özvegy",
+    "A denevér",
+    "Csárdáskirálynő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik rockoperában hangzik el a \"Te kit választanál?\" kezdetű dal?",
+   "valaszok": [
+    "Sztárcsinálók",
+    "Attila",
+    "István, a király",
+    "Jézus Krisztus szupersztár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik történelmi korban játszódik a \"Valahol Európában\" című musical?",
+   "valaszok": [
+    "a lovagkorban",
+    "az ipari forradalom idején",
+    "a II. világháború után",
+    "a honfoglalás korában"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város mesterdalnokairól írt operát Wagner?",
+   "valaszok": [
+    "München",
+    "Hamburg",
+    "Nürnberg",
+    "Bayreuth"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városban gyakorolja a borbélymesterséget az operairodalom ismert alakja, Figaro?",
+   "valaszok": [
+    "Malaga",
+    "Madrid",
+    "Barcelona",
+    "Sevilla"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik zeneszerző nevezetes műve a Bolero?",
+   "valaszok": [
+    "Ravel",
+    "Liszt Ferenc",
+    "Berlioz",
+    "Debussy"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a címe Cserháti Zsuzsa híres slágerének: \"Száguldás, …\"",
+   "valaszok": [
+    "Wartburg, szerelem",
+    "Jaguár, szerelem",
+    "Trabant, szerelem",
+    "Porsche, szerelem"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a címe Fenyő Miklós musicaljének?",
+   "valaszok": [
+    "Ismeri a szandi-mandit?",
+    "Hotel Menthol",
+    "Csókkirály",
+    "Multimilliomos jazzdobos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Henrik Berté Schubert-melódiákból összeállított világhírű operettjének: \"Három …\"",
+   "valaszok": [
+    "a grácia",
+    "a kislány",
+    "az igazság",
+    "a nővér"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Ránki György, Hubay Miklós és Vas István musicaljének: \"Egy szerelem …\"",
+   "valaszok": [
+    "két délutánja",
+    "három éjszakája",
+    "hat hajnala",
+    "hét napja"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Wolfgang Amadeus Mozart művének: \"Szöktetés …\"",
+   "valaszok": [
+    "a borbélytól",
+    "a bordélyból",
+    "Sevillából",
+    "a szerájból"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a címe az Illés együttes slágerének: \"Az ész a fontos, nem a …\"",
+   "valaszok": [
+    "ruha",
+    "diploma",
+    "has",
+    "haj"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a címe az Omega együttes 1968-ban megjelent kislemezének?",
+   "valaszok": [
+    "Egykori cimborák",
+    "Hajdani haverok",
+    "Régi csibészek",
+    "Idejétmúlt barátok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe ifjabb Johann Strauss híres operettjének?",
+   "valaszok": [
+    "Szabadlábon Velencében",
+    "Egy éj Velencében",
+    "A velencei mór",
+    "A velencei kalmár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a világhírű musical címe: \"Az operaház ...\"",
+   "valaszok": [
+    "karnagya",
+    "gondnoka",
+    "fantomja",
+    "basszusa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"becsületről\" írt operát Mascagni?",
+   "valaszok": [
+    "munkás",
+    "betyár",
+    "asszony",
+    "paraszt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"királynak\" nevezték ifjabb Johann Strausst?",
+   "valaszok": [
+    "keringő",
+    "kánkán",
+    "tangó",
+    "rumba"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen a csokoládé Katona Klári nagylemezének címe szerint?",
+   "valaszok": [
+    "keserű",
+    "savanyú",
+    "édes",
+    "citromízű"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen bálról írt operát Verdi?",
+   "valaszok": [
+    "tollas",
+    "gólya",
+    "opera",
+    "álarcos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen címen írt operát Vincenzo Bellini?",
+   "valaszok": [
+    "Az alvajáró",
+    "A terepjáró",
+    "A gyalogjáró",
+    "A tengeralattjáró"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen címen írt zenét Mozart? \"Egy kis …\"",
+   "valaszok": [
+    "macskazene",
+    "éji zene",
+    "téli zene",
+    "katonazene"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen gazdasági társulás nevét vette fel egy magyar rockegyüttes a 80-as években?",
+   "valaszok": [
+    "ÁFÉSZ",
+    "GMK",
+    "KFT",
+    "TSZ"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen hajú lányról énekelt az Omega együttes a 60-as években?",
+   "valaszok": [
+    "len",
+    "gyöngy",
+    "arany",
+    "vörös"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen hollandiról írt operát Wagner?",
+   "valaszok": [
+    "facipős",
+    "eltévedt",
+    "tulipános",
+    "bolygó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen kert szerepel a Gül baba című operettben?",
+   "valaszok": [
+    "tulipán",
+    "rózsa",
+    "viola",
+    "nárcisz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen királyról énekelt a Hungária együttes 1980-as nagylemezén?",
+   "valaszok": [
+    "tündér",
+    "trónfosztott",
+    "csók",
+    "divat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen kisasszonyról írt operát Puccini?",
+   "valaszok": [
+    "angol",
+    "gróf",
+    "pillangó",
+    "vén"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen közlekedési eszköz szerepel a Fonográf együttes egyik dalának címében?",
+   "valaszok": [
+    "az utolsó metró",
+    "az első villamos",
+    "az eltévedt troli",
+    "a lerobbant busz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen néven vált ismertté a Republic együttes énekese?",
+   "valaszok": [
+    "Bakancs",
+    "Cipő",
+    "Saru",
+    "Szandi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen okmányról énekelt Bródy János?",
+   "valaszok": [
+    "anyakönyvi kivonatról",
+    "forgalmi engedélyről",
+    "személyi igazolványról",
+    "adókártyáról"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen rózsáról énekelt az Illés együttes 1969-es nagylemezén?",
+   "valaszok": [
+    "őszi",
+    "sárga",
+    "bazsa",
+    "vörös"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen szekrényről írt vígoperát Farkas Ferenc?",
+   "valaszok": [
+    "hűtő",
+    "páncél",
+    "tükrös",
+    "bűvös"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen vadászról írt operát Carl Maria von Weber?",
+   "valaszok": [
+    "szoknya",
+    "fej",
+    "bűvös",
+    "oroszlán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen vasútról énekelt a Bergendy együttes 1974-es lemezén?",
+   "valaszok": [
+    "úttörő",
+    "vihar",
+    "szellem",
+    "kéreg"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen virágól írt operettet Hervé?",
+   "valaszok": [
+    "Hóvirág",
+    "Nebáncsvirág",
+    "Tiszavirág",
+    "Penészvirág"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek az országáról írt operettet Lehár Ferenc?",
+   "valaszok": [
+    "szerelem",
+    "boldogság",
+    "mosoly",
+    "zene"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit ér meg Pest a sláger címe szerint?",
+   "valaszok": [
+    "egy reggelt",
+    "egy estet",
+    "egy testet",
+    "egy pengőt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "\"Van neki, na mije van neki?\" Fényes Szabolcs dala szerint?",
+   "valaszok": [
+    "pisze orra",
+    "csókos ajka",
+    "szöszi haja",
+    "arany szíve"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A felsoroltak közül melyik nem Beatles-nagylemez?",
+   "valaszok": [
+    "Flowers",
+    "Help",
+    "Let It Be",
+    "A Hard Day's Night"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A hét melyik napjáról írt \"szomorú\" dalt Seress Rezső a 30-as években?",
+   "valaszok": [
+    "a szombatról",
+    "a vasárnapról",
+    "a hétfőről",
+    "a szerdáról"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy becézik a Republic együttes frontemberét?",
+   "valaszok": [
+    "Cipő",
+    "Cipó",
+    "Papucs",
+    "Hobó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy hívják a Mágnás Miska című operettben a címszereplő menyasszonyát?",
+   "valaszok": [
+    "Ilma",
+    "Juliska",
+    "Marcsa",
+    "Ledér"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan folytatódik a dal? \"Köszönöm, hogy imádott, hogy …\"",
+   "valaszok": [
+    "sohasem hibázott",
+    "az ablakon bemászott",
+    "tegezett, nem magázott",
+    "reám így vigyázott"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan szól az ismert dal? \"Tanulj meg, fiacskám, …\"",
+   "valaszok": [
+    "két lábbal állni",
+    "mindig csak várni",
+    "komédiázni",
+    "bolondot játsz'ni"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol játszódik Andrew Lloyd Webber Evita című musicalje?",
+   "valaszok": [
+    "Brazília",
+    "Argentína",
+    "Chile",
+    "Panama"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol volt a legendás rockfesztivál 1969 nyarán?",
+   "valaszok": [
+    "Sacramentóban",
+    "Woodstockban",
+    "Seattle-ben",
+    "Londonban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány ajtót nyit ki Judit Bartók Béla A kékszakállú herceg vára című operájában?",
+   "valaszok": [
+    "hármat",
+    "hetet",
+    "tizet",
+    "tizenhármat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány húrja van a hegedűnek?",
+   "valaszok": [
+    "4.0",
+    "5.0",
+    "6.0",
+    "8.0"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány ága van a hangszerek behangolását segítő eszköznek, a hangvillának?",
+   "valaszok": [
+    "egy",
+    "kettő",
+    "három",
+    "négy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki a Rolling Stones együttes szólóénekese?",
+   "valaszok": [
+    "Mick Jagger",
+    "David Bowie",
+    "Elton John",
+    "Freddy Mercury"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki adott nagy sikerű koncertet Budapesten 2004-ben?",
+   "valaszok": [
+    "Paul McCartney",
+    "Barbra Streisand",
+    "Cher",
+    "Liza Minnelli"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki alapította meg 1967-ben a Hungária együttest?",
+   "valaszok": [
+    "Neményi Béla",
+    "Fenyő Miklós",
+    "Szikora Róbert",
+    "Balázs Ferenc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Cher első férje?",
+   "valaszok": [
+    "George Michael",
+    "Sonny Bono",
+    "Jack Nicholson",
+    "Bruce Willis"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik a címszereplői George Gershwin híres színpadi művének?",
+   "valaszok": [
+    "Bonnie és Clyde",
+    "Porgy és Bess",
+    "Sonny és Cher",
+    "Harry és Sally"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a meséi szerepelnek Offenbach operájának címében?",
+   "valaszok": [
+    "Andersen",
+    "La Fontaine",
+    "Hoffmann",
+    "Grimm"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit választott egy musical hősnőjének Andrew Lloyd Webber és Tim Rice?",
+   "valaszok": [
+    "Mata Harit",
+    "Eva Perónt",
+    "Marilyn Monroet",
+    "Jacqueline Kennedyt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik angol városból indult a Beatles együttes pályafutása?",
+   "valaszok": [
+    "Liverpool",
+    "London",
+    "Birmingham",
+    "Manchester"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik egy világhírű Offenbach-eperett címe?",
+   "valaszok": [
+    "Szép Heléna",
+    "Tehénszemű Héra",
+    "Hatalmas Aphrodité",
+    "Vén Európa"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik együttes nagy slágere volt a \"Yesterday\" című dal?",
+   "valaszok": [
+    "Beatles",
+    "Rolling Stones",
+    "Bee Gees",
+    "Beach Boys"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik együttes slágere volt a \"The Wall\"?",
+   "valaszok": [
+    "Pink Floyd",
+    "Genesis",
+    "Rolling Stones",
+    "Queen"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik együttes slágere volt a Lady Madonna?",
+   "valaszok": [
+    "Uriah Heep",
+    "Beatles",
+    "Rolling Stones",
+    "Deep Purple"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik együttes szólóénekese Balázs Ferenc?",
+   "valaszok": [
+    "Generál",
+    "Apostol",
+    "Korál",
+    "Edda"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik együttes tartotta búcsúkoncertjét a Nyugati pályaudvaron?",
+   "valaszok": [
+    "Piramis",
+    "Fonográf",
+    "Lokomotiv GT",
+    "V' Moto-Rock"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik együttes énekelt Lady Madonnáról 1968-ban?",
+   "valaszok": [
+    "Bee Gees",
+    "Beatles",
+    "Rolling Stones",
+    "Who"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik együttes énekelt a \"Régi csibészek\"-ről?",
+   "valaszok": [
+    "Illés",
+    "Generál",
+    "Omega",
+    "Hungária"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik együttes énekelte, hogy : \"Az ész a fontos, nem a haj\"?",
+   "valaszok": [
+    "Bergendy",
+    "Illés",
+    "Omega",
+    "Hungária"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik együttes írt dalt a rádió hőskoráról Szól a rádió refrénnel?",
+   "valaszok": [
+    "Fonográf",
+    "Locomotiv GT",
+    "Metro",
+    "V' Moto-Rock"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik folyót \"zenésítette meg\" Smetana Hazám című szimfonikus sorozatában?",
+   "valaszok": [
+    "Elba",
+    "Moldva",
+    "Duna",
+    "Volga"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik halról írt zenedarabot öt hangszerre Schubert?",
+   "valaszok": [
+    "a tintahalról",
+    "a tonhalról",
+    "a lazacról",
+    "a pisztrángról"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik hangszer világhírű művésze volt Louis Armstrong?",
+   "valaszok": [
+    "zongora",
+    "gitár",
+    "trombita",
+    "dob"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hangszer virtuóz zenésze Carlos Santana?",
+   "valaszok": [
+    "gitár",
+    "szaxofon",
+    "hegedű",
+    "dob"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik háború idején játszódik a Hair című musical?",
+   "valaszok": [
+    "Öböl-háború",
+    "II. világháború",
+    "vietnami háború",
+    "koreai háború"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hősnő nem egy Puccini-operában szerepel?",
+   "valaszok": [
+    "Izolda",
+    "Turandot",
+    "Mimi",
+    "Cso-cso-szán"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik magyar városból indult a 70-es évek végén az Edda együttes?",
+   "valaszok": [
+    "Ózd",
+    "Debrecen",
+    "Miskolc",
+    "Szolnok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar énekesnő írta és dalolta, hogy \"Nem vagyok én apáca\"?",
+   "valaszok": [
+    "Zalatnay Sarolta",
+    "Szűcs Judit",
+    "Kovács Kati",
+    "Cserháti Zsuzsa"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik musical főhősének van öt lánya?",
+   "valaszok": [
+    "Hello, Dolly!",
+    "Hegedűs a háztetőn",
+    "Őrült nők ketrece",
+    "My Fair Lady"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik musical szól Tony és Maria tragikus végű szerelméről?",
+   "valaszok": [
+    "West Side Story",
+    "Kabaré",
+    "Hair",
+    "Pomádé"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik musicalban játsszik főszerepet a Madách Színházban Király Linda?",
+   "valaszok": [
+    "Az operaház fantomja",
+    "Jézus Krisztus Szupersztár",
+    "Evita",
+    "My Fair Lady"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik olasz városban játszódik Verdi Rigoletto című operája?",
+   "valaszok": [
+    "Nápoly",
+    "Róma",
+    "Mantova",
+    "Firenze"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik opera játszódik vándorkomédiások között?",
+   "valaszok": [
+    "Bohémélet",
+    "Parasztbecsület",
+    "Bajazzók",
+    "Carmen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik operettben szerepel a \"Hajmási Péter, Hajmási Pál\" kezdetű dal?",
+   "valaszok": [
+    "Csárdáskirálynő",
+    "A víg özvegy",
+    "Bob herceg",
+    "A denevér"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ruhadarab szerepel Puccini egyik operájának címében?",
+   "valaszok": [
+    "kalap",
+    "nadrág",
+    "köpeny",
+    "kesztyű"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szereplő énekli a bordalt Erkel Bánk bán című operájában?",
+   "valaszok": [
+    "Bánk bán",
+    "Petúr bán",
+    "Biberach",
+    "Ottó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik tudomány professzora Henry Higgins, a My Fair Lady című musical főhőse?",
+   "valaszok": [
+    "matematika",
+    "nyelvészet",
+    "fizika",
+    "történelem"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik történelmi alak szerepel Kodály Zoltán Háry János című daljátékában?",
+   "valaszok": [
+    "II. Szulejmán",
+    "Napóleon",
+    "Thököly Imre",
+    "Nagy Péter cár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik történelmi alakról nem írt operát Erkel Ferenc?",
+   "valaszok": [
+    "Dózsa György",
+    "Bánk bán",
+    "Zrínyi Miklós",
+    "Hunyadi László"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik uralkodónk felesége a címszereplője az Elisabeth című zenés műnek?",
+   "valaszok": [
+    "Mátyás király",
+    "Nagy Lajos",
+    "Ferenc József",
+    "Luxemburgi Zsigmond"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik volt egy magyar együttes?",
+   "valaszok": [
+    "Blues Brothers",
+    "Spice Girls",
+    "Baby Sisters",
+    "New Kids On The Block"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városban tartózkodik az \"olasz nő\" Rossini vígoperájában?",
+   "valaszok": [
+    "Algírban",
+    "Rómában",
+    "Bagdadban",
+    "Párizsban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városról kapta címét John Kander és Frank Ebb világhírű musicalje?",
+   "valaszok": [
+    "Chicago",
+    "New York",
+    "Washington",
+    "Boston"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik énekes nyerte meg a táncdalfesztivált \"Szóljon hangosan az ének\" című dalával?",
+   "valaszok": [
+    "Máté Péter",
+    "Szécsi Pál",
+    "Soltész Rezső",
+    "Delhusa Gjon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik énekesnő megzenésített verseket tartalmazó albuma a \"Kertész leszek\"?",
+   "valaszok": [
+    "Katona Klári",
+    "Cserháti Zsuzsa",
+    "Konc Zsuzsa",
+    "Kovács Kati"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Lloyd Webber musicaljének: \"József és a színes, szélesvásznú …\"",
+   "valaszok": [
+    "filmkocka",
+    "televízió",
+    "álomkabát",
+    "csodasaru"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Munkácsi Miklós színpadi művének: \"Mindhalálig …\"",
+   "valaszok": [
+    "Illés",
+    "Beatles",
+    "Rolling Stones",
+    "Metro"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Offenbach világhírű operettjének: \"Orfeusz…\"",
+   "valaszok": [
+    "a Moulin Rouge-ban",
+    "az Olümposzon",
+    "az alvilágban",
+    "az olimpián"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a foglalkozása Rigolettónak Verdi operájában?",
+   "valaszok": [
+    "udvari tanácsos",
+    "udvari bolond",
+    "lovász",
+    "hóhér"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a rangja Maricának Kálmán Imre operettjében?",
+   "valaszok": [
+    "grófnő",
+    "hercegnő",
+    "bárónő",
+    "királynő"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mick Jagger melyik együttes frontembere?",
+   "valaszok": [
+    "The Bee Gees",
+    "Genesis",
+    "The Rolling Stones",
+    "Pink Floyd"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen asszonyról énekelt Deák Bill Gyula az ismert dal címe szerint?",
+   "valaszok": [
+    "hosszú körmű",
+    "hosszú lábú",
+    "gyöngyhajú",
+    "kék"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen asszonyról énekelt a Lokomotív GT?",
+   "valaszok": [
+    "hűtlen",
+    "szép",
+    "kék",
+    "özvegy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen az \"asszony\" Verdi Rigolettójának szállóigévé vált sora szerint?",
+   "valaszok": [
+    "ingatag",
+    "hallgatag",
+    "szókimondó",
+    "tűzrőlpattant"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen családi kötelék fűzte Lisztet Wagnerhez?",
+   "valaszok": [
+    "apósa",
+    "sógora",
+    "unokatestvére",
+    "nagybátyja"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen címen írt nyitányt Rossini?",
+   "valaszok": [
+    "A tűzoltólétra",
+    "A szamárlétra",
+    "A tyúklétra",
+    "A selyemlétra"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen diákról írt operettet Karl Millöcker?",
+   "valaszok": [
+    "vándor",
+    "garabonciás",
+    "koldus",
+    "öreg"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen hangszer készítőjeként vált híressé Stradivari?",
+   "valaszok": [
+    "zongora",
+    "gitár",
+    "hegedű",
+    "nagybőgő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen hangszerekre írta Mozart az Egy kis éji zene című művét?",
+   "valaszok": [
+    "vonós hangszerekre",
+    "billentyűs hangszerekre",
+    "fúvósokra",
+    "ütősökre"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen kalapról írt balettet Manuel de Falla?",
+   "valaszok": [
+    "kemény",
+    "vas",
+    "szalma",
+    "háromszögletű"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen kürtnek nevezik az oboa egyik rokonát?",
+   "valaszok": [
+    "angol",
+    "német",
+    "francia",
+    "orosz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen mézről énekelt a United együttes?",
+   "valaszok": [
+    "keserű",
+    "savanyú",
+    "édes",
+    "sós"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen származású volt a híres énekes-színésznő Joséphine Baker?",
+   "valaszok": [
+    "francia",
+    "amerikai",
+    "angol",
+    "belga"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen sípnak nevezték a tárogatót?",
+   "valaszok": [
+    "csángó",
+    "polák",
+    "székely",
+    "török"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek az \"országa\" szerepel Lehár Ferenc operettjének címében?",
+   "valaszok": [
+    "a mosoly",
+    "a szerelem",
+    "az amazonok",
+    "a könnyek"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbi operaszereplők közül melyikük királyfi?",
+   "valaszok": [
+    "Don Giovanni",
+    "Don Ottavio",
+    "Don Carlos",
+    "Don Pasquale"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Beethoven hányadik szimfóniájának mellékneve a \"Pastorale\"?",
+   "valaszok": [
+    "III.",
+    "VI.",
+    "VII.",
+    "IX."
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Csajkovszkij alábbi művei közül melyik az opera?",
+   "valaszok": [
+    "Csipkerózsika",
+    "Olasz capriccio",
+    "Diótörő",
+    "Anyegin"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik más szóval a zenei rögtönzést?",
+   "valaszok": [
+    "interpretáció",
+    "improvizáció",
+    "intermezzó",
+    "interpoláció"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan folytatódik Bartók művének címe: Zene húros hangszerekre, ütőkre és …?",
+   "valaszok": [
+    "csembalóra",
+    "cselesztára",
+    "citerára",
+    "cimbalomra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan szólaltatják meg a szitárt?",
+   "valaszok": [
+    "megfújják",
+    "megütik",
+    "pengetik",
+    "billentik"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol játszódik Puccini Pillangókisasszony című operája?",
+   "valaszok": [
+    "Japán",
+    "Olaszország",
+    "Kína",
+    "Franciaország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány egész hangból áll egy egész oktáv?",
+   "valaszok": [
+    "tíz",
+    "nyolc",
+    "tizenkettő",
+    "hat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki komponálta a West Side Story című musical zenéjét?",
+   "valaszok": [
+    "George Gershwin",
+    "Leonard Bernstein",
+    "Maurice Ravel",
+    "Nino Rota"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem operaénekes az alábbi művészek közül?",
+   "valaszok": [
+    "Berkes János",
+    "Gregor József",
+    "Szokolay Sándor",
+    "Gulyás Dénes"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem osztrák zeneszerző az alábbiak közül?",
+   "valaszok": [
+    "Schubert",
+    "Britten",
+    "Mahler",
+    "Haydn"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem volt a Fővárosi Operettszínház tagja?",
+   "valaszok": [
+    "Lehoczky Zsuzsa",
+    "Oszvald Marika",
+    "Galambos Erzsi",
+    "Tábori Nóra"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem volt soha tagja az Omega együttesnek?",
+   "valaszok": [
+    "Presser Gábor",
+    "Tátrai Tibor",
+    "Somló Tamás",
+    "Mihály Tamás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki szerezte Bertolt Brecht Koldusoperájának zenéjét?",
+   "valaszok": [
+    "Kurt Weill",
+    "Franz von Suppé",
+    "Jerry Bock",
+    "Irving Berlin"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt Ludmilla párja Glinka operájában?",
+   "valaszok": [
+    "Rómeó",
+    "Trisztán",
+    "Ruszlán",
+    "Porgy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt a főpap Mozart A varázsfuvola című operájában?",
+   "valaszok": [
+    "Tamino",
+    "Sarastro",
+    "Monostatos",
+    "Papageno"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az Omega együttes első dobosa?",
+   "valaszok": [
+    "Solti János",
+    "Debreceni Ferenc",
+    "Laux József",
+    "Németh Oszkár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki zenésítette meg a Himnuszt?",
+   "valaszok": [
+    "Liszt Ferenc",
+    "Kodály Zoltán",
+    "Egressy Béni",
+    "Erkel Ferenc"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki énekli James Cameron Titanic című filmjének betétdalát?",
+   "valaszok": [
+    "Céline Dion",
+    "Madonna",
+    "Britney Spears",
+    "Annie Lennox"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki írta a Für Elise című zongoradarabot?",
+   "valaszok": [
+    "Schubert",
+    "Beethoven",
+    "Chopin",
+    "Mozart"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki örökítette meg Lady Diana emlékét \"Gyertyák a szélben\" című dalával?",
+   "valaszok": [
+    "Mick Jagger",
+    "Elton John",
+    "Rod Stewart",
+    "Paul McCartney"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik éneklik a Valami Amerika című dalt?",
+   "valaszok": [
+    "Bon Bon",
+    "Roy és Ádám",
+    "Kimnowak",
+    "Kispál és a Borz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a \"meséiről\" írt zenekari szvitet Ravel?",
+   "valaszok": [
+    "Rémusz bácsi",
+    "Télapó",
+    "Hófehérke",
+    "Lúdanyó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a nevét viseli a Zeneművészeti Főiskola?",
+   "valaszok": [
+    "Erkel Ferenc",
+    "Kodály Zoltán",
+    "Liszt Ferenc",
+    "Bartók Béla"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a zenéjét és életét dolgozza fel Berté a Három a kislány című operettjében?",
+   "valaszok": [
+    "Schubert",
+    "Mozart",
+    "Offenbach",
+    "Rossini"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik Beatles-tag felesége volt Yoko Ono?",
+   "valaszok": [
+    "Paul McCartney",
+    "John Lennon",
+    "Ringo Starr",
+    "George Harrison"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik Beethoven egyetlen operája?",
+   "valaszok": [
+    "Fidelio",
+    "Rigoletto",
+    "A varázsfuvola",
+    "Prométheusz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik Lehár-operettben szerepel egy sárga kabát?",
+   "valaszok": [
+    "A víg özvegy",
+    "Luxemburg grófja",
+    "Cigányszerelem",
+    "A mosoly országa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik Verdi-opera fináléjában hangzik el Violetta és Alfréd kettőse?",
+   "valaszok": [
+    "Tosca",
+    "Traviata",
+    "Rigoletto",
+    "Bohémélet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik Verdi-operában hangzik el \"Az asszony ingatag\" kezdetű ária?",
+   "valaszok": [
+    "Otello",
+    "Don Carlos",
+    "Rigoletto",
+    "Traviata"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik dzsesszzenészt becézték \"Satchmo\"-nak?",
+   "valaszok": [
+    "Miles Davist",
+    "Benny Goodmant",
+    "Louis Armstrongot",
+    "Duke Ellingtont"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy Szörényi Levente és Bródy János által írt rockopera címe?",
+   "valaszok": [
+    "A kitaszított",
+    "A kiátkozott",
+    "Az elátkozott",
+    "A kitagadott"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik együttes frontembere Lovasi András?",
+   "valaszok": [
+    "Animal Cannibals",
+    "Tankcsapda",
+    "Kispál és a borz",
+    "Republic"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik együttes keltett nagy feltűnést \"Bábu vagy\"című számával az 1981-es Táncdalfesztiválon?",
+   "valaszok": [
+    "LGT",
+    "URH",
+    "KFT",
+    "VHK"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik együttes nagylemeze a \"Bummm!\"?",
+   "valaszok": [
+    "Pokolgép",
+    "Skorpió",
+    "Lokomotiv GT",
+    "Dinamit"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik együttes nagylemeze a \"Tessék dudálni\"?",
+   "valaszok": [
+    "Pa-Dö-Dö",
+    "Bon Bon",
+    "Carpe Diem",
+    "Dolly Roll"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik együttes nyert táncdalfesztivált \"Amikor én még kissrác voltam\" című dalával?",
+   "valaszok": [
+    "Metro",
+    "Illés",
+    "Hungária",
+    "Omega"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik együttes énekelt arról, hogy milyen nehéz az iskolatáska?",
+   "valaszok": [
+    "Bojtorján együttes",
+    "Bergendy együttes",
+    "Fonográf együttes",
+    "Neoton Família"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik együttes énekelte, hogy \"Mindenki másképp csinálja\"?",
+   "valaszok": [
+    "Fonográf",
+    "Piramis",
+    "Skorpió",
+    "Lokomotiv GT"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik együttesben énekelt korábban Horváth Charlie?",
+   "valaszok": [
+    "Apostol",
+    "Hungária",
+    "Neoton",
+    "Generál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik együttest alakították meg a Gibb-testvérek?",
+   "valaszok": [
+    "The Hollies",
+    "The Rolling Stones",
+    "The Bee Gees",
+    "The Beach Boys"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik együttest alapította Soltész Rezső?",
+   "valaszok": [
+    "Express",
+    "Apostol",
+    "Corvina",
+    "Neoton"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hangszer előadóművésze Dés László?",
+   "valaszok": [
+    "szaxofon",
+    "zongora",
+    "gitár",
+    "trombita"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hangszer művésze volt Rácz Aladár?",
+   "valaszok": [
+    "cimbalom",
+    "citera",
+    "cseleszta",
+    "klarinét"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hangszer nincs a vonósnégyesben az alábbiak közül?",
+   "valaszok": [
+    "brácsa",
+    "hegedű",
+    "nagybőgő",
+    "gordonka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hangszer világhírű művésze volt Fischer Annie?",
+   "valaszok": [
+    "hegedű",
+    "gordonka",
+    "hárfa",
+    "zongora"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik hangszer virtuóza Pege Aladár?",
+   "valaszok": [
+    "hegedű",
+    "zongora",
+    "nagybőgő",
+    "trombita"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hangszeren játszik a kitűnő dzsessz-zenész Szakcsi Lakatos Béla?",
+   "valaszok": [
+    "szaxofon",
+    "dob",
+    "gitár",
+    "zongora"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik híres popsztár slágerei voltak a \"Bad\" illetve a \"Black Or White\"?",
+   "valaszok": [
+    "Michael Jackson",
+    "Rod Stewart",
+    "George Michael",
+    "Elton John"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik idom szerepel az Edda együttes egyik dalának címében?",
+   "valaszok": [
+    "négyzet",
+    "háromszög",
+    "kör",
+    "téglalap"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar táncdalénekesnő dalolt ólomkatonáról?",
+   "valaszok": [
+    "Koncz Zsuzsa",
+    "Katona Klári",
+    "Cserháti Zsuzsa",
+    "Kovács Kati"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mitológiai szereplőről írt operettet Offenbach?",
+   "valaszok": [
+    "Bölcs Pallasz Athéné",
+    "Hős Akhilleusz",
+    "Szép Heléna",
+    "Haragvó Hádész"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik musicalben hal meg a főhős?",
+   "valaszok": [
+    "My Fair Lady",
+    "West Side Story",
+    "Hegedűs a háztetőn",
+    "Kabaré"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik musicalben veszi el gyermekei nevelőnőjét az özvegy Trapp kapitány?",
+   "valaszok": [
+    "A muzsika hangja",
+    "Funny Girl",
+    "Hello, Dolly!",
+    "My Fair Lady"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik női név szerepel Flotow operájának címében?",
+   "valaszok": [
+    "Rita",
+    "Tosca",
+    "Márta",
+    "Sarolta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik operettet írta ifj. Johann Strauss egy Jókai-mű alapján?",
+   "valaszok": [
+    "A cigánybáró",
+    "A denevér",
+    "Egy éj Velencében",
+    "Cigányszerelem"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik operában szerepel többek között egy szép cigánylány, egy torreádor és egy tizedes?",
+   "valaszok": [
+    "Verdi: A trubadúr",
+    "Puccini: Tosca",
+    "Verdi: Traviata",
+    "Bizet: Carmen"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik operát írta Verdi a Szuezi-csatorna megnyitása kapcsán?",
+   "valaszok": [
+    "a Rigolettót",
+    "az Otellót",
+    "a Traviatát",
+    "az Aidát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik orosz cárról írt operát Muszorgszkij?",
+   "valaszok": [
+    "Nagy Péterről",
+    "Borisz Godunovról",
+    "I. Miklósról",
+    "Rettegett Ivánról"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban játszódik a \"Hegedűs a háztetőn\" című musical?",
+   "valaszok": [
+    "Oroszországban",
+    "Franciaországban",
+    "Izraelben",
+    "Lengyelországban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országban született Fédéric Chopin?",
+   "valaszok": [
+    "francia",
+    "lengyel",
+    "orosz",
+    "osztrák"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országból indult el világhírű útjára az ABBA együttes?",
+   "valaszok": [
+    "Svédországból",
+    "Nagy-Britanniából",
+    "Dániából",
+    "Hollandiából"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országból származik Vangelis, a világhírű muzsikus?",
+   "valaszok": [
+    "Spanyolország",
+    "Görögország",
+    "India",
+    "Mexikó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik osztrák városban született Mozart?",
+   "valaszok": [
+    "Grazban",
+    "Linzben",
+    "Bécsben",
+    "Salzburgban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik rock-operában éneklik, hogy \"Ringasd el magad!\"?",
+   "valaszok": [
+    "A nyomorultak",
+    "Képzelt riport ...",
+    "István, a király",
+    "Sztárcsinálók"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportág címadója az LGT együttes egyik dalának?",
+   "valaszok": [
+    "a jéghoki",
+    "a foci",
+    "a sakk",
+    "az ökölvívás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sütemény neve egy Halász Judit nagylemez címe?",
+   "valaszok": [
+    "Képviselőfánk",
+    "Mákosrétes",
+    "Francia krémes",
+    "Dobostorna"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik táncdalénekes dalolt egy szál harangvirágról?",
+   "valaszok": [
+    "Aradszky László",
+    "Máté Péter",
+    "Szécsi Pál",
+    "Poór Péter"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik történelmi német tartomány neve szerepel J. S. Bach egyik zenekari művének címében?",
+   "valaszok": [
+    "Thüringia",
+    "Brandenburg",
+    "Vesztfália",
+    "Pomeránia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik világhírű gitáros-énekes robbant be a rockzenébe \"Hey Joe\" című számával?",
+   "valaszok": [
+    "Jimi Hendrix",
+    "Paul Simon",
+    "Roy Orbison",
+    "Eric Clapton"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik volt Koncz Zsuzsa első önálló nagy slágere?",
+   "valaszok": [
+    "Szőke Anni balladája",
+    "Rohan az idő",
+    "Színes ceruzák",
+    "Kis virág"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városban halt meg Bartók Béla?",
+   "valaszok": [
+    "San Francisco",
+    "Párizs",
+    "New York",
+    "London"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városban játszódik Puccini Bohémélet című operája?",
+   "valaszok": [
+    "Rómában",
+    "New Yorkban",
+    "Velencében",
+    "Párizsban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városban lötték le John Lennont?",
+   "valaszok": [
+    "Los Angelesben",
+    "Londonban",
+    "New Yorkban",
+    "Liverpoolban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik zenei irányzat található Hobó együttesének nevében?",
+   "valaszok": [
+    "country",
+    "blues",
+    "rap",
+    "reggae"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik zeneszerző látogatta meg többször is a Brunszvik családot Martonvásáron?",
+   "valaszok": [
+    "Berlioz",
+    "Brahms",
+    "Haydn",
+    "Beethoven"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik zeneszerzőnk nevét viseli zeneművészeti egyetem Budapesten?",
+   "valaszok": [
+    "Bartók Béla",
+    "Kodály Zoltán",
+    "Liszt Ferenc",
+    "Erkel Ferenc"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik zenés színpadi műben hangzik fel a \"Ha én gazdag lennék …\" kezdetű dal?",
+   "valaszok": [
+    "Koldusopera",
+    "Hegedűs a háztetőn",
+    "Nyomorultak",
+    "Porgy és Bess"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állat vontatta Lohengrin csónakját Wagner operájában?",
+   "valaszok": [
+    "delfin",
+    "hattyú",
+    "cethal",
+    "vadkacsa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi Beethoven III. szimfóniájának mellékneve?",
+   "valaszok": [
+    "Pastorale",
+    "Sors",
+    "Jupiter",
+    "Eroica"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a címe Kodály Zoltán népdalokra épített egyfelvonásos daljátékának?",
+   "valaszok": [
+    "Nyári este",
+    "Marosszéki táncok",
+    "Székelyfonó",
+    "Felszállott a páva"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a foglalkozása Papagenónak Mozart: A varázsfuvola című operájában?",
+   "valaszok": [
+    "madarász",
+    "halász",
+    "vadász",
+    "kanász"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen \"vecsernyéről\" írt operát Verdi?",
+   "valaszok": [
+    "szicíliai",
+    "lombardiai",
+    "nápolyi",
+    "korzikai"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen címen írt zenés mesét Prokofjev? \"Péter és a …\"",
+   "valaszok": [
+    "medve",
+    "farkas",
+    "vadkacsa",
+    "kisnyúl"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen fény szerepel a Crystal együttes slágerének címében?",
+   "valaszok": [
+    "hajnali",
+    "északi",
+    "petróleumlámpa",
+    "neon"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen hangszeren játszik a szimfonikus zenekarok rangban első tagja, a koncertmester?",
+   "valaszok": [
+    "zongorán",
+    "hegedűn",
+    "fuvolán",
+    "csellón"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen inasról írt zenekari scherzót Paul Dukas?",
+   "valaszok": [
+    "hajós",
+    "bűvész",
+    "pék",
+    "szoba"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen jármű szerepel a United együttes slágerének címében?",
+   "valaszok": [
+    "vörös postakocsi",
+    "hófehér Jaguár",
+    "lila Trabant",
+    "rózsaszín meseautó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen kutyáról szól DJ Bobo slágere?",
+   "valaszok": [
+    "kuvasz",
+    "csivava",
+    "puli",
+    "tacskó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen menyasszonyról írt operát Smetana?",
+   "valaszok": [
+    "az elvarázsolt",
+    "a megcsalt",
+    "a becsapott",
+    "az eladott"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen nevet kapott rajongóitól a híres színész és énekes Frank Sinatra?",
+   "valaszok": [
+    "Az Arc",
+    "A Szem",
+    "A Hang",
+    "A Király"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nőről énekelt az Animal Cannibals együttes a 90-es években?",
+   "valaszok": [
+    "varró",
+    "tanító",
+    "titkár",
+    "takarító"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen rokonsági viszonyban áll Don Carlos Fülöp királlyal Verdi operájában?",
+   "valaszok": [
+    "fia",
+    "testvére",
+    "apja",
+    "unokaöccse"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen üdítőitalról énekel a pancsoló kislány a 60-as évek egyik slágerében?",
+   "valaszok": [
+    "limonádéról",
+    "málnaszörpről",
+    "kóláról",
+    "bambiról"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek a hangjairól szól Simon és Garfunkel nagysikerű dala?",
+   "valaszok": [
+    "madár",
+    "város",
+    "csend",
+    "tél"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minek a hatalmáról írt operát Verdi?",
+   "valaszok": [
+    "a szerelem",
+    "a végzet",
+    "a király",
+    "a pénz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit jelent a rekviem zenei kifejezés?",
+   "valaszok": [
+    "bordal",
+    "gyászmise",
+    "középkori diákének",
+    "húsvéti körtánc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Victor Hugo melyik regényéből készült musical főszerepét játszotta Vikidál Gyula?",
+   "valaszok": [
+    "A párizsi Notre-Dame",
+    "A nyomorultak",
+    "A nevető ember",
+    "A tenger munkásai"
+   ],
+   "helyes": 1
+  }
+ ]
+}

@@ -1,0 +1,1658 @@
+{
+ "id": "kviz-sport-konnyu",
+ "nev": "Sport — könnyebb",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "Hogy nevezik a futballban azt a rúgásfajtát, amikor a játékos hanyatt vetődve rúgja kapura a labdát?",
+   "valaszok": [
+    "késezés",
+    "ekézés",
+    "lapátolás",
+    "ollózás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik a labdarúgásban a csaknem vízszintesen elnyúlt testtel való fejelést?",
+   "valaszok": [
+    "tökfejes",
+    "kígyófejes",
+    "csukafejes",
+    "káposztafejes"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik az ökölvívó mérkőzések kötelekkel elkerekített négyzet alakú dobogóját?",
+   "valaszok": [
+    "aprító",
+    "szárító",
+    "szorító",
+    "hasító"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezzük asztaliteniszben azt a mozzanatot, amikor a labda az asztal felső szélét éri?",
+   "valaszok": [
+    "metélt",
+    "derelye",
+    "lebbencs",
+    "csusza"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezik a labdarúgásban az ellenfél lábai között továbbított labdát?",
+   "valaszok": [
+    "pokróc",
+    "partedli",
+    "miniszoknya",
+    "kötény"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezik a puhány, finomkodó játékot a labdarúgásban?",
+   "valaszok": [
+    "csipkezoknis foci",
+    "gerleguriga",
+    "elsőbálozós lötyögés",
+    "kisasszonyfutball"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy labdarúgócsapaton belüli poszt az alábbiak közül?",
+   "valaszok": [
+    "gereblyéző",
+    "takarító",
+    "suvickoló",
+    "söprögető"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik rovarról neveztek el egy úszásnemet?",
+   "valaszok": [
+    "szöcske",
+    "hangya",
+    "pillangó",
+    "darázs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportágban alkalmaznak célfotót?",
+   "valaszok": [
+    "sakkban",
+    "műkorcsolyában",
+    "toronyugrásban",
+    "síkfutásban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állatról neveztek el egy tornaszert?",
+   "valaszok": [
+    "lajhár",
+    "teve",
+    "pingvin",
+    "ló"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"repülés\" egy sportág neve?",
+   "valaszok": [
+    "boszorkány",
+    "tündér",
+    "sárkány",
+    "kobold"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen helyzetnek nevezi a sportnyelv a kihagyhatatlan gólszerzési lehetőséget?",
+   "valaszok": [
+    "ajtó-ablak",
+    "csatár-csemege",
+    "kupa-kapu",
+    "grundon-gründolt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen lehet egy gólhelyzet a sportkifejezés szerint?",
+   "valaszok": [
+    "tomboló",
+    "ordító",
+    "rikkantó",
+    "bömbölő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen lábú focistának nevezi a népnyelv a nagyon tehetséges labdarúgót?",
+   "valaszok": [
+    "arany",
+    "bronz",
+    "ezüst",
+    "ólom"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen rúgásnak nevezik másképp a tizenegyest?",
+   "valaszok": [
+    "figyelmeztetés",
+    "intő",
+    "rovó",
+    "büntető"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit állítanak fel szabadrúgásnál a labda és a kapu közé?",
+   "valaszok": [
+    "sorfalat",
+    "rabicfalat",
+    "tűzfalat",
+    "spanyolfalat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy nevezi a köznyelv a motorcsónaksport versenyhajóit?",
+   "valaszok": [
+    "papucs",
+    "szandál",
+    "csizma",
+    "topánka"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy nevezik a labdarúgásban a rendkívül szigorú, zárt védekezést?",
+   "valaszok": [
+    "acélvédelem",
+    "betonvédelem",
+    "cementvédelem",
+    "gránitvédelem"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik az a területet, ahol a birkózók küzdenek?",
+   "valaszok": [
+    "parkett",
+    "gyep",
+    "szőnyeg",
+    "pást"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan becézik Kovács István profi ökölvívónkat?",
+   "valaszok": [
+    "Boxer",
+    "Aranykovács",
+    "Villámöklű",
+    "Kokó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány évenként rendeznek olimpiai játékokat?",
+   "valaszok": [
+    "2.0",
+    "4.0",
+    "5.0",
+    "10.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik csapat nem az olasz labdarúgó-bajnokságban szerepel?",
+   "valaszok": [
+    "Juventus",
+    "Lazia",
+    "Chievo",
+    "Arsenal"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik futballistát nevezik \"Fekete gyöngyszem\"-nek?",
+   "valaszok": [
+    "Thuramot",
+    "Pelét",
+    "Eusebiót",
+    "Andy Cole-t"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik labdarúgó klubcsapatban játszott több mint húsz évig Albert Flórián?",
+   "valaszok": [
+    "Újpesti Dózsa",
+    "Vasas",
+    "Bp. Honvéd",
+    "Ferencváros"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem a tornasport egyik szerének hivatalos elnevezése?",
+   "valaszok": [
+    "gyűrű",
+    "gerenda",
+    "korlát",
+    "trapéz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportág kiválósága Szeles Mónika?",
+   "valaszok": [
+    "úszás",
+    "gyorskorcsolyázás",
+    "tenisz",
+    "asztalitenisz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportág szövetségi kapitánya dr. Kemény Dénes?",
+   "valaszok": [
+    "kézilabda",
+    "kajak-kenu",
+    "birkózás",
+    "vízilabda"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágat nevezik röviden hokinak?",
+   "valaszok": [
+    "gyeplabda",
+    "strandröplabda",
+    "jégkorong",
+    "lovas póló"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportágban lehet kötényt adni?",
+   "valaszok": [
+    "labdarúgásban",
+    "röplabdában",
+    "fallabdában",
+    "íjászatban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban lehet tarolni?",
+   "valaszok": [
+    "sakkban",
+    "íjászatban",
+    "tekézésben",
+    "gátfutásban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportágban nyert négy olimpiai aranyérmet Darnyi Tamás?",
+   "valaszok": [
+    "úszás",
+    "kajak-kenu",
+    "öttusa",
+    "vívás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban rendezik meg a Tour de France nevű versenyt?",
+   "valaszok": [
+    "vitorlázás",
+    "kerékpározás",
+    "terepfutás",
+    "motorcsónaksport"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban rendezik meg évente a Tour de France nevű versenyt?",
+   "valaszok": [
+    "autósport",
+    "kerékpározás",
+    "evezés",
+    "tájékozódási futás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban rendeznek rali versenyt?",
+   "valaszok": [
+    "autósport",
+    "lovaglás",
+    "kerékpározás",
+    "atlétika"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a dzsúdó nevű sportág magyar elnevezése?",
+   "valaszok": [
+    "ökölvívás",
+    "fallabda",
+    "cselgáncs",
+    "csúszókorong"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi történik azzal, akit diszkvalifikálnak?",
+   "valaszok": [
+    "kitüntetnek",
+    "megverik",
+    "emelkedik a ranglétrán",
+    "kizárják a versenyből"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen alakú labdával játsszák a rögbit?",
+   "valaszok": [
+    "gömb",
+    "körte",
+    "csillag",
+    "tojás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen mérkőzésnek nevezik a nemzetek közti, tét nélküli labdarúgó találkozót?",
+   "valaszok": [
+    "szelíd",
+    "barátságos",
+    "ismerkedő",
+    "levezető"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen passznak nevezik a labdarúgásban a közelre pöccintett átadást?",
+   "valaszok": [
+    "arasz",
+    "ujjbegy",
+    "köröm",
+    "karom"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen sportág világbajnoka volt Arnold Schwarzenegger?",
+   "valaszok": [
+    "testépítés",
+    "tenisz",
+    "sakk",
+    "rúdugrás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit csinál a kapus a sportnyelv szerint, amikor szerencsétlenül próbál a labdáért nyúlni?",
+   "valaszok": [
+    "nyulat fog",
+    "bogarászik",
+    "lepkézik",
+    "csigát gyűjt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit rendeznek minden év elején Párizs és Dakar között?",
+   "valaszok": [
+    "léghajóversenyt",
+    "kerékpárversenyt",
+    "raliversenyt",
+    "futóversenyt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mivel játszák a lovaspólót?",
+   "valaszok": [
+    "faütőkkel",
+    "lándzsákkal",
+    "buzogányokkal",
+    "lasszóval"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy hívták Fa Nándor és Gál József hajóját, amellyel 717 nap alatt megkerülték a Földet?",
+   "valaszok": [
+    "Poszeidon",
+    "Calypso",
+    "Szent Jupát",
+    "Titanic"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik a labdarúgásban az igen közelre pöccentett átadást?",
+   "valaszok": [
+    "térdpassz",
+    "bokapassz",
+    "combpassz",
+    "körömpassz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol rendezik a következő olimpiát?",
+   "valaszok": [
+    "Norvégia",
+    "Franciaország",
+    "Kína",
+    "Kanada"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány aranyérmet szereztünk a sydneyi olimpián?",
+   "valaszok": [
+    "hatot",
+    "nyolcat",
+    "tizet",
+    "tizenegyet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kilométerre kerekítve mekkora a maratoni futók távja?",
+   "valaszok": [
+    "36 km",
+    "42 km",
+    "44 km",
+    "48 km"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Maximum hány pontot adhatnak a pontozóbírák műkorcsolyában?",
+   "valaszok": [
+    "10.0",
+    "7.0",
+    "6.0",
+    "5.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar egyesületben futballozott Nyilasi Tibor?",
+   "valaszok": [
+    "Újpesti Dózsa",
+    "Vasas",
+    "Ferencváros",
+    "Kispest Honvéd"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar futballcsapat beceneve a \"zöld sasok\"?",
+   "valaszok": [
+    "Sasad SE",
+    "Ferencváros",
+    "Parádsasvár SC",
+    "Sashalom FC"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportág kiemelkedő egyénisége Portisch Lajos?",
+   "valaszok": [
+    "sakk",
+    "labdarúgás",
+    "tenisz",
+    "úszás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportág kiválósága Adorján András?",
+   "valaszok": [
+    "sakk",
+    "autóverseny",
+    "úszás",
+    "vízilabda"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportág kiválósága Biros Péter?",
+   "valaszok": [
+    "kajak-kenu",
+    "vízilabda",
+    "kézilabda",
+    "torna"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportág küzdelmei folynak páston?",
+   "valaszok": [
+    "bírkózás",
+    "vívás",
+    "ökölvívás",
+    "cselgáncs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportág szőke csillaga Steffi Graf?",
+   "valaszok": [
+    "úszás",
+    "vízilabda",
+    "tenisz",
+    "atlétika"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportág világbajnoka Béres Alexandra?",
+   "valaszok": [
+    "fitness",
+    "tenisz",
+    "úszás",
+    "műugrás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban \"lengenek\" a lovon?",
+   "valaszok": [
+    "torna",
+    "kerékpár",
+    "fogathajtás",
+    "öttusa"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban hátrány a csapatnak, ha hálóba juttatja a labdát?",
+   "valaszok": [
+    "kézilabda",
+    "labdarúgás",
+    "vízilabda",
+    "röplabda"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban lehet 180 méternél is távolabbra repülni szárnyak nélkül?",
+   "valaszok": [
+    "síugrás",
+    "távolugrás",
+    "toronyugrás",
+    "díjugratás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban nevezik a meneteket csörtének is?",
+   "valaszok": [
+    "strandröplabda",
+    "ökölvívás",
+    "tenisz",
+    "vívás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban nevezik a mérkőzés egy menetét csörtének?",
+   "valaszok": [
+    "teniszben",
+    "vívásban",
+    "ökölvívásban",
+    "cselgáncsban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban szakítanak és löknek?",
+   "valaszok": [
+    "súlyemelés",
+    "teke",
+    "bírkózás",
+    "torna"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban váltak híressé a Williams nővérek?",
+   "valaszok": [
+    "atlétika",
+    "sakk",
+    "kosárlabda",
+    "tenisz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik város labdarúgó egyesülete a Videoton FC?",
+   "valaszok": [
+    "Zalaegerszeg",
+    "Székesfehérvár",
+    "Szombathely",
+    "Dunaújváros"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban rendezték meg a 2001. évi vízilabda Európa-bajnokságot?",
+   "valaszok": [
+    "Berlin",
+    "Bécs",
+    "Belgrád",
+    "Budapest"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városunkban kereshetik fel a futballszurkolók a nagyerdei stadiont?",
+   "valaszok": [
+    "Diósgyőrben",
+    "Szegeden",
+    "Debrecenben",
+    "Nyíregyházán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a Nemzetközi Labdarúgó Szövetség közismert rövidítése?",
+   "valaszok": [
+    "UEFA",
+    "FIFA",
+    "MLSZ",
+    "BLASZ"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen lapot mutat fel a játékvezető a labdarúgásban kiállításkor?",
+   "valaszok": [
+    "rózsaszínt",
+    "sárgát",
+    "pirosat",
+    "feketét"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen megkülönböztető jelzést visel egy labdarúgócsapatban a kapitány?",
+   "valaszok": [
+    "más színű cipőt",
+    "más színárnyalatú mezt",
+    "karszalagot",
+    "mezfeliratot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen rendezvényéről nevezetes a dél-angliai Epsom városa?",
+   "valaszok": [
+    "rockfesztivál",
+    "filmfesztivál",
+    "lóverseny",
+    "teniszbajnokság"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen védelemnek hívják a rendkívül szigorú, zárt védekezést a labdarúgásban?",
+   "valaszok": [
+    "acél",
+    "beton",
+    "cement",
+    "szikla"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat neve szerepel a chicagói NBA-s kosárlabda-csapat nevében?",
+   "valaszok": [
+    "zsiráfok",
+    "fókák",
+    "elefántok",
+    "bikák"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az Aranycsapat melyik tagját becézték Cucunak?",
+   "valaszok": [
+    "Zakariás Józsefet",
+    "Budai II Lászlót",
+    "Kocsis Sándort",
+    "Bozsik Józsefet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy egyárbócos vitorlás neve?",
+   "valaszok": [
+    "dingi",
+    "diné",
+    "dimer",
+    "dzsigg"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány játékos küzd egy csapatból egyszerre a vízilabdában?",
+   "valaszok": [
+    "5.0",
+    "6.0",
+    "7.0",
+    "8.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány játékos van egyszerre a pályán egy kosárlabda-csapatból?",
+   "valaszok": [
+    "négy",
+    "hét",
+    "hat",
+    "öt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki az az ötszörös olimpiai bajnok úszó, aki Tarzanként is ismert lett?",
+   "valaszok": [
+    "Mark Spitz",
+    "Matt Biondi",
+    "Mike Burton",
+    "Johnny Weissmüller"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem asztaliteniszező az alábbi sportolók közül?",
+   "valaszok": [
+    "Bercsik Zoltán",
+    "Jónyer István",
+    "Sidó Ferenc",
+    "Taróczy Balázs"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem volt soha tagja a legendás Aranycsapatnak az alábbiak közül?",
+   "valaszok": [
+    "Kocsis Sándor",
+    "Lóránt Gyula",
+    "Novák Dezső",
+    "Zakariás József"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nyerte meg 2000-ben a Forma 1-es autóverseny világbajnoki címét?",
+   "valaszok": [
+    "David Coulthard",
+    "Mika Hakkinen",
+    "Ralf Schumacher",
+    "Michael Schumacher"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt a legeredményesebb magyar amatőr ökölvívó?",
+   "valaszok": [
+    "Gedó György",
+    "Csík Tibor",
+    "Kovács István",
+    "Papp László"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik csapatsportot játsszák tojás alakú labdával?",
+   "valaszok": [
+    "kosárlabda",
+    "lovaspóló",
+    "rögbi",
+    "gyeplabda"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik földrészen nem rendeztek még olimpiai játékokat?",
+   "valaszok": [
+    "Észak-Amerikában",
+    "Ausztráliában",
+    "Ázsiában",
+    "Afrikában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik magyar sportegyesület színe a kék-fehér?",
+   "valaszok": [
+    "FTC",
+    "MTK",
+    "Újpest",
+    "Vasas"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország nyerte a legtöbb aranyérmet a sydneyi olimpián?",
+   "valaszok": [
+    "Ausztrália",
+    "Oroszország",
+    "Amerikai Egyesült Államok",
+    "Kína"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország válogatottja nyerte meg a 2003. évi vízilabda világbajnokságot?",
+   "valaszok": [
+    "Magyarország",
+    "Szerbia és Montenegró",
+    "Olaszország",
+    "Spanyolország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország válogatottja nyerte meg a 2004. évi labdarúgó Európa-bajnokságot?",
+   "valaszok": [
+    "Franciaország",
+    "Portugália",
+    "Görögország",
+    "Hollandia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik országból ered a cselgáncs?",
+   "valaszok": [
+    "Thaiföld",
+    "Japán",
+    "Kína",
+    "Korea"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik pályán rendezik meg a Forma 1-es versenyautók Olasz Nagydíját?",
+   "valaszok": [
+    "Interlagos",
+    "Monza",
+    "Imola",
+    "Monte Carlo"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportolóról nevezték el a Budapest Sportarénát?",
+   "valaszok": [
+    "Hajós Alfréd",
+    "Papp László",
+    "Puskás Ferenc",
+    "Gerevich Aladár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportág háromszoros olimpiai bajnoka Storcz Botond?",
+   "valaszok": [
+    "kajak-kenu",
+    "vívás",
+    "úszás",
+    "torna"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportág klasszisa volt a '80-as években Katarina Witt?",
+   "valaszok": [
+    "atlétika",
+    "tenisz",
+    "műkorcsolyázás",
+    "úszás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportág legendás szakembere volt Széchy Tamás?",
+   "valaszok": [
+    "kajak-kenu",
+    "birkózás",
+    "vízilabda",
+    "úszás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportág nemzetközi szövetsége a FIFA?",
+   "valaszok": [
+    "bírkózás",
+    "kosárlabda",
+    "labdarúgás",
+    "kerékpározás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportág szakkifejezése a bodicsek?",
+   "valaszok": [
+    "kosárlabda",
+    "jégkorong",
+    "gyeplabda",
+    "ökölvívás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportág tiszta játékideje háromszor 20 perc?",
+   "valaszok": [
+    "jégkorong",
+    "kosárlabda",
+    "kézilabda",
+    "röplabda"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportág többszörös világbajnoka Bessenyei Péter?",
+   "valaszok": [
+    "autóversenyzés",
+    "lovassport",
+    "műrepülés",
+    "motorcsónaksport"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportágban küzdenek egymással a versenyzők fog- és fejvédőben?",
+   "valaszok": [
+    "bírkózás",
+    "vívás",
+    "cselgáncs",
+    "ökölvívás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban lehet elnyerni a Davis Kupát?",
+   "valaszok": [
+    "tenisz",
+    "labdarúgás",
+    "díjlovaglás",
+    "kerékpár"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban lehet tripla Lutzot ugrani?",
+   "valaszok": [
+    "atlétika",
+    "műugrás",
+    "díjlovaglás",
+    "műkorcsolya"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban nyert aranyérmet a Janics-Kovács kettős a 2004-es évi athéni olimpián?",
+   "valaszok": [
+    "asztalitenisz",
+    "kajak",
+    "evezés",
+    "kenu"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett ezüstérmet Gyurta Dániel a 2004-es athéni olimpián?",
+   "valaszok": [
+    "vívás",
+    "kajak-kenu",
+    "sportlövészet",
+    "úszás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett ezüstérmet Márkus Erzsébet a sydneyi olimpián?",
+   "valaszok": [
+    "sportlövészetben",
+    "cselgáncsban",
+    "súlyemelésben",
+    "vívásban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportágban szokás háttal célba érni?",
+   "valaszok": [
+    "kenuzásban",
+    "kajakozásban",
+    "díjlovaglásban",
+    "evezésben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szín hiányzik az olimpiai ötkarikáról?",
+   "valaszok": [
+    "fekete",
+    "barna",
+    "piros",
+    "sárga"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város kapta meg a 2008. évi nyári olimpiai játékok rendezési jogát?",
+   "valaszok": [
+    "Toronto",
+    "Párizs",
+    "Athén",
+    "Peking"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik úszásnemben szerzett aranyérmet Egerszegi Krisztina az 1996-os atlantai olimpián?",
+   "valaszok": [
+    "hátúszásban",
+    "vegyesúszásban",
+    "mellúszásban",
+    "gyorsúszásban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mennyi a műkorcsolyázásban adható maximális pontszám?",
+   "valaszok": [
+    "3.0",
+    "5.0",
+    "6.0",
+    "8.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a klubszíne az Újpesti TE sportegyesületnek?",
+   "valaszok": [
+    "kék-fehér",
+    "piros-kék",
+    "zöld-fehér",
+    "lila-fehér"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi volt a neve a XIX. század '70-es éveiben sikert sikerre halmozó csodakancának?",
+   "valaszok": [
+    "Fecske",
+    "Szélvész",
+    "Kincsem",
+    "Ráró"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nemzetiségű Mika Hakkinen Forma-1-es versenyző?",
+   "valaszok": [
+    "finn",
+    "német",
+    "svéd",
+    "dán"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen nemzetiségű volt Ayrton Senna,a tragikus körülmények között elhunyt Forma 1-es pilóta?",
+   "valaszok": [
+    "spanyol",
+    "argentin",
+    "olasz",
+    "brazil"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen színű sapkát visel a kapus a vízilabdában?",
+   "valaszok": [
+    "kék",
+    "piros",
+    "fekete",
+    "fehér"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen zászlóval jelzik a futam végét a Forma-1-es versenyeken?",
+   "valaszok": [
+    "pöttyös",
+    "csíkos",
+    "fehér",
+    "kockás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit ítélnek a játékvezetők a vízilabdában, ha a játékos lábbal továbbítja a hálóba a labdát?",
+   "valaszok": [
+    "kidobást",
+    "gólt",
+    "kétperces kiállítást",
+    "4 méterest"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik a cselgáncsban a hagyományos küzdőszőnyeget?",
+   "valaszok": [
+    "cukahara",
+    "cunami",
+    "tatami",
+    "ikebana"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol rendezik meg a 2004-es olimpiát?",
+   "valaszok": [
+    "Peking",
+    "Madrid",
+    "München",
+    "Athén"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol rendezték meg a 2004-es paralimpiát?",
+   "valaszok": [
+    "Athén",
+    "Párizs",
+    "Peking",
+    "Sydney"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány aranyérmet szereztünk az 1952-es helsinki olimpián?",
+   "valaszok": [
+    "11.0",
+    "14.0",
+    "16.0",
+    "19.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány méterről dobják a bűntetőt a vízilabdában?",
+   "valaszok": [
+    "tizenegy",
+    "négy",
+    "hét",
+    "félpályáról üres kapura"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hányadik lett a 2005-ben megrendezett Dakar-ralin a Palik-Darázsi páros?",
+   "valaszok": [
+    "tizennyolcadik",
+    "huszonnyolcadik",
+    "harmincnyolcadik",
+    "negyvennyolcadik"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki az a híres amerikai kosárlabda-játékos, aki az RTL Klub Zsoldosok című sorozatában szerepel?",
+   "valaszok": [
+    "Jordan",
+    "Barkley",
+    "Rodman",
+    "Pippen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki az egyetlen aranyladás magyar focista?",
+   "valaszok": [
+    "Puskás Ferenc",
+    "Albert Flórián",
+    "Bozsik József",
+    "Détári Lajos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki közvetítette a legendás 6:3-as magyar-angol futballmérkőzést?",
+   "valaszok": [
+    "Vitray Tamás",
+    "Komjáthy György",
+    "Szepesi György",
+    "Ipper Pál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki szerezte meg a magyar sport 150. Olimpiai aranyérmét?",
+   "valaszok": [
+    "Nagy Tímea",
+    "Kolonics György",
+    "Csollány Szilveszter",
+    "Kovács Ágnes"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt a Szovjetunió Komminista Pártjának főtitkára a moszkvai olimpia idején?",
+   "valaszok": [
+    "Nyikita Hruscsov",
+    "Leonyid Brezsnyev",
+    "Mihail Gorbacsov",
+    "Jurij Andropov"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az a világhírű atléta, aki az 1936-os berlini olimpián négy aranyérmet szerzett?",
+   "valaszok": [
+    "Carl Lewis",
+    "Paavo Nurmi",
+    "Jesse Owens",
+    "Bob Beamon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik atlétikai versenyszám nem szerepel a nők küzdelmében?",
+   "valaszok": [
+    "súlylökés",
+    "tízpróba",
+    "maratoni futás",
+    "diszkoszvetés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik atlétikai versenyszámot nem dobókörből hajtják végre?",
+   "valaszok": [
+    "kalapácsvetés",
+    "súlylökés",
+    "gerelyhajítás",
+    "diszkoszvetés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik csapat nyerte meg az 1999. évi olaszországi vízilabda Európa-bajnokságot?",
+   "valaszok": [
+    "Olaszország",
+    "Horvátország",
+    "Magyarország",
+    "Spanyolország"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik keleti harcművészeti ágban használnak bambuszbotokat?",
+   "valaszok": [
+    "kendó",
+    "aikidó",
+    "sumo",
+    "dzsetkundó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik kosárlabdacsapatban kezdte NBA-beli szereplését Dávid Kornél?",
+   "valaszok": [
+    "Utah Jazz",
+    "Los Angeles Lakers",
+    "Chicago Bulls",
+    "Orlando Magic"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik két versenyszámból áll a biatlon?",
+   "valaszok": [
+    "futás és kerékpározás",
+    "úszás és lovaglás",
+    "sífutás és lövészet",
+    "futás és lovaglás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik labdajátékban van nyitás, forgás és sáncolás?",
+   "valaszok": [
+    "kosárlabda",
+    "röplabda",
+    "kézilabda",
+    "vízilabda"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik labdajátékot nem időre játsszák az alábbiak közül?",
+   "valaszok": [
+    "röplabda",
+    "kézilabda",
+    "vízilabda",
+    "kosárlabda"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik labdarúgó csapat nyerte meg a 2001. évi Bajnokok Ligája -döntőt?",
+   "valaszok": [
+    "Valencia",
+    "Real Madrid",
+    "Bayern München",
+    "Liverpool"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik labdarúgó klubcsapatban játszott Törőcsik András?",
+   "valaszok": [
+    "Ferencváros",
+    "Kispest Honvéd",
+    "Újpesti Dózsa",
+    "Vasas"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik labdarúgó lett játékosként és szövetségi kapitányként is világbajnok?",
+   "valaszok": [
+    "Franz Beckenbauer",
+    "Bobby Charlton",
+    "Michel Platini",
+    "Dino Zoff"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik magyar futballistát nevezték \"Szőke Sziklának\"?",
+   "valaszok": [
+    "Garaba Imrét",
+    "Szőke Istvánt",
+    "Mészöly Kálmánt",
+    "Varga Zoltánt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar labdarúgó klubcsapat szerezte addig a legtöbb bajnokságot?",
+   "valaszok": [
+    "Kispest Honvéd",
+    "Újpest",
+    "Vasas",
+    "Ferencváros"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik olimpián hangzott el ez a híres mondat: \"Az olimpiának folytatódnia kell!\"?",
+   "valaszok": [
+    "a moszkvai olimpián",
+    "a müncheni olimpián",
+    "a Los Angeles-i olimpián",
+    "az atlantai olimpián"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország válogatottja nyerte a 2002. évi labdarúgó-világbajnokságot?",
+   "valaszok": [
+    "Argentína",
+    "Brazília",
+    "Németország",
+    "Franciaország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országból származik a szumó birkózás?",
+   "valaszok": [
+    "Japán",
+    "Indonézia",
+    "Kína",
+    "Mongólia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportág kiválósága Cseh László?",
+   "valaszok": [
+    "atlétika",
+    "úszás",
+    "torna",
+    "vívás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportág kiválósága volt a 70-es, 80-as években Taróczy Balázs?",
+   "valaszok": [
+    "asztalitenisz",
+    "vízilabda",
+    "tenisz",
+    "kajak-kenu"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportág szakkifejezései a nyitás, az ejtés és a sáncolás?",
+   "valaszok": [
+    "kosárlabda",
+    "röplabda",
+    "sakk",
+    "tenisz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportág többszörös Európa-bajnokai a Bátorfi Csilla - Tóth Krisztina páros?",
+   "valaszok": [
+    "asztalitenisz",
+    "kajak-kenu",
+    "evezés",
+    "vitorlázás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban lehet vezércselt végrehajtani?",
+   "valaszok": [
+    "a labdarúgásban",
+    "a jégkorongban",
+    "asztaliteniszben",
+    "a sakkban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban nyert aranyérmet Majoros István a 2004-es athéni olimpián?",
+   "valaszok": [
+    "úszás",
+    "birkózás",
+    "öttusa",
+    "vívás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban nyert három olimpiai aranyérmet Balczó András?",
+   "valaszok": [
+    "vívás",
+    "birkózás",
+    "torna",
+    "öttusa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban nyert világbajnokságot 1972-ben Monspart Sarolta?",
+   "valaszok": [
+    "íjászat",
+    "tekézés",
+    "evezés",
+    "tájfutás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban nyert világbajnokságot a Jónyer-Klampár páros?",
+   "valaszok": [
+    "tenisz",
+    "műkorcsolyázás",
+    "asztalitenisz",
+    "kajak-kenu"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett aranyérmet Növényi Norbert az 1980-as moszkvai olimpián?",
+   "valaszok": [
+    "kick-box",
+    "birkózás",
+    "súlyemelés",
+    "ökölvívás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett aranyérmet Repka Attila az 1992-es barcelonai olimpián?",
+   "valaszok": [
+    "vívás",
+    "birkózás",
+    "cselgáncs",
+    "torna"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett aranyérmet Ónodi Henrietta az 1992-es barcelonai olimpián?",
+   "valaszok": [
+    "úszásban",
+    "kajak-kenuban",
+    "vívásban",
+    "tornában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett ezüstérmet Balogh Gábor a sydneyi olimpián?",
+   "valaszok": [
+    "kajak-kenuban",
+    "sportlövészetben",
+    "öttusában",
+    "birkózásban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett hat aranyérmet Michael Phelps a 2004. évi athéni olimpián?",
+   "valaszok": [
+    "atlétika",
+    "torna",
+    "úszás",
+    "evezés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett olimpiai aranyérmet Schmitt Pál, a Magyar Olimpiai Bizottság elnöke?",
+   "valaszok": [
+    "vívás",
+    "öttusa",
+    "vízilabda",
+    "atlétika"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban ért el sikereket Kőbán Rita?",
+   "valaszok": [
+    "torna",
+    "vívás",
+    "úszás",
+    "kajakozás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik stadionban következett be a 39 áldozatot követelő tragédia 1985-ben, a BEK-döntőn?",
+   "valaszok": [
+    "a brüsszeli Heysel-stadionban",
+    "a müncheni Olimiai Stadionban",
+    "az amszterdami Ajax-stadionban",
+    "a bécsi Práterben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik úszásnemben győzött Egerszegi Krisztina az 1988-as szöuli olimpián?",
+   "valaszok": [
+    "hátúszás",
+    "gyorsúszás",
+    "mellúszás",
+    "pillangóúszás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi az egyesületi színe a Vasas Sport Clubnak?",
+   "valaszok": [
+    "kék-fehér",
+    "piros-kék",
+    "piros-fekete",
+    "lila-fehér"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen néven vált híressé Edson Arantes do Nascimento?",
+   "valaszok": [
+    "Eusebio",
+    "Maradona",
+    "Pelé",
+    "Ronaldo"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen színű zászlóval jelzik a Forma-1-es versenyeken, hogy a versenyt félbeszakították?",
+   "valaszok": [
+    "piros",
+    "zöld",
+    "sárga",
+    "kék"
+   ],
+   "helyes": 0
+  }
+ ]
+}

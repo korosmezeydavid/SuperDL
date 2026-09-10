@@ -1,0 +1,6078 @@
+{
+ "id": "kviz-irodalom-konnyu",
+ "nev": "Irodalom — könnyebb",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "A nóta szerint \"hol jöttem a világra\"?",
+   "valaszok": [
+    "rózsabokorban",
+    "szülőotthonban",
+    "folyóparton",
+    "focipályán"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Egészítse ki a Petőfi-mű címét! \"A helység …\"",
+   "valaszok": [
+    "fejszéje",
+    "baltája",
+    "fokosa",
+    "kalapácsa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Egészítse ki a gyerekverset! \"Egy kis malac, röf-röf-röf, …\"",
+   "valaszok": [
+    "trombitálgat: töf-töf-töf",
+    "dagonyázgat: Cupp-cupp-cupp",
+    "vacsorázgat: Nyam-nyam-nyam",
+    "folyton visít: Uí-uí-uí"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy hangzik a Shakespeare Szentivánéji álom című darabjából származó híres idézet?",
+   "valaszok": [
+    "Ide nekem az osztrigát is!",
+    "Ide nekem az orrszarvút is!",
+    "Ide nekem az orángutánt is!",
+    "Ide nekem az oroszlánt is!"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan folytatódik a gyermekvers? \"Csip-csip csóka, ...\"",
+   "valaszok": [
+    "csúf hernyócska",
+    "vad karmocska",
+    "hat manócska",
+    "vak varjúcska"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan folytatódik a mesékből ismert mondás? \"Hol jársz erre, …\"",
+   "valaszok": [
+    "ahol a tyúk se kapar",
+    "ahol a méh se döngicsél",
+    "ahol a tücsök se ciripel",
+    "ahol még a madár se jár"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan folytatódik az ismert gyermekmondóka: \"Ecc-pecc …\"?",
+   "valaszok": [
+    "átjöhetsz",
+    "leülhetsz",
+    "kimehetsz",
+    "megehetsz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan folytatódik az ismert magyar népköltés: \"Kerekecske, gombocska, itt szalad a …\"?",
+   "valaszok": [
+    "lovacska",
+    "rókácska",
+    "nyulacska",
+    "gyíkocska"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan nevezi Katona József Biberachot a Bánk bánban?",
+   "valaszok": [
+    "lázongó trapper",
+    "lézengő ritter",
+    "hőzöngő kókler",
+    "gürcölő farmer"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan szokás nevezni a mesékben a rókát?",
+   "valaszok": [
+    "lapuli",
+    "sunnyogi",
+    "ravaszdi",
+    "sompolyi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan szólítják meg a kocsmárosnét a Falu végén kurta kocsma című Petőfi-versben?",
+   "valaszok": [
+    "pintyőkemadár",
+    "aranyvirág",
+    "begyes galamb",
+    "mókuspofi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan ébresztik fel Csipkerózsikát a mesében?",
+   "valaszok": [
+    "muzsikával",
+    "csókkal",
+    "forró kávé illatával",
+    "egy vödör vízzel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol költ a ruca a népdal szerint?",
+   "valaszok": [
+    "mező füvén",
+    "erdő mélyén",
+    "káka tövén",
+    "eresz alatt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol lakott a boszorkány a Jancsi és Juliska című mesében?",
+   "valaszok": [
+    "kastélyban",
+    "oduban",
+    "mézeskalács házban",
+    "nádkunyhóban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol nem jó lakni a népdal szerint?",
+   "valaszok": [
+    "kutyaólban",
+    "határ szélén",
+    "társasházban",
+    "erdő mellett"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol sütik már a rántott békát?",
+   "valaszok": [
+    "Kovácséknál",
+    "Vargáéknál",
+    "Virágéknál",
+    "Gólyáéknál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol találkozik Lúdas Matyi először Döbrögivel?",
+   "valaszok": [
+    "a házuk udvarán",
+    "egy fogadóban",
+    "egy vásárban",
+    "egy libatömő-versenyen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hová készül a kiskacsa a gyermekdalban?",
+   "valaszok": [
+    "apjához Finnországba",
+    "anyjához Lengyelországba",
+    "nénikéjéhez Sanghajba",
+    "bácsikájához Alaszkába"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hová megy a gőzös a gyerekdal szövege szerint?",
+   "valaszok": [
+    "vakvágányra",
+    "Kanizsára",
+    "kocsiszínbe",
+    "tönkre"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hová tart Piroska a mesében?",
+   "valaszok": [
+    "az iskolába",
+    "a kalácsárushoz",
+    "a nagymamájához",
+    "a vadászhoz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány éjszakán át mesélt Seherezádé a mesegyűjtemény címe szerint?",
+   "valaszok": [
+    "998.0",
+    "999.0",
+    "1000.0",
+    "1001.0"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki James F. Cooper híres indiánregényének egyik hőse?",
+   "valaszok": [
+    "Kékharisnya",
+    "Titokzokni",
+    "Bokafix",
+    "Bőrharisnya"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki a Micimackó egyik szereplője?",
+   "valaszok": [
+    "Nyakas",
+    "Szemes",
+    "Füles",
+    "Farkas"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki akarta megsütni Jancsit az ismert mesében?",
+   "valaszok": [
+    "a mostoha",
+    "a boszorkány",
+    "Juliska",
+    "a pék"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki menti meg Piroskát és a nagymamát a mesében?",
+   "valaszok": [
+    "a királyfi",
+    "a vadász",
+    "a csillagszemű juhász",
+    "a három kismalac"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki mesélte el Az ezeregyéjszaka meséit?",
+   "valaszok": [
+    "Leila, az arab démon",
+    "Benedek Elek",
+    "Szimba",
+    "Seherezádé"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki mérgezi meg Hófehérkét a mesében?",
+   "valaszok": [
+    "a királyfi",
+    "a mostoha",
+    "Kuka",
+    "a főszakács"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem Hófehérke hét törpéjének az egyike?",
+   "valaszok": [
+    "Morgó",
+    "Hapci",
+    "Szende",
+    "Törperős"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki tört Hófehérke életére?",
+   "valaszok": [
+    "egy dühös törpe",
+    "a nőgyűlölő királyfi",
+    "egy megvadult nyúl",
+    "a gonosz mostoha"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki vagy mi ébreszti fel Csipkerózsikát a mesében?",
+   "valaszok": [
+    "egy kakas",
+    "leendő párja",
+    "egy vekkerárus",
+    "egy tűzoltó-zenekar"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik a címszereplői Agatha Christie híres regényének?",
+   "valaszok": [
+    "öt pici kínai",
+    "tíz kicsi néger",
+    "húsz törpe busman",
+    "száz apró patagón"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik a szereplői Molnár Ferenc A Pál utcai fiúk című regényének?",
+   "valaszok": [
+    "lilazoknisok",
+    "vörösingesek",
+    "kékharisnyák",
+    "zöldfülűek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a kalapjára esik az eső \"karikára\"?",
+   "valaszok": [
+    "Kossuth Lajos",
+    "József nádor",
+    "Ferenc József",
+    "II. József"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a rézágyúja van felvirágozva a népdal szerint?",
+   "valaszok": [
+    "Rózsa Sándor",
+    "Vak Bottyán",
+    "Bem apó",
+    "Gábor Áron"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek volt kalandja negyven rablóval az ismert mesében?",
+   "valaszok": [
+    "Lencsi babának",
+    "Gül babának",
+    "Böbe babának",
+    "Ali babának"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kiről szól Saint-Exupéry híres műve?",
+   "valaszok": [
+    "a kis királyfiról",
+    "a kis hercegről",
+    "a kis apródról",
+    "a kisvállalkozóról"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit falazott be a várfalba Kőműves Kelemen a ballada szerint?",
+   "valaszok": [
+    "a feleségét",
+    "az ácsot",
+    "tizenkét kőművest",
+    "a művezetőt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kitől követeli vissza a gyémánt félkrajcárját a kiskakas a mesében?",
+   "valaszok": [
+    "az orosz cártól",
+    "a tatár kántól",
+    "a török császártól",
+    "a burkus királytól"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik \"meteorológiai kifejezés\" illik egy Rejtő-regény címszereplőnőjére?",
+   "valaszok": [
+    "vörös tornádó",
+    "fekete passzát",
+    "barna sirokkó",
+    "szőke ciklon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy Petőfi-vers címe az alábbiak közül?",
+   "valaszok": [
+    "A róna, tavasztájt",
+    "A mező, nyáridőben",
+    "A préri, ősz közelgvén",
+    "A puszta, télen"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy Verne-regény címe?",
+   "valaszok": [
+    "Négyévi nyaralás",
+    "Háromévi szünidő",
+    "Kétévi vakáció",
+    "Félévi szabadság"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hangszeren játszott Kukorica Jancsi?",
+   "valaszok": [
+    "citera",
+    "hegedű",
+    "furulya",
+    "tárogató"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ifjúsági történetek játszódnak többnyire a prérin?",
+   "valaszok": [
+    "kalózregények",
+    "indiánregények",
+    "légiós regények",
+    "lányregények"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik régi közlekedési eszköz egy Petőfi-vers címe is?",
+   "valaszok": [
+    "nyolckutyás szán",
+    "négyökrös szekér",
+    "kétlovas bricska",
+    "egyszamaras kordé"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik testrészről nevezték el az időmértékes verselés legkisebb ritmikai egységét?",
+   "valaszok": [
+    "kéz",
+    "láb",
+    "hát",
+    "has"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik tánc neve egyezik meg egy közismert Dickens-hős nevével?",
+   "valaszok": [
+    "dzsigg",
+    "foxtrott",
+    "boogie-woogie",
+    "twist"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a \"szerencsés\" megszólítás a mesékben?",
+   "valaszok": [
+    "komanéném",
+    "tekintetes ángyom",
+    "öreganyám",
+    "vénséges banyám"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Karinthy ismert irodalmi paródiagyűjteményének?",
+   "valaszok": [
+    "Ezt meg ki írta?",
+    "Így írtok ti",
+    "Én pedig így írok",
+    "Így irtok én"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a neve Csukás István híres sárkányának?",
+   "valaszok": [
+    "Oriza Triznyák",
+    "Pompom",
+    "Lököttke",
+    "Süsü"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a neve Kanga kicsinyének a Micimackóban?",
+   "valaszok": [
+    "Zsebiböbe",
+    "Zsebibubu",
+    "Zsebibébi",
+    "Zsebibaba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a neve a meséből ismert csokoládéfüggő, pufók madárnak?",
+   "valaszok": [
+    "Gombolyag Géza",
+    "Glükóz Atanáz",
+    "Gömböc Ödön",
+    "Gombóc Artúr"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a neve a tigrisnek A dzsungel könyvében?",
+   "valaszok": [
+    "Bagira",
+    "Sir Kán",
+    "Dzsingisz kán",
+    "Mohikán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a neve az alacsony termetéről elnevezett mesehősnek?",
+   "valaszok": [
+    "Arasz Anti",
+    "Pöttöm Lali",
+    "Dió Dani",
+    "Hüvelyk Matyi"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi hull a fáról az ismert magyar népdal szerint?",
+   "valaszok": [
+    "szilva",
+    "dinnye",
+    "kolbász",
+    "béka"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi lesz a rút kiskacsából Andersen meséjében?",
+   "valaszok": [
+    "pulyka",
+    "hattyú",
+    "strucc",
+    "rút nagykacsa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi történik a mesében Pinocchióval, amikor hazudik?",
+   "valaszok": [
+    "megnő az orra",
+    "sűrűn pislog",
+    "megnyúlik a füle",
+    "sántítani kezd"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi volt Toldi keresztneve Arany János művében?",
+   "valaszok": [
+    "Miklós",
+    "András",
+    "Lajos",
+    "Bence"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi vágtatott úgy Petőfi művében, mint az őrült, ki letépte láncát?",
+   "valaszok": [
+    "Morzsa kutyája",
+    "János vitéz lova",
+    "a forradalmi ifjúság",
+    "a Tisza"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miből készült a kiskakas félkrajcárja az ismert mesében?",
+   "valaszok": [
+    "ezüstből",
+    "aranyból",
+    "platinából",
+    "gyémántból"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"beteg\" Moliére színművének címszereplője?",
+   "valaszok": [
+    "képzelt",
+    "képzett",
+    "kiképzett",
+    "beképzelt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen Edward király A walesi bárdok című versben?",
+   "valaszok": [
+    "kese",
+    "fakó",
+    "gebe",
+    "sánta"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen babának nevezik a boszorkányokat a mesékben?",
+   "valaszok": [
+    "acélfogú",
+    "vasorrú",
+    "betonfejű",
+    "krumpliarcú"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen hibát követ el a gyermekversben Mehemed?",
+   "valaszok": [
+    "megfogja a tehén tőgyét",
+    "megfogja a tehén farkát",
+    "rossz társaságba keveredik",
+    "rossz lóra tesz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen juhász szerepel az ismert mesében?",
+   "valaszok": [
+    "vasorrú",
+    "tyúkeszű",
+    "lapátfülű",
+    "csillagszemű"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen kandúr szerepel az ismert mesében?",
+   "valaszok": [
+    "bocskoros",
+    "kalucsnis",
+    "bakancsos",
+    "csizmás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen kismalac szokott túrni a mesékben?",
+   "valaszok": [
+    "trombita orrú",
+    "kurta farkú",
+    "pocsolyában fürdő",
+    "korpa közé keveredett"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen mama szerepel az ismert Brecht-darab címében?",
+   "valaszok": [
+    "Kíváncsi",
+    "Kurázsi",
+    "Stelázsi",
+    "Balázsy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen mérgezett gyümölcs okozza majdnem Hófehérke vesztét?",
+   "valaszok": [
+    "meggy",
+    "alma",
+    "ribizli",
+    "banán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen néven lett ismert a mesebeli, világgá zavart macska?",
+   "valaszok": [
+    "Kandúr kán",
+    "Cirmos császár",
+    "Cicamica cár",
+    "Kacor király"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen pogácsa a népmesék útravalója?",
+   "valaszok": [
+    "tejben főtt",
+    "tepertős",
+    "szénné égett",
+    "hamuban sült"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen tenger szerepel gyakran a magyar népmesékben?",
+   "valaszok": [
+    "Burkus",
+    "Óperenciás",
+    "Madárlátta",
+    "Hétmérföldes"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen vár szerepel Fekete István regényének címében?",
+   "valaszok": [
+    "kártya",
+    "homok",
+    "lég",
+    "tüske"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állathős nem szerepel Milne Micimackójában?",
+   "valaszok": [
+    "bagoly",
+    "szamár",
+    "nyúl",
+    "rozsomák"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állatot nem látott még Mehemed a vers szerint?",
+   "valaszok": [
+    "koalát",
+    "tehenet",
+    "jegesmedvét",
+    "kengurut"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állattal találkozik a mesehős Piroska az erdőben?",
+   "valaszok": [
+    "mókussal",
+    "farkassal",
+    "rókával",
+    "mormotával"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen írásműveiről nevezetes Mikes Kelemen?",
+   "valaszok": [
+    "toborzó röpcéduláiról",
+    "isztambuli útikönyveiről",
+    "leveleiről",
+    "képeslapjairól"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minek a ruhája izzik őszi éjjel Weöres Sándor versében?",
+   "valaszok": [
+    "áfonya",
+    "burgonya",
+    "tarhonya",
+    "galagonya"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek az eltűnését kéri számon a gyerekdal a cirmos cicán?",
+   "valaszok": [
+    "gombolyag",
+    "tejföl",
+    "vaj",
+    "forró kása"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csalt ki a róka szájából La Fontaine meséjében?",
+   "valaszok": [
+    "szőlőt",
+    "diót",
+    "sajtot",
+    "szájharmonikát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál a népdalban szereplő Vargáné, akinek kontya alá ütött a gőz?",
+   "valaszok": [
+    "vargabélest süt",
+    "káposztát főz",
+    "levest kavar",
+    "sóskát habar"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinál álmában a villamos József Attila Altatója szerint?",
+   "valaszok": [
+    "új síneken siklik",
+    "remizről remizre száll",
+    "nem sárgul tovább",
+    "csönget"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit dob Kukorica Jancsi Tündérország tavába?",
+   "valaszok": [
+    "egy követ",
+    "egy óriást",
+    "egy aranyhalat",
+    "egy rózsát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit kérdez Hófehérke mostohája a tükörtől?",
+   "valaszok": [
+    "Hogy néz ki az üveges?",
+    "Látszanak-e a szarkalábak?",
+    "Használjak-e alapozót?",
+    "Ki a legszebb a vidéken?"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit vettem a vásárban félpénzzel a népköltés szerint?",
+   "valaszok": [
+    "vattacukrot",
+    "mézeskalácsot",
+    "tyúkot",
+    "fél disznót"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mivel szúrja meg az ujját Csipkerózsika a mesében?",
+   "valaszok": [
+    "orsó",
+    "horgolótű",
+    "zsákvarró tű",
+    "horog"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miért kell a csigának kijönnie a gyerekdal szerint?",
+   "valaszok": [
+    "mert kint melegebb van",
+    "mert megjöttek a rokonok",
+    "mert ég a háza",
+    "mert rossz házba ment be"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miért kéne Debrecenbe menni a gyermekdal szerint?",
+   "valaszok": [
+    "megnézni a virágfesztivált",
+    "sétálni a Nagyerdőben",
+    "megnézni a Nagytemplomot",
+    "pulykakakast venni"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miért megy a kisnyulacska az erdőbe a gyerekdal szerint?",
+   "valaszok": [
+    "répácskáért",
+    "vesszőcskéért",
+    "rókácskáért",
+    "füvecskéért"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A drámai művek mely része a prológ?",
+   "valaszok": [
+    "bevezetése",
+    "zárszava",
+    "a konfliktus csúcspontja",
+    "a főszereplő monológja"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A népdal szerint mivel van kirakva a szántói híres utca?",
+   "valaszok": [
+    "gázcsövekkel",
+    "cimbalommal",
+    "csillagokkal",
+    "kabátgombbal"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy műfaj sejtelmességét kifejező irodalmi stíluselem elnevezése?",
+   "valaszok": [
+    "ódai pompa",
+    "lírai szikra",
+    "balladai homály",
+    "drámai ború"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Folytassa a Petőfi-idézetet! \"Hát hogymint vagytok otthon, …?\"",
+   "valaszok": [
+    "mamikám",
+    "apuskám",
+    "Juliskám",
+    "Pistikám"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy folytatódik a Shakespeare \"Szentivánéji álom\"-jából származó idézet: \"Helyes a bőgés, …!\"",
+   "valaszok": [
+    "vadszamár",
+    "tehén",
+    "oroszlán",
+    "tinó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy hívták János vitéz szerelmét?",
+   "valaszok": [
+    "Juliska",
+    "Piroska",
+    "Iluska",
+    "Örzse"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy szól Verne regényének a címe? \"Grant kapitány ...\"",
+   "valaszok": [
+    "gyermekkora",
+    "szakálla",
+    "gyermekei",
+    "falába"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan nevezzük a főképp szerelmi költészetükről neves középkori lovagköltőket!",
+   "valaszok": [
+    "tuaregek",
+    "tunguzok",
+    "trubadúrok",
+    "turánok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan szakad el otthonról Dorothy az Óz, a csodák csodájában?",
+   "valaszok": [
+    "elragadja az árvíz",
+    "felkapja a forgószél",
+    "eltéved az erdőben",
+    "elcsalja a gonosz boszorka"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan vágtatott a Tisza Petőfi verse szerint?",
+   "valaszok": [
+    "mint a megvadult bika",
+    "mint a forgószél",
+    "mint az őrült, ki letépte láncát",
+    "mint a menekülő, kit kerget a tatár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol nyílott meg a \"kutya-tár\" Weöres Sándor versében?",
+   "valaszok": [
+    "Budán",
+    "a hentes szomszédságában",
+    "Harap utca három alatt",
+    "a kiképzőtelepen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol találták nevelőszülei a későbbi János vitézt?",
+   "valaszok": [
+    "szénakazalban",
+    "erdőben",
+    "kukoricaföldön",
+    "nádasban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol tölt hosszú éveket a regényhős Robinson Crusoe?",
+   "valaszok": [
+    "a Himalája csúcsán",
+    "a brazil esőerdőkben",
+    "egy lakatlan szigeten",
+    "a Szaharában"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol történik gyilkosság Agatha Christie ismert regényében?",
+   "valaszok": [
+    "az Orient expresszen",
+    "a 424-es gőzmozdonyon",
+    "a francia szupervasúton",
+    "az Intercityn"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol él Asterix, a képregényhős?",
+   "valaszok": [
+    "egy gall faluban",
+    "a skót Felföldön",
+    "az Égei-tenger partján",
+    "a Duna forrásvidékén"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hová mentem én el félpénzzel a népdal szerint?",
+   "valaszok": [
+    "a szomszédba",
+    "a kocsmába",
+    "az erdőbe",
+    "a vásárba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki Nyakigláb és Csupaháj társa a mesében?",
+   "valaszok": [
+    "Boglyahaj",
+    "Vasököl",
+    "Kérgesszív",
+    "Málészáj"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki Tom Sawyer barátja Mark Twain regényében?",
+   "valaszok": [
+    "Harry Potter",
+    "Adrian Mole",
+    "Huckleberry Finn",
+    "a koldus és a királyfi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki akarta feleségül adni a lányát János vitézhez?",
+   "valaszok": [
+    "Iluska mostohája",
+    "a francia király",
+    "a tatár kán",
+    "az óriások királya"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki egy ismert Rejtő-hős az alábbiak közül?",
+   "valaszok": [
+    "Sehonnai Alpár",
+    "Senkiházi Atanáz",
+    "Semmirekellő Artúr",
+    "Senki Alfonz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki meséli az Ezeregyéjszaka meséit?",
+   "valaszok": [
+    "Salome",
+    "Szemiramisz",
+    "Betsabé",
+    "Seherezádé"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem Dumas három testőrének egyike?",
+   "valaszok": [
+    "Athos",
+    "Porthos",
+    "Aramis",
+    "Cyrano"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem visel báni méltóságot Katona József Bánk bánjának hősei közül?",
+   "valaszok": [
+    "Mikhál",
+    "Petur",
+    "Simon",
+    "Tiborc"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki szerepel az Arany-ballada címében?",
+   "valaszok": [
+    "Kurázsi-mama",
+    "Ágnes asszony",
+    "Tóth Mari",
+    "Kató néni"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki teremtette meg a nyomozó vénkisasszony, Miss Marple alakját?",
+   "valaszok": [
+    "Sir Arthur Conan Doyle",
+    "Agatha Christie",
+    "Georges Simenon",
+    "Dashiel Hammel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a rest La Fontaine meséjében?",
+   "valaszok": [
+    "a hangya",
+    "a szöcske",
+    "a tücsök",
+    "a katicabogár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki írt egyperces novellákat?",
+   "valaszok": [
+    "Örkény István",
+    "Karinthy Frigyes",
+    "Heltai Jenő",
+    "Móricz Zsigmond"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kije volt Rocinantének don Quijote?",
+   "valaszok": [
+    "lova",
+    "gazdája",
+    "szolgálója",
+    "szerelme"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik a címszereplői Mikszáth művének?",
+   "valaszok": [
+    "a két koldusdiák",
+    "a három garabonciás",
+    "a négy vándordalnok",
+    "a tíz gubernátor"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik fuvoláznak a Bóbita című Weöres Sándor-versben?",
+   "valaszok": [
+    "a New York-i filharmónikusok",
+    "hetérák",
+    "konzervatóriumi diákok",
+    "béka-hadak"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kik harcolnak egymással a Szigeti veszedelem című műben?",
+   "valaszok": [
+    "magyarok és németek",
+    "görögök és perzsák",
+    "magyarok és törökök",
+    "punok és rómaiak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik lakják Lilliput országát Swift regényében?",
+   "valaszok": [
+    "törpék",
+    "óriások",
+    "tündérek",
+    "sárkányok"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik voltak Ali baba ellenségei?",
+   "valaszok": [
+    "barlangászok",
+    "tevehajcsárok",
+    "rablók",
+    "pandúrok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a közismert írói álneve P. Howard?",
+   "valaszok": [
+    "Szerb Antal",
+    "Rejtő Jenő",
+    "Heltai Jenő",
+    "Karinthy Frigyes"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a művében szerepel Biberach?",
+   "valaszok": [
+    "Jókai Mór",
+    "Katona József",
+    "Arany János",
+    "Krúdy Gyula"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a tulajdona volt a két iciripiciri kis ökör Móricz gyermekversében?",
+   "valaszok": [
+    "egy iciripiciri asszonykáé",
+    "egy iciripiciri kis macskáé",
+    "egy iciripiciri ökörszemé",
+    "egy iciripiciri kis tehéné"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek az udavarába kerül egy jenki Mark Twain regényében?",
+   "valaszok": [
+    "Kleopátra",
+    "Bölcs Salamon",
+    "Arthur király",
+    "VIII. Henrik"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kiről szól James Fenimore Cooper regénye?",
+   "valaszok": [
+    "az utolsó apacsról",
+    "az utolsó komancsról",
+    "az utolsó sziúról",
+    "az utolsó mohikánról"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kit tekintünk a magyar irodalom legnagyobb műballada-költőjének?",
+   "valaszok": [
+    "Balassi Bálintot",
+    "Fazekas Mihályt",
+    "Vajda Jánost",
+    "Arany Jánost"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kit ver meg Lúdas Matyi háromszor?",
+   "valaszok": [
+    "a vasorrú bábát",
+    "a gyevi bírót",
+    "Nils Holgerssont",
+    "Döbrögit"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik Shakespeare-dráma kulcsfontosságú része az erkélyjelenet?",
+   "valaszok": [
+    "Hamlet",
+    "Rómeó és Júlia",
+    "Lear király",
+    "Macbeth"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik csárdába jár a cimbalmos a cimbalmával cimbalmozni a népdal szerint?",
+   "valaszok": [
+    "csengeri",
+    "hortobágyi",
+    "horgosi",
+    "bodajki"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy Karinthy Frigyes-mű címe?",
+   "valaszok": [
+    "Miniszter úr kérem",
+    "Bíró úr kérem",
+    "Tanár úr kérem",
+    "Elnök úr kérem"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy híres Shakespeare-mű címe?",
+   "valaszok": [
+    "A tornádó",
+    "A ciklon",
+    "Az orkán",
+    "A vihar"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy népszerű Mikszáth-mű címe?",
+   "valaszok": [
+    "A helyes matyók",
+    "A kellemdús sokácok",
+    "A csupaszív székelyek",
+    "A jó palócok"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik háború alatt játszódik Svejk, a derék katona története?",
+   "valaszok": [
+    "II. világháború",
+    "harmincéves háború",
+    "hétéves háború",
+    "I. világháború"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik irodalmi hős elnevezése a \"búsképű lovag\"?",
+   "valaszok": [
+    "Trisztán",
+    "Don Quijote",
+    "Ivanhoe",
+    "Cid"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik irodalmi műfajban alkotott Walter Scott?",
+   "valaszok": [
+    "detektívtörténet",
+    "állatmese",
+    "science-fiction",
+    "történelmi regény"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik jeles nap szerepel egy Shakespeare-komédia címében a magyar fordításban?",
+   "valaszok": [
+    "Pünkösd",
+    "Gyertyaszentelő",
+    "Szent Patrik-nap",
+    "Vízkereszt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik mű szereplője Boka?",
+   "valaszok": [
+    "Puskák és galambok",
+    "A Pál utcai fiúk",
+    "Tüskevár",
+    "Hahó, Öcsi!"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem irodalmi műfaj az alábbiak közül?",
+   "valaszok": [
+    "elégia",
+    "esztrád",
+    "epigramma",
+    "episztola"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szóval kezdődik Petőfi Anyám tyúkja című verse?",
+   "valaszok": [
+    "ihaj",
+    "ej",
+    "tyű",
+    "hujj"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik természeti jelenség egyezik meg egy Shakespeare-mű címével?",
+   "valaszok": [
+    "vízözön",
+    "vihar",
+    "délibáb",
+    "hóesés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik testrésze vagy szerve nagyobb az átlagosnál Cyrano de Bergeracnak?",
+   "valaszok": [
+    "füle",
+    "lába",
+    "mája",
+    "orra"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik város szerepel \"A vadon szava\" írójának nevében?",
+   "valaszok": [
+    "Manchester",
+    "London",
+    "Boston",
+    "Milwaukee"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állat házasodik egy ismert magyar népdal szerint?",
+   "valaszok": [
+    "a pocok",
+    "a tücsök",
+    "a medve",
+    "a szamár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ünnep szerepel Shakespeare művének címében?",
+   "valaszok": [
+    "karácsony",
+    "vízkereszt",
+    "hamvazószerda",
+    "húsvét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a műfaja Flaubert Bovaryné című művének?",
+   "valaszok": [
+    "komédia",
+    "elégia",
+    "regény",
+    "eposz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a neve Sherlock Holmes állandó társának?",
+   "valaszok": [
+    "dr. Doolittle",
+    "dr. Watson",
+    "dr. Bubó",
+    "dr. Alban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a neve Süsü, a sárkány utódjának a mese folytatásában?",
+   "valaszok": [
+    "Norbert",
+    "Jeromos",
+    "Okoska",
+    "Süsüke"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a neve az Ezeregyéjszaka híres hajósának?",
+   "valaszok": [
+    "Dzsafar",
+    "Szindbád",
+    "Aladdin",
+    "Ali baba"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a tudás Bacon szállóigéje szerint?",
+   "valaszok": [
+    "pénz",
+    "hatalom",
+    "erő",
+    "felelősség"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi fényesebb a láncnál Petőfi ismert verse szerint?",
+   "valaszok": [
+    "a hant",
+    "az akarat",
+    "a kard",
+    "a malaszt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi van a Kwai folyón Pierre Boulle regényének címe szerint?",
+   "valaszok": [
+    "árvíz",
+    "hadihajó",
+    "híd",
+    "vízesés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt Piszkos Fred rangja Rejtő Jenő regényében?",
+   "valaszok": [
+    "tengernagy",
+    "őrnagy",
+    "ezredes",
+    "kapitány"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi zöldell az ablak előtt Petőfi Szeptember végén című versében?",
+   "valaszok": [
+    "nyírfa",
+    "tölgyfa",
+    "bükkfa",
+    "nyárfa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miből készült Pinokkió?",
+   "valaszok": [
+    "acélból",
+    "rongyból",
+    "fából",
+    "bronzból"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mije van egy mesebeli unikornisnak?",
+   "valaszok": [
+    "agancsa",
+    "szárnya",
+    "szarva",
+    "pikkelye"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miket írt Mikes Kelemen?",
+   "valaszok": [
+    "leveleket",
+    "kalandregényeket",
+    "útikönyveket",
+    "eposzokat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen \"hölgy\" ifjabb Alexander Dumas művének címszereplője?",
+   "valaszok": [
+    "kökörcsines",
+    "kaméliás",
+    "kamillás",
+    "kámeás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen a cserebogár a Petőfi-vers refrénjében?",
+   "valaszok": [
+    "elcserélt",
+    "zümmögő",
+    "szárnyaló",
+    "sárga"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen anyagból van Andersen rendíthetetlen játékkatonája?",
+   "valaszok": [
+    "ón",
+    "ólom",
+    "réz",
+    "bronz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen arcszőrzettel rendelkezik Rejtő Jenő hőse, Wagner úr?",
+   "valaszok": [
+    "kaporszakállal",
+    "rőtszakállal",
+    "kék szakállal",
+    "szőke szakállal"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen autó szerepel Rejtő Jenő ismert regényében?",
+   "valaszok": [
+    "egymillió fontos",
+    "huszonkét unciás",
+    "tizennégy karátos",
+    "hétezer köbcentis"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen egylet szerepel A Pál utcai fiúk című regényében?",
+   "valaszok": [
+    "gittegylet",
+    "gipszegylet",
+    "lövészegylet",
+    "védegylet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen félelmetes jövevényektől rettegnek a négyszögletű kerekerdő lakói Lázár Ervin meséjében?",
+   "valaszok": [
+    "bodobácsoktól",
+    "pomogácsoktól",
+    "fakopáncsoktól",
+    "pogácsoktól"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen kalmár a címszereplője Shakespeare művének?",
+   "valaszok": [
+    "firenzei",
+    "veronai",
+    "velencei",
+    "milánói"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen körről szól Arany János népszerű verse?",
+   "valaszok": [
+    "baráti",
+    "családi",
+    "szakmai",
+    "mértani"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen különleges tárgy szerepel az Aladdin című Disney-rajzfilmben?",
+   "valaszok": [
+    "hétmérföldes csizma",
+    "láthatatlanná tevő köpeny",
+    "lángoló kard",
+    "repülőszőnyeg"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen lovagokról írt színművet Shakespeare?",
+   "valaszok": [
+    "sótlan-lótlan",
+    "lóválett",
+    "lóvátett",
+    "lóképű"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen madár szerepel Milne Micimackójában?",
+   "valaszok": [
+    "Kakukk",
+    "Bagoly",
+    "Vöcsök",
+    "Keselyű"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen megvadult állatot fékez meg Toldi puszta kézzel a pesti utcán?",
+   "valaszok": [
+    "lovat",
+    "bikát",
+    "medvét",
+    "kutyát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen mesebeli lények a koboldok?",
+   "valaszok": [
+    "hétfejű sárkányok",
+    "csintalan manók",
+    "legkisebb királyfik",
+    "jólelkű óriások"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen muriról szól Móricz Zsigmond ismert regénye?",
+   "valaszok": [
+    "újévi",
+    "dzsentri",
+    "úri",
+    "keresztúri"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nemzetiségű volt a magyarosan Verne Gyulaként emlegetett világhírű író?",
+   "valaszok": [
+    "német",
+    "skót",
+    "orosz",
+    "francia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen rendkívüli ruhadarab szerepel Mikszáth egyik művének címében?",
+   "valaszok": [
+    "csodatévő suba",
+    "beszélő köntös",
+    "éneklő szűr",
+    "makacs bekecs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen rovar szerepel Petőfi Szülőföldemen című versében?",
+   "valaszok": [
+    "sárga cserebogár",
+    "pettyes katicabogár",
+    "zúgó éji bogár",
+    "skarlát skarabeusz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen szigetről szól Stevenson híres ifjúsági regénye a mű címe szerint?",
+   "valaszok": [
+    "lakatlan",
+    "elátkozott",
+    "kincses",
+    "trópusi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen szél áraszt vizet a népdal szerint?",
+   "valaszok": [
+    "őszi",
+    "viharos",
+    "tavaszi",
+    "északi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen szérű szerepel Ady Endre versének címében?",
+   "valaszok": [
+    "királyi",
+    "grófi",
+    "ispáni",
+    "nádori"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen sógort emlegetnek az \"Egyedem-begyedem tengertánc\" kezdetű magyar népköltésben?",
+   "valaszok": [
+    "osztrák",
+    "hajdú",
+    "labanc",
+    "lengyel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen tizennégykarátos jármű szerepel Rejtő Jenő könyvének címében?",
+   "valaszok": [
+    "konflis",
+    "fiáker",
+    "omnibusz",
+    "autó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen volt a mesében Vackor, a kölyökmackó?",
+   "valaszok": [
+    "csekély értelmű",
+    "selypes",
+    "pisze",
+    "szószátyár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen ákác szerepel Szép Ernő regényének címében?",
+   "valaszok": [
+    "tüskés",
+    "illatos",
+    "sárga",
+    "lila"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állat Kele, Fekete István könyvének hőse?",
+   "valaszok": [
+    "gulipán",
+    "gólya",
+    "gepárd",
+    "görény"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat a mesebeli Mirr-Murr?",
+   "valaszok": [
+    "nyúl",
+    "medve",
+    "kutya",
+    "macska"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állat lett a rút kiskacsából Andersen meséjében?",
+   "valaszok": [
+    "rút nagykacsa",
+    "páva",
+    "hattyú",
+    "daru"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen állat változik királyfivá a mesékben, ha megcsókolják?",
+   "valaszok": [
+    "öszvér",
+    "nyúl",
+    "pulyka",
+    "béka"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állatok laknak a Pincérfrakk utcában Kormos István mesecíme szerint?",
+   "valaszok": [
+    "pingvinek",
+    "cicák",
+    "kocák",
+    "cincérek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állattal együtt repítette a szél Dorothyt Óz országában?",
+   "valaszok": [
+    "majom",
+    "bölény",
+    "kutya",
+    "grizzly"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen étel a József Attila versében is szereplő kugler?",
+   "valaszok": [
+    "libacomb",
+    "édesség",
+    "mártás",
+    "leves"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen ételt neveztek el a Fekete gyémántok írójáról?",
+   "valaszok": [
+    "tyúkhúslevest",
+    "marhahúslevest",
+    "bablevest",
+    "a feketelevest"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minek képzeli magát Don Quijote?",
+   "valaszok": [
+    "spanyol királynak",
+    "Amerika felfedezőjének",
+    "kalózkapitánynak",
+    "lovagnak"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mire kapott rá Móricz Zsigmond versében a két iciripiciri kis ökör?",
+   "valaszok": [
+    "iciripiciri kis mákra",
+    "iciripiciri kis tökre",
+    "iciripiciri kis sörre",
+    "iciripiciri kis tehénre"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit hagyjon a mama másra József Attila verse szerint?",
+   "valaszok": [
+    "a padlástakarítást",
+    "a mosóteknőt",
+    "a nehéz kosarat",
+    "a dagadt ruhát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit hallgat a süket ember a száraz tó partján a gyermekdalban?",
+   "valaszok": [
+    "tücsökciripelést",
+    "vízcsobogást",
+    "kuruttyolást",
+    "walkmant"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit rágnak rendszeresen A Pál utcai fiúk című regény egyleti tagjai?",
+   "valaszok": [
+    "medvecukrot",
+    "papírt",
+    "gittet",
+    "gipszet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mivel foglalkozik La Fontaine A tücsök és a hangya című meséjében a tücsök?",
+   "valaszok": [
+    "gyűjtöget",
+    "sajtot lop",
+    "hegedül",
+    "ugrabugrál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Petőfi melyik hőse jut el Tündérországba?",
+   "valaszok": [
+    "Szilveszter",
+    "Pató Pál",
+    "János vitéz",
+    "Szemérmetes Erzsók"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "\"Mint ha pásztortűz ég őszi éjszakákon...\" Melyik mű kezdődik így?",
+   "valaszok": [
+    "János vitéz",
+    "Toldi",
+    "Csongor és Tünde",
+    "Szigeti veszedelem"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A címszereplő mely rokonának szelleme szerepel Shakespeare Hamlet című drámájában?",
+   "valaszok": [
+    "nagyapjának",
+    "öccsének",
+    "apjának",
+    "bátyjának"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A kertész mije szerepel Lope de Vega ismert vígjátékának címében?",
+   "valaszok": [
+    "kapája",
+    "kutyája",
+    "kaszája",
+    "kabátja"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül ki egy Gogol-mű címszereplője?",
+   "valaszok": [
+    "kritikus",
+    "revizor",
+    "jegyző",
+    "adószedő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy Albee-színmű címe?",
+   "valaszok": [
+    "Nem félünk a farkastól",
+    "Ember embernek farkasa",
+    "Farkasokkal táncoló",
+    "Farkasverem"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Dickens melyik regényének nem gyermek a főszereplője?",
+   "valaszok": [
+    "Karácsonyi ének",
+    "Twist Olivér",
+    "Copperfield Dávid",
+    "Kis Dorrit"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Egészítse ki Gerald Durrell művének címét! \"Családom és egyéb …\"",
+   "valaszok": [
+    "sorscsapások",
+    "állatfajták",
+    "próbatételek",
+    "földönkívüliek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Egészítse ki a Petőfi-idézetet! \"… E kettő kell nekem.\"",
+   "valaszok": [
+    "Forradalom, dicsőség!",
+    "Szabadság, szerelem!",
+    "Fegyver, paripa!",
+    "Házasság, nyugalom!"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Egészítse ki a Sarkadi Imre-színmű címét! \"Oszlopos …\"",
+   "valaszok": [
+    "Sirák",
+    "Simeon",
+    "Sámuel",
+    "Salamon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Egészítse ki a híres novella címét! \"Mario és a …\"",
+   "valaszok": [
+    "varázshegy",
+    "varázsló",
+    "kiválasztott",
+    "Buddenbrook-ház"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Egészítse ki a regény címét! \"Zorbász, a ...\"",
+   "valaszok": [
+    "görög",
+    "török",
+    "táncos",
+    "halász"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Folytassa Villon ismert szállóigéjét! \"De hol van a tavalyi …?\"",
+   "valaszok": [
+    "nyár",
+    "csók",
+    "hó",
+    "szó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezték régen a tragédia műfaját?",
+   "valaszok": [
+    "komorjáték",
+    "búsjáték",
+    "szigorújáték",
+    "szomorújáték"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan szól Katajev híres regényének a címe? \"Távolban egy …\"",
+   "valaszok": [
+    "vörös partizán",
+    "fehér vitorla",
+    "úri trojka",
+    "nikkel szamovár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan szól Kölcsey Ferenc szállóigéje? \"Jelszavaink valának: …\"",
+   "valaszok": [
+    "szabad nyelv, szabad hon",
+    "alkotás és gyarapodás",
+    "tisztesség és akarat",
+    "haza és haladás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol játszódik Tamási Áron Ábel a rengetegben című regénye?",
+   "valaszok": [
+    "a Mátrában",
+    "a Hargitán",
+    "a Bakonyban",
+    "a Tátrában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol látjuk Kukorica Jancsit a János vitéz kezdő soraiban?",
+   "valaszok": [
+    "csatamezőn",
+    "patakparton",
+    "az óriások lakomáján",
+    "tündérország tavánál"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol rendelnek el vesztegzárat a Rejtő-regény címében?",
+   "valaszok": [
+    "az előretolt helyőrségben",
+    "a Grand Hotelben",
+    "az elveszett cirkálón",
+    "a néma revolverek városában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol terem sok hal a népdal szerint?",
+   "valaszok": [
+    "a Dunában",
+    "a Balatonban",
+    "a Tiszában",
+    "a Velencei-tóban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol áll meg Petőfi nyári napnak alkonyulatánál a vers szerint?",
+   "valaszok": [
+    "a családi porta előtt",
+    "babája ablaka alatt",
+    "a kanyargó Tiszánál",
+    "vadregényes fenyvesben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hova vezet sárgaköves út?",
+   "valaszok": [
+    "Shrek mocsarához",
+    "Óz palotájához",
+    "Háry János falujába",
+    "a szent Grálhoz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hová van bezárva az Aladdint szolgáló dzsinn?",
+   "valaszok": [
+    "egy szekrénybe",
+    "egy lámpába",
+    "egy hárembe",
+    "egy konzervdobozba"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány ökör húzta a szekeret a Petőfi-vers címében?",
+   "valaszok": [
+    "egy",
+    "kettő",
+    "három",
+    "négy"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki a Koldus és királyfi című ifjúsági regény szerzője?",
+   "valaszok": [
+    "Jack London",
+    "Daniel Defoe",
+    "Charles Dickens",
+    "Mark Twain"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki a Sherlock Holmes-történetek szerzője?",
+   "valaszok": [
+    "Edgar Allan Poe",
+    "Sir Arthur Conan Doyle",
+    "Edgar Wallace",
+    "Edgar Rice Burroughs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki a címszereplője Szigligeti Ede vígjátékának?",
+   "valaszok": [
+    "Liliomfi",
+    "Szellemfi",
+    "Felhőfi",
+    "Rókafi"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki a szerzője a Lassie hazatér című regénynek?",
+   "valaszok": [
+    "Mark Twain",
+    "Charles Dickens",
+    "Eric Knight",
+    "Selma Lagerlöf"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki kérdezi Shakespeare művében: \"Ó, Romeo, mért vagy te Romeo?\"?",
+   "valaszok": [
+    "Tybalt",
+    "Lőrinc barát",
+    "Júlia",
+    "Mercutio"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki költő az alábbi hírességek közül?",
+   "valaszok": [
+    "Berlioz",
+    "Godard",
+    "Verlaine",
+    "Renoir"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki lett gyilkosság áldozata Katona József drámájában?",
+   "valaszok": [
+    "Bánk bán",
+    "Tiborc",
+    "Gertrúd",
+    "Melinda"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem házasodott meg a költők közül?",
+   "valaszok": [
+    "Csokonai Vitéz Mihály",
+    "Ady Endre",
+    "Kosztolányi Dezső",
+    "Balassi Bálint"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem ókori filozófus az alábbiak közül?",
+   "valaszok": [
+    "Ciceró",
+    "Erasmus",
+    "Platón",
+    "Lao-ce"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki teremtette Hercule Poirot figuráját?",
+   "valaszok": [
+    "Raymond Chandler",
+    "Georges Simenon",
+    "Agatha Cristie",
+    "Conan Doyle"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki teszi fel a kérdést híres monológjában? \"Lenni vagy nem lenni?\"",
+   "valaszok": [
+    "Rómeó",
+    "Hamlet",
+    "Ádám",
+    "Bánk bán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki vagy mi járt tegnap Párizsban Ady Endre verse szerint?",
+   "valaszok": [
+    "Napóleon",
+    "az Ősz",
+    "Léda árnya",
+    "Szent Mihály"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Ithaka királya Homérosz szerint?",
+   "valaszok": [
+    "Patroklosz",
+    "Tantalosz",
+    "Adonisz",
+    "Odüsszeusz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt a \"búsképű lovag\"?",
+   "valaszok": [
+    "Cyrano",
+    "Lancelot",
+    "Oroszlánszívű Richárd",
+    "Don Quijote"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt a közlegény a Pál utcai fiúk csapatában?",
+   "valaszok": [
+    "Geréb",
+    "Csónakos",
+    "Nemecsek",
+    "Boka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt az az ógörög költőnő, aki Leszbosz szigetén lányokból álló művészeti kört vezetett?",
+   "valaszok": [
+    "Lüsztisztraté",
+    "Lesbia",
+    "Szapphó",
+    "Chloé"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki ígér könnyű álmot Sütő András művének címében?",
+   "valaszok": [
+    "az édesanyja",
+    "a nővére",
+    "a dajkája",
+    "az altatóorvosa"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki írt álmoskönyvet az alábbi írok közül?",
+   "valaszok": [
+    "Móra Ferenc",
+    "Karinthy Frigyes",
+    "Krúdy Gyula",
+    "Hunyady Sándor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki ölte meg Katona József drámájában Gertrúd királynét?",
+   "valaszok": [
+    "Tiborc",
+    "Bánk bán",
+    "Petur bán",
+    "Biberach"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kihez írt verset Vörösmarty az alábbiak közül a mű címe szerint?",
+   "valaszok": [
+    "a tűnődőhöz",
+    "az álmodozóhoz",
+    "a merengőhöz",
+    "a mélázóhoz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik a szereplői Karl May Az Ezüst-tó kincse című művének?",
+   "valaszok": [
+    "kalózok és foglyaik",
+    "indiánok és cowboyok",
+    "detektívek és betöről",
+    "halászok és vadőrök"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik ellen harcolt a Tenkes kapitánya?",
+   "valaszok": [
+    "oroszok",
+    "tatárok",
+    "törökök",
+    "labancok"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kiket végeztetett ki Edward király az Arany-ballada szerint?",
+   "valaszok": [
+    "skót dudásokat",
+    "ír szabadságharcosokat",
+    "kelta druidákat",
+    "walesi bárdokat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kiknek a végnapjai szerepelnek Jókai művének címében?",
+   "valaszok": [
+    "eunuchok",
+    "janicsárok",
+    "bégek",
+    "basák"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a \"látogatása\" szerepel Dürrenmatt világhírű drámájának címében?",
+   "valaszok": [
+    "agg matróna",
+    "öreg hölgy",
+    "vénkisasszony",
+    "víg özvegy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a felesége volt Szendrey Júlia?",
+   "valaszok": [
+    "Jókai Mór",
+    "Arany János",
+    "Petőfi Sándor",
+    "Vasvári Pál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a hőse Némó kapitány?",
+   "valaszok": [
+    "Mark Twain",
+    "Jules Verne",
+    "Charles Dickens",
+    "Erich Kastner"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a katonája volt a dalból ismert Tyukodi pajtás?",
+   "valaszok": [
+    "Kossuth",
+    "Rákóczi",
+    "Dózsa",
+    "Hunyadi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek az apródjai szerepelnek Arany János versében?",
+   "valaszok": [
+    "Hunyadi János",
+    "Szondy György",
+    "Dobó István",
+    "Bethlen István"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit üldöz a rendőrfelügyelő Victor Hugo A nyomorultak című regényében?",
+   "valaszok": [
+    "Quasimodót",
+    "Jean Valjeant",
+    "Monte Cristót",
+    "Edmont Dantest"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kivel folytatott baráti levelezést Petőfi Sándor 1846 után az alábbiak közül?",
+   "valaszok": [
+    "Berzsenyi Dániel",
+    "Katona József",
+    "Kölcsey Ferenc",
+    "Arany János"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kivel köt szerződést Faust Goethe művében?",
+   "valaszok": [
+    "Gábriel arkangyal",
+    "Mephisztóval",
+    "Márk evangelistával",
+    "Hermésszel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy ismert Hemingway-mű címe az alábbiak közül?",
+   "valaszok": [
+    "Akiért az ágyúk dörögnek",
+    "Akiért az angyalok dalolnak",
+    "Akiért a harang szól",
+    "Akiért a taps zúg"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy ismert Petőfi-vers címe az alábbiak közül?",
+   "valaszok": [
+    "Egy tavaszom Pápán",
+    "Egy nyaram Koltón",
+    "Egy őszöm Patakon",
+    "Egy telem Debrecenben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy ismert Vörösmarty-vers címe az alábbiak közül?",
+   "valaszok": [
+    "Elmélkedések az oskolában",
+    "Gondolatok a könyvtárban",
+    "Merengések a teátrumban",
+    "Reflexiók a bibliotékában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy népszerű Ady-vers címe?",
+   "valaszok": [
+    "Vigyázom az álmod",
+    "Őrizem a szemed",
+    "Lesem az óhajod",
+    "Követem a lábnyomod"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik folyón mennék én által ladikon a népdal szerint?",
+   "valaszok": [
+    "Rábán",
+    "Dunán",
+    "Tiszán",
+    "Sajón"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hős győzi le saját elbeszélése szerint Napóleont?",
+   "valaszok": [
+    "Háry János",
+    "János vitéz",
+    "Münchausen báró",
+    "Till Eulenspiegel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik irodalmi alak vívott szélmalomharcot?",
+   "valaszok": [
+    "Kinizsi Pál",
+    "Trisztán",
+    "Don Quijote",
+    "Toldi Miklós"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik irodalmi műfaj jeles képviselője volt Benedek Elek?",
+   "valaszok": [
+    "szonett",
+    "dráma",
+    "óda",
+    "mese"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik irodalmi szereplő volt kutyakereskedő?",
+   "valaszok": [
+    "Pickering",
+    "Potrien",
+    "Raszkolnyikov",
+    "Svejk"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik madár szállott fel a vármegye-házára a magyar népdal szerint?",
+   "valaszok": [
+    "gerle",
+    "rigó",
+    "páva",
+    "sólyom"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar településen látszik csak két torony a népdal szerint?",
+   "valaszok": [
+    "Nagyváradon",
+    "Nagyabonyban",
+    "Nagykőrösön",
+    "Nagymaroson"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mesében szerepelnek Nyuszi barátai és üzletfelei?",
+   "valaszok": [
+    "A békakirályfi",
+    "A róka és a nyúl",
+    "Micimackó",
+    "A három nyulak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem a Toldi-trilógia része?",
+   "valaszok": [
+    "Toldi",
+    "Toldi estéje",
+    "Toldi szerelme",
+    "Toldi a rengetegben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nevezetes hős ellenfele Gessler, a zsarnok helytartó?",
+   "valaszok": [
+    "Robin Hood",
+    "Tell Vilmos",
+    "Till Eulenspiegel",
+    "Sztyepan Razin"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nép polgárháborújához kapcsolható szorosan a Tamás bátya kunyhója című regény?",
+   "valaszok": [
+    "amerikai",
+    "angol",
+    "spanyol",
+    "orosz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik növény nevére tárul ki a barlang Ali baba meséjében?",
+   "valaszok": [
+    "tapló",
+    "szantál",
+    "szezám",
+    "szizál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szám szerepel Joseph Heller háborús regényének címében?",
+   "valaszok": [
+    "3.0",
+    "07",
+    "22.0",
+    "100"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik tartományt szemléli fakó lován léptetve Edward király az Arany-versben?",
+   "valaszok": [
+    "Skóciát",
+    "Walest",
+    "Sussexet",
+    "Cornwallt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik testrésze volt nagy Cyranónak, a Rostand-dráma hősének?",
+   "valaszok": [
+    "a füle",
+    "a lába",
+    "az orra",
+    "az ujja"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik virág egy Jókai-regény címe?",
+   "valaszok": [
+    "égő pipacs",
+    "sárga rózsa",
+    "kék nefelejcs",
+    "lila orgona"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik vár építésénél falazták be Kőmíves Kelemennét?",
+   "valaszok": [
+    "Drégely",
+    "Eger",
+    "Déva",
+    "Visegrád"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város ostromakor használták Odüsszeusz falovát?",
+   "valaszok": [
+    "Jerikó",
+    "Szürakúza",
+    "Spárta",
+    "Trója"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állat nem szerepel a brémai muzsikusok között?",
+   "valaszok": [
+    "liba",
+    "szamár",
+    "kakas",
+    "macska"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik állatszereplőt teremtette meg Eric Knight?",
+   "valaszok": [
+    "Bambi",
+    "Micimackó",
+    "Lassie",
+    "Lutra"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állattal kötött barátságot a kis herceg?",
+   "valaszok": [
+    "farkassal",
+    "rókával",
+    "majommal",
+    "szarvassal"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mennyi idő alatt kellett megkerülniük a Földet Verne hőseinek?",
+   "valaszok": [
+    "egy hónap",
+    "fél év",
+    "80 nap",
+    "1680 nap"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi Mary Poppins foglalkozása az ismert mesében?",
+   "valaszok": [
+    "doktornő",
+    "nevelőnő",
+    "jósnő",
+    "szabónő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi Nemo kapitány hajójának a neve?",
+   "valaszok": [
+    "Kon-Tiki",
+    "Mayflower",
+    "Nautilus",
+    "Santa Maria"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi Tigris kedvenc eledele Milne Micimackójában?",
+   "valaszok": [
+    "a méz",
+    "a bogáncs",
+    "a ricinus",
+    "a csukamájolaj"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a címe Daphne du Maurier világhírű regényének? \"A Manderley-ház …\"",
+   "valaszok": [
+    "kertésze",
+    "asszonya",
+    "kísértete",
+    "komornyikja"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Fejes Endre színpadi művének: \"Jó estét nyár, jó …\"",
+   "valaszok": [
+    "reggelt, búbánat!",
+    "estét, szerelem!",
+    "napot, szabadság!",
+    "éjszakát, ifjúság!"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Irwin Shaw világhírű, II. világháborús regényének?",
+   "valaszok": [
+    "Medvebocsok",
+    "Fecskefiókák",
+    "Oroszlánkölykök",
+    "Kecskegidák"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Sütő András színdarabjának: \"Egy lócsiszár …\"",
+   "valaszok": [
+    "nyelvbotlása",
+    "árulása",
+    "virágvasárnapja",
+    "világa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Tatay Sándor népszerű ifjúsági regényének?",
+   "valaszok": [
+    "Pisztolyok és pávák",
+    "Tőrök és túzokok",
+    "Buzogányok és baglyok",
+    "Puskák és galambok"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a foglalkozása Kukorica Jancsinak a János vitéz elején?",
+   "valaszok": [
+    "asztalosinas",
+    "lovászfiú",
+    "apród",
+    "juhászbojtár"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a foglalkozása Quasimodónak, Victor Hugo hősének?",
+   "valaszok": [
+    "kovács",
+    "vándorszínész",
+    "harangozó",
+    "udvari bolond"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a foglalkozása Zsivágónak Borisz Paszternak művében?",
+   "valaszok": [
+    "dékán",
+    "orvos",
+    "direktor",
+    "néptribun"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a kedvenc foglalkozása az őrnagynak Örkény Tóték című színművében?",
+   "valaszok": [
+    "makramézás",
+    "dobozolás",
+    "ólomkatona-öntés",
+    "gyöngyfűzés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a neve a Micimackóban szereplő kisfiúnak?",
+   "valaszok": [
+    "Twist Olivér",
+    "Róbert Gida",
+    "Pán Péter",
+    "Tom Sawyer"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi akart lenni egy verse alapján József Attila?",
+   "valaszok": [
+    "tűzoltó",
+    "kertész",
+    "cipész",
+    "pék"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi az élet megrontója Vörösmarty verse szerint?",
+   "valaszok": [
+    "a pénz",
+    "a politika",
+    "az ábrándozás",
+    "a fogyókúra"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi csendes Solohov regényének címében?",
+   "valaszok": [
+    "a Kaukázus",
+    "a Volga",
+    "a Don",
+    "Kamcsatka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi cseng fel \"éj-mélyből\" Weöres Sándor versében?",
+   "valaszok": [
+    "női kacagás",
+    "altatódal",
+    "száncsengő",
+    "az ószeres hangja"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi mesél Ödön von Horváth ismert darabjának címe szerint?",
+   "valaszok": [
+    "a berlini hársfaliget",
+    "a szibériai fenyves",
+    "a riói gyapotföld",
+    "a bécsi erdő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi született egyszer régen az irkámon Zelk Zoltán verse szerint?",
+   "valaszok": [
+    "irkafirka",
+    "ákombákom",
+    "paca",
+    "tintapacni"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt Petőfi Sándor eredeti neve?",
+   "valaszok": [
+    "Petneházi Sándor",
+    "Petrovics Sándor",
+    "Petőfia Sándor",
+    "Péterffy Sándor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt Rejtő Jenő írói álneve?",
+   "valaszok": [
+    "J. Hide",
+    "K. Jerome",
+    "P. Howard",
+    "P. G. Wodehouse"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt Robin Hood legjellemzőbb fegyvere?",
+   "valaszok": [
+    "dárda",
+    "íj",
+    "buzogány",
+    "parittya"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt a neve a Petőfi egyik versében leírt csárdának?",
+   "valaszok": [
+    "Lóvakaró",
+    "Kutyakaparó",
+    "Hollósírató",
+    "Macskarúgta"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mikor izzik a galagonya ruhája Weöres Sándor versében?",
+   "valaszok": [
+    "amikor felpróbálja",
+    "ha tűzbe tartják",
+    "őszi éjjel",
+    "szedés közben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"mezőgazdasági dolgozó\" lesz József Attila, egyik versének címe szerint?",
+   "valaszok": [
+    "traktoros",
+    "borász",
+    "agronómus",
+    "kertész"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"ákác\" szerepel a Szép Ernő-mű címében?",
+   "valaszok": [
+    "szúrós",
+    "lila",
+    "virágzó",
+    "fehér"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen Levente szerepel Heltai Jenő művének címében?",
+   "valaszok": [
+    "kopasz",
+    "kékszakállú",
+    "néma",
+    "harsány"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen Marci Tersánszky Józsi Jenő hőse?",
+   "valaszok": [
+    "Sólyom",
+    "Kakuk",
+    "Galamb",
+    "Pinty"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen Medvebocs Micimackó Milne meséje szerint?",
+   "valaszok": [
+    "Lángoló agyvelejű",
+    "Csekélyértelmű",
+    "Teddide-teddoda",
+    "Nagyhatalmú"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen ablaka van a cifra palotának a gyermekdalban?",
+   "valaszok": [
+    "barna",
+    "kék",
+    "zöld",
+    "rácsos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen bűncselekményt követ el Édes Anna a Kosztolányi-regényben?",
+   "valaszok": [
+    "váltóhamisítást",
+    "kémkedést",
+    "gyilkosságot",
+    "orgazdaságot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen család szerepel Bálint Ágnes ifjúsági regényének címében?",
+   "valaszok": [
+    "kelekótya",
+    "széllelbélelt",
+    "szeleburdi",
+    "kótyagos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen címmel írt regényt Kosztolányi Dezső?",
+   "valaszok": [
+    "Gólya",
+    "Galamb",
+    "Pacsirta",
+    "Daru"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen ember Tímár Mihály az ismert regényben?",
+   "valaszok": [
+    "kétéltű",
+    "kőszívű",
+    "arany",
+    "sehonnai bitang"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen hajós szerepel a Verne-regény címében?",
+   "valaszok": [
+    "tiszai",
+    "dunai",
+    "sebes-körösi",
+    "hernádi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen helyiségbe fordult be Petőfi, miközben szeretett volna rágyújtani a pipájára?",
+   "valaszok": [
+    "kamrába",
+    "konyhára",
+    "kis szobába",
+    "fészerbe"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen jármű szerepel az ismert Krúdy-mű címében?",
+   "valaszok": [
+    "kék konflis",
+    "barna batár",
+    "vörös postakocsi",
+    "sárga tengeralattjáró"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen kereskedőről írt drámát Shakespeare?",
+   "valaszok": [
+    "isztambuli bazáros",
+    "velencei kalmár",
+    "genovai kufár",
+    "londoni szatócs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen kert szerepel Csehov színművének címében?",
+   "valaszok": [
+    "almás",
+    "szőlős",
+    "cseresznyés",
+    "gesztenyés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen köntös szerepel Mikszáth regényében?",
+   "valaszok": [
+    "hímzett",
+    "bélelt",
+    "beszélő",
+    "daloló"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen középutat hirdetett Horatius?",
+   "valaszok": [
+    "arany",
+    "ezüst",
+    "bronz",
+    "bádog"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen madár mondja Edgar Allan Poe versében: \"sohamár\"?",
+   "valaszok": [
+    "papagáj",
+    "holló",
+    "karvaly",
+    "varjú"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen mesehős Misi Tersánszky Józsi Jenő művében?",
+   "valaszok": [
+    "mackó",
+    "mókus",
+    "törpe",
+    "sárkány"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nemesi címet használ a füllentéseiről híres irodalmi alak Münchhausen?",
+   "valaszok": [
+    "őrgróf",
+    "báró",
+    "herceg",
+    "nádor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen polgár Molére darabjának címszereplője?",
+   "valaszok": [
+    "arany",
+    "nyárs",
+    "úrhatnám",
+    "kis"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen részekre tagolódik az eposz?",
+   "valaszok": [
+    "dalokra",
+    "énekekre",
+    "szólamokra",
+    "fejezetekre"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen színű a János vitézben szereplő Iluska haja?",
+   "valaszok": [
+    "hollófekete",
+    "rozsdavörös",
+    "gesztenyebarna",
+    "szőke"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen területen ad tanácsokat a Káma-szútra című népszerű olvasmány?",
+   "valaszok": [
+    "konyhaművészet",
+    "belsőépítészet",
+    "lóápolás",
+    "érzéki szerelem"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen városban találnak rá Ózra a mesében?",
+   "valaszok": [
+    "opál",
+    "smaragd",
+    "zafír",
+    "topáz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat Akela?",
+   "valaszok": [
+    "medve",
+    "párduc",
+    "elefánt",
+    "farkas"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állat Balu, A dzsungel könyve című regény hőse?",
+   "valaszok": [
+    "kígyó",
+    "medve",
+    "párduc",
+    "keselyű"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat a Micimackóban szereplő Füles?",
+   "valaszok": [
+    "nyúl",
+    "szamár",
+    "elefánt",
+    "spániel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat a mesehős, Zsebibaba?",
+   "valaszok": [
+    "nyúl",
+    "kenguru",
+    "medve",
+    "macska"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat a regényhős Lassie?",
+   "valaszok": [
+    "macska",
+    "kutya",
+    "bárány",
+    "nyúl"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat szerepel Mándy Iván Csutakról szóló regényének címében?",
+   "valaszok": [
+    "árva kiscica",
+    "ázott cinege",
+    "szürke ló",
+    "gombszemű puli"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen állat van a forró bádogtetőn Tennessee Williams színművének címében?",
+   "valaszok": [
+    "galamb",
+    "macska",
+    "gólya",
+    "egér"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állatokkal küzd meg Toldi Miklós a nádasban?",
+   "valaszok": [
+    "medvékkel",
+    "bikákkal",
+    "farkasokkal",
+    "vaddisznókkal"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen állatot szelídít meg a kis herceg a híres regényben?",
+   "valaszok": [
+    "oroszlánt",
+    "rókát",
+    "medvét",
+    "delfint"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek a csapdájáról szól Joseph Heller regénye?",
+   "valaszok": [
+    "a 007-es",
+    "a 22-es",
+    "a 111-es",
+    "a 424-es"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek a zsiványait vezette Robin Hood?",
+   "valaszok": [
+    "a skót felföld",
+    "a sherwoodi erdő",
+    "a déli lápvidék",
+    "a kikötőnegyed"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire használta Bagoly Füles farkát a Micimackóban?",
+   "valaszok": [
+    "ruhaszárító kötélnek",
+    "cipőpertlinek",
+    "nadrágszíjnak",
+    "csengőzsinórnak"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miről nevezte el Robinson bennszülött szolgáját?",
+   "valaszok": [
+    "egy hajóskapitányról",
+    "dédnagyapjáról",
+    "a lábméretéről",
+    "a hét egyik napjáról"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit csinál a bakterház Rideg Sándor regényének címében?",
+   "valaszok": [
+    "összedől",
+    "kigyullad",
+    "indul",
+    "érkezik"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál Ágnes asszony Arany balladájában?",
+   "valaszok": [
+    "főz",
+    "fon",
+    "vasal",
+    "mos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit csinált Petőfi egy versében, amikor befordult a konyhára?",
+   "valaszok": [
+    "bort ivott",
+    "pipázott",
+    "verset írt",
+    "almát evett"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit nem ismert a humorban Karinthy Frigyes a szállóige szerint?",
+   "valaszok": [
+    "poént",
+    "kegyelmet",
+    "pardont",
+    "tréfát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit ír Petőfi a Nemzeti dalban? \"Ide veled, …\"",
+   "valaszok": [
+    "régi büszkeségünk",
+    "régi dicsőségünk",
+    "régi buzogányunk",
+    "régi kardunk"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mivel mennek által a Tiszán a népdal szerint?",
+   "valaszok": [
+    "tutajon",
+    "kompon",
+    "bárkán",
+    "ladikon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miért nem mehet el a bálba a Péter nevű kis bálna Devecseri gyerekverse szerint?",
+   "valaszok": [
+    "nem írta meg a leckét",
+    "nincs még egy kilométer",
+    "szobafogságban van",
+    "nem tud táncolni"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Shakespeare melyik darabjában szerepel a Capulet család?",
+   "valaszok": [
+    "A velencei kalmár",
+    "A makrancos hölgy",
+    "Tévedések vígjátéka",
+    "Rómeó és Júlia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "\"Mondottam, ember: küzdj és bízva bízzál!\" Ki mondja ezt Az ember tragédiájában?",
+   "valaszok": [
+    "Ádám",
+    "Éva",
+    "Lucifer",
+    "az Úr"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Aiszóposz meséjében melyiknek volt savanyú a szőlő?",
+   "valaszok": [
+    "a rókának",
+    "a kecskének",
+    "a darunak",
+    "a békának"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Arany János versében kinek írta levelét Szilágyi Erzsébet?",
+   "valaszok": [
+    "Hunyadi Jánosnak",
+    "Hunyadi Lászlónak",
+    "Hunyadi Mátyásnak",
+    "Szilágyi Mihálynak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül ki a Fehérlófia című népmese szereplője?",
+   "valaszok": [
+    "Bokorugró",
+    "Fanyűvő",
+    "Fűvágó",
+    "Fenyődöntő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy Fekete István-mű címe?",
+   "valaszok": [
+    "Rigójárta berek",
+    "Napfényes berek",
+    "Téli berek",
+    "Illa berek"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy Jack London-regény címe?",
+   "valaszok": [
+    "A csend hangja",
+    "A dzsungel könyve",
+    "A vadon szava",
+    "Az erdő kapitánya"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy József Attila-vers címe?",
+   "valaszok": [
+    "A Marosnál",
+    "A Szamosnál",
+    "A Tiszánál",
+    "A Dunánál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy Plautus-színmű címe?",
+   "valaszok": [
+    "A szabadságos katona",
+    "A hetvenkedő katona",
+    "Az ólomkatona",
+    "A kárókatona"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az irodalom mely területén szerzett magának hírnevet Stephen King?",
+   "valaszok": [
+    "gyermekversek",
+    "horrorkönyvek",
+    "királydrámák",
+    "útleírások"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Egy tisztviselőnek melyik testrésze válik le és kezd önálló életet Gogol művében?",
+   "valaszok": [
+    "az orra",
+    "a füle",
+    "a keze",
+    "a lába"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Egészítse ki Umberto Eco világhírű krimijének a címét! \"A rózsa …\"",
+   "valaszok": [
+    "illata",
+    "tövise",
+    "színe",
+    "neve"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Egészítse ki az ismert ifjúsági regény címét! \"… és csapata\"",
+   "valaszok": [
+    "Nyilas Misi",
+    "Áts Feri",
+    "Timur",
+    "Timur Lenk"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Folytassa a Shakespeare-idézetet! \"Az vagy nekem, mi testnek a …\"",
+   "valaszok": [
+    "napfény",
+    "csók",
+    "lélek",
+    "kenyér"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy hívják Tutajos öreg barátját Fekete István Tüskevár című regényében?",
+   "valaszok": [
+    "Goriot apó",
+    "Dzsepettó mester",
+    "Csoszogi, az öreg suszter",
+    "Matula bácsi"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy hívják a főhős szolgálóját Vörösmarty Mihály Csongor és Tündéjében?",
+   "valaszok": [
+    "Balga",
+    "Bamba",
+    "Sete",
+    "Suta"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan folytatódik az idézet? \"Fülembe forró ólmot öntsetek, legyek az új, az énekes …\"",
+   "valaszok": [
+    "Koppány",
+    "Ajtony",
+    "Vazul",
+    "Vata"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan folytatódik az ismert Vörösmarty-idézet? \"Ez jó mulatság, …!\"",
+   "valaszok": [
+    "derék dolog volt",
+    "röpke játék volt",
+    "áldott élet volt",
+    "férfi munka volt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan szokás Shakespeare-t nevezni?",
+   "valaszok": [
+    "a stratfordi trubadúr",
+    "a veronai szerelmes",
+    "az avoni hattyú",
+    "a londoni oroszlán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan szól Chaucer fő művének a címe?",
+   "valaszok": [
+    "Varjúdombi mesék",
+    "Canterbury mesék",
+    "Hoffmann meséi",
+    "Rémusz bácsi meséi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol játszódik Az ember tragédiája legelső színe?",
+   "valaszok": [
+    "a mennyekben",
+    "a Paradicsomban",
+    "Egyiptomban",
+    "az Űrben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol játszódik Bohumil Hrabal capricciója?",
+   "valaszok": [
+    "Capri-szigetén",
+    "egy vonaton",
+    "egy sörgyárban",
+    "Banská Bystricán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol lakik Micimackó?",
+   "valaszok": [
+    "a kerekerdőben",
+    "az Óperenciás-tengernél",
+    "a Százholdas Pagonyban",
+    "az Üveghegyen túl"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol van a Sherlock Holmes lakásáról elhíresült Baker street?",
+   "valaszok": [
+    "Dublinban",
+    "Glasgow-ban",
+    "Londonban",
+    "Belfastban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány \"fodor van szoknyámon\" a népdal szerint?",
+   "valaszok": [
+    "7.0",
+    "13.0",
+    "20.0",
+    "33.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki Balga szerelme a Csongor és Tündében?",
+   "valaszok": [
+    "Vilma",
+    "Irma",
+    "Ilma",
+    "Hilda"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki Shakespeare Vízkeresztjének egyik szereplője Radnóti Miklós fordításában?",
+   "valaszok": [
+    "báró Tottyan Tankréd",
+    "lord Hukkan Hugó",
+    "nagytiszteletű Mottyan Manó",
+    "nemes Böffen Tóbiás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki a \"szülőatyja\" Balunak és Bagirának?",
+   "valaszok": [
+    "Milne",
+    "Kipling",
+    "Andersen",
+    "Fekete István"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki a szerzője a nagy sikerű Abigél című regénynek?",
+   "valaszok": [
+    "Galgóczi Erzsébet",
+    "Erdős Renée",
+    "Szabó Magda",
+    "Jókai Anna"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki a szerzője az alábbi soroknak? \"Ki gépen száll fölébe, annak térkép e táj …\"",
+   "valaszok": [
+    "Vörösmarty Mihály",
+    "Ady Endre",
+    "József Attila",
+    "Radnóti Miklós"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki a véres költő Kosztolányi regényében?",
+   "valaszok": [
+    "D' Annunzio",
+    "Nero",
+    "Danton",
+    "Dante"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki az a magyar király, aki Vörösmarty Szép Ilonka című versében megjelenik?",
+   "valaszok": [
+    "Mátyás",
+    "Zsigmond",
+    "Ferenc József",
+    "Nagy Lajos"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki keveredik kalandokba Arthur király udvarában Mark Twain regényében?",
+   "valaszok": [
+    "egy talján",
+    "egy jenki",
+    "egy burkus",
+    "egy hispán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem házasodott meg az alábbi irodalmi hősök közül?",
+   "valaszok": [
+    "Bornemissza Gergely",
+    "Rómeó",
+    "Oidipusz",
+    "Hamlet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem tartozott a három testőr közé Rejtő Jenő regényében?",
+   "valaszok": [
+    "Senki Alfonz",
+    "Tuskó Hopkins",
+    "Potrien",
+    "Csülök"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nyitott kutya-tárat a Harap utca három alatt a vers szerint?",
+   "valaszok": [
+    "Kutyaorrú Atanáz",
+    "Kutyafülü Aladár",
+    "Kutyaszívű Balambér",
+    "Kutyafejű Kelemen"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki szerepel egy Petőfi-vers címében az alábbiak közül?",
+   "valaszok": [
+    "az ifjú brigadéros",
+    "a meglett huszár",
+    "a koros kapitány",
+    "a vén zászlótartó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki van vérzivatarban Örkény István művének címe szerint?",
+   "valaszok": [
+    "Peti",
+    "Pisti",
+    "Sanyi",
+    "Jani"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Csokonai versének a pénzt mindennél jobban szerető hőse?",
+   "valaszok": [
+    "Pató Pál",
+    "Fösvény bátya",
+    "Zsugori uram",
+    "Kapzsi Janó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt a mondabeli Hunor és Magyar apja Arany János verse alapján?",
+   "valaszok": [
+    "Attila",
+    "Álmos",
+    "Magóg",
+    "Ménrót"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt az a 16. századi vándorénekes, aki először írta le Toldi Miklós történetét?",
+   "valaszok": [
+    "Ilosvai Selymes Péter",
+    "Bornemissza Péter",
+    "Kecskeméti Vég Mihály",
+    "Szenci Molnár Albert"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki írt balladát Vastag Margot-ról?",
+   "valaszok": [
+    "Vlagyimir Viszockij",
+    "Arany János",
+    "Francois Villon",
+    "John Milton"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki írt világhírű regényt a párizsi Notre Dame toronyőréről?",
+   "valaszok": [
+    "Honore de Balzac",
+    "Victor Hugo",
+    "Emile Zola",
+    "Gustave Flaubert"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki írta következőket? \"Oly korban éltem én e földön, mikor a költő is csak hallgatott…\"",
+   "valaszok": [
+    "Babits Mihály",
+    "Kosztolányi Dezső",
+    "József Attila",
+    "Radnóti Miklós"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kikkel találkozott bojongása során Odüsszeusz?",
+   "valaszok": [
+    "lótuszevőkkel",
+    "kókuszevőkkel",
+    "kaktuszevőkkel",
+    "krókuszevőkkel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a felesége volt Boncza Berta?",
+   "valaszok": [
+    "Arany János",
+    "Babits Mihály",
+    "Jókai Mór",
+    "Ady Endre"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a hívására tér haza Bánk bán a dráma elején?",
+   "valaszok": [
+    "Gertrúd",
+    "Melinda",
+    "Petúr bán",
+    "Tiborc"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a látogatása szerepel Dürrenmatt ismert drámájának címében?",
+   "valaszok": [
+    "a fiatal leány",
+    "az ifjú legény",
+    "az öreg hölgy",
+    "az éltes úr"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a megállítására szólít fel minket Bertolt Brecht darabjának címe?",
+   "valaszok": [
+    "Godot",
+    "Arturo Ui",
+    "a kopasz énekesnő",
+    "a szecsuáni jólélek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a művei a Tudós nők és az Úrhatnám polgár?",
+   "valaszok": [
+    "Schiller",
+    "Moliere",
+    "Shakespeare",
+    "Lope de Vega"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a művéből készült Dargay Attila Lúdas Matyi című rajzfilmje?",
+   "valaszok": [
+    "Petőfi Sándor",
+    "Arany János",
+    "Csokonai Vitéz Mihály",
+    "Fazekas Mihály"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a nyakékéről szól id. Alexandre Dumas ismert műve?",
+   "valaszok": [
+    "a királyné",
+    "a szatócsfeleség",
+    "a toszkán ékszerész",
+    "a négy muskétás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a síremléke található az egri várban?",
+   "valaszok": [
+    "Tömörkény István",
+    "Gárdonyi Géza",
+    "Bródy Sándor",
+    "Móra Ferenc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a vendége Micimackó, amikor távozáskor beszorul a kijáratba?",
+   "valaszok": [
+    "Nyuszi",
+    "Bagoly",
+    "Malacka",
+    "Kanga"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek az agyműtétjéről szól az \"Utazás a koponyám körül\" című regény?",
+   "valaszok": [
+    "Babits Mihály",
+    "Karinthy Frigyes",
+    "Jules Verne",
+    "Victor Hugo"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek az udvarát szántom fel a népköltés szerint?",
+   "valaszok": [
+    "a bíróét",
+    "a babámét",
+    "a császárét",
+    "az ispánét"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek írta Tatjana híres levelét?",
+   "valaszok": [
+    "Anyeginnek",
+    "Puskinnak",
+    "Lenszkijnek",
+    "II. Miklós cárnak"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kiről írt színművet Anton Csehov?",
+   "valaszok": [
+    "Soiness építőmesterről",
+    "Ványa bácsiról",
+    "Übü királyról",
+    "Lear királyról"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit akart felköttetni Edward király Arany János balladájában?",
+   "valaszok": [
+    "a walesi bárdokat",
+    "Montgomeryt",
+    "a lord-majort",
+    "a vis majort"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit kellett volna dicsőiteniük a walesi bárdokban Arany versében?",
+   "valaszok": [
+    "Henriket",
+    "Richárdot",
+    "Edwárdot",
+    "Györgyöt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit szólít fel Lázár Ervin mesekönyvének címében arra, hogy jöjjön haza?",
+   "valaszok": [
+    "Bruckner Szigfridet",
+    "Dömdödömöt",
+    "Mikkamakkát",
+    "Ló Szerafint"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit szólít meg József Attila Kései sirató című versében?",
+   "valaszok": [
+    "nővéreit",
+    "szerelmét",
+    "édesapját",
+    "édesanyját"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kit tekintenek a közmegállapodás szerint az Iliász és az Odüsszeia szerzőjének?",
+   "valaszok": [
+    "Anakreónt",
+    "Homéroszt",
+    "Xenophónt",
+    "Aiszkhüloszt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kitől kérdezte Petőfi: \"Ne válasszunk magunknak csillagot\"?",
+   "valaszok": [
+    "Marikától",
+    "Juliskától",
+    "Erzsikétől",
+    "Piroskától"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely romvár bús düledékeiről írt halhatatlan sorokat Kölcsey Ferenc?",
+   "valaszok": [
+    "Drégely",
+    "Szendrő",
+    "Huszt",
+    "Siklós"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely városnak volt fehér asszonya a Jókai-regény címe szerint?",
+   "valaszok": [
+    "Kassa",
+    "Beszterce",
+    "Lőcse",
+    "Bártfa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik Petőfi-versből való az idézet: \"Fázuk és éhezünk, s átlőve oldalunk\"?",
+   "valaszok": [
+    "Medvék dala",
+    "Lovak dala",
+    "Farkasok dala",
+    "Kutyák dala"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik Shakespeare-mű alapján készült Leonard Bernstein West Side Story című musicalje?",
+   "valaszok": [
+    "Othello",
+    "Rómeó és Júlia",
+    "A makrancos hölgy",
+    "Hamlet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik Shakespeare-műben tűnik fel Yorick, az egykori udvari bolond koponyája?",
+   "valaszok": [
+    "III. Richárd",
+    "V. Henrik",
+    "Hamlet",
+    "Titus Andronicus"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik bibliai szereplőről és testvéreiről írt regényt Thomas Mann?",
+   "valaszok": [
+    "Noéról",
+    "Józsefről",
+    "Dávidról",
+    "Illésről"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy Csehov dráma címe az alábbiak közül?",
+   "valaszok": [
+    "Sirály",
+    "Sas",
+    "Túzok",
+    "Albatrosz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik egy Dickens-regény címe?",
+   "valaszok": [
+    "Húsvéti kórus",
+    "Pünkösdi kantáta",
+    "Karácsonyi ének",
+    "Vízkereszt, vagy amit akartok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy Móricz-regény címe az alábbiak közül?",
+   "valaszok": [
+    "Pillangó",
+    "Éjszakai pillangó",
+    "Lepke",
+    "Lepketánc"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik egy Turgenyev-mű címe az alábbiak közül?",
+   "valaszok": [
+    "Anyák és leányok",
+    "Apák és fiúk",
+    "Anyák és fiaik",
+    "Apák és leányaik"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik híd átadása nyomán írta Arany János a Hídavatás című balladáját?",
+   "valaszok": [
+    "Lánchíd",
+    "Ferenc József híd",
+    "Margit híd",
+    "Erzsébet híd"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik irodalmi hős köt szerződést Mephistóval?",
+   "valaszok": [
+    "Phaedra",
+    "Faust",
+    "Rastignac",
+    "Raszkolnyikov"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik kártyalap szerepel egy Puskin-mű címében?",
+   "valaszok": [
+    "treff ász",
+    "kőr király",
+    "pikk dáma",
+    "káró bubi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik költőé volt a híres Kapcsos könyv?",
+   "valaszok": [
+    "Radnóti Miklós",
+    "Nagy László",
+    "Arany János",
+    "Vörösmarty Mihály"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar történelmi területről írt Móricz Zsigmond trilógiát?",
+   "valaszok": [
+    "a Felvidékről",
+    "Erdélyről",
+    "Dél-Bácskáról",
+    "Burgenlandról"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mű hőseinek története folytatódik a Kárpáthy Zoltán című regényben?",
+   "valaszok": [
+    "Egri csillagok",
+    "A kőszívű ember fiai",
+    "Egy magyar nábob",
+    "Az aranyember"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik mű kezdősora szerint van egy, csak egy legény talpon a vidéken?",
+   "valaszok": [
+    "János vitéz",
+    "A helység kalapácsa",
+    "Toldi",
+    "Buda halála"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik mű utolsó sorai a következők? \"Ötszáz énekli hangosan a vértanúk dalát?\"",
+   "valaszok": [
+    "Nemzeti dal",
+    "A XIX. század költői",
+    "Szondi két apródja",
+    "A walesi bárdok"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik műben szerepel: \"Gyarlóság, asszony a neved\"?",
+   "valaszok": [
+    "Csongor és Tünde",
+    "Pygmalion",
+    "Bánk bán",
+    "Hamlet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nagy költőnk szerelme volt Brüll Adél?",
+   "valaszok": [
+    "József Attila",
+    "Babits Mihály",
+    "Kosztolányi Dezső",
+    "Ady Endre"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik országban játszódik Miller Salemi boszorkányok című drámája?",
+   "valaszok": [
+    "USA",
+    "Franciaország",
+    "Spanyolország",
+    "Anglia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik regényalak nevelkedett egy ideig árvaházban?",
+   "valaszok": [
+    "Twist Olivér",
+    "Copperfield Dávid",
+    "Tom Sawyer",
+    "Harry Potter"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik író élte élete egy részét Indiában?",
+   "valaszok": [
+    "Rudyard Kipling",
+    "John Milton",
+    "Oscar Wilde",
+    "Charles Dickens"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi Shakespeare Rómeójának családi neve?",
+   "valaszok": [
+    "Escalus",
+    "Benvolio",
+    "Capulet",
+    "Montague"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a \"tett halála\" Az ember tragédiájából származó idézet szerint?",
+   "valaszok": [
+    "a restség",
+    "a tunyaság",
+    "az okoskodás",
+    "az arasznyi lét"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Szabó Magda leányiskolában játszódó ismert művének?",
+   "valaszok": [
+    "Alexandra",
+    "Anna",
+    "Abigél",
+    "Abiság"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Sánta Ferenc ismert művének?",
+   "valaszok": [
+    "Tíz nap",
+    "Még öt perc",
+    "Húsz óra",
+    "Csak néhány év"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Vámos Miklós közelmúltban megjelent könyvének?",
+   "valaszok": [
+    "Apáink regénye",
+    "Apák könyve",
+    "Apa csak egy van",
+    "Apák és fiúk"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a foglalkozása Édes Annának Kosztolányi regényében?",
+   "valaszok": [
+    "színésznő",
+    "cseléd",
+    "tanítónő",
+    "cukorkaárus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a neve Bánk bán feleségének a drámában?",
+   "valaszok": [
+    "Gertrúd",
+    "Melinda",
+    "Gizella",
+    "Izabella"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a neve Petőfi \"Az apostol\" című művében szereplő ifjú forradalmárnak?",
+   "valaszok": [
+    "Maximilien",
+    "Oliver",
+    "Saul",
+    "Szilveszter"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a neve Shakespeare makrancos hölgyének?",
+   "valaszok": [
+    "Anna",
+    "Kata",
+    "Viola",
+    "Olívia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a neve a Bánk bán intrikáló \"lézengő ritterének\"?",
+   "valaszok": [
+    "Solom",
+    "Petúr",
+    "Biberach",
+    "Tiborc"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a neve a Gorcsev Ivánt helyettesítő botcsinálta légiósnak a Rejtő-regényben?",
+   "valaszok": [
+    "Senki Alfonz",
+    "Tuskó Hopkins",
+    "Vanek úr",
+    "Troppauer Hümér"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a neve a Pinokkiót készítő öreg mesternek?",
+   "valaszok": [
+    "Dzsuzeppe",
+    "Dzsepetto",
+    "Dzsovánni",
+    "Dzsánkárló"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a neve a híres ifjúsági regényben a szüleiket újra összeboronáló ikerpárnak?",
+   "valaszok": [
+    "Luisa és Britta",
+    "Lotte és Luise",
+    "Brigitte és Lotte",
+    "Odett és Gitte"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi az ebédem és a vacsorám az Elindultam szép hazámból című népköltés szerint?",
+   "valaszok": [
+    "kenyér",
+    "bú",
+    "fű",
+    "szél"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi nélkül nem élhetett Móricz a regénycím alapján?",
+   "valaszok": [
+    "asszony",
+    "hét krajcár",
+    "muzsikaszó",
+    "úri muri"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi támadott föl az ismert Petőfi-vers szerint?",
+   "valaszok": [
+    "a forradalom szele",
+    "a nemzet lelkiismerete",
+    "a népek tengere",
+    "a szabadság emléke"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt Svejk beosztása a hadseregben?",
+   "valaszok": [
+    "távírdász",
+    "őrmester",
+    "tisztiszolga",
+    "közkatona"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt a virágénekek állandó témája?",
+   "valaszok": [
+    "a kertészet",
+    "a nyár",
+    "a szerelem",
+    "a méhek"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen a Paradicsom John Milton drámájában?",
+   "valaszok": [
+    "elhagyott",
+    "elveszett",
+    "megtagadott",
+    "megkapált"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen atyafiak szerepelnek Mikszáth novelláskötetének címében?",
+   "valaszok": [
+    "palóc",
+    "tót",
+    "vend",
+    "bunyevác"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen címmel írt regényt Karinthy Ferenc?",
+   "valaszok": [
+    "Római nyár",
+    "Párizsi ősz",
+    "Pétervári tél",
+    "Budapesti tavasz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen emléket emelt magának Horatius saját sorai szerint?",
+   "valaszok": [
+    "bikánál szívósabb",
+    "acélnál masszívabb",
+    "fércnél időtállóbb",
+    "ércnél maradandóbb"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen fegyverrel párbajozik Cyrano Rostand drámájában?",
+   "valaszok": [
+    "pisztoly",
+    "kard",
+    "nyíl",
+    "puska"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen irodalmi mű a pamflet?",
+   "valaszok": [
+    "népies színmű",
+    "gúnyirat",
+    "gyerekkori napló",
+    "aforizmagyűjtemény"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen kő szerepel az ismert Ady-vers címében?",
+   "valaszok": [
+    "föl-földobott",
+    "kiszáradt kútba hulló",
+    "folyóvíz csiszolta",
+    "tűzcsiholó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen madár visz üzenetet a Mátyás anyja című Arany versben?",
+   "valaszok": [
+    "galamb",
+    "bagoly",
+    "vércse",
+    "holló"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen műfajban alkotott William Shakespeare százötvennél is több művet?",
+   "valaszok": [
+    "tragédia",
+    "eposz",
+    "szonett",
+    "komédia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nemzetiségű volt a nagy meseíró, Andersen?",
+   "valaszok": [
+    "svéd",
+    "dán",
+    "német",
+    "holland"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen ruhadarab szerepel Gogol 1842-es, ismert novellájának címében?",
+   "valaszok": [
+    "kalap",
+    "köntös",
+    "köpönyeg",
+    "kamásni"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen szelek szerepelnek Emily Bronte regényének címében?",
+   "valaszok": [
+    "fényes",
+    "tomboló",
+    "üvöltő",
+    "suttogó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen szín nincs Az ember tragédiájában?",
+   "valaszok": [
+    "egyiptomi",
+    "római",
+    "athéni",
+    "perzsa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen vár szerepel Jókai Mór regényének címében?",
+   "valaszok": [
+    "kísértetlakta",
+    "névtelen",
+    "tüske",
+    "homok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat Hedvig, Harry Potter levélhordozója?",
+   "valaszok": [
+    "galamb",
+    "kutya",
+    "bagoly",
+    "macska"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen állat Rocinante?",
+   "valaszok": [
+    "róka",
+    "tehén",
+    "kecske",
+    "ló"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állat a Fekete István történetéből ismert Lutra?",
+   "valaszok": [
+    "hód",
+    "vidra",
+    "cickány",
+    "tengerimalac"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat szerepel Petőfi Arany Lacinak írt versében?",
+   "valaszok": [
+    "nyúl",
+    "bárány",
+    "mókus",
+    "ürge"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állat szerepel Petőfi Sándor Arany Lacihoz című versében?",
+   "valaszok": [
+    "fecske",
+    "ürge",
+    "üregi nyúl",
+    "kutya"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állatokkal utazott Nils Holgersson?",
+   "valaszok": [
+    "fecskékkel",
+    "sirályokkal",
+    "keselyűkkel",
+    "ludakkal"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek az ostromáról írt regényt Mikszáth Kálmán?",
+   "valaszok": [
+    "Drégely",
+    "Eger",
+    "Beszterce",
+    "Szigetvár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minek az édes madaráról írt drámát Tennesse Williams?",
+   "valaszok": [
+    "a vágy",
+    "az ügynök",
+    "a boldogság",
+    "az ifjúság"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit kérdezett a feldúlt Othello Desdemonától a végzetes tett előtt?",
+   "valaszok": [
+    "Járt-e nálad Cassio?",
+    "Mit főztél?",
+    "Írtál-e végrendeletet?",
+    "Imádkoztál-e?"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit nyilazott le a fia fejéről Tell Vilmos?",
+   "valaszok": [
+    "egy körtét",
+    "egy almát",
+    "egy diót",
+    "a sapkáját"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit veszít el Jumurdzsák az Egri csillagokban?",
+   "valaszok": [
+    "az amulettjét",
+    "a jatagánját",
+    "a hitét",
+    "a kaftánját"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mivel mutatta az utat Toldi Miklós Buda felé Laczfi nádornak?",
+   "valaszok": [
+    "vasvillával",
+    "nehéz rúddal",
+    "karddal",
+    "iránytűvel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik bírósági kifejezés egy Kafka-regény címe is?",
+   "valaszok": [
+    "A vádlott",
+    "A per",
+    "A tárgyalás",
+    "A bizonyíték"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy Gogol-mű címe?",
+   "valaszok": [
+    "Egy kozák harcai",
+    "Egy komisszár feljegyzései",
+    "Egy muzsik élete",
+    "Egy őrült naplója"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy Szerb Antal regény címe?",
+   "valaszok": [
+    "A Forsyte Saga",
+    "A Pendragon-legenda",
+    "A Thibault család",
+    "A Buddenbrook-ház"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy népszerű Zilahy-regény címe?",
+   "valaszok": [
+    "Valamit súg a szél",
+    "Valamit visz a víz",
+    "Valamit suttog a fenyves",
+    "Valamit álmodik a nyomor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az év mely ünnepnapján született Petőfi Sándor?",
+   "valaszok": [
+    "újévkor",
+    "húsvét vasárnapján",
+    "pünkösdkor",
+    "karácsony este"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Folytassa az Ady-vers címét! \"Páris, az én …\"",
+   "valaszok": [
+    "Mecsekem",
+    "Hortobágyom",
+    "Bakonyom",
+    "Börzsönyöm"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy hívták József Attila édesanyját?",
+   "valaszok": [
+    "Hrúz Mária",
+    "Mauks Ilona",
+    "Pőcze Borbála",
+    "Nagy Bella"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy hívták Petőfi Sándor fiát?",
+   "valaszok": [
+    "István",
+    "Zoltán",
+    "László",
+    "András"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan halt meg Puskin?",
+   "valaszok": [
+    "tüdőbajban",
+    "párbajban",
+    "öngyilkos lett",
+    "a cár kivégeztette"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan szól a Rousseau-nak tulajdonított szállóige?",
+   "valaszok": [
+    "Arccal a királyság felé!",
+    "Arccal a népuralom felé!",
+    "Vissza a természethez!",
+    "Vissza a természetből!"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol halt meg József Attila?",
+   "valaszok": [
+    "Balatonfüreden",
+    "Balatonszabadiban",
+    "Balatonszéplakon",
+    "Balatonszárszón"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol járt a mesehősnő Alice?",
+   "valaszok": [
+    "Sehol-szigeten",
+    "Sohaországban",
+    "Csodaországban",
+    "Smaragdvárosban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol játszódik Szabó Magda Abigél című regénye?",
+   "valaszok": [
+    "kolostorban",
+    "leányiskolában",
+    "színházban",
+    "börtönben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol játszódik a Tamás bátya kunyhója című regény?",
+   "valaszok": [
+    "Angliában",
+    "Egyiptomban",
+    "Amerikában",
+    "Indiában"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol született Arany János?",
+   "valaszok": [
+    "Szklabonyán",
+    "Érmindszenten",
+    "Nagyszalontán",
+    "Sztregován"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol volt gimnáziumi tanár Arany János?",
+   "valaszok": [
+    "Nagyszalontán",
+    "Kisújszálláson",
+    "Nagykőrösön",
+    "Aradon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol végez az életével Anna Karenina a Tolsztoj-regényben?",
+   "valaszok": [
+    "egy kertben",
+    "egy pályaudvaron",
+    "egy szalonban",
+    "egy vadászaton"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol zöldell a nyárfa szeptember végén Petőfi versében?",
+   "valaszok": [
+    "a hegy tetején",
+    "a kertek alatt",
+    "az ablak előtt",
+    "az út elején"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Honnan indul Phileas Fogg 80 napos Föld körüli útjára?",
+   "valaszok": [
+    "Párizsból",
+    "Berlinből",
+    "Londonból",
+    "New Yorkból"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Honnan származik az idézet? \"Ha per, úgymond, hadd legyen per!\"",
+   "valaszok": [
+    "Tizenkét dühös ember",
+    "A fülemile",
+    "Bevezetés a bűntetőjogba",
+    "Sári bíró"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hová tart kosárral a kezében József Attila édesanyja a Mama című versben?",
+   "valaszok": [
+    "a kertbe",
+    "a kamrába",
+    "a padlásra",
+    "a boltba"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány farkassal küzdött meg a nádasban Toldi Miklós Arany János művében?",
+   "valaszok": [
+    "eggyel",
+    "kettővel",
+    "hárommal",
+    "kilencvenkilenccel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány fokos lázban ég József Attila a Kései sirató című versében?",
+   "valaszok": [
+    "36.0",
+    "38.0",
+    "39.0",
+    "40.0"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány lánya van Lear királynak Shakespeare művében?",
+   "valaszok": [
+    "egy",
+    "kettő",
+    "három",
+    "öt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki Mario Thomas Mann ismert novellájában?",
+   "valaszok": [
+    "szanatóriumi beteg",
+    "varázsló",
+    "nyaraló vendég",
+    "fiatal pincér"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki a főhőse Moliere A fösvény című darabjának?",
+   "valaszok": [
+    "Pangloss",
+    "Harpagon",
+    "Tartuffe",
+    "Alceste"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki a szerzője Az éneklő kutya című regénynek?",
+   "valaszok": [
+    "Charles Dickens",
+    "Mark Twain",
+    "Oscar Wilde",
+    "Jack London"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki gyilkol meg egy uzsorásnőt az orosz irodalomban?",
+   "valaszok": [
+    "Platonov",
+    "Kosztiljov",
+    "Raszkolnyikov",
+    "Rasztakovszkij"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki mondja a drámában? \"Temetni jöttem Caesart, nem dicsérni.\"",
+   "valaszok": [
+    "Kleopátra",
+    "Antonius",
+    "Brutus",
+    "Cassius"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem Shakespeare-címszereplő az alábbiak közül?",
+   "valaszok": [
+    "III. Richard",
+    "VIII. Henrik",
+    "Julius Caesar",
+    "Cornelius Scipio"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem tartozott a népi írók mozgalmához az alábbiak közül?",
+   "valaszok": [
+    "Illyés Gyula",
+    "Féja Géza",
+    "Veres Péter",
+    "Krúdy Gyula"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem volt a francia felvilágosodás vezető személyisége?",
+   "valaszok": [
+    "Diderot",
+    "Mazarin",
+    "Rousseau",
+    "Voltaire"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem volt a kőszívű ember fia?",
+   "valaszok": [
+    "Ödön",
+    "Richárd",
+    "Ottó",
+    "Jenő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki siratja Mexikót Passuth regényének címe szerint?",
+   "valaszok": [
+    "Cortez",
+    "Esőisten",
+    "Napisten",
+    "Montezuma"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki vett feleségül egy nála több mint ötven évvel fiatalabb lányt?",
+   "valaszok": [
+    "Vörösmarty Mihály",
+    "Arany János",
+    "Mikszáth Kálmán",
+    "Jókai Mór"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt Daniel Dafoe hőse?",
+   "valaszok": [
+    "Gulliver",
+    "dr. Jekyll",
+    "Robinson",
+    "Frankenstein"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt József Attila versében \"fehérek közt egy európai\"?",
+   "valaszok": [
+    "Friedrich Dürrenmatt",
+    "Arthur Miller",
+    "Louis Aragon",
+    "Thomas Mann"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki érkezik Tótékhoz Örkény István művében?",
+   "valaszok": [
+    "egy dobozgyáros",
+    "egy amerikai rokon",
+    "egy adóellenőr",
+    "egy őrnagy"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki írt monumentális regényt a bibliai József és testvérei történetéről?",
+   "valaszok": [
+    "Robert Musil",
+    "Lion Feuchtwanger",
+    "Thomas Mann",
+    "Franz Werfel"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki írt világhírű művet Dorian Gray arcképéről?",
+   "valaszok": [
+    "Oscar Wilde",
+    "Honoré de Balzac",
+    "George Bernard Shaw",
+    "Edmond Rostand"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik a címszereplői Schiller színművének?",
+   "valaszok": [
+    "bakók",
+    "lovagok",
+    "haramiák",
+    "vásározók"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik ellen védte meg Franciaországot János vitéz?",
+   "valaszok": [
+    "óriások",
+    "griffmadarak",
+    "törökök",
+    "tatárok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a nevéhez fűződik a Micimackó magyar fordítása?",
+   "valaszok": [
+    "Tóth Árpád",
+    "Arany János",
+    "Karinthy Frigyes",
+    "Nemes Nagy Ágnes"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a regényéből készült a \"La Mancha lovagja\" című musical?",
+   "valaszok": [
+    "Victor Hugo",
+    "Cervantes",
+    "Boccaccio",
+    "Dickens"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a testamentumáról szól Fekete István ifjúsági regénye?",
+   "valaszok": [
+    "a budai pasa",
+    "a török szultán",
+    "a koppányi aga",
+    "az isztambuli janicsár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a virágvasárnapjáról szól Sütő András drámája?",
+   "valaszok": [
+    "egy juhászbojtár",
+    "egy havasi pásztor",
+    "egy lócsiszár",
+    "egy agg székely"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek az unokája Ady Endre az ismert vers szerint?",
+   "valaszok": [
+    "Koppány vezér",
+    "Árpád fejedelem",
+    "Dózsa György",
+    "Esze Tamás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek az édesanyja volt Ercsey Julianna?",
+   "valaszok": [
+    "Arany János",
+    "Arany László",
+    "Ady Endre",
+    "Vörösmarty Mihály"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek az önéletrajzi írása a Fogságom naplója?",
+   "valaszok": [
+    "Balassi Bálint",
+    "Kölcsey Ferenc",
+    "Kazinczy Ferenc",
+    "Zrínyi Miklós"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek az üdvözlését örökíti meg egy ismert József Attila-vers címe?",
+   "valaszok": [
+    "Lev Tolsztoj",
+    "Makszim Gorkij",
+    "Thomas Mann",
+    "Stefan Zweig"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek jósolta meg királyi címét három boszorkány Shakespeare egyik drámájában?",
+   "valaszok": [
+    "III. Richárdnak",
+    "VIII. Henriknek",
+    "Macbethnek",
+    "Hamletnek"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kiről szól Kodolányi János Az égő csipkebokor című műve?",
+   "valaszok": [
+    "Julianus barátról",
+    "Mózesről",
+    "Keresztelő Szent Jánosról",
+    "Szent Lászlóról"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiről írta Petőfi? \"Izzó vastrónon őt elégetétek, de szellemét a tűz nem égeté meg.\"",
+   "valaszok": [
+    "Szent Johanna",
+    "Giordano Bruno",
+    "Loyolai Szent Ignác",
+    "Dózsa György"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kit gyilkol meg Bánk bán a drámában?",
+   "valaszok": [
+    "a királyt",
+    "a királynét",
+    "Petúr bánt",
+    "Tiborcot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit találnak holtan a radványi sötét erdőben Arany balladájában?",
+   "valaszok": [
+    "Kund Abigélt",
+    "Bárczi Benőt",
+    "Szondi két apródját",
+    "Zách Klárát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Meddig égnek a gyertyák Márai Sándor könyvének címe szerint?",
+   "valaszok": [
+    "hajnalig",
+    "a kanóc végéig",
+    "olvadásig",
+    "csonkig"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mely város bírája volt Robin Hood ádáz ellensége?",
+   "valaszok": [
+    "Manchester",
+    "Nottingham",
+    "York",
+    "Birmingham"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik Jókai-regény szereplője a kettős élelet élő Fatia Negra?",
+   "valaszok": [
+    "Rab Ráby",
+    "Sárga rózsa",
+    "Szegény gazdagok",
+    "Gazdag szegények"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy ismert Shakespeare-mű címe?",
+   "valaszok": [
+    "Tavaszi történet",
+    "Nyári monda",
+    "Őszi legenda",
+    "Téli rege"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy rövid, csattanóval végződő irodalmi műfaj?",
+   "valaszok": [
+    "elégia",
+    "eposz",
+    "epigramma",
+    "episztola"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy rövid, vidám, csattanós irodalmi alkotás?",
+   "valaszok": [
+    "adoma",
+    "elégia",
+    "burleszk",
+    "gesta"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik egy szigorú szabályok szerint szerkesztett, virtuóz versciklus elnevezése?",
+   "valaszok": [
+    "balladafüzés",
+    "szonettkoszorú",
+    "dalcsokor",
+    "ódavirág"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik elnevezéssel szokás Jókai Mórt illetni?",
+   "valaszok": [
+    "a nemzet tollnoka",
+    "a nagy mesemondó",
+    "a történelem hírmondója",
+    "a pillanat művésze"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik hegy hava szerepel Hemingway művének címében?",
+   "valaszok": [
+    "Mont Blanc",
+    "Fudzsijama",
+    "Himalája",
+    "Kilimandzsáró"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik híres alföldi betyár életéről írt regényt Móricz Zsigmond?",
+   "valaszok": [
+    "Anagyl Bandi",
+    "Sobri Jóska",
+    "Savanyú Jóska",
+    "Rózsa Sándor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik irodalmi műben szerepel az idézet? \"Messze jövendővel komolyan vess öszve jelenkort…\"",
+   "valaszok": [
+    "Szózat",
+    "Himnusz",
+    "Huszt",
+    "Gondolatok a könyvtárban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ismert vadnyugati regény szereplője Old Shatterhand?",
+   "valaszok": [
+    "Az utolsó mohikán",
+    "Winnetou",
+    "Bőrharisnya",
+    "Vadölő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik költő nem a XX. században alkotott?",
+   "valaszok": [
+    "Szilágyi Domokos",
+    "Weöres Sándor",
+    "Vas István",
+    "Reviczky Gyula"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik költőnk tartozott a Nyugat első generációjához?",
+   "valaszok": [
+    "Vajda János",
+    "Kosztolányi Dezső",
+    "Nemes Nagy Ágnes",
+    "Weöres Sándor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik magyar író visszatérő hőse Szindbád?",
+   "valaszok": [
+    "Móricz Zsigmond",
+    "Krúdy Gyula",
+    "Jókai Mór",
+    "Gárdonyi Géza"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mesét nem Andersen írta?",
+   "valaszok": [
+    "A rút kiskacsa",
+    "A hókirálynő",
+    "A rendíthetetlen ólomkatona",
+    "A tücsök és a hangya"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik mű szereplője Dulcinea?",
+   "valaszok": [
+    "Gulliver utazásai",
+    "Üvöltő szelek",
+    "Don Quijote",
+    "Búcsú a fegyverektől"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik műből származik a szállóige? \"Régi dicsőségünk, hol késel az éji homályban?\"",
+   "valaszok": [
+    "Huszt",
+    "Föltámadott a tenger",
+    "A magyarokhoz",
+    "Zalán futása"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem Vörösmarty Csongor és Tündéjében szereplő ördögfi neve?",
+   "valaszok": [
+    "Kurrah",
+    "Bezzegh",
+    "Duzzog",
+    "Berreh"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem egy Shakespeare-királydráma címe?",
+   "valaszok": [
+    "V. Henrik",
+    "III. Richárd",
+    "VIII. Henrik",
+    "I. Erzsébet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik regényhős börtönviselt az alábbiak közül?",
+   "valaszok": [
+    "Don Quijote",
+    "Hans Castorp",
+    "Jean Valjean",
+    "Rezeda Kázmér"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik regényszereplő keltette életre a saját teremtményét?",
+   "valaszok": [
+    "dr. Jekyll",
+    "Mr. Hyde",
+    "Frankenstein",
+    "Drakula"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik regényszereplő olvasott fel naponta egy órát a vak Pósalaky úrnak?",
+   "valaszok": [
+    "Kakukk Marci",
+    "Nyilas Misi",
+    "Nemecsek Ernő",
+    "Tóth Mihály"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik regényt írta Steinbeck az alábbiak közül?",
+   "valaszok": [
+    "Távol Afrikától",
+    "Édentől keletre",
+    "Észak Dél ellen",
+    "Pekingi ősz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágról írt kritikus hangú könyvet Végh Antal \"Gyógyít(6)atlan?\" címmel?",
+   "valaszok": [
+    "öttusa",
+    "díjlovaglás",
+    "szertorna",
+    "labdarúgás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik versben szerepel a \"sehonnai bitang ember\"?",
+   "valaszok": [
+    "Himnusz",
+    "Nemzeti dal",
+    "Szózat",
+    "Pató Pál úr"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik versben szerepel az idézet? \"Elhull a virág, eliramlik az élet...\"",
+   "valaszok": [
+    "Reszket a bokor, mert...",
+    "Minek nevezzelek...",
+    "Szabadság, szerelem!",
+    "Szeptember végén"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik város Mikszáth fekete városa?",
+   "valaszok": [
+    "Kassa",
+    "Lőcse",
+    "Késmárk",
+    "Eperjes"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban játszódik Móricz Zsigmond Légy jó mindhalálig című regénye?",
+   "valaszok": [
+    "Szeged",
+    "Sárospatak",
+    "Debrecen",
+    "Pápa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik évszám szerepel Orwell világhírű regényének címében?",
+   "valaszok": [
+    "2001.0",
+    "1793.0",
+    "1984.0",
+    "1516.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik írónak volt a testvére is és a fia is író?",
+   "valaszok": [
+    "Thomas Mann",
+    "Arthur Miller",
+    "Graham Greene",
+    "Victor Hugo"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi Móricz Zsigmond regényének címe?",
+   "valaszok": [
+    "Testvérek",
+    "Rokonok",
+    "Barátok",
+    "Szomszédok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi Willy Loman foglalkozása Arthur Miller közismert drámájában?",
+   "valaszok": [
+    "katona",
+    "orvos",
+    "ügynök",
+    "író"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a boszorkány neve Vörösmarty művében, a Csongor és Tündében?",
+   "valaszok": [
+    "Bibircsók",
+    "Varangy",
+    "Mirígy",
+    "Banya"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe John Steinbeck regényének: Egerek és …?",
+   "valaszok": [
+    "egérfogók",
+    "sajtok",
+    "emberek",
+    "macskák"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Szabó Magda népszerű meseregényének?",
+   "valaszok": [
+    "Tündér Panna",
+    "Tündér Terka",
+    "Tündér Palkó",
+    "Tündér Lala"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a neve a Georges Simenon regényeiből ismert felügyelőnek?",
+   "valaszok": [
+    "Poirot",
+    "Columbo",
+    "Maigret",
+    "Derrick"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a neve a finn népi eposz, a Kalevala főszereplőjének?",
+   "valaszok": [
+    "Mika Waltari",
+    "Mauno Koivisto",
+    "Vejnemöjnen",
+    "Paavo Nurmi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a neve az Óz, a csodák csodája című mesében szereplő kislánynak?",
+   "valaszok": [
+    "Tiffany",
+    "Dorothy",
+    "Susie",
+    "Bessie"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi az élet tanítómestere a latin mondás szerint?",
+   "valaszok": [
+    "a természet",
+    "a történelem",
+    "a művészet",
+    "az álom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt Gulliver foglalkozása Swift művében?",
+   "valaszok": [
+    "hajóskapitány",
+    "hajószakács",
+    "hajóorvos",
+    "matróz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt Pató Pál úr kedvenc mondata?",
+   "valaszok": [
+    "Én magyar nemes vagyok!",
+    "Ej mi a kő!",
+    "Ej, ráérünk arra még!",
+    "Még kér a nép!"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt Setét Lajos foglalkozása Heltai A néma levente című művében?",
+   "valaszok": [
+    "hóhér",
+    "udvari bolond",
+    "brigadéros",
+    "szolga"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi volt a keresztneve a Pál utcai fiúk vezérének, Bokának?",
+   "valaszok": [
+    "Ferenc",
+    "Ernő",
+    "Róbert",
+    "János"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miknek a hőse Hűbele Balázs Arany László műve szerint?",
+   "valaszok": [
+    "zord idők",
+    "délibábok",
+    "hideg napok",
+    "úri murik"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miknek a városáról írt Rejtő Jenő a mű címe szerint?",
+   "valaszok": [
+    "rozsdás bajonettek",
+    "szunnyadó szuronyok",
+    "néma revolverek",
+    "megkukult coltok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor játszódik Csokonai Dorottya című komikus eposza?",
+   "valaszok": [
+    "vízkereszt napján",
+    "farsangkor",
+    "szüretkor",
+    "karácsonykor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mikor keletkeztek a gesták?",
+   "valaszok": [
+    "az őskorban",
+    "az ókorban",
+    "a középkorban",
+    "az újkorban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"szép üzenetet\" írt Ady Endre Lédának?",
+   "valaszok": [
+    "életre szóló",
+    "elbocsátó",
+    "álombéli",
+    "meg nem vallott"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen avatás szerepel az ismert Arany János-vers címében?",
+   "valaszok": [
+    "hajó",
+    "híd",
+    "lakás",
+    "ház"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen címen írta meg Dumas A három testőr folytatását?",
+   "valaszok": [
+    "A fekete tulipán",
+    "Húsz év múlva",
+    "A királyné nyakéke",
+    "Monte-Christo grófja"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen címmel nem írt színdarabot Neil Simon?",
+   "valaszok": [
+    "Mezítláb a parkban",
+    "Furcsa pár",
+    "A Napsugár fiúk",
+    "A miniszter félrelép"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen címmel írt regénytrilógiát Thomas Mann?",
+   "valaszok": [
+    "Ráchel és Rebeka",
+    "Lót és lányai",
+    "József és testvérei",
+    "Ézsau és Jakab"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen ember a Moliere-hős Harpagon, a színdarab címe szerint?",
+   "valaszok": [
+    "képzelt beteg",
+    "fösvény",
+    "úrhatnám",
+    "álszent"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen indiánok leszármazottja Csingacsguk, J. F. Cooper regényeinek hőse?",
+   "valaszok": [
+    "mohikánok",
+    "dakoták",
+    "apacsok",
+    "irokézek"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen kiállítás szerepel egy Örkény-mű címében?",
+   "valaszok": [
+    "kökörcsin",
+    "pipacs",
+    "árvácska",
+    "rózsa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen kísértetről írt Oscar Wilde elbeszélést?",
+   "valaszok": [
+    "canterbury",
+    "canterville-i",
+    "edgehille-i",
+    "strawberry"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen láng szerepel Illyés Gyula drámájának címében?",
+   "valaszok": [
+    "gyertya",
+    "fáklya",
+    "lidérc",
+    "szalma"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen madarak násza szerepel egy ismert Ady-vers címében?",
+   "valaszok": [
+    "sas",
+    "héja",
+    "keselyű",
+    "vércse"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen madár szeretne lenni Weöres Sándor a Buba éneke című versben? \"Ó, ha … volnék\"",
+   "valaszok": [
+    "fecske",
+    "páva",
+    "rigó",
+    "cinke"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen műfajban jeleskedett az ókori irodalom neves képviselője, Szophoklész?",
+   "valaszok": [
+    "óda",
+    "eposz",
+    "tragédia",
+    "epigramma"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nyelven írta műveit a középkori történetíró, Bonfini?",
+   "valaszok": [
+    "németül",
+    "franciául",
+    "görögül",
+    "latinul"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen nyelven íródott Janus Pannonius életműve?",
+   "valaszok": [
+    "németül",
+    "latinul",
+    "görögül",
+    "magyarul"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen sors szerepel Solohov kisregényének címében?",
+   "valaszok": [
+    "bosszúálló",
+    "emberi",
+    "gondolkodó",
+    "kiszámíthatatlan"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen származású volt a híres drámaíró, Lope de Vega?",
+   "valaszok": [
+    "portugál",
+    "spanyol",
+    "mexikói",
+    "kubai"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen szörnyeteg a féltékenység Shakespeare szerint?",
+   "valaszok": [
+    "emberevő",
+    "önmagát felfaló",
+    "zöld szemű",
+    "hétfejű"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen természetrajz szerepel Nagy Lajos humoros művének a címében?",
+   "valaszok": [
+    "képes",
+    "képtelen",
+    "hasznos",
+    "haszontalan"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat Moby Dick?",
+   "valaszok": [
+    "oroszlán",
+    "bálna",
+    "medve",
+    "elefánt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat nem címszereplője egy Fekete István-regénynek sem?",
+   "valaszok": [
+    "róka",
+    "kutya",
+    "fecske",
+    "vaddisznó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek \"asszony a neve\" Hamlet szerint?",
+   "valaszok": [
+    "zsémbesség",
+    "gyarlóság",
+    "bujaság",
+    "hiúság"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit javasol Hamlet Opheliának az Arany János-féle fordításban?",
+   "valaszok": [
+    "imádkozzon többszőr",
+    "legyen csábítóbb",
+    "költözzön haza anyjához",
+    "vonuljon kolostorba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit kért a szállóige szerint Goethe a halálos ágyán?",
+   "valaszok": [
+    "egy pohár vizet",
+    "feloldozást",
+    "hatalmat a népnek",
+    "több fényt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit nevez Csokonai földiekkel játszó égi tüneménynek?",
+   "valaszok": [
+    "a visszhangot",
+    "az álmot",
+    "a reményt",
+    "a hitet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit tesz a cím szerint Piszkos Fred Fülig Jimmy őszinte sajnálatára?",
+   "valaszok": [
+    "pofozkodik",
+    "visszatér",
+    "közbelép",
+    "olajra lép"
+   ],
+   "helyes": 2
+  }
+ ]
+}

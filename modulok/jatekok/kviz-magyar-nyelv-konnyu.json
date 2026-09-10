@@ -1,0 +1,9248 @@
+{
+ "id": "kviz-magyar-nyelv-konnyu",
+ "nev": "Magyar nyelv — könnyebb",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "A lusta ember melyik testrészére süt a nap a mondás szerint?",
+   "valaszok": [
+    "fejére",
+    "hátára",
+    "hasára",
+    "talpára"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A mondás szerint miben szerencsés az, aki szerencsétlen a kártyában?",
+   "valaszok": [
+    "a kockában",
+    "a lóversenyben",
+    "a szerelemben",
+    "a lutriban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A mondás szerint mit \"kötnek a talpára\" annak, akit elküldenek?",
+   "valaszok": [
+    "csalánt",
+    "banánhéjat",
+    "útilaput",
+    "szamártövist"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A szólás szerint mi \"savanyú\" annak, aki nem tud elérni valamit?",
+   "valaszok": [
+    "a szilva",
+    "az uborka",
+    "a káposzta",
+    "a szőlő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A szólás szerint mire épít az, aki bizonytalan dologra alapoz?",
+   "valaszok": [
+    "vízre",
+    "üvegre",
+    "homokra",
+    "papírra"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A szólás szerint mit csinálnak a nem kívánt kérővel?",
+   "valaszok": [
+    "kiseprűzik",
+    "kikosarazzák",
+    "megvesszőzik",
+    "kiklopfolják"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik a kukorica egyik népi elnevezése?",
+   "valaszok": [
+    "tavi",
+    "tengeri",
+    "folyami",
+    "pataki"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy konyhai eszköz neve?",
+   "valaszok": [
+    "tökfedő",
+    "tökgyalu",
+    "tökkobak",
+    "tökráspoly"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy tréfás dorgálás?",
+   "valaszok": [
+    "macskanyávogta",
+    "galambbúgta",
+    "ebugatta",
+    "libagágogta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Egészítse ki a közmondást! \"..., búsuljon a ló!\"",
+   "valaszok": [
+    "elfogyott a zab",
+    "négy lába van",
+    "nagy a feje",
+    "meghízott a huszár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Egészítse ki a közmondást! \"Ha fénylik Vince, megtelik a ...\"",
+   "valaszok": [
+    "bugyelláris",
+    "pocak",
+    "puttony",
+    "pince"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Egészítse ki a mondást! \" ... enged, ... szenved.\"",
+   "valaszok": [
+    "okos-butus",
+    "okos-szamár",
+    "szamár-öszvér",
+    "erős-gyenge"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Egészítse ki a mondást! \"Akinek nem inge, ...\"",
+   "valaszok": [
+    "annak bugyogója",
+    "ne vegye magára",
+    "ne varrjon rá gombot",
+    "ne hordja el másét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Egészítse ki a mondást! \"Ember embernek …\"",
+   "valaszok": [
+    "igáslova",
+    "hatökre",
+    "keselyűje",
+    "farkasa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Egészítse ki a mondást! \"Helyes a bőgés, …\"",
+   "valaszok": [
+    "tigris",
+    "oroszlán",
+    "tehén",
+    "kakadu"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Egészítse ki a mondást! \"Tudja, hol szorít …\"",
+   "valaszok": [
+    "az idő",
+    "a derékszíj",
+    "a cipő",
+    "a vasmarok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Eltűnik, mint a kámfor - tartja a mondás; de mi a kámfor?",
+   "valaszok": [
+    "trópusi rovar",
+    "külföldi pénznem",
+    "kristályos vegyület",
+    "alföldi betyár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Fejezze be a mondást: \"Aki a virágot szereti, rossz ...\"",
+   "valaszok": [
+    "kertész nem lehet",
+    "ember nem lehet",
+    "kedve nem lehet",
+    "embert nem ehet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Fejezze be a szólást: \"A kecske is jóllakik, ...\"",
+   "valaszok": [
+    "mert megnyalta a sót",
+    "a gida is gömbölyödik",
+    "a káposzta is megmarad",
+    "a karalábé is elfogy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Folytassa a mondást! \"Akkor lássam, amikor …!\"",
+   "valaszok": [
+    "a Duna fenekét",
+    "a hátam közepét",
+    "az ángyom térdkalácsát",
+    "az ispán poroszlóját"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Folytassa a mondást! \"Ki mint veti ágyát, ...\"",
+   "valaszok": [
+    "úgy arat",
+    "úgy alussza álmát",
+    "addig nyújtózkodik",
+    "olyan a fogadjisten"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ha valakit erősen ócsárolunk, akkor szidjuk, mint a ...",
+   "valaszok": [
+    "Bochkort",
+    "Borost",
+    "bokrot",
+    "borzot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezi a költői nyelv a szép ívelésű női nyakat?",
+   "valaszok": [
+    "zsiráfnyak",
+    "tyúknyak",
+    "hattyúnyak",
+    "angyalnyak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezi a köznyelv a szem körüli, apró ráncot?",
+   "valaszok": [
+    "versláb",
+    "gyólyaláb",
+    "kamatláb",
+    "szarkaláb"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezi a köznyelv tréfásan az ostoba embert?",
+   "valaszok": [
+    "háromtehén",
+    "négyborjú",
+    "ötmarha",
+    "hatökör"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezi a népnyelv a bonyolult, erőltetett dolgokat?",
+   "valaszok": [
+    "nyelvepörgött",
+    "ujjacsavart",
+    "füleforgott",
+    "nyakatekert"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezi a népnyelv a lusta embert?",
+   "valaszok": [
+    "csillagcsenő",
+    "bolygóbitorló",
+    "holdrabló",
+    "naplopó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezi a népnyelv a nagy, elálló fülü embert?",
+   "valaszok": [
+    "ásófülű",
+    "kapafülű",
+    "kaszafülű",
+    "lapátfülű"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezi a népnyelv a nagyon vékony hangot?",
+   "valaszok": [
+    "fonal",
+    "madzag",
+    "cérna",
+    "spárga"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezi a népnyelv a nehéz helyzetben gyorsan megoldást találó embert?",
+   "valaszok": [
+    "orrabukott",
+    "hasraesett",
+    "fejreesett",
+    "talpraesett"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezi a népnyelv a reményeiben csalódott, letört személyt?",
+   "valaszok": [
+    "tollatépett",
+    "karmakopott",
+    "csőrecsonkolt",
+    "szárnyaszegett"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezi a népnyelv az agyafúrt kópét?",
+   "valaszok": [
+    "szitakötő",
+    "kefekötő",
+    "kerékkötő",
+    "lókötő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezi a népnyelv az értetlen, ostoba embert?",
+   "valaszok": [
+    "vasarcú",
+    "betonagyú",
+    "kőeszű",
+    "fafejű"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezi a népnyelv gúnyosan az ostoba embert?",
+   "valaszok": [
+    "makkfilkó",
+    "babfilkó",
+    "rozsfilkó",
+    "tökfilkó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezi a népnyelv tréfásan a buta embert?",
+   "valaszok": [
+    "makkalsújtott",
+    "babbalbúbolt",
+    "mákkalpüfölt",
+    "tökkelütött"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezi a népnyelv tréfásan a nagyétkű, falánk embert?",
+   "valaszok": [
+    "gyomorhangya",
+    "bendőbogár",
+    "pocakcincér",
+    "haspók"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezi a népnyelv tréfásan a pofont?",
+   "valaszok": [
+    "halászlé",
+    "barátfüle",
+    "madártej",
+    "nyakleves"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik a fiatal, éretlen fiút?",
+   "valaszok": [
+    "túrósbajszú",
+    "tejszínesvállú",
+    "vajasfülű",
+    "tejfölösszájú"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik a hódító szépségként viselkedő piperkőc férfit?",
+   "valaszok": [
+    "bájkappan",
+    "bájgácsér",
+    "bájbika",
+    "bájgúnár"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik a kicsi, borulékony csónakot?",
+   "valaszok": [
+    "lélekemelő",
+    "lékhajó",
+    "lélekvesztő",
+    "lélekharang"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik a kimerültségtől árnyékolt szemet?",
+   "valaszok": [
+    "kockás",
+    "gyűrűs",
+    "köríves",
+    "karikás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik a len gerebenezésekor fennmaradó összegubancolódott szálak csomóját?",
+   "valaszok": [
+    "póc",
+    "kanóc",
+    "daróc",
+    "kóc"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik a makacs embert?",
+   "valaszok": [
+    "lábas",
+    "kezes",
+    "nyakas",
+    "hasas"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik a nyilvános szerepléssel járó izgalmat?",
+   "valaszok": [
+    "gyertyaláz",
+    "függönyfrász",
+    "lámpaláz",
+    "színpadfélsz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik a női orvostanhallgatót?",
+   "valaszok": [
+    "naiva",
+    "komika",
+    "tragika",
+    "medika"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik a rendkívüli szellemi képességű embert?",
+   "valaszok": [
+    "parázsfej",
+    "tűzagy",
+    "fényelme",
+    "lángész"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik a szerelemben szenvedélyes menyecskét?",
+   "valaszok": [
+    "halvérű",
+    "kékvérű",
+    "bikavérű",
+    "tüzesvérű"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik az eleven, fürge, temperamentumos nőket?",
+   "valaszok": [
+    "légbőlkapott",
+    "vízbepottyant",
+    "tűzrőlpattant",
+    "szellőnszállt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik az ügyetlen vadászt?",
+   "valaszok": [
+    "ártányvadász",
+    "kocavadász",
+    "kappanvadász",
+    "ürüvadász"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik az ügyvédi irodában dolgozó joggyakornokot?",
+   "valaszok": [
+    "ügyvédkukta",
+    "ügyvédbéres",
+    "ügyvédinas",
+    "ügyvédbojtár"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik az ültetni való hagymát?",
+   "valaszok": [
+    "teszthagyma",
+    "rejthagyma",
+    "dughagyma",
+    "rakhagyma"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik azt a letétet, mely az üzlettől való visszalépés esetén elvész?",
+   "valaszok": [
+    "ugrósumma",
+    "illanóinkasszó",
+    "búbiztosíték",
+    "bánatpénz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik másképp a kocsis ülését?",
+   "valaszok": [
+    "suta",
+    "kan",
+    "ürü",
+    "bak"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik tréfásan a büntetést, megtorlást érdemlő személyt?",
+   "valaszok": [
+    "pipacspalánta",
+    "bűnbimbó",
+    "gyarlógyökér",
+    "mákvirág"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik tréfásan a hivatalnokot?",
+   "valaszok": [
+    "papírpók",
+    "iratmoly",
+    "okmányhangya",
+    "aktakukac"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezték a babona szerint csodás tettekre képes diákot?",
+   "valaszok": [
+    "grabancos",
+    "garasos",
+    "garabonciás",
+    "nagygaratú"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy szól a mondás: \"..., vedd el a lányát.\"",
+   "valaszok": [
+    "Kérd meg az anyját",
+    "Kerüld az apját",
+    "Nézd meg az anyját",
+    "Számold a pénzét"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy szól a mondás: \"Karcsú, mint a ...\"",
+   "valaszok": [
+    "szalmaszál",
+    "hangszál",
+    "kőszál",
+    "nádszál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy szól a mondás: \"Ki mint vet, ...\"",
+   "valaszok": [
+    "úgy kaszál",
+    "úgy arat",
+    "úgy marad",
+    "úgy gereblyézik"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan alszik a mély álomban lévő amber a szólás szerint?",
+   "valaszok": [
+    "mint a bagoly",
+    "mint a bunda",
+    "mint az aludttej",
+    "mint a villamos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan fejezi ki a mondás azt, hogy valaki elszámította magát?",
+   "valaszok": [
+    "Rossz agarat futtatott",
+    "Rossz nyúlra lőtt",
+    "Rossz lóra tett",
+    "Rossz medvét molesztált"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan fejezi ki a mondás valaminek a kedvezőtlen vonásait? \"Nem fenékig …\"",
+   "valaszok": [
+    "tejszín",
+    "kefír",
+    "tejfel",
+    "túró"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan fejezi ki a mondás, ha nem a megfelelő emberre bízunk egy feladatot?",
+   "valaszok": [
+    "nyuszira a répát",
+    "macira a mézet",
+    "mókusra a mogyorót",
+    "kecskére a káposztát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan fejezi ki a mondás, hogy elfogtak valakit?",
+   "valaszok": [
+    "Lecsaptak a subájára",
+    "Elkapták a frakkját",
+    "Kitették a szűréből",
+    "Megfogták mente mentén"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan fejezi ki a mondás, hogy eszemben sincs megtenni valamit?",
+   "valaszok": [
+    "Nem rágtam gittet",
+    "Nem nyeltem nokedlit",
+    "Nem ittam ecetet",
+    "Nem ettem meszet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan fejezi ki a mondás, hogy hamarosan nagyobb pénzösszegre teszünk szert?",
+   "valaszok": [
+    "lóg a pénzeső lába",
+    "benéz a lé az ablakon",
+    "ki korán kel, telt bukszát lel",
+    "pénz áll a házhoz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan fejezi ki a mondás, hogy megváltoztak a körülmények?",
+   "valaszok": [
+    "Más nap süt az égen.",
+    "Más szelek fújnak.",
+    "Más villámok dörögnek.",
+    "Más eső csepereg."
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan fejezi ki a mondás, hogy valaki hozzánk tartozik?",
+   "valaszok": [
+    "a mi medvénk bocsa",
+    "a mi tehenünk borja",
+    "a mi tyúkunk csibéje",
+    "a mi kutyánk kölyke"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan fejezi ki a mondás, hogy valakinek nagyon hízelegnek?",
+   "valaszok": [
+    "mintha illóolajjal dörzsölnék",
+    "mintha zsirral masszíroznák",
+    "mintha hájjal kenegetnék",
+    "mintha párnával dögönyöznék"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan folytatódik a mondás: \"Kerülgeti, mint macska a …\"",
+   "valaszok": [
+    "dermedt egeret",
+    "kivert kutyát",
+    "forró kását",
+    "másnapos macskatápot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan folytatódik a mondás? \"Ahová lép, ott ...\"",
+   "valaszok": [
+    "döng a föld",
+    "fű nem terem",
+    "víz fakad",
+    "megáll az idő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan folytatódik a mondás? \"Annyit ért hozzá, mint…\"",
+   "valaszok": [
+    "ló a számtanhoz",
+    "csiga a betűvetéshez",
+    "tyúk az ábécéhez",
+    "cica az algebrához"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan folytatódik a mondás? \"Azt se mondta: …\"",
+   "valaszok": [
+    "lakkcsizma",
+    "bőrbocskor",
+    "rongymamusz",
+    "fapapucs"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan folytatódik a mondás? \"Belejön, mint…\"",
+   "valaszok": [
+    "kismackó a brummogásba",
+    "kismalac a röfögésbe",
+    "kisegér a cincogásba",
+    "kiskutya az ugatásba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan folytatódik a mondás? \"Láttam én már ...\"",
+   "valaszok": [
+    "sapkán bojtot",
+    "karón varjút",
+    "labdán pöttyöt",
+    "zoknin lyukat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan folytatódik a mondás? \"Minden jó, ha …\"",
+   "valaszok": [
+    "jól kezdődik",
+    "jó a vége",
+    "jókor van vége",
+    "jó a nézettsége"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan folytatódik a mondás? \"Mindenütt jó, de ...\"",
+   "valaszok": [
+    "még mennyire!",
+    "legjobb otthon!",
+    "lesz még rosszabb!",
+    "nem eléggé!"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan folytatódik a mondás? \"Szégyen a futás, de …\"",
+   "valaszok": [
+    "gyorsabb a sétánál",
+    "hasznos",
+    "egészséges",
+    "okos megoldás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan folytatódik a mondóka? \"Ne nézz hátra, jön a ...\"",
+   "valaszok": [
+    "török",
+    "mumus",
+    "farkas",
+    "fogó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan haladnak, akik egyesével közlekednek egymás után?",
+   "valaszok": [
+    "gúnárglédában",
+    "csigacsámpában",
+    "szöcskeszlalomban",
+    "libasorban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan hazudik a mondás szerint, aki folyamatosan nem mond igazat?",
+   "valaszok": [
+    "mintha dézsából öntené",
+    "mint a vízfolyás",
+    "mint felhő megy az égen",
+    "mintha papírja lenne róla"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan ismerni meg a másik embert a mondás szerint?",
+   "valaszok": [
+    "lakva",
+    "jóllakva",
+    "magánnyomozóval",
+    "álmában"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan jár a gyorsan beszélő ember szája a mondás szerint?",
+   "valaszok": [
+    "mint a pipetta",
+    "mint a motetta",
+    "mint a motolla",
+    "mint a rozetta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan jár a keze a gyorsan hadonászó embernek a mondás szerint?",
+   "valaszok": [
+    "mint a légycsapó",
+    "mint a habverő",
+    "mint a szőnyegporoló",
+    "mint a cséphadaró"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan megy a mondás szerint a nagyon simán alakuló dolog?",
+   "valaszok": [
+    "mint a légycsapás",
+    "mint a karikacsapás",
+    "mint az arculcsapás",
+    "mint a sorscsapás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan megy, aki csámpásan jár?",
+   "valaszok": [
+    "békázik",
+    "kutyázik",
+    "fókázik",
+    "kacsázik"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan mondjuk másképpen, ha valakit nem viselt meg nagyon egy esemény?",
+   "valaszok": [
+    "nem vette a hátára",
+    "nem vette a kezébe",
+    "nem vette a szívére",
+    "nem vette a szájára"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan nevezi a népi szólás a szabad prédára hagyott holmit?",
+   "valaszok": [
+    "Buzsáki szénája",
+    "Csáki szalmája",
+    "Deákné vászna",
+    "Morzsa kutya vacsorája"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezi a népnyelv a csintalan, vásott gyermeket?",
+   "valaszok": [
+    "anyaszomorító",
+    "apakeserítő",
+    "bátybosszantó",
+    "hugheccelő"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan nevezi a népnyelv a felelőtlen, megbízhatatlan személyt?",
+   "valaszok": [
+    "felhőhúzó",
+    "viharverő",
+    "záporzúzó",
+    "széltoló"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezi a népnyelv a haszontalan vagy bolondos személyt?",
+   "valaszok": [
+    "fittyenfúrt",
+    "fúrtonfitty",
+    "fittyemkotty",
+    "kótyomfitty"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezi a népnyelv a jámborságot színlelő gonosz embert?",
+   "valaszok": [
+    "farkasbőrbe bújt bárány",
+    "báránybőrbe bújt farkas",
+    "nyúlbőrbe bújt róka",
+    "rókabőrbe bújt nyúl"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezi a népnyelv tréfásan a haszontalan, komisz ember?",
+   "valaszok": [
+    "nyúlnyújtotta",
+    "sünosztotta",
+    "lóvette",
+    "ebadta"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezi a népnyelv tréfásan a szemüveget?",
+   "valaszok": [
+    "pápaszem",
+    "tengerszem",
+    "macskaszem",
+    "pávaszem"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan nevezi a tolvajnyelv a páncélszekrényt?",
+   "valaszok": [
+    "boci",
+    "cica",
+    "paci",
+    "mackó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezik a dologkerülő embert?",
+   "valaszok": [
+    "csillagcsóró",
+    "holdbugázó",
+    "földsikkasztó",
+    "naplopó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezik a félrevezető szándékú beszédet, hamis látszat keltését?",
+   "valaszok": [
+    "füstfújás",
+    "ködkeltés",
+    "szmogszórás",
+    "porhintés"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezik a tolvajnyelvben a besúgót?",
+   "valaszok": [
+    "habarcs",
+    "murva",
+    "salak",
+    "tégla"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezik az érzéketlen, közömbös ábrázatú embert?",
+   "valaszok": [
+    "betonfej",
+    "pléhpofa",
+    "bazaltarc",
+    "bádogbura"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezik gúnyosan a rikítóan öltözködő személyt?",
+   "valaszok": [
+    "dinnyedani",
+    "paradicsompalkó",
+    "zellerzoli",
+    "paprikajancsi"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezik kedveskedve a kezdő autóvezetőt?",
+   "valaszok": [
+    "moha",
+    "páfrány",
+    "mazsola",
+    "tádé"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan nevezik tréfásan a szélhámosságra hajló személyt?",
+   "valaszok": [
+    "szénlapátoló",
+    "levélsöprögető",
+    "jégtörő",
+    "hóhányó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezik tréfásan az éretlen, tapasztalatlan személyt?",
+   "valaszok": [
+    "zöldszemű",
+    "vörösorrú",
+    "kékszakállú",
+    "zöldfülű"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezik tréfásan, amikor az ember valamelyik testrésze elzsibbad?",
+   "valaszok": [
+    "elbékásodik",
+    "elkutyásodik",
+    "elmackósodik",
+    "elmacskásodik"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezte a népnyelv az elhanyagolt öltözetű embert?",
+   "valaszok": [
+    "orrabukott",
+    "ágrólszakadt",
+    "lórólesett",
+    "iccelátott"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezték régen gúnyosan valamely rendvédelmi szerv tagját?",
+   "valaszok": [
+    "mardel",
+    "kapdel",
+    "csípdmeg",
+    "fogdmeg"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezzük a rövid időre magára hagyott házastársat?",
+   "valaszok": [
+    "szénaremete",
+    "próbaaszkéta",
+    "szalmaözvegy",
+    "poszt-tinédzser"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan nevezzük tréfásan a részeges embert?",
+   "valaszok": [
+    "tintakohó",
+    "naftakártya",
+    "piakemence",
+    "szeszkazán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan reszket a fázó vagy ijedt ember a szólás szerint?",
+   "valaszok": [
+    "mint a nyárfalevél",
+    "mint a miskolci kacsa",
+    "mint a harcsabajusz",
+    "mint Marci hevesen"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan szokás nevezni a durva, goromba embert?",
+   "valaszok": [
+    "abrosz",
+    "kárpit",
+    "faliszőttes",
+    "pokróc"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan szól a közmondás? \"Vergődik, mint ...\"",
+   "valaszok": [
+    "az elefánt a porcelánboltban",
+    "a partra vetett hal",
+    "Misi a moziban",
+    "aki disznók közé keveredett"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan szól a mondás? \"Nomen est …\"",
+   "valaszok": [
+    "show-man",
+    "omen",
+    "Truman",
+    "bitumen"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan szól a népi mondóka? \"Szebb a ..., mint a ...\"",
+   "valaszok": [
+    "veréb-túzok",
+    "liba-lúd",
+    "páva-pulyka",
+    "mama-lánya"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan szól a régi felkiáltás? \"Eb ura …!\"",
+   "valaszok": [
+    "bakó",
+    "Makó",
+    "zakó",
+    "fakó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan szól a tréfás mondás? \"Veszek neked toronyórát ...\"",
+   "valaszok": [
+    "toronyőrrel",
+    "ingával",
+    "lánccal",
+    "másodpercmutatóval"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan távozik az izgatottan elrohanó ember?",
+   "valaszok": [
+    "sebbel-lobbal",
+    "csapolva-papolva",
+    "izgőn-mozgón",
+    "csittel-csattal"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan tűnik el a nyom nélkül elkallódó tárgy a mondás szerint?",
+   "valaszok": [
+    "szőrén-szálán",
+    "fülén-farkán",
+    "éren-nádon",
+    "árkon-bokron"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan tűnik el a nyomtalanul elvesző dolog?",
+   "valaszok": [
+    "árkon-bokron",
+    "sebbel-lobbal",
+    "szőrén-szálán",
+    "fülén-farkán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyán szokás nevezni a csintalan, izgő-mozgó gyereket?",
+   "valaszok": [
+    "molylepke",
+    "kerge bocs",
+    "ebihal",
+    "sajtkukac"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol bűzlik valami a szállóige szerint?",
+   "valaszok": [
+    "a vegyszerboltban",
+    "a zoknis fiókban",
+    "a sajtraktárban",
+    "Dániában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol csücsülünk le a séta után az ismert magyar mondóka szerint?",
+   "valaszok": [
+    "egy zöld réten",
+    "egy szép hegyen",
+    "egy nagy székben",
+    "egy kis dombon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol fogadják a vendégeket a szállodákban?",
+   "valaszok": [
+    "recenzión",
+    "recepción",
+    "recesszión",
+    "reciprokon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol keres csomót a mondás szerint, aki akadékoskodik?",
+   "valaszok": [
+    "hókán",
+    "kákán",
+    "csókán",
+    "sóskán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol van a mondás szerint az, akire haragszom?",
+   "valaszok": [
+    "a markomban",
+    "a csőrömben",
+    "a begyemben",
+    "a zsebemben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol van a mondás szerint, aki kínos helyzetbe került?",
+   "valaszok": [
+    "csalánosban",
+    "csalitosban",
+    "csávában",
+    "csigaházban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol van az \"orvosság\" a népi bölcsesség szerint?",
+   "valaszok": [
+    "sóban-borsban",
+    "sörben-borban",
+    "fűben-fában",
+    "erdőn-mezőn"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol van az igazság a szólás szerint?",
+   "valaszok": [
+    "sörben",
+    "törvénykönyvben",
+    "borban",
+    "a prókátornál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol vész el a gyerek a mondás szerint?",
+   "valaszok": [
+    "két tűz közt",
+    "sok bába közt",
+    "sok lúd közt",
+    "disznók közt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol él meg a mondás szerint az élelmes ember?",
+   "valaszok": [
+    "medvebarlangban is",
+    "farkasveremben is",
+    "jég hátán is",
+    "házsártos asszony mellett is"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol úr minden kakas a mondás szerint?",
+   "valaszok": [
+    "a maga csirkeóljában",
+    "a maga taraja körül",
+    "a maga szemétdombján",
+    "a maga pörköltjében"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol ülhet az ember szamárpadban?",
+   "valaszok": [
+    "moziban",
+    "parkban",
+    "szamárkordén",
+    "iskolában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Honnan beszél a fölényes ember a mondás szerint?",
+   "valaszok": [
+    "fejbúbról",
+    "orrcsúcsról",
+    "lábujjhegyről",
+    "foghegyről"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Honnan fúj bolond szél a mondás szerint?",
+   "valaszok": [
+    "lyukas bendőből",
+    "zoknilyukból",
+    "egérlyukból",
+    "bolond lyukból"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hova megy, aki teátrumba készül?",
+   "valaszok": [
+    "kocsmába",
+    "színházba",
+    "teaházba",
+    "tánciskolába"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hova mászik a szólás szerint az, aki nagyon szenved?",
+   "valaszok": [
+    "létrára",
+    "fára",
+    "oszlopra",
+    "falra"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hová bámul a borjú a mondás szerint?",
+   "valaszok": [
+    "az új vályúra",
+    "az új legelőre",
+    "az új kapura",
+    "az új bikára"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hová dugja a fejét, aki nem akar tudomásul venni valamit?",
+   "valaszok": [
+    "hamuba",
+    "homokba",
+    "csuklya mögé",
+    "a hóna alá"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hová hajtja a fejét a házasodó férfi a mondás szerint?",
+   "valaszok": [
+    "pallos alá",
+    "oroszlán szájába",
+    "bogáncsos vánkosra",
+    "igába"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hová hajtja a vizet a mondás szerint, aki segíti valaki más érdekét?",
+   "valaszok": [
+    "más kertje alá",
+    "más kanálisába",
+    "más eresze felé",
+    "más malmára"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hová kapaszkodott fel az érdemtelenül magas pozícióba jutott rátarti ember a mondás szerint?",
+   "valaszok": [
+    "futóbab karójára",
+    "kastély ereszére",
+    "villanypóznára",
+    "uborkafára"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hová könnyű vinni Katát a mondás szerint?",
+   "valaszok": [
+    "szénakazal mögé",
+    "göröngyös útra",
+    "táncba",
+    "erdőbe"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hová küldjük az idegesítő, nemkívánatos személyt?",
+   "valaszok": [
+    "napsütötte tájra",
+    "trópusi vidékre",
+    "az Egyenlítő mellé",
+    "melegebb éghajlatra"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hová szállt a dicsőség annak, aki elbizakodott lett a szólás szerint?",
+   "valaszok": [
+    "orrába",
+    "nadrágjába",
+    "inába",
+    "fejébe"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hová viszi a bőrét a mondás szerint a nagy kockázatot vállaló ember?",
+   "valaszok": [
+    "lagziba",
+    "búcsúba",
+    "vásárra",
+    "ócskapiacra"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hová írjuk fel a ritka, szokatlan eseményt a mondás szerint?",
+   "valaszok": [
+    "ajtófélfára",
+    "zsebkendőcsücsökbe",
+    "fehér holló csőrébe",
+    "kéménybe"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki fárad kétszer a mondás szerint?",
+   "valaszok": [
+    "a rest",
+    "a felelőtlen",
+    "a precíz",
+    "a postás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki jelenik meg a mondás szerint, ha szóba hozzák?",
+   "valaszok": [
+    "megidézett mókus",
+    "tetemre hívott keselyű",
+    "lépre csalt mackó",
+    "emlegetett szamár"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nevet igazán a mondás szerint?",
+   "valaszok": [
+    "aki hangosan nevet",
+    "ak visítva nevet",
+    "aki magában nevet",
+    "aki utoljára nevet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki öregszik meg hamarabb a mondás szerint?",
+   "valaszok": [
+    "aki sokat eszik",
+    "aki kiváncsi",
+    "aki korán született",
+    "aki nem pletykás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki üti bele mindenbe az orrát?",
+   "valaszok": [
+    "aki bokszoló",
+    "aki rövidlátó",
+    "aki szórakozott",
+    "aki kotnyeles"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kik férnek el kis helyen is a mondás szerint?",
+   "valaszok": [
+    "sok sovány ember",
+    "sok jó ember",
+    "sok közlekedő ember",
+    "sok türelmes ember"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik nem férnek el egy csárdában a mondás szerint?",
+   "valaszok": [
+    "öt kondás",
+    "négy juhász",
+    "három flótás",
+    "két dudás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek van fapipája a nyelvtörő mondóka szerint?",
+   "valaszok": [
+    "pipás papinak",
+    "pipacsfalvi piperés pipinek",
+    "pipogya piperkőcnek",
+    "ibafai papnak"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek áll a világ a mondás szerint?",
+   "valaszok": [
+    "fülesnek",
+    "kezesnek",
+    "szemesnek",
+    "tyúkszemesnek"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek áll a világ szólás szerint?",
+   "valaszok": [
+    "szemesnek",
+    "fülesnek",
+    "lábasnak",
+    "fogasnak"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kiről állítja a mondás, hogy semmi sem drága neki?",
+   "valaszok": [
+    "a kincstárnokról",
+    "a dzsentriről",
+    "a kibicről",
+    "a tékozló emberről"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit nevezünk pancsernek?",
+   "valaszok": [
+    "lubickoló gyermeket",
+    "puncskészítő mixert",
+    "folyton panaszkodó embert",
+    "kétbalkezes személyt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kit vagy mit nevez a népnyelv tréfásan gézengúznak?",
+   "valaszok": [
+    "a pajkos mongúzbébit",
+    "a rakoncátlan gyereket",
+    "a huncut kötözőnővért",
+    "a kigyomlált gazt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit vagy mit érnek hamarabb utol, mint a sánta kutyát?",
+   "valaszok": [
+    "a kocogót",
+    "a hazug embert",
+    "a villamost",
+    "a lajhárt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kitől vagy mitől nem látja valaki az erdőt a szólás szerint?",
+   "valaszok": [
+    "a hegytől",
+    "a vadásztól",
+    "az őztől",
+    "a fától"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Meddig \"megy\" az indulatos vita a mondás szerint?",
+   "valaszok": [
+    "baltaélig",
+    "késhegyig",
+    "kapanyélig",
+    "csúzliszárig"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Meddig issza le magát a nagyon részeg ember a szólás szerint?",
+   "valaszok": [
+    "a fekete humuszig",
+    "a barna kőszénig",
+    "a szürke homokig",
+    "a sárga földig"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Meddig issza le magát a sok alkoholt fogyasztó ember a mondás szerint?",
+   "valaszok": [
+    "az avarig",
+    "a pocsolyáig",
+    "a sárga földig",
+    "a vakondjáratig"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Meddig szerelmes a mondás szerint a rendkivüli szenvedélyt átélő ember?",
+   "valaszok": [
+    "fejbúbig",
+    "fülig",
+    "hajszálhíjig",
+    "lábujjhegyig"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Meddig tanul a jó pap a mondás szerint?",
+   "valaszok": [
+    "gyertyacsonkig",
+    "holtig",
+    "hajnalhasadásig",
+    "vizsgákig"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely rokonaid jöjjenek ide a mondás szerint?",
+   "valaszok": [
+    "húgod, bátyád",
+    "nénéd, ángyod",
+    "apád, anyád",
+    "kuzinod, komád"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely testrészénél fogva vezetik a becsapott embert?",
+   "valaszok": [
+    "fülénél fogva",
+    "orránál fogva",
+    "kisujjánál fogva",
+    "hajánál fogva"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik \"burgonya\" egy étel elnevezése?",
+   "valaszok": [
+    "széna",
+    "szalma",
+    "bogáncs",
+    "boglya"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik a feleség tréfás elnevezése?",
+   "valaszok": [
+    "oldalfegyver",
+    "oldalkormány",
+    "vendégoldal",
+    "oldalborda"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy előkelő hölgy és egy táblás játék elnevezése is?",
+   "valaszok": [
+    "matróna",
+    "lady",
+    "dáma",
+    "domina"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy forróövi rovar neve?",
+   "valaszok": [
+    "termosz",
+    "terpesz",
+    "termesz",
+    "herpesz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy fűszer neve?",
+   "valaszok": [
+    "faháncs",
+    "fahéj",
+    "farost",
+    "fabatka"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy közgazdasági szakkifejezés az alábbiak közül?",
+   "valaszok": [
+    "ökokanál",
+    "biovilla",
+    "vircsaftkés",
+    "agrárolló"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy speciális katonai fedezék elnevezése?",
+   "valaszok": [
+    "bombadúc",
+    "pisztolyalom",
+    "géppuskafészek",
+    "gránátkuckó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy tréfásan indulatos népi kifejezés az alábbiak közül?",
+   "valaszok": [
+    "Daloljon neki a vetési varjú!",
+    "Vigye el a kánya!",
+    "Pottyantsa le a galamb!",
+    "Lépjen a lábára a strucc!"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy vízi jármű és egy ruhadarab-rész elnevezése is?",
+   "valaszok": [
+    "gondola",
+    "uszály",
+    "dzsunka",
+    "komp"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik fűszerről tartja a mondás, hogy kicsi, de erős?",
+   "valaszok": [
+    "bors",
+    "köménymag",
+    "lestyán",
+    "kakukkfű"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik gyümölcs nem esik messze a fájától a mondás szerint?",
+   "valaszok": [
+    "a vilmoskörte",
+    "a kókuszdió",
+    "az alma",
+    "a kukacos cseresznye"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik halfajta nevével illetik a sovány embert?",
+   "valaszok": [
+    "ponty",
+    "csuka",
+    "hering",
+    "keszeg"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik hangszer neve egyezik meg egy növény nevével?",
+   "valaszok": [
+    "gordonka",
+    "orgona",
+    "oboa",
+    "citera"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik időjárási jelenségnek lóghat a lába a mondás szerint?",
+   "valaszok": [
+    "a ködnek",
+    "az esőnek",
+    "a zúzmarának",
+    "a mennydörgésnek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik kifejezés jelenti a tolvajnyelvben a pénzt?",
+   "valaszok": [
+    "bukta",
+    "béles",
+    "rizskoch",
+    "guba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik kifejezéssel illetik azt, aki kényszerből olyan szerepet vállalt, melyhez nem ért?",
+   "valaszok": [
+    "bárdfaragta",
+    "husánghasította",
+    "botcsinálta",
+    "fejszeformálta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik közmondás fejez ki nemtörődömséget?",
+   "valaszok": [
+    "Ahogy huppan, úgy nyekken.",
+    "Ahogy nyüszög, úgy nyifog.",
+    "Ahogy esik, úgy puffan.",
+    "Ahogy pottyan, úgy tottyan."
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik lehet szelindek az alábbiak közül?",
+   "valaszok": [
+    "gesztenye",
+    "galamb",
+    "kutya",
+    "bamba férj"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik meteorológiai kifejezés nevét viseli egy vártípus vagy várrész?",
+   "valaszok": [
+    "zápor",
+    "felleg",
+    "szellő",
+    "dér"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mondás fejezi ki, hogy két fél együttműködik valamiben?",
+   "valaszok": [
+    "láb lábat töröl",
+    "kéz kezet mos",
+    "szem szemet huny",
+    "fül fület hegyez"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem növény?",
+   "valaszok": [
+    "olajfa",
+    "ecetfa",
+    "vajfa",
+    "satrafa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik növény nevét viseli hazánk egyik hegysége?",
+   "valaszok": [
+    "bors",
+    "bükk",
+    "birs",
+    "cserszömörce"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik növényről kapta nevét egy kupolatípus?",
+   "valaszok": [
+    "dinnye",
+    "tök",
+    "uborka",
+    "hagyma"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szó jelent ülőalkalmatosságot és női ruha részét is?",
+   "valaszok": [
+    "sámli",
+    "fotel",
+    "hokedli",
+    "puff"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szó jelöl egy tésztafajtát?",
+   "valaszok": [
+    "hájas",
+    "molett",
+    "dundi",
+    "pufók"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik szó jelöli a takarmánynövények egy csoportját?",
+   "valaszok": [
+    "színes",
+    "szagos",
+    "szemes",
+    "füles"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szó jelölt egy csizmafajtát?",
+   "valaszok": [
+    "prímás",
+    "rámás",
+    "rámpás",
+    "rakoncás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik testrészét üti meg az ember a szólás szerint, amikor meglakol valamiért?",
+   "valaszok": [
+    "fejét",
+    "bokáját",
+    "orrát",
+    "ujját"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik testrészünket nevezik tréfásan bagólesőnek?",
+   "valaszok": [
+    "szem",
+    "orr",
+    "száj",
+    "tenyér"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik tréfás kifejezés utal valaminek a nagyon rövid kiterjedésére?",
+   "valaszok": [
+    "tacskólábnyi",
+    "egértalpnyi",
+    "nyúlfarknyi",
+    "lepkefülnyi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik vak állat talál szemet a mondás szerint?",
+   "valaszok": [
+    "a ló",
+    "a tyúk",
+    "a vakond",
+    "a vakegér"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állat \"vérével\" inti nyugalomra a mondás a türelmetlen embert?",
+   "valaszok": [
+    "béka",
+    "gyík",
+    "csiga",
+    "lajhár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állat ritka a szólás szerint?",
+   "valaszok": [
+    "a pöttyös tigris",
+    "a vérszomjas csiga",
+    "a fehér holló",
+    "a beszélő papagáj"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állathoz köti a népnyelv a lankadatlan szorgalmat?",
+   "valaszok": [
+    "lajhár",
+    "csiga",
+    "hangya",
+    "teknős"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állatról kapta nevét egy lépcsőtípus?",
+   "valaszok": [
+    "liba",
+    "polip",
+    "kagyló",
+    "csiga"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állatról nevezték el a faltörésre használt ostromeszközt?",
+   "valaszok": [
+    "a bikáról",
+    "a kosról",
+    "a dúvadról",
+    "az öszvérről"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik épületnév lehet a pincsi előtagja?",
+   "valaszok": [
+    "kúria",
+    "palota",
+    "pagoda",
+    "kastély"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyiket nevezik kupicának?",
+   "valaszok": [
+    "rendetlenséget",
+    "sikamlós dalt",
+    "női kupecet",
+    "pálinkáspoharat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a basszuskulcs?",
+   "valaszok": [
+    "az erényöv nyitója",
+    "jel a kottán",
+    "káromkodás",
+    "titkosírás kódja"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a következménye a mondás szerint annak, ha lassan járunk?",
+   "valaszok": [
+    "később érünk célba",
+    "nem melegedünk ki",
+    "utolér a sánta kutya",
+    "tovább érünk"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a lélekvesztő?",
+   "valaszok": [
+    "kártya",
+    "pálinka",
+    "kis csónak",
+    "a pszichiáter kanapéja"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a lórum?",
+   "valaszok": [
+    "lovaspóló",
+    "lóápoló szesz",
+    "lovászok itala",
+    "kártyajáték"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a puding próbája a mondás szerint?",
+   "valaszok": [
+    "a puffadás",
+    "a pudingpor",
+    "a kavarás",
+    "az evés"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a szalmonella?",
+   "valaszok": [
+    "fagylaltfajta",
+    "friss szénakazal",
+    "kémiai oldószer",
+    "baktériumcsoport"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a vargánya?",
+   "valaszok": [
+    "suszterinas",
+    "gombafajta",
+    "gázlómadárfajta",
+    "cipészszerszám"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi az UFO általánosan használt neve?",
+   "valaszok": [
+    "repülő kondér",
+    "repülő szamovár",
+    "repülő mélytányér",
+    "repülő csészealj"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi bújuk ki a zsákból a szólás szerint, ha kiderül valakinek a valódi szándéka?",
+   "valaszok": [
+    "gombostű",
+    "macska",
+    "kisegér",
+    "szög"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi csattan a végén a mondás szerint?",
+   "valaszok": [
+    "vastaps",
+    "pofon",
+    "vasajtó",
+    "ostor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi előtt söpörjön mindenki a közmondás szerint?",
+   "valaszok": [
+    "a maga portája",
+    "a szomszéd portája",
+    "a seprűbolt",
+    "felmosás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi esik le a mondás szerint, amikor hirtelen megértünk valamit?",
+   "valaszok": [
+    "mandzsettagomb",
+    "vakolat",
+    "tantusz",
+    "vérnyomás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi forr be a mondás szerint?",
+   "valaszok": [
+    "szúnyogcsípés",
+    "macskakarmolás",
+    "ebcsont",
+    "csigacsigolya"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi győz disznót az ismert mondás szerint?",
+   "valaszok": [
+    "sok kondás",
+    "sok böllér",
+    "sok lúd",
+    "sok kismalac"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi jár vissza a mondás szerint?",
+   "valaszok": [
+    "happolt habcsók",
+    "kunyerált kifli",
+    "bérbuci",
+    "kölcsönkenyér"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi jön meg evés közben a mondás szerint?",
+   "valaszok": [
+    "váratlan vendég",
+    "ihlet",
+    "étvágy",
+    "gyomorgörcs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi kell a jó munkához a mondás szerint?",
+   "valaszok": [
+    "ihlet",
+    "idő",
+    "ötéves terv",
+    "béremelés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi lehet hétpecsétes?",
+   "valaszok": [
+    "katicabogár",
+    "fehér ing",
+    "gyűrű",
+    "titok"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi lesz a tinóból, ha eleget \"tanult\"?",
+   "valaszok": [
+    "tinóru",
+    "ökör",
+    "ökörszem",
+    "hatökör"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi nem terem a mondás szerint a sikertelen embernek?",
+   "valaszok": [
+    "petrezselyem",
+    "zsálya",
+    "babér",
+    "bab"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi nem zörög a mondás szerint, ha nem fújja a szél?",
+   "valaszok": [
+    "eresz",
+    "haraszt",
+    "roló",
+    "csontváz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi nélkül iszik a mértéktelen alkoholfogyasztású ember a mondás szerint?",
+   "valaszok": [
+    "kötőfék",
+    "pányva",
+    "kantár",
+    "nyakló"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi teszi a mestert a mondás szerint?",
+   "valaszok": [
+    "mestervizsga",
+    "gyakorlat",
+    "inas",
+    "reklám"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi történik a meghiúsuló tervvel a mondás szerint?",
+   "valaszok": [
+    "kereke törik",
+    "kútba esik",
+    "nyaka nyekken",
+    "likas dézsába ömlik"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi történik a mondás szerint azzal, aki kemény erőfeszítés után eléri a célját?",
+   "valaszok": [
+    "fészket rak",
+    "megköti lovát",
+    "aranyrögöt talál",
+    "révbe ér"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi történik a mondás szerint azzal, aki másnak vermet ás?",
+   "valaszok": [
+    "estére elfárad",
+    "kisebesedik a tenyere",
+    "homok megy a szemébe",
+    "maga esik bele"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi történik a sokat markoló emberrel a mondás szerint?",
+   "valaszok": [
+    "kérges lesz a tenyere",
+    "görcs áll a kezébe",
+    "hamar megizzad",
+    "keveset fog"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi történik a szólás szerint azzal, aki nem végzi el a dolgát időben?",
+   "valaszok": [
+    "összesűrűsödik az agya",
+    "utoléri a tatár",
+    "körmére ég a munka",
+    "boldogan él, míg meg nem hal"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi történik azzal a mondás szerint, aki a Tisza vizét issza?",
+   "valaszok": [
+    "visszavágyik",
+    "délibábot lát",
+    "nem lesz szomjas",
+    "kiszőkül"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi törött el a mondás szerint annál, aki sírva fakad?",
+   "valaszok": [
+    "a rózsa töve",
+    "a mécses",
+    "a lópatkó",
+    "a kardántengely"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi után édes a pihenés a mondás szerint?",
+   "valaszok": [
+    "ebéd",
+    "kertészkedés",
+    "munka",
+    "semmittevés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi vagy ki nincsen tövis nélkül a szólás szerint?",
+   "valaszok": [
+    "kaktusz",
+    "rózsa",
+    "anyós",
+    "sündisznó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi van a mondás szerint a szemtelen, tiszteletlen ember képén?",
+   "valaszok": [
+    "piros pattanás",
+    "hamiskás ránc",
+    "vastag bőr",
+    "friss sebhely"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi ér aranyat a mondás szerint?",
+   "valaszok": [
+    "az aranyeső",
+    "a májusi eső",
+    "az ónos eső",
+    "a pénzeső"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mibe kapaszkodik a mondás szerint az utolsó reménysugarat megragadó ember?",
+   "valaszok": [
+    "szúnyog szárnyába",
+    "fűszál élébe",
+    "szalmaszálba",
+    "szentjánosbogár fényébe"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mibe nem léphetünk kétszer a híres ókori mondás szerint?",
+   "valaszok": [
+    "ugyanabba a pártba",
+    "ugyanabba a tócsába",
+    "ugyanabba az árokba",
+    "ugyanabba a folyóba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mibe vágja a fejszéjét a mondás szerint, aki nehéz feladatba kezd?",
+   "valaszok": [
+    "fűszálba",
+    "sűrű cserjébe",
+    "nagy fába",
+    "korhadt tuskóba"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miben szerencsés a mondás szerint, aki szerencsétlen a kártyában?",
+   "valaszok": [
+    "a tőzsdézésben",
+    "a szerelemben",
+    "a kockázásban",
+    "az időjóslásban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miből mit csinál, aki eltúloz egy problémát?",
+   "valaszok": [
+    "bolhából elefántot",
+    "kecskéből káposztát",
+    "fából vaskarikát",
+    "hangyából mamutot"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mihez hasonlítja a népnyelv a boldog szerelmeseket?",
+   "valaszok": [
+    "csicsergő csicsörkékhez",
+    "füttyögő füzikékhez",
+    "trillázó tengelicékhez",
+    "turbékoló galambokhoz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mihez hasonlítja a szólás a teljesen egészséges embert?",
+   "valaszok": [
+    "sünhöz",
+    "gesztenyéhez",
+    "pillangóhoz",
+    "makkhoz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mihez hasonlítja a szólás az egészen kicsi dolgot?",
+   "valaszok": [
+    "tyúkszem",
+    "gyöngyszem",
+    "macskaszem",
+    "mákszem"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mihez hasonlítják az engedelmes embert?",
+   "valaszok": [
+    "jámbor juhoz",
+    "szelíd szöcskéhez",
+    "békés békához",
+    "kezes bárányhoz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mihez nem ért a hajdú az ismert közmondás szerint?",
+   "valaszok": [
+    "kopjafaragáshoz",
+    "harangöntéshez",
+    "lóabrakoltatáshoz",
+    "sonkafüstöléshez"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mihez veri a garast a zsugori ember a szólás szerint?",
+   "valaszok": [
+    "bukszájához",
+    "fejéhez",
+    "perselyéhez",
+    "fogához"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mije \"kopog\" az embernek az éhségtől?",
+   "valaszok": [
+    "füle",
+    "orra",
+    "ujja",
+    "szeme"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mije törik bele az embernek a kivitelezhetetlen dologba a mondás szerint?",
+   "valaszok": [
+    "foga fehérje",
+    "körme",
+    "furkósbotja",
+    "bicskája"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mije van a munkának a mondás szerint?",
+   "valaszok": [
+    "légiója",
+    "bandériuma",
+    "dandárja",
+    "kommandója"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mije van az ekének?",
+   "valaszok": [
+    "agancsa",
+    "szarva",
+    "tülke",
+    "csülke"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mijét emlegetik annak, akinek a retyerutyájáról van szó?",
+   "valaszok": [
+    "az alsóneműjét",
+    "a házát",
+    "a rokonságát",
+    "a nagy száját"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mijét kötik be a szólás szerint annak, aki férjhez megy?",
+   "valaszok": [
+    "a szemét",
+    "a száját",
+    "a kezét",
+    "a fejét"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mijét mutatja ki, aki felfedi valódi rossz tulajdonságait?",
+   "valaszok": [
+    "az ökle erejét",
+    "a karma hosszát",
+    "a foga fehérét",
+    "az epéje sárgáját"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mijét teszik ki a nemkívánatos embernek?",
+   "valaszok": [
+    "lelkét",
+    "szűrét",
+    "szőrét",
+    "lábát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mijét üti meg a szólás szerint az, aki meglakol valamiért?",
+   "valaszok": [
+    "fejét",
+    "bokáját",
+    "könyökét",
+    "térdét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mik nem nőnek az égig a mondás szerint?",
+   "valaszok": [
+    "a pónilovak",
+    "a laklik",
+    "a fák",
+    "a dombok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miken ül a mondás szerint az izgatottan várakozó ember?",
+   "valaszok": [
+    "kaktuszokon",
+    "lópokrócokon",
+    "fakírok ágyán",
+    "tűkön"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miket itat a síró gyerek a mondás szerint?",
+   "valaszok": [
+    "bolhákat",
+    "hangyákat",
+    "egereket",
+    "gyíkokat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miket tagad le a nyilvánvalóan hazugságokat állító ember a mondás szerint?",
+   "valaszok": [
+    "a barackokat a fáról",
+    "a bolhákat a kutyáról",
+    "a csillagokat az égről",
+    "a fodrokat a felhőkről"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikkel ékeskedik a mondás szerint, aki más gondolatait sajátjaként tünteti fel?",
+   "valaszok": [
+    "idegen szalagokkal",
+    "idegen tollakkal",
+    "idegen selymekkel",
+    "idegen brillekkel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milye nincs annak, akinek nincs egy vasa se?",
+   "valaszok": [
+    "rossz foga",
+    "akaratereje",
+    "piercingje",
+    "pénze"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"betyárnak\" nevezik a nőket leszólító, szemtelen férfit?",
+   "valaszok": [
+    "bitumen",
+    "cement",
+    "aszfalt",
+    "gipsz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"bőrnek\" nevezik a katonai egyenruhát?",
+   "valaszok": [
+    "sárkány",
+    "angyal",
+    "kutya",
+    "ló"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen \"deréknak\" nevezik a nagyon karcsú női derekat?",
+   "valaszok": [
+    "szúnyog",
+    "bolha",
+    "darázs",
+    "kullancs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"hivatalnak\" hívják az olyan helyet, ahol túlteng a bürokrácia?",
+   "valaszok": [
+    "cukor",
+    "só",
+    "ecet",
+    "bors"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen \"kaparásnak\" nevezik a csúnya írást?",
+   "valaszok": [
+    "tyúk",
+    "kutya",
+    "macska",
+    "majom"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"láza\" lehet fellépés előtt egy színésznek?",
+   "valaszok": [
+    "villany",
+    "mécses",
+    "gyertya",
+    "lámpa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"magos\" lehet egy tyúk?",
+   "valaszok": [
+    "árpa",
+    "kender",
+    "rozs",
+    "vető"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen \"népnek\" nevezik tréfásan egy közösségben a nők összességét?",
+   "valaszok": [
+    "khaki",
+    "bíbor",
+    "okker",
+    "fehér"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"parádéba vágja magát\", aki kiöltözik?",
+   "valaszok": [
+    "hecc",
+    "strucc",
+    "pech",
+    "pucc"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"étvágyúnak\" nevezik a nagy étvágyú embert?",
+   "valaszok": [
+    "madár",
+    "pocok",
+    "hörcsög",
+    "farkas"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen a dühös ember a mondás szerint?",
+   "valaszok": [
+    "füstös",
+    "szmogos",
+    "szivaros",
+    "pipás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen a dühös ember?",
+   "valaszok": [
+    "almás",
+    "mákos",
+    "krumplis",
+    "zabos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen a feddhetetlen ember a régies kifejezés szerint?",
+   "valaszok": [
+    "béklyótnemlátott",
+    "bitókerülő",
+    "gáncstalan",
+    "acélgerinces"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen a helyzet a mondás szerint, amikor nincs okunk bizakodásra?",
+   "valaszok": [
+    "cseppet csalános",
+    "korátsem kikericses",
+    "nem épp nefelejcses",
+    "nem túl rózsás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen a háta a borzongó embernek a mondás szerint?",
+   "valaszok": [
+    "kígyóbőrben",
+    "kutyabőrben",
+    "angyalbőrben",
+    "libabőrben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen a háta a közös lónak a mondás szerint?",
+   "valaszok": [
+    "kemény",
+    "túros",
+    "szőrös",
+    "bolhás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen a jelentéktelen ügy?",
+   "valaszok": [
+    "csitt-csatt",
+    "csip-csup",
+    "sitty-sutty",
+    "flik-flak"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen a nyelve a szólás szerint annak, aki másokra gúnyos megjegyzést tesz?",
+   "valaszok": [
+    "csípős",
+    "borsos",
+    "cukros",
+    "vörös"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen a piaci légy a közmondás szerint?",
+   "valaszok": [
+    "kövér",
+    "szemtelen",
+    "hangos",
+    "jóllakott"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen a slampos ember?",
+   "valaszok": [
+    "rendetlen",
+    "rendszerető",
+    "csámpás",
+    "peckes"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen a szilárd jellemű ember?",
+   "valaszok": [
+    "tenyeres",
+    "talpas",
+    "agyas",
+    "gerinces"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen a széles, kerek arcú ember a mondás szerint?",
+   "valaszok": [
+    "péklapátpofijú",
+    "ámbráscet-ábrázatú",
+    "holdvilágképű",
+    "malomkerékarcú"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen a szólás szerint az az ember, akinek kopog a szeme?",
+   "valaszok": [
+    "éhes",
+    "rövidlátó",
+    "szemfüles",
+    "parafenomén"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen a szűkmarkú ember?",
+   "valaszok": [
+    "fityinges",
+    "petákos",
+    "krajcáros",
+    "garasos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen a tartósan nyomott hangulatú ember a mondás szerint?",
+   "valaszok": [
+    "gondaltömött",
+    "bajbabugyolált",
+    "búvalbélelt",
+    "szplínbetekert"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen a túlságosan nagy összegű számla a mondás szerint?",
+   "valaszok": [
+    "paprikás",
+    "kapros",
+    "borsos",
+    "köményes"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen arcú a rezzenéstelen tekintetű, nagy önuralmú ember?",
+   "valaszok": [
+    "snapszer",
+    "póker",
+    "kanaszta",
+    "bridzs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen az iszákosságtól vörössé vált orr a mondás szerint?",
+   "valaszok": [
+    "művirágos",
+    "borvirágos",
+    "jégvirágos",
+    "sörvirágos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen betűt csinál, aki kerülőutat téve jut el valahová?",
+   "valaszok": [
+    "csizmadia",
+    "varga",
+    "kovács",
+    "borbély"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen bőrbe bújt farkasnak nevezik a jámborságot színlelő álnok embert?",
+   "valaszok": [
+    "medve",
+    "krokodil",
+    "róka",
+    "bárány"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen deresnek nevezik a kerek foltokkal tarkázott lovat?",
+   "valaszok": [
+    "szilvás",
+    "dinnyés",
+    "almás",
+    "barackos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen dohányosnak nevezi a népnyelv a csak alkalmilag dohányzó személyt?",
+   "valaszok": [
+    "jérce",
+    "boci",
+    "tinó",
+    "koca"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen elnevezéssel szokás illetni tréfásan az agyafúrt, nem mindig becsületes embert?",
+   "valaszok": [
+    "csirkekopasztó",
+    "birkanyúzó",
+    "lókötő",
+    "libalovasító"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen ember a potrohos a népnyelv szerint?",
+   "valaszok": [
+    "irigy",
+    "pocakos",
+    "ostoba",
+    "kopaszodó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen ember az, aki a mondás szerint a sült galambra vár?",
+   "valaszok": [
+    "éhes",
+    "ravasz",
+    "tétlen",
+    "kapkodó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen emberre mondja a népnyelv, hogy olyan mint a pulykatojás?",
+   "valaszok": [
+    "mérges",
+    "borostás",
+    "kövér",
+    "szeplős"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen fejfedőt \"visel\" a maradi, kicsinyes ember?",
+   "valaszok": [
+    "vaskalapot",
+    "betoncsákót",
+    "ólomsüveget",
+    "krómozott kendőt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen gulya tölti a nyarat és a telet is a szabadban a kifejezés szerint?",
+   "valaszok": [
+    "duhaj",
+    "szilaj",
+    "ihaj",
+    "csuhaj"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen jelzővel illeti a népnyelv a heves vérmérsékletű menyecskét?",
+   "valaszok": [
+    "szeles",
+    "vizes",
+    "napos",
+    "tüzes"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen kerti szerszám \"sülhet el\" néha a mondás szerint?",
+   "valaszok": [
+    "az eke szarva",
+    "a kapanyél",
+    "a locsolócső",
+    "a metszőolló"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen képzőnek nevezzük a -tlan, -tlen, -talan, -telen toldalékot?",
+   "valaszok": [
+    "osztó",
+    "fosztó",
+    "rontó",
+    "bontó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen körülmények között fekete minden tehén a mondás szerint?",
+   "valaszok": [
+    "áramszünetkor",
+    "alagút közepén",
+    "sötétben",
+    "teljes napfogyatkozáskor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen levonat szerepelt a nyomdászok szaknyelvében?",
+   "valaszok": [
+    "fésű",
+    "csipesz",
+    "kefe",
+    "pumpa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen lábbelihez hasonlítják a mulya férjet?",
+   "valaszok": [
+    "csizma",
+    "bakancs",
+    "papucs",
+    "surranó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen lányoknak nevezik a menyasszony kisérőit az esküvőkön?",
+   "valaszok": [
+    "pántlikás",
+    "bokrétás",
+    "cicomás",
+    "koszorús"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen madzagot húz el az ember szája előtt, aki csábító ígéretet tesz?",
+   "valaszok": [
+    "lekváros",
+    "csokimázas",
+    "mézes",
+    "diós-mákos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nyelvnek szokás nevezni az argót?",
+   "valaszok": [
+    "tolvaj",
+    "smasszer",
+    "gengszter",
+    "őrző-védő"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen néven szokás illetni a sorozatosan ügyetlen embert?",
+   "valaszok": [
+    "balfajd",
+    "jobbtúzok",
+    "balfácán",
+    "jobbfürj"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen oroszlánt ne ébresszünk fel a mondás szerint?",
+   "valaszok": [
+    "lánchídi",
+    "gyáva",
+    "alvó",
+    "fogfájós"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen szemű az élesen látó ember?",
+   "valaszok": [
+    "sas",
+    "bab",
+    "gomb",
+    "tyúk"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen szezonnak nevezik tréfásan az eseménytelen időszakot?",
+   "valaszok": [
+    "áfonya",
+    "burgonya",
+    "saláta",
+    "uborka"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen szívű a rideg, részvétlen ember?",
+   "valaszok": [
+    "prémes",
+    "bundás",
+    "szőrös",
+    "tollas"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen testrészre \"esett\" a nehéz helyzetben gyorsan jó megoldást találó ember?",
+   "valaszok": [
+    "talpra",
+    "orra",
+    "térdre",
+    "fenékre"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen tréfás elnevezéssel illeti a népnyelv a szokatlanul magas embert?",
+   "valaszok": [
+    "felhőkarcoló",
+    "égimeszelő",
+    "toronypöccintő",
+    "medvebúboló"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen vén a nagyon idős ember a mondás szerint?",
+   "valaszok": [
+    "mint a medvejárta ösvény",
+    "mint a faluvégi dűlő",
+    "mint a kockaköves utca",
+    "mint az országút"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állat nevét viseli az apró, fehéres gomolyagokból álló ritkás felhő?",
+   "valaszok": [
+    "komondor",
+    "jegesmedve",
+    "angóranyúl",
+    "bárány"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állatot köt a karóhoz a konok ember a mondás szerint?",
+   "valaszok": [
+    "lovat",
+    "kecskét",
+    "ebet",
+    "bikát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen élelmiszer nem lesz a kutyából a mondás szerint?",
+   "valaszok": [
+    "hurka",
+    "kolbász",
+    "szalonna",
+    "virsli"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen évszakjuk van a vénasszonyoknak a szókapcsolat szerint?",
+   "valaszok": [
+    "tele",
+    "tavasza",
+    "nyara",
+    "ősze"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen úszó az állandó munkahellyel nem rendelkező személy az elnevezés szerint?",
+   "valaszok": [
+    "pillangó",
+    "gyors",
+    "hát",
+    "szabad"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Min \"csúszik el\" az a mondás szerint, aki egy kis hiba miatt vall kudarcot?",
+   "valaszok": [
+    "dinnyehéjon",
+    "narancshéjon",
+    "banánhéjon",
+    "kenyérhéjon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Min keresztül érvényesíti akaratát a nagy nehézségeket legyűrő ember?",
+   "valaszok": [
+    "árkon-bokron",
+    "kézen-közön",
+    "seben-lobon",
+    "tűzön-vízen"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Min lát át a ravaszkodást felismerő ember a mondás szerint?",
+   "valaszok": [
+    "a sötétített üvegen",
+    "a vastag arcbőrön",
+    "a szúnyoghálón",
+    "a szitán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Min szokott felkapaszkodni egy rangsorban előrébb jutó hivatalnok?",
+   "valaszok": [
+    "kötéllétrán",
+    "szamárlétrán",
+    "mozgólépcsőn",
+    "csigalépcsőn"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Min tartják a fegyelemre kényszerített embert a mondás szerint?",
+   "valaszok": [
+    "kurta kötélen",
+    "szigorú szíjon",
+    "pinduri pányván",
+    "rövid pórázon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek a javát ette meg az éltes ember a mondás szerint?",
+   "valaszok": [
+    "szalonnája",
+    "kenyere",
+    "vöröshagymája",
+    "bélszínje"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek a rövidítése a DNS?",
+   "valaszok": [
+    "denaturáltszesz",
+    "dinosaurus",
+    "darwinizmus",
+    "dezoxiribonukleinsav"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek a túloldalára esik az ellenkező végletet választó ember a mondás szerint?",
+   "valaszok": [
+    "ló",
+    "hintaló",
+    "lóca",
+    "nyaktiló"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Minek híg a leve a szólás szerint?",
+   "valaszok": [
+    "a jóllakott tehénnek",
+    "az érett gyümölcsnek",
+    "olcsó húsnak",
+    "használt mosogatórongynak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minek nem kell cégér a mondás szerint?",
+   "valaszok": [
+    "jó cégnek",
+    "jó lónak",
+    "jó bornak",
+    "jó bőrnek"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minek nem tud ártani a nagyon szelíd ember a mondás szerint?",
+   "valaszok": [
+    "darázsnak",
+    "póknak",
+    "légynek",
+    "katicabogárnak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minél volt nagyobb az általam megfogott szúnyog a versike szerint?",
+   "valaszok": [
+    "egy kredencnél",
+    "egy lónál",
+    "egy hegynél",
+    "egy háznál"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire \"lehet kenni\" az engedékeny embert a mondás szerint?",
+   "valaszok": [
+    "briósra",
+    "kalácsra",
+    "palacsintára",
+    "kenyérre"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mire iszik előre az elbizakodott ember a mondás szerint?",
+   "valaszok": [
+    "a róka prémjére",
+    "a birka gyapjára",
+    "a teve szőrére",
+    "a medve bőrére"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mire iszik előre az elbizakodott ember?",
+   "valaszok": [
+    "az elefánt ormányára",
+    "a tigris fogára",
+    "a medve bőrére",
+    "a szamár fülére"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mire jut a nyilvánossá váló információ a mondás szerint?",
+   "valaszok": [
+    "teliholdra",
+    "napvilágra",
+    "csillagfényre",
+    "hajnalpírra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miről nevezték el az éles, U alakú kanyarulatokat?",
+   "valaszok": [
+    "melltű",
+    "gombostű",
+    "hajtű",
+    "varrótű"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit adnak annak, aki büdöskét kap ajándékba?",
+   "valaszok": [
+    "borzkölyköt",
+    "juhsajtot",
+    "növényt",
+    "romlott kölnit"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csap az, aki hevesen udvarol valakinek?",
+   "valaszok": [
+    "szelet",
+    "ajtót",
+    "legyet",
+    "asztalt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit csinál a fába szorult féreg a szólás szerint?",
+   "valaszok": [
+    "perceg",
+    "rágcsál",
+    "ordít",
+    "mocorog"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál a hencegő ember?",
+   "valaszok": [
+    "ötvenkedik",
+    "hatvankodik",
+    "hetvenkedik",
+    "nyolcvankodik"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál a mondás szerint a lerészegedő ember?",
+   "valaszok": [
+    "behavazódik",
+    "elázik",
+    "köddé válik",
+    "széllelbélelt lesz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinál a mondás szerint a másik emberrel az, aki követelőzésre biztatja?",
+   "valaszok": [
+    "lovat ad alá",
+    "bakot tart neki",
+    "felkurblizza az öntudatát",
+    "aládúcolja a szándékait"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit csinál a mondás szerint a másikkal az ember, amikor ravaszul elbánik vele?",
+   "valaszok": [
+    "kidinnyéz",
+    "kikarfioloz",
+    "kimazsoláz",
+    "kikukoricáz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit csinál a mondás szerint a zavartan kertelő ember?",
+   "valaszok": [
+    "hintáz-hantáz",
+    "altat-áltat",
+    "cinkel-linkel",
+    "hímez-hámoz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit csinál a mondás szerint az, aki úgy próbálkozik, hogy még nem látja a helyes megoldást?",
+   "valaszok": [
+    "pincében botorkál",
+    "sötétben tapogatózik",
+    "lámpás nélkül barlangászik",
+    "fáklyátlan motoz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinál a mondás szerint, aki \"igába hajtja a fejét\"?",
+   "valaszok": [
+    "elválik",
+    "tehenet fej",
+    "megnősül",
+    "ekét tesztel"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál a mondás szerint, aki hevesen udvarol?",
+   "valaszok": [
+    "kavarja a vizet",
+    "rontja a levegőt",
+    "csapja a szelet",
+    "hordja a hetet-havat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál az egyre szemtelenebbé váló ember a mondás szerint?",
+   "valaszok": [
+    "bebojtárosodik",
+    "kikondásodik",
+    "felpásztorodik",
+    "elkanászodik"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit csinál az epéje a haragra lobbanó embernek?",
+   "valaszok": [
+    "bugyog",
+    "morog",
+    "felforr",
+    "megkövül"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál az, aki nagyszabású eszközöket használ fel kisszerű célra?",
+   "valaszok": [
+    "Mamuttal megy egeret fogni.",
+    "Ágyúval lő verébre.",
+    "Sodronnyal stoppolja a zoknit.",
+    "Gyönggyel eteti a disznót."
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinál, aki a flasztert tapossa?",
+   "valaszok": [
+    "erős sodrásban úszik",
+    "kövezett úton gyalogol",
+    "iszapban fürdik",
+    "csűr padlóját döngöli"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinál, aki pipiskedik?",
+   "valaszok": [
+    "tyúkokat etet",
+    "tojásokat költ",
+    "kényeskedik",
+    "kendermagot válogat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál, aki ródlizik?",
+   "valaszok": [
+    "siel",
+    "szánkózik",
+    "korcsolyázik",
+    "énekel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinál, aki tovább nehezít egy feszült helyzetet?",
+   "valaszok": [
+    "fát visz az erdőbe",
+    "olajat önt a tűzre",
+    "vizet locsol a tengerbe",
+    "cukrot szór a mézre"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinálhatunk a nyomával annak, aki kereket oldott?",
+   "valaszok": [
+    "forrón tarthatjuk",
+    "bottal üthetjük",
+    "gipszbe önthetjük",
+    "elsepergethetjük"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinálnak a mondás szerint a cinkosként együttműködő felek?",
+   "valaszok": [
+    "együtt gyúrják a tésztát",
+    "közös lepényt sütnek",
+    "egy lopótököt szívnak",
+    "összeszűrik a levet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit csinálnak az okarinával?",
+   "valaszok": [
+    "megisszák",
+    "megfújják",
+    "learatják",
+    "elköltik"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinálnak egy műalkotással a restaurálás során?",
+   "valaszok": [
+    "elrabolják",
+    "elárverezik",
+    "sokszorisítják",
+    "helyreállítják"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit dob be a mondás szerint, aki felad valamit?",
+   "valaszok": [
+    "a tétet",
+    "a törülközőt",
+    "a kulcsot",
+    "a csatabárdot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit fog rövidre, aki szigorúbb fegyelemre kényszerít valakit?",
+   "valaszok": [
+    "gyeplőt",
+    "nyakörvet",
+    "derékszíjat",
+    "kutyaláncot"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit fújnak az azonos érdekeket képviselő emberek a mondás szerint?",
+   "valaszok": [
+    "egy tilinkót",
+    "egy pikulát",
+    "egy tubát",
+    "egy követ"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit hagy ott, aki hirtelen távozik?",
+   "valaszok": [
+    "házat, hazát",
+    "csapot, papot",
+    "zabot, babot",
+    "tanyát, banyát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit hasogat a kifejezés szerint a fontoskodó ember?",
+   "valaszok": [
+    "fűszálat",
+    "virágszálat",
+    "hajszálat",
+    "szőrszálat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit hord össze az összevissza beszélő ember?",
+   "valaszok": [
+    "hetet-havat",
+    "tücsköt-szöcskét",
+    "kecskét-macskát",
+    "szénát-szalmát"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit húz ki a népnyelv szerint az, aki pórul jár?",
+   "valaszok": [
+    "szálkát",
+    "fiókot",
+    "fogat",
+    "gyufát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit jelent a \"piano\" kifejezés?",
+   "valaszok": [
+    "zenei utasítás: halkan",
+    "cimbalom",
+    "alkoholt nem árusító bolt",
+    "Afrikában honos fafajta"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit jelent a bakfis szavunk?",
+   "valaszok": [
+    "hím hal",
+    "kocsis",
+    "borravaló",
+    "serdülő lány"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit kap a felbátorodó ember?",
+   "valaszok": [
+    "tyúkszemet",
+    "pápaszemet",
+    "mákszemet",
+    "vérszemet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit kap, akinek pralinét ajándékoznak?",
+   "valaszok": [
+    "illatszert",
+    "likőrt",
+    "édességet",
+    "kiütést"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit kap, akinek visszautasítják a házassági ajánlatát?",
+   "valaszok": [
+    "batyut",
+    "tarisznyát",
+    "puttonyt",
+    "kosarat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit keres a kákán az akadékoskodó ember?",
+   "valaszok": [
+    "egy kisebb vagyont",
+    "gumót",
+    "csomót",
+    "masnit"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit kiabál másokra az aljasul rágalmazó ember?",
+   "valaszok": [
+    "tücsköt-bogarat",
+    "nyuszit-pockot",
+    "gyíkot-hangyát",
+    "kígyót-békát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit mond a bagoly a verébnek a közmondás szerint?",
+   "valaszok": [
+    "hogy nagyhangú",
+    "hogy nagyfejű",
+    "hogy mitugrász",
+    "hogy kis töpszli"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit mond a népnyelv a cinkosságot vállaló emberekről?",
+   "valaszok": [
+    "egy tilinkót fújnak",
+    "egy cimbalmot ütnek",
+    "egy vonóval húznak",
+    "egy húron pendülnek"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit mond a népnyelv a nagyon széles vállú, izmos felsőtestű ember?",
+   "valaszok": [
+    "alfás",
+    "bétás",
+    "gammás",
+    "deltás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit mond a népnyelv a szenvtelen, egykedvű emberre?",
+   "valaszok": [
+    "halvérű",
+    "póklábú",
+    "kosfejű",
+    "tyúkszemű"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit mond a népnyelv az ittas emberre?",
+   "valaszok": [
+    "krétás",
+    "tollas",
+    "festékes",
+    "tintás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit mond, aki felsül valamiben?",
+   "valaszok": [
+    "hétfőt",
+    "keddet",
+    "szerdát",
+    "csütörtököt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit mondanak az észrevétlenül távozó emberre: \"Eltűnik, mint a ...\"",
+   "valaszok": [
+    "kámfor",
+    "kántor",
+    "kontár",
+    "kondér"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit mondunk a félrevezetett emberre?",
+   "valaszok": [
+    "kaptárba került",
+    "lépre ment",
+    "csuporba szorult",
+    "málnásban bóklászott"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit mondunk a kihasználatlan lehetőségre?",
+   "valaszok": [
+    "pamlagon henyél",
+    "parlagon hever",
+    "gyékényen gunnyaszt",
+    "gubán gubbaszt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit mondunk gúnyosan a nem mindennapi emberre?",
+   "valaszok": [
+    "sose botlik a lova",
+    "takarón túl nyújtozkodik",
+    "van pénze is, posztója is",
+    "megéri a pénzét"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit mozgat meg a cél érdekében mindent megpróbáló ember?",
+   "valaszok": [
+    "minden izmot",
+    "minden porcikát",
+    "minden követ",
+    "minden szöget"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit ne halassz holnapra a közmondás szerint?",
+   "valaszok": [
+    "amit ma megehetsz",
+    "amit ma megtehetsz",
+    "amit ma megvehetsz",
+    "amit ma meglelhetsz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit ne tegyen a mondás szerint az, aki nem dolgozik?",
+   "valaszok": [
+    "ne is igyék",
+    "ne is egyék",
+    "ne is aludjék",
+    "ne is mulassék"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit nem lát az elvakult ember a mondás szerint?",
+   "valaszok": [
+    "máktól a rétest",
+    "tövistől a rózsát",
+    "zabtól a lovat",
+    "fától az erdőt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit nem árul a nyilt ember a szólás szerint?",
+   "valaszok": [
+    "petrezselymet",
+    "zsákbamacskát",
+    "pormacskát",
+    "gyékényt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveznek folyondárnak?",
+   "valaszok": [
+    "folyami dandárt",
+    "a melegvíz árát",
+    "kúszónövényt",
+    "cipészszerszámot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit nevezünk kanasztának?",
+   "valaszok": [
+    "a kánász segédjét",
+    "férfimodellt",
+    "díjnyertes kandúrt",
+    "kártyajátékot"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit nyomhatunk tréfásan a gyermek feje búbjára a mondás szerint?",
+   "valaszok": [
+    "almát",
+    "barackot",
+    "citromot",
+    "diót"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit nyújtanak annak, aki számára kvártélyt biztosítanak?",
+   "valaszok": [
+    "napi két étkezést",
+    "szállást",
+    "külön fürdőszobát",
+    "szabad eltávozást"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit szemlél az, aki a szaldóját ellenőrzi?",
+   "valaszok": [
+    "vérnyomását",
+    "banki egyenlegét",
+    "ünnepi öltözetét",
+    "iskolai bizonyítványát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit tartottak a bugyellárisban?",
+   "valaszok": [
+    "fehérneműt",
+    "levélpapírt",
+    "tintát",
+    "pénzt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit terem a türelem a mondás szerint?",
+   "valaszok": [
+    "rezedát",
+    "gerberát",
+    "nefelejcset",
+    "rózsát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit tesz a mondás szerint a másik féllel az, aki rendre utasítja?",
+   "valaszok": [
+    "tyúkszemére tipor",
+    "derékon kapja",
+    "orrára koppint",
+    "nyakára hág"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit tesz a mondás szerint a nehéz körülmények között is kitartó ember?",
+   "valaszok": [
+    "gyúrja a havat",
+    "állja a sarat",
+    "rúgja a port",
+    "tapossa az iszapot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit tesz a tűzre a csintalan gyermek a mondás szerint?",
+   "valaszok": [
+    "nedves gallyat",
+    "rossz fát",
+    "olcsó brikettet",
+    "olajos rongyot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit tesznek az emberrel, amikor detoxikálják?",
+   "valaszok": [
+    "méregtelenítik",
+    "továbbképzik",
+    "lefokozzák",
+    "besorozzák"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit tud a bajok mibenlétét ismerő ember a mondás szerint?",
+   "valaszok": [
+    "hol fáj a lúdtalp",
+    "hol tör a bocskor",
+    "hol szorít a cipő",
+    "hol szellőzik a szandál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit tud a mondás szerint a fortélyos, furfangos ember?",
+   "valaszok": [
+    "mitől rikkant a rigó",
+    "mitől botlik meg a ló",
+    "mitől lassú a sánta kutya",
+    "mitől döglik a légy"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit visz el a győztes a mondás szerint?",
+   "valaszok": [
+    "aranyesőt",
+    "olajágat",
+    "babért",
+    "pálmát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit ásnak el a békülő indiánok a mondás szerint?",
+   "valaszok": [
+    "véres nyerget",
+    "harci tolldíszt",
+    "csatabárdot",
+    "skalpoló tőrt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mivel \"bélelt\" a léha, üresfejű személy a mondás szerint?",
+   "valaszok": [
+    "szénával",
+    "széllel",
+    "szénnel",
+    "szőrrel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel eszik a sokat és jó étvággyal táplálkozó ember a mondás szerint?",
+   "valaszok": [
+    "likas bendővel",
+    "nagy kanállal",
+    "arany vellával",
+    "péklapáttal"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel gyógyítják a kutyaharapást a szólás szerint?",
+   "valaszok": [
+    "macskakarmolással",
+    "védőoltással",
+    "ráolvasással",
+    "szőrével"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mivel játszik a mondás szerint a nagy kockázatot vállaló ember?",
+   "valaszok": [
+    "kútkávával",
+    "egérfogóval",
+    "tigris bajszával",
+    "tűzzel"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mivel kell gyógyítani a kutyaharapást a mondás szerint?",
+   "valaszok": [
+    "macskával",
+    "gumicsonttal",
+    "életelixírrel",
+    "szőrével"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mivel álmodik az éhes disznó a mondás szerint?",
+   "valaszok": [
+    "korpával",
+    "makkal",
+    "táppal",
+    "pocsolyával"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivé nem válik a vér a mondás szerint?",
+   "valaszok": [
+    "vízzé",
+    "borrá",
+    "fröccsé",
+    "aludttejjé"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mivé tesszük a mondás szerint azt, aki hagyja magát félrevezetni?",
+   "valaszok": [
+    "szamárrá",
+    "öszvérré",
+    "birkává",
+    "lóvá"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "\"Fabatkát sem ér.\"- mondjuk az értéktelen dologra. Mit neveztek régen batkának?",
+   "valaszok": [
+    "gabonamagot",
+    "inggombot",
+    "aprópénzt",
+    "parányi élősködőt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "\"Spongyát rá!\" - szól a mondás. Mit neveztek régen spongyának?",
+   "valaszok": [
+    "a ködöt",
+    "a selyemleplet",
+    "a szivacsot",
+    "a keszkenőt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A levelek melyik részét nevezik latinul postscriptumnak?",
+   "valaszok": [
+    "megszólítás",
+    "bevezetés",
+    "keltezés",
+    "utóirat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbi szavak közül melyiket írtuk helytelenül?",
+   "valaszok": [
+    "sóhaj",
+    "talaj",
+    "fogoj",
+    "zsivaj"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi állatnevek közül melyik egy himlőfajta előneve?",
+   "valaszok": [
+    "farkas",
+    "szamár",
+    "galamb",
+    "bárány"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik a dizőz?",
+   "valaszok": [
+    "őzsuta",
+    "vadászkürt",
+    "énekesnő",
+    "vadtrófea"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket kapja az, akinek kékfrankost ajándékoznak?",
+   "valaszok": [
+    "francia pénzérmét",
+    "vörösbort",
+    "ruhaszövetet",
+    "tintát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket nevezik pipitérnek?",
+   "valaszok": [
+    "egy növényt",
+    "a tyúkólat",
+    "énekesmadarat",
+    "a baromfiudvart"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket nevezik tüllnek?",
+   "valaszok": [
+    "fúvós hangszert",
+    "kolibrifajtát",
+    "szövegfajtát",
+    "női cipőt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket nevezték bugyellárisnak?",
+   "valaszok": [
+    "rövid bugyogót",
+    "pénztárcát",
+    "bugylibicskát",
+    "buggyos batyut"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket nevezték kazamatának?",
+   "valaszok": [
+    "világítótornyot",
+    "föld alatti börtönt",
+    "ókori ostromgépet",
+    "ausztrál futómadarat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Deák úr melyik családtagja szerepel egy ismert tréfás közmondásban?",
+   "valaszok": [
+    "fia",
+    "lánya",
+    "neje",
+    "anyósa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Egészítse ki a mondást! \"…, a karaván halad.\"",
+   "valaszok": [
+    "a macska nyávog",
+    "a tücsök ciripel",
+    "a malac röfög",
+    "a kutya ugat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Egészítse ki a szólást: \"Aki ... közé keveredik, megeszik a disznók.\"",
+   "valaszok": [
+    "korpa",
+    "moslék",
+    "kása",
+    "konkoly"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Folytassa a mondást! \"Se pénz, se …\"",
+   "valaszok": [
+    "vacsora",
+    "posztó",
+    "békesség",
+    "asszony"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Folytassa a régi modást! \"Ép testben …\"",
+   "valaszok": [
+    "alig élek",
+    "ép lélek",
+    "szép lélek",
+    "hallgat a lélek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ha egy vállalkozás deficites, akkor minden kétséget kizáróan ...",
+   "valaszok": [
+    "nyereséges",
+    "veszteséges",
+    "törvénytelen",
+    "megeszi a nagyhal"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezi a népnyelv a bőrön található kisebb barnás foltot?",
+   "valaszok": [
+    "anyajegy",
+    "sorsjegy",
+    "névjegy",
+    "kézjegy"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy nevezik a tánc térbeli és kifejezésbeli megszerkesztését?",
+   "valaszok": [
+    "korrepetálás",
+    "koreográfia",
+    "korrektúra",
+    "korreláció"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik a több tudományágban jártas, egyetemes tudású személyt?",
+   "valaszok": [
+    "polisztirol",
+    "poligám",
+    "polihisztor",
+    "polifon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik másképp a csigatésztát?",
+   "valaszok": [
+    "lúdtalp",
+    "lúdbőr",
+    "lúdgége",
+    "ludvérc"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan fejezi ki a mondás, hogy két személytől függ valami?",
+   "valaszok": [
+    "Két fél kell az alkuhoz.",
+    "Kettő csinálja az üzletet.",
+    "Kettőn áll a vásár.",
+    "Kettőre szabták a boltot."
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan fejezi ki a népnyelv, ha azért kicsinyelünk le valamit, mert nem tudtunk megszerezni?",
+   "valaszok": [
+    "Csípős a paprika",
+    "Fonnyadt a körte",
+    "Savanyú a szőlő",
+    "Kukacos az alma"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan folytatódik a mondás? \"Ahány ház, annyi …\"",
+   "valaszok": [
+    "adó",
+    "gazdasszony",
+    "szokás",
+    "kamra"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan harcol vagy vitázik a szándékait nem rejtegető ember a mondás szerint?",
+   "valaszok": [
+    "kesztyűtlen kézzel",
+    "sodronyingben",
+    "páncél nélkül",
+    "nyílt sisakkal"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezi a népnyelv a pupillát?",
+   "valaszok": [
+    "szemfény",
+    "szembogár",
+    "macskaszem",
+    "szemtükör"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezik közismert szóval az elnyomó hatalommal szemben álló felkelőt?",
+   "valaszok": [
+    "gepida",
+    "gerilla",
+    "gorilla",
+    "guzlica"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezték tréfálkozva a kisgyerekeket?",
+   "valaszok": [
+    "zöldszájú",
+    "tejfelesfülü",
+    "hátulgombolós",
+    "elölkapcsos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan nevezzük a nem eredeti állapotukban fennmaradt, sérült műalkotásokat?",
+   "valaszok": [
+    "torero",
+    "torzió",
+    "torzó",
+    "tortilla"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan szól a mondás? \"Több nap, mint …\"",
+   "valaszok": [
+    "fizetés",
+    "kolbász",
+    "plajbász",
+    "lencse"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol találkozhatunk a narrátorral?",
+   "valaszok": [
+    "irodalmi művekben",
+    "orvosi rendelőben",
+    "zenekarban",
+    "repülőtéren"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol árulnak a mondás szerint, akik valamiben közösködnek, cinkosságot vállalnak?",
+   "valaszok": [
+    "egy lóvásárban",
+    "egy gyékényen",
+    "egy pulton",
+    "egy kapualjban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hová megy, aki egy ankétra hivatalos?",
+   "valaszok": [
+    "esküvőre",
+    "értekezletre",
+    "hangversenyre",
+    "lóvásárra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hová vezet minden út a mondás szerint?",
+   "valaszok": [
+    "Rómába",
+    "Moszkvába",
+    "Washingtonba",
+    "Tibetbe"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hányan vannak a gonoszok a mondás szerint?",
+   "valaszok": [
+    "heten",
+    "tizen",
+    "tizenketten",
+    "negyvenen"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki a spion?",
+   "valaszok": [
+    "rab",
+    "kém",
+    "katonaszökevény",
+    "katonai futár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki vagy mi a papaja?",
+   "valaszok": [
+    "afrikai ügetőmadár",
+    "trópusi gyümölcs",
+    "új-zélandi törzs",
+    "tibeti szerzetes"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki vagy mi a történelmi filmekből és regényekből ismert bajonett?",
+   "valaszok": [
+    "bárónő",
+    "szúrófegyver",
+    "bajor menyecske",
+    "francia mártás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiket nevezett a népnyelv martalócnak?",
+   "valaszok": [
+    "a bölléreket",
+    "a bakókat",
+    "a zsiványokat",
+    "a sörfőzőket"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kiket neveznek a sajtónyelvben lánglovagoknak?",
+   "valaszok": [
+    "tűznyelőket",
+    "vulkánológusokat",
+    "pirotechnikusokat",
+    "tűzoltókat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kiket vagy miket szokás amazonoknak nevezni?",
+   "valaszok": [
+    "egy denevérfajt",
+    "a brazil őslakosokat",
+    "a harcias nőket",
+    "egy almafajtát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a láttán talál az ember szerencsét a régi mondás szerint?",
+   "valaszok": [
+    "nyalka huszár",
+    "kikapós menyecske",
+    "sorsjegyárús",
+    "kéményseprő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kit neveznek régiesen latornak?",
+   "valaszok": [
+    "vándorköszörűst",
+    "gonosztevőt",
+    "kereskedőt",
+    "pásztort"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit neveztek a lányos házaknál gavallérnak?",
+   "valaszok": [
+    "az apát",
+    "az apósjelöltet",
+    "az udvarlót",
+    "a fiútestvért"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit neveztek brigadérosnak?",
+   "valaszok": [
+    "építésvezetőt",
+    "karnagyot",
+    "katonai vezetőt",
+    "iskolaigazgatót"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit neveztek imposztornak a régi nyelvezetben?",
+   "valaszok": [
+    "sokoldalú tudóst",
+    "posztókereskedőt",
+    "csalót, gazembert",
+    "strázsát, ajtónállót"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit neveztek zsandárnak?",
+   "valaszok": [
+    "a vasutast",
+    "a csendőrt",
+    "a szatócsot",
+    "a békebírót"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kitől kihez jár a mondás szerint, aki egyik helyről a másikra szaladgál eredménytelenül?",
+   "valaszok": [
+    "Kajafástól Barrabásig",
+    "Ponciustól Pilátusig",
+    "Saulustól Paulusig",
+    "Ádámtól Éváig"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik a görög ábécé harmadik betűje?",
+   "valaszok": [
+    "delta",
+    "alpha",
+    "gamma",
+    "béta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik a magyar nyelv leggyakrabb magánhangzója?",
+   "valaszok": [
+    "a",
+    "e",
+    "i",
+    "ó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik az a madár, amelynek egyetlen példánya még nem csinál nyarat a mondás szerint?",
+   "valaszok": [
+    "gólya",
+    "fecske",
+    "pacsirta",
+    "daru"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy ruhadarab és egy hentesáru elnevezése is?",
+   "valaszok": [
+    "kimonó",
+    "krokett",
+    "krinolin",
+    "kalucsni"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hangszer neve jelöl egy féktípust?",
+   "valaszok": [
+    "tuba",
+    "bőgő",
+    "csemballó",
+    "dob"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik lehet pudvás az alábbiak közül?",
+   "valaszok": [
+    "karalábé",
+    "varjú",
+    "kecske",
+    "csizma"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik madárnév írásmódja helytelen?",
+   "valaszok": [
+    "karvaly",
+    "sirály",
+    "papagály",
+    "gólya"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem a görög ábécé betűje az alábbiak közül?",
+   "valaszok": [
+    "epszilon",
+    "pszi",
+    "théta",
+    "makro"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik része a laktanyáknak a kantin?",
+   "valaszok": [
+    "lőtér",
+    "őrtorony",
+    "büfé",
+    "hálóhelyiség"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szó jelent bohócot, paprikajancsit?",
+   "valaszok": [
+    "hektor",
+    "harlekin",
+    "hippia",
+    "hippodrom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szó madár- és növénynév is?",
+   "valaszok": [
+    "kivi",
+    "grapefruit",
+    "papaja",
+    "mangó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik testrész adja nevét egy vitorlafajtának?",
+   "valaszok": [
+    "vádli",
+    "tenyér",
+    "térd",
+    "orr"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik testrész lehet mandulavágású?",
+   "valaszok": [
+    "orr",
+    "fül",
+    "szem",
+    "homlok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik tánc neve egyezik meg egy női ruha nevével?",
+   "valaszok": [
+    "tangó",
+    "mazurka",
+    "boleró",
+    "rumba"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ujjunkat nevezik a népnyelvben öregujjnak?",
+   "valaszok": [
+    "hüvelykujj",
+    "mutatóujj",
+    "gyűrűsujj",
+    "kisujj"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik állat latin neve Panthera leo?",
+   "valaszok": [
+    "kutya",
+    "medve",
+    "oroszlán",
+    "uhu"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állat népies elnevezése a gilice az alábbiak közül?",
+   "valaszok": [
+    "gerle",
+    "giliszta",
+    "kiscsibe",
+    "fecske"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik állatról kapta nevét egy fűszernövény?",
+   "valaszok": [
+    "sólyom",
+    "sakál",
+    "denevér",
+    "kakukk"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állatról nevezték el a szürkületi vakságot?",
+   "valaszok": [
+    "róka",
+    "farkas",
+    "szarvas",
+    "párduc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyiket nevezhetik mortadellának az alábbiak közül?",
+   "valaszok": [
+    "olasz operaénekesnőt",
+    "fagylaltot",
+    "felvágottfajtát",
+    "evezős hajót"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyiket nevezik békatutajnak?",
+   "valaszok": [
+    "a búvárok uszonyát",
+    "egy vízinövényt",
+    "az ebihalat",
+    "egy kezdetleges vízi járművet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyiket nevezik hibiszkusznak?",
+   "valaszok": [
+    "lótestű mitológiai lényeket",
+    "óriásgyíkot",
+    "dísznövénynemzetséget",
+    "ókori számológépet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyiket nevezték csobolyónak?",
+   "valaszok": [
+    "kerti szökőkutat",
+    "italtartó edényt",
+    "halászhálót",
+    "kis zuhatagot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mennyit nem enged a makacs ember a mondás szerint?",
+   "valaszok": [
+    "kottányit sem",
+    "jottányit sem",
+    "jussomnyit sem",
+    "dugónyit sem"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a Nagy Medve csillagkép egy részének népies elnevezése?",
+   "valaszok": [
+    "Tejút",
+    "Esthajnalcsillag",
+    "Göncölszekér",
+    "Medvebocs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a Tyrannosaurus rex?",
+   "valaszok": [
+    "gumiabroncs-márka",
+    "társasjáték",
+    "ókori királysír",
+    "kihalt őslény"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a csibuk?",
+   "valaszok": [
+    "pipa",
+    "nyereg",
+    "hangszer",
+    "cipész szerszám"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a dudva?",
+   "valaszok": [
+    "virágágyás",
+    "déligyümölcs",
+    "gyom",
+    "ásvány"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a findzsa?",
+   "valaszok": [
+    "szúrófegyver",
+    "lábbeli",
+    "bögre",
+    "lószerszám"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a garnizon?",
+   "valaszok": [
+    "szálloda",
+    "kocsma",
+    "helyőrség",
+    "bútordarab"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a gulipán?",
+   "valaszok": [
+    "kerti szerszám",
+    "gyomnövény",
+    "madár",
+    "kínai csónak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a hidroglóbusz magyar elnevezése?",
+   "valaszok": [
+    "tűzgömb",
+    "földgolyó",
+    "űrrakéta",
+    "víztorony"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a kintorna?",
+   "valaszok": [
+    "reggeli gimnasztika",
+    "laboratóriumi eszköz",
+    "agárverseny",
+    "sípláda"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a koboz?",
+   "valaszok": [
+    "börtöncella",
+    "tárolóeszköz",
+    "pengetőhangszer",
+    "pikkelyes termés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a neve a préseléssel vagy szárítással kikészített növények gyűjteményének?",
+   "valaszok": [
+    "herbárium",
+    "almárium",
+    "abszolutórium",
+    "antikvárium"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a obszidián?",
+   "valaszok": [
+    "pornográf film",
+    "csillagászati távcső",
+    "kemény vulkáni kőzet",
+    "ehetetlen déligyümölcs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a páternoszter?",
+   "valaszok": [
+    "felvonófajta",
+    "lépcsőfajta",
+    "papi öltözék",
+    "rózsafüzér"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a szabályok régies elnevezése?",
+   "valaszok": [
+    "regula",
+    "strigula",
+    "fityula",
+    "fabula"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a szamárkenyér?",
+   "valaszok": [
+    "pékinas első sütése",
+    "takarmánykeverék",
+    "menzakoszt",
+    "gyomnövény"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a szerelem a szólás szerint?",
+   "valaszok": [
+    "fekete lyuk",
+    "sötét verem",
+    "fületlen kosár",
+    "házatlan csiga"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a tambura?",
+   "valaszok": [
+    "édesvizi hal",
+    "perzsa népcsoport",
+    "hangszer",
+    "ázsiai vadló"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a trezor?",
+   "valaszok": [
+    "rokokó komód",
+    "vízágy",
+    "páncélszekrény",
+    "árnyékszék"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a trojka?",
+   "valaszok": [
+    "szibériai kutyafajta",
+    "pengetős hangszer",
+    "hármas lovasfogat",
+    "trójai kisgyerek"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a vége a nemakarásnak a mondás szerint?",
+   "valaszok": [
+    "nyafogás",
+    "nyüszítés",
+    "nyögés",
+    "nyűglődés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi az ametiszt?",
+   "valaszok": [
+    "katonai rang",
+    "féldrágakő",
+    "ütőhangszer",
+    "textilfajta"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi az aviatika?",
+   "valaszok": [
+    "repüléstan",
+    "fürdőtan",
+    "gyümölcstan",
+    "őslénytan"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi az ekrazit?",
+   "valaszok": [
+    "vulkanikus kőzet",
+    "latin nyelvű versforma",
+    "régi görög váltópénz",
+    "robbanóanyag"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi bújt ki a zsákból a mondás szerint, ha valaki felfedte valódi céljait?",
+   "valaszok": [
+    "a macska",
+    "a szög",
+    "a szén",
+    "a krumpli"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi furdalhatja az ember oldalát a mondás szerint?",
+   "valaszok": [
+    "kivagyiság",
+    "kíváncsiság",
+    "mohóság",
+    "kotnyelesség"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi marad meg a mondás szerint, míg a szó elszáll?",
+   "valaszok": [
+    "gondolat",
+    "jókedv",
+    "étvágy",
+    "írás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi után nevezik mimózának az érzékeny embert?",
+   "valaszok": [
+    "egy növény",
+    "egy pillangó",
+    "egy díszhal",
+    "egy francia báróné"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi van az elillanó személy előtt és után a mondás szerint?",
+   "valaszok": [
+    "por",
+    "dér",
+    "köd",
+    "felhő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miben fürdik a jól elő ember a mondás szerint?",
+   "valaszok": [
+    "vízben-mézben",
+    "sörben-borban",
+    "tejben-vajban",
+    "hóban-fagyban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miből van a szíve annak, aki érzéketlen?",
+   "valaszok": [
+    "vasból",
+    "fából",
+    "csontból",
+    "kőből"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mihez készül, aki früstökölni fog?",
+   "valaszok": [
+    "hajvágáshoz",
+    "reggelihez",
+    "tök kapálásához",
+    "kolbászfüstöléshez"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mije fogyatkozott meg Kossuth Lajosnak, amikor elfogyott a regimentje?",
+   "valaszok": [
+    "türelme",
+    "pénze",
+    "baráti köre",
+    "serege"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mijét hagyja ott a szólás szerint az, aki a harcban elesik?",
+   "valaszok": [
+    "fogát",
+    "fejét",
+    "fülét",
+    "ujját"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miket láthat, aki egy arborétumban sétál?",
+   "valaszok": [
+    "boroshordókat",
+    "toronyházakat",
+    "népművészeti bemutatót",
+    "növényeket"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mikor ismerszik meg a jó barát a mondás szerint?",
+   "valaszok": [
+    "ha ellenséggé vált",
+    "borozgatás közben",
+    "bajban",
+    "nagy szerencsében"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"nátha\" egy virágpor okozta allergiás betegség népies elnevezése?",
+   "valaszok": [
+    "szalma",
+    "búza",
+    "ocsú",
+    "széna"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"szakállnak\" nevezik a hírhedt nőcsábászokat?",
+   "valaszok": [
+    "bak",
+    "fekete",
+    "kék",
+    "kecske"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"ágyú\" a katonai mozgókonyha?",
+   "valaszok": [
+    "pörkölt",
+    "gulyás",
+    "tokány",
+    "hurka"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen a hányaveti ember?",
+   "valaszok": [
+    "sokat tipródó",
+    "gyomorérzékeny",
+    "nyegle",
+    "rossz alvó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen a kapatos ember?",
+   "valaszok": [
+    "szerencsés",
+    "közkedvelt",
+    "enyhén italos",
+    "könnyűvérű"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen a kardinális probléma?",
+   "valaszok": [
+    "jelentéktelen",
+    "megoldhatatlan",
+    "nagy fontosságú",
+    "megoldott"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen a korhely férfi?",
+   "valaszok": [
+    "otthonülő",
+    "mulatozó",
+    "nagyon idős",
+    "goromba"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen a makulátlan ember?",
+   "valaszok": [
+    "figyelmetlen",
+    "komolytalan",
+    "feddhetetlen",
+    "iskolázatlan"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen a nyalka ember?",
+   "valaszok": [
+    "hízelkedő",
+    "önfejű",
+    "beszédes",
+    "csinos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen a plenáris ülés?",
+   "valaszok": [
+    "zárt",
+    "váratlanul összehívott",
+    "hiányos létszámú",
+    "teljes"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen a profitábilis vállalkozás?",
+   "valaszok": [
+    "egyéni",
+    "társas",
+    "veszteséges",
+    "nyereséges"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen a slendrián munka?",
+   "valaszok": [
+    "precíz",
+    "hanyag",
+    "határidős",
+    "alkalmi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen a szakállas vicc?",
+   "valaszok": [
+    "nagyon hosszú",
+    "rosszul előadott",
+    "közismert",
+    "lapos csattanójú"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen a zabos ember?",
+   "valaszok": [
+    "éhes",
+    "lóvá tett",
+    "fáradt",
+    "haragos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen emberre mondja a népnyelv, hogy tintás?",
+   "valaszok": [
+    "piszkos",
+    "bolond",
+    "beteg",
+    "részeg"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen emberre mondják választékosan, hogy illuminált?",
+   "valaszok": [
+    "nagyothalló",
+    "falánk",
+    "részeg",
+    "ostoba"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen embert nevez a népnyelv golyhónak?",
+   "valaszok": [
+    "pufókot",
+    "együgyűt",
+    "kopaszt",
+    "okoskodót"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen embert nevezünk keménykötésűnek?",
+   "valaszok": [
+    "lassú felfogásút",
+    "faragatlan modorút",
+    "erős testalkatút",
+    "makacskodót"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen eredetű a Zorán név?",
+   "valaszok": [
+    "francia",
+    "latin",
+    "szláv",
+    "német"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen esőnek nevezi a népnyelv a lehullva rögtön megfagyó sűrű csapadékot?",
+   "valaszok": [
+    "rezes",
+    "brómos",
+    "ónos",
+    "vasas"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen fejsze nyelét emlegetjük, ha egy menthetetlen ügyre utalunk?",
+   "valaszok": [
+    "csorba",
+    "talált",
+    "edzett",
+    "veszett"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen hangulatban van a melankolikus ember?",
+   "valaszok": [
+    "vidám",
+    "bizakodó",
+    "ünnepélyes",
+    "búskomor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen hatású lehet egy arckrém?",
+   "valaszok": [
+    "hibridizáló",
+    "hipogén",
+    "hidratáló",
+    "homofág"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen hibának nevezi a népnyelv a vaskos, durva vétséget?",
+   "valaszok": [
+    "kecske",
+    "bárány",
+    "medve",
+    "szarvas"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen humornak nevezik a bajban lévő ember kesernyés tréfálkozását?",
+   "valaszok": [
+    "kaloda",
+    "bakó",
+    "spanyolcsizma",
+    "akasztófa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen háziállatot neveztek a népnyelvben kacornak?",
+   "valaszok": [
+    "pulit",
+    "kandúrt",
+    "kacsát",
+    "kiscsikót"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen katonát neveztek regrutának?",
+   "valaszok": [
+    "újoncot",
+    "leszerelőt",
+    "dezertálót",
+    "önkéntest"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen kereskedelemnek nevezi a köznyelv a titokban folytatott adásvételt?",
+   "valaszok": [
+    "komor",
+    "sötét",
+    "fekete",
+    "gyászos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen királyságnak nevezik a rövid ideig tartó hatalmat?",
+   "valaszok": [
+    "húsvéti",
+    "karácsonyi",
+    "pünkösdi",
+    "újévi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen lakomának nevezik a fényűzően pazar étkezést?",
+   "valaszok": [
+    "homéroszi",
+    "lukulluszi",
+    "tantaloszi",
+    "leszboszi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen lelkűnek nevezzük a fondorlatosan álnok személyt?",
+   "valaszok": [
+    "farkas",
+    "karvaly",
+    "róka",
+    "galamb"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen munkát végeztek a summások?",
+   "valaszok": [
+    "pénzügyi",
+    "mezőgazdasági",
+    "pedagógiai",
+    "kézművesipari"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nyelvű szállóige az In vino veritas (Borban az igazság)?",
+   "valaszok": [
+    "francia",
+    "lengyel",
+    "spanyol",
+    "latin"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen poétának nevezzük a tehetségtelen versfaragót?",
+   "valaszok": [
+    "nyírfa",
+    "nyárfa",
+    "fűzfa",
+    "bükkfa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen résznek nevezzük valaminek a legnagyobb részét?",
+   "valaszok": [
+    "elefánt",
+    "mamut",
+    "oroszlán",
+    "bálna"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen rímnek nevezik a szóképző mássalhangzókat változtató szójátékot?",
+   "valaszok": [
+    "öszvér",
+    "kecske",
+    "pingvin",
+    "fóka"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen rózsának nevezik a bazsarózsát?",
+   "valaszok": [
+    "vízkereszti",
+    "farsangi",
+    "húsvéti",
+    "pünkösdi"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen szobának nevezték a falusi házak vendégfogadására használt szobáját?",
+   "valaszok": [
+    "rendes",
+    "tiszta",
+    "csendes",
+    "puccos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen színű hajat nevez a népnyelv gúnyosan kesének?",
+   "valaszok": [
+    "fekete",
+    "barna",
+    "vörös",
+    "szőke"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állathoz hasonlítja a szólás a lomha nehézkes embert?",
+   "valaszok": [
+    "lajhár",
+    "medve",
+    "láma",
+    "tapír"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen állathoz hasonlítja a szólás a szorgalmas embert?",
+   "valaszok": [
+    "kutya",
+    "mosómedve",
+    "öszvér",
+    "hangya"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állathoz szokás hasonlítani egy család rossz útra tévedt tagját?",
+   "valaszok": [
+    "fehér holló",
+    "fekete bárány",
+    "szürke galamb",
+    "fekete macska"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állatokkal fekszik a mondás szerint a korán nyugovóra térő ember?",
+   "valaszok": [
+    "a baglyokkal",
+    "a denevérekkel",
+    "a tyúkokkal",
+    "a disznókkal"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen állásnak nevezik a minden állásról megerősített védelmi rendszert?",
+   "valaszok": [
+    "polip",
+    "gömbhal",
+    "strucc",
+    "sündisznó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen átok a rossz szomszédság a közmondás szerint?",
+   "valaszok": [
+    "tatár",
+    "török",
+    "labanc",
+    "kun"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen étvágya van annak az embernek, aki nagyon éhes?",
+   "valaszok": [
+    "róka",
+    "farkas",
+    "medve",
+    "tigris"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek nem vájja ki a holló a szemét a mondás szerint?",
+   "valaszok": [
+    "a madárijesztőnek",
+    "a szőlőfürtnek",
+    "a hollónak",
+    "a kukoricának"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minek nézi még az eget is az ember bizonyos állapotban a mondás szerint?",
+   "valaszok": [
+    "citerának",
+    "pikulának",
+    "bőgőnek",
+    "koboznak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mire használják a keleti népek a kaftánt?",
+   "valaszok": [
+    "lószerszámként",
+    "fejfedőként",
+    "vízipipaként",
+    "kabátként"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mire használják a pányvát?",
+   "valaszok": [
+    "kabátdíszítésre",
+    "borsószedésre",
+    "madarak etetésére",
+    "állatok kikötözésére"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mire költi a pénzét, aki malagát vásáról?",
+   "valaszok": [
+    "szivarra",
+    "papagájra",
+    "borra",
+    "díszkardra"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mire költi a pénzét, aki pelerint vásárol?",
+   "valaszok": [
+    "apró rágcsálóra",
+    "ruhára",
+    "ecsetre",
+    "díszkardra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit \"árul\" az a lány, akit egy mulatságban nem kérnek fel táncolni?",
+   "valaszok": [
+    "karalábét",
+    "káposztát",
+    "petrezselymet",
+    "kukoricát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit arat a mondás szerint, aki szelet vet?",
+   "valaszok": [
+    "szellőt",
+    "zivatart",
+    "záporesőt",
+    "vihart"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit bont a szükség a mondás szerint?",
+   "valaszok": [
+    "zárakat",
+    "becsületet",
+    "törvényt",
+    "házasságot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit cserél a szállóige szerint, aki hazát cserél?",
+   "valaszok": [
+    "köpönyeget",
+    "szívet",
+    "orcát",
+    "becsületet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinál a piromániában szenvedő ember?",
+   "valaszok": [
+    "gyújtogat",
+    "eszik",
+    "bezárkózik",
+    "keresi a veszélyt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit csinál egy kintornás?",
+   "valaszok": [
+    "kerti munkát végez",
+    "zeneszerszámon játszik",
+    "kínosan feszeng",
+    "a szabadban sportol"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinál kórosan az, aki kleptomániában szenved?",
+   "valaszok": [
+    "lop",
+    "alszik",
+    "ír",
+    "fürdik"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit csinál, aki kiókumlál valamit?",
+   "valaszok": [
+    "megszelidít",
+    "megsemmisít",
+    "kikerül",
+    "kitalál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit csinál, aki kokettál valakivel?",
+   "valaszok": [
+    "alkalmazkodik",
+    "szembeszegül",
+    "hazudik",
+    "kacérkodik"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit csinál, aki prognózist készít?",
+   "valaszok": [
+    "leltárt zár",
+    "portrét fest",
+    "előrejelzést ad",
+    "olasz tésztafélét főz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinálnak a brindzával?",
+   "valaszok": [
+    "megisszák",
+    "zenélnek vele",
+    "megeszik",
+    "utaznak rajta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinálnak a keleti népek a piláffal?",
+   "valaszok": [
+    "megeszik",
+    "füstölőnek használják",
+    "zenélnek vele",
+    "utaznak rajta"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit csinálnak az indiánok a mokaszínnal?",
+   "valaszok": [
+    "vadásznak vele",
+    "járnak benne",
+    "meglovagolják",
+    "elszívják"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinálnak az olaszok a tortellinivel?",
+   "valaszok": [
+    "megeszik",
+    "zenélnek vele",
+    "hajóznak vele",
+    "kalapként hordják"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit csinált, aki \"shimmyt járt\"?",
+   "valaszok": [
+    "menetelt",
+    "bocsánatot kért",
+    "táncolt",
+    "túrázott"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csináltak elődeink a muskétával?",
+   "valaszok": [
+    "a kalapjuk mellé tűzték",
+    "megitták",
+    "lőttek vele",
+    "szúrtak vele"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit fejez ki a mondás? \"Le a kalappal!\"",
+   "valaszok": [
+    "fegyelmezést",
+    "bizonytalanságot",
+    "elismerést",
+    "haragot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit gyűjt az erdőben a venyigegyűjtő ember?",
+   "valaszok": [
+    "gombát",
+    "madárhangokat",
+    "eldobált szemetet",
+    "száraz gallyakat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit határozunk meg metronómmal?",
+   "valaszok": [
+    "a metrójáratok sebességét",
+    "a folyók mélységét",
+    "a városok szennyezettségét",
+    "a zeneművek tempóját"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit jelent a pizzicato kifejezés?",
+   "valaszok": [
+    "egy pizzafélét",
+    "a húrok pengetését",
+    "a Katalin név becézését",
+    "japán tornaelemet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit kedvel az, aki szereti a sprotnit?",
+   "valaszok": [
+    "egy halfajt",
+    "az osztrák népzenét",
+    "szerb táncot",
+    "egy sajtfajtát"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit keres, aki közönséges cickafark után kutat?",
+   "valaszok": [
+    "gyógynövényt",
+    "rágcsálót",
+    "makcskaféle ragadozót",
+    "énekesmadarat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit mutat az a szólás szerint, aki gúnyosan elutasít valamit?",
+   "valaszok": [
+    "fügét",
+    "banánt",
+    "kókuszt",
+    "datolyát"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit nevezett a népnyelv tréfásan talpalávalónak?",
+   "valaszok": [
+    "új cipőt",
+    "tavaszi rétet",
+    "gyors táncot",
+    "élénk zenét"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit neveznek indiánernek?",
+   "valaszok": [
+    "vadbölényt",
+    "békepipát",
+    "süteményt",
+    "sátortípust"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit neveznek papramorgónak?",
+   "valaszok": [
+    "a pálinkát",
+    "a hamis kutyát",
+    "a dödöllét",
+    "a lusta kántort"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit neveznek sasliknak?",
+   "valaszok": [
+    "sasfészket",
+    "vadászfegyvert",
+    "nyársonsült húsételt",
+    "távcsövet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit neveznek tréfásan fizimiskának?",
+   "valaszok": [
+    "a tenyeret",
+    "az arcot",
+    "a talpat",
+    "a hát közepét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveztek koloncnak a népnyelvben?",
+   "valaszok": [
+    "vándorbatyut",
+    "díszszalagot",
+    "nehezéket",
+    "övön függő erszényt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit neveztek régen éternek?",
+   "valaszok": [
+    "a méter négyötödét",
+    "a légnyomásmérőt",
+    "a tengert",
+    "a levegőt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit tanul, aki egy grammatikai tárgyú könyvet forgat?",
+   "valaszok": [
+    "összhangzattant",
+    "ábrázoló geometriát",
+    "atomfizikát",
+    "nyelvtant"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit tart a mondás szerint a menekülésre kényszerülő emberről?",
+   "valaszok": [
+    "farigcsálják neki a kalodát",
+    "csörgetik már a béklyóját",
+    "ég a talaj a lába alatt",
+    "villámlik a feje fölött"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit vagy kit neveznek borostyánnak?",
+   "valaszok": [
+    "borkedvelő öregurat",
+    "futónövényt",
+    "a fagylalttölcsér ostyáját",
+    "boros tyúkpörköltet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit vesz, aki veknit vásárol?",
+   "valaszok": [
+    "kenyeret",
+    "szalámit",
+    "órát",
+    "faedényt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit értettek régen egy ember országlása alatt?",
+   "valaszok": [
+    "országjárást",
+    "uralkodást",
+    "okoskodást",
+    "térképkészítést"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel főz a szegény ember a mondás szerint?",
+   "valaszok": [
+    "rizzsel",
+    "vízzel",
+    "kopogó szemmel",
+    "likas edénnyel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miért \"most szép lenni katonának\" a népdal szerint?",
+   "valaszok": [
+    "mert vége a háborúnak",
+    "mert új az egyenruha",
+    "mert Kossuthnak verbuválnak",
+    "mert nősül a főkapitány"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Montecuccoli szállóigéje szerint mi az a három dolog, ami a háborúhoz kell?",
+   "valaszok": [
+    "pénz, pénz, pénz",
+    "paripa, paripa, paripa",
+    "fegyver, fegyver, fegyver",
+    "vér, veríték, könnyek"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mt \"húz\" az, aki hangosan horkol a tréfás szólás szerint?",
+   "valaszok": [
+    "angyalbőrt",
+    "kutyabőrt",
+    "kígyóbőrt",
+    "lóbőrt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül kit neveztek régen nótáriusnak?",
+   "valaszok": [
+    "karmester",
+    "jegyző",
+    "kocsmáros",
+    "zongorakészítő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik a novícius?",
+   "valaszok": [
+    "új bor",
+    "szerzetesnövendék",
+    "a falu jegyzője",
+    "kilencszögű tér"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik kifejezés illik a szangvinikus emberre?",
+   "valaszok": [
+    "lobbanékony",
+    "hidegvérű",
+    "mélabús",
+    "megfontolt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik lehet sujtásos?",
+   "valaszok": [
+    "sublót",
+    "mente",
+    "fokos",
+    "alkóv"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik ruha- és ételnév is?",
+   "valaszok": [
+    "guba",
+    "gumó",
+    "suba",
+    "subrika"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül mi a nadragulya?",
+   "valaszok": [
+    "nádasba tévedt marhák",
+    "mérgező növény",
+    "a nadrágszár régiesen",
+    "mocsári futómadár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül mit neveznek lajbinak?",
+   "valaszok": [
+    "bicskát",
+    "férfi posztókabátot",
+    "tejesedényt",
+    "vízhordó embert"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Egészítse ki a közmondást! \"Ha Katalin …, karácsony …\"",
+   "valaszok": [
+    "fázós-ázós",
+    "kopog-locsog",
+    "csendes-nedves",
+    "napos-fagyos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Egészítse ki a személyazonosságra vonatkozó tréfás kérdést! \"Ki fia, …?\"",
+   "valaszok": [
+    "gidája",
+    "tinója",
+    "borja",
+    "bocsa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Folytassa a mondást! \"Madarat tolláról, embert ...\"",
+   "valaszok": [
+    "családjáról",
+    "barátjáról",
+    "ruhájáról",
+    "munkájáról"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ha valaki rá se hederít valamire, akkor…",
+   "valaszok": [
+    "keresztet vet rá",
+    "mérget iszik rá",
+    "áldását adja rá",
+    "fittyet hány rá"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik a katonai nyelvben a hadviselő felek által át nem léphető sávot?",
+   "valaszok": [
+    "demagnetizált terület",
+    "denaturalizált terep",
+    "demarkációs vonal",
+    "delokalizált szakasz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik az a személyt, aki tudását, ismereteit önképzéssel szerezte?",
+   "valaszok": [
+    "autokrata",
+    "autodidakta",
+    "autonóm",
+    "autodróm"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik azt az eljárást, mellyel a lenyírt gyapjút szálaira szedik?",
+   "valaszok": [
+    "fándlizás",
+    "stuccolás",
+    "stancolás",
+    "kártolás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik más szóval az államcsínyt?",
+   "valaszok": [
+    "fuccs",
+    "puccs",
+    "krach",
+    "klikk"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik másképpen a képzelt beteget?",
+   "valaszok": [
+    "hipochonder",
+    "hipokrita",
+    "hipotéka",
+    "hippodrom"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan írjuk helyesen az alábbi kifejezést?",
+   "valaszok": [
+    "sakk klub",
+    "sakklub",
+    "sakk-klub",
+    "sakkklub"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol dolgozott a pedellus?",
+   "valaszok": [
+    "az iskolában",
+    "az orvos mellett",
+    "a szőlőben",
+    "a postahivatalban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol időzhetünk egy szeparéban az alábbiak közül?",
+   "valaszok": [
+    "állatkertben",
+    "vonaton",
+    "múzeumban",
+    "mulatóban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol parancsnokol egy korvett kapitánya?",
+   "valaszok": [
+    "tengeralattjárón",
+    "hajón",
+    "krikettcsapatban",
+    "lovas hadseregben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol tevékenykedik egy attasé?",
+   "valaszok": [
+    "egyetemen",
+    "bíróságon",
+    "diplomáciai képvisleten",
+    "újság szerkesztőségében"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol tevékenykedtek régen az óbesterek?",
+   "valaszok": [
+    "a hadseregben",
+    "a városházán",
+    "a csapszékben",
+    "az órásműhelyben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol van, aki egy garnizonban tartózkodik?",
+   "valaszok": [
+    "egyszobás lakásban",
+    "helyőrségben",
+    "konyhában",
+    "orvosi rendelőben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol viselték elődeink a pruszlikot?",
+   "valaszok": [
+    "a fejtetőn",
+    "a felsőtesten",
+    "a csuklón",
+    "a lábszáron"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol ülhetünk lanovkára?",
+   "valaszok": [
+    "űrhajó fedélzetén",
+    "lovardában",
+    "sítúrán",
+    "falusi búcsúban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hová lát az, aki kitalálja a legtitkosabb gondolatait is a szólás szerint?",
+   "valaszok": [
+    "veséjébe",
+    "májába",
+    "gyomrába",
+    "tüdejébe"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány évenként rendeznek biennálét?",
+   "valaszok": [
+    "kettő",
+    "tizenkettő",
+    "húsz",
+    "kétszáz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány éves évforduló a centenárium?",
+   "valaszok": [
+    "tíz",
+    "húsz",
+    "ötven",
+    "száz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki vigyázzon, ha jön a kanyar, a mondás szerint?",
+   "valaszok": [
+    "Lujza",
+    "Rózsi",
+    "Malvin",
+    "Olga"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kiket neveznek tréfásan fakabátnak?",
+   "valaszok": [
+    "az erdészeket",
+    "a rendőröket",
+    "a ruhatárosokat",
+    "a favágókat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiket neveztek despotának?",
+   "valaszok": [
+    "vándorköszörűsöket",
+    "közkatonákat",
+    "zsarnokokat",
+    "postamestereket"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kiket neveztek régen taljánoknak?",
+   "valaszok": [
+    "a franciákat",
+    "a tatárokat",
+    "az oroszokat",
+    "az olaszokat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kiket szokás zöldeknek nevezni a sajtó nyelvében?",
+   "valaszok": [
+    "újoncokat",
+    "mellébeszélőket",
+    "környezetvédőket",
+    "agrárpárti képviselőket"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kire használják az albínó kifejezést?",
+   "valaszok": [
+    "sovány emberre",
+    "festékhiányos bőrű élőlényre",
+    "Albániából származó emberre",
+    "hegylakóra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit vagy mit neveznek dácsának?",
+   "valaszok": [
+    "szibériai vadludat",
+    "doni kozákokat",
+    "orosz nyaralót",
+    "grúz feketeteát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit vagy mit neveznek laptopnak?",
+   "valaszok": [
+    "itatóspapírt",
+    "hordozható számítógépet",
+    "angol kódexmásolót",
+    "mocsári virágot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit vagy mit neveznek politúrnak?",
+   "valaszok": [
+    "század eleji politikust",
+    "bútorfényező anyagot",
+    "diplomáciai utazást",
+    "a polónium elektronjait"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely nyelvek közé tartozik a zuluk nyelve?",
+   "valaszok": [
+    "bengáli",
+    "polinéz",
+    "bantu",
+    "altaji"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik \"kerek erdő\" szerepel a magyar népdalban?",
+   "valaszok": [
+    "aranyosszéki",
+    "háromszéki",
+    "marosszéki",
+    "csíkszéki"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik a helyes írásmódja az alábbi igének?",
+   "valaszok": [
+    "kostol",
+    "kóstol",
+    "kostól",
+    "kóstól"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy több oldalágú tartóoszlop népi neve?",
+   "valaszok": [
+    "rudacs",
+    "ágas",
+    "gallyas",
+    "tönkicse"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik előtag fejez ki levegővel, légnemű testekkel való kapcsolatot?",
+   "valaszok": [
+    "poli-",
+    "termo-",
+    "aero-",
+    "paleo-"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik foglalkozást nevezi a népnyelv tréfásan füstfaragónak?",
+   "valaszok": [
+    "tűzoltó",
+    "pipagyártó",
+    "kéményseprő",
+    "trafikos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hím állat lehet egy sörfajta is az alábbiak közül?",
+   "valaszok": [
+    "bika",
+    "gácsér",
+    "bak",
+    "kan"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik madarat nevezi a néphit vészmadárnak?",
+   "valaszok": [
+    "a seregélyt",
+    "a verebet",
+    "a kuvikot",
+    "a feketerigót"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem szláv nyelv az alábbiak közül?",
+   "valaszok": [
+    "szlovén",
+    "macedón",
+    "belorusz",
+    "román"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nevet tartották a Jules név magyar megfeleőjének a XIX. században?",
+   "valaszok": [
+    "János",
+    "Gyula",
+    "József",
+    "György"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik növényhez hasonlítja a népnyelv a szőke hajat?",
+   "valaszok": [
+    "kukorica",
+    "rozs",
+    "len",
+    "napraforgó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szó jelöl egy boltozattípust?",
+   "valaszok": [
+    "dáma",
+    "donna",
+    "donga",
+    "dongó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szó nem egy szemüvegfajtát takar?",
+   "valaszok": [
+    "lornyon",
+    "okuláré",
+    "monokli",
+    "laterna"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik testrészét mosták meg a megszidott embernek a mondás szerint?",
+   "valaszok": [
+    "lábát",
+    "kezét",
+    "hátát",
+    "fejét"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik testrészünkre mondják tréfásan, hogy fizimiska?",
+   "valaszok": [
+    "arc",
+    "boka",
+    "váll",
+    "könyök"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik virág szerény a mondás szerint?",
+   "valaszok": [
+    "nárcisz",
+    "százszorszép",
+    "nefelejcs",
+    "ibolya"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állat a gyávaság jelképe a magyar nyelvben?",
+   "valaszok": [
+    "csibe",
+    "nyúl",
+    "őzbak",
+    "vakond"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állat bűzlik a fejétől a mondás szerint?",
+   "valaszok": [
+    "a görény",
+    "az oposszum",
+    "a hal",
+    "az orrszarvú"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állat népies elnevezése a tik?",
+   "valaszok": [
+    "kacsa",
+    "liba",
+    "tyúk",
+    "páva"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állathoz hasonlítja a szólás a lankadatlan szorgalmú embert?",
+   "valaszok": [
+    "hangya",
+    "lajhár",
+    "csiga",
+    "kaméleon"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik állatot nevezi a népnyelv csikasznak?",
+   "valaszok": [
+    "tyúkot",
+    "keszeget",
+    "farkast",
+    "ökröt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik írásmód a helyes?",
+   "valaszok": [
+    "tipus",
+    "típus",
+    "tipús",
+    "típús"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ókori törzs nevével szokás jelezni az esztelen rombolást?",
+   "valaszok": [
+    "gepida",
+    "burgund",
+    "longobard",
+    "vandál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik őrzi a francia Récamier asszony nevét?",
+   "valaszok": [
+    "egy fekvőbútor",
+    "egy textilfajta",
+    "egy hajótípus",
+    "egy kártyajáték"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyiket nevezték dandynek?",
+   "valaszok": [
+    "divatfit",
+    "játékszert",
+    "kutyafajtát",
+    "kis csónakot"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyiket nevezték dramolettnek?",
+   "valaszok": [
+    "rövid színművet",
+    "túlsúlyos operaénekesnőt",
+    "drasztikus fogyókúrát",
+    "szoros fűzőt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a csattanó maszlag?",
+   "valaszok": [
+    "ostor",
+    "kínai petárda",
+    "mérges gyomnövény",
+    "frappáns válasz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe az ismert szójátéknak: \"fekete, fehér …\"",
+   "valaszok": [
+    "kék, piros",
+    "talán, bizony",
+    "igen, nem",
+    "kicsi, nagy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a hobbija annak, aki szívesen batikol?",
+   "valaszok": [
+    "terepasztal-készítés",
+    "kelmefestés",
+    "virágkötés",
+    "sípfaragás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a porlasztó?",
+   "valaszok": [
+    "temetői alkalmazott",
+    "két malomkő",
+    "egy szívókás szerkezet",
+    "egy fúvókás autóalkatrész"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a tamburin?",
+   "valaszok": [
+    "orvosság",
+    "ugródeszka",
+    "csörgődob",
+    "gyomnövény"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a tett halála az ismert szállóige szerint?",
+   "valaszok": [
+    "a lustaság",
+    "a kétbalkezesség",
+    "az okoskodás",
+    "a bátortalanság"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi az icce?",
+   "valaszok": [
+    "régi űrmértékegység",
+    "inulatszó",
+    "pásztoreledel",
+    "poén nélküli vicc"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi iránt érez olthatatlan szenvedélyt az, aki piromániában szenved?",
+   "valaszok": [
+    "írás",
+    "lopás",
+    "gyújtogatás",
+    "cégalapítás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi történt azzal az emberrel, akit pellengérre állítottak?",
+   "valaszok": [
+    "besorozták katonának",
+    "lovaggá ütötték",
+    "megszégyenítették",
+    "kivégezték"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi van a borban a szállóige szerint?",
+   "valaszok": [
+    "a csábítás",
+    "a hamisság",
+    "az igazság",
+    "muslica"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miben szenved, akinek megalomániája van?",
+   "valaszok": [
+    "tériszonyban",
+    "pókiszonyban",
+    "nagyzási hóbortban",
+    "álmatlanságban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mielyiket nevezik ördögszekérnek az alábbiak közül?",
+   "valaszok": [
+    "egy mozdonyt",
+    "egy gyomnövényt",
+    "egy fánkfélét",
+    "a hullámvasutat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mik között válogathatunk egy bibliotékában?",
+   "valaszok": [
+    "illatszerek",
+    "olvasnivalók",
+    "ruhaneműk",
+    "gyermekjátékok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen a csélcsap ember?",
+   "valaszok": [
+    "cseles",
+    "csapodár",
+    "csapkodó",
+    "csendes"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen a mimózalelkű ember a mondás szerint?",
+   "valaszok": [
+    "rossz emberismerő",
+    "hirtelen haragú",
+    "nagyon érzékeny",
+    "túlzottan szerény"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen a prűd ember?",
+   "valaszok": [
+    "bőbeszédű",
+    "változó kedélyállapotú",
+    "szorgalmas",
+    "álszemérmes"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen ember, akit hercignek mondanak?",
+   "valaszok": [
+    "nemesi származású",
+    "kényes",
+    "oktondi",
+    "kedves"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen emberre mondja a népnyelv, hogy korhely?",
+   "valaszok": [
+    "mulatozó",
+    "barátkozó",
+    "hazudozó",
+    "unatkozó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen embert nevezett a népnyelv szavajátszónak?",
+   "valaszok": [
+    "költői vénájút",
+    "ékesszólásút",
+    "megbízhatatlant",
+    "trágárt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen embert neveztek régen gigerlinek?",
+   "valaszok": [
+    "gerletenyésztőt",
+    "pántlikaárust",
+    "piperkőcöt",
+    "magas hangút"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen igenév nincs a magyar nyelvben?",
+   "valaszok": [
+    "főnévi",
+    "melléknévi",
+    "határozói",
+    "névutói"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen kifejezéssel szokás illetni a katonai egyenruhát?",
+   "valaszok": [
+    "kényszerzubbony",
+    "angyalbőr",
+    "bakaballon",
+    "huszárköntös"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen lóra mondják, hogy telivér?",
+   "valaszok": [
+    "fajtisztán tenyésztett",
+    "irányíthatatlanul vad",
+    "vörös szőrű",
+    "csatamén"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen nyelven beszél az alábbiak közül, aki deákul tud?",
+   "valaszok": [
+    "olaszul",
+    "latinul",
+    "ógermánul",
+    "franciául"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen szavak jönnek létre szókapcsolatok, összetételek töredékeiből, kezdőbetűiből?",
+   "valaszok": [
+    "terrakotta",
+    "montázs",
+    "hibrid",
+    "mozaik"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen színpadi szerepkör az amorózó?",
+   "valaszok": [
+    "szerelmes fiatal férfi",
+    "púpos cselszövő",
+    "feledékeny idős úr",
+    "cserfes öregasszony"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen testfelépítésű a mokány ember?",
+   "valaszok": [
+    "magas, vékony",
+    "alacsony, izmos",
+    "magas, pocakos",
+    "alacsony, görnyedt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek az őse volt a velocipéd?",
+   "valaszok": [
+    "orrszarvú",
+    "tornacipő",
+    "repülő",
+    "kerékpár"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mire használja a népnyelv a drótszamár kifejezést?",
+   "valaszok": [
+    "szemüveg",
+    "kerítés",
+    "hajkefe",
+    "kerékpár"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mire használják a colstokot?",
+   "valaszok": [
+    "kukoricatörésre",
+    "mérésre",
+    "zenélésre",
+    "italtárolásra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire használták a csézát?",
+   "valaszok": [
+    "számolásra",
+    "utazásra",
+    "kávézásra",
+    "zenélésre"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire használták a mángorlót?",
+   "valaszok": [
+    "tésztakelesztésre",
+    "bor tárolására",
+    "ruhasimításra",
+    "söprésre"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál az egyetemista, amikor kollokvál?",
+   "valaszok": [
+    "előadást hallgat",
+    "szakot változtat",
+    "vizsgázik",
+    "beiratkozik"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál az, aki dzsiggel?",
+   "valaszok": [
+    "kártyázik",
+    "hajózik",
+    "táncol",
+    "lovagol"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál, aki sifríroz?",
+   "valaszok": [
+    "tálal",
+    "töpreng",
+    "kigúnyol",
+    "rejtjelez"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit csinál, aki srófol?",
+   "valaszok": [
+    "könyvel",
+    "kalapál",
+    "csavaroz",
+    "pénzt ver"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinálnak a dödöllével?",
+   "valaszok": [
+    "muzsikálnak rajta",
+    "felszántják",
+    "megeszik",
+    "lőnek vele"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinálnak a mexikóiak a tortillával?",
+   "valaszok": [
+    "idomítják",
+    "megeszik",
+    "lőnek vele",
+    "eltáncolják"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinálnak a rébusszal?",
+   "valaszok": [
+    "megmérik",
+    "megfejik",
+    "megfejtik",
+    "kifejtik"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinálnak egy buzukival?",
+   "valaszok": [
+    "megeszik",
+    "palackba zárják",
+    "zenélnek vele",
+    "utaznak rajta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csináltak azzal, akit kistafíroztak?",
+   "valaszok": [
+    "kisminkelték",
+    "törölték a nyílvántartásból",
+    "ellátták kelengyével",
+    "pellengérre állították"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit fejez ki a népnyelv a \"felszállt a házra a vörös kakas\" mondással?",
+   "valaszok": [
+    "a lámpák felgyújtását",
+    "tűzvész pusztítását",
+    "a gazda haragját",
+    "a tető cserepezését"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit forgat az elveit az érdekei szerint változtató ember az ismert kifejezés szerint?",
+   "valaszok": [
+    "csatabárdot",
+    "köpönyeget",
+    "verklit",
+    "földet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit gyűjt, akinek a filatélia a hobbija?",
+   "valaszok": [
+    "pénzérméket",
+    "bélyegeket",
+    "kaktuszokat",
+    "gyógyteákat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit jelent a \"dupla Lutz\"?",
+   "valaszok": [
+    "osztrák ikerpár",
+    "német fenyőpálinka",
+    "ugrásfajta a műkorcsolyában",
+    "matematikai együttható"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit jelent magyarul az artéria?",
+   "valaszok": [
+    "műterem",
+    "vízgyűjtő terület",
+    "szélrózsa",
+    "verőér"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit kapott, akinek obsitot adtak?",
+   "valaszok": [
+    "havi zsoldot",
+    "elbocsátó iratot",
+    "meleg vacsorát",
+    "előléptetést"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit nevez a népnyelv vörös kakasnak?",
+   "valaszok": [
+    "tüzet",
+    "naplementét",
+    "szelet",
+    "a rák csillagképet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit neveznek a keleti népeknél baksisnak?",
+   "valaszok": [
+    "kamasz lányokról",
+    "édes süteményt",
+    "borravalót",
+    "kétkerekű kocsit"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit neveznek botolónak?",
+   "valaszok": [
+    "táncot",
+    "öreg lovat",
+    "küszöböt",
+    "középkori bírót"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit neveznek régiesen górcsőnek?",
+   "valaszok": [
+    "kéményt",
+    "alagutat",
+    "mikroszkópot",
+    "hosszú tésztát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit neveztek kalodának?",
+   "valaszok": [
+    "a talált tárgyak hivatalát",
+    "a malomkövet",
+    "középkori bűntetőeszközt",
+    "egy erdélyi ételt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit neveztek régen az iskolában egzámennek?",
+   "valaszok": [
+    "az egyenruhát",
+    "a szünetet",
+    "a táblát",
+    "a vizsgát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit szoktak csinálni a szilvóriummal?",
+   "valaszok": [
+    "lekvárt főznek vele",
+    "poharat tartanak benne",
+    "megisszák",
+    "meggyújtják"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit tartottak a kalandozó magyarok a puzdrában?",
+   "valaszok": [
+    "szárított húst",
+    "gyógynövényeket",
+    "nyílvesszőket",
+    "takarót"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit tartottak régen a kalamárisban?",
+   "valaszok": [
+    "disznóeledelt",
+    "tintát",
+    "papírt",
+    "hulladékot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit tesz a dezertáló katona?",
+   "valaszok": [
+    "leszerel",
+    "megszökik",
+    "tiszteleg",
+    "kantinban mulat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel foglalkozik az alábbiak közül a szanitéc?",
+   "valaszok": [
+    "fegyverjavítással",
+    "földműveléssel",
+    "sebkötözéssel",
+    "kereskedelemmel"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mivel való kapcsolatot jelent összetett szavakban a hidro- előtag?",
+   "valaszok": [
+    "tűzzel",
+    "vízzel",
+    "széllel",
+    "kővel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel való kapcsolatot jelöl összetetett szavakban a foto- előtag?",
+   "valaszok": [
+    "hang",
+    "fény",
+    "idő",
+    "tér"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A férfikalapon kívül mit neveznek még cilindernek?",
+   "valaszok": [
+    "a motor hengereit",
+    "a repülő légcsavarját",
+    "a cimbalom ütőit",
+    "az ajtó vasalását"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A talpraesett ember érti a csíziót. Mit jelentett eredetileg a csízió szó?",
+   "valaszok": [
+    "énekesmadarat",
+    "verses naptárt",
+    "ragasztókeverést",
+    "mulatozást"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy csavaranyatípus?",
+   "valaszok": [
+    "párizsi",
+    "frankfurti",
+    "hollandi",
+    "kölni"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik mesterséges nyelv?",
+   "valaszok": [
+    "gael",
+    "kopt",
+    "ido",
+    "csukcs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket nevezik kotlettnek?",
+   "valaszok": [
+    "a serdülő csirkét",
+    "a könnyűvérű hölgyet",
+    "a kotnyeles lettet",
+    "a sertéskarajt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül mit neveznek tandemnek?",
+   "valaszok": [
+    "női fehérneműt",
+    "kétüléses kerékpárt",
+    "tanári szemléltetőeszközt",
+    "kétfedelű repülőgépet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy mondjuk idegen szóval az összetartozó erőt?",
+   "valaszok": [
+    "gravitáció",
+    "koalíció",
+    "kohézió",
+    "korrekció"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik a muzulmán sírkápolnát?",
+   "valaszok": [
+    "dzsámi",
+    "moszk",
+    "türbe",
+    "vilajet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik azt a fémből készült öntőformát, mely egymás után sok öntvény készítésére alkalmas?",
+   "valaszok": [
+    "papilloma",
+    "kokilla",
+    "tortilla",
+    "lamella"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik idegen szóval az emlékezet teljes vagy részleges hiányát?",
+   "valaszok": [
+    "anómia",
+    "ambrózia",
+    "anamnézis",
+    "amnézia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan gúnyolták a középkori törökök a nem iszlám vallásúakat?",
+   "valaszok": [
+    "guzla",
+    "gyuvecs",
+    "gyaur",
+    "gürtli"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan nevezik az előkelő körök szokásait utánzó újgazdagot?",
+   "valaszok": [
+    "purparlé",
+    "parvenü",
+    "paraplé",
+    "persziflázs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan írjuk helyesen a hangszer nevét a magyar szabályok szerint?",
+   "valaszok": [
+    "csembalo",
+    "csemballo",
+    "csembaló",
+    "csemballó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan írjuk helyesen a következő szót a magyar helyesírás szabályai szerint?",
+   "valaszok": [
+    "milenium",
+    "millenium",
+    "milennium",
+    "millennium"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan írjuk helyesen a következő testrész nevét?",
+   "valaszok": [
+    "gyűrűs ujj",
+    "gyűrűsujj",
+    "gyűrüs ujj",
+    "gyűrüsujj"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan írjuk helyesen az uralkodócsalád nevét?",
+   "valaszok": [
+    "Burbon",
+    "Burboun",
+    "Bourbon",
+    "Bourboun"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol van a népdalbéli kerek erdő, melyben tizenkét madár lakik?",
+   "valaszok": [
+    "Mezőcsáton",
+    "Marosszéken",
+    "Kanizsán",
+    "Kunhegyesen"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol van, aki látogatást tesz az alma materében?",
+   "valaszok": [
+    "előző lakásában",
+    "egykori iskolájában",
+    "gyümölcsöskertben",
+    "a szülői házban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Honnan kapta elnevezését az ébenfekete szín?",
+   "valaszok": [
+    "egy édesvízi halról",
+    "egy trópusi fáról",
+    "egy mitikus hősről",
+    "egy kávécserjéről"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hupikék szavunk a \"hupál\" szóból származik. Mit jelentett vajon?",
+   "valaszok": [
+    "hullámzik",
+    "szilvát szed",
+    "üt-ver",
+    "huszárnak áll"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány betűből áll a magyar ábécé az idegen betűk nélkül?",
+   "valaszok": [
+    "20.0",
+    "30.0",
+    "40.0",
+    "50.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki foglalkozhat az alábbiak közül a mezozoikummal?",
+   "valaszok": [
+    "agykutató",
+    "régész",
+    "meteorológus",
+    "énektanár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Cirill társa a szláv írásbeliség megteremtésében?",
+   "valaszok": [
+    "Magóg",
+    "Metód",
+    "Magor",
+    "Mikeás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kikre jellemző a Knut keresztnév?",
+   "valaszok": [
+    "a belső-ázsiai nomádokra",
+    "a skandináv népekre",
+    "az észak-afrikai nomádokra",
+    "a kaukázusi népekre"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiről vagy miről kapta a nevét a trappista sajt?",
+   "valaszok": [
+    "szerzetesrendről",
+    "francia borászról",
+    "holland legelőről",
+    "tehénfajtáról"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kit hívtak régen handlénak?",
+   "valaszok": [
+    "a gyepmestert",
+    "a házmestert",
+    "az ószerest",
+    "a tisztiszolgát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit neveztek régen fiskálisnak?",
+   "valaszok": [
+    "tanítót",
+    "ügyvédet",
+    "jegyzőt",
+    "sekrestyést"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit neveztek régen képfaragónak?",
+   "valaszok": [
+    "ácsot",
+    "szobrászt",
+    "favágót",
+    "portréfestőt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik a görög ábécé egyik betűje az alábbiak közül?",
+   "valaszok": [
+    "helóta",
+    "zelóta",
+    "kappa",
+    "kápa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik bútort nevezték régiesen tékának?",
+   "valaszok": [
+    "kerek asztalt",
+    "könyvespolcot",
+    "franciaágyat",
+    "sámlit"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik elem régies neve az éleny?",
+   "valaszok": [
+    "oxigén",
+    "hidrogén",
+    "nitrogén",
+    "klór"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hang a \"p\" zöngés párja?",
+   "valaszok": [
+    "m",
+    "v",
+    "f",
+    "b"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik magyar eredetű az alábbi női nevek közül?",
+   "valaszok": [
+    "Katalin",
+    "Ilona",
+    "Mária",
+    "Emese"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem hangutánzó szó az alábbiak közül?",
+   "valaszok": [
+    "csipog",
+    "ketyeg",
+    "köhög",
+    "biceg"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik régies elnevezés takarja a hamiskártyást?",
+   "valaszok": [
+    "sillabusz",
+    "simléder",
+    "sipsirica",
+    "sipista"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szó jelöl egy vitorlás versenyhajó-típust?",
+   "valaszok": [
+    "matróz",
+    "kalóz",
+    "révész",
+    "kadét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szó írásmódja helytelen a magyar szabályok szerint?",
+   "valaszok": [
+    "differencia",
+    "pudding",
+    "akvarell",
+    "intelligens"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szó írásmódja helytelen?",
+   "valaszok": [
+    "menü",
+    "aszú",
+    "szelid",
+    "bőkezű"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szókapcsolat nem hibás nyelvhelyességi szempontból?",
+   "valaszok": [
+    "önműködő automata",
+    "harmonikus kapcsolat",
+    "bestiális fenevad",
+    "hétvégi víkendház"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állatot nevezi a népnyelv göbölynek?",
+   "valaszok": [
+    "őszi legyet",
+    "hizlalt ökröt",
+    "hím gólyát",
+    "kis kecskét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állatot nevezi rucának a népnyelv?",
+   "valaszok": [
+    "pávát",
+    "hattyút",
+    "vadkacsát",
+    "fácánt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik írásmódja helytelen?",
+   "valaszok": [
+    "Váci utca",
+    "Kent grófság",
+    "Petőfi híd",
+    "Ruhr vidék"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyiket nevezték masamódnak az alábbiak közül?",
+   "valaszok": [
+    "prémvadászt",
+    "mosómedvét",
+    "kalaposlányt",
+    "hódot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyikre használták a biga kifejezést az ókori rómaiak az alábbiak közül?",
+   "valaszok": [
+    "evezős hajó",
+    "kétkerekű kocsi",
+    "fiatal szolgálólány",
+    "többnejű görög"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi Nándorfehérvár mai neve?",
+   "valaszok": [
+    "Zágráb",
+    "Belgrád",
+    "Vajdahunyad",
+    "Székesfehérvár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a gersli?",
+   "valaszok": [
+    "fagyöngy",
+    "hántolt árpagyöngy",
+    "disznósajtféle",
+    "palóc főkötő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a kvazár?",
+   "valaszok": [
+    "kvarckőzet",
+    "csillagszerű rádióforrás",
+    "albán piac",
+    "kihalt vadló"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a libretto?",
+   "valaszok": [
+    "újfajta szerencsejáték",
+    "áruhitel",
+    "zenés művek szövegkönyve",
+    "rabszolgák felszabadítása"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a neve a lengyel parlamentnek?",
+   "valaszok": [
+    "szejm",
+    "knesszet",
+    "szkupstina",
+    "przemysl"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a paszomány?",
+   "valaszok": [
+    "ruhát összefogó kapocs",
+    "régi útlevél",
+    "ruhát díszítő zsinór",
+    "magas szárú csizma"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a sallang?",
+   "valaszok": [
+    "madárdal",
+    "kerülőút",
+    "bőrdísz",
+    "főúri rendelet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a szónoklattan közismert neve?",
+   "valaszok": [
+    "grammatika",
+    "retorika",
+    "ezoterika",
+    "gimnasztika"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a triangulum?",
+   "valaszok": [
+    "ütőhangszer",
+    "háromlábú szék",
+    "hármaskereszt",
+    "törvénygyűjtemény"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a vecsernye?",
+   "valaszok": [
+    "húsétel",
+    "esti ima",
+    "gyomnövény",
+    "fémszerszám"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi az oktáns?",
+   "valaszok": [
+    "iskolai fenyítő eszköz",
+    "rossz minőségű benzin",
+    "afrikai vadtulok",
+    "csillagászati szögmérő műszer"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi történik egy szerződéssel, amikor ratifikálják?",
+   "valaszok": [
+    "megszegik",
+    "felbontják",
+    "záradékkal látják el",
+    "jóváhagyják"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi vagy ki a kurkuma?",
+   "valaszok": [
+    "török nyalánkság",
+    "bőrbetegség",
+    "kurd koma",
+    "fűszernövény"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi volt az ostábla?",
+   "valaszok": [
+    "társasjáték",
+    "bírósági fórum",
+    "közúti jelzőtábla",
+    "édesség"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mihez hasonlítja a népi elnevezés a Bika csillagkép ismert csillaghalmazát?",
+   "valaszok": [
+    "őzsutához és gidáihoz",
+    "tigrishez és kölykeihez",
+    "kancához és csikóihoz",
+    "tyúkhoz és csibéihez"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miket gyűjt egy filatelista?",
+   "valaszok": [
+    "lepkéket",
+    "bélyegeket",
+    "tájképeket",
+    "könyvritkaságokat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miket jelölnek az alábbi kifejezések: spondeus, daktilus, trocheus?",
+   "valaszok": [
+    "emberi szerveket",
+    "katonai tisztségeket",
+    "verslábakat",
+    "növényeket"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"parcellának\" nevezik a keskeny szántóföldeket?",
+   "valaszok": [
+    "nadrágszár",
+    "nadrágfék",
+    "nadrágszíj",
+    "nadrágtartó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen a bakafántos ember?",
+   "valaszok": [
+    "türelmes",
+    "katonás",
+    "akadékoskodó",
+    "kicsapongó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen a bornírt ember?",
+   "valaszok": [
+    "túlságosan aktív",
+    "maróan gúnyos",
+    "szűk látókörű",
+    "állandóan búslakodó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen az ösztövér ember?",
+   "valaszok": [
+    "alacsony, köpcös",
+    "makacs, önfejű",
+    "hirtelen haragú",
+    "magas, vékony"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen eredetű múzeum szavunk?",
+   "valaszok": [
+    "görög",
+    "finnugor",
+    "francia",
+    "török"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen eredetű szó a vérbosszút jelentő vendetta?",
+   "valaszok": [
+    "francia",
+    "portugál",
+    "olasz",
+    "orosz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen munkát végzett a prókátor?",
+   "valaszok": [
+    "orvosi",
+    "kereskedői",
+    "ügyvédi",
+    "fuvarozói"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nemzetiségű, akit a népnyelv polyáknak nevez?",
+   "valaszok": [
+    "szlovák",
+    "lengyel",
+    "osztrák",
+    "orosz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen rokona valakinek a nászura?",
+   "valaszok": [
+    "keresztapja",
+    "apósa",
+    "gyermeke apósa",
+    "sógora"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen személy egy országban, aki \"persona non grata\"?",
+   "valaszok": [
+    "igen kedvelt",
+    "szigorúan védett",
+    "törvények felett álló",
+    "nem kívánatos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen tulajdonságú vagy képességű embert neveztek régen bűbájosnak?",
+   "valaszok": [
+    "kétszínűt",
+    "nagy képzelőerejűt",
+    "varázserejűt",
+    "csinosat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Min vesz részt egy tanár, amikor hospitál?",
+   "valaszok": [
+    "szülői értekezleten",
+    "kollégája tanóráján",
+    "felvételi vizsgán",
+    "ballagáson"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire használták a nők a XIX. században a viganót?",
+   "valaszok": [
+    "ruhaként hordták",
+    "főztek benne",
+    "összejövetelek tartására",
+    "zenélésre"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mire utal a \"termo\" alaptag termosz szavunkban?",
+   "valaszok": [
+    "a palack anyagára",
+    "a palack alakjára",
+    "az űrtartalomra",
+    "a hőtartó képességére"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miről kapta a nevét a bermuda?",
+   "valaszok": [
+    "egy szabóról",
+    "egy szigetcsoportról",
+    "egy hegyről",
+    "egy folyóról"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miről nevezetes a spanyolországi Altamira-barlang?",
+   "valaszok": [
+    "cseppköveiről",
+    "folyórendszeréről",
+    "medvéiről",
+    "falrajzairól"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit csinál az, aki lobbizik?",
+   "valaszok": [
+    "ritka sportot űz",
+    "szenvedélyesen gyűjt valamit",
+    "lóversenyre jár",
+    "érdekeket képvisel"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit csinálnak a japánok a szakéval?",
+   "valaszok": [
+    "olvassák",
+    "megisszák",
+    "számolnak vele",
+    "utaznak rajta"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinált, aki silbakolt?",
+   "valaszok": [
+    "vasúti sorompót kezelt",
+    "őrködött",
+    "gyereket nevelt",
+    "állatot terelt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit jelent politikai nyelvhasználatban a pluralizmus?",
+   "valaszok": [
+    "egypártrendszer",
+    "többpártrendszer",
+    "katonai diktatúra",
+    "proletárdiktatúra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit kerget az, aki hiú ábrándok után fut a mondás szerint?",
+   "valaszok": [
+    "szivárványt",
+    "villámfényt",
+    "holdsugarat",
+    "délibábot"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit készítenek jutából?",
+   "valaszok": [
+    "szekrényt",
+    "zsákvásznat",
+    "pálinkát",
+    "lisztet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit nevez a népnyelv fuszulykának?",
+   "valaszok": [
+    "babaágyat",
+    "rakott szoknyát",
+    "furulyát",
+    "babot"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit neveznek Oroszországban dácsának?",
+   "valaszok": [
+    "vonós hangszert",
+    "nyaralót",
+    "kétlovas szánt",
+    "szibériai rókát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveznek a nyelvészetben nazálisnak?",
+   "valaszok": [
+    "a névmásokat",
+    "az orrhangokat",
+    "a legősibb szavakat",
+    "az elváló igekötőket"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveznek régiesen nadálynak?",
+   "valaszok": [
+    "a nadrágszárat",
+    "a rozoga viskót",
+    "a ladikot",
+    "a piócát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit neveznek slowfoxnak?",
+   "valaszok": [
+    "rókavadászatot",
+    "kutyafajtát",
+    "táncot",
+    "kártyajátékot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit neveztek eleink árendának?",
+   "valaszok": [
+    "papi ruhát",
+    "vékony gerendát",
+    "haszonbérletet",
+    "csendőrséget"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit neveztek régen indóháznak?",
+   "valaszok": [
+    "telefonközpont",
+    "kékfestőműhelyt",
+    "vasútállomást",
+    "az automobil motorját"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit neveztek régen malaclopónak?",
+   "valaszok": [
+    "kétkerekű taligát",
+    "hosszú köpenyt",
+    "gumicsizmát",
+    "petróleumlámpást"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveztek spanyolcsizmának?",
+   "valaszok": [
+    "a torreádorok cipőjét",
+    "nemesi lábbelit",
+    "borkészítő eszközt",
+    "vallatóeszközt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit takar a dingó elnevezés?",
+   "valaszok": [
+    "szerencsejátékot",
+    "édes gyümölcsöt",
+    "vadkutyát",
+    "lovas szánt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit vesz, aki bourbont vásárol?",
+   "valaszok": [
+    "pezsgőt",
+    "whiskey-t",
+    "csokoládét",
+    "liliomot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mitől fél az, akinek agorafóbiája van?",
+   "valaszok": [
+    "magasságtól",
+    "pókoktól",
+    "víztől",
+    "nyílt terektől"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mivel foglalkozik az az ember, akit régiesen frízőrnek hívnak?",
+   "valaszok": [
+    "domborművek őrzésével",
+    "hajvágással",
+    "mélyhűtéssel",
+    "zöldségárusítással"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel foglalkozott a vigéc?",
+   "valaszok": [
+    "énektanítással",
+    "ügynökösködéssel",
+    "lámpagyújtogatással",
+    "táncoktatással"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel gyógyítanak, amikor balneoterápiát használnak?",
+   "valaszok": [
+    "gyógyvízzel",
+    "gyógynövénnyel",
+    "gyümölcsökkel",
+    "olajokkal"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Tolvajnyelven mit csinál a rendőrségen az, aki vallomást tesz a társai ellen?",
+   "valaszok": [
+    "krákog",
+    "prüszköl",
+    "tüsszent",
+    "köhög"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "\"Falun járva láttam egy cakót.\"- újságolja valaki. Minek a látványa nyújtott neki emlékezetes élményt?",
+   "valaszok": [
+    "egy gabonatárolóé",
+    "egy hímzett felöltőé",
+    "egy szemrevaló menyecskéé",
+    "egy gólyáé"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbi szókapcsolatokat gyakran használjuk a hétköznapokban. Melyik szókapcsolat helytelen?",
+   "valaszok": [
+    "túl nagy falat",
+    "fogós kérdés",
+    "nehéz dió",
+    "burokban született"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül ki vagy mi a laboda?",
+   "valaszok": [
+    "bűntetőeszköz",
+    "gyomnövény",
+    "a labdarúgó régiesen",
+    "énekesmadár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül kit vagy mit neveznek bajadérnak?",
+   "valaszok": [
+    "őszülő bajuszt",
+    "téli csapadékot",
+    "indiai táncosnőt",
+    "bajai menyecskét"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik elnevezés fedi a kukoricát?",
+   "valaszok": [
+    "kótyonfitty",
+    "nyüzüge",
+    "málé",
+    "lütyő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik lehet szeladon?",
+   "valaszok": [
+    "egy kihalt őslény",
+    "egy ifjú udvarló",
+    "egy hatalmas kutya",
+    "egy hamvas hajadon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket nevezik bricskának?",
+   "valaszok": [
+    "vitorlás hajót",
+    "lovas kocsit",
+    "zsebkést",
+    "térdnadrágot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket nevezik francia négyesnek?",
+   "valaszok": [
+    "egy tiltott szerencsejátékot",
+    "egy táncot",
+    "egy négylovas fogatot",
+    "egy kártyajátékot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül mivel foglalkozik egy designer?",
+   "valaszok": [
+    "utazásszervezéssel",
+    "formatervezéssel",
+    "ruhakereskedelemmel",
+    "számlakezeléssel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezik az anyanyelvként már sehol sem használt nyelveket?",
+   "valaszok": [
+    "apanyelvek",
+    "holt nyelvek",
+    "zárt nyelvek",
+    "alvó nyelvek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány perc egy fertályóra?",
+   "valaszok": [
+    "30 perc",
+    "15 perc",
+    "60 perc",
+    "45 pec"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki foglalkozik kőnyomatokkal az alábbiak közül?",
+   "valaszok": [
+    "etnográfus",
+    "bibliográfus",
+    "litográfus",
+    "biográfus"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt a XVIII. század végén induló nyelvújító mozgalom vezéralakja?",
+   "valaszok": [
+    "Pázmány Péter",
+    "Mikes Kelemen",
+    "Kazinczy Ferenc",
+    "Batsányi János"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik dolgoznak egy redakcióban?",
+   "valaszok": [
+    "szakácsok",
+    "újságírók",
+    "artisták",
+    "lakatosok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kikkel találkozhatunk, ha hivatalosak vagyunk a PEN Club estélyére?",
+   "valaszok": [
+    "karikaturistákkal",
+    "irodalmárokkal",
+    "festőkkel",
+    "bankárokkal"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiknek a jellegzetes viselete a skapuláré?",
+   "valaszok": [
+    "balett-táncosok",
+    "szerzetesek",
+    "űrhajósok",
+    "műúszók"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit neveztek régen jurátusnak?",
+   "valaszok": [
+    "a juhászbojtárt",
+    "a joggyakornokot",
+    "a régészt",
+    "az építészt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kivel vagy mivel küzdött meg az a személy, akire rátámadt egy toportyán?",
+   "valaszok": [
+    "egy farkassal",
+    "egy útonállóval",
+    "egy vaddisznóval",
+    "egy portyázó török sereggel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mely nép kultúrájával foglalkozik a sinológus?",
+   "valaszok": [
+    "kínai",
+    "mexikói",
+    "maláj",
+    "egyiptomi"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik a helyes írásmód a következők közül?",
+   "valaszok": [
+    "ivóvíz ellátás",
+    "ivóvíz-ellátás",
+    "ivóvízellátás",
+    "ivó-vízellátás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik a műhely régies elnevezése az alábbiak közül?",
+   "valaszok": [
+    "oficér",
+    "officina",
+    "ispotály",
+    "kamarilla"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik hangszert nevezték régen flótának?",
+   "valaszok": [
+    "fuvolát",
+    "hegedűt",
+    "fagottot",
+    "trombitát"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hivatalos okirat régi elnevezése a matrikula?",
+   "valaszok": [
+    "útlevél",
+    "személyi igazolvány",
+    "katonakönyv",
+    "anyakönyv"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ige írásmódja helytelen?",
+   "valaszok": [
+    "tűr",
+    "hűl",
+    "dűl",
+    "sűl"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik kapta nevét egy magyar faluról?",
+   "valaszok": [
+    "okapi",
+    "mozi",
+    "kocsi",
+    "tipli"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik kifejezés jelöli az elkerülhetetlen, megmásíthatatlan sorsot?",
+   "valaszok": [
+    "faktum",
+    "fárosz",
+    "fátum",
+    "fakszni"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik kifejezés jelöli befektetői csoportok alkalmi együttműködését?",
+   "valaszok": [
+    "konzílium",
+    "konzisztencia",
+    "konzulátus",
+    "konzorcium"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik kifejezés megfelelője: kölcsönösen, viszont?",
+   "valaszok": [
+    "vinum regum",
+    "vice versa",
+    "viribus unitis",
+    "vita brevis"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik kutyafajta neve egyezik meg egy belső égésű motortípus elnevezésével?",
+   "valaszok": [
+    "bulldog",
+    "komondor",
+    "boxer",
+    "puli"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar eredetű név?",
+   "valaszok": [
+    "Benjámin",
+    "Bernát",
+    "Brúnó",
+    "Bódog"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik magyar híresség neve szerepel helytelenül leírva?",
+   "valaszok": [
+    "Thököly Imre",
+    "Széchényi Ferenc",
+    "Weöres Sándor",
+    "Vörösmarthy Mihály"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik matematikai művelet idegen eredetű neve az addíció?",
+   "valaszok": [
+    "kivonás",
+    "összeadás",
+    "osztás",
+    "szorzás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mondat fejezi ki azt, hogy valaki csak tetteti a bűnbánatot?",
+   "valaszok": [
+    "Láthatóan megbánta bűneit",
+    "Láthatólag megbánta bűneit",
+    "Látszik, hogy megbánta bűneit",
+    "Látszólag megbánta bűneit"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem finnugor nyelv?",
+   "valaszok": [
+    "vót",
+    "vepsze",
+    "udmurt",
+    "macedón"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem igemód a magyar nyelvben?",
+   "valaszok": [
+    "kijelentő",
+    "feltételes",
+    "felszólító",
+    "kérdő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nemzetiséget fedi a \"tót\" elnevezés?",
+   "valaszok": [
+    "osztrákot",
+    "szerbet",
+    "szlovákot",
+    "bolgárt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szakmához tartozó szakkifejezés a huta?",
+   "valaszok": [
+    "borbély",
+    "tímár",
+    "kohász",
+    "rőfös"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szót írtuk le helytelenül?",
+   "valaszok": [
+    "kilogramm",
+    "monogram",
+    "autogramm",
+    "diagram"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik településünk neve szerepel helytelenül leírva?",
+   "valaszok": [
+    "Celldömölk",
+    "Szentgothárd",
+    "Balassagyarmat",
+    "Orosháza"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik tudományág foglalkozik a gyógyszerkutatással?",
+   "valaszok": [
+    "lingvisztika",
+    "genealógia",
+    "farmakológia",
+    "magnetosztatika"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik írásmód helytelen a magyar szabályok szerint?",
+   "valaszok": [
+    "ellipszis",
+    "bulldog",
+    "affektál",
+    "bagatell"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik írásmód helytelen?",
+   "valaszok": [
+    "cseresznyemag",
+    "cseresznyésrétes",
+    "cseresznyevirág",
+    "cseresznyefa bútor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ószövetségi név az alábbiak közül?",
+   "valaszok": [
+    "Brigitta",
+    "Edit",
+    "Ildikó",
+    "Ráhel"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyiket nevezik ciberének?",
+   "valaszok": [
+    "újbort",
+    "levesfajtát",
+    "húros hangszert",
+    "kabátfajtát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyiket nevezik trencskónak?",
+   "valaszok": [
+    "rövid lábú vadászebet",
+    "kabátfajtát",
+    "páncélszekrényt",
+    "edzőcipőt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyikük keresztneve nem az, mint a többi háromé?",
+   "valaszok": [
+    "Pollack",
+    "Gorbacsov",
+    "Faraday",
+    "Dickens"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a borseprő?",
+   "valaszok": [
+    "hordótakarító eszköz",
+    "a letisztult bor üledéke",
+    "a szőlőprés alkatrésze",
+    "megecetesedett bor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a körmagyar?",
+   "valaszok": [
+    "mezőgazdasági épület",
+    "reformkori társastánc",
+    "falusi lakodalmi asztal",
+    "hívők ünnepélyes menete"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a polenta?",
+   "valaszok": [
+    "sapka",
+    "étel",
+    "ruhaanyag",
+    "takaró"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a szonáta?",
+   "valaszok": [
+    "zenei műfaj",
+    "versforma",
+    "fúvós hangszer",
+    "mértékegység"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a vörös szín egyik árnyalatának nevet adó cinóber?",
+   "valaszok": [
+    "gyógynövény",
+    "ásvány",
+    "légköri jelenség",
+    "ritka rágcsáló"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi készülhet chippendale stílusban az alábbiak közül?",
+   "valaszok": [
+    "lakóház",
+    "bútor",
+    "festmény",
+    "kert"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi lehet lukulluszi a mondás szerint?",
+   "valaszok": [
+    "győzelem",
+    "szépség",
+    "kín",
+    "lakoma"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi tartozik az érdeklődési körébe annak az embernek, aki impalákkal foglalkozik?",
+   "valaszok": [
+    "kézimunkázás",
+    "barkácsolás",
+    "klasszikus építészet",
+    "egy állatfajta"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi volt az obsit, amit a leszerelő katona kapott?",
+   "valaszok": [
+    "elbocsátó levél",
+    "pénz",
+    "birtoklevél",
+    "kitüntetés"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi volt az orosz parasztok közismert elnevezése?",
+   "valaszok": [
+    "bojárok",
+    "muzsikok",
+    "trojkák",
+    "dácsák"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi érdekli azt az embert aki majolikákról olvas?",
+   "valaszok": [
+    "a fűszerek",
+    "egy játék",
+    "a bábművészet",
+    "a cserépedények"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen a fád ember?",
+   "valaszok": [
+    "harsány",
+    "unalmas",
+    "szétszórt",
+    "ábrándozó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen a pikírt megjegyzés?",
+   "valaszok": [
+    "tréfás",
+    "bölcs",
+    "csípős",
+    "kéretlen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen az obligát kérdés?",
+   "valaszok": [
+    "megválaszolhatatlan",
+    "elmaradhatatlan",
+    "költői",
+    "eldöntendő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen egy rabiátus ember?",
+   "valaszok": [
+    "alattomos",
+    "tétovázó",
+    "halk szavú",
+    "indulatos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen ember a homo sapiens az elnevezés szerint?",
+   "valaszok": [
+    "tűzgyújtó",
+    "felegyenesedett",
+    "játékos",
+    "bölcs"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen eredetű a \"kollégium\" jövevényszavunk?",
+   "valaszok": [
+    "német",
+    "francia",
+    "latin",
+    "szláv"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen eredetű a Judit név?",
+   "valaszok": [
+    "latin",
+    "spanyol",
+    "héber",
+    "szláv"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen eredetű a Richárd név?",
+   "valaszok": [
+    "germán",
+    "szláv",
+    "görög",
+    "héber"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen gyűjtemény a herbárium?",
+   "valaszok": [
+    "növény",
+    "lepke",
+    "bélyeg",
+    "érme"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen határozó nincs a magyar nyelvben?",
+   "valaszok": [
+    "cél",
+    "eszköz",
+    "hely",
+    "minőség"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek az elmélete a retorika?",
+   "valaszok": [
+    "költészet",
+    "szónoki beszéd",
+    "erkölcs",
+    "tanítás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire használták eredetileg a szakajtót?",
+   "valaszok": [
+    "tészta kelesztésére",
+    "lovak patkolására",
+    "bor érlelésére",
+    "tyúkok etetésére"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miről kapta nevét a madeirabor?",
+   "valaszok": [
+    "egy szigetről",
+    "egy hegyről",
+    "egy szőlőtermesztőről",
+    "egy folyóról"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit csinál a köpölyöző ember a régies kifejezés szerint?",
+   "valaszok": [
+    "pletykát terjeszt",
+    "vajat készít",
+    "orvosi műveletet végez",
+    "vallomást tesz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál az, aki a valóságot meghamisítva elködösít valamit?",
+   "valaszok": [
+    "eltuszkol",
+    "eltusol",
+    "eltussol",
+    "letusol"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál, aki a népies kifejezés szerint óg-móg?",
+   "valaszok": [
+    "hangosan töpreng",
+    "dörmög, dohog",
+    "szórakozottan babrál",
+    "bambul, bámészkodik"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinál, aki piedesztára emel valakit?",
+   "valaszok": [
+    "feláldoz",
+    "közszemlére tesz",
+    "dicsőít",
+    "pellengérre állít"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál, aki protestál?",
+   "valaszok": [
+    "előre kinyilatkoztat",
+    "végrendelkezik",
+    "tiltakozik",
+    "pártfogásba vesz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit jelent a \"moderato\" zenei tempójelzés?",
+   "valaszok": [
+    "élénken",
+    "csillogóan",
+    "pátosszal",
+    "mérsékelten"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit jelent a latin 'et cetera' kifejezés?",
+   "valaszok": [
+    "kezdetektől fogva",
+    "az idők végéig",
+    "szó szerint",
+    "és a többi"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit jelent a pakompart szó?",
+   "valaszok": [
+    "rakodótér",
+    "folyómeder",
+    "lovaglónadrág",
+    "oldalszakáll"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit jelent magyarul Buenos Aires neve?",
+   "valaszok": [
+    "isten hozott",
+    "jó napot kívánok",
+    "jó szelek",
+    "szép kilátás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit jelent magyarul a pekingi Tienanmen tér neve?",
+   "valaszok": [
+    "áldott ősatyák",
+    "mennyei béke",
+    "igazság és dicsőség",
+    "fényességes istenek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit kap az, akinek szuflét adnak?",
+   "valaszok": [
+    "selyemhálóinget",
+    "szerenádot",
+    "felfújtat",
+    "virágkosarat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit kapott az az ember, akinek szépiát vittek ajándékba?",
+   "valaszok": [
+    "mezei virágot",
+    "csokoládés süteményt",
+    "tintahalat",
+    "elegáns szeszes italt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit készít, aki szuszékot csinál?",
+   "valaszok": [
+    "ládát",
+    "ágyat",
+    "bundát",
+    "paplant"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit nevez a népnyelv kólikának?",
+   "valaszok": [
+    "kis üditőitalt",
+    "szúrós gyomnövényt",
+    "nádfurulyát",
+    "hascsikarást"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit neveznek régiesen ispotálynak?",
+   "valaszok": [
+    "az iskolát",
+    "az istállót",
+    "a kórházat",
+    "a községházát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit neveztek görebnek?",
+   "valaszok": [
+    "a sánta kutyát",
+    "a görbe szöget",
+    "egy öreg viskót",
+    "egy kémiai eszközt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit neveztek kócsagforgónak?",
+   "valaszok": [
+    "fejfedő díszét",
+    "kerékfajtát",
+    "sült madárcombot",
+    "könyökvédőt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit szeret az, aki kedveli az anagrammákat?",
+   "valaszok": [
+    "egy ókori versfajtát",
+    "egy ételkülönlegességet",
+    "kisebb tárgyak gyűjtését",
+    "nyelvi játékokat"
+   ],
+   "helyes": 3
+  }
+ ]
+}

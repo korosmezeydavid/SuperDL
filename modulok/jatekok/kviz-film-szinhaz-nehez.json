@@ -1,0 +1,4988 @@
+{
+ "id": "kviz-film-szinhaz-nehez",
+ "nev": "Film és színház — nehezebb",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "A Vészhelyzet című sorozat melyik orvosa gyógyított hosszabb ideig Afrikában?",
+   "valaszok": [
+    "dr. Ross",
+    "dr. Carter",
+    "dr. Romano",
+    "dr. Benton"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Charlie Chaplin melyik filmjének főszereplője Marlon Brando?",
+   "valaszok": [
+    "A diktátor",
+    "Modern idők",
+    "Aranyláz",
+    "A honkongi grófnő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy hívták az Őze Lajos által megformált karaktert A tanú című filmben?",
+   "valaszok": [
+    "Bástya elvtárs",
+    "Virág elvtárs",
+    "Pelikán elvtárs",
+    "Gödény elvtárs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan hunyt el a legendás filmsztár, James Dean?",
+   "valaszok": [
+    "alkoholmérgezésben",
+    "szívrohamot kapott",
+    "autóbalesetben",
+    "vadászbalesetben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan lesz vége a főhősök kapcsolatának a Love Story című filmben?",
+   "valaszok": [
+    "eltűnik a főhős",
+    "szakítanak",
+    "börtönbe kerülnek",
+    "meghal a hősnő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol alapította meg a Taganka Színházat Jurij Petrovics Ljubimov?",
+   "valaszok": [
+    "Moszkva",
+    "Szentpétervár",
+    "Kijev",
+    "Varsó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol játszódik a Vészhelyzet című népszerű sorozat?",
+   "valaszok": [
+    "Atlantában",
+    "Miamiban",
+    "Chicagóban",
+    "Anchorage-ban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol született Charlie Chaplin?",
+   "valaszok": [
+    "Londonban",
+    "Los Angelesben",
+    "Dublinban",
+    "Bostonban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol állt 1967-től a Kazimir Károly kezdeményezésére létrehozott budapesti Körszínház?",
+   "valaszok": [
+    "a Városligetben",
+    "a Budai Várban",
+    "a Gellért-hegyen",
+    "a Margit-szigeten"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol építettek hidat az angol hadifoglyok David Lean filmjében?",
+   "valaszok": [
+    "túl messze",
+    "a Zambézin",
+    "a Kwai folyón",
+    "a Szakvenen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki Julia Roberts partnere a Micsoda nő! című vígjátékban?",
+   "valaszok": [
+    "Tom Hanks",
+    "Mel Gibson",
+    "Richard Gere",
+    "Kurt Russel"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki a címszereplője Sándor Pál 1956-os témájú filmjének?",
+   "valaszok": [
+    "Hajmási Péter",
+    "Szerencsés Dániel",
+    "Bors Máté",
+    "Fekete Péter"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki a főszereplője a Mission: Impossible 2 című filmnek?",
+   "valaszok": [
+    "Tom Hanks",
+    "Nicolas Cage",
+    "Tom Cruise",
+    "Brad Pitt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki a hőse a Goldfinger című filmnek?",
+   "valaszok": [
+    "Sherlock Holmes",
+    "Simon Templar",
+    "James Bond",
+    "Hercule Poirot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki bújt női ruhába az Egy szoknya, egy nadrág című magyar filmvígjátékban?",
+   "valaszok": [
+    "Bilicsi Tivadar",
+    "Kabos Gyula",
+    "Latabár Kálmán",
+    "Koltai Róbert"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki játszotta Jumurdzsák szerepét az Egri csillagok filmváltozatában?",
+   "valaszok": [
+    "Darvas Iván",
+    "Bárdy György",
+    "Sinkovits Imre",
+    "Major Tamás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játszotta a köpcöst a Szóljatok a köpcösnek című vígjátékban?",
+   "valaszok": [
+    "Gene Hackman",
+    "Jack Nicholson",
+    "Dustin Hoffman",
+    "Danny de Vito"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki játszotta a női főszerepet a My Fair Lady című musical 1964-es filmváltozatában?",
+   "valaszok": [
+    "Barbara Streisand",
+    "Liza Minnelli",
+    "Audrey Hepburn",
+    "Shirley MacLaine"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki játszotta a nőt, akibe Robert Redford szerelmes volt a Távol Afrikától című filmben?",
+   "valaszok": [
+    "Glenn Close",
+    "Meryl Streep",
+    "Demi Moore",
+    "Sharon Stone"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játszotta el Batmant az alábbi színészek közül?",
+   "valaszok": [
+    "Michael Keaton",
+    "Leonardo DiCaprio",
+    "Brad Pitt",
+    "Keanu Reeves"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki kapta a legjobb női főszereplőnek járó Oscar-díjat 2001-ben?",
+   "valaszok": [
+    "Sharon Stone",
+    "Julia Roberts",
+    "Kim Basinger",
+    "Juliette Binoche"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki kétszeres Kossuth-díjas a színésznők közül?",
+   "valaszok": [
+    "Törőcsik Mari",
+    "Psota Irén",
+    "Tábori Nóra",
+    "Máthé Erzsi"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kiknek nem készített \"naplót\" Mészáros Márta filmjeinek címe szerint?",
+   "valaszok": [
+    "szerelmeinek",
+    "gyermekeinek",
+    "apjának, anyjának",
+    "az élőknek"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a művei alapján készült Dargay Attila Szaffi című rajzfilmje?",
+   "valaszok": [
+    "Mikszáth Kálmán",
+    "Jókai Mór",
+    "Arany János",
+    "Móra Ferenc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a nevéhez fűződik a Jászai Mari és Ódry Árpád színészotthon létrhehozása?",
+   "valaszok": [
+    "Gobbi Hilda",
+    "Ruttkai Éva",
+    "Tolnay Klári",
+    "Törőcsik Mari"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kiről kapta nevét Békéscsaba színháza?",
+   "valaszok": [
+    "Jókai Mór",
+    "Petőfi Színház",
+    "Arany János",
+    "Vörösmarty Mihály"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kiről kapta nevét a nyíregyházi színház?",
+   "valaszok": [
+    "Kölcsey Ferenc",
+    "Móra Ferenc",
+    "Móricz Zsigmond",
+    "Katona József"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kiről kapta nevét a veszprémi színház?",
+   "valaszok": [
+    "Arany Jánosról",
+    "Petőfi Sándorról",
+    "Csiky Gergelyről",
+    "Madách Imréről"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit alakít Brad Pitt Wolfgang Petersen Trója című filmjében?",
+   "valaszok": [
+    "Akhilleuszt",
+    "Menelaoszt",
+    "Páriszt",
+    "Hektort"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kit vett feleségül Brad Pitt?",
+   "valaszok": [
+    "Jennifer Aniston",
+    "Julia Roberts",
+    "Gwyneth Paltrow",
+    "Jennifer Lopez"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kiért áll bosszút Harmonika a Volt egyszer egy vadnyugat című filmben?",
+   "valaszok": [
+    "apjáért",
+    "testvéréért",
+    "menyasszonyáért",
+    "anyjáért"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik darabot játszotta a Nemzeti Színház 1848. március 15-én?",
+   "valaszok": [
+    "Az ember tragédiája",
+    "Bánk bán",
+    "A pártütők",
+    "Csongor és Tünde"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik detektívet alakította Humphrey Bogart A máltai sólyom című filmben?",
+   "valaszok": [
+    "Sherlock Holmes",
+    "Hercule Poirot",
+    "Sam Spade",
+    "Maigret felügyelő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy Harrison Ford főszereplésével készült film címe: \"A kis …\"",
+   "valaszok": [
+    "fültanú",
+    "szemtanú",
+    "koronatanú",
+    "hamis tanú"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik együttes szerepel a Kalózok című magyar filmben?",
+   "valaszok": [
+    "Rapülők",
+    "Bikini",
+    "Republic",
+    "Jazz+Az"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik fantasztikus filmnek nem készült folytatása?",
+   "valaszok": [
+    "Csillagok háborúja",
+    "Mátrix",
+    "Szárnyas fejvadász",
+    "A nyolcadik utas: a halál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik film főhőse magyar?",
+   "valaszok": [
+    "Amerikai szépség",
+    "Egy francia nő",
+    "Az angol beteg",
+    "Arábiai Lawrance"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik film főszerepét játszotta Arnold Schwarzenegger?",
+   "valaszok": [
+    "Az utolsó cserkész",
+    "Az utolsó akcióhős",
+    "Az utolsó császár",
+    "Az utolsó mohikán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik film kapta meg a legjobb filmnek járó Oscar-díjat 2001-ben?",
+   "valaszok": [
+    "Csokoládé",
+    "Gladiátor",
+    "Tigris és sárkány",
+    "Traffic"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik filmfesztivál díja az Arany Oroszlán?",
+   "valaszok": [
+    "a cannes-i",
+    "a velencei",
+    "a berlini",
+    "a locarnói"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik filmhős alakítójaként lett világhírű Christopher Reeve?",
+   "valaszok": [
+    "James Bond",
+    "Fantomas",
+    "Zorro",
+    "Superman"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik filmhős apja Darth Vader?",
+   "valaszok": [
+    "James Bond",
+    "Luke Skywalker",
+    "Han Solo",
+    "Superman"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik háborúban játszódik Mel Gibson Katonák voltunk című filmje?",
+   "valaszok": [
+    "az Öböl-háborúban",
+    "a vietnámi háborúban",
+    "a koreai háborúban",
+    "a II. világháborúban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik híres westernfilmben játszott Charles Bronson?",
+   "valaszok": [
+    "A jó, a rossz és a csúf",
+    "Egy maréknyi dollárért",
+    "A hét mesterlövész",
+    "Nincs bocsánat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar film főhőse Nyúl Béla?",
+   "valaszok": [
+    "Hannibál tanár úr",
+    "Régi idők focija",
+    "A tanú",
+    "A három testőr Afrikában"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sorozatból készült filmben játszott Cameron Diaz?",
+   "valaszok": [
+    "Mission: Impossible",
+    "Charlie angyalai",
+    "San Francisco utcáin",
+    "Columbo"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sztár nem játszik az Ocean's Eleven - Tripla vagy semmi című filmben?",
+   "valaszok": [
+    "Julia Roberts",
+    "George Clooney",
+    "Mat Damon",
+    "Jennifer Lopez"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik színház igazgatója volt Kazimir Károly?",
+   "valaszok": [
+    "Vidám Színpad",
+    "Thália Színház",
+    "Pesti Színház",
+    "Játékszín"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik színház nevét változtatták 2000-ben Pesti Magyar Színházra?",
+   "valaszok": [
+    "a Nemzeti Színházét",
+    "a Madách Színházét",
+    "a Pesti Színházét",
+    "a Katona József Színházét"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik színházat hívták eredetileg Népoperának?",
+   "valaszok": [
+    "Fővárosi Operettszínház",
+    "Erkel Színház",
+    "Állami Operaház",
+    "Thália Színház"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik színházban kezdte pályafutását a főiskola elvégzése után Eszenyi Enikő?",
+   "valaszok": [
+    "Madách Színház",
+    "Nemzeti Színház",
+    "Thália Színház",
+    "Vígszínház"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik színházunkban mutatták be a \"Képzelt riport egy amerikai popfesztiválról\" című darabot?",
+   "valaszok": [
+    "a Vígszínházban",
+    "a Madách Színházban",
+    "a Nemzeti Színházban",
+    "az Operett Színházban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik színésznő kapott Oscar-díjat a Ghost című filmben nyújtott alakításáért?",
+   "valaszok": [
+    "Whoopi Goldberg",
+    "Demi Moore",
+    "Michelle Pfeiffer",
+    "Barbra Streisand"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik színésztársa írt könyvet Gálvölgyi Jánosról?",
+   "valaszok": [
+    "Bajor Imre",
+    "Rátonyi Róbert",
+    "Mikó István",
+    "Körmendi János"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik színészünk volt már több színház igazgatója is?",
+   "valaszok": [
+    "Gálvölgyi János",
+    "Mikó István",
+    "Kern András",
+    "Rudolf Péter"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik táncról kapta címét a Rudolf Péter főszereplésével készült film?",
+   "valaszok": [
+    "rock and roll",
+    "rumba",
+    "tangó",
+    "cha-cha-cha"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városunkban áll a Szigligeti Edéről elnevezett színház?",
+   "valaszok": [
+    "Kaposvár",
+    "Veszprém",
+    "Szolnok",
+    "Gyula"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik énekesnő szerepelt a Mad Max III. című filmben?",
+   "valaszok": [
+    "Madonna",
+    "Tina Turner",
+    "Whitney Houston",
+    "Cher"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Clint Eastwood Oscar-díjas westernjének? \"Nincs …\"",
+   "valaszok": [
+    "kegyelem",
+    "több töltény",
+    "bocsánat",
+    "már bölény"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Fellini vándormutatványosokról szóló világhírű filmjének?",
+   "valaszok": [
+    "Az édes élet",
+    "Országúton",
+    "Cabiria éjszakái",
+    "Amarcord"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Ingmar Bergman világhírű filmjének: \"Jelenetek …\"",
+   "valaszok": [
+    "egy család életéből",
+    "egy házasságból",
+    "a Hamletből",
+    "egy színjátékból"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Marco Ferreri híres botrányfilmjének: \"A nagy …\"",
+   "valaszok": [
+    "piálás",
+    "balhé",
+    "zabálás",
+    "kurtizán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Radványi Géza filmjének?",
+   "valaszok": [
+    "Circus Minimus",
+    "Circus Maximus",
+    "Circus Optimus",
+    "Circus Pessimus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Tímár Péter első nagyjátékfilmjének?",
+   "valaszok": [
+    "Csinibaba",
+    "Egészséges erotika",
+    "Csapd le, csacsi!",
+    "Zimmer Feri"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe a DreamWorks Stúdió rajzfilmjének: \"Szilaj, vad völgy …\"",
+   "valaszok": [
+    "bikája",
+    "bölénye",
+    "paripája",
+    "szamara"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a foglalkozása a Gregory Peck által játszott hősnek a Római vakáció című filmben?",
+   "valaszok": [
+    "testőr",
+    "inas",
+    "újságíró",
+    "fényképész"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi eszi meg az Ikreket reggelire az ismert magyar film címe szerint?",
+   "valaszok": [
+    "a Skorpió",
+    "a Vízöntő",
+    "az Oroszlán",
+    "a Nyilas"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi volt a Tenkes kapitányának valódi neve?",
+   "valaszok": [
+    "Beke Benő",
+    "Cseke Tóni",
+    "Zeke Móric",
+    "Eke Máté"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi volt a foglalkozása Leonardo DiCaprionak a Titanic című filmben?",
+   "valaszok": [
+    "szakács",
+    "matróz",
+    "festő",
+    "jégtáncos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"fények\" szerepelnek Charlie Chaplin világhírű filmjének címében?",
+   "valaszok": [
+    "kisvárosi",
+    "nagyvárosi",
+    "külvárosi",
+    "kertvárosi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen \"kapcsolat\" szerepel a Gene Hackman főszereplésével készült Oscar-díjas film címében?",
+   "valaszok": [
+    "belga",
+    "szicíliai",
+    "francia",
+    "máltai"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen beosztásban dolgozik a rendőrségen a filmhős Columbo?",
+   "valaszok": [
+    "őrnagy",
+    "kapitány",
+    "hadnagy",
+    "őrmester"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen jármű kapitányát alakítja Sean Connery a Vadászat a Vörös Októberre című filmben?",
+   "valaszok": [
+    "repülőgép",
+    "hadihajó",
+    "tengeralattjáró",
+    "űrhajó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen rangot visel Háti, az elefántok vezére A dzsungel könyve című Disney-rajzfilmben?",
+   "valaszok": [
+    "maharadzsa",
+    "ezredes",
+    "százados",
+    "szultán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen szerepet játszott Tom Cruise A cég című filmben?",
+   "valaszok": [
+    "ügyvédet",
+    "rendőrt",
+    "bankárt",
+    "brókert"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen szuperhőst alakít a filmvásznon az Oscar-díjas Halle Berry?",
+   "valaszok": [
+    "Macskanő",
+    "Pókasszony",
+    "Denevérlány",
+    "Hulk"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen származású a képregény- és filmhős Asterix?",
+   "valaszok": [
+    "gall",
+    "normann",
+    "vandál",
+    "viking"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen tudos a főhőse az Egy csodálatos elme című Oscar-díjas filmnek?",
+   "valaszok": [
+    "agysebész",
+    "pszichológus",
+    "matematikus",
+    "irodalmár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen állat az Oscar-díjas magyar rajzfilm főszereplője?",
+   "valaszok": [
+    "szúnyog",
+    "róka",
+    "egér",
+    "légy"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miről nevezték el Batman ellenfelét a Tim Burton-féle sorozat első filmjében?",
+   "valaszok": [
+    "egy sakkfiguráról",
+    "egy rulett-kombinációról",
+    "egy kártyalapról",
+    "egy tánclépésről"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál az \"idő\" Gothár Péter híres filmjének címében?",
+   "valaszok": [
+    "rohan",
+    "megáll",
+    "elszáll",
+    "eltűnik"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinál életében utoljára Marion, Hitchcock Psycho című filmjének hősnője?",
+   "valaszok": [
+    "teázik",
+    "zuhanyozik",
+    "autót vezet",
+    "kenyeret pirít"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miért hagyta abba a filmezést a szőke filmsztár, Grace Kelly?",
+   "valaszok": [
+    "férjhez ment egy herceghez",
+    "párizsi nagykövet lett",
+    "filmstúdiót alapított",
+    "férjhez ment egy szenátorhoz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Quentin Tarantino melyik filmje két részés?",
+   "valaszok": [
+    "Ponyvaregény",
+    "Kill Bill",
+    "Kutyaszorítóban",
+    "Jackie Brown"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Rejtő Jenő melyik művéből rendezett filmet Bujtor István?",
+   "valaszok": [
+    "A Láthatatlan Légió",
+    "Csontbrigád",
+    "A három testőr Afrikában",
+    "Piszkos Fred, a kapitány"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Roman Polanski melyik munkáját jutalmazták a legjobb rendezőnek járó Oscar-díjjal?",
+   "valaszok": [
+    "Kés a vízben",
+    "Kínai negyed",
+    "A zongorista",
+    "Egy tiszta nő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Steven Spielberg melyik filmjében játssza a főszerepet Leonardo DiCaprio?",
+   "valaszok": [
+    "A.I. - Mesterséges értelem",
+    "Különvélemény",
+    "Kapj el, ha tudsz",
+    "Ryan közlegény megmentése"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Steven Spielberg melyik filmjének főszereplője Tom Cruise?",
+   "valaszok": [
+    "Az elveszett frigyláda…",
+    "Különvélemény",
+    "Harmadik típusú találkozások",
+    "Ryan közlegény megmentése"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Szabó István melyik filmjében nem Klaus Maria Brandauer a főszerelpő?",
+   "valaszok": [
+    "Mephisto",
+    "Redl ezredes",
+    "Hanussen",
+    "Bizalom"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Sándor Pál melyik filmjéből vált szállóigévé: \"egyedül nem megy\"?",
+   "valaszok": [
+    "Bohóc a falon",
+    "Régi idők focija",
+    "Ripacsok",
+    "Szerencsés Dániel"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Amerika melyik botrányáról szól Az elnök emberei című film?",
+   "valaszok": [
+    "a Lewinsky-ügyről",
+    "a Kennedy-gyilkosságról",
+    "a Watergate-ügyről",
+    "a Reagan-merényletről"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi filmek közül melyiket nem Hitchcock rendezte?",
+   "valaszok": [
+    "A Manderley-ház asszonya",
+    "Szédülés",
+    "Psycho",
+    "Psyché"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbi művészek közül kiről nincs budapesti színház elnevezve?",
+   "valaszok": [
+    "József Attila",
+    "Katona József",
+    "Radnóti Miklós",
+    "Vörösmarty Mihály"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Bruce Willis melyik filmjében alakít taxisofőrt, akinek meg kell mentenie a világot?",
+   "valaszok": [
+    "Drágán add az életed",
+    "Az ötödik elem",
+    "Armageddon",
+    "Ponyvaregény"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy hívták a Danny DeVito alakította gonosztevőt a Batman visszatér című filmben?",
+   "valaszok": [
+    "Hapci",
+    "Pingvin",
+    "Zsiráf",
+    "Morgó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan kapcsolódik Shakespeare nevéhez a \"Globe\"?",
+   "valaszok": [
+    "darabjának címe",
+    "születési helye",
+    "a színháza volt",
+    "a színésznője volt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol van a ház Makk Károly híres filmjének címe szerint?",
+   "valaszok": [
+    "szilfák alatt",
+    "sziklák alatt",
+    "dombok alatt",
+    "lombok alatt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Honnan szökik meg Steve McQueen a Pillangó című film főhőseként?",
+   "valaszok": [
+    "az Alcatrazból",
+    "a Bastille-ból",
+    "If várából",
+    "az Ördögszigetről"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hova kerül Tom Hanks a Számkivetett című film főhőseként?",
+   "valaszok": [
+    "Lakatlan bolygóra",
+    "börtönbe",
+    "lakatlan szigetre",
+    "megrongálódott űrbázisra"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hova ment a papa Emir Kusturica híres filmjének címe szerint?",
+   "valaszok": [
+    "szabadságra",
+    "szolgálati útra",
+    "külföldre",
+    "Titóhoz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki Mészáros Ági színésznő lánya?",
+   "valaszok": [
+    "Szirtes Ági",
+    "Udvaros Dorottya",
+    "Básti Juli",
+    "Voith Ági"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki Robert Redford partnere A nagy balhé című filmben?",
+   "valaszok": [
+    "Charles Bronson",
+    "Paul Newman",
+    "Henry Fonda",
+    "Steve McQueen"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki Will Smith partnere a Man in Black Sötét zsaruk című film második részében?",
+   "valaszok": [
+    "Eddie Murphy",
+    "Tommy Lee Jones",
+    "Denzel Washington",
+    "Arnold Schwarzenegger"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki a főszereplője Jean-Luc Godard Kifulladásig című filmjének?",
+   "valaszok": [
+    "Alain Delon",
+    "Jean-Paul Belmondo",
+    "Pierre Richard",
+    "Gerard Depardieu"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki a női főszereplője James Cameron Titanic című filmjének?",
+   "valaszok": [
+    "Kate Winslet",
+    "Gwyneth Paltrow",
+    "Angelina Jolie",
+    "Winona Ryder"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki alakítja Barbra Streisand szerelmét a Funny Girl című filmben?",
+   "valaszok": [
+    "Omar Sharif",
+    "Ryan O'Neal",
+    "Steve McQueen",
+    "Paul Newman"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki alakította Han Solót a Csillagok háborúja című filmben?",
+   "valaszok": [
+    "Harrison Ford",
+    "Clint Eastwood",
+    "Charles Bronson",
+    "Richard Dreyfuss"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki alapította az Elfújta a szél című filmben Scarlett reménytelen szerelmét, Ashleyt?",
+   "valaszok": [
+    "Clark Gable",
+    "Leslie Howard",
+    "Errol Flynn",
+    "Cary Grant"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játssza Nicole Kidman szerelmét a Moulin Rouge című zenés filmben?",
+   "valaszok": [
+    "Tom Cruise",
+    "George Clooney",
+    "Leonardo DiCaprio",
+    "Ewan McGregor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki játssza a Dirty Dancing című 1987-es film főszerepét?",
+   "valaszok": [
+    "John Travolta",
+    "Patrick Swayze",
+    "Fred Astaire",
+    "David Hasselhoff"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játssza a Farelly-fivérek A nagyon nagy Ő című vígjátékának kövér hősnőjét?",
+   "valaszok": [
+    "Gwyneth Paltrow",
+    "Julia Roberts",
+    "Kim Basinger",
+    "Cameron Diaz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki játssza a Mad Max című film főszerepét?",
+   "valaszok": [
+    "Clint Eastwood",
+    "Mel Gibson",
+    "Sylvester Stallone",
+    "Telly Savalas"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játssza a címszerepet a Hyppolit, a lakáj című film újrafeldolgozásában?",
+   "valaszok": [
+    "Kern András",
+    "Haumann Péter",
+    "Eperjes Károly",
+    "Koltai Róbert"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki játssza a címszerepet a Mágnás Miska című filmben?",
+   "valaszok": [
+    "Jávor Pál",
+    "Gábor Miklós",
+    "Darvas Iván",
+    "Kabos Gyula"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játssza a főszerepet Martin Scorsese New York bandái című filmjében?",
+   "valaszok": [
+    "Robert de Niro",
+    "Leonardo DiCaprio",
+    "Brad Pitt",
+    "Al Pacino"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játssza a főszerepet a Majmok bolygója című klasszikus fantasztikus filmben?",
+   "valaszok": [
+    "Steve McQueen",
+    "Paul Newman",
+    "Charlton Heston",
+    "Kirk Douglas"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki játssza az Elemi ösztön című film \"szőke démonát\"?",
+   "valaszok": [
+    "Uma Thurman",
+    "Nicole Kidman",
+    "Sharon Stone",
+    "Demi Moore"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki játszik Coppola A keresztapa trilógiájának összes részében?",
+   "valaszok": [
+    "Marlon Brando",
+    "Al Pacino",
+    "Robert De Niro",
+    "Andy Garcia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játszotta Bob Fosse Kabaré című világhírű filmjének férfi főszerepét?",
+   "valaszok": [
+    "Ryan O'Neal",
+    "Michael York",
+    "Robert Redford",
+    "Jeff Bridges"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játszotta Clouseau felügyelőt A rózsaszín párduc című filmben?",
+   "valaszok": [
+    "Jack Lemmon",
+    "Pierre Richard",
+    "Peter Sellers",
+    "Woody Allen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki játszotta Gábor Pál Angi Vera című filmjének címszerepét?",
+   "valaszok": [
+    "Pap Vera",
+    "Venczel Vera",
+    "Halász Judit",
+    "Peremartoni Krisztina"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki játszotta Oskar Schindler szerepét Steven Spielberg filmjében?",
+   "valaszok": [
+    "Jeremy Irons",
+    "Daniel Day-Lewis",
+    "Liam Neeson",
+    "Ralph Fiennes"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki játszotta Rhett Butler legendás szerepét az Elfújta a szél című filmben?",
+   "valaszok": [
+    "Trevor Howard",
+    "Clark Gable",
+    "Leslie Howard",
+    "Bruce Willis"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játszotta a Forest Gump című Oscar-díjas film címszerepét?",
+   "valaszok": [
+    "Robin Williams",
+    "Tommy Lee Jones",
+    "Tom Hanks",
+    "Michael J. Fox"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki kapta meg a Nemzet Színésze címet 2005 januárjában?",
+   "valaszok": [
+    "Zenthe Ferenc",
+    "Bodrogi Gyula",
+    "Sztankay István",
+    "Szabó Gyula"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki kezdte pályafutását a Marosvásárhelyi Nemzeti Színház színészeként?",
+   "valaszok": [
+    "Bács Ferenc",
+    "Bánffy György",
+    "Bessenyei Ferenc",
+    "Sinkovits Imre"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki lett világhírű az Elfújta a szél Scarlett O'Harájaként?",
+   "valaszok": [
+    "Audrey Hepburn",
+    "Vivien Leigh",
+    "Olivia de Havilland",
+    "Judy Garland"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem a kaposvári Csiky Gergely Színházban kezdte pályafutását?",
+   "valaszok": [
+    "Pogány Judit",
+    "Koltai Róbert",
+    "Börcsök Enikő",
+    "Hirtling István"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki rendezett 2004-ben színdarabot Budapesten?",
+   "valaszok": [
+    "Milos Forman",
+    "Jiri Menzel",
+    "Roman Polanski",
+    "Andrzej Wajda"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki rendezte a Fehérlófia című magyar rajzfilmet?",
+   "valaszok": [
+    "Dargay Attila",
+    "Jankovics Marcell",
+    "Nepp József",
+    "Gémes József"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki rendezte a Vakvagányok című magyar filmet?",
+   "valaszok": [
+    "Jancsó Miklós",
+    "Tímár Péter",
+    "Bacsó Péter",
+    "Makk Károly"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki rendezte az Egy szöszi szerelmei című filmet?",
+   "valaszok": [
+    "Milos Forman",
+    "Andrzej Wajda",
+    "Szabó István",
+    "Jiri Menzel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki szeret bele a Bakaruhában című magyar film főhősébe, a fiatal újságíróba?",
+   "valaszok": [
+    "egy hercegnő",
+    "egy grófkisasszony",
+    "egy cselédlány",
+    "egy tanítónő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki szerezte Fellini Országúton című filmjének zenéjét?",
+   "valaszok": [
+    "Nino Rota",
+    "Ennio Morricone",
+    "Vangelis",
+    "Leonard Bernstein"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt Terence Hill partnere a Nevem: Senki című filmben?",
+   "valaszok": [
+    "Clint Eastwood",
+    "Henry Fonda",
+    "John Wayne",
+    "Charles Bronson"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Yves Montand felesége?",
+   "valaszok": [
+    "Simone Signoret",
+    "Brigitte Bardot",
+    "Sophia Loren",
+    "Gina Lollobrigida"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki énekli a Halj meg máskor! Című James Bond-film főcímdalát?",
+   "valaszok": [
+    "Madonna",
+    "Tina Turner",
+    "Cher",
+    "Britney Spears"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik a hősei Ridley Scott A sólyom végveszélyben című filmjének?",
+   "valaszok": [
+    "katonák",
+    "ornitológusok",
+    "űrhajósok",
+    "bankrablók"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a műve alapján készítette Bódy Gábor Psyché című filmjét?",
+   "valaszok": [
+    "Pilinszky János",
+    "Weöres Sándor",
+    "Szabó Lőrinc",
+    "Esterházy Péter"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek az életéről készített filmet Oliver Stone?",
+   "valaszok": [
+    "Nagy Sándor",
+    "Julius Caesar",
+    "Hannibál",
+    "Spartacus"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek az írásai alapján készítette Huszárik Zoltán Szindbád című filmjét?",
+   "valaszok": [
+    "Móricz Zsigmond",
+    "Kosztolányi Dezső",
+    "Krúdy Gyula",
+    "Szép Ernő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kiről kapta nevét a soproni színház?",
+   "valaszok": [
+    "Vörösmarty Mihály",
+    "Petőfi Sándor",
+    "Arany János",
+    "Madách Imre"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit vagy mit üldözött Gregory Peck Ahab kapitányként John Huston filmjében?",
+   "valaszok": [
+    "King Kongot",
+    "Godzillát",
+    "Moby Dicket",
+    "Drakulát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik Hitchcock-film főszereplője Anthony Perkins?",
+   "valaszok": [
+    "Psycho",
+    "Szédülés",
+    "Madarak",
+    "Észak-északnyugat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik afroamerikai színész nyert legjobb férfialakításért járó Oscar díjat?",
+   "valaszok": [
+    "Eddie Murphy",
+    "Denzel Washington",
+    "Morgan Freeman",
+    "Harry Belafonte"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik angol komikus lett híres a filmhős Pitkin alakítójaként?",
+   "valaszok": [
+    "Rowan Atkinson",
+    "Michael Palin",
+    "Norman Wisdom",
+    "Eric Idle"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik bibliai alak a főhőse az Egyiptom hercege című amerikai rajzfilmnek?",
+   "valaszok": [
+    "József",
+    "Mózes",
+    "Ábrahám",
+    "Dávid"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik dráma hőseiről szól a \"Rosencrantz és Guildenstern halott\" című film?",
+   "valaszok": [
+    "Lear király",
+    "Tartuffe",
+    "Hamlet",
+    "III. Richard"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy Cameron Diaz főszereplésével készült akciófilm címe?",
+   "valaszok": [
+    "Hello, Mrs. Columbo",
+    "Charlie angyalai",
+    "Kojak nyalókái",
+    "San Francisco terein"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik film 2000-ben a legjobb filmnek járó Oscar-díjat?",
+   "valaszok": [
+    "A bennfentes",
+    "Amerikai szépség",
+    "Árvák hercege",
+    "Hatodik érzék"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik film főhősei nem járnak az űrben?",
+   "valaszok": [
+    "Armageddon",
+    "A gömb",
+    "Csillagközi invázió",
+    "Baljós árnyak"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik film főszereplője volt Shirley MacLaine?",
+   "valaszok": [
+    "Casablanca",
+    "Irma, te édes",
+    "Szerelmem, Hirosima",
+    "Római vakáció"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik film főszerepében nyújtott alakításáért kapott Oscar-díjat Charlton Heston?",
+   "valaszok": [
+    "Tízparancsolat",
+    "Spartacus",
+    "Ben Hur",
+    "Quo vadis?"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik film főszerepét játszotta Marlene Dietrich?",
+   "valaszok": [
+    "Szédülés",
+    "A vád tanúja",
+    "A sanghaji asszony",
+    "A máltai sólyom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik film nyerte el először a legjobb animációs játékfilmnek járó Oscar-díjat?",
+   "valaszok": [
+    "Szörny Rt.",
+    "Shrek",
+    "Aladdin",
+    "A kis hableány"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik film újrafeldolgozásában játszik Kern András és Bajor Imre?",
+   "valaszok": [
+    "Hippolyt, a lakáj",
+    "Meseautó",
+    "Halálos tavasz",
+    "Lila ákác"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik filmben játszik Julia Roberts esküvőiről elmenekülő menyasszonyt?",
+   "valaszok": [
+    "Oltári nő",
+    "Sztárom a párom",
+    "Micsoda nő!",
+    "Álljon meg a nászmenet!"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik filmben játszik szívrohamon átesett nőcsábászt Jack Nicholson?",
+   "valaszok": [
+    "Minden végzet nehéz",
+    "Lesz ez még így se!",
+    "Egy becsületbeli ügy",
+    "Ki nevel a végén?"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik filmben nyújtott alakításáért kapta meg a legjobb színésznek járó Oscar-díjat Russel Crowe?",
+   "valaszok": [
+    "Gladiátor",
+    "Szigorúan bizalmas",
+    "Egy csodálatos elme",
+    "Túszharc"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik filmben nyújtott alakításáért kapta meg a legjobb színésznőnek járó Oscar-díjat Nicole Kidman?",
+   "valaszok": [
+    "Moulin Rouge",
+    "Az órák",
+    "Tágra zárt szemek",
+    "Majd megdöglik érte"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik filmet rendezte Robert De Niro?",
+   "valaszok": [
+    "A szarvasvadász",
+    "Bronxi mese",
+    "Taxisofőr",
+    "A rettegés foka"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik filmhőst formálta meg Harrison Ford?",
+   "valaszok": [
+    "Obi-Wan Kenobi",
+    "Indiana Jones",
+    "Hercule Poirot",
+    "Ben Hur"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik filmjében alakította harmadszor Anthony Hopkins a híres kannibált, Hannibal Lectert?",
+   "valaszok": [
+    "A bárányok hallgatnak",
+    "Hannibál",
+    "A vörös sárkány",
+    "Az oroszlán télen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik filmjében nem gengsztert játszik Al Pacino?",
+   "valaszok": [
+    "A sebhelyes arcú",
+    "A keresztapa",
+    "Dick Tracy",
+    "Egy asszony illata"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik filmjében nem rendőrt játszik Al Pacino?",
+   "valaszok": [
+    "A szerelem tengere",
+    "Serpico",
+    "Szemtől szemben",
+    "Az ördög ügyvédje"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik filmjével vált világhírűvé Marlene Dietrich?",
+   "valaszok": [
+    "A kék angyal",
+    "Szőke Vénusz",
+    "A vád tanúja",
+    "A nőstény ördög"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik filmjéért nyerte el első ízben a legjobb rendezőnek járó Oscar-díjat Steven Spielberg?",
+   "valaszok": [
+    "A cápa",
+    "Harmadik típusú találkozások",
+    "E.T.",
+    "Schindler listája"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik filmrendező volt a legendás Monty Python csoport tagja?",
+   "valaszok": [
+    "Mel Brooks",
+    "Terry Gilliam",
+    "Quentin Tarantino",
+    "Woody Allen"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik híres filmszínész teremtette meg Hulot úr alakját?",
+   "valaszok": [
+    "Jacques Tati",
+    "Fernandel",
+    "Bourvil",
+    "Louis de Funes"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik híres magyar filmben szerepel Koncz Zsuzsa?",
+   "valaszok": [
+    "Eltávozott nap",
+    "Ezek a fiatalok",
+    "Szerelmesfilm",
+    "Bohóc a falon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik híres zenés film főszereplője Natalie Wood?",
+   "valaszok": [
+    "My Fair Lady",
+    "West Side Story",
+    "A muzsika hangja",
+    "Pomádé"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik irodalmi hőst játszotta el filmen a legendás Soós Imre?",
+   "valaszok": [
+    "Toldi Miklóst",
+    "János vitézt",
+    "Lúdas Matyit",
+    "Liliomfit"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ismert zenész a Vígszínház zenei vezetője?",
+   "valaszok": [
+    "Szörényi Levente",
+    "Presser Gábor",
+    "Benkő László",
+    "Dés László"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik kiváló rockzenész szerezte Az oroszlánkirály című film zenéjét?",
+   "valaszok": [
+    "Rod Stewart",
+    "David Bowie",
+    "Stevie Wonder",
+    "Elton John"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik magyar regény alapján nem rendezett filmet Várkonyi Zoltán?",
+   "valaszok": [
+    "Egri csillagok",
+    "A láthatatlan ember",
+    "A kőszívű ember fiai",
+    "Egy magyar nábob"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mesehős megformálásáért kapott Oscar-díjat Julie Andrews?",
+   "valaszok": [
+    "Seherezádé",
+    "Mary Poppins",
+    "Hamupipőke",
+    "Szörnyella de Frász"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban élt 1946-tól 1957-ig a népszerű színész, Jávor Pál?",
+   "valaszok": [
+    "Brazíliában",
+    "Franciaországban",
+    "az USA-ban",
+    "Angliában"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik rajzfilmhőst keltette életre Robin Williams Robert Altman filmjében?",
+   "valaszok": [
+    "Asterix",
+    "Popeye",
+    "Frédi",
+    "Béni"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik rajzfilmrendezőnk filmje kapott Oscar-díjat?",
+   "valaszok": [
+    "Jankovics Marcell",
+    "Dargay Attila",
+    "Rófusz Ferenc",
+    "Nepp József"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik regény egyik filmváltozatában játszott főszerepet Gina Lollobrigida?",
+   "valaszok": [
+    "A párizsi Notre-Dame",
+    "A pármai kolostor",
+    "A három testőr",
+    "Vörös és fekete"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik regény filmváltozatában játszott főszerepet Gérard Philipe?",
+   "valaszok": [
+    "Nyomorultak",
+    "Vörörs és fekete",
+    "Monte Cristo grófja",
+    "A kaméliás hölgy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik színház igazgatója volt Major Tamás?",
+   "valaszok": [
+    "Madách Színház",
+    "Nemzeti Színház",
+    "Vígszínház",
+    "Pesti Színház"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik színház tagja volt 1964-től haláláig Domján Edit?",
+   "valaszok": [
+    "Thália Színház",
+    "Nemzeti Színház",
+    "Madách Színház",
+    "Petőfi Színház"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik színház tagja volt 1964-től majdnem húsz évig Galambos Erzsi?",
+   "valaszok": [
+    "Erkel Színház",
+    "Fővárosi Operett Színház",
+    "Thália Színház",
+    "Madách Színház"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik színháznak nem volt tagja Bodrogi Gyula?",
+   "valaszok": [
+    "Vidám Színpad",
+    "Nemzeti Színház",
+    "József Attila Színház",
+    "Katona József Színház"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik színész volt a \"magas szőke férfi felemás cipőben\"?",
+   "valaszok": [
+    "Terence Hill",
+    "Louis de Funes",
+    "Pierre Richard",
+    "Yves Montand"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város része Hollywood, a \"film fővárosa\"?",
+   "valaszok": [
+    "Los Angeles",
+    "Las Vegas",
+    "New York",
+    "Detroit"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik vígjáték egyik főszereplője Jamie Lee Curtis?",
+   "valaszok": [
+    "A hal neve: Wanda",
+    "Irma, te édes",
+    "Van, aki forrón szereti",
+    "Gyalog-galopp"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi Sam foglalkozása a Casablanca című klasszikus filmben?",
+   "valaszok": [
+    "kém",
+    "zongorista",
+    "krupié",
+    "rendőrfőnök"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Latinovits Zoltán könyvének?",
+   "valaszok": [
+    "Szélvető",
+    "Vihartartó",
+    "Ködszurkáló",
+    "Felhőjáró"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Sergio Leone utolsó filmjének: \"Volt egyszer egy …\"",
+   "valaszok": [
+    "vadnyugat",
+    "család",
+    "Amerika",
+    "cowboy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Sophie Marceau első filmjének?",
+   "valaszok": [
+    "Huhogók",
+    "Házibuli",
+    "D' Artagnan lánya",
+    "Macskajaj"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Zeffirelli Assisi Szent Ferenc életéről készítettt filmjének?",
+   "valaszok": [
+    "Ferenc, Isten lantosa",
+    "Napfivér, Holdnővér",
+    "Isten báránykája",
+    "Naphimnusz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe a Louis de Funes főszereplésével készült filmnek: \"… őfelségét\"",
+   "valaszok": [
+    "leszavazták",
+    "lenyakazták",
+    "felszarvazták",
+    "kirabolták"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a foglalkozása a főhősnek A kaktusz virága című darabban?",
+   "valaszok": [
+    "kertész",
+    "fogorvos",
+    "rendőr",
+    "virágárus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a foglalkozása a főhősnek Szabó István Mephisto című filmjében?",
+   "valaszok": [
+    "katonatiszt",
+    "pap",
+    "színész",
+    "író"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a főhős foglalkozása Michelangelo Antonioni Nagyítás című filmjében?",
+   "valaszok": [
+    "filmrendező",
+    "optikus",
+    "szemész",
+    "fényképész"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi miatt kerülnek börtönbe a Chicago című Oscar-díjas zenés film hősnői?",
+   "valaszok": [
+    "lopás",
+    "gyilkosság",
+    "kémkedés",
+    "sikkasztás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi szerepel Tony Richardson klasszikus filmjének címében: \"Egy csepp …\"",
+   "valaszok": [
+    "vér",
+    "veríték",
+    "könny",
+    "méz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi volt a \"kilencedik utas\" A nyolcadik utas: a halál című sci-fiben?",
+   "valaszok": [
+    "egy kutya",
+    "egy macska",
+    "egy bőregér",
+    "egy kígyó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt a híres magyar színésznő, Déryné felvett leánykori neve?",
+   "valaszok": [
+    "Vajda Júlia",
+    "Laborfalvi Róza",
+    "Szendrey Júlia",
+    "Széppataki Róza"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mikor játszódik Jim Carrey A grincs című filmje?",
+   "valaszok": [
+    "húsvétkor",
+    "farsangkor",
+    "pünkösdkor",
+    "karácsonykor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mikor vonult vissza a filmezéstől Greta Garbo?",
+   "valaszok": [
+    "1941-ben",
+    "1962-ben",
+    "1973-ban",
+    "1984-ben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen \"generáció\" szerepel András Ferenc filmjének címében?",
+   "valaszok": [
+    "kis",
+    "elveszett",
+    "zseniális",
+    "nagy"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen fogságba kerülnek az angol katonák a Híd a Kwai folyón című filmben?",
+   "valaszok": [
+    "vietnámi",
+    "koreai",
+    "japán",
+    "német"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen járművek vezetői küzdenek egymással Spielberg Párbaj című filmjében?",
+   "valaszok": [
+    "személyautó és teherautó",
+    "hadihajó és tengeralattjáró",
+    "vitorlás hajó és kalózhajó",
+    "repülőgép és helikopter"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen járművet kellett vezetnie Sandra Bullocknak a Féktelenül című film főszereplőjeként?",
+   "valaszok": [
+    "villamost",
+    "buszt",
+    "tankhajót",
+    "repülőt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen jókívánság Jean-Paul Belmondo és Sophie Marceau filmvígjátékának címe?",
+   "valaszok": [
+    "Kellemes karácsonyi ünnepeket!",
+    "Kellemes húsvéti ünnepeket!",
+    "Boldog új évet!",
+    "Boldog születésnapot!"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen néven lett híres Mario Girotti olasz színész?",
+   "valaszok": [
+    "Franco Nero",
+    "Bud Spencer",
+    "Terence Hill",
+    "Vittorio Gassman"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen szerepet alakított Al Pacino a Serpico című filmben?",
+   "valaszok": [
+    "gengsztert",
+    "ügyvédet",
+    "rendőrt",
+    "katonát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen szerepet játszik Bruce Willis a \"Drágán add az életed!\" című filmben?",
+   "valaszok": [
+    "titkosügynököt",
+    "rendőrt",
+    "fegyverkereskedőt",
+    "katonát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen szerepet játszik Shirley MacLaine az Irma, te édes című filmben?",
+   "valaszok": [
+    "utcalányt",
+    "kóristalányt",
+    "apácát",
+    "cukrászt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen szerepet játszott Clint Eastwood a Kelly hősei című filmben?",
+   "valaszok": [
+    "cowboy",
+    "katona",
+    "rendőr",
+    "bankrabló"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat Dorka Dargay Attila Az erdő kapitánya című rajzfilmjében?",
+   "valaszok": [
+    "medvebocs",
+    "macska",
+    "őzgida",
+    "kisegér"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen állat Robin Hood a Disney-rajzfilmben?",
+   "valaszok": [
+    "farkas",
+    "kígyó",
+    "róka",
+    "medve"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minek a hídjai szerepelnek Clint Eastwood romantikus filmjének címében?",
+   "valaszok": [
+    "a sóhajok",
+    "a szív",
+    "Velence",
+    "Iowa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Shakespeare melyik művéből készített Oscar-díjas filmet Laurence Olivier?",
+   "valaszok": [
+    "Lear király",
+    "Macbeth",
+    "Hamlet",
+    "Othello"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Sylvester Stallone melyik filmjét forgatták Magyarországon is?",
+   "valaszok": [
+    "Rocky",
+    "Rambo",
+    "Menekülés a győzelembe",
+    "Fantom az éjszakában"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi színésznők közül kiről neveztek el Budapesten színházat?",
+   "valaszok": [
+    "Ruttkai Éva",
+    "Gobbi Hilda",
+    "Dajka Margit",
+    "Domján Edit"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy japán színpadi műfaj?",
+   "valaszok": [
+    "kaliban",
+    "kabuki",
+    "nori",
+    "nippon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Federico Fellini melyik filmjében nem felesége, Giulietta Masina a női főszereplő?",
+   "valaszok": [
+    "Országúton",
+    "Cabiria éjszakái",
+    "Ginger és Fred",
+    "Az édes élet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy hívják Antonio Banderast a Desperado című filmben?",
+   "valaszok": [
+    "Sabata",
+    "El Nino",
+    "Mucho Macho",
+    "El Mariachi"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol játszódik Tímár Péter Egészséges erotika című filmje?",
+   "valaszok": [
+    "anyacsavar-üzemben",
+    "ládaüzemben",
+    "likőrgyárban",
+    "kefirgyárban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol készült az első rémfilm Godzilláról?",
+   "valaszok": [
+    "Kínában",
+    "Indiában",
+    "Japánban",
+    "Franciaországban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol született Omar Sharif, a híres filmsztár?",
+   "valaszok": [
+    "Egyiptomban",
+    "Törökországban",
+    "Marokkóban",
+    "Szaud-Arábiában"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hányszor játszotta el Mel Gibson Mad Max szerepét?",
+   "valaszok": [
+    "egyszer",
+    "kétszer",
+    "háromszor",
+    "négyszer"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki a bérgyilkos célpontja A sakál napja című filmben?",
+   "valaszok": [
+    "Winston Churchill",
+    "Charles de Gauille",
+    "J. F. Kennedy",
+    "Mahatma Gandhi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki a főhőse az Ördöglovas című magyar filmnek?",
+   "valaszok": [
+    "Széchenyi István",
+    "Wesselényi Miklós",
+    "Sándor Móric",
+    "Rózsa Sándor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki a társrendezője A csend világa című, cannes-i Arany Pálmával díjazott filmnek?",
+   "valaszok": [
+    "David Attenborough",
+    "Gerard Durell",
+    "Jacques-Yves Cousteau",
+    "Thor Heyerdahl"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki alakítja Kéki Katát, a főhősnőt az Állítsátok meg Terézanyut! Című filmben?",
+   "valaszok": [
+    "Hámori Gabriella",
+    "Gubás Gabi",
+    "Szinetár Dóra",
+    "Gryllus Dorka"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki alakította James Bond első partnernőjét a Dr. No című filmben?",
+   "valaszok": [
+    "Ursula Andress",
+    "Sophia Loren",
+    "Gina Lollobrigida",
+    "Brigitte Bardot"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki alakította a főszerepet Antonioni \"Foglalkozása: riporter\" című filmjében?",
+   "valaszok": [
+    "Marlon Brando",
+    "Jack Nicholson",
+    "Marcello Mastroianni",
+    "Al Pacino"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki alapította a Karinthy Színházat?",
+   "valaszok": [
+    "Karinthy Frigyes",
+    "Karinthy Márton",
+    "Karinthy Ferenc",
+    "Karinthy Gábor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki az a magyar felfedező, akinek életét a közelmúltban egy Oscar-díjas film is feldolgozta?",
+   "valaszok": [
+    "Vámbéry Ármin",
+    "Teleki Sámuel",
+    "Kittenberger Kálmán",
+    "Almásy László"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki az a magyar operatőr, akit Oscar-díjra jelöltek a Malena című filmben nyújott munkájáért?",
+   "valaszok": [
+    "Zsigmond Vilmos",
+    "Ragályi Elemér",
+    "Sára Sándor",
+    "Koltai Lajos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki az írója és főszereplője a Spencer című magyar színdarabnak?",
+   "valaszok": [
+    "Kern András",
+    "Koltai Róbert",
+    "Bujtor István",
+    "Mikó István"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki játssza III. Richárdot az új Nemzeti Színház előadásában?",
+   "valaszok": [
+    "Garas Dezső",
+    "Sinkó László",
+    "Stohl András",
+    "Kulka János"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki játssza Ron Howard Truman Show című filmjének főszerepét?",
+   "valaszok": [
+    "Jim Carrey",
+    "Robin Williams",
+    "Eddie Murphy",
+    "Tom Hanks"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki játssza a bosszúálló Menyasszonyt Quentin Tarantino Kill Bill című filnjében?",
+   "valaszok": [
+    "Sharon Stone",
+    "Uma Thurman",
+    "Nicole Kidman",
+    "Kim Basinger"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játssza a főszerepet Máriássy Félix Budapesti tavasz című filmjében?",
+   "valaszok": [
+    "Latinovits Zoltán",
+    "Darvas Iván",
+    "Gábor Miklós",
+    "Sinkovits Imre"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki játssza a főszerepet a V.I.P. - Több mint testőr című televíziós sorozatban?",
+   "valaszok": [
+    "Pamela Anderson",
+    "Erika Eleniak",
+    "Kate Moss",
+    "Naomi Campbell"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki játssza a lakájt a Hyppolit, a lakáj című filmben?",
+   "valaszok": [
+    "Kabos Gyula",
+    "Csortos Gyula",
+    "Gózon Gyula",
+    "Somlay Artúr"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játssza a rossz útra tért angyalt a Charlie angyalai: Teljes gázzal című mozifilmben?",
+   "valaszok": [
+    "Farrah Fawcett",
+    "Demi Moore",
+    "Kim Basinger",
+    "Julia Roberts"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játszik meghízott, félig süket zsarut a Cop Land című bűnügyi filmben?",
+   "valaszok": [
+    "Arnold Schwarzenegger",
+    "Sylvester Stallone",
+    "Bruce Willis",
+    "Telly Savalas"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játszik tanárt a Harry Potter és a Titkok Kamrája című filmben?",
+   "valaszok": [
+    "Kenneth Branagh",
+    "Hugh Grant",
+    "Anthony Hopkins",
+    "Jeremy Irons"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki játszotta A muzsika hangja című zenés film főszerepét?",
+   "valaszok": [
+    "Julie Andrews",
+    "Barbra Streisand",
+    "Judy Garland",
+    "Liza Minnelli"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki játszotta Batman ellenfelét a Batman és Robin című filmben?",
+   "valaszok": [
+    "Arnold Schwarzenegger",
+    "Sylvester Stallone",
+    "Jackie Chan",
+    "Jean-Claude van Damme"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki játszotta János vitézt Kacsóh Pongrác daljátékának bemutatóján?",
+   "valaszok": [
+    "Sárdy János",
+    "Fedák Sári",
+    "Blaha Lujza",
+    "Ujházi Ede"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki játszotta a főszerepet a Dúvad című magyar filmben?",
+   "valaszok": [
+    "Básti Lajos",
+    "Bessenyei Ferenc",
+    "Latinovits Zoltán",
+    "Koncz Gábor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki kapott Kossuth-díjat 2001-ben az alábbi színésznők közül?",
+   "valaszok": [
+    "Básti Juli",
+    "Eszenyi Enikő",
+    "Udvaros Dorottya",
+    "Bánsági Ildikó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki kapott Oscar-díjat színészi teljesítményéért?",
+   "valaszok": [
+    "Frank Sinatra",
+    "Elvis Presley",
+    "Phil Collins",
+    "Sting"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki kapott legtöbbször Oscar-díjat az alábbi színészek közül?",
+   "valaszok": [
+    "Marlon Brando",
+    "Al Pacino",
+    "Gene Hackman",
+    "Jack Nicholson"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki kapta meg a legjobb rendezőnek járó Oscar-díjat Átlagemberek című filmjéért?",
+   "valaszok": [
+    "Mel Gibson",
+    "Clint Eastwood",
+    "Robert Redford",
+    "Kevin Costner"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem játszotta Batman partnernőjét az alábbi színésznők közül?",
+   "valaszok": [
+    "Kim Basinger",
+    "Nicole Kidman",
+    "Isabella Rossellini",
+    "Michelle Pfeiffer"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem játszotta a \"kőszívű ember fiát\" Várkonyi Zoltán 1965-ben bemutatott filmjében?",
+   "valaszok": [
+    "Tordy Géza",
+    "Bitskey Tibor",
+    "Mécs Károly",
+    "Benkő Péter"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem játszotta a hét mesterlövész egyikét az azonos című westernfilmben?",
+   "valaszok": [
+    "Steve McQueen",
+    "Charles Bronson",
+    "Yul Brynner",
+    "John Wayne"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem komikusként lett a némafilmek sztárja?",
+   "valaszok": [
+    "Harold Lloyd",
+    "Buster Keaton",
+    "Rudolph Valentino",
+    "Oliver Hardy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki rendezte A nagy ábránd című klasszikus filmet?",
+   "valaszok": [
+    "Alain Resnais",
+    "Jean Renoir",
+    "Francois Truffaut",
+    "Constantin Costa-Gavras"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki rendezte a Kelj fel, komám, ne aludjál! című magyar filmet?",
+   "valaszok": [
+    "Jancsó Miklós",
+    "Makk Károly",
+    "Szabó István",
+    "Bacsó Péter"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki rendezte a Vígszínházban 2004-ben bemutatott Tévedések vígjátékát?",
+   "valaszok": [
+    "Törőcsik Mari",
+    "Eszenyi Enikő",
+    "Básti Juli",
+    "Udvaros Dorottya"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki rendezte a cannes-i nagydíjas Fahrenheit 9/11 című dokumentumfilmet?",
+   "valaszok": [
+    "Michael Moore",
+    "Oliver Stone",
+    "Steven Spielberg",
+    "Francis Ford Coppola"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki rendezte az olasz neorealista film klasszikusát, a Róma nyílt város című filmet?",
+   "valaszok": [
+    "Federico Fellini",
+    "Roberto Rossellini",
+    "Vittorio De Sica",
+    "Michelangelo Antonioni"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki szerepel a Magyar vándor című filmvígjátékban?",
+   "valaszok": [
+    "Korda György",
+    "Koós János",
+    "Aradszky László",
+    "Komár László"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt A királylány a feleségem című híres kalandfilm főszereplője?",
+   "valaszok": [
+    "Sophia Loren",
+    "Gina Lollobrigida",
+    "Brigitte Bardot",
+    "Claudia Cardinale"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Andrej Rubljov, Tarkovszkij világhírű filmjének címszereplője?",
+   "valaszok": [
+    "az első cár",
+    "ikonfestő",
+    "hadvezér",
+    "pátriárka"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Meg Ryan partnere A szerelem hullámhosszán című filmben?",
+   "valaszok": [
+    "Tom Cruise",
+    "Tom Hanks",
+    "Russel Crowe",
+    "Billy Crystal"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a Vígszínház első igazgatója?",
+   "valaszok": [
+    "Paulay Ede",
+    "Ditrói Mór",
+    "Csortos Gyula",
+    "Ujházy Ede"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a budapesti Merlin Színház egyik alapítója?",
+   "valaszok": [
+    "Básti Juli",
+    "Ruttkai Éva",
+    "Gobbi Hilda",
+    "Lázár Kati"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt közülük színházigazgató is?",
+   "valaszok": [
+    "Ady Endre",
+    "Kosztolányi Dezső",
+    "Babits Mihály",
+    "Heltai Jenő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kik a főhősei Neil Simon A napsugár fiúk című darabjának?",
+   "valaszok": [
+    "színészek",
+    "rendőrök",
+    "meteorológusok",
+    "kertészek"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik szerepelnek egy Dürrenmatt-színmű címében?",
+   "valaszok": [
+    "botanikusok",
+    "fizikusok",
+    "kémikusok",
+    "ornitológusok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a kezdeményezésére jött létre a Bajor Gizi Színészmúzeum?",
+   "valaszok": [
+    "Major Tamás",
+    "Gobbi Hilda",
+    "Dajka Margit",
+    "Páger Antal"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a lányát jelölték Oscar-díjra az Elveszett jelentés című film rendezéséért?",
+   "valaszok": [
+    "Steven Spielberg",
+    "George Lucas",
+    "Francis Ford Coppola",
+    "Oliver Stone"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek tett \"tisztességtelen ajánlatot\" Robert Redford az azonos című filmben?",
+   "valaszok": [
+    "Julia Roberts",
+    "Demi Moore",
+    "Sharon Stone",
+    "Dennis Richards"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiről kapta nevét a budapesti színészmúzeum?",
+   "valaszok": [
+    "Jászai Mari",
+    "Bajor Gizi",
+    "Blaha Lujza",
+    "Gobbi Hilda"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiről mintázták a Sebhelyes ember című klasszikus gengszterfilm főhősét?",
+   "valaszok": [
+    "Bugsy Siegel",
+    "Al Capone",
+    "Lucky Luciano",
+    "Frank Costello"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit akar megmenteni a terroristáktól Bruce Willis a Drágán add az életed című filmben?",
+   "valaszok": [
+    "öccsét",
+    "feleségét",
+    "anyját",
+    "anyósát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Marlon Brandón kívül ki kapott még Oscar-díjat a Keresztapa, Vito Corleone megformálásáért?",
+   "valaszok": [
+    "Al Pacino",
+    "Robert De Niro",
+    "Robert Duvall",
+    "James Caan"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik James Bond-filmben játszik Madonna?",
+   "valaszok": [
+    "Dr. No",
+    "A holnap markában",
+    "A világ nem elég",
+    "Halj meg máskor!"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik Shakespeare-mű alapján készült Greenaway Prospero könyvei című filmje?",
+   "valaszok": [
+    "Téli rege",
+    "A vihar",
+    "Hamlet",
+    "Macbeth"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik Shakespeare-műből nem rendezett filmet Franco Zeffirelli?",
+   "valaszok": [
+    "Rómeó és Júlia",
+    "Makrancos hölgy",
+    "Hamlet",
+    "Lear király"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik Webber-musicalben hangzanak fel T. S. Eliot megzenésített versei?",
+   "valaszok": [
+    "Macskák",
+    "Evita",
+    "Jézus Krisztus Szupersztár",
+    "Az operaház fantomja"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik a legnagyobb befogadóképességű az alábbi színházak közül?",
+   "valaszok": [
+    "Erkel Színház",
+    "Vígszínház",
+    "Madách Színház",
+    "Thália Színház"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik budapesti színházunk mutatta be A padlás című musicalt?",
+   "valaszok": [
+    "a Vígszínház",
+    "a Madách Színház",
+    "a Thália Színház",
+    "az Operett Színház"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik egy híres Hitchcock-film címe?",
+   "valaszok": [
+    "Bejárati ajtó",
+    "Hátsó ablak",
+    "Padlásfeljáró",
+    "Vakablak"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egykori gyermekszínész játszotta az Árvácska című magyar film főszerepét?",
+   "valaszok": [
+    "Geszti Péter",
+    "Ullmann Mónika",
+    "Czinkóczi Zsuzsa",
+    "Kovács Krisztián"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik együttes játszotta \"A kenguru\" című film címadó dalát?",
+   "valaszok": [
+    "Lokomotív GT",
+    "Gemini",
+    "Fonográf",
+    "M7"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik európai sztár szerepel a Még zöldebb a szomszéd nője című vígjátékban?",
+   "valaszok": [
+    "Brigitte Bardot",
+    "Sophia Loren",
+    "Claudia Cardinale",
+    "Catherine Deneuve"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik fantasztikus film zeneszerzője Vangelis?",
+   "valaszok": [
+    "Csillagok háborúja",
+    "Szárnyas fejvadász",
+    "Az ötödik elem",
+    "Baljós árnyak"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik fantasztikus film zenéjét szerezte a Queen együttes?",
+   "valaszok": [
+    "Szárnyas fejvadász",
+    "Flash Gordon",
+    "Csillagok háborúja",
+    "Superman"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik fantasztikus filmben nem játszik Harrison Ford?",
+   "valaszok": [
+    "Csillagok háborúja",
+    "A birodalom visszavág",
+    "Szárnyas fejvadász",
+    "A nyolcadik utas: a halál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik filmben játszotta a főhős szerelmét Mészáros Ági?",
+   "valaszok": [
+    "Körhinta",
+    "Talpalattnyi föld",
+    "Liliomfi",
+    "Halálos tavasz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik filmben nem játszott Stohl András?",
+   "valaszok": [
+    "Rosszfiúk",
+    "Presszó",
+    "Európa Expressz",
+    "A miniszter félrelép"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik filmben tanul táncolni Richard Gere?",
+   "valaszok": [
+    "Pomádé",
+    "Hölgyválasz",
+    "Fame",
+    "Dirty Dancing"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik filmből készült musical Dés László zenéjével?",
+   "valaszok": [
+    "Körhinta",
+    "Valahol Európában",
+    "A tizedes meg a többiek",
+    "Talpalattnyi föld"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik filmhős lett szerelmes Jessica Lange-be a klasszikus történet újrafeldolgozásában?",
+   "valaszok": [
+    "King Kong",
+    "Drakula",
+    "Superman",
+    "Godzilla"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik híres filmet nem Billy Wilder rendezte?",
+   "valaszok": [
+    "A vád tanúja",
+    "Van, aki forrón szereti",
+    "Irma, te édes",
+    "Álom luxuskivitelben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik híres filmet rendezte Claude Lelouch?",
+   "valaszok": [
+    "Egy asszony meg a lánya",
+    "Egy férfi és egy nő",
+    "Az asszony illata",
+    "Egy amerikai Párizsban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik híres szerző színtársulatát foglalta magába a XIV. Lajos által alapított Comédie Francaise?",
+   "valaszok": [
+    "Moliére",
+    "Jean Racine",
+    "Edmond Rostand",
+    "Pierre Corneille"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik híres színész életéről rendezett filmet Richard Attenborough?",
+   "valaszok": [
+    "Charlie Chaplin",
+    "Harold Lloyd",
+    "Buster Keaton",
+    "Stan Laurel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hőst játszotta Omar Sharif David Lean 1965-ben bemutatott filmjében?",
+   "valaszok": [
+    "Jevgenyij Anyegint",
+    "Doktor Zsivágót",
+    "Vronszkij grófot",
+    "Raszkolnyikovot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mű alapján készített filmet Pie Paolo Pasolini?",
+   "valaszok": [
+    "Isteni színjáték",
+    "Dekameron",
+    "Hamlet",
+    "Bűn és bűnhődés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban alapított színházat August Strindberg, a híres drámaíró?",
+   "valaszok": [
+    "Németország",
+    "Anglia",
+    "Svédország",
+    "Hollandia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik színház igazgatója volt kétszer is Fényes Szabolcs zeneszerző?",
+   "valaszok": [
+    "Operettszínház",
+    "Operaház",
+    "Erkel Színház",
+    "Madách Színház"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik színház kamaraszínháza volt önállósodásáig a budapesti Katona József Színház?",
+   "valaszok": [
+    "Thália Színház",
+    "Madách Színház",
+    "Nemzeti Színház",
+    "Vígszínház"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik történelmi alak szerelmét játssza Greta Garbo a Walewska grófnő című filmben?",
+   "valaszok": [
+    "Nelson admirális",
+    "XIV. Lajos",
+    "I. Napóleon",
+    "Nagy Péter"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik zeneszerző építtetett színházat Bayreuthban?",
+   "valaszok": [
+    "Wolfgang Amadeus Mozart",
+    "Richard Wagner",
+    "Ludwig von Beethoven",
+    "Johann Sebastian Bach"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik zenés filmet rendezte Bob Fosse?",
+   "valaszok": [
+    "Szombat esti láz",
+    "My Fair Lady",
+    "Mindhalálig zene",
+    "Hair"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik énekesnő játszott \"Az eastwicki boszorkányok\" című filmben?",
+   "valaszok": [
+    "Madonna",
+    "Whitney Houston",
+    "Cher",
+    "Suzanne Vega"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Jancsó Miklós 1999-ben készített filmjének?",
+   "valaszok": [
+    "Apám!… a Batman!",
+    "Hernádi, a Drakula",
+    "Anyád!… a szúnyogok",
+    "Kismalac! És a farkasok?"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Pasolini Jézus életéről készített filmjének?",
+   "valaszok": [
+    "Márk evangéliuma",
+    "Lukács evangéliuma",
+    "János evangéliuma",
+    "Máté evangéliuma"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a címe a George Clooney főszereplésével készült filmnek: \"Sivatagi ...\"",
+   "valaszok": [
+    "rókák",
+    "cápák",
+    "tevék",
+    "vihar"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miknek a \"lovagjáról\" készített történelmi filmet Szergej Eizenstein?",
+   "valaszok": [
+    "jégmezők",
+    "sztyeppék",
+    "gleccserek",
+    "hegycsúcsok"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen \"ember\" szerepel Andrzej Wajda híres filmjének címében?",
+   "valaszok": [
+    "gránit",
+    "agyag",
+    "márvány",
+    "arany"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen Pierrot szerepel Jean-Luc Godard világhírű filmjének címében?",
+   "valaszok": [
+    "bolond",
+    "bohém",
+    "fehér",
+    "kockás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen császár a főhőse Bertolucci Az utolsó császár című filmnek?",
+   "valaszok": [
+    "német-római",
+    "etióp",
+    "osztrák",
+    "kínai"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen madárról kapta nevét a Csillagok háborújában Han Solo űrhajója?",
+   "valaszok": [
+    "kolibri",
+    "sas",
+    "sólyom",
+    "albatrosz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen néven lett világhírű filmsztár Bernard Schwartz?",
+   "valaszok": [
+    "Humphrey Bogart",
+    "Tony Curtis",
+    "Woody Allen",
+    "Arnold Schwarzenegger"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen néven nyílt meg 1837-ben Pest első magyar színháza?",
+   "valaszok": [
+    "Nemzeti Színház",
+    "Pesti Víg Színház",
+    "Pesti Magyar Színház",
+    "Pesti Thália Színház"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen szerepet alakított John Travolta Quentin Tarantino Ponyvaregény című filmjében?",
+   "valaszok": [
+    "bokszolót",
+    "bérgyilkost",
+    "rendőrt",
+    "tolvajt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen szerepet játszik Robin Williams a Hol költők társasága című filmben?",
+   "valaszok": [
+    "régész",
+    "tanár",
+    "könyvkiadó",
+    "bérgyilkos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen szerepet játszik Tom Hanks A kárhozat útja című filmben?",
+   "valaszok": [
+    "rendőrt",
+    "börtönőrt",
+    "bérgyilkost",
+    "katonatisztet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen versenyen játszódik A lovakat lelövik, ügye? című film?",
+   "valaszok": [
+    "táncversenyen",
+    "lóversenyen",
+    "maratoni futáson",
+    "autóversenyen"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen állattal küzdött Anthony Hopkins A vadon foglyai című filmben?",
+   "valaszok": [
+    "medvével",
+    "pumával",
+    "rozsomákkal",
+    "prérifarkassal"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen épület állt a budapesti Madách Színház mai helyén?",
+   "valaszok": [
+    "mulató",
+    "irodaház",
+    "börtön",
+    "iskola"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mivel vádolták ártatlanul Harrison Fordot A szökevény című film főhőseként?",
+   "valaszok": [
+    "sikkasztással",
+    "gyilkossággal",
+    "ékszerrablással",
+    "hazaárulással"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbi filmek közül melyikben játszott együtt Alain Delon és Jean-Paul Belmondo?",
+   "valaszok": [
+    "Rocco és fivérei",
+    "Borsalino",
+    "A szamuráj",
+    "A riói kaland"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbi filmek közül melyikben nem játszott Latinovits Zoltán?",
+   "valaszok": [
+    "Az aranyember",
+    "Egri csillagok",
+    "Egy magyar nábob",
+    "A kőszívű ember fiai"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbi filmek közül melyiket nem Szabó István rendezte?",
+   "valaszok": [
+    "Apa",
+    "Álmodozások kora",
+    "Szerelmesfilm",
+    "Bohóc a falon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Federico Fellini melyik filmjét nem díjazták a legjobb külföldi filmnek járó Oscar-díjjal?",
+   "valaszok": [
+    "Amarcord",
+    "Országúton",
+    "Az édes élet",
+    "8 és fél"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Fellini melyik filmjében nem játszott főszerepet Marcello Mastroianni?",
+   "valaszok": [
+    "Az édes élet",
+    "Ginger és Fred",
+    "Országúton",
+    "8 és fél"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan utaznak a világ különböző pontjain az Éjszaka a Földön című film hősei?",
+   "valaszok": [
+    "villamoson",
+    "vonaton",
+    "taxival",
+    "metrón"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol alapított színházat a híres színész, rendező, pedagógus Konsztantyin Sztanyiszlavszkij?",
+   "valaszok": [
+    "Szentpétervár",
+    "Kijev",
+    "Moszkva",
+    "Odessza"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol hunyt el a népszerű komikus, Kabos Gyula?",
+   "valaszok": [
+    "Los Angeles",
+    "New Yorkban",
+    "Zürichben",
+    "Londonban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány filmben személyesítette meg Rocky Balboát Sylvester Stallone?",
+   "valaszok": [
+    "egy",
+    "három",
+    "öt",
+    "kilenc"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ibsen melyik drámájában szerepel a Gomböntő?",
+   "valaszok": [
+    "Peer Gynt",
+    "A vadkacsa",
+    "Nóra",
+    "Kísértetek"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki Brad Pitt partnere az Ocean's Twelve - Eggyel nő a tét című filmben?",
+   "valaszok": [
+    "Catherine Zeta-Jones",
+    "Cameron Diaz",
+    "Jennifer Aniston",
+    "Angelina Jolie"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki Julia Roberts partnere A mexikói című filmben?",
+   "valaszok": [
+    "Brad Pitt",
+    "Antonio Banderas",
+    "Tom Cruise",
+    "Richard Gere"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki Kern András \"furcsa párja\" a Vígszínház azonos című előadásában?",
+   "valaszok": [
+    "Koltai Róbert",
+    "Verebes István",
+    "Gálvölgyi János",
+    "Lukács Sándor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki a főhőse A világ nem elég című 1999-ben készült filmnek?",
+   "valaszok": [
+    "Sherlock Holmes",
+    "Batman",
+    "Superman",
+    "James Bond"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki a páciense a Marlon Brando alakította pszichiáternek az 1995-ös romantikus vígjátékban?",
+   "valaszok": [
+    "Casanova",
+    "Don Quijote",
+    "Don Juan deMarco",
+    "Lope de Vega"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki alakította a férjet a Nem félünk a farkastól című filmben?",
+   "valaszok": [
+    "Steve McQueen",
+    "Gregory Peck",
+    "Paul Newman",
+    "Richard Burton"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki hallja a nők gondolatait a \"Mi kell a nőnek?\" című film főszereplőjeként?",
+   "valaszok": [
+    "Mel Gibson",
+    "Jack Nicholson",
+    "Brad Pitt",
+    "Danny DeVito"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki játszotta Mike Nichols Diploma előtt című filmjében az a fiatalembert, akit Mrs. Robinson elcsábított?",
+   "valaszok": [
+    "Woody Allen",
+    "Dustin Hoffman",
+    "Robert Redford",
+    "Omar Sharif"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játszotta Oroszlánszívű Richárd szerepét a Robin Hood, a tolvajok fejedelme című filmben?",
+   "valaszok": [
+    "Gregory Peck",
+    "Marlon Brando",
+    "Sean Connery",
+    "Jack Nicholson"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki játszotta Stanley Kubrick Ragyogás című filmjének főszerepét?",
+   "valaszok": [
+    "Anthony Hopkins",
+    "Jack Nicholson",
+    "Anthony Perkins",
+    "Al Pacino"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játszotta Superman ellenfelét Richard Donner nagy sikerű filmjében?",
+   "valaszok": [
+    "Danny De Vito",
+    "Jack Nicholson",
+    "Gene Hackman",
+    "Christopher Walken"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki játszotta a Hatosfogat című klasszikus western főszerepét?",
+   "valaszok": [
+    "Steve Martin",
+    "John Wayne",
+    "Charles Bronson",
+    "Steve McQueen"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játszotta a főhőst, Kárpáthy Jánost az Egy magyar nábob című 1966-os filmben?",
+   "valaszok": [
+    "Sinkovits Imre",
+    "Bessenyei Ferenc",
+    "Latinovits Zoltán",
+    "Darvas Iván"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játszotta az És akkor a pasas… című magyar film főszerepét?",
+   "valaszok": [
+    "Básti Lajos",
+    "Latabár Kálmán",
+    "Sinkovits Imre",
+    "Gábor Miklós"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki kapott legjobb női főszereplőnek járó Oscar-díjat a filmszínésznők közül?",
+   "valaszok": [
+    "Gina Lollobrigida",
+    "Sophia Loren",
+    "Brigitte Bardot",
+    "Claudia Cardinale"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki kapta a legtöbb Oscar-díjat a színésznők közül?",
+   "valaszok": [
+    "Meryl Streep",
+    "Katherine Hepburn",
+    "Glenn Close",
+    "Elizabeth Taylor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki kelti életre a filmvásznon Lara Croftot, a világhírű számítógépes játékok hősnőjét?",
+   "valaszok": [
+    "Denise Richards",
+    "Angelina Jolie",
+    "Jennifer Lopez",
+    "Sandra Bullock"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki kezdte a budapesti pályafutását a Fővárosi Operettszínház tagjaként?",
+   "valaszok": [
+    "Jászai Mari",
+    "Domján Edit",
+    "Kiss Manyi",
+    "Bajor Gizi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki lett 2001-ben a budapesti Madách Kamara színház művészeti vezetője?",
+   "valaszok": [
+    "Mácsai Pál",
+    "Szerednyei Béla",
+    "Dunai Tamás",
+    "Haumann Péter"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem kapott Oscar-díjat a színésznők közül?",
+   "valaszok": [
+    "Grace Kelly",
+    "Marilyn Monroe",
+    "Ingrid Bergman",
+    "Vivien Leigh"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem kapott egyik alakításáért sem Oscar-díjat az alábbi színésznők közül?",
+   "valaszok": [
+    "Greta Garbo",
+    "Audrey Hepburn",
+    "Olivia de Havilland",
+    "Bette Davis"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki rendezte a Csontváry című filmet?",
+   "valaszok": [
+    "Jancsó Miklós",
+    "Huszárik Zoltán",
+    "Bereményi Géza",
+    "Szabó István"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki rendezte a Talpalattnyi föld című magyar filmet?",
+   "valaszok": [
+    "Keleti Márton",
+    "Bán Frigyes",
+    "Gertler Viktor",
+    "Radványi Géza"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki rendezte az Emberek a havason című filmet?",
+   "valaszok": [
+    "Fábri Zoltán",
+    "Bán Frigyes",
+    "Révész György",
+    "Szőts István"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki vagy mi volt a \"rózsaszín párduc\" az azonos című filmvígjátékban?",
+   "valaszok": [
+    "a felügyelő fedőneve",
+    "egy gyémánt",
+    "egy táncosnő macskája",
+    "a bűnöző neve"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt James Dean partnernője Az óriás című filmben?",
+   "valaszok": [
+    "Marilyn Monroe",
+    "Elizabeth Taylor",
+    "Kim Novak",
+    "Grace Kelly"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a hangján szólalt meg a kis Vuk a rajzfilmben?",
+   "valaszok": [
+    "Pogány Judit",
+    "Psota Irén",
+    "Udvaros Dorottya",
+    "Eszenyi Enikő"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a műve alapján készült a Halálos tavasz című magyar film?",
+   "valaszok": [
+    "Herczeg Ferenc",
+    "Heltai Jenő",
+    "Zilahy Lajos",
+    "Szép Ernő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a nevét viseli 2004 őszétől az egykori budapesti Madách Kamara Színház?",
+   "valaszok": [
+    "Örkény István",
+    "Kosztolányi Dezső",
+    "Ottlik Géza",
+    "Weöres Sándor"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek az életéről készített Oscar-díjjal jutalmazott filmet Richard Attenborough?",
+   "valaszok": [
+    "Mahatma Gandhi",
+    "Albert Schweitzer",
+    "Martin Luther King",
+    "Teréz anya"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kit vagy kiket védelmezett a hét mesterlövész az azonos című klasszikus westernfilmben?",
+   "valaszok": [
+    "az amerikai elnököt",
+    "egy mexikói falut",
+    "olsz maffiozókat",
+    "egy apacs törzset"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik Fellini-film híres hősnője Gelsomina?",
+   "valaszok": [
+    "Az édes élet",
+    "Országúton",
+    "Amarcord",
+    "8 és fél"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik Jókai-regényből nem Várkonyi Zoltán rendezett filmet?",
+   "valaszok": [
+    "Fekete gyémántok",
+    "A kőszívű ember fiai",
+    "Szegény gazdagok",
+    "Egy magyar nábob"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik Shakespeare-idézetet választotta filmvígjátéka címéül Ernst Lubitsch?",
+   "valaszok": [
+    "Gyarlóság, asszony a neved",
+    "Lenni vagy nem lenni",
+    "Kizökkent az idő",
+    "Valami bűzlik Dániában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik Walt Disney-rajzfilmhez komponált dalokat Elton John?",
+   "valaszok": [
+    "Pocahontas",
+    "Oroszlánkirály",
+    "Herkules",
+    "Aladdin"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik amerikai író volt Marilyn Monroe második férje?",
+   "valaszok": [
+    "Tennesse Williams",
+    "Ernest Hemingway",
+    "Arthur Miller",
+    "Joseph Heller"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik budapesti színház tagja lett 2003-ban Stohl András?",
+   "valaszok": [
+    "Nemzeti Színház",
+    "Bárka Színház",
+    "József Attila Színház",
+    "Pesti Színház"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik egy Nepp József által rendezett rajzfilm címe?",
+   "valaszok": [
+    "Csipkerózsi",
+    "Hamupipő",
+    "Hófehér",
+    "Piros és a farkas"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik fantsztikus film hősei indulnak felderítő útra a tiltott Zónába?",
+   "valaszok": [
+    "Solaris",
+    "Sztalker",
+    "2001: Űrodüsszeia",
+    "Szárnyas fejvadász"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik filmben nem játszott Marlon Brando?",
+   "valaszok": [
+    "A vágy villamosa",
+    "Oroszlánkölykök",
+    "Superman",
+    "Batman"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik filmet rendezte a Fábry Sándor showjából is ismert Szőke András?",
+   "valaszok": [
+    "Európa kemping",
+    "Valahol Európában",
+    "Európa nem válaszol",
+    "Európa messze van"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik filmjében borotválja kopaszra a fejét Demi Moore?",
+   "valaszok": [
+    "Tisztességtelen ajánlat",
+    "Zaklatás",
+    "G.I. Jane",
+    "Ghost"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik filmjét készítette Milos Forman azt követően, hogy Csehszlovákiából emigrlált?",
+   "valaszok": [
+    "Tűz van, babám!",
+    "Fekete Péter",
+    "Amadeus",
+    "Egy szöszi szerelme"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik filmmel kezdődött meg a magyar hangosfilm korszaka?",
+   "valaszok": [
+    "Lila ákác",
+    "A meseautó",
+    "A kék bálvány",
+    "Hyppolit, a lakáj"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik háborúban játszódik Oliver Stone A szakasz című filmje?",
+   "valaszok": [
+    "Öböl-háború",
+    "II. világháború",
+    "vietnami háború",
+    "koreai háború"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik híres filmrendező a Dreamworks filmstúdió egyik alapítója?",
+   "valaszok": [
+    "Francis Ford Coppola",
+    "Steven Spielberg",
+    "George Lucas",
+    "Oliver Stone"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik híres regény egyik filmváltozatában játszott Audrey Hepburn?",
+   "valaszok": [
+    "Háború és béke",
+    "Anna Karenina",
+    "Bűn és bűnhődés",
+    "Mester és Margarita"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik költőnek állított emléket a \"Ki látott engem?\" című magyar film?",
+   "valaszok": [
+    "Ady Endre",
+    "Radnóti Miklós",
+    "József Attila",
+    "Petőfi Sándor"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik legendás indián törzsfőnököt személyesítik meg a Buffalo Bill és az indiánok című filmben?",
+   "valaszok": [
+    "Winnetou",
+    "Vörös Felhő",
+    "Ülő Bika",
+    "Osceola"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik rendező készített filmet a vérszívó Drakuláról?",
+   "valaszok": [
+    "Francis Coppola",
+    "George Lucas",
+    "Steven Spielberg",
+    "Martin Scorsese"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik színház egyik alapító tagja volt Jordán Tamás színész?",
+   "valaszok": [
+    "Radnóti Színház",
+    "Merlin Színház",
+    "Komédium Színház",
+    "Katona József Színház"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik színház igazgatója lett 1985-ben Bálint András?",
+   "valaszok": [
+    "Vígszínház",
+    "Radnóti Színház",
+    "Madách Színház",
+    "Új Színház"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik színház színésze lett 1992-ben Vikidál Gyula?",
+   "valaszok": [
+    "Vígszínház",
+    "Rockszínház",
+    "Madách Színház",
+    "József Attila Színház"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik színésznőnk kezdte pályafutását gyermekszínészként?",
+   "valaszok": [
+    "Karády Katalin",
+    "Gobbi Hilda",
+    "Ruttkai Éva",
+    "Tolnay Klári"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik világhírű olasz filmrendező volt Ingrid Bergman férje?",
+   "valaszok": [
+    "Federico Fellini",
+    "Bernardo Bertolucci",
+    "Pier Paolo Pasolini",
+    "Roberto Rossellini"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik volt Federico Fellini utolsó filmje?",
+   "valaszok": [
+    "A nők városa",
+    "A Hold hangja",
+    "És a hajó megy",
+    "Ginger és Fred"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik énekes aratta első nagy színészi sikerét A félelem bére című filmben?",
+   "valaszok": [
+    "Charles Aznavour",
+    "Frank Sinatra",
+    "Elvis Presley",
+    "Yves Montand"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik énekes játszott Diana Ross oldalán a The Wiz című filmben?",
+   "valaszok": [
+    "George Michael",
+    "Bruce Springsteen",
+    "Michael Jackson",
+    "Paul Young"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Bereményi Géza 1988-ban rendezett filmjének?",
+   "valaszok": [
+    "Atlantisz",
+    "Eldorádó",
+    "Valpurgis",
+    "Olümposz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Charlie Chaplin utolsó filmjének?",
+   "valaszok": [
+    "A hongkongi grófnő",
+    "Egy király New Yorkban",
+    "Rivaldafény",
+    "Cirkusz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a címe Eszenyi Enikő nagylemezének?",
+   "valaszok": [
+    "E Tangó",
+    "E Mambó",
+    "E Rumba",
+    "E Szamba"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a címe William Friedkin klasszikus horrorfilmjének?",
+   "valaszok": [
+    "Sátántangó",
+    "Az ördögűző",
+    "A légy",
+    "A köd"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe a Dan Aykroyd főszereplésével készült zenés filmvígjátéknak?",
+   "valaszok": [
+    "Blues Brothers",
+    "Rock Fathers",
+    "King Singers",
+    "Moonwalkers"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a címe a legendás színész, Básti Lajos könyvének: \"Mire gondolsz, …?\"",
+   "valaszok": [
+    "Bánk bán",
+    "Ádám",
+    "Hamlet",
+    "Oidipusz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a neve a főhős palotájának Orson Welles Aranypolgár című klasszikus filmjében?",
+   "valaszok": [
+    "Uruk",
+    "Tartarosz",
+    "Xanadu",
+    "Tádzs Mahal"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt a neve az első magyar filmstúdiónak?",
+   "valaszok": [
+    "Hungária",
+    "Uránia",
+    "Hunnia",
+    "Pannónia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"Edward\" a címszereplője Tim Burton filmjének?",
+   "valaszok": [
+    "pudingfejű",
+    "ollókezű",
+    "ólomlábú",
+    "táglaarcú"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen \"randevú\" szerepel Alfred Hitchcock híres filmjének címében?",
+   "valaszok": [
+    "berlini",
+    "gyilkos",
+    "londoni",
+    "végzetes"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen jármű a címszereplője Buster Keaton A generális című filmjének?",
+   "valaszok": [
+    "gőzhajó",
+    "repülőgép",
+    "mozdony",
+    "tengeralattjáró"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen játékot játszik a lovag a Halállal Ingmar Bergman A hetedik pecsét című filmjében?",
+   "valaszok": [
+    "sakkozik",
+    "kártyázik",
+    "dominózik",
+    "malmozik"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen művészeket választott egyik filmjének címszereplőiül Federico Fellini?",
+   "valaszok": [
+    "bohócokat",
+    "kardnyelőket",
+    "kötéltáncosokat",
+    "oroszlánszelídítőket"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen szerepet játszott Paul Newman a Butch Cassidy és a Sundance kölyök című westernben?",
+   "valaszok": [
+    "marhapásztor",
+    "rablót",
+    "seriffet",
+    "bárzongoristát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mozart melyik művéből rendezett filmet Ingmar Bergman?",
+   "valaszok": [
+    "Szöktetés a szerájból",
+    "Don Giovanni",
+    "A varázsfuvola",
+    "Figaro házassága"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy hívják az űrhajó számítógépét A nyolcadik utas: a halál című sci-fiben?",
+   "valaszok": [
+    "Apa",
+    "Anya",
+    "Nagy Testvér",
+    "Bádogember"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol alakított színházi együttest 1949-ben Bertolt Brecht?",
+   "valaszok": [
+    "NDK-ban",
+    "Szovjetunióban",
+    "NSZK-ban",
+    "Amerikai Egyesült Államokban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol játszódik Bertolucci Lopott szépség című filmje?",
+   "valaszok": [
+    "Rómában",
+    "Párizsban",
+    "Toscanában",
+    "Korzikán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol játszódott John Carpenter Menekülés Los Angelesből című filmjének előző része?",
+   "valaszok": [
+    "Bostonban",
+    "Washingtonban",
+    "Atlantában",
+    "New Yorkban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Jiri Menzel melyik filmjéért kapott Oscar-díjat?",
+   "valaszok": [
+    "Szigorúan ellenőrzött vonatok",
+    "Sörgyári capriccio",
+    "Pacsirták cérnaszálon",
+    "Hóvirágünnep"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki a főszereplője Jean Renoir A nagy ábránd című klasszikus filmjének?",
+   "valaszok": [
+    "Jean Marais",
+    "Jean Gabin",
+    "Yves Montand",
+    "Gerard Philipe"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki alakítja a főszerepet az új Nemzeti Színház Az ügynök halála című darabjában?",
+   "valaszok": [
+    "Bodrogi Gyula",
+    "Sinkó László",
+    "Garas Dezső",
+    "Darvas Iván"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki alapította a híres francia színházat, a Comédie Francaise-t?",
+   "valaszok": [
+    "Napóleon",
+    "XIV. Lajos",
+    "Richelieu bíboros",
+    "Madame de Pompadour"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki alapította meg 1989-ben Szegeden a Független Színpadot?",
+   "valaszok": [
+    "Ruszt József",
+    "Babarczy László",
+    "Bereményi Géza",
+    "Csányi János"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem kapta meg egyszer sem a legjobb rendezésért járó Oscar-díjat?",
+   "valaszok": [
+    "Alfred Hitchcock",
+    "Victor Fleming",
+    "Billy Wilder",
+    "Milos Forman"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem tartozik a francia új hullám rendezői közé?",
+   "valaszok": [
+    "Francois Truffaut",
+    "Jean-Luc Godard",
+    "Claude Chabrol",
+    "Jean Renoir"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki rendezte a Biciklitolvajok című klasszikus filmet?",
+   "valaszok": [
+    "Roberto Rossellini",
+    "Federico Fellini",
+    "Vittorio De Sica",
+    "Luchino Visconti"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki szerezte Jean-Paul Belmondo A Profi című filmjének zenéjét?",
+   "valaszok": [
+    "Nino Rota",
+    "Ennio Morricone",
+    "Vangelis",
+    "Sting"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a budapesti Nemzeti Színház igazgatója az alábbiak közül?",
+   "valaszok": [
+    "Hevesi Sándor",
+    "Jób Dániel",
+    "Várkonyi Zoltán",
+    "Ditrói Mór"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt az 1837-ben megnyílt Pesti Magyar Színház első igazgatója?",
+   "valaszok": [
+    "Csiky Gergely",
+    "Bajza József",
+    "Szigligeti Ede",
+    "Paulay Ede"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki énekli a Gyűrűk Ura - A király visszatér című film Oscar-díjas betétdalát?",
+   "valaszok": [
+    "Tina Turner",
+    "Annie Lennox",
+    "Celine Dion",
+    "Cher"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a regénye alapján készült Tarkovszkij Solaris című filmje?",
+   "valaszok": [
+    "Isaac Asimov",
+    "Stanislaw Lem",
+    "Aldous Huxley",
+    "Pierre Boulle"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik amerikai filmsztár született az egykori NSZK-ban?",
+   "valaszok": [
+    "Bruce Willis",
+    "Arnold Schwarzenegger",
+    "Leonardo DiCaprio",
+    "Marlon Brando"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik egy Szabó István rendezte rövidfilm címe?",
+   "valaszok": [
+    "Én",
+    "Te",
+    "Ő",
+    "Mi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik film főszerepét játszotta saját rendezésében Barbra Streisand?",
+   "valaszok": [
+    "Funny Girl",
+    "Hello, Dolly!",
+    "Mi van, doki?",
+    "Yentl"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik filmben nem játszott együtt Ruttkai Éva és Latinovits Zoltán?",
+   "valaszok": [
+    "Szindbád",
+    "Butaságom története",
+    "Kárpáthy Zoltán",
+    "Alfa Rómeó és Júlia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik filmfesztiválon osztják az Arany Leopárd-díjat?",
+   "valaszok": [
+    "Locarnóban",
+    "Lipcsében",
+    "Lübeckben",
+    "Mannheimben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik híres festő vett részt az Andalúziai kutya című film elkészítésében?",
+   "valaszok": [
+    "Pablo Picasso",
+    "Salvador Dalí",
+    "Marc Chagall",
+    "Henri Matisse"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik híres filmet nem magyar származású rendező készítette?",
+   "valaszok": [
+    "Casablanca",
+    "VIII. Henrik magánélete",
+    "Lady Hamilton",
+    "Irma, te édes"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik jármű egy Hitchcock-film címe?",
+   "valaszok": [
+    "földalatti",
+    "tengeralattjáró",
+    "léghajó",
+    "mentőcsónak"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik rockegyüttes írt filmzenét a \"Zabriskie Point\" című Antonioni-filmhez?",
+   "valaszok": [
+    "Led Zeppelin",
+    "Pink Floyd",
+    "Dire Straits",
+    "Yes"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik színdarabban nyújtotta utolsó, híres alakítását Tímár József?",
+   "valaszok": [
+    "Salemi boszorkányok",
+    "Az ügynök halála",
+    "Pillantás a hídról",
+    "Godot-ra várva"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik színház tagja volt 1926-tól haláláig Bajor Gizi?",
+   "valaszok": [
+    "Vígszínház",
+    "Nemzeti Színház",
+    "Király Színház",
+    "Magyar Színház"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik színházban kezdte pályafutását Törőcsik Mari?",
+   "valaszok": [
+    "Nemzeti Színház",
+    "Vígszínház",
+    "Madách Színház",
+    "Thália Színház"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik színész-énekesnő kapott Oscar-díjat a \"Holdkórosok\" című filmben nyújtott alakításáért?",
+   "valaszok": [
+    "Gloria Estefan",
+    "Whitney Houston",
+    "Madonna",
+    "Cher"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik színésznő kapott Kossuth-díjat 2002-ben?",
+   "valaszok": [
+    "Psota Irén",
+    "Galambos Erzsi",
+    "Almási Éva",
+    "Máthé Erzsi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik színésznő vált eredeti vezetéknevén híressé?",
+   "valaszok": [
+    "Marlene Dietrich",
+    "Sophia Loren",
+    "Brigitte Bardot",
+    "Marilyn Monroe"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik színésznőt nevezték kortársai a \"szőke csodának\"?",
+   "valaszok": [
+    "Márkus Emíliát",
+    "Jászai Marit",
+    "Fedák Sárit",
+    "Mészáros Ágit"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik író aratott sikereket filmrendezőként is?",
+   "valaszok": [
+    "Jean-Paul Sartre",
+    "Jean Cocteau",
+    "Albert Camus",
+    "Marcel Proust"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Ang Lee több Oscar-díjat nyert filmjének: \"Tigris és …\"",
+   "valaszok": [
+    "majom",
+    "hiéna",
+    "sárkány",
+    "patkány"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Ingmar Bergman klasszikus filmjének? \"A hetedik …\"",
+   "valaszok": [
+    "kereszt",
+    "asszony",
+    "pecsét",
+    "lovag"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen szerepet játszik George Clooney a Viharzóna című filmben?",
+   "valaszok": [
+    "meteorológust",
+    "tűzoltót",
+    "halászt",
+    "rendőrt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen szerepet játszott Robert Redford Az elnök emberei című filmben?",
+   "valaszok": [
+    "testőr",
+    "újságíró",
+    "elnök",
+    "szenátor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen származású volt a világhírű színésznő, Sarah Bernhardt?",
+   "valaszok": [
+    "francia",
+    "német",
+    "angol",
+    "amerikai"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miért tartóztatják le a Szelíd motorosok című film két főhősét?",
+   "valaszok": [
+    "gyorshajtásért",
+    "köztéri alkoholfogyasztásért",
+    "drogfogyasztásért",
+    "engedély nélküli felvonulásért"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Roman Polanski melyik filmjének főszereplője Jack Nicholson?",
+   "valaszok": [
+    "Vámpírok bálja",
+    "Kínai negyed",
+    "Keserű méz",
+    "Rosemary gyermeke"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbi ismert énekesek közül ki játszotta saját magát Sándor Pál Ripacsok című filmjében?",
+   "valaszok": [
+    "Szörényi Levente",
+    "Somló Tamás",
+    "Zorán",
+    "Vikidál Gyula"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi női nevek közül melyik nem szerepelt Fassbinder-film címében?",
+   "valaszok": [
+    "Petra von Kant",
+    "Katharina Blum",
+    "Effi Briest",
+    "Veronika Voss"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbi színészek közül ki nem tartozott a United Artists filmstúdió alapítói közé?",
+   "valaszok": [
+    "Mary Pickford",
+    "Charlie Chaplin",
+    "Douglas Fairbanks",
+    "Gloria Swanson"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki a főszereplője Roger Vadim Veszedelmes viszonyok című filmjének?",
+   "valaszok": [
+    "Alain Dalon",
+    "Gérard Philipe",
+    "Jean-Paul Belmondo",
+    "Jean Marais"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki játszotta a női főszerepet a Volt egyszer egy vadnyugat című westernfilmben?",
+   "valaszok": [
+    "Raquel Welch",
+    "Claudia Cardinale",
+    "Monica Vitti",
+    "Brigitte Bardot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem játszotta a legendás James Bondot?",
+   "valaszok": [
+    "Sean Connery",
+    "George Lazenby",
+    "Timothy Hutton",
+    "Timothy Dalton"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem tartozott a filmkomikus Marx testvérek közé?",
+   "valaszok": [
+    "Groucho",
+    "Harold",
+    "Chico",
+    "Harpo"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem volt a mai Vígszínház igazgatója?",
+   "valaszok": [
+    "Jób Dániel",
+    "Goda Gábor",
+    "Somló István",
+    "Vörös Pál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki rendezte A birodalom visszavág című fantasztikus filmet?",
+   "valaszok": [
+    "George Lucas",
+    "Irvin Kershner",
+    "Lawrence Kasdan",
+    "Peter Mayhew"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki rendezte a Ködös utak című klasszikus francia filmet?",
+   "valaszok": [
+    "Jean Cocteau",
+    "Marcel Carné",
+    "Jean Renoir",
+    "René Clair"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a műve alapján készült Milos Forman Ragtime című filmje?",
+   "valaszok": [
+    "E. L. Doctorow",
+    "J. D. Salinger",
+    "Kurt Vonnegut",
+    "Joseph Heller"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek az önéletírása az Egy színész elmondja című könyv?",
+   "valaszok": [
+    "Kabos Gyuláé",
+    "Jávor Pálé",
+    "Csortos Gyuláé",
+    "Básti Lajosé"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit személyesített meg Geraldine Chaplin Richard Attenborough Chaplin című filmjében?",
+   "valaszok": [
+    "saját édesanyját",
+    "saját nagyanyját",
+    "saját nővérét",
+    "saját nagynénjét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik filmben nem játszott együtt Tom Cruise és Nicole Kidman?",
+   "valaszok": [
+    "Túl az Óperencián",
+    "Mint a villám",
+    "Koktél",
+    "Tágra zárt szemek"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik filmet rendezte a híres színész, George Clooney?",
+   "valaszok": [
+    "Mint a kámfor",
+    "Egy veszedelmes elme vallomásai",
+    "Egy csodálatos elme",
+    "Mint a villám"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik filmrendező született az Amerikai Egyesült Államokban?",
+   "valaszok": [
+    "Billy Wilder",
+    "Charlie Chaplin",
+    "Alfred Hitchcock",
+    "George Cukor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik híres filmszínésznő nem Svédországban született?",
+   "valaszok": [
+    "Anita Ekberg",
+    "Greta Garbo",
+    "Ingrid Bergman",
+    "Liv Ullmann"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik irodalmi mű alapján készített filmet Pier Paolo Pasolini?",
+   "valaszok": [
+    "Az isteni színjáték",
+    "Canterbury mesék",
+    "Don Quijote",
+    "Szentivánéji álom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mozifilmet nem Fábri Zoltán rendezte?",
+   "valaszok": [
+    "Hannibál tanár úr",
+    "A Pál utcai fiúk",
+    "Édes Anna",
+    "Macskajáték"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik színház tagja volt 1958-tól 1963-ig Sinkovits Imre?",
+   "valaszok": [
+    "József Attila Színház",
+    "Vígszínház",
+    "Thália Színház",
+    "Katona József Színház"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik színtársulat tagja lett 1999-ben Hobo, azaz Földes László?",
+   "valaszok": [
+    "Madách Színház",
+    "Új Színház",
+    "Katona József Színház",
+    "Bárka Színház"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik zenés filmet rendezte a világhírű színész Gene Kelly?",
+   "valaszok": [
+    "Óz, a csodák csodája",
+    "Hello, Dolly",
+    "My Fair Lady",
+    "A muzsika hangja"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik énekesnő alakította a Billy Holiday életéről forgatott Lady Sings The Blues című film főszerepét?",
+   "valaszok": [
+    "Madonna",
+    "Whitney Houston",
+    "Tina Turner",
+    "Diana Ross"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen eredetű színjátszás a nó?",
+   "valaszok": [
+    "japán",
+    "maláj",
+    "kínai",
+    "koreai"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik nem kapta meg a legjobb filmnek járó Oscar-díjat?",
+   "valaszok": [
+    "Most és mindörökké",
+    "Van aki forrón szereti",
+    "A muzsika hangja",
+    "80 nap alatt a Föld körül"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Dickens melyik műve alapján készült Tolcsvay László az Isten Pénze című musicalje?",
+   "valaszok": [
+    "Karácsonyi ének",
+    "Twist Oliver",
+    "Copperfield Dávid",
+    "Szép remények"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki a zeneszerzője A keresztapa című 1974-es, Oscar-díjas filmnek?",
+   "valaszok": [
+    "Ennio Morricone",
+    "Sergio Leone",
+    "Nino Rota",
+    "John Barry"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki játszotta Casanova szerepét Federico Fellini 1976-os filmjében?",
+   "valaszok": [
+    "Alain Delon",
+    "Donald Sutherland",
+    "Marcello Mastroianni",
+    "Robert Redford"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki kapta meg egymást követő két évben a legjobb férfialakításért járó Oscar-díjat?",
+   "valaszok": [
+    "Tom Hanks",
+    "Al Pacino",
+    "Dustin Hoffman",
+    "Robert De Niro"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki rendezte a Marlene Dietrich főszereplésével készült Kék angyal című filmet?",
+   "valaszok": [
+    "Fritz Lang",
+    "Erich von Stroheim",
+    "Josef von Sternberg",
+    "Friedrich Murnau"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik darabbal nyitották meg a Nemzeti Színház elődjének számító Pesti Magyar Színházat?",
+   "valaszok": [
+    "Csongor és Tünde",
+    "Az ember tragédiája",
+    "Árpád ébredése",
+    "Bánk bán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik filmjét nem a Szovjetunióban készítette Andrej Tarkovszkij?",
+   "valaszok": [
+    "Iván gyermekkora",
+    "Andrej Rubljov",
+    "Solaris",
+    "Áldozathozatal"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik híres film operatőre volt a magyar származású Zsigmond Vilmos?",
+   "valaszok": [
+    "Apokalipszis most",
+    "A cápa",
+    "Harmadik típusú találkozások",
+    "Hair"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar filmrendező kapott életműdíjat az 1979-es cannes-i filmfesztiválon?",
+   "valaszok": [
+    "Fábri Zoltán",
+    "Makk Károly",
+    "Szabó István",
+    "Jancsó Miklós"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik vonattal hagyja el a megszállt Párizst Rick, a Casablanca című film főhőse?",
+   "valaszok": [
+    "az ötórás marsaille-ivel",
+    "a hatórás toulonival",
+    "a hétórás marseille-ivel",
+    "a nyolcórás toulonival"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen pályát hagyott félbe Moliére a színház kedvéért?",
+   "valaszok": [
+    "papi",
+    "orvosi",
+    "jogi",
+    "tanári"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi híres filmek közül egyet nem ugyanaz a rendező rendezett, melyiket?",
+   "valaszok": [
+    "Ben Hur",
+    "Római vakáció",
+    "Funny Girl",
+    "Kleopátra"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem játszotta el Fletcher Christian szerepét A Bounty lázadói című regény filmváltozataiban?",
+   "valaszok": [
+    "Clark Gable",
+    "James Stewart",
+    "Marlon Brando",
+    "Mel Gibson"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a regényéből készítette Milos Forman Valmont című filmjét?",
+   "valaszok": [
+    "Choderlos de Laclos",
+    "Denis Diderot",
+    "Restif de la Bretonne",
+    "Émile Verhaeren"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek az elbeszéléséből készült Fábri Zoltán Körhinta című filmje?",
+   "valaszok": [
+    "Móricz Zsigmond",
+    "Illyés Gyula",
+    "Örkény István",
+    "Sarkadi Imre"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek az írásai alapján készült Nyikita Mihalkov Etűdök gépzongorára című filmje?",
+   "valaszok": [
+    "Fjodor M. Dosztojevszkij",
+    "Nyikolaj Gogol",
+    "Anton P. Csehov",
+    "Mihail Bulgakov"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit alakított Szőke Szakáll a Casablanca című filmben?",
+   "valaszok": [
+    "a bárzongoristát",
+    "a főpincért",
+    "egy francia szökevényt",
+    "egy német tisztet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mai sexbomba játszott gyerekszínészként Spielberg E.T. című filmjében?",
+   "valaszok": [
+    "Pamela Anderson",
+    "Erika Eleniak",
+    "Sharon Stone",
+    "Cameron Diaz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szerepéért kapta meg Tőrőcsik Mari a cannes-i filmfesztivál legjobb színésznőjének járó díját?",
+   "valaszok": [
+    "Körhinta",
+    "Édes Anna",
+    "Déryné, hol van?",
+    "Macskajáték"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Sergio Leone melyik westernfilmjében nem Clint Eastwood játssza a főszerepet?",
+   "valaszok": [
+    "Egy maréknyi dollárért",
+    "Egy marék dinamit",
+    "A jó, a rossz és a csúf",
+    "Néhány dollárral többért"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik zenés film nem nyerte el a legjobb filmnek járó Oscar-díjat?",
+   "valaszok": [
+    "A muzsika hangja",
+    "Ének az esőben",
+    "Egy amerikai Párizsban",
+    "My Fair Lady"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen díjat osztanak a trieszti filmfesztiválon?",
+   "valaszok": [
+    "Arany Polip",
+    "Arany Kagyló",
+    "Arany Aszteroid",
+    "Arany Galamb"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki játszotta Lucifer szerepét az Ember tragédiája ősbemutatóján?",
+   "valaszok": [
+    "Csortos Gyula",
+    "Gyenes László",
+    "Pethes Imre",
+    "Ódry Árpád"
+   ],
+   "helyes": 1
+  }
+ ]
+}

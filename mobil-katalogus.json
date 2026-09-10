@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "platform": "android",
-  "frissitve": "2026-09-06",
+  "frissitve": "2026-09-10",
   "megjegyzes": "A SuperDL mobil (Android) katalógusa. A modulok ADATOK (kérdéssor, szólista, állomáslista, útmutató) — NEM futtatható kód. A motorjuk a SuperDL alkalmazásban van, így új tartalomhoz nem kell új alkalmazás-verzió.",
   "kategoriak": [
     {
@@ -92,6 +92,281 @@
       "meret": 269463,
       "fajl": "temak/tema-elena.json",
       "minAlkalmazasVerzio": "1.63.0"
+    },
+    {
+      "id": "kviz-tortenelem-konnyu",
+      "nev": "Történelem — könnyebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Az egytől ötig terjedő nehézségű kérdések. 456 kérdés.",
+      "meret": 91889,
+      "fajl": "modulok/jatekok/kviz-tortenelem-konnyu.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-tortenelem-nehez",
+      "nev": "Történelem — nehezebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "A hatos és afölötti nehézségű kérdések. 732 kérdés.",
+      "meret": 149092,
+      "fajl": "modulok/jatekok/kviz-tortenelem-nehez.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-magyar-nyelv-konnyu",
+      "nev": "Magyar nyelv — könnyebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Az egytől ötig terjedő nehézségű kérdések. 924 kérdés.",
+      "meret": 179135,
+      "fajl": "modulok/jatekok/kviz-magyar-nyelv-konnyu.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-magyar-nyelv-nehez",
+      "nev": "Magyar nyelv — nehezebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "A hatos és afölötti nehézségű kérdések. 221 kérdés.",
+      "meret": 43102,
+      "fajl": "modulok/jatekok/kviz-magyar-nyelv-nehez.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-irodalom-konnyu",
+      "nev": "Irodalom — könnyebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Az egytől ötig terjedő nehézségű kérdések. 607 kérdés.",
+      "meret": 122081,
+      "fajl": "modulok/jatekok/kviz-irodalom-konnyu.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-irodalom-nehez",
+      "nev": "Irodalom — nehezebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "A hatos és afölötti nehézségű kérdések. 388 kérdés.",
+      "meret": 80194,
+      "fajl": "modulok/jatekok/kviz-irodalom-nehez.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-film-szinhaz-konnyu",
+      "nev": "Film és színház — könnyebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Az egytől ötig terjedő nehézségű kérdések. 388 kérdés.",
+      "meret": 81697,
+      "fajl": "modulok/jatekok/kviz-film-szinhaz-konnyu.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-film-szinhaz-nehez",
+      "nev": "Film és színház — nehezebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "A hatos és afölötti nehézségű kérdések. 498 kérdés.",
+      "meret": 108435,
+      "fajl": "modulok/jatekok/kviz-film-szinhaz-nehez.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-zene-opera-konnyu",
+      "nev": "Zene és opera — könnyebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Az egytől ötig terjedő nehézségű kérdések. 322 kérdés.",
+      "meret": 64565,
+      "fajl": "modulok/jatekok/kviz-zene-opera-konnyu.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-zene-opera-nehez",
+      "nev": "Zene és opera — nehezebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "A hatos és afölötti nehézségű kérdések. 456 kérdés.",
+      "meret": 91155,
+      "fajl": "modulok/jatekok/kviz-zene-opera-nehez.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-elovilag-konnyu",
+      "nev": "Élővilág — könnyebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Az egytől ötig terjedő nehézségű kérdések. 435 kérdés.",
+      "meret": 78719,
+      "fajl": "modulok/jatekok/kviz-elovilag-konnyu.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-elovilag-nehez",
+      "nev": "Élővilág — nehezebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "A hatos és afölötti nehézségű kérdések. 198 kérdés.",
+      "meret": 36670,
+      "fajl": "modulok/jatekok/kviz-elovilag-nehez.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-foldrajz-konnyu",
+      "nev": "Földrajz és országok — könnyebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Az egytől ötig terjedő nehézségű kérdések. 383 kérdés.",
+      "meret": 69130,
+      "fajl": "modulok/jatekok/kviz-foldrajz-konnyu.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-foldrajz-nehez",
+      "nev": "Földrajz és országok — nehezebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "A hatos és afölötti nehézségű kérdések. 322 kérdés.",
+      "meret": 59310,
+      "fajl": "modulok/jatekok/kviz-foldrajz-nehez.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-tudomany-konnyu",
+      "nev": "Tudomány és technika — könnyebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Az egytől ötig terjedő nehézségű kérdések. 262 kérdés.",
+      "meret": 49128,
+      "fajl": "modulok/jatekok/kviz-tudomany-konnyu.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-tudomany-nehez",
+      "nev": "Tudomány és technika — nehezebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "A hatos és afölötti nehézségű kérdések. 248 kérdés.",
+      "meret": 48218,
+      "fajl": "modulok/jatekok/kviz-tudomany-nehez.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-sport-konnyu",
+      "nev": "Sport — könnyebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Az egytől ötig terjedő nehézségű kérdések. 165 kérdés.",
+      "meret": 33230,
+      "fajl": "modulok/jatekok/kviz-sport-konnyu.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-sport-nehez",
+      "nev": "Sport — nehezebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "A hatos és afölötti nehézségű kérdések. 302 kérdés.",
+      "meret": 63155,
+      "fajl": "modulok/jatekok/kviz-sport-nehez.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-konyha",
+      "nev": "Konyha és gasztronómia",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Konyha és gasztronómia témájú kérdések, vegyes nehézséggel. 389 kérdés.",
+      "meret": 69330,
+      "fajl": "modulok/jatekok/kviz-konyha.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-vallas",
+      "nev": "Vallás és mitológia",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Vallás és mitológia témájú kérdések, vegyes nehézséggel. 369 kérdés.",
+      "meret": 69830,
+      "fajl": "modulok/jatekok/kviz-vallas.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-muveszet",
+      "nev": "Képzőművészet és építészet",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Képzőművészet és építészet témájú kérdések, vegyes nehézséggel. 305 kérdés.",
+      "meret": 62173,
+      "fajl": "modulok/jatekok/kviz-muveszet.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-hazai",
+      "nev": "Magyarország — további kérdések",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Magyarország témájú kérdések, vegyes nehézséggel. 159 kérdés.",
+      "meret": 31039,
+      "fajl": "modulok/jatekok/kviz-hazai.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-vegyes-konnyu",
+      "nev": "Vegyes műveltség — könnyebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Az egytől ötig terjedő nehézségű kérdések. 1096 kérdés.",
+      "meret": 207880,
+      "fajl": "modulok/jatekok/kviz-vegyes-konnyu.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-vegyes-nehez",
+      "nev": "Vegyes műveltség — nehezebb",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "A hatos és afölötti nehézségű kérdések. 266 kérdés.",
+      "meret": 53398,
+      "fajl": "modulok/jatekok/kviz-vegyes-nehez.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
+    },
+    {
+      "id": "kviz-gyerek",
+      "nev": "Gyerekeknek",
+      "tipus": "quiz",
+      "verzio": 1,
+      "leiras": "Gyerekeknek témájú kérdések, vegyes nehézséggel. 122 kérdés.",
+      "meret": 23347,
+      "fajl": "modulok/jatekok/kviz-gyerek.json",
+      "minAlkalmazasVerzio": "1.63.0",
+      "kategoria": "jatekok"
     }
   ]
 }

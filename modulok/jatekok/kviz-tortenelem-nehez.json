@@ -1,0 +1,7328 @@
+{
+ "id": "kviz-tortenelem-nehez",
+ "nev": "Történelem — nehezebb",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "A Kennedy-merénylet óta melyik amerikai elnököt érte fegyveres támadás?",
+   "valaszok": [
+    "Lyndon B. Johnson",
+    "Richard Nixon",
+    "Gerald Ford",
+    "Ronald Reagan"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy hívják Hollandia királynőjét?",
+   "valaszok": [
+    "Margit",
+    "Beatrix",
+    "Erzsébet",
+    "Krisztina"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy hívják a francia köztársasági elnököt, aki országát átvezette a kétezres évekbe?",
+   "valaszok": [
+    "Jacques Chirac",
+    "Francois Mitterrand",
+    "Michel Rocard",
+    "Pierre Mauroy"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy hívják a jelenlegi spanyol királyt?",
+   "valaszok": [
+    "János Zsigmond",
+    "Károly Gusztáv",
+    "János Károly",
+    "XIII. Alfonz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy hívták Szamarkand sánta és kegyetlen uralkodóját?",
+   "valaszok": [
+    "Gur-Emir",
+    "Ulag Beg",
+    "Timur-Lenk",
+    "Bábur"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy hívták az utolsó magyar király feleségét?",
+   "valaszok": [
+    "Erzsébet",
+    "Zita",
+    "Katalin",
+    "Gizella"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezték a 16. századi francia protestánsokat?",
+   "valaszok": [
+    "adventisták",
+    "johanniták",
+    "puritánok",
+    "hugenották"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan folytatódott Oliver Cromwell új mintájú hadseregének a jelszava? \"Bizz Istenben és ...\"",
+   "valaszok": [
+    "nyergeld a lovadat!",
+    "ne higgy a királyoknak!",
+    "tartsd szárazon a puskaport!",
+    "építs flottát!"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan halt meg Mahátma Gandhi?",
+   "valaszok": [
+    "fertőző betegségben",
+    "éhségsztrájk közben",
+    "börtönben",
+    "merénylet következtében"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezik az ókori karthágóiakat másképpen?",
+   "valaszok": [
+    "trákok",
+    "illírek",
+    "sumérok",
+    "punok"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol alakult meg 1949-ben a KGST?",
+   "valaszok": [
+    "Budapesten",
+    "Varsóban",
+    "Szófiában",
+    "Moszkvában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol fekszik Szent Ferenc szülővárosa, Assisi?",
+   "valaszok": [
+    "a svájci Alpok déli részén",
+    "az olasz riviérán",
+    "Itália középső részén",
+    "Szicília szigetén"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol feküdt az ókorban Etruria, az etruszkok hazája?",
+   "valaszok": [
+    "Skandináviában",
+    "Közép-Itáliában",
+    "a Balkánon",
+    "a Baltikumban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol feküdt az ókorban Trákia?",
+   "valaszok": [
+    "a Balkán-félszigeten",
+    "a Skandináv-félszigeten",
+    "Belső-Ázsiában",
+    "Nyugat-Afrikában"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol folytak eredményes béketárgyalások Egyiptom és Izrael között 1978-ban?",
+   "valaszok": [
+    "Camp Davidben",
+    "Kairóban",
+    "Párizsban",
+    "Helsinkiben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol halt meg Horthy Miklós?",
+   "valaszok": [
+    "Portugáliában",
+    "Spanyolországban",
+    "Brazíliában",
+    "Argentínában"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol halt meg a híres felfedező és tengerész Vasco da Gama?",
+   "valaszok": [
+    "Amerikában",
+    "Japánban",
+    "Indiában",
+    "Kínában"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol halt meg gróf Széchenyi István?",
+   "valaszok": [
+    "Nagycenken",
+    "Döblingben",
+    "Debrecenben",
+    "Budapesten"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol helyezték végső nyugalomra Mindszenty József hamvait?",
+   "valaszok": [
+    "Székesfehérvár",
+    "Pécsett",
+    "Esztergomban",
+    "Kassán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol látható Napóleon sírja?",
+   "valaszok": [
+    "Korzikán",
+    "Elba szigetén",
+    "Párizsban",
+    "Szent Ilona szigetén"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol mondták ki a Habsburgok trónfosztását 1849. április 14-én?",
+   "valaszok": [
+    "Pozsonyban",
+    "Debrecenben",
+    "Kassán",
+    "Székesfehérváron"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol nyomtatták ki először Károli Gáspár teljes bibliafordítását?",
+   "valaszok": [
+    "Kassán",
+    "Nagyszombatban",
+    "Vizsolyban",
+    "Gyulafehérváron"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol született Casanova?",
+   "valaszok": [
+    "Itáliában",
+    "Spanyolországban",
+    "Franciaországban",
+    "Portugáliában"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol volt Minótaurosz híres labirintusa?",
+   "valaszok": [
+    "Máltán",
+    "Cipruson",
+    "Krétán",
+    "Korzikán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol volt a közékorban a magyar pénzverés központja?",
+   "valaszok": [
+    "Sepsziszentgyörgyön",
+    "Selmecbányán",
+    "Zólyomban",
+    "Körmöcbányán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol élnek a kecsuák?",
+   "valaszok": [
+    "Észak-Amerikában",
+    "Dél-Amerikában",
+    "Afrikában",
+    "Pápua Új-Guineában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol ült össze 1944 decemberében a magyar Ideiglenes Nemzetgyűlés?",
+   "valaszok": [
+    "Budapesten",
+    "Pécsett",
+    "Pozsonyban",
+    "Debrecenben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hová emigrált a magyar szabadságharc után Bem József?",
+   "valaszok": [
+    "Franciaországba",
+    "Törökországba",
+    "Piemontba",
+    "Lengyelországba"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hová indult az első keresztes hadjárat?",
+   "valaszok": [
+    "Egyiptomba",
+    "Indiába",
+    "a Szentföldre",
+    "Bizánc ellen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hová menekült 622-ben Mekkából a próféta a \"Mohamed futásá\"-nak nevezett út során?",
+   "valaszok": [
+    "Bászrába",
+    "Medinába",
+    "Damaszkuszba",
+    "Iszfahánba"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány István néven uralkodó magyar király volt?",
+   "valaszok": [
+    "egy",
+    "három",
+    "öt",
+    "hat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány alkalommal volt magyar miniszterelnök Wekerle Sándor?",
+   "valaszok": [
+    "egyszer",
+    "kétszer",
+    "háromszor",
+    "négyszer"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány király uralkodott Mátyás néven Magyarországon?",
+   "valaszok": [
+    "egy",
+    "kettő",
+    "három",
+    "négy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány női uralkodója volt Magyarországnak?",
+   "valaszok": [
+    "1",
+    "2",
+    "3",
+    "4"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány éves korában hunyt el Ronald Reagan, az Egyesült Államok volt elnöke?",
+   "valaszok": [
+    "63.0",
+    "73.0",
+    "83.0",
+    "93.0"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány évesen lett tábornok Bonaparte Napóleon?",
+   "valaszok": [
+    "24.0",
+    "38.0",
+    "48.0",
+    "54.0"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány évig élt II. Rákóczi Ferenc Rodostóban?",
+   "valaszok": [
+    "5.0",
+    "15.0",
+    "35.0",
+    "45.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hányadik Lajosként uralkodott az utolsó Lajos nevű, 1824-ben elhunyt francia király?",
+   "valaszok": [
+    "XV.",
+    "XVI.",
+    "XVII.",
+    "XVIII."
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hányadik elnöke volt az USA-nak a 2004-ben elhunyt Ronald Reagan?",
+   "valaszok": [
+    "20.",
+    "40.",
+    "50.",
+    "75."
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki adott ki ukázt?",
+   "valaszok": [
+    "Gutenberg János",
+    "II. András",
+    "az orosz cár",
+    "Batu kán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki alapította a könyvritkaságairól nevezetes keszthelyi Helikon Könyvtárat?",
+   "valaszok": [
+    "Esterházy Károly",
+    "Festetics György",
+    "Savoyai Jenő",
+    "Grassalkovich Antal"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki fedezte fel Hispaniola szigetét?",
+   "valaszok": [
+    "James Cook",
+    "Magellán",
+    "Kolumbusz",
+    "Francis Drake"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki foglalta el Egyiptomot Kr. e. 332-ben?",
+   "valaszok": [
+    "Julius Caesar",
+    "Hannibál",
+    "Nagy Sándor",
+    "Cornelius Scipio"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki harcolt a labancok ellen?",
+   "valaszok": [
+    "Vay Ádám",
+    "Dugovics Titusz",
+    "Tomori Pál",
+    "Szondy György"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki követte Kádár Jánost az MSZMP főtitkári posztján?",
+   "valaszok": [
+    "Grósz Károly",
+    "Szűrös Mátyás",
+    "Nyers Rezső",
+    "Pozsgay Imre"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki követte közvetlenül Harry Spencer Trumant az USA elnöki székében?",
+   "valaszok": [
+    "H. C. Hoover",
+    "F. D. Roosevelt",
+    "D. D. Eisenhower",
+    "J. F. Kennedy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki küldte Szent Istvánnak a királyi koronát?",
+   "valaszok": [
+    "X. Pius pápa",
+    "II. Szilveszter pápa",
+    "Cirill és Metód",
+    "XI. Gergely pápa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki lakott New Yorkban a Dakota házban?",
+   "valaszok": [
+    "Martin Luther King",
+    "John Lennon",
+    "Marylin Monroe",
+    "Woody Allen"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem találkozhatott a többiekkel az alábbiak közül?",
+   "valaszok": [
+    "Immanuel Kant",
+    "Marie Curie",
+    "Wilhelm Conrad Röntgen",
+    "Pierre-Auguste Renoir"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem volt a Horn-kormány pénzügyminisztere?",
+   "valaszok": [
+    "Békesi László",
+    "Kupa Mihály",
+    "Bokros Lajos",
+    "Medgyessy Péter"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem volt miniszterelnök az alábbi magyar politikusok közül?",
+   "valaszok": [
+    "Nyers Rezső",
+    "Lázár György",
+    "Fock Jenő",
+    "Grósz Károly"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki vakítatta meg gyerekkorában a későbbi II. Béla magyar királyt?",
+   "valaszok": [
+    "a bizánci császár",
+    "a kijevi fejedelem",
+    "Szent István",
+    "Könyves Kálmán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki vett részt a győzhetetlennek hitt spanyol Armada legyőzésében 1588-ban?",
+   "valaszok": [
+    "Francis Drake",
+    "James Cook",
+    "Horatio Nelson",
+    "Robert Blake"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki vezette a magyar seregeket 1448-ban a rigómezei csatában?",
+   "valaszok": [
+    "Kinizsi Pál",
+    "Nádasdy Ferenc",
+    "Hunyadi János",
+    "Török Bálint"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt 1848-ban az Országos Honvédelmi Bizottmány Elnöke?",
+   "valaszok": [
+    "Perczel Mór",
+    "Kossuth Lajos",
+    "Jókai Mór",
+    "Deák Ferenc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Habsburg uralkodó az alábbi magyar királyok közül?",
+   "valaszok": [
+    "I. András",
+    "I. Lajos",
+    "I. László",
+    "IV. Károly"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt XV. Lajos francia király híres kegyence?",
+   "valaszok": [
+    "Mme de Sévigné",
+    "Mme de Pompadour",
+    "Mme Récamier",
+    "Mme de Stael"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a Német Szövetségi Köztársaság első kancellárja?",
+   "valaszok": [
+    "Ludwig Erhard",
+    "Konrad Adenauer",
+    "Willy Brandt",
+    "Helmut Schmidt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a görögök vezére a marathoni csatában?",
+   "valaszok": [
+    "Leonidász",
+    "Miltiadész",
+    "Themisztoklész",
+    "Periklész"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a leghosszabb ideig uralkodó Árpád-házi király?",
+   "valaszok": [
+    "Szent István",
+    "Aba Sámuel",
+    "I. Béla",
+    "III. András"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt a magyar király, amikor beköszöntöttek az 1500-as évek?",
+   "valaszok": [
+    "Imre",
+    "Zsigmond",
+    "II. Ulászló",
+    "Rudolf"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt a mondabeli Arthur király felesége?",
+   "valaszok": [
+    "Izolda",
+    "Guinevra",
+    "Freya",
+    "Brünhilda"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a nevelőapja Octavianusnak?",
+   "valaszok": [
+    "Cornelius Scipio",
+    "Julius Caesar",
+    "Caligula",
+    "Nero"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a római császár Jézus születése idején?",
+   "valaszok": [
+    "Augustus",
+    "Traianus",
+    "Claudius",
+    "Marcus Aurelius"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt a turini remete?",
+   "valaszok": [
+    "Deák Ferenc",
+    "Kossuth Lajos",
+    "Mikes Kelemen",
+    "Madách Imre"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az 1849-ben, a magyar szabadságharc leverésére küldött orosz hadsereg főparancsnoka?",
+   "valaszok": [
+    "Gyenyikin",
+    "Kerenszkij",
+    "Paszkievics",
+    "Kolcsak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt az a király, akit a nagy francia forradalom alatt kivégeztek?",
+   "valaszok": [
+    "XIV. Lajos",
+    "XV. Lajos",
+    "XVI. Lajos",
+    "XVIII. Lajos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt az a római császár, aki székhelyét Rómából Bizáncba tette át?",
+   "valaszok": [
+    "Diocletianus",
+    "Vespasianus",
+    "Titusz",
+    "Constantinus"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt az anglikán egyház megalapítója?",
+   "valaszok": [
+    "I. Erzsébet",
+    "VIII. Henrik",
+    "Oliver Cromwell",
+    "Orániai Vilmos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az apja Don Carlosnak?",
+   "valaszok": [
+    "V. Károly",
+    "II. Ferdinánd",
+    "II. Fülöp",
+    "X. Alfonz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt az az Árpád-házi szent asszony, akinek kötényében a kenyér rózsává változott?",
+   "valaszok": [
+    "Margit",
+    "Gizella",
+    "Erzsébet",
+    "Kunigunda"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt az első köztársasági elnök Magyarországon a II. világháború után?",
+   "valaszok": [
+    "Nagy Ferenc",
+    "Szakasits Árpád",
+    "Dobi István",
+    "Tildy Zoltán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt az utolsó előtti Árpád-házi király?",
+   "valaszok": [
+    "III. László",
+    "IV. Béla",
+    "IV. László",
+    "III. András"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt történetíró az alábbi ókori személyiségek közül?",
+   "valaszok": [
+    "Hérakleitosz",
+    "Hérodotosz",
+    "Anaximandrosz",
+    "Anaxagorász"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki védte Munkács várát 1691-ben a császári csapatok ellen?",
+   "valaszok": [
+    "Bercsényi Miklós",
+    "Zrínyi Miklós",
+    "I. Rákóczi Ferenc",
+    "Zrínyi Ilona"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki állt a kurucok élén az 1680-as évek Habsburg-ellenes harcaiban?",
+   "valaszok": [
+    "Bocskai István",
+    "Thököly Imre",
+    "Hajnóczy József",
+    "Klapka György"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kije volt Kossuth Lajosnak a szabadságharc alatt főápolónőként dolgozó Kossuth Zsuzsanna?",
+   "valaszok": [
+    "anyja",
+    "húga",
+    "lánya",
+    "unokahúga"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik ajándékozták a New York-i Szabadság-szobrot az Egyesült Államoknak?",
+   "valaszok": [
+    "az angol uralkodóház",
+    "a francia nép",
+    "az indián őslakók",
+    "a német nép"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik alapították a mai New York városát?",
+   "valaszok": [
+    "angol fegyencek",
+    "ír földművesek",
+    "holland telepesek",
+    "spanyol hódítók"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik ellen győzedelmeskedtek Montecuccoli csapatai Szentgotthárdnál?",
+   "valaszok": [
+    "poroszok",
+    "franciák",
+    "törökök",
+    "osztrákok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik fedezték fel Grönlandot?",
+   "valaszok": [
+    "vikingek",
+    "hollandok",
+    "spanyolok",
+    "portugálok"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik hordták eredetileg az anorákot?",
+   "valaszok": [
+    "a serpák",
+    "az eszkimók",
+    "a lappok",
+    "a nyenyecek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik jártak át a Sóhajok hídján Velencében?",
+   "valaszok": [
+    "a bírák",
+    "a szűzleányok",
+    "az elítéltek",
+    "a leprások"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik nyerték 1448-ban a rigómezei csatát?",
+   "valaszok": [
+    "a törökök",
+    "a magyarok",
+    "a szerbek",
+    "a románok"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik vagy mik alkották a legyőzhetetlennek hitt Armadát?",
+   "valaszok": [
+    "francia légionáriusok",
+    "spanyol hadihajók",
+    "angol lovagok",
+    "római légiók"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik voltak Fokváros alapítói?",
+   "valaszok": [
+    "német gyarmatosítók",
+    "portugál hajósok",
+    "holland kereskedők",
+    "angol kalózok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik voltak a görögök ellenfelei a thermopülai szorosban vívott csatában?",
+   "valaszok": [
+    "perzsák",
+    "etruszkok",
+    "rómaiak",
+    "punok"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik voltak eredetileg az agent provocateur-ök?",
+   "valaszok": [
+    "bolsevik aktivisták",
+    "titkos rendőrügynökök",
+    "vásári komédiások",
+    "bujdosó bonapartisták"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiknek a hajóhadát nevezték Győzhetetlen Armadának a XVI. században?",
+   "valaszok": [
+    "angolok",
+    "spanyolok",
+    "hollandok",
+    "velenceiek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a felajánlására alapították meg a Nemzeti Múzeumot?",
+   "valaszok": [
+    "Kazinczy Ferenc",
+    "Martinovics Ignác",
+    "Széchényi Ferenc",
+    "Széchenyi István"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a felesége volt Andrássy Katinka, a \"vörös grófnő\"?",
+   "valaszok": [
+    "Andrássy Gyula",
+    "Tisza Kálmán",
+    "Károlyi Mihály",
+    "Eötvös József"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a felesége volt Sarolt?",
+   "valaszok": [
+    "Szent Imre herceg",
+    "Szent István király",
+    "Géza fejedelem",
+    "Álmos vezér"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a felkérése kapott megbízást William Clark a Lánchíd megtervezésére?",
+   "valaszok": [
+    "Széchenyi István",
+    "Kossuth Lajos",
+    "Eötvös József",
+    "Deák Ferenc"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a fia volt I. András és I. Béla magyar király?",
+   "valaszok": [
+    "Ajtony",
+    "Koppány",
+    "Vazul",
+    "Vata"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a kortársa volt Marcus Antonius római politikus, hadvezér?",
+   "valaszok": [
+    "Julius Caesar",
+    "Nero",
+    "Diocletianus",
+    "Romolus Augustulus"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a nevéhez fűződik a kiegyezést követő magyar tanügyi reform?",
+   "valaszok": [
+    "Esterházy Pál",
+    "Eötvös József",
+    "Kemény Zsigmond",
+    "Egressy Gábor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a népi elnevezése volt Szibinyáni Jank?",
+   "valaszok": [
+    "Husz János",
+    "Szapolyai János",
+    "Kapisztrán János",
+    "Hunyadi János"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a szémélyéhez kapcsolható a mondás? \"Ecce homo. (Íme az ember.)\"",
+   "valaszok": [
+    "Julius Caesar",
+    "Pilátus",
+    "Néró",
+    "Heródes"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek adományozta V. Károly német-római császár Málta szigetét?",
+   "valaszok": [
+    "a török népnek",
+    "Velence polgárainak",
+    "a johannita rendnek",
+    "a Habsburg császárnéknak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek az uralkodása alatt győzte le 1588-ban az angol hajóhad a spanyol Armadát?",
+   "valaszok": [
+    "VIII. Henrik",
+    "I. Erzsébet",
+    "I. Jakab",
+    "I. Károly"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek az életében nem jutott fontos szerep Bécsnek?",
+   "valaszok": [
+    "Mátyás király",
+    "Csokonai Vitéz Mihály",
+    "Hadik András",
+    "Bessenyei György"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek írta intelmeit Szent István?",
+   "valaszok": [
+    "unokaöccsének",
+    "fiának",
+    "ispánjainak",
+    "Koppánynak"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit győzött le Árpád a honfoglaláskor a monda szerint?",
+   "valaszok": [
+    "Detrét",
+    "Zalánt",
+    "Ügyeket",
+    "Tar Zerindet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit szokás a niklai remetének emlegetni?",
+   "valaszok": [
+    "Kölcsey Ferencet",
+    "Kossuth Lajost",
+    "Széchenyi Istvánt",
+    "Berzsenyi Dánielt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kitől származik az idézet? \"A haza minden előtt.\"",
+   "valaszok": [
+    "Petőfi Sándor",
+    "Vörösmarty Mihály",
+    "Kölcsey Ferenc",
+    "Rákóczi Ferenc"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Meddig tartott hazánkban a reformkor?",
+   "valaszok": [
+    "az 1848-as forradalomig",
+    "Széchenyi haláláig",
+    "a kiegyezésig",
+    "az I. világháborúig"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mely mai népek ősei voltak a normannok?",
+   "valaszok": [
+    "spanyol, portugál",
+    "lett, litván, lengyel",
+    "svéd, norvég, dán",
+    "mongol, kínai"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely ország partjainál fekszik az 1961-es partraszállásról elhíresült Disznó-öböl?",
+   "valaszok": [
+    "Korea",
+    "Vietnam",
+    "Kuba",
+    "Algéria"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely országnak üzent először hadat az Osztrák-Magyar Monarchia az I. világháborúban?",
+   "valaszok": [
+    "Anglia",
+    "Franciaország",
+    "Oroszország",
+    "Szerbia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mely állam mely korszakát nevezzük viktoriánus kornak?",
+   "valaszok": [
+    "Franciaország, XVII. század",
+    "Anglia, XIX. század",
+    "Németország, XX. század",
+    "Spanyolország, XVIII. század"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik amerikai elnök kényszerült lemondani a Watergate-ügy miatt?",
+   "valaszok": [
+    "Nixon",
+    "Johnson",
+    "Ford",
+    "Reagan"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik amerikai elnöknek kellett lemondania a Watergate-botrány miatt?",
+   "valaszok": [
+    "Gerald Ford",
+    "Jimmy Carter",
+    "Lyndon Johnson",
+    "Richard Nixon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik angol király harcolt a Szentföldön?",
+   "valaszok": [
+    "I. (Hódító) Vilmos",
+    "I. (Oroszlánszívű) Richárd",
+    "VIII. Henrik",
+    "I. Károly"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik angol miniszterlenök kapott lovagi címet az uralkodótol?",
+   "valaszok": [
+    "John Major",
+    "James R. MacDonald",
+    "Winston Churchill",
+    "Neville Chamberlain"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik birodalmat irányította a 9-10. század fordulóján Bölcs Leó?",
+   "valaszok": [
+    "bizánci",
+    "orosz",
+    "frank",
+    "német-római"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik esemény idején élt Julius Haynau?",
+   "valaszok": [
+    "az ónodi országgyűlés",
+    "Mária Terézia esküvője",
+    "a Lánchíd alapkőletétele",
+    "a kiegyezés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik európai állam uralkodói a Grimaldik?",
+   "valaszok": [
+    "Belgium",
+    "Spanyolország",
+    "Monaco",
+    "Norvégia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik földrészen végzett kutatómunkát Kittenberger Kálmán, a neves utazó?",
+   "valaszok": [
+    "Dél-Amerika",
+    "Kelet-Ázsia",
+    "Afrika",
+    "Antarktisz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik háborúban játszott fontos szerepet Ulysses Grant tábornok?",
+   "valaszok": [
+    "amerikai polgárháború",
+    "I. világháború",
+    "II. világháború",
+    "vietnámi háború"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik háborúban vívtak nagy csatát El-Alameinnél?",
+   "valaszok": [
+    "I. római-pun háború",
+    "II. római-pun háború",
+    "I. világháború",
+    "II. világháború"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik híres hajó nem volt vitorlás?",
+   "valaszok": [
+    "Pinta",
+    "Santa Maria",
+    "Mayflower",
+    "Clermont"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik híres tengerész esett el a trafalgari ütközetben?",
+   "valaszok": [
+    "William Baffin",
+    "Sir Francis Drake",
+    "James Cook",
+    "Horatio Nelson"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik hónapban zajlott 1848-ban a pákozdi csata?",
+   "valaszok": [
+    "márciusban",
+    "áprilisban",
+    "szeptemberben",
+    "decemberben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik itáliai városból származott az Anjouk Magyarországon is uralkodó ága?",
+   "valaszok": [
+    "Firenze",
+    "Nápoly",
+    "Milánó",
+    "Velence"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik királyné nem Angliában élt?",
+   "valaszok": [
+    "Medici Katalin",
+    "Aragóniai Katalin",
+    "Howard Katalin",
+    "Parr Katalin"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik királyunk viseli a \"kun\" jelzőt?",
+   "valaszok": [
+    "II. Béla",
+    "III. András",
+    "IV. László",
+    "II. István"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik királyunk vívott győztes csatát Rozgonynál 1312-ben?",
+   "valaszok": [
+    "Szent László",
+    "II. András",
+    "Károly Róbert",
+    "Zsigmond"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik közép-kelet-európai ország 1989-es rendszerváltását nevezik \"bársonyos forradalomnak\"?",
+   "valaszok": [
+    "Magyarország",
+    "Csehszlovákia",
+    "Lengyelország",
+    "Románia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik magyar király alapította a tihanyi apátságot?",
+   "valaszok": [
+    "I. András",
+    "I. Béla",
+    "I. István",
+    "I. László"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik magyar király volt német-római császár is az alábbiak közül?",
+   "valaszok": [
+    "Nagy Lajos",
+    "Zsigmond",
+    "Hunyadi Mátyás",
+    "Szent László"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik magyar miniszterelnök tölötte be tisztségét a 19. században?",
+   "valaszok": [
+    "Münnich Ferenc",
+    "Darányi Kálmán",
+    "Bethlen István",
+    "Lónyai Menyhért"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik mai állam területén találhatók az ókori Karthágó romjai?",
+   "valaszok": [
+    "Görögország",
+    "Líbia",
+    "Törökország",
+    "Tunézia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik miniszteri posztot töltötte be Baross Gábor?",
+   "valaszok": [
+    "közmunka- és közlekedésügyi",
+    "hadügyminiszteri",
+    "külügyminiszteri",
+    "egészségügyi"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik nem egykori portugál gyarmat az alábbiak közül?",
+   "valaszok": [
+    "Angola",
+    "Brazília",
+    "Mozambik",
+    "Peru"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nemzet jeles történelmi alakja Kemál Atatürk?",
+   "valaszok": [
+    "mongol",
+    "török",
+    "egyiptomi",
+    "albán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nép építette a híres Machu Picchut?",
+   "valaszok": [
+    "az aztékok",
+    "az inkák",
+    "a sziúk",
+    "a perzsák"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország királynő volt a 2004 márciusában elhunyt Julianna királynő?",
+   "valaszok": [
+    "Hollandia",
+    "Dánia",
+    "Norvégia",
+    "Belgium"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország kommunista pártjának volt vezetője Todor Zsivkov?",
+   "valaszok": [
+    "Lengyelország",
+    "Bulgária",
+    "Csehszlovákia",
+    "Románia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország köztársasági elnöke Hoszni Mubarak?",
+   "valaszok": [
+    "Egyiptom",
+    "Jemen",
+    "Nigéria",
+    "Algéria"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország miniszterelnöke volt a merénylet áldozatává lett Olof Palme?",
+   "valaszok": [
+    "Törökország",
+    "Svédország",
+    "Norvégia",
+    "Dánia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország trónján ült 2004-ig Norodom Szihanuk?",
+   "valaszok": [
+    "Laosz",
+    "Kambodzsa",
+    "Srí Lanka",
+    "Fülöp-szigetek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország uralkodója volt Krisztina királynő, akit filmen Greta Garbo is megszemélyesített?",
+   "valaszok": [
+    "Norvégia",
+    "Dánia",
+    "Svédország",
+    "Finnország"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország vezetője volt Salvador Allende?",
+   "valaszok": [
+    "Mexikó",
+    "Chile",
+    "Uganda",
+    "Nigéria"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország államfője Moammer Kadhafi?",
+   "valaszok": [
+    "Libanon",
+    "Egyiptom",
+    "Líbia",
+    "Afganisztán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország államfője lett Nelson Mandela, az egykori legendás polgárjogi harcos?",
+   "valaszok": [
+    "Dél-afrikai Köztársaság",
+    "Angola",
+    "Amerikai Egyesült Államok",
+    "Mozambik"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országban kísérleteztek a \"nagy ugrás\" politikájával 1958-61 között?",
+   "valaszok": [
+    "Kuba",
+    "Kína",
+    "Szovjetunió",
+    "Jugoszlávia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban található a németek által lebombázott Guernica?",
+   "valaszok": [
+    "Olaszország",
+    "Spanyolország",
+    "Franciaország",
+    "Lengyelország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban tevékenykedett a \"négyek bandája\"?",
+   "valaszok": [
+    "Amerikai Egyesült Államok",
+    "Szovjetunió",
+    "Kína",
+    "Mexikó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik országban tört ki a bokszerlázadás?",
+   "valaszok": [
+    "India",
+    "Kína",
+    "Japán",
+    "Egyiptom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban uralkodott Hirohito császár?",
+   "valaszok": [
+    "Kínában",
+    "Etiópiában",
+    "Japánban",
+    "Indonéziában"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik országot nevezik latinul Helvéciának?",
+   "valaszok": [
+    "Csehországot",
+    "Franciaországot",
+    "Romániát",
+    "Svájcot"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik pápa hajtott végre naptárreformot?",
+   "valaszok": [
+    "XIII. Gergely",
+    "VII. Gergely",
+    "III. Ince",
+    "II. Orbán"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik párt nyerte meg az 1945-ös országgyűlési választásokat Magyarországon?",
+   "valaszok": [
+    "Független Kisgazdapárt",
+    "Magyar Kommunista Párt",
+    "Szociáldemokrata Párt",
+    "Nemzeti Parasztpárt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik történelmi hírességünk született Victor Hugóval egy esztendőben?",
+   "valaszok": [
+    "Zrínyi Miklós",
+    "Thököly Imre",
+    "II. Rákóczi Ferenc",
+    "Kossuth Lajos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik uralkodónk látogatására készült a váci diadalív?",
+   "valaszok": [
+    "II. József",
+    "Ferenc József",
+    "Mária Terézia",
+    "I. Ferenc"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik uralkodóról készült fénykép az alábbiak közül?",
+   "valaszok": [
+    "Mária Terézia",
+    "Viktória királynő",
+    "Stuart Mária",
+    "Nagy Katalin"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik várat védte a törököktől Dugovics Titusz?",
+   "valaszok": [
+    "Nándorfehérvárat",
+    "Szigetvár",
+    "Eger",
+    "Drégely"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik város római kori neve volt Vindobona?",
+   "valaszok": [
+    "Velence",
+    "Bécs",
+    "München",
+    "Veszprém"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban alakult meg a KGST?",
+   "valaszok": [
+    "Varsó",
+    "Berlin",
+    "Szófia",
+    "Moszkva"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állam császára volt Bíborbanszületett Konstantin?",
+   "valaszok": [
+    "Német-Római Birodalom",
+    "Bizánci Birodalom",
+    "Nyugat-Római Birodalom",
+    "Frank Birodalom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik évben lett Magyarország újra köztársaság?",
+   "valaszok": [
+    "1985.0",
+    "1989.0",
+    "1990.0",
+    "1992.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik évben lett Mihail Gorbacsov a Szovjetunió Kommunista Pártjának főtitkára?",
+   "valaszok": [
+    "1980.0",
+    "1985",
+    "1988",
+    "1990"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik évben volt a csernobili katasztrófa?",
+   "valaszok": [
+    "1979.0",
+    "1983",
+    "1986",
+    "1989"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik évben zajlottak a Nemzeti Kerekasztal tárgyalásai?",
+   "valaszok": [
+    "1987.0",
+    "1989.0",
+    "1991.0",
+    "1994.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik írónk töltötte be a vallás- és közoktatásügyi miniszteri posztot a Batthyány-kormányban?",
+   "valaszok": [
+    "Jókai Mór",
+    "Kemény Zsigmond",
+    "Gyulai Pál",
+    "Eötvös József"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ókori város előkikötője volt Ostia?",
+   "valaszok": [
+    "Athén",
+    "Róma",
+    "Karthágó",
+    "Alexandria"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ókori város pusztult el vulkánkitörés következtében?",
+   "valaszok": [
+    "Alexandria",
+    "Herculaneum",
+    "Szürakuza",
+    "Karthago"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mennyi ideig volt hatalmon Napóleon Elbáról való visszatérése után?",
+   "valaszok": [
+    "két hétig",
+    "egy hónapig",
+    "száz napig",
+    "másfél évig"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a kapcsolat Pollack Mihály és a Nemzeti Múzeum épülete között?",
+   "valaszok": [
+    "ő volt az első igazgatója",
+    "ő tervezte",
+    "adománnyal segítette",
+    "ő restaurálta"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt Vak Bottyán kuruc generális keresztneve?",
+   "valaszok": [
+    "József",
+    "János",
+    "Imre",
+    "István"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mije volt egy hűbérúrnak, ha volt bandériuma?",
+   "valaszok": [
+    "kincstára",
+    "serege",
+    "örököse",
+    "nyári lakja"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mikor halt meg a kürtjéről nevezetes Lehel vezér?",
+   "valaszok": [
+    "Attila korában",
+    "a honfoglalás idején",
+    "Taksony vezér korában",
+    "István uralkodása alatt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor járt Magyarországon Margaret Thatcher brit miniszterelnök?",
+   "valaszok": [
+    "1964.0",
+    "1974.0",
+    "1984.0",
+    "1994.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor koronázták magyar királlyá Ferenc Józsefet?",
+   "valaszok": [
+    "1848-ban",
+    "1849-ben",
+    "1867-ben",
+    "1896-ban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor volt Zrínyi nevezetes szigetvári kirohanása?",
+   "valaszok": [
+    "1456-ban",
+    "1566-ban",
+    "1646-ban",
+    "1686-ban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mikor vívták a francia-spanyol hajóhad vereségével végződő trafalgari ütközetet?",
+   "valaszok": [
+    "a XV. század elején",
+    "a XVII. század elején",
+    "a XIX. század elején",
+    "a XX. század elején"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor építették a Gellért-hegyi Citadellát?",
+   "valaszok": [
+    "a II. világháború után",
+    "a millennium alkalmával",
+    "az 1850-es években",
+    "a török kiűzése után"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor épültek a dolmeneknek nevezett sírépítmények?",
+   "valaszok": [
+    "a kőkorszakban",
+    "az ókor végén",
+    "a középkor elején",
+    "az újkorban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen célra építették az alcázart?",
+   "valaszok": [
+    "bikaviadalok arénájának",
+    "erődített palotának",
+    "jezsuita kolostornak",
+    "az inkvizíció börtönének"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen címet viselt Báthory István erdélyi fejedelem?",
+   "valaszok": [
+    "szász választófejedelem",
+    "horvát bán",
+    "lengyel király",
+    "brandenburgi őrgróf"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen címet viselt a Pákozdnál legyőzött Jellasics?",
+   "valaszok": [
+    "porosz generális",
+    "erdélyi fejedelem",
+    "horvát bán",
+    "császári hadügyminiszter"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen menetelésnek nevezik a kínai kommunista hadsereg 1934-1935-ös hadműveletét?",
+   "valaszok": [
+    "vörös",
+    "véres",
+    "hosszú",
+    "erőltetett"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen miniszter volt a Szovjetunióban 1957 és 1985 között Andrej Gromiko?",
+   "valaszok": [
+    "külügy",
+    "oktatásügy",
+    "pénzügy",
+    "hadügy"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen miniszteri posztot töltött be 1976 és 1980 között Pozsgay Imre?",
+   "valaszok": [
+    "kulturális",
+    "belügyi",
+    "igazságügyi",
+    "honvédelmi"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen miniszteri posztot töltött be Trefort Ágoston?",
+   "valaszok": [
+    "vallás- és közoktatásügy",
+    "hadügy",
+    "pénzügy",
+    "kisebbségügy"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen nemzetiségű volt a középkori reformer, Husz János?",
+   "valaszok": [
+    "cseh",
+    "francia",
+    "porosz",
+    "spanyol"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen néven uralkodott az utolsó XX. századi angol király II. Erzsébet előtt?",
+   "valaszok": [
+    "Jakab",
+    "Vilmos",
+    "Edward",
+    "György"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen származású volt Magellán?",
+   "valaszok": [
+    "német",
+    "olasz",
+    "németalföldi",
+    "portugál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen tárcát vezetett Eötvös József az 1848-as Batthyány-kormányban?",
+   "valaszok": [
+    "belügy",
+    "vallás- és nevelésügy",
+    "igazságügy",
+    "földművelésügy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen építmény része volt a szkéné az ókori görögöknél?",
+   "valaszok": [
+    "színház",
+    "jósda",
+    "fürdő",
+    "lakóház"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miről volt nevezetes az ókorban Delpoi városa?",
+   "valaszok": [
+    "állatvásárairól",
+    "erkölcstelenségéről",
+    "jósdájáról",
+    "szigorú neveléséről"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinált Klapka György 1849. szeptemberében, a világosi fegyverletétel után?",
+   "valaszok": [
+    "börtönben volt",
+    "Komárom várát védte",
+    "emigrált",
+    "csapatokat szervezett"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csináltak a teával az 1773-as \"bostoni teadélutánon\"?",
+   "valaszok": [
+    "elégették",
+    "tengerbe szórták",
+    "megitták",
+    "elásták"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveztek a nagy francia forradalom alatt konventnek?",
+   "valaszok": [
+    "a forradalmi naptárt",
+    "az alkotmányozó gyűlést",
+    "egy kivégzőeszközt",
+    "egy parlamenti csoportot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveztek az ókori Rómában limesnek?",
+   "valaszok": [
+    "a cirkuszi kocsipályát",
+    "a császári palástot",
+    "a birodalom határvonalát",
+    "az útadót"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit neveztek az ókori görög városállamokban agorának?",
+   "valaszok": [
+    "a templomot",
+    "a piacteret",
+    "a főkaput",
+    "a közkutat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miért harcoltak a szüfrazsettek a századfordulón?",
+   "valaszok": [
+    "a fűző ellen",
+    "a női választójogért",
+    "a válás jogáért",
+    "a tanulás jogáért"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Thatcher lemondása, Németország újraegyesítése egyazon esztendőben volt. Melyikben?",
+   "valaszok": [
+    "1989-ben",
+    "1990-ben",
+    "1991-ben",
+    "1992-ben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "\"A cél szentesíti az eszközt.\" Kinek tulajdonítjuk a megállapítást?",
+   "valaszok": [
+    "XIV. Lajos",
+    "Lucrezia Borgia",
+    "Niccolo Machiavelli",
+    "Maximilien Rebespierre"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A világ melyik részén uralkodott az apartheid politika?",
+   "valaszok": [
+    "Közel-Kelet",
+    "Indokína",
+    "Karib-térség",
+    "Dél-Afrika"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbi népek közül kik építettek piramisokat?",
+   "valaszok": [
+    "a busmanok",
+    "a maják",
+    "a vikingek",
+    "a hunok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbi építmények közül melyik nem tartozott az ókori világ hét csodája közé?",
+   "valaszok": [
+    "epheszoszi Artemisz-templom",
+    "halikarnasszoszi mauzóleum",
+    "Pheidiasz Zeusz-szobra",
+    "Salamon temploma"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik városunkban nem található minaret?",
+   "valaszok": [
+    "Pécs",
+    "Veszprém",
+    "Érd",
+    "Eger"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezték a rabszolgát az ókori Spártában?",
+   "valaszok": [
+    "ephorosz",
+    "perioikosz",
+    "geruszia",
+    "helóta"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan halt meg Horthy István, Horthy Miklós idősebb fia?",
+   "valaszok": [
+    "hadifogságban",
+    "tengeri csatában",
+    "repülőgép-balesetben",
+    "vadászbalesetben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan halt meg Stuart Mária?",
+   "valaszok": [
+    "lovas balesetben",
+    "kivégezték",
+    "csatatéren",
+    "pestisben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezik IV. Fülöp francia királyt?",
+   "valaszok": [
+    "Merész Fülöp",
+    "Szép Fülöp",
+    "Civakodó Fülöp",
+    "Kopasz Fülöp"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezik a Mária Terézia körül kialakult magyar írói kört?",
+   "valaszok": [
+    "tereziánusok",
+    "testőrírók",
+    "udvarnokok",
+    "bécsi irodalombarátok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezték a kozák katonai parancsnokot?",
+   "valaszok": [
+    "kelevéz",
+    "atamán",
+    "atanáz",
+    "ottomán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol feküdt Rákos mezeje, középkori országgyűléseink helyszíne?",
+   "valaszok": [
+    "Pozsony közelében",
+    "Pest közelében",
+    "Esztergom közelében",
+    "Veszprém közelében"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol halt meg Bonaparte Napóleon?",
+   "valaszok": [
+    "Korzikán",
+    "Elba-szigetén",
+    "Mallorcán",
+    "Szent Ilona-szigetén"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol halt meg a XVII. századi költő-hadvezér, Zrínyi Miklós?",
+   "valaszok": [
+    "csatamezőn",
+    "vadászaton",
+    "börtönben",
+    "száműzetésben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol látható I. András király sírja?",
+   "valaszok": [
+    "az esztergomi bazilikában",
+    "a székesfehérvári romkertben",
+    "a tihanyi apátságban",
+    "a Mátyás-templomban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol rendezték meg az Európai Biztonsági és Együttműködési Értekezletet 1975-ben?",
+   "valaszok": [
+    "Washington",
+    "Párizs",
+    "Genf",
+    "Helsinki"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol történt a \"pálfordulás\"?",
+   "valaszok": [
+    "Tarsusban",
+    "Jeruzsálemben",
+    "a damaszkuszi úton",
+    "a Rómába vezető úton"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol vívták a népek csatájaként ismertté vált ütközetet?",
+   "valaszok": [
+    "Várnában",
+    "Waterloonál",
+    "Philippinél",
+    "Lipcsénél"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hova ment az ókori görög, ha a hippodromba igyekezett?",
+   "valaszok": [
+    "fürdőbe",
+    "lóversenypályára",
+    "könyvtárba",
+    "bíróságra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány kötetből állt megközelítőleg Mátyás király híres könyvgyűjteménye, a Bibliotheca Corviniana?",
+   "valaszok": [
+    "500",
+    "2500",
+    "25000",
+    "50000"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány magyar király uralkodott Lipót néven?",
+   "valaszok": [
+    "egy",
+    "kettő",
+    "három",
+    "négy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány magyar király uralkodott Ulászló néven?",
+   "valaszok": [
+    "egy",
+    "kettő",
+    "három",
+    "négy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány magyar király uralkodott a XI. században?",
+   "valaszok": [
+    "2.0",
+    "5.0",
+    "9.0",
+    "14.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány évig létezett az Osztrák-Magyar Monarchia?",
+   "valaszok": [
+    "377.0",
+    "207.0",
+    "69.0",
+    "51.0"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány évig uralkodott az utolsó magyar király, IV. Károly?",
+   "valaszok": [
+    "2.0",
+    "6.0",
+    "10.0",
+    "14.0"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hányan képviselik Magyarországot az Európai Parlamentben?",
+   "valaszok": [
+    "12.0",
+    "18.0",
+    "24.0",
+    "32.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki a szerzője a \"Húsvéti cikk\" néven emlegetett történelmi dokumentumnak?",
+   "valaszok": [
+    "Kossuth Lajos",
+    "Deák Ferenc",
+    "Németh László",
+    "Jászi Oszkár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki alapította keszthelyi Georgikont?",
+   "valaszok": [
+    "Festetics György",
+    "Esterházy Móric",
+    "Széchényi Ferenc",
+    "Savoyai Jenő"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki az a francia forradalmár, akit Charlotte Corday gyilkolt meg?",
+   "valaszok": [
+    "Marat",
+    "Robespierre",
+    "Danton",
+    "Saint-Just"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki az az angol költő, aki a görög szabadságharcban vesztette életét?",
+   "valaszok": [
+    "Byron",
+    "Shelley",
+    "Milton",
+    "Coleridge"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki fedezte fel Trója állítólagos romjait?",
+   "valaszok": [
+    "Champollion",
+    "Homérosz",
+    "Schliemann",
+    "Evans"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki győzött a Falkland-szigetekért folytatott háborúban 1982-ben?",
+   "valaszok": [
+    "Franciaország",
+    "Argentína",
+    "Spanyolország",
+    "Nagy-Britannia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki jelenleg a német kancellár?",
+   "valaszok": [
+    "Joschka Fischer",
+    "Helmut Kohl",
+    "Gerhard Schröder",
+    "Johannes Rau"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki kiáltotta ki 1989. október 23-án a Magyar Köztársaságot?",
+   "valaszok": [
+    "Göncz Árpád",
+    "Szűrös Mátyás",
+    "Pozsgay Imre",
+    "Szabad György"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki kérdezte kitől a legenda szerint? \"Quo vadis, Domine?\" (Hová mész, uram?)",
+   "valaszok": [
+    "Seneca Nero császártól",
+    "egy gladiátor Augustustól",
+    "Péter apostol Jézustól",
+    "Ben Hur Messalától"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki követte közvetlenül Szent Isvánt a trónon?",
+   "valaszok": [
+    "I. András",
+    "Orseolo Péter",
+    "I. Béla",
+    "Szent László"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki lett Leonyid Brezsnyev utóda a szovjet pártvezetés élén?",
+   "valaszok": [
+    "Andrej Gromiko",
+    "Jurij Andropov",
+    "Konsztantyin Csernyenko",
+    "Mihail Gorbacsov"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki lett Sztálin utóda a szovjet kommunista párt élén?",
+   "valaszok": [
+    "Andrej Gromiko",
+    "Nyikita Hruscsov",
+    "Georgij Malenkov",
+    "Leonyid Brezsnyev"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem a XVII. század szülötte az alábbiak közül?",
+   "valaszok": [
+    "II. Rákóczi Ferenc",
+    "Bonaparte Napóleon",
+    "XIV. Lajos (a Napkirály)",
+    "Nagy Péter orosz cár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem kapott Nobel-békedíjat?",
+   "valaszok": [
+    "Jichak Rabin",
+    "Teréz anya",
+    "Anvar Szadat",
+    "Francois Mitterand"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem láthatta az első balatoni gőzhajó, a Kisfaludy vízre bocsátását?",
+   "valaszok": [
+    "Katona József",
+    "Széchenyi István",
+    "Kossuth Lajos",
+    "Petőfi Sándor"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem vett részt Camp David-i béketárgyaláson?",
+   "valaszok": [
+    "Jimmy Carter",
+    "Anvar Szadat",
+    "Menáhem Begin",
+    "Jasszer Arafat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nevezte ki magyar miniszterelnökké Batthyány Lajost?",
+   "valaszok": [
+    "II. Lipót",
+    "I. Ferenc",
+    "V. Ferdinánd",
+    "Ferenc József"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki rendelte el a betlehemi gyermekgyilkosságokat a Biblia szerint?",
+   "valaszok": [
+    "Kajafás",
+    "Pilátus",
+    "Heródes",
+    "Augustus"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki tette hivatalos vallássá a kereszténységet az ókori Rómában?",
+   "valaszok": [
+    "Augustus",
+    "Diocletianus",
+    "Tiberius",
+    "Constantinus"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki vett részt az alábbiak közül a nándorfehérvári ütközetben?",
+   "valaszok": [
+    "Szapolyai János",
+    "Hunyadi László",
+    "Szilágyi Mihály",
+    "Csák Máté"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki vezette a magyar seregeket a segesvári ütközetben?",
+   "valaszok": [
+    "Perczel Mór",
+    "Damjanich János",
+    "Bem József",
+    "Dembinszky Henrik"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt Bill Clinton republikánus ellenfele az 1992-es amerikai elnökválasztáson?",
+   "valaszok": [
+    "Michael Dukakis",
+    "Al Gore",
+    "Dick Cheney",
+    "George Bush"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt Hunyadi János fiainak nevelője?",
+   "valaszok": [
+    "Janus Pannonius",
+    "Vitéz János",
+    "Johannes Regiomontanus",
+    "Bátor Johann"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Hunyadi László menyasszonya Erkel Ferenc operájában?",
+   "valaszok": [
+    "Cillei Ulrika",
+    "Gara Mária",
+    "Podjebrád Katalin",
+    "Báthory Mária"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt I. Erzsébet angol királynő édesanyja?",
+   "valaszok": [
+    "Stuart Mária",
+    "Boleyn Anna",
+    "Viktória",
+    "Véres Mária"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Magyarország miniszterelnöke 1975 és 1987 között?",
+   "valaszok": [
+    "Grósz Károly",
+    "Lázár György",
+    "Fock Jenő",
+    "Kádár János"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Menelaosz király felesége?",
+   "valaszok": [
+    "Pénelopé",
+    "Léda",
+    "Helené",
+    "Perszephoné"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt Nagy-Britannia miniszterelnöke a Falkland-szigeteki háború idején?",
+   "valaszok": [
+    "Sir Winston Churchill",
+    "John Major",
+    "Margaret Thatcher",
+    "Harold Wilson"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt a Szovjetunió Komminista Pártjának főtitkára az 1980-as moszkvai olimpia idején?",
+   "valaszok": [
+    "Nyikita Hruscsov",
+    "Leonyid Brezsnyev",
+    "Mihail Gorbacsov",
+    "Konsztantyin Csernyenko"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a magyar országgyűlés elnöke 1994 és 1998 között?",
+   "valaszok": [
+    "Gál Zoltán",
+    "Szabad György",
+    "Göncz Árpád",
+    "Pozsgay Imre"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt a mondák szerint a Himnuszból is ismert Bendegúz?",
+   "valaszok": [
+    "Attila apja",
+    "Álmos apja",
+    "Árpád apja",
+    "Géza apja"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt a szabadságharc tábornokának, Perczel Mórnak a gyermekkori nevelője?",
+   "valaszok": [
+    "Orlai Petrich Soma",
+    "Erkel Ferenc",
+    "Vörösmarty Mihály",
+    "Kossuth Lajos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt az ENSZ első főtitkára?",
+   "valaszok": [
+    "U Thant",
+    "Trygve Lie",
+    "Dag Hammarskjöld",
+    "Pérez de Cuéllar"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az USA elnöke az 1956-os magyar forradalom idején?",
+   "valaszok": [
+    "Eisenhower",
+    "Nixon",
+    "Kennedy",
+    "Truman"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt az anglikán egyház alapítója?",
+   "valaszok": [
+    "VIII. Henrik",
+    "Morus Tamás",
+    "Rotterdami Erasmus",
+    "I. Erzsébet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt az első európai, aki eljutott Kínába?",
+   "valaszok": [
+    "Marco Polo",
+    "Abel Tasman",
+    "Ferdinand Magellán",
+    "James Cook"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt az első francia király Napóleon bukása után?",
+   "valaszok": [
+    "XVI. Lajos",
+    "XVIII. Lajos",
+    "X. Károly",
+    "Lajos Fülöp"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az első magyar kormányzó?",
+   "valaszok": [
+    "Zrínyi Miklós",
+    "II. Rákóczi Ferenc",
+    "Hunyadi János",
+    "Géza fejedelem"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt az orosz cár a Rákóczi-szabadságharc idején?",
+   "valaszok": [
+    "Rettegett Iván",
+    "Nagy Péter",
+    "Nagy Katalin",
+    "II. Sándor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki építette Dzsószer fáraó szakkarai lépcsős piramisát?",
+   "valaszok": [
+    "Hammurápi",
+    "Imhotep",
+    "Ehnaton",
+    "Nabukodonozor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kije vagy mije volt Caligulának Incitatus?",
+   "valaszok": [
+    "fogadott fia",
+    "lova",
+    "rabszolgája",
+    "gyilkosa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kije volt II. Rákóczi Ferencnek II. Rákóczi György erdélyi fejedelem?",
+   "valaszok": [
+    "dédapja",
+    "nagyapja",
+    "apja",
+    "testvére"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kije volt a miniszterelnök Tisza Kálmánnak a miniszterelnök Tisza István?",
+   "valaszok": [
+    "apja",
+    "fia",
+    "unokatestvére",
+    "testvére"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kije volt az ugyancsak merényletben elhunyt Robert Kennedy J. F. Kennedynek?",
+   "valaszok": [
+    "bátyja",
+    "unokaöccse",
+    "öccse",
+    "fia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik dúlták fel Kijevet a XIII. század derekán?",
+   "valaszok": [
+    "varégek",
+    "tatárok",
+    "törökök",
+    "alánok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik harcoltak a rózsák háborújában?",
+   "valaszok": [
+    "angolok franciák ellen",
+    "angolok angolok ellen",
+    "magyarok törökök ellen",
+    "törökök osztrákok ellen"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik robbantották ki az 1831-es lyoni felkelést?",
+   "valaszok": [
+    "bányászok",
+    "takácsok",
+    "asztalosok",
+    "kőfaragók"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik utzatak a Mayflower nevű hajón?",
+   "valaszok": [
+    "Magellán hajósai",
+    "az első amerikai telepesek",
+    "az Onassis család",
+    "Cook kapitány matrózai"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik voltak az iszlám uralkodók testőrei?",
+   "valaszok": [
+    "az eunuchok",
+    "a mamelukok",
+    "az effendik",
+    "a kádik"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik éltek a Kárpát-medencében az alábbiak közül?",
+   "valaszok": [
+    "médek",
+    "parthusok",
+    "szárdok",
+    "kabarok"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a jelmondata volt: \"Jó szerencse, semmi más.\"",
+   "valaszok": [
+    "Thököly Imre",
+    "Hunyadi János",
+    "II. Rókóczi Ferenc",
+    "Zrínyi Miklós"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a korában játszódik Jókai Mór Szeretve mind a vérpadig című regénye?",
+   "valaszok": [
+    "Hunyadi János",
+    "II. Lajos",
+    "Bethlen Gábor",
+    "II. Rákóczi Ferenc"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a nevéhez fűződik a Julianus-naptár?",
+   "valaszok": [
+    "Julianus barát",
+    "Julius Caesar",
+    "Justinianus császár",
+    "Gergely pápa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a nevéhez fűződik a mondás? \"Jöttem, láttam, győztem.\"",
+   "valaszok": [
+    "Julius Caesar",
+    "Kolumbusz",
+    "Nagy Sándor",
+    "Napóleon"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a születésnapja alkalmából indult a 70-es trolibuszjárat Budapesten?",
+   "valaszok": [
+    "Sztálin",
+    "Rákosi Mátyás",
+    "Hruscsov",
+    "Lenin"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a tiszteletére emelték az ókori görögök az athéni Parthenont?",
+   "valaszok": [
+    "Periklész",
+    "Héra",
+    "Pallasz Athéné",
+    "Zeusz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek az apja volt Hamilcar Barkas?",
+   "valaszok": [
+    "Dareiosz",
+    "Hammurapi",
+    "Asóka",
+    "Hannibál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kit győzött le a lipcsei csatamezőn a híres hadvezér, Blücher?",
+   "valaszok": [
+    "Sándor orosz cárt",
+    "Nelson admirálist",
+    "Napóleont",
+    "II. Frigyest"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit győzött le az 1960-as elnökválasztáson minimális különbséggel J. F. Kennedy?",
+   "valaszok": [
+    "Richard Nixont",
+    "Gerald Fordot",
+    "Lyndon B. Johnsont",
+    "Jimmy Cartert"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kit neveztek a spanyol és a portugál királyi udvarban infánsnőnek?",
+   "valaszok": [
+    "a király ágyasait",
+    "a királyi hercegnőket",
+    "a szakácsnőket",
+    "az udvarhölgyeket"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit ütött le Lehel a kürtjével a monda szerint?",
+   "valaszok": [
+    "a kijevi fejedelmet",
+    "a bizánci császárt",
+    "a német királyt",
+    "a tatár kánt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kivel kötött paktumot Molotov szovjet külügyminiszter 1939 augusztusában?",
+   "valaszok": [
+    "Keitellel",
+    "Göringgel",
+    "Ribbentroppal",
+    "Clemenceau-val"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely nép uralkodói voltak a Karagyorgyevicsek?",
+   "valaszok": [
+    "szerb",
+    "román",
+    "orosz",
+    "albán"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mely ország nem tartozott a II. világháború alatt a tengelyhatalmak közé?",
+   "valaszok": [
+    "Németország",
+    "Japán",
+    "Anglia",
+    "Olaszország"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely város székesegyházában nyugszanak II. Rákóczi Ferenc hamvai?",
+   "valaszok": [
+    "Munkács",
+    "Beregszász",
+    "Lőcse",
+    "Kassa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mely évek fordulóján zajlott a sztálingrádi csata?",
+   "valaszok": [
+    "1941-1942",
+    "1942-1943",
+    "1943-1944",
+    "1944-1945"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik amerikai elnök hirdette meg a New Deal néven emlegetett gazdaságpolitikát?",
+   "valaszok": [
+    "F. D. Roosevelt",
+    "J. F. Kennedy",
+    "H. S Truman",
+    "T. W. Wilson"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik amerikai elnök tett látogatást a berlini falnál 1963-ban?",
+   "valaszok": [
+    "John F. Kennedy",
+    "Lyndon B. Johnson",
+    "Dwight D. Eisenhower",
+    "Richard M. Nixon"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik dinasztia kiemelkedő alakja volt Nagy Károly császár?",
+   "valaszok": [
+    "Karoling",
+    "Meroving",
+    "Valois",
+    "Bourbon"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik dinasztia sarjai uralkodtak Bizáncban?",
+   "valaszok": [
+    "Flavius",
+    "Severus",
+    "Valentinianus",
+    "Laszkarisz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik dinasztiából nem került ki lengyel király?",
+   "valaszok": [
+    "Piast",
+    "Premysl",
+    "Jagelló",
+    "Obrenovic"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy XII. században alakult lovagrend az alábbiak közül?",
+   "valaszok": [
+    "stephanita",
+    "johannita",
+    "jakobiánus",
+    "karteziánus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik esemény történt Kr. e. a 8. században az alábbiak közül?",
+   "valaszok": [
+    "Bábel tornyának leomlása",
+    "a gizahi piramis építése",
+    "az első olimpia megrendezése",
+    "Nagy Sándor hadjárata"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik esemény után alkalmazták a magyar közéletben a passzív ellenállás politikáját?",
+   "valaszok": [
+    "a mohácsi csata",
+    "a Rákóczi-szabadságharc",
+    "az 1848-as szabadságharc",
+    "a kiegyezés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik európai ország nem írta alá az 1975-ös helsinki konferencia záródokumentumát?",
+   "valaszok": [
+    "Albánia",
+    "Jugoszlávia",
+    "Svájc",
+    "Spanyolország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik európai színésznő lett országa kulturális minisztere?",
+   "valaszok": [
+    "Gina Lollobrigida",
+    "Melina Mercouri",
+    "Sophia Loren",
+    "Irene Papas"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik görög városállam vezetője volt Periklész?",
+   "valaszok": [
+    "Spárta",
+    "Athén",
+    "Mükéné",
+    "Milétosz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik háborúban harcolnak Michael Cimino A szarvasvadász című filmjének hősei?",
+   "valaszok": [
+    "a II. világháborúban",
+    "a koreai háborúban",
+    "az Öböl-háborúban",
+    "a vietnami háborúban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik királyt szolgálta Dumas három testőre?",
+   "valaszok": [
+    "VI. Fülöp",
+    "XIII. Lajos",
+    "XIV. Lajos",
+    "Lajos Fülöp"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik királyunk fulladt a mohácsi csata idején a Csele-patakba?",
+   "valaszok": [
+    "II. Lajos",
+    "I. Lajos",
+    "II. Ulászló",
+    "I. Ulászló"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik korszakban harcolt Lebstück Mária főhadnagy?",
+   "valaszok": [
+    "Rákóczi-szabadságharc",
+    "I. világháború",
+    "1848-49-es szabadságharc",
+    "Eger 1552-es ostroma"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik mai ország uralkodói származnak a Bernadotte-házból?",
+   "valaszok": [
+    "Spanyolország",
+    "Belgium",
+    "Svédország",
+    "Dánia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik miniszteri tárcát kapta meg Mádl Ferenc 1993-ban?",
+   "valaszok": [
+    "igazságügyi",
+    "művelődési és közoktatási",
+    "pénzügyi",
+    "ipari és kereskedelmi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem volt perzsa király az alábbiak közül?",
+   "valaszok": [
+    "Kürosz",
+    "Philipposz",
+    "Dareiosz",
+    "Xerxész"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik neves történelmi személyünk szülőhelye Borsi?",
+   "valaszok": [
+    "Hunyadi János",
+    "II. Rákóczi Ferenc",
+    "Széchenyi István",
+    "Kossuth Lajos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nép egyik ismert képviselője volt Vörös Erik, a felfedező?",
+   "valaszok": [
+    "szárd",
+    "kelta",
+    "viking",
+    "frank"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nép vezetője volt a mondákból ismert Szvatopluk?",
+   "valaszok": [
+    "besenyő",
+    "bolgár",
+    "kazár",
+    "morva"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország alakult meg 1971-ben Kelet-Pakisztánból",
+   "valaszok": [
+    "Mianmar",
+    "Banglades",
+    "Sri Lanka",
+    "Laosz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország budapesti nagykövetségén élt éveken át 1956 után Mindszenty József?",
+   "valaszok": [
+    "Franciaország",
+    "Nagy-Britannia",
+    "NSZK",
+    "USA"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország diktátora volt Franco tábornok?",
+   "valaszok": [
+    "Portugália",
+    "Argentína",
+    "Spanyolország",
+    "Uruguay"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország elnöke volt 1960-tól Makariosz érsek?",
+   "valaszok": [
+    "Görögország",
+    "Fülöp-szigetek",
+    "Ciprus",
+    "Mexikó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország elnöke volt Kim Ir Szen?",
+   "valaszok": [
+    "Kína",
+    "Észak-Korea",
+    "Mongólia",
+    "Vietnam"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország kormányfője volt Vidkun Quisling a II. világháború alatt?",
+   "valaszok": [
+    "Franciaország",
+    "Norvégia",
+    "Belgium",
+    "Olaszország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország köztársasági elnöke volt a merénylet áldozatául esett Anvar Szadat?",
+   "valaszok": [
+    "Szíria",
+    "Egyiptom",
+    "Szudán",
+    "Fülöp-szigetek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország maradt semleges az I. világháborúban?",
+   "valaszok": [
+    "Bulgária",
+    "Norvégia",
+    "Olaszország",
+    "Románia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország miniszterelnöke volt Golda Meir?",
+   "valaszok": [
+    "India",
+    "Izrael",
+    "Dél-afrikai Köztársaság",
+    "Argentína"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország nem volt alapító tagja az Európai Unió elődjének, az EGK-nak?",
+   "valaszok": [
+    "Írország",
+    "Franciaország",
+    "Németország",
+    "Olaszország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országban uralkodott Podjebrád György?",
+   "valaszok": [
+    "Oroszország",
+    "Csehország",
+    "Szerbia",
+    "Lengyelország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik pápa avatta szentté I. Istvánt?",
+   "valaszok": [
+    "II. Szilveszter",
+    "VII. Gergely",
+    "II. Orbán",
+    "III. Kelemen"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik párt vezető személyisége volt Kéthly Anna?",
+   "valaszok": [
+    "Felirati Párt",
+    "Szabadelvű Párt",
+    "MSZDP",
+    "FKgP"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik tudományág nem tartozott bele az ókori hét szabad művészetbe?",
+   "valaszok": [
+    "aritmetika",
+    "asztronómia",
+    "mechanika",
+    "geometria"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik uralkodói családba tartozott a Magyarország ügyeit 1437-39-ben irányító Albert király?",
+   "valaszok": [
+    "Habsburg",
+    "Jagelló",
+    "Luxemburgi",
+    "Anjou"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik volt spanyol gyarmat az alábbiak közül?",
+   "valaszok": [
+    "India",
+    "Fülöp-szigetek",
+    "Laosz",
+    "Guinea"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban lőtték le John Fitzgerald Kennedyt?",
+   "valaszok": [
+    "Las Vegasban",
+    "Chicagóban",
+    "Bostonban",
+    "Dallasban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városban voltak \"fogságban\" a pápák a 14. században?",
+   "valaszok": [
+    "Canossa",
+    "Ravenna",
+    "Reims",
+    "Avignon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városban végezte karitatív tevékenységét Teréz anya?",
+   "valaszok": [
+    "Madras",
+    "Bombay",
+    "Delhi",
+    "Kalkutta"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állam nem volt alapító tagja az Európai Uniónak?",
+   "valaszok": [
+    "Ausztria",
+    "Belgium",
+    "Németország",
+    "Olaszország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik évben hagyta el Magyarországot az utolsó szovjet katona?",
+   "valaszok": [
+    "1989.0",
+    "1990.0",
+    "1991.0",
+    "1992.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik évben vezették be Magyarországon az új forintot?",
+   "valaszok": [
+    "1948-ban",
+    "1950-ben",
+    "1946-ban",
+    "1949-ben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik évben volt a Rajk-per Magyarországon?",
+   "valaszok": [
+    "1946-ban",
+    "1948-ban",
+    "1949-ben",
+    "1953-ban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik évben voltak a \"prágai tavasz\" eseményei?",
+   "valaszok": [
+    "1956.0",
+    "1968.0",
+    "1973.0",
+    "1985.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyikük nem volt a másik három kortársa?",
+   "valaszok": [
+    "Kopernikusz",
+    "Luther",
+    "Gutenberg",
+    "Magellán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi az egykori Kelet-Pakisztán mai neve?",
+   "valaszok": [
+    "Kambodzsa",
+    "Thaiföld",
+    "Banglades",
+    "Malajzia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi pusztított Pesten 1838-ban?",
+   "valaszok": [
+    "pestis",
+    "földrengés",
+    "árvíz",
+    "tűzvész"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt a hivatalos pénznem hazánkban 1927 és 1946 között?",
+   "valaszok": [
+    "dukát",
+    "dénár",
+    "korona",
+    "pengő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi volt a híres betyár, Vidróczki keresztneve?",
+   "valaszok": [
+    "Bertalan",
+    "Márton",
+    "Tamás",
+    "Sándor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt a neve az 1970-es évektől tevékenykedő olaszországi szélsőbaloldali terrorszervezetnek?",
+   "valaszok": [
+    "Vörösingesek",
+    "Vörös Hadsereg",
+    "Vörös Brigádok",
+    "Vörösgárdisták"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt régen a Louvre?",
+   "valaszok": [
+    "királyi palota",
+    "kaszárnya",
+    "börtön",
+    "iskola"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miből készült a XVIII-XIX. századi angol fizetőeszköz, a guinea?",
+   "valaszok": [
+    "rézből",
+    "vasból",
+    "aranyból",
+    "papírból"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miből készült hajón tett kísérletet Thor Heyerdahl az Atlanti-óceán átszelésére?",
+   "valaszok": [
+    "bambusz",
+    "ébenfa",
+    "papirusz",
+    "parafa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor halt meg Giordano Bruno?",
+   "valaszok": [
+    "1200-ban",
+    "1400-ban",
+    "1600-ban",
+    "1800-ban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor lett Mihail Gorbacsov az SZKP Központi Bizottságának főtitkára?",
+   "valaszok": [
+    "1975-ben",
+    "1980-ban",
+    "1985-ben",
+    "1990-ben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor lett a magyar nyelv a közigazgatás, törvényhozás és oktatás hivatalos nyelve hazánkban?",
+   "valaszok": [
+    "Bethlen Gábor idején",
+    "II. Rákóczi Ferenc korában",
+    "a reformkorban",
+    "az I. világháború alatt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor szolgáltatta vissza az Egyesült Államok a koronát Magyarországnak?",
+   "valaszok": [
+    "1965",
+    "1971",
+    "1978.0",
+    "1989.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor született tragikus sorsú miniszterelnökünk, Nagy Imre?",
+   "valaszok": [
+    "1886.0",
+    "1896.0",
+    "1906.0",
+    "1916.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mikor tette kötelezővé rendelet Magyarországon az SI mértékegységrendszer használatát?",
+   "valaszok": [
+    "1952.0",
+    "1965.0",
+    "1976.0",
+    "1989.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor tette meg történelmi jelentőségű útját a Mayflower vitorlás hajó?",
+   "valaszok": [
+    "1492-ben",
+    "1620-ban",
+    "1690-ben",
+    "1789-ben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mikor történt a híres Hindenburg léghajó katasztrófája?",
+   "valaszok": [
+    "1905-ben",
+    "1915-ben",
+    "1937-ben",
+    "1947-ben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen feladatot láttak el a székelyek a középkori magyar királyságban?",
+   "valaszok": [
+    "sót bányásztak",
+    "a határt őrízték",
+    "marhával kereskedtek",
+    "királyi írnokok voltak"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen miniszteri posztott töltött be Hóman Bálint?",
+   "valaszok": [
+    "pénzügy",
+    "vallás- és közoktatásügy",
+    "külügy",
+    "hadügy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nemzetiségű volt a 2003-ban meggyilkolt Anna Lindin külügyminiszter?",
+   "valaszok": [
+    "holland",
+    "norvég",
+    "svéd",
+    "dán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nemzetiségű volt a híres felfedező, Vitus Bering?",
+   "valaszok": [
+    "portugál",
+    "olasz",
+    "német",
+    "dán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen származású volt Marco Polo, a híres utazó?",
+   "valaszok": [
+    "velencei",
+    "genovai",
+    "római",
+    "nápolyi"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen tisztséget töltött be Benyovszky Móric Madagaszkár szigetén?",
+   "valaszok": [
+    "sah",
+    "szultán",
+    "király",
+    "seriff"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miért kellett lemondania a trónról VIII. Edward angol király?",
+   "valaszok": [
+    "kétes származása miatt",
+    "elborult az elméje",
+    "elvált nőt akart feleségül venni",
+    "hazaárulással vádolták"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mióta fizetünk Magyarországon általános forgalmi adót, azaz áfát?",
+   "valaszok": [
+    "1968.0",
+    "1978.0",
+    "1988.0",
+    "1998.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "\"Canossát jár.\"-mondják a vezeklő emberre. Minek vagy kinek a neve volt eredetileg Canossa?",
+   "valaszok": [
+    "egy pápáé",
+    "egy császáré",
+    "egy kínzóeszközé",
+    "egy váré"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A Zrínyi család mely tagja volt Zrínyi Ilona apja?",
+   "valaszok": [
+    "Miklós, a szigetvári hős",
+    "Miklós, az eposzíró",
+    "György, horvát bán",
+    "Péter, horvát bán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A felsoroltak közül ki nem volt pénzügyminiszter?",
+   "valaszok": [
+    "Bokros Lajos",
+    "Rabár Ferenc",
+    "Surányi György",
+    "Medgyessy Péter"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik a honfoglaló magyarság egyik főméltósági címe?",
+   "valaszok": [
+    "keszi",
+    "kolos",
+    "horka",
+    "zolta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy hívják II. Erzsébet brit uralkodónő férjét?",
+   "valaszok": [
+    "András",
+    "György",
+    "Károly",
+    "Fülöp"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy hívták Indira Gandhi fiát, aki később szintén merénylet áldozata lett?",
+   "valaszok": [
+    "Karamcsand Gandhi",
+    "Radzsiv Gandhi",
+    "Csaran Szingh",
+    "Csandra Sékhar"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol gyilkolták meg Erzsébet magyar királynét 1898-ban?",
+   "valaszok": [
+    "Genfben",
+    "Marseille-ben",
+    "Korfun",
+    "Krétán"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol halt meg Tomori Pál, a mohácsi csata magyar hadvezére?",
+   "valaszok": [
+    "a mohácsi csatamezőn",
+    "a kufsteini várbörtönben",
+    "Szapolyai táborában",
+    "Szulejmán táborában"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol koronázták meg Szent Istvánt?",
+   "valaszok": [
+    "Fehérváron",
+    "Veszprémben",
+    "Esztergomban",
+    "Pannonhalmán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol lőtték le Abraham Lincolnt?",
+   "valaszok": [
+    "Los Angelesben",
+    "Washingtonban",
+    "Atlantában",
+    "Chicagóban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol tört ki parasztfelkelés Budai Nagy Antal vezetésével?",
+   "valaszok": [
+    "Budán",
+    "Békésben",
+    "Erdélyben",
+    "Nyugat-Dunántúlon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol volt 1991-ben Magyarország, Csehszlovákia és Lengyelország vezetőinek csúcstalálkozója?",
+   "valaszok": [
+    "Székesfehérvárott",
+    "Budapesten",
+    "Visegrádon",
+    "Esztergomban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol volt a minószi kultúra központja?",
+   "valaszok": [
+    "Krétán",
+    "Számoszon",
+    "Ródoszon",
+    "Déloszon"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol állnak Drégely várának romjai?",
+   "valaszok": [
+    "a szlovák határ mellett",
+    "az osztrák határ mellett",
+    "a szlovén határ mellett",
+    "a horvát határ mellett"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol élnek nyelvrokonaink, az osztjákok?",
+   "valaszok": [
+    "Szibériában",
+    "a Baltikumban",
+    "a Balkán-félszigeten",
+    "Kis-Ázsiában"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol építtetett magának kastélyt Erzsébet királyné (Sisi)?",
+   "valaszok": [
+    "a Loire mellett",
+    "Róma külvárosában",
+    "Szentpéterváron",
+    "Korfu szigetén"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol ölték meg Lincoln amerikai elnököt?",
+   "valaszok": [
+    "egy nyitott autóban",
+    "egy színházban",
+    "az utcán",
+    "egy nagygyűlésen"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Honnan indult első útjára az első balatoni gőzhajó?",
+   "valaszok": [
+    "Balatonfüred",
+    "Siófok",
+    "Fonyód",
+    "Keszthely"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Honnan kapta nevét az Oszmán Birodalom?",
+   "valaszok": [
+    "egy népcsoportról",
+    "egy folyóról",
+    "egy prófétáról",
+    "az első szultánról"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hová vezetett az a hadiút, melyet magyar nyelven említ a tihanyi apátság alapítólevele?",
+   "valaszok": [
+    "Pécsváradra",
+    "Esztergomba",
+    "Óbudára",
+    "Fehérvárra"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány évente választanak köztársasági elnököt Magyarországon?",
+   "valaszok": [
+    "három",
+    "hat",
+    "öt",
+    "négy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány éves korában koronázták meg XIV. Lajos francia királyt?",
+   "valaszok": [
+    "öt",
+    "tizenöt",
+    "huszonöt",
+    "harmincöt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány évig volt Magyarország a Varsói Szerződés tagja?",
+   "valaszok": [
+    "26.0",
+    "36.0",
+    "46.0",
+    "56.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány évig élt Napóleon száműzetésben Szent Ilona szigetén?",
+   "valaszok": [
+    "hat",
+    "tizennyolc",
+    "huszonhat",
+    "harmincnyolc"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hányadik férje volt Napóleon Joséphine császárnénak?",
+   "valaszok": [
+    "első",
+    "második",
+    "harmadik",
+    "negyedik"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki alapította a francia becsületrendet?",
+   "valaszok": [
+    "XIV. Lajos",
+    "Napóleon",
+    "Lajos Fülöp",
+    "IV. (Navarrai) Henrik"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki az a francia király, aki szerint Párizs megér egy misét?",
+   "valaszok": [
+    "Kis Pipin",
+    "IV. Henrik",
+    "XIV. Lajos",
+    "Nagy Károly"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki bocsátotta ki a - katonának állt jobbágyokat a közterhek alól felmentő - vetési pátenst?",
+   "valaszok": [
+    "Dózsa György",
+    "Bocskai István",
+    "II. Rákóczi Ferenc",
+    "Kossuth Lajos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki borult le a nemzet nagysága előtt?",
+   "valaszok": [
+    "Deák Ferenc",
+    "Petőfi Sándor",
+    "Széchenyi István",
+    "Kossuth Lajos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki dönt a parlamenti képviselők mentelmi jogának felfüggesztéséről?",
+   "valaszok": [
+    "a köztársasági elnök",
+    "az Országgyülés",
+    "a miniszterelnök",
+    "az Igazságügyi Minisztérium"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki előtt tette le a fegyvert Dózsa György serege?",
+   "valaszok": [
+    "Szapolyai János",
+    "Werbőczy István",
+    "II. Lajos",
+    "Báthory Zsigmond"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki igázta le a perui inka birodalmat?",
+   "valaszok": [
+    "Cortázar",
+    "Cortez",
+    "Pizarro",
+    "Piscator"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem vehetett részt az 1873-ban kötött, \"három császár szövetsége\" néven ismert egyezményben?",
+   "valaszok": [
+    "I. Ferenc József császár",
+    "I. Vilmos császár",
+    "I. Ferdinánd császár",
+    "II. Sándor cár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem vett részt 1945-ben a jaltai konferencián az alábbi személyek közül?",
+   "valaszok": [
+    "Sztálin",
+    "Churchill",
+    "Truman",
+    "F. D. Roosevelt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem volt orvos az alábbiak közül?",
+   "valaszok": [
+    "Galenus",
+    "Paracelsus",
+    "Comenius",
+    "Vesalius"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki vezette a vesztes seregeket 1848 őszén a pákozdi csatában?",
+   "valaszok": [
+    "Bem",
+    "Görgey",
+    "Metternich",
+    "Jellasics"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt Balassi Bálint feleségének apja?",
+   "valaszok": [
+    "Dobó István",
+    "Bornemissza Péter",
+    "Heltai Gáspár",
+    "Török Bálint"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt Corvin János anyja?",
+   "valaszok": [
+    "Aragóniai Beatrix",
+    "Podjebrád Katalin",
+    "Edelpeck Borbála",
+    "Wolfram Ilona"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt János Zsigmond erdélyi fejedelem apja?",
+   "valaszok": [
+    "I. Ferdinánd",
+    "Szapolyai János",
+    "Werbőczy István",
+    "Martinuzzi György"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Nero császár híres nevelője?",
+   "valaszok": [
+    "Seneca",
+    "Cicero",
+    "Ovidius",
+    "Cato"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt Periklész kortársa?",
+   "valaszok": [
+    "Nero",
+    "Julius Caesar",
+    "Nagy Sándor",
+    "Xerxész"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt a Kínai Kommunista Párt elnöke a II. világháború után?",
+   "valaszok": [
+    "Csang Kaj-sek",
+    "Mao Ce-tung",
+    "Teng Hsziao-ping",
+    "Csao Ce-jang"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a Német Szövetségi Köztársaság kancellárja a berlini fal lebontásakor?",
+   "valaszok": [
+    "Helmut Schmidt",
+    "Gerhard Schröder",
+    "Helmut Kohl",
+    "Willy Brandt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt a Szovjetunió Kommunista Pártjának főtitkára a csernobili atomkatasztrófa idején?",
+   "valaszok": [
+    "Brezsnyev",
+    "Gorbacsov",
+    "Andropov",
+    "Csernyenko"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a két küzdő fél a búr háborúban?",
+   "valaszok": [
+    "angol és francia",
+    "angol és dél-afrikai holland",
+    "német és dél-afrikai holland",
+    "angol és indiai"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a magyar kormányfő a világosi fegyverletételkor?",
+   "valaszok": [
+    "Szemere Bertalan",
+    "Kossuth Lajos",
+    "Batthyány Lajos",
+    "Görgei Artúr"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt a modern izrael állam első miniszterelnöke?",
+   "valaszok": [
+    "Ben Gurion",
+    "Jichák Rabin",
+    "Menáhem Begin",
+    "Golda Meir"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt a második római császár?",
+   "valaszok": [
+    "Hadrianus",
+    "Traianus",
+    "Vespasianus",
+    "Tiberius"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt az 1848-as Batthyány-kormány igazságügy-minisztere?",
+   "valaszok": [
+    "Szemere Bertalan",
+    "Klauzál Gábor",
+    "Kossuth Lajos",
+    "Deák Ferenc"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt az NSZK kancellárja a berlini fal felépítésekor 1961-ben?",
+   "valaszok": [
+    "Willy Brandt",
+    "Ludwig Erhard",
+    "Helmut Schmidt",
+    "Konrad Adenauer"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt az amerikai elnök, amikor az USA belépett az I. világháborúba?",
+   "valaszok": [
+    "Theodore Roosevelt",
+    "William Taft",
+    "Warren Harding",
+    "Woodrow Wilson"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt az anyai nagyapja a Sasfióknak, Napóleon fiának?",
+   "valaszok": [
+    "az osztrák császár",
+    "az angol király",
+    "egy lengyel nemes",
+    "egy francia polgár"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt az első női miniszterelnök egy iszlám ország élén?",
+   "valaszok": [
+    "Benazir Bhutto",
+    "Indira Gandhi",
+    "Corazón Aquino",
+    "Sirimavo Bandaranaike"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt az esztergomi híd kapcsán gyakran emlegetett Mária Valéria?",
+   "valaszok": [
+    "Ferenc József anyja",
+    "Ferenc József húga",
+    "Ferenc József lánya",
+    "Ferenc József felesége"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki építette a Gellért-hegyen álló Citadellát?",
+   "valaszok": [
+    "I. Szulejmán",
+    "Haynau",
+    "Alexander Bach",
+    "Metternich"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki építette a Kr. e. 10. században a jeruzsálemi főtemplomot?",
+   "valaszok": [
+    "Saul",
+    "Salamon",
+    "Sámuel",
+    "Dávid"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki építette a híres spanyol királyi palotát, az Escorialt?",
+   "valaszok": [
+    "Aragóniai Ferdinánd",
+    "Kasztíliai Izabella",
+    "V. Károly",
+    "II. Fülöp"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki építette a visegrádi Királyi palotát első formájában?",
+   "valaszok": [
+    "Károly Róbert",
+    "Nagy Lajos",
+    "Mátyás király",
+    "Luxemburgi Zsigmond"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kije volt Nagy Lajosnak Magyarország királynője, Mária?",
+   "valaszok": [
+    "anyja",
+    "nővére",
+    "lánya",
+    "unokahúga"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kije volt a költő Zrínyi Miklósnak a Bécsújhelyen lefejezett Zrínyi Péter?",
+   "valaszok": [
+    "dédapja",
+    "testvére",
+    "unokaöccse",
+    "nevelt fia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik laktak a Tiltott Városban?",
+   "valaszok": [
+    "mongol kánok",
+    "indiai maharadzsák",
+    "kínai császárok",
+    "tibeti szerzetesek"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik voltak a königgratzi csata vesztesei?",
+   "valaszok": [
+    "oroszok",
+    "osztrákok",
+    "franciák",
+    "poroszok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik voltak a négusok?",
+   "valaszok": [
+    "közép-afrikai törzs",
+    "etióp császárok",
+    "amerikai rabszolgák",
+    "pretoriai polgárjogi harcosok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik voltak az orosz történelemből ismert dekabristák?",
+   "valaszok": [
+    "egy kommunista sejt",
+    "egy festőcsoport",
+    "romantikus zeneszerzők",
+    "cárellenes összeesküvők"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kiknek a viselete volt a khitón?",
+   "valaszok": [
+    "görögök",
+    "egyiptomiak",
+    "kései rómaiak",
+    "hun vezérek"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a kegyencnője volt Madame de Pompadour?",
+   "valaszok": [
+    "VIII. Henrik",
+    "Napóleon",
+    "XV. Lajos",
+    "XIV. Lajos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a kortársa volt Nagy Katalin orosz cárnő?",
+   "valaszok": [
+    "Balassi Bálint",
+    "Zrínyi Miklós",
+    "Csokonai Vitéz Mihály",
+    "Petőfi Sándor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a kortársa volt Vazul?",
+   "valaszok": [
+    "Árpád",
+    "Szent Gellért",
+    "Anonymus",
+    "Julianus barát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a külügyminisztere volt a diplomácia nagymesterének tartott Talleyrand?",
+   "valaszok": [
+    "XIV. Lajos",
+    "Napóleon",
+    "Clemenceau",
+    "De Gaulle"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a lánya volt Marie Antoinette?",
+   "valaszok": [
+    "XVI. Lajos",
+    "I. Frigyes",
+    "Mária Terézia",
+    "II. József"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a nevéhez fűződik a Magna Charta Liberatum kiadása?",
+   "valaszok": [
+    "Hódító Vilmos",
+    "Szép Fülöp",
+    "Navarrai Henrik",
+    "Földnélküli János"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a nevéhez fűződik az ősiség törvényének kibocsátása?",
+   "valaszok": [
+    "Károly Róbert",
+    "Könyves Kálmán",
+    "Nagy Lajos",
+    "Mária Terézia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek volt a fia a perzsa király, Xerxész?",
+   "valaszok": [
+    "Dareiosznak",
+    "Daidalosznak",
+    "Xenophónnak",
+    "Xantippének"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kit nem abban az évben avattak szentté, mint a másik három szentet?",
+   "valaszok": [
+    "Szent István",
+    "Szent László",
+    "Szent Imre",
+    "Szent Gellért"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit neveztek ki a magyar fősereg parancsnokává 1849 márciusában?",
+   "valaszok": [
+    "Kossuth Lajost",
+    "Mészáros Lázárt",
+    "Görgey Artúrt",
+    "Bem Józsefet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit tekintett felelősnek a korabeli nemesség a Dózsa-féle parasztfelkelés kirobbanásáért?",
+   "valaszok": [
+    "Habsburg Ferdinándot",
+    "Szapolyai Jánost",
+    "II. Lajost",
+    "Bakócz Tamást"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kit ábrázolt az ókori hét csoda egyike, a rodoszi kolosszus?",
+   "valaszok": [
+    "Pallasz Athénét",
+    "Hélioszt",
+    "Zeuszt",
+    "Apollónt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely korszakra volt jellemző a copf stílus?",
+   "valaszok": [
+    "16. század eleje",
+    "17. század eleje",
+    "18. század második fele",
+    "19. század második fele"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely ország XX. századi történelmében játszottak fontos szerepet a falangisták?",
+   "valaszok": [
+    "Szovjetunió",
+    "Spanyolország",
+    "Ausztria",
+    "Görögország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely állammal háborúzott Oroszország 1904 és 1905 folyamán?",
+   "valaszok": [
+    "Törökország",
+    "Finnország",
+    "Lengyelország",
+    "Japán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik afrikai ország függetlenségi mozgalmának volt vezetője Patrice Lumumba?",
+   "valaszok": [
+    "Angola",
+    "Belga-Kongó",
+    "Etiópia",
+    "Rhodesia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik birodalom széthullásának fontos állomása volt a verduni szerződés 843-ban?",
+   "valaszok": [
+    "Római Birodalom",
+    "Frank Birodalom",
+    "Hun Birodalom",
+    "Avar Birodalom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik európai felfedező ért először tengeren Indiába?",
+   "valaszok": [
+    "Vasco da Gama",
+    "Kolumbusz Kristóf",
+    "James Cook",
+    "Bartolomeo Diaz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik fáraó piramisa nem tartozik a gízai piramisok közé?",
+   "valaszok": [
+    "Kheopsz",
+    "Mükerinosz",
+    "Khephrén",
+    "Dzsószer"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik híres magyar történelmi személyt ítélték távollétében halálra?",
+   "valaszok": [
+    "Deák Ferencet",
+    "id. Andrássy Gyulát",
+    "Eötvös Józsefet",
+    "Irinyi Jánost"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik hónapot nevezték régen Szent Jakab havának?",
+   "valaszok": [
+    "február",
+    "április",
+    "július",
+    "november"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik itáliai város urai voltak a Mediciek?",
+   "valaszok": [
+    "Róma",
+    "Firenze",
+    "Nápoly",
+    "Pescara"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik két ország közt húzódott az I. világháború után a Curzon-vonal?",
+   "valaszok": [
+    "Oroszország-Lengyelország",
+    "Portugália-Spanyolország",
+    "Németország-Franciaország",
+    "Törökország-Bulgária"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik magyar király viselt hadat Nápoly ellen?",
+   "valaszok": [
+    "II. András",
+    "III. Béla",
+    "Nagy Lajos",
+    "Zsigmond"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar államférfit nevezték vasminiszternek?",
+   "valaszok": [
+    "Kossuth Lajost",
+    "Tisza Kálmánt",
+    "Teleki Pált",
+    "Baross Gábort"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik mai ország területén található a történelemből ismert Drinápoly?",
+   "valaszok": [
+    "Görögország",
+    "Törökország",
+    "Olaszország",
+    "Jugoszlávia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mai ország területén zajlott a sztálingrádi csata?",
+   "valaszok": [
+    "Oroszország",
+    "Fehéroroszország",
+    "Ukrajna",
+    "Kazahsztán"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik mai területen éltek az ókorban a dákok?",
+   "valaszok": [
+    "Toscanában",
+    "Egyiptomban",
+    "Erdélyben",
+    "Görögországban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik miniszterelnök töltötte be tisztségét a XIX. században?",
+   "valaszok": [
+    "Szapáry Gyula",
+    "Khuen-Héderváry Károly",
+    "Imrédy Béla",
+    "Dobi István"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik nem 1949-ben történt?",
+   "valaszok": [
+    "a Mindszenty-per",
+    "az NDK megalakulása",
+    "a NATO megalakulása",
+    "Churchill fultoni beszéde"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nemzet forradalmára volt Emiliano Zapata?",
+   "valaszok": [
+    "chilei",
+    "mexikói",
+    "spanyol",
+    "argentin"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nemzet függetlenségi harcának volt jelentős állomása a saratogai ütközet?",
+   "valaszok": [
+    "amerikai",
+    "mexikói",
+    "ír",
+    "indiai"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik nép városa volt Perszepolisz?",
+   "valaszok": [
+    "görög",
+    "perzsa",
+    "római",
+    "pun"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország alkotmányos monarchia az alábbiak közül?",
+   "valaszok": [
+    "Kína",
+    "India",
+    "Thaiföld",
+    "Vietnam"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország diktátora volt Noriega tábornok?",
+   "valaszok": [
+    "Mexikó",
+    "Fülöp-szigetek",
+    "Nicaragua",
+    "Panama"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország egykori királya lett miniszterelnök 2001-ben?",
+   "valaszok": [
+    "Románia",
+    "Bulgária",
+    "Spanyolország",
+    "Dánia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország ipari minisztere volt Che Guevara 1961 és 1965 között?",
+   "valaszok": [
+    "Argentína",
+    "Kuba",
+    "Mexikó",
+    "Chile"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország köztársasági elnöke volt Corazón Aquino asszony?",
+   "valaszok": [
+    "Sri Lanka",
+    "Banglades",
+    "India",
+    "Fülöp-szigetek"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország miniszterelnöke volt kétszer is Pierre Trudeau?",
+   "valaszok": [
+    "Kanada",
+    "Svájc",
+    "Franciaország",
+    "Belgium"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország nem alapítótagja a NATO-nak az alábbiak közül?",
+   "valaszok": [
+    "USA",
+    "Norvégia",
+    "Franciaország",
+    "Spanyolország"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország nem tagja jelenleg az Európai Uniónak?",
+   "valaszok": [
+    "Málta",
+    "Írország",
+    "Ciprus",
+    "Izland"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország uralkodója volt Fejszal király?",
+   "valaszok": [
+    "Jordánia",
+    "Marokkó",
+    "Szaúd-Arábia",
+    "Etiópia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik országban volt kormányfő Sirimavo Bandaranaike asszony?",
+   "valaszok": [
+    "Fülöp-szigetek",
+    "India",
+    "Pakisztán",
+    "Sri Lanka"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik tragikus emlékű csatát szokás Lech-mezei csatának is nevezni?",
+   "valaszok": [
+    "a mohácsi csatát",
+    "a muhi csatát",
+    "a merseburgi csatát",
+    "az augsburgi csatát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik uralkodóházhoz tartozott az angol polgári forradalom alatt lefejezett I. Károly?",
+   "valaszok": [
+    "Plantagenet",
+    "Tudor",
+    "Stuart",
+    "Windsor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik vezér nem vett részt a lechmezei csatában?",
+   "valaszok": [
+    "Botond",
+    "Bulcsú",
+    "Lél",
+    "Súr"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik város egyetemének tanára volt az eretnekként megégetett Husz János?",
+   "valaszok": [
+    "Párizs",
+    "Prága",
+    "Bologna",
+    "Oxford"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város volt a II. világháború alatt a francia bábállam székhelye?",
+   "valaszok": [
+    "Boulogne",
+    "Vichy",
+    "Montpellier",
+    "Lyon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város volt az inka kultúra egyik központja?",
+   "valaszok": [
+    "Tenochtitlan",
+    "Viracocha",
+    "Machu Picchu",
+    "Quetzalcoatl"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városban alkotott a német származású Fazola Henrik vasműves?",
+   "valaszok": [
+    "Buda",
+    "Eger",
+    "Szeged",
+    "Pécs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ázsiai ország elnöke volt többször Norodom Szihanuk?",
+   "valaszok": [
+    "Malaysia",
+    "Kambodzsa",
+    "Vietnam",
+    "Indonézia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik év nyarán foglalták el a német csapatok Párizst?",
+   "valaszok": [
+    "1939.0",
+    "1940.0",
+    "1941.0",
+    "1942.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik évben alakult meg az ENSZ?",
+   "valaszok": [
+    "1920.0",
+    "1938.0",
+    "1945.0",
+    "1950.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik évben alakult meg az Európai Gazdasági Közösség?",
+   "valaszok": [
+    "1949.0",
+    "1957",
+    "1968",
+    "1973"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik évben omlott le a berlini fal?",
+   "valaszok": [
+    "1989-ben",
+    "1990-ben",
+    "1988-ban",
+    "1991-ben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mennyi ideig viselt miniszteri posztot Deák Ferenc?",
+   "valaszok": [
+    "öt hónapig",
+    "másfél évig",
+    "öt évig",
+    "másfél évtizedig"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a Németországi Szociáldemokrata Párt közismert rövidítése?",
+   "valaszok": [
+    "SPD",
+    "FDP",
+    "CDU",
+    "NDPD"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a neve az Észak-Kínától a Földközi-tengerig húzódó régi kereskedelmi útvonalnak?",
+   "valaszok": [
+    "karavánút",
+    "selyemút",
+    "Nagy Sándor-út",
+    "borostyánút"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi mentette meg a Capitolium védőinek életét 387-ben a gallok támadásakor?",
+   "valaszok": [
+    "özönvízszerű eső",
+    "a szent ludak gágogása",
+    "kisebb földrengés",
+    "egy visszatérő légió"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt a ragadványneve Normandiai Vilmosnak, a XI. századi angol királynak?",
+   "valaszok": [
+    "Oroszlánszívű",
+    "Hódító",
+    "Földnélküli",
+    "Orániai"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt az ultima ratio regum, a királyok végső érve a mondás értelmezése szerint?",
+   "valaszok": [
+    "a fegyverek ereje",
+    "a kegyelem",
+    "a kincstár",
+    "a pallosjog"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mije nincs egy államnak semmiképpen az interregnum idején?",
+   "valaszok": [
+    "államadóssága",
+    "természetes határa",
+    "fővárosa",
+    "törvényes államfője"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mikor fizettek Magyarországon tallérral?",
+   "valaszok": [
+    "a 11-12. században",
+    "az Anjouk korában",
+    "a 16-19.században",
+    "csak Ferenc József alatt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor lett Alaszka az USA tagállama?",
+   "valaszok": [
+    "1776-ban",
+    "1865-ben",
+    "1919-ben",
+    "1959-ben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mikor lett másodszor Magyarország miniszterelnöke Teleki Pál?",
+   "valaszok": [
+    "1875-ben",
+    "1903-ban",
+    "1920-ban",
+    "1939-ben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mikor léptek ki a déli rabszolgatartó államok az Amerikai Egyesült Államokból?",
+   "valaszok": [
+    "az 1790-es években",
+    "az 1820-as években",
+    "az 1860-as években",
+    "az 1890-es években"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor vették fel Magyarországot a Népszövetségbe?",
+   "valaszok": [
+    "1922-ben",
+    "1928-ban",
+    "1946-ban",
+    "1882-ben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen \"lovag\" lett 1995-ben Margaret Thatcher, Nagy-Britannia volt miniszterelnöke?",
+   "valaszok": [
+    "a Brit Oroszlán",
+    "a Királyasszony lovagja",
+    "a Térdszalagrend lovagja",
+    "az angol Borrend lovagja"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen alexandriai építmény tartozott az ókori világ hét csodája közé?",
+   "valaszok": [
+    "könyvtár",
+    "világítótorony",
+    "függőkert",
+    "kolosszus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen gyarmat volt Indonézia nagy része a 19. században?",
+   "valaszok": [
+    "holland",
+    "német",
+    "amerikai",
+    "portugál"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen miniszteri tárcát töltött be több éven át Nagyatádi Szabó István?",
+   "valaszok": [
+    "külügy",
+    "oktatásügy",
+    "földművelésügy",
+    "pénzügy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen néven uralkodott az ókori Rómában Gaius Octavianus?",
+   "valaszok": [
+    "Augustus",
+    "Claudius",
+    "Caligula",
+    "Caracalla"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen származású volt a híres hajós és felfedező Roald Amundsen?",
+   "valaszok": [
+    "dán",
+    "norvég",
+    "svéd",
+    "finn"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen tárcát vezetett gróf Klebelsberg Kunó 1922 és 1931 között?",
+   "valaszok": [
+    "pénzügyi",
+    "hadügyi",
+    "vallás- és közoktatásügyi",
+    "külügyi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit neveznek RAF-nak az angol hadseregben?",
+   "valaszok": [
+    "a tengeri flottát",
+    "a légiérőt",
+    "a kémelhárítást",
+    "a vezérkart"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A középkori hölgyek mije volt a hennin?",
+   "valaszok": [
+    "szoknyájuk",
+    "nyergük",
+    "erényövük",
+    "fejfedőjük"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az USA-n kívül hol adtak még ki Függetlenségi Nyilatkozatot?",
+   "valaszok": [
+    "Angliában",
+    "Franciaországban",
+    "Finnországban",
+    "Magyarországon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket nevezték Code Napóleonnak?",
+   "valaszok": [
+    "örökösödési törvényét",
+    "a császárság intézményét",
+    "fiának írt intelmeit",
+    "polgári törvénykönyvét"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy hívták azt a spártai királyt, aki a Thermopülai-szorost védte a perzsákkal szemben?",
+   "valaszok": [
+    "Miltiadész",
+    "Menelaosz",
+    "Laertész",
+    "Leónidasz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan halt meg Szilágyi Mihály, Hunyadi János sógora?",
+   "valaszok": [
+    "a zajló Dunába fulladt",
+    "elesett Nándorfehérvárnál",
+    "a szultán kivégeztette",
+    "pestisben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan szavaztak az ókori Athénban a népgyűlésben, ha valakinek a száműzéséről döntöttek?",
+   "valaszok": [
+    "felállással",
+    "kézfeltartással",
+    "pálcikákkal",
+    "cserépdarabokkal"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan töltötte élete utolsó éveit Dobó István, Eger várkapitánya?",
+   "valaszok": [
+    "török fogságban",
+    "Habsburg-fogságban",
+    "madridi követként",
+    "királyi tanácsosként"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol feküdt a híres ókori város, Knósszos?",
+   "valaszok": [
+    "Kis-Ázsiában",
+    "az Olümposz lábánál",
+    "Krétán",
+    "Rodoszon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol győzték le a rómaiak végleg Hannibált?",
+   "valaszok": [
+    "Mediolanumnál",
+    "Cannaenál",
+    "Tarentumnál",
+    "Zámánál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol halt meg Hunyadi Mátyás magyar király?",
+   "valaszok": [
+    "Visegrádon",
+    "Budán",
+    "Bécsben",
+    "Galambócon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol halt meg az ókori államférfi-filozófus, Seneca?",
+   "valaszok": [
+    "Korzikán",
+    "Rómában",
+    "Krétán",
+    "Epheszoszban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol látható ma Hammurapi törvénykönyve?",
+   "valaszok": [
+    "Bagdadban",
+    "Teheránban",
+    "Párizsban",
+    "Londonban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol olvashatók Hammurapi törvényei?",
+   "valaszok": [
+    "egy sírkamrában",
+    "egy papirusztekercsen",
+    "egy piramis falán",
+    "egy oszlopon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány Katalin nevű felesége volt VIII. Henriknek?",
+   "valaszok": [
+    "kettő",
+    "három",
+    "öt",
+    "hat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány feleségét végeztette ki VIII. Henrik angol király?",
+   "valaszok": [
+    "nyolcat",
+    "hatot",
+    "négyet",
+    "kettőt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány évig uralkodott Magyarországon II. József, a kalapos király?",
+   "valaszok": [
+    "10.0",
+    "20.0",
+    "30.0",
+    "40.0"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "II. Erzsébet angol királynő melyik leszármazottja viseli a walesi herceg címet?",
+   "valaszok": [
+    "András",
+    "Edward",
+    "Károly",
+    "Vilmos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki az az angol király, akiről Mark Twain a Koldus és királyfi egyik címszereplőjét alkotta?",
+   "valaszok": [
+    "III. Richard",
+    "VIII. Henrik",
+    "VI. Edward",
+    "II. György"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki ellen követett el merényletet Zách Felicián?",
+   "valaszok": [
+    "Nagy Lajos",
+    "Károly Róbert",
+    "Zsigmond",
+    "II. András"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki követte közvetlenül Szent Lászlót a magyar trónon?",
+   "valaszok": [
+    "II. András",
+    "Károly Róbert",
+    "II. (Vak) Béla",
+    "Könyves Kálmán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem volt az aradi vértanuk egyike?",
+   "valaszok": [
+    "Dessewffy Arisztid",
+    "Schweidel József",
+    "Dembinszky Henrik",
+    "Knezich Károly"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki pillantotta meg első európaiként a Csendes-óceánt?",
+   "valaszok": [
+    "Magellán",
+    "Balboa",
+    "Bartolomeo Diaz",
+    "James Cook"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki temette el a mohácsi csatamezőn elesett katonákat?",
+   "valaszok": [
+    "Szapolyai János",
+    "Török Bálint",
+    "Mária királyné",
+    "Kanizsai Dorottya"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt Bill Clinton republikánus ellenlábasa az 1996-os választásokon?",
+   "valaszok": [
+    "Al Gore",
+    "Ross Perot",
+    "Robert Dole",
+    "Michael Dukakis"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt Csehszlovákia első köztársasági elnöke?",
+   "valaszok": [
+    "Tomás Masaryk",
+    "Alexander Dubcek",
+    "Eduard Benes",
+    "Vaclav Havel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt Lehel vezér társa az elbukott augsburgi csatában?",
+   "valaszok": [
+    "Bács",
+    "Baján",
+    "Bulcsú",
+    "Berény"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt Nagy-Britannia miniszterelnöke Sztálin 1953-ban bekövetkezett halálakor?",
+   "valaszok": [
+    "Clement Attlee",
+    "Sir Winston Churchill",
+    "Harold Wilson",
+    "Sir Anthony Eden"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a magyar király a százéves háború kitörésekor?",
+   "valaszok": [
+    "II. (Vak) Béla",
+    "Károly Róbert",
+    "II. Lajos",
+    "Mária Terézia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a magyar miniszterelnök a dicsőséges londoni 6:3 idején?",
+   "valaszok": [
+    "Tildy Zoltán",
+    "Nagy Imre",
+    "Hegedűs András",
+    "Münnich Ferenc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a német kancellár az 1972-es müncheni olimpia idején?",
+   "valaszok": [
+    "Willy Brandt",
+    "Konrad Adenauer",
+    "Helmut Schmidt",
+    "Helmut Kohl"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt a valódi Cyrano de Bergerac?",
+   "valaszok": [
+    "író",
+    "testőrkapitány",
+    "tengerész",
+    "Ory grófja"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt az Egyesült Államok elnöke az 1956-os magyar forradalom idején?",
+   "valaszok": [
+    "Kennedy",
+    "Roosevelt",
+    "Eisenhower",
+    "Truman"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt az Egyesült Államok elnöke az Öböl-háború idején?",
+   "valaszok": [
+    "Ronald Reagan",
+    "George Bush",
+    "Bill Clinton",
+    "Jimmy Carter"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az a német császár, aki 1122-ben a wormsi konkordátumban megegyezett a pápával?",
+   "valaszok": [
+    "III. Henrik",
+    "III. Konrád",
+    "V. Henrik",
+    "II. Frigyes"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt az a politikus, aki 1971-ben kikiáltotta Banglades függetlenségét?",
+   "valaszok": [
+    "Mórárdzsi Dészái",
+    "Ziaur Rahman",
+    "Mahmud Ullah",
+    "Mudzsibur Rahman"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt az anarchista mozgalom ismert alakja az alábbiak közül?",
+   "valaszok": [
+    "Dimitrov",
+    "Bakutyin",
+    "Frunze",
+    "Csapajev"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az apja Könyves Kálmánnak?",
+   "valaszok": [
+    "I. András",
+    "I. Béla",
+    "I. Géza",
+    "I. (Szent) László"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt az első csanádi püspök?",
+   "valaszok": [
+    "Bakócz Tamás",
+    "Vitéz János",
+    "Szent Vencel",
+    "Szent Gellért"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt az első független felelős magyar kormány első közlekedésügyi minisztere?",
+   "valaszok": [
+    "Baross Gábor",
+    "Széchenyi István",
+    "Szemere Bertalan",
+    "Vásárhelyi Pál"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az osztrák uralkodó 1703-ban, a Rákóczi-szabadságharc kitörésekor?",
+   "valaszok": [
+    "Mária Terézia",
+    "II. József",
+    "IV. Károly",
+    "I. Lipót"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt római diktátor az alábbi ókori személyiségek közül?",
+   "valaszok": [
+    "Apollodórosz",
+    "Cincinnatus",
+    "Polübiosz",
+    "Lucretius"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Árpád-házi Szent Margit apja?",
+   "valaszok": [
+    "Szent István",
+    "IV. Béla",
+    "II. András",
+    "Szent László"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik laktak a Potala palotában?",
+   "valaszok": [
+    "a japán császárok",
+    "az egyiptomi főpapok",
+    "a dalai lámák",
+    "az inka uralkodók"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik rabolták el a szabin nőket?",
+   "valaszok": [
+    "Hunor és Magor",
+    "Nagy Sándor katonái",
+    "Zeusz és testvérei",
+    "a római ifjak"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kik voltak a bogumilok?",
+   "valaszok": [
+    "eretnekek",
+    "alkimisták",
+    "kuruzslók",
+    "kereskedők"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik építettek masztabákat?",
+   "valaszok": [
+    "az aztékok",
+    "az egyiptomiak",
+    "a perzsák",
+    "a vikingek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiket neveztek brávóknak a XVIII. századi Itáliában?",
+   "valaszok": [
+    "arisztokrata tiszteket",
+    "a fejedelmek fiait",
+    "a bérgyilkosokat",
+    "a pápa követeit"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kiknek a nyelvén alapult az amerikai haderő által a II. világháborúban használt kódrendszer?",
+   "valaszok": [
+    "maják",
+    "eszkimók",
+    "hawaii őslakosok",
+    "navahók"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a korában élt Hess András, aki először nyomtatott könyvet Magyarországon?",
+   "valaszok": [
+    "Mátyás",
+    "Nagy Lajos",
+    "Ferenc József",
+    "Mária Terézia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a nevelője volt Szent Gellért püspök?",
+   "valaszok": [
+    "Szent István",
+    "IV. Béla",
+    "Imre herceg",
+    "Szent Margit"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kiről nevezték el a szigorú ítéleteket \"drákói ítéletnek\"?",
+   "valaszok": [
+    "egy spártai tábornokról",
+    "egy római helytartóról",
+    "egy athéni törvényhozóról",
+    "egy alexandriai tanárról"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kitől ered a Tűzföld elnevezése?",
+   "valaszok": [
+    "Magellántól",
+    "Kolumbusztól",
+    "Pizarrótól",
+    "Toscanellitől"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mely ország területén szolgáltak a szipolyok?",
+   "valaszok": [
+    "Kína",
+    "India",
+    "Japán",
+    "Egyiptom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik 20. századi brit miniszterelnök volt a legtovább kormányon?",
+   "valaszok": [
+    "Harold Wilson",
+    "Winston Churchill",
+    "Margaret Thatcher",
+    "Neville Chamberlaine"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik amerikai elnök küldte vissza a magyar koronát?",
+   "valaszok": [
+    "Gerald Ford",
+    "Jimmy Carter",
+    "George Bush",
+    "Ronald Reagan"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik angol miniszterlenök töltötte be hivatalát a II. világháború után?",
+   "valaszok": [
+    "David Lloyd George",
+    "James Ramsey McDonald",
+    "Neville Chamberlain",
+    "Maurice Harold Macmillan"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik csata nem kötődik Nagy Sándor nevéhez?",
+   "valaszok": [
+    "Gaugaméla",
+    "Szalamisz",
+    "Granikosz",
+    "Isszosz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik dinasztia tagja volt II. (Nagy) Frigyes porosz király?",
+   "valaszok": [
+    "Habsburg",
+    "Luxemburgi",
+    "Stauf",
+    "Hohenzollern"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik dinasztia tagja volt a tragikus sorsú utolsó cár, II. Miklós?",
+   "valaszok": [
+    "Alekszandrov",
+    "Godunov",
+    "Romanov",
+    "Ivanov"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egyetemen tanított 1508-tól Luther Márton?",
+   "valaszok": [
+    "wartburgi",
+    "wittenbergi",
+    "heidelbergi",
+    "strassburgi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik feltaláló vett részt az Amerikai Függetlenségi Nyilatkozat megfogalmazásában?",
+   "valaszok": [
+    "Robert Fulton",
+    "James Watt",
+    "Benjamin Franklin",
+    "Samuel Morse"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik háború legnagyobb tengeri ütközete zajlott a Jüttland-félszigetnél?",
+   "valaszok": [
+    "első napóleoni háború",
+    "utolsó napóleoni háború",
+    "I. világháború",
+    "II. világháború"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik isten tiszteletére előadott szertartásokból alakult ki az ókori görög színjátszás?",
+   "valaszok": [
+    "Dionüszosz",
+    "Poszeidon",
+    "Hermész",
+    "Hádész"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik királyt végezték ki 1649-ben, az angol polgári forradalomban?",
+   "valaszok": [
+    "II. Jakab",
+    "Orániai Vilmos",
+    "I. Károly",
+    "V. György"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik királyunk lánya volt Árpád-házi Szent Erzsébet?",
+   "valaszok": [
+    "II. András",
+    "Szent László",
+    "IV. Béla",
+    "Szent István"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik magyar király felesége volt Cillei Borbála?",
+   "valaszok": [
+    "Szapolyai János",
+    "Mátyás",
+    "Zsigmond",
+    "II. András"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar tudós volt 1894-1895 között vallás- és közoktatásügyi miniszter?",
+   "valaszok": [
+    "Eötvös Loránd",
+    "Bánki Donát",
+    "Vámbéry Ármin",
+    "Kandó Kálmán"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik mai országhoz tartozik a történelmi Szlavónia területe?",
+   "valaszok": [
+    "Szlovákia",
+    "Szlovénia",
+    "Horvátország",
+    "Szerbia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik mongol kán lett kínai császár?",
+   "valaszok": [
+    "Dzsingisz",
+    "Batu",
+    "Kubiláj",
+    "Ögödej"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nép államalapítója I. Mieszko fejedelem?",
+   "valaszok": [
+    "morva",
+    "szerb",
+    "lengyel",
+    "litván"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik népcsoportban voltak a lófők?",
+   "valaszok": [
+    "a ruténeknél",
+    "a kunoknál",
+    "a székelyeknél",
+    "a sokácoknál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország elnöke volt 30 éven át Habib Burgiba?",
+   "valaszok": [
+    "Kenya",
+    "Szíria",
+    "Tunézia",
+    "Algéria"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország külügyminisztere volt Robert Schumann?",
+   "valaszok": [
+    "Ausztria",
+    "Belgium",
+    "Franciaország",
+    "Németország"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország miniszterelnöke majd államfője volt Mario Soares?",
+   "valaszok": [
+    "Argentína",
+    "Portugália",
+    "Spanyolország",
+    "Mexikó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország rendelkezik a legtöbb mandátummal az Európai Parlamentben?",
+   "valaszok": [
+    "Nagy-Britannia",
+    "Franciaország",
+    "Németország",
+    "Spanyolország"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország államelnöke volt Ziaul Hakk tábornok?",
+   "valaszok": [
+    "Fülöp-szigetek",
+    "Pakisztán",
+    "Panama",
+    "Szudán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban bukott meg 1959-ben a Batista-diktatúra?",
+   "valaszok": [
+    "Mexikó",
+    "Kuba",
+    "Görögország",
+    "Spanyolország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban uralkodtak több mint hatvan évig a Somoza család tagjai?",
+   "valaszok": [
+    "Nicaragua",
+    "Panama",
+    "Argentína",
+    "Uruguay"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik politikus nem volt vallás- és közoktatásügyi miniszter?",
+   "valaszok": [
+    "Apponyi Albert",
+    "Trefort Ágoston",
+    "Ortutay Gyula",
+    "Klauzál Gábor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik római császár engedélyezte a keresztény vallás szabad gyakorlását?",
+   "valaszok": [
+    "Marcus Aurelius",
+    "Diocletianus",
+    "Vespasianus",
+    "Constantinus"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik században élt Lomonoszov, a neves orosz polihisztor?",
+   "valaszok": [
+    "16. század",
+    "18. század",
+    "19. század",
+    "20. század"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik történelmi személyt nevezték kortársai il Magnificonak?",
+   "valaszok": [
+    "Lorenzo de' Medicit",
+    "II. Viktor Emánuelt",
+    "Francesco Petrarcát",
+    "Giuseppe Verdit"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik uralkodócsaládból származott II. Lajos, Mohácsnál elesett királyunk?",
+   "valaszok": [
+    "Jagelló",
+    "Anjou",
+    "Habsburg",
+    "Premysl"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik város ellen vezetett hadjáratot I. Lajos magyar király, öccse megölése miatt?",
+   "valaszok": [
+    "Nápoly",
+    "Firenze",
+    "Velence",
+    "Milánó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városban alakult meg a Charta '77 nevű ellenzéki polgárjogi mozgalom?",
+   "valaszok": [
+    "Varsó",
+    "Budapest",
+    "Prága",
+    "Párizs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városban alakult meg a NATO 1949-ben?",
+   "valaszok": [
+    "Brüsszelben",
+    "Washingtonban",
+    "Párizsban",
+    "New Yorkban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban pusztított hatalmas tűzvész 1666 szeptemberében?",
+   "valaszok": [
+    "Róma",
+    "Lisszabon",
+    "London",
+    "Moszkva"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városban született és halt meg Arkhimédész?",
+   "valaszok": [
+    "Athén",
+    "Szürakuszai",
+    "Milétosz",
+    "Epeszosz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban áll a valaha arany- és ezüstlemezekkel borított Naptemplom?",
+   "valaszok": [
+    "Cuzco",
+    "Toledo",
+    "Nagaszaki",
+    "Bandung"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ázsiai országot tartották uralmuk alatt a vörös khmerek az 1970-es években?",
+   "valaszok": [
+    "Thaiföld",
+    "Kambodzsa",
+    "Vietnam",
+    "Laosz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik évben alakult meg Izrael?",
+   "valaszok": [
+    "1948-ban",
+    "1954-ben",
+    "1949-ben",
+    "1946-ban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik évben lett Magyarország a NATO teljes jogú tagja?",
+   "valaszok": [
+    "1992.0",
+    "1996.0",
+    "1999.0",
+    "2001.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik évben volt az úgynevezett szuezi válság?",
+   "valaszok": [
+    "1949.0",
+    "1956.0",
+    "1968.0",
+    "1973.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik évben írták alá a Maastrichti szerződést?",
+   "valaszok": [
+    "1985.0",
+    "1992.0",
+    "1996.0",
+    "2000.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi Sztálingrád mai neve?",
+   "valaszok": [
+    "Szentpétervár",
+    "Kalinyingrád",
+    "Volgográd",
+    "Novgorod"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt Sopron római kori neve?",
+   "valaszok": [
+    "Sopianae",
+    "Scarbantia",
+    "Savaria",
+    "Spalatum"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt a Földet először körbeutazó hajó neve?",
+   "valaszok": [
+    "Pinta",
+    "Argo",
+    "Victoria",
+    "Trinidad"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt a címe az első magyar nyelvű újságnak?",
+   "valaszok": [
+    "Magyar Hírmondó",
+    "Pannon Hírnök",
+    "Pesti Hírharang",
+    "Pozsonyi Hírharsona"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi volt a francia forradalmár, Robespierre keresztneve?",
+   "valaszok": [
+    "Georges Jacques",
+    "Maximilien",
+    "Jean-Paul",
+    "Louis Antoine Léon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt a mai Portugália területén fekvő római tartomány latin neve?",
+   "valaszok": [
+    "Lutécia",
+    "Caledonia",
+    "Lusitania",
+    "Hebrida"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor jött létre a Csehszlovák Köztársaság?",
+   "valaszok": [
+    "1900. január 1-jén",
+    "az I. világháború elején",
+    "az I. világháború végén",
+    "a II. világháború végén"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor lett Spanyolország királya I. János Károly?",
+   "valaszok": [
+    "1960-ban",
+    "1975-ben",
+    "1985-ben",
+    "1995-ben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen békekötéssel zárult a harmincéves háború?",
+   "valaszok": [
+    "vasvári",
+    "bécsi",
+    "linzi",
+    "vesztfáliai"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen céllal építette egy indiai uralkodó a Tadzs Mahalt a 17. században?",
+   "valaszok": [
+    "lakóépület céljából",
+    "felesége síremlékéül",
+    "vallási szentélynek",
+    "katonai erődnek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen különleges ókori hangszer maradványai került elő Aquincumban?",
+   "valaszok": [
+    "vízorgona",
+    "hétlyukú bronzsíp",
+    "szélhárfa",
+    "bronzvázas lant"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen miniszter volt az idősebb és az ifjabb Andrássy Gyula is?",
+   "valaszok": [
+    "hadügy",
+    "külügy",
+    "belügy",
+    "pénzügy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen miniszterré nevezték ki Maléter Pált Nagy Imre kormányában 1956-ban?",
+   "valaszok": [
+    "pénzügy",
+    "külügy",
+    "közlekedésügyi",
+    "honvédelmi"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen nemzetiségű politikus került 2004 nyarán az Európai Bizottság élére?",
+   "valaszok": [
+    "francia",
+    "olasz",
+    "holland",
+    "portugál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen nemzetiségű volt Trygve Lie, az ENSZ első főtitkára?",
+   "valaszok": [
+    "norvég",
+    "kínai",
+    "holland",
+    "burmai"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen nemzetiségű volt U Thant, az ENSZ egykori főtitkára?",
+   "valaszok": [
+    "kambodzsai",
+    "koreai",
+    "burmai",
+    "pakisztáni"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen származású volt Sztálin?",
+   "valaszok": [
+    "ukrán",
+    "kazah",
+    "grúz",
+    "örmény"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csináltak a középkori kolostorok lakói a dormitóriumban?",
+   "valaszok": [
+    "étkeztek",
+    "aludtak",
+    "kódexet másoltak",
+    "büntetésüket töltötték"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy hívták Ferenc József és Erzsébet királyné egyetlen fiúgyermekét?",
+   "valaszok": [
+    "Ottó",
+    "Ferdinánd",
+    "Rudolf",
+    "Miksa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol halt meg Bethlen István korábbi magyar miniszterelnök?",
+   "valaszok": [
+    "az Egyesült Államokban",
+    "Nagy-Britanniában",
+    "Svájcban",
+    "a Szovjetunióban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol halt meg a híres felfedező, James Cook?",
+   "valaszok": [
+    "Ausztráliában",
+    "Új-Zélandon",
+    "a Húsvét-szigeten",
+    "a Hawaii-szigeteken"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol laktak a középkorban a priorok?",
+   "valaszok": [
+    "kolostorban",
+    "kastélyban",
+    "remetelakban",
+    "a királyi udvarban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol született Kolumbusz Kristóf?",
+   "valaszok": [
+    "Madridban",
+    "Genovában",
+    "Páduában",
+    "Lisszabonban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol született a híres kémnő, Mata Hari?",
+   "valaszok": [
+    "Indiában",
+    "Hollandiában",
+    "Svédországban",
+    "Jáva szigetén"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol írta alá szeptember elején a japán küldöttség a kapitulációs okmányokat?",
+   "valaszok": [
+    "a Lincoln hadihajón",
+    "a Missouri hadihajón",
+    "Pearl Harborban",
+    "Okinava szigetén"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány kormányfője volt Magyarországnak 1919 folyamán?",
+   "valaszok": [
+    "kettő",
+    "három",
+    "négy",
+    "hat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány év telt el a Himnusz megírása és megzenésítése között?",
+   "valaszok": [
+    "egy",
+    "tízenegy",
+    "huszonegy",
+    "harmincegy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány évvel a halála után avatták szentté Jeanne d' Arcot?",
+   "valaszok": [
+    "ötven",
+    "száz",
+    "közel kétszázötven",
+    "közel ötszáz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki alakított huszárezredet 1720-ban Franciaországban?",
+   "valaszok": [
+    "Hadik András",
+    "Bercsényi László",
+    "Sigray Jakab",
+    "Guyon Richárd"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki ellen követtek el sikertelen merényletet 1984-ben Brightonban?",
+   "valaszok": [
+    "Edward Heath",
+    "Harold Wilson",
+    "Erzsébet királynő",
+    "Margaret Thatcher"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki győzte le Marcus Antoniust az actiumi csatában?",
+   "valaszok": [
+    "Octavianus",
+    "Mucius Scaevola",
+    "Pompeius",
+    "Julius Caesar"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki követte II. Józsefet a trónon?",
+   "valaszok": [
+    "testvére",
+    "fia",
+    "nagybátyja",
+    "unokája"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki követte közvetlenül Könyves Kálmánt a magyar királyi trónon?",
+   "valaszok": [
+    "I. Géza",
+    "II. István",
+    "II. (Vak) Béla",
+    "II. László"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem ugyanannak a pártnak a színeiben lett az USA elnöke, mint a többiek?",
+   "valaszok": [
+    "Richard Nixon",
+    "George W. Bush",
+    "Theodore Roosevelt",
+    "Lyndon B. Johnson"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem volt VIII. Henrik felesége?",
+   "valaszok": [
+    "Boleyn Anna",
+    "Aquitániai Eleonóra",
+    "Catherine Parr",
+    "Cleve-i Anna"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem volt hatalmon J. F. Kennedy halálakor?",
+   "valaszok": [
+    "Konrad Adenauer",
+    "Nyikita Hruscsov",
+    "Charles de Gaulle",
+    "Francisco Franco"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem volt soha Németország kancellárja?",
+   "valaszok": [
+    "Konrad Adenauer",
+    "Willy Brandt",
+    "Franz Josef Strauss",
+    "Ludwig Erhard"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem élt, amikor Dantont kivégezték?",
+   "valaszok": [
+    "Francisco Goya",
+    "Johann W. Goethe",
+    "Robert Fulton",
+    "René Descartes"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt a Pazar lakomáiról is híres Lucius Licinius Lucullus?",
+   "valaszok": [
+    "filozófus",
+    "hadvezér",
+    "költő",
+    "színész"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a brit miniszterelnök a II. világháború kitörésekor, 1939-ben?",
+   "valaszok": [
+    "Chamberlain",
+    "Churchill",
+    "Attlee",
+    "Lloyd George"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt a híres ókori uralkodóné, Nofretete férje?",
+   "valaszok": [
+    "Kheopsz",
+    "II. Ramszesz",
+    "IV. Amenhotep",
+    "III. Thotmesz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt a magyar miniszterelnök Kossuth Lajos halálakor?",
+   "valaszok": [
+    "Tisza Kálmán",
+    "Wekerle Sándor",
+    "Tisza István",
+    "Bethlen István"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a magyar miniszterelnök, amikor a németek megtámadták a Szovjetuniót?",
+   "valaszok": [
+    "Teleki Pál",
+    "Bárdossy László",
+    "Kállay Miklós",
+    "Sztójai Döme"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt tíz éven át lengyel király az alábbi magyar történelmi személyek közül?",
+   "valaszok": [
+    "Bethlen Gábor",
+    "Rákóczi György",
+    "Báthori István",
+    "Bocskai István"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt Árpád társfejedelme a honfoglalás korában?",
+   "valaszok": [
+    "Levedi",
+    "Jutocsa",
+    "Kurszán",
+    "Ajtony"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki állt a középkori egyetemek élén?",
+   "valaszok": [
+    "a dékán",
+    "a rektor",
+    "a magiszter",
+    "a decreta"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kije volt Ferenc Józsefnek a Mexikóban kivégzett Habsburg Miksa?",
+   "valaszok": [
+    "testvére",
+    "fia",
+    "nagybátyja",
+    "unokaöccse"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik voltak a tagjai a XVII. század végén alakult angol konzervatív, királyhű pártnak?",
+   "valaszok": [
+    "toryk",
+    "whigek",
+    "guelfek",
+    "ghibellinek"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik voltak valójában a mesékből ismert burkusok?",
+   "valaszok": [
+    "franciák",
+    "poroszok",
+    "velenceiek",
+    "spanyolok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a jövedelme volt az 1850-ig fizetett harmincad?",
+   "valaszok": [
+    "a királyé",
+    "a földesúré",
+    "az egyházé",
+    "a városi polgároké"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a névnapjára írta Beethoven Névnapi nyitány című darabját?",
+   "valaszok": [
+    "II. Ferenc",
+    "Mária Terézia",
+    "II. József",
+    "Ferenc József"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek az uralkodása alatt nyílt meg a budai Várszínház Kempelen Farkas tervei alapján?",
+   "valaszok": [
+    "I. Lipót",
+    "II. József",
+    "I. Ferenc József",
+    "I. Ferenc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek az uralkodásától szedték hazánkban a tizedet?",
+   "valaszok": [
+    "I. István",
+    "I. András",
+    "I. Géza",
+    "I. László"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek az öccse volt Földnélküli János angol király?",
+   "valaszok": [
+    "I. Erzsébet",
+    "VIII. Henrik",
+    "III. Richárd",
+    "Oroszlánszívű Richárd"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kit győzött le Cornelius Scipio Kr.e. 202-ben a zámai csatában?",
+   "valaszok": [
+    "Nagy Sándort",
+    "Spartacust",
+    "Hannibált",
+    "Dareioszt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit nevezünk a bresciai hiénának?",
+   "valaszok": [
+    "Radetzkyt",
+    "Metternichet",
+    "Haynaut",
+    "Caraffát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit választottak a magyar rendek királlyá Besztercebányán?",
+   "valaszok": [
+    "Bethlen Gábort",
+    "II. Rákóczi Ferencet",
+    "Bocskai Istvánt",
+    "Thököly Imrét"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mely mai ország területén épült fel az ókori nevezetesség, Hadrianus fala?",
+   "valaszok": [
+    "Olaszország",
+    "Görögország",
+    "Anglia",
+    "Egyiptom"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely ókori város királya volt a legenda szerint Gilgames?",
+   "valaszok": [
+    "Babilon",
+    "Uruk",
+    "Ur",
+    "Ninive"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik afrikai ország diktátora volt Idi Amin?",
+   "valaszok": [
+    "Szudán",
+    "Kenya",
+    "Uganda",
+    "Közép-afrikai Köztársaság"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik amerikai elnök hirdette meg az Apolló űrprogramot?",
+   "valaszok": [
+    "Truman",
+    "Kennedy",
+    "Nixon",
+    "Eisenhower"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik esemény nem a melbourne-i olimpia évében történt?",
+   "valaszok": [
+    "felkelés Lengyelországban",
+    "megalakul a Varsói Szerződés",
+    "a Szuezi-válság",
+    "forradalom Magyarországon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik esemény történt II. József halálának évében?",
+   "valaszok": [
+    "megalapították Washingtont",
+    "Rodrigo Borgia pápa lett",
+    "Stephenson mozdonyt épített",
+    "elpusztult a nagy Armada"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik magyar uralkodó vett részt a nikápolyi csatában?",
+   "valaszok": [
+    "Nagy Lajos",
+    "Zsigmond",
+    "I. Ulászló",
+    "II. Lajos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mai ország területén született Balassi Bálint?",
+   "valaszok": [
+    "Szlovákia",
+    "Románia",
+    "Horvátország",
+    "Ukrajna"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik mai ország területén található a csatájáról nevezetes Rozgony?",
+   "valaszok": [
+    "Szlovákia",
+    "Horvátország",
+    "Románia",
+    "Ukrajna"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik mai város területén található Diocletianus római császár palotája?",
+   "valaszok": [
+    "Split",
+    "Velence",
+    "Pula",
+    "Bejrút"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik nem volt magyar vármegye neve?",
+   "valaszok": [
+    "Zólyom",
+    "Ung",
+    "Arad",
+    "Csákvár"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik neves magyar író volt a háború után honvédelmi miniszter?",
+   "valaszok": [
+    "Illyés Gyula",
+    "Veres Péter",
+    "Darvas József",
+    "Szabó Pál"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik német császár uralkodása alatt sújtották birodalmi átokkal Luthert?",
+   "valaszok": [
+    "V. Károly",
+    "I. Ferdinánd",
+    "II. Miksa",
+    "II. Rudolf"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik nép nagy uralkodója volt Montezuma?",
+   "valaszok": [
+    "maja",
+    "azték",
+    "inka",
+    "eszkimó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik orosz államférfi építtetett látszatfalvakat a cárnő látogatása alkalmából?",
+   "valaszok": [
+    "Raszputyin",
+    "Patyomkin",
+    "Kutuzov",
+    "Kolcsak"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban található a csatájáról nevezetes Lepantó?",
+   "valaszok": [
+    "Spanyolország",
+    "Olaszország",
+    "Görögország",
+    "Portugália"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik településen kezdődött meg 1945-ben a földosztás?",
+   "valaszok": [
+    "Kápolnán",
+    "Battonyán",
+    "Pusztaszeren",
+    "Tarpán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város dózséja volt a Verdi-operában is megörökített Simone Boccanegra?",
+   "valaszok": [
+    "Velence",
+    "Genova",
+    "Firenze",
+    "Ferrara"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város római neve volt Lutécia?",
+   "valaszok": [
+    "Lausanne",
+    "Nápoly",
+    "Lyon",
+    "Párizs"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városból származik Vergilius hőse, Aeneas?",
+   "valaszok": [
+    "Athén",
+    "Trója",
+    "Róma",
+    "Théba"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik épület nem I. Ferenc József uralkodása alatt épült?",
+   "valaszok": [
+    "Magyar Nemzeti Múzeum",
+    "Erkel Színház",
+    "budapesti Keleti pályaudvar",
+    "Szépművészeti Múzeum"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik évben csatlakozott Nagy-Britannia az Európai Unióhoz?",
+   "valaszok": [
+    "1957.0",
+    "1973.0",
+    "1986.0",
+    "1995.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik évben lett először Magyarország miniszterlenöke Wekerle Sándor?",
+   "valaszok": [
+    "1892",
+    "1899",
+    "1906",
+    "1917"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi volt a neve Nelson admirális vezérhajójának a trafalgari ütközetben?",
+   "valaszok": [
+    "Queen Elisabeth",
+    "Victory",
+    "King George III.",
+    "Triumph"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt az Anjou-család címerében?",
+   "valaszok": [
+    "sellő",
+    "liliom",
+    "buzogány",
+    "koronás nap"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mikor avatták szentté István királyt?",
+   "valaszok": [
+    "a XI. században",
+    "a XIV. században",
+    "a XVII. században",
+    "a XX. században"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen kapcsolatban volt Bornemissza Péter Balassi Bálinttal?",
+   "valaszok": [
+    "katonatársa volt",
+    "sógora volt",
+    "diáktársa volt",
+    "nevelője volt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen miniszter volt 1961 és 1964 között Robert Kennedy?",
+   "valaszok": [
+    "pénzügyminiszter",
+    "külügyminiszter",
+    "igazságügy-miniszter",
+    "hadügyminiszter"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen miniszter volt a Thatcher-kormányban a későbbi miniszterelnök, John Major?",
+   "valaszok": [
+    "hadügy",
+    "belügy",
+    "oktatásügy",
+    "pénzügy"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen miniszteri posztot viselt Nagy Imre 1944 decembere és 1945 novembere között?",
+   "valaszok": [
+    "pénzügy",
+    "hadügy",
+    "földművelésügy",
+    "külügy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen származású volt Bakócz Tamás bíboros, esztergomi érsek?",
+   "valaszok": [
+    "szász polgár",
+    "délvidéki főnemes",
+    "székely kisnemes",
+    "szatmári jobbágy"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit mondott ki a Monroe-elv?",
+   "valaszok": [
+    "a rabszolgák felszabadítását",
+    "a titkosszolgálat ellenőrzését",
+    "a be nem avatkozás politikáját",
+    "a telepesek földhöz jutását"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol halt meg Bercsényi Miklós, a Rákóczi-szabadságharc tábornoka?",
+   "valaszok": [
+    "Párizsban",
+    "Rodostóban",
+    "Torinóban",
+    "Londonban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol uralkodott a XIX. század nagy részében a Braganca-házból való II. Pedro?",
+   "valaszok": [
+    "Spanyolország",
+    "Brazília",
+    "Olaszország",
+    "Argentína"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol választották királlyá Szapolyai Jánost a magyar rendek 1526 novemberében?",
+   "valaszok": [
+    "Budán",
+    "Székesfehérváron",
+    "Pozsonyban",
+    "Váradon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol égették meg Jeanne d' Arcot?",
+   "valaszok": [
+    "Rouenban",
+    "Párizsban",
+    "Reims-ben",
+    "Londonban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol élnek a Bounty hajó lázadó legénységének a leszármazottai?",
+   "valaszok": [
+    "Pitcairn-szigetek",
+    "Virgin-szigetek",
+    "Azori-szigetek",
+    "Salamon-szigetek"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki győzte le a Magyarországra betörő III. Henrik német-római császárt?",
+   "valaszok": [
+    "I. Béla",
+    "II. Béla",
+    "III. Béla",
+    "IV. Béla"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki mérgeztette meg Claudius császárt a közvélekedés szerint?",
+   "valaszok": [
+    "testőrparancsnoka",
+    "társcsászára",
+    "felesége",
+    "egy megbuktatott szenátor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem volt a kerekasztal lovagja?",
+   "valaszok": [
+    "Parsifal",
+    "Gawain",
+    "Cid",
+    "Lancelot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem volt az 1848. áprilisában beiktatott Batthyány-kormány tagja?",
+   "valaszok": [
+    "Mészáros Lázár",
+    "Klauzál Gábor",
+    "Fáy András",
+    "Esterházy Pál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem volt francia köztársasági elnök és miniszterelnök is?",
+   "valaszok": [
+    "Charles de Gaulle",
+    "Georges Pompidou",
+    "Francois Mitterand",
+    "Jacques Chirac"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem volt Árpád vezér fia?",
+   "valaszok": [
+    "Tarhos",
+    "Jutas",
+    "Zolta",
+    "Fajsz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt Magyarország párizsi nagykövete 1947-1949 között?",
+   "valaszok": [
+    "Szakasits Árpád",
+    "Károlyi Mihály",
+    "Fejtő Ferenc",
+    "Illyés Gyula"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az Egyesült Államok elnöke a vietnami háborút lezáró fegyverszüneti egyezmény aláírásakor?",
+   "valaszok": [
+    "Ford",
+    "Nixon",
+    "Johnson",
+    "Carter"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az az uralkodó, akiről csak udvari szobrásza, Lüszipposz készíthetett szobrot?",
+   "valaszok": [
+    "Periklész",
+    "Dareiosz",
+    "Nagy Sándor",
+    "Néro"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt az utolsó Valois-házi király Franciaország trónján?",
+   "valaszok": [
+    "IX. Károly",
+    "III. Henrik",
+    "IV. Henrik",
+    "XIII. Lajos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Árpád-házi Szent Margit édesanyja?",
+   "valaszok": [
+    "Anjou Izabella",
+    "Capet Margit",
+    "Kun Erzsébet",
+    "Laszkarisz Mária"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek tulajdonítják a mondást? \"Vae victis!\" (Jaj a legyőzötteknek!)",
+   "valaszok": [
+    "Julius Caesarnak",
+    "Tacitusnak",
+    "Lepidusnak",
+    "Brennusnak"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek volt az udvari orvosa Nostradamus?",
+   "valaszok": [
+    "II. Fülöp Ágost",
+    "IV. Fülöp",
+    "IX. Károly",
+    "XV. Lajos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kivel nem találkozhatott Werbőczy István?",
+   "valaszok": [
+    "Luxemburgi Zsigmonddal",
+    "II. Ulászlóval",
+    "II. Lajossal",
+    "Szapolyai Jánossal"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mely európai ország gyarmata volt az 1910-es évek elején a mai Líbia?",
+   "valaszok": [
+    "Hollandia",
+    "Franciaország",
+    "Olaszország",
+    "Nagy-Britannia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely hónapok fordulójának felel meg a francia forradalmi naptár thermidor hava?",
+   "valaszok": [
+    "január-február",
+    "március-április",
+    "július-augusztus",
+    "október-november"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik folyó partján fekszik az egykori pápai székhely, Avignon?",
+   "valaszok": [
+    "Rhone",
+    "Rajna",
+    "Saone",
+    "Garonne"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország diktátora volt Antonio de Oliveira Salazar?",
+   "valaszok": [
+    "Mexikó",
+    "Argentína",
+    "Panama",
+    "Portugália"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik pannóniai település állt a mai Komárom területén?",
+   "valaszok": [
+    "Brigetio",
+    "Mursella",
+    "Cirpi",
+    "Intercisa"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik politikus kapta meg 1973-ban Le Duc Tho-val megosztva a Nobel-díjat?",
+   "valaszok": [
+    "Gerald Ford",
+    "Willy Brandt",
+    "Henry Kissinger",
+    "Anvar Szadat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik történelmi személyiség született Dálnokon?",
+   "valaszok": [
+    "Bakócz Tamás",
+    "Dózsa György",
+    "Bethlen Gábor",
+    "Eötvös József"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban írták alá a NATO megalakulásáról szóló dokumentumot?",
+   "valaszok": [
+    "Párizs",
+    "Brüsszel",
+    "London",
+    "Washington"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városállam türannosza volt Peiszisztratosz?",
+   "valaszok": [
+    "Spárta",
+    "Athén",
+    "Théba",
+    "Korinthosz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi az Európai Unió mottója?",
+   "valaszok": [
+    "Sok kultúra, egy közösség",
+    "Külön és mégis együtt",
+    "Egység a sokféleségben",
+    "Összefogás és partnerség"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minek a felfedezése fűződik Bartolomeu Diaz nevéhez?",
+   "valaszok": [
+    "Horn-fok",
+    "Jóreménység foka",
+    "Kuba",
+    "Tahiti"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveztek az ókori sumérok a \"tábla házának\"?",
+   "valaszok": [
+    "bíróságot",
+    "iskolát",
+    "vendéglőt",
+    "fürdőt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Árpád fejedelmen kívül melyik magyar király apját hívták szintén Álmosnak?",
+   "valaszok": [
+    "Szent László",
+    "I. Géza",
+    "II. Béla",
+    "I. András"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki kezdte el építtetni a Louvre épületét?",
+   "valaszok": [
+    "I. Ferenc",
+    "IV. Fülöp",
+    "IV. Henrik",
+    "XIV. Lajos"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek az uralkodása alatt kezdték építeni a római Colosseumot?",
+   "valaszok": [
+    "Nero",
+    "Augustus",
+    "Vespasianus",
+    "Traianus"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik király nem közvetlenül követte az apját a trónon?",
+   "valaszok": [
+    "II. István",
+    "IV. Béla",
+    "II. Géza",
+    "I. (Szent) László"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik magyar miniszterelnök felesége volt Vörösmarty Mihály lánya?",
+   "valaszok": [
+    "Wekerle Sándor",
+    "Tisza István",
+    "Szapáry Gyula",
+    "Széll Kálmán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik orosz cár nyújtott katonai segítséget a Habsburgoknak 1849-ben?",
+   "valaszok": [
+    "I. Miklós",
+    "II. Miklós",
+    "I. Sándor",
+    "II. Sándor"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország egyik politikai ereje a Kongresszus Párt?",
+   "valaszok": [
+    "Japán",
+    "Brazília",
+    "India",
+    "Egyiptom"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városban halt meg Lenin?",
+   "valaszok": [
+    "Szentpéterváron",
+    "Moszkvában",
+    "Irkutszkban",
+    "Gorki"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik évben lépett be Magyarország az ENSZ-be?",
+   "valaszok": [
+    "1955.0",
+    "1949.0",
+    "1945.0",
+    "1958.0"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ókori görög filozófus volt a macedóniai Nagy Sándor nevelője?",
+   "valaszok": [
+    "Arhimédész",
+    "Platón",
+    "Arisztotelész",
+    "Diogenész"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen eredetű a jász nemzetiség?",
+   "valaszok": [
+    "viking",
+    "balti szláv",
+    "germán",
+    "iráni"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az 1848-49-es magyar szabadságharc melyik neves alakja hunyt el Murad Tevfik pasa néven?",
+   "valaszok": [
+    "Bem József",
+    "Szemere Bertalan",
+    "Guyon Richard",
+    "Klapka György"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hányszor járt Kolumbusz Amerikában?",
+   "valaszok": [
+    "egyszer",
+    "kétszer",
+    "háromszor",
+    "négyszer"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki győzte le Spartacust, az ókori rabszolgafelkelés vezetőjét?",
+   "valaszok": [
+    "Scipio",
+    "Pompeius",
+    "Julius Caesar",
+    "Crassus"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt Nagy-Briannia miniszterelnöke az 1948-as londoni olimpia idején?",
+   "valaszok": [
+    "Clement Attlee",
+    "Lloyd George",
+    "Sir Winston Churchill",
+    "Harold Wilson"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt a tagja az első triumvirátusnak az alábbiak közül?",
+   "valaszok": [
+    "Augustus",
+    "Romulus",
+    "Vespasianus",
+    "Crassus"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kik alapították Karthágó városát?",
+   "valaszok": [
+    "egyiptomiak",
+    "vikingek",
+    "sumérok",
+    "föníciaiak"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi nem tartozott a \"hét lovagi készség\" közé a középkori lovagi nevelésben?",
+   "valaszok": [
+    "birkózás",
+    "éneklés",
+    "sakkozás",
+    "úszás"
+   ],
+   "helyes": 0
+  }
+ ]
+}

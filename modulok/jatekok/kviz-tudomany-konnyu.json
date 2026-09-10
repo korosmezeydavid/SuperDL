@@ -1,0 +1,2628 @@
+{
+ "id": "kviz-tudomany-konnyu",
+ "nev": "Tudomány és technika — könnyebb",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "Az alábbiak közül melyiket lehet vizsgálni a planetáriumban?",
+   "valaszok": [
+    "holdkóros betegeket",
+    "naphalakat",
+    "égitesteket",
+    "egysejtűeket"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik a féknek a forgó felületéhez súrlódó alkatrészét?",
+   "valaszok": [
+    "fékorca",
+    "fékajak",
+    "fékcsőr",
+    "fékpofa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan szól Arkhimédész szállóigéje? \"Ne zavard …!\"",
+   "valaszok": [
+    "köreimet",
+    "rombuszaimat",
+    "háromszögeimet",
+    "paralelepipedonjaimat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki vagy mi rögzíti repülés közben a repülőgép műszaki adatait?",
+   "valaszok": [
+    "a stewardess",
+    "a fehér kocka",
+    "a fekete doboz",
+    "a bűvös kocka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy egyszerű gép elnevezése?",
+   "valaszok": [
+    "mosómedve",
+    "hangyászsün",
+    "fakopáncs",
+    "csiga"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik jármű volt régen \"ekhós\"?",
+   "valaszok": [
+    "gőzhajó",
+    "szekér",
+    "mozdony",
+    "léghajó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szó jelöl egy hídtípust?",
+   "valaszok": [
+    "lógó",
+    "csüngő",
+    "függő",
+    "fityegő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi az elektromos feszültség mértékegysége?",
+   "valaszok": [
+    "van",
+    "nincs",
+    "volt",
+    "lesz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi keletkezik sav és bázis kémiai reakciójából?",
+   "valaszok": [
+    "só",
+    "bors",
+    "szegfűszeg",
+    "gyömbér"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen \"szem\" van a kerékpárokon?",
+   "valaszok": [
+    "sas",
+    "macska",
+    "vakond",
+    "kutya"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen egységben mérik a szemüveg lencséjének erősségét?",
+   "valaszok": [
+    "luxban",
+    "dioptriában",
+    "fokban",
+    "araszban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen eszköz volt a középkorban használatos katapult?",
+   "valaszok": [
+    "markotányosnők gyékénye",
+    "leanyvásár emelvénye",
+    "ostromgép",
+    "grófkisasszonyok kanapéja"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen jármű a gokart?",
+   "valaszok": [
+    "vízibicikli",
+    "versenyautó",
+    "sárkányrepülő",
+    "kutyaszán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen mértékegységben mérik az arany finomságát?",
+   "valaszok": [
+    "grammban",
+    "kalóriában",
+    "lóerőben",
+    "karátban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen pályáról szállnak fel a repülőgépek?",
+   "valaszok": [
+    "befutó",
+    "kifutó",
+    "elszálló",
+    "műjég"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire használják a hidegvágót?",
+   "valaszok": [
+    "fagylaltkészítésre",
+    "időjárás-előrejelzésre",
+    "fémvágásra",
+    "nádaratásra"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál a gépkocsi motorja, amikor túlzott terhelés miatt hirtelen megáll?",
+   "valaszok": [
+    "kifullad",
+    "elfullad",
+    "lefullad",
+    "megfullad"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit használtak régen az autósok az autó motorjának beindításához?",
+   "valaszok": [
+    "kurblit",
+    "verklit",
+    "vurslit",
+    "veknit"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit kiáltott Arkhimédész a fürdőkádból kiugorva, mikor rájött híres törvényére?",
+   "valaszok": [
+    "Demokrácia!",
+    "Olimpia!",
+    "Anarchia!",
+    "Heuréka!"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mivel szálltak le az űrhajósok a Holdra?",
+   "valaszok": [
+    "holdtutajjal",
+    "holdbárkával",
+    "holdkomppal",
+    "holduszállyal"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket nevezik Jumbo Jetnek?",
+   "valaszok": [
+    "egy tankhajótípust",
+    "a teherhordó elefántot",
+    "egy repülőgéptípust",
+    "egy űrállomást"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik a légi illetve vízi járművekre stabilitás céljából rakott terhet?",
+   "valaszok": [
+    "málha",
+    "kolonc",
+    "nyűg",
+    "ballaszt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik a matematikában a koordináta-rendszer kezdőpontját?",
+   "valaszok": [
+    "orgánum",
+    "orgia",
+    "origó",
+    "origami"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik az új repülőgép működését ellenőrző próbautat?",
+   "valaszok": [
+    "kirepülés",
+    "berepülés",
+    "átrepülés",
+    "felrepülés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezzük a derékszögű háromszög melletti oldalait?",
+   "valaszok": [
+    "átfogó",
+    "befogó",
+    "tengely",
+    "szelő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol található egy hajón a tőkesúly?",
+   "valaszok": [
+    "árbocán",
+    "gerincén",
+    "vitorláján",
+    "kormánylapátján"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány Celsius-fokon forr a víz?",
+   "valaszok": [
+    "120 °C-on",
+    "100 °C-on",
+    "80 °C-on",
+    "1000 °C-on"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány fokosak az egyenlő oldalú háromszög belső szögei?",
+   "valaszok": [
+    "180.0",
+    "60.0",
+    "90.0",
+    "45.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki foglalkozik az alábbiak közül őslényekkel?",
+   "valaszok": [
+    "hidrológus",
+    "turkológus",
+    "paleontológus",
+    "balneológus"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik anyag nem szükséges a beton előállításához?",
+   "valaszok": [
+    "homok",
+    "sóder",
+    "szurok",
+    "cement"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy csillagászati távolságegység elnevezése?",
+   "valaszok": [
+    "fénynap",
+    "fényhét",
+    "fényhónap",
+    "fényév"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik eszköz megfigyelését végzi egy rádiólokátor kezelője?",
+   "valaszok": [
+    "részecskegyorsító",
+    "meteorológiai műhold",
+    "radar",
+    "röntgenkészülék"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hidunk építését vezette Clark Ádám?",
+   "valaszok": [
+    "Margit híd",
+    "Lánchíd",
+    "Erzsébet híd",
+    "Szabadság híd"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik istenről kapta nevét egy amerikai űrhajótípus?",
+   "valaszok": [
+    "Apolló",
+    "Dionüszosz",
+    "Zeusz",
+    "Hádész"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik jármű alkatrésze a csűrőlap?",
+   "valaszok": [
+    "szekér",
+    "repülőgép",
+    "vitorlás hajó",
+    "kerékpár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik két kémiai elem vegyülete a víz?",
+   "valaszok": [
+    "nitrogén és oxigén",
+    "hidrogén és oxigén",
+    "hidrogén és klór",
+    "nátrium és klór"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik skálán nem mérhetünk hőmérsékletet?",
+   "valaszok": [
+    "Réaumur",
+    "Celsius",
+    "Richter",
+    "Fahrenheit"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik síkidomra vonatkozik a Pitagorasz-tétel?",
+   "valaszok": [
+    "kör",
+    "ellipszis",
+    "téglalap",
+    "derékszögű háromszög"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik égitest okozza az árapály jelenséget?",
+   "valaszok": [
+    "a Hold",
+    "a Mars",
+    "a Jupiter",
+    "a Vénusz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyikből készítik a vattát?",
+   "valaszok": [
+    "gyapotszálakból",
+    "gyapjúszálakból",
+    "selyemszálakból",
+    "kenderrostból"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a dízelmotorok üzemanyaga?",
+   "valaszok": [
+    "benzin",
+    "benzol",
+    "gázolaj",
+    "metán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a szputnyik?",
+   "valaszok": [
+    "űrrepülőgép",
+    "hordozórakéta",
+    "műhold",
+    "űrteleszkóp"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt a neve a Föld első mesterséges holdjának?",
+   "valaszok": [
+    "Szputnyik-1",
+    "Vosztok-1",
+    "Szaljut-1",
+    "Szojuz-1"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mije van egy dzsunkának?",
+   "valaszok": [
+    "vitorlája",
+    "szárnya",
+    "kereke",
+    "gyökere"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mije van egy kúpnak?",
+   "valaszok": [
+    "sapkája",
+    "palástja",
+    "pantallója",
+    "bocskora"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen \"automatát\" épített Kempelen Farkas?",
+   "valaszok": [
+    "automata fényképezőgépet",
+    "sakkautomatát",
+    "kávéautomatát",
+    "automata kártyajátékost"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen \"erő\" volt a teljesítmény mértékegysége az SI rendszer bevezetése előtt?",
+   "valaszok": [
+    "bivaly",
+    "elefánt",
+    "ökör",
+    "ló"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen anyagból készül a furnérlemez?",
+   "valaszok": [
+    "üvegből",
+    "fából",
+    "vasból",
+    "pamutból"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen fényképezési eljárás során készül el a fénykép egy-két perc alatt?",
+   "valaszok": [
+    "polarográfia",
+    "polaroid",
+    "tomográfia",
+    "polder"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen hosszúság-mértékegységet használnak a csillagászatban?",
+   "valaszok": [
+    "kilómétert",
+    "mérföldet",
+    "araszt",
+    "fényévet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen jármű a naszád?",
+   "valaszok": [
+    "vadászrepülő",
+    "hadihajó",
+    "tengeralattjáró",
+    "tank"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen jármű része a tőkesúly?",
+   "valaszok": [
+    "vitorlás hajó",
+    "sárkányrepülő",
+    "léghajó",
+    "mozdony"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen járműtípust neveztek el Ferdinand von Zeppelinről?",
+   "valaszok": [
+    "tengeralattjárót",
+    "űrhajót",
+    "léghajót",
+    "gépkocsit"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen szerkezetet épített Nikolaus August Otto?",
+   "valaszok": [
+    "helikoptert",
+    "belsőégésű motort",
+    "űrrakétát",
+    "távírót"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen találmány fűződik Samuel Colt nevéhez?",
+   "valaszok": [
+    "egy távcsöves puska",
+    "egy ágyú",
+    "egy revolver",
+    "egy vadászkés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen találmány ihletője volt a bogáncs?",
+   "valaszok": [
+    "cellux",
+    "tépőzár",
+    "buzogány",
+    "tűpárna"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen természeti jelenség a főn, a bóra és a nemere?",
+   "valaszok": [
+    "tengeráramlat",
+    "üstökös",
+    "szél",
+    "napfolt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen égitest kapta nevét Edmond Halley csillagászról?",
+   "valaszok": [
+    "csillag",
+    "hold",
+    "bolygó",
+    "üstökös"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek az SI-mértékegységét nevezték el James Wattról?",
+   "valaszok": [
+    "teljesítményt",
+    "elektromos feszültség",
+    "erő",
+    "munka"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mire használják a vályogot?",
+   "valaszok": [
+    "üveggyártásra",
+    "ruhakészítésre",
+    "építkezésre",
+    "fűtésre"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit alkotott Celsius, Fahrenheit és Réaumur?",
+   "valaszok": [
+    "barométert",
+    "termodinamikai törvényt",
+    "hőmérsékleti skálát",
+    "gőzgépet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit mérünk a barométerrel?",
+   "valaszok": [
+    "hőmérséklettel",
+    "légnyomást",
+    "szélerősséget",
+    "feszültséget"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveznek folyékony szénnek?",
+   "valaszok": [
+    "a kávét",
+    "a kőolajat",
+    "a higanyt",
+    "az ébenfa gyantáját"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveztek el Rudolf Diesel feltalálóról?",
+   "valaszok": [
+    "belsőégésű motorfajtát",
+    "felfújható gumiabroncsot",
+    "gőzhajótípust",
+    "egykerekű biciklit"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mivel foglalkozik a fizika egyik ága, az optika?",
+   "valaszok": [
+    "hang",
+    "fény",
+    "elektromosság",
+    "nyomás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A tudomány melyik területén tevékenykedett James Joule?",
+   "valaszok": [
+    "kémia",
+    "fizika",
+    "orvostudomány",
+    "geológia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbi tárgyak közül melyiket készítik dongákból?",
+   "valaszok": [
+    "fahordót",
+    "bekecset",
+    "szőnyeget",
+    "horgászbotot"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik indítja meg a gázkeverék robbanását a belsőégésű motorban?",
+   "valaszok": [
+    "gyújtózsinór",
+    "gyújtólencse",
+    "gyújtógyertya",
+    "gyutacs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik a személyiséget az írásjegyek alapján vizsgáló eljárást?",
+   "valaszok": [
+    "morfológia",
+    "grafológia",
+    "kalligráfia",
+    "topográfia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezzük a derékszögű háromszögben a derékszöggel szemközti oldalt?",
+   "valaszok": [
+    "átmérő",
+    "átfogó",
+    "átló",
+    "befogó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezzük a vegyi folyamatok sebességét megváltoztató anyagot?",
+   "valaszok": [
+    "katalizátor",
+    "katapult",
+    "katalógus",
+    "katarzis"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol közlekedik a monitor elnevezésű jármű?",
+   "valaszok": [
+    "levegőben",
+    "vízen",
+    "föld alatt",
+    "szárazföldön"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány fokos az egyenesszög?",
+   "valaszok": [
+    "60.0",
+    "90.0",
+    "180.0",
+    "360.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány karátos a színarany?",
+   "valaszok": [
+    "18.0",
+    "20.0",
+    "24.0",
+    "42.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány éle van egy kockának?",
+   "valaszok": [
+    "6.0",
+    "12.0",
+    "8.0",
+    "4.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely országok űrhajósai hajtották végre az első nemzetközi űrrepülést?",
+   "valaszok": [
+    "USA-Szovjetunió",
+    "Franciaország-Szovjetunió",
+    "USA-Kína",
+    "USA-Kanada"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik \"váltó\" nincs a vasúton?",
+   "valaszok": [
+    "őr",
+    "ház",
+    "kar",
+    "bot"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik a Naphoz legközelebbi bolygó?",
+   "valaszok": [
+    "Merkur",
+    "Vénusz",
+    "Föld",
+    "Mars"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik anyag növényi eredetű?",
+   "valaszok": [
+    "gyapjú",
+    "pamut",
+    "selyem",
+    "angóra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy galaxis neve az alábbiak közül?",
+   "valaszok": [
+    "Fúria-felleg",
+    "Androméda-köd",
+    "Héliosz-felhő",
+    "Kalüpszó-csomó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik eljárást nem szőnyegkészítésre használják?",
+   "valaszok": [
+    "szövés",
+    "tűnemezelés",
+    "varrva hurkolás",
+    "kártolás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik feltaláló készített autót?",
+   "valaszok": [
+    "Kandó Kálmán",
+    "Csonka János",
+    "Puskás Tivadar",
+    "Irinyi János"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik fémből állítják elő az acélt?",
+   "valaszok": [
+    "alumínium",
+    "réz",
+    "vas",
+    "magnézium"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik fémet szokták \"magyar ezüst\"-nek nevezni?",
+   "valaszok": [
+    "alumíniumot",
+    "vasat",
+    "nikkelt",
+    "rezet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik harcászati eszköz másik neve a srapnel?",
+   "valaszok": [
+    "harckocsi",
+    "bombázó",
+    "repeszgránát",
+    "akna"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik járműnek lehet lánctalpa?",
+   "valaszok": [
+    "a katamaránnak",
+    "a targoncának",
+    "a függővasútnak",
+    "a harckocsinak"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik kémiai elemet használják a víz fertőtlenítésére?",
+   "valaszok": [
+    "a brómot",
+    "a mangánt",
+    "a klórt",
+    "a magnéziumot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik matematikai alapművelet jelenik meg a hatványozásban?",
+   "valaszok": [
+    "összeadás",
+    "kivonás",
+    "osztás",
+    "szorzás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik matematikai alapművelethez köthető a hatványozás?",
+   "valaszok": [
+    "összeadás",
+    "szorzás",
+    "kivonás",
+    "osztás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem egy szögfüggvény elnevezése?",
+   "valaszok": [
+    "tangens",
+    "koszinusz",
+    "szinkópa",
+    "szinusz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik országról kapta nevét a polónium?",
+   "valaszok": [
+    "Portugália",
+    "Lengyelország",
+    "Csehország",
+    "Franciaország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik síkidomnak van átfogója?",
+   "valaszok": [
+    "négyzet",
+    "téglalap",
+    "kör",
+    "derékszögű háromszög"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik tudományos területen nem osztanak Nobel-díjat?",
+   "valaszok": [
+    "kémia",
+    "fizikai",
+    "orvostudomány",
+    "politológia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik tudományág művelője a médiából is közismert Grétsy László?",
+   "valaszok": [
+    "matematika",
+    "fizika",
+    "nyelvészet",
+    "régészet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik égitesten hajtott végre sikeres leszállást a Luna-9 szovjet űrszonda?",
+   "valaszok": [
+    "Marson",
+    "Holdon",
+    "Vénuszon",
+    "Uránuszon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik égitesten közlekedett a szovjet Lunohod?",
+   "valaszok": [
+    "Marson",
+    "Holdon",
+    "Vénuszon",
+    "Merkúron"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik égitestet kutatták a szovjet Luna űrszondák?",
+   "valaszok": [
+    "a Napot",
+    "a Plútót",
+    "a Vénuszt",
+    "a Holdat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ércből állítják elő az alumíniumot?",
+   "valaszok": [
+    "rézből",
+    "bauxitból",
+    "vasércből",
+    "nikkelből"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyiket szokták földelni az alábbiak közül?",
+   "valaszok": [
+    "mechanikus gép",
+    "vízmeghajtású szerkezet",
+    "villamos berendezés",
+    "gázüzemű berendezés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mennyi a Föld tengely körüli forgásideje?",
+   "valaszok": [
+    "egy nap",
+    "egy hónap",
+    "három hónap",
+    "egy év"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mennyi a Ludolf-féle szám vagyis a \"pi\" kerekített értéke?",
+   "valaszok": [
+    "3.14",
+    "4.25",
+    "1.34",
+    "3.33"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mennyi a négyszög belső szögeinek összege?",
+   "valaszok": [
+    "0.0",
+    "90.0",
+    "180.0",
+    "360.0"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mennyi idő alatt kerüli meg a Hold a Földet?",
+   "valaszok": [
+    "28 nap",
+    "30 nap",
+    "40 nap",
+    "1 év"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a keresztneve Einstein, Nobel-díjas fizikusnak?",
+   "valaszok": [
+    "Albert",
+    "Alfred",
+    "Alfons",
+    "Anton"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a neve a fényképezőgép felvételre szolgáló lencserendszerének?",
+   "valaszok": [
+    "aktív",
+    "passzív",
+    "objektív",
+    "szubjektív"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi alapján jósolják meg életutunkat az asztrológusok?",
+   "valaszok": [
+    "a napkitörések",
+    "a madarak röpte",
+    "a bolygók állása",
+    "a kávé illata"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi tartja pályájukon az égitesteket?",
+   "valaszok": [
+    "az égellenállás",
+    "a gravitáció",
+    "a fénysebesség",
+    "a szaturáció"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen anyagból készül a \"római tál\" nevű sütőedény?",
+   "valaszok": [
+    "acélból",
+    "porcelánból",
+    "hőálló üvegből",
+    "agyagból"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen anyagokat szoktak tisztítás céljából deríteni?",
+   "valaszok": [
+    "szilárd",
+    "folyékony",
+    "légnemű",
+    "plazma"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen anyagot tartalmaznak a hagyományos molyírtók?",
+   "valaszok": [
+    "naftalint",
+    "nikotint",
+    "koffeint",
+    "halogént"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen elmélet fűződik Einstein nevéhez?",
+   "valaszok": [
+    "realitás",
+    "relativitás",
+    "reparálás",
+    "renoválás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen gázt használtak harci eszközként?",
+   "valaszok": [
+    "torma",
+    "bors",
+    "mustár",
+    "paprika"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen híres gyárat alapított Ettore Bugatti?",
+   "valaszok": [
+    "autógyárat",
+    "sörgyárat",
+    "textilgyárat",
+    "sajtgyárat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen híres találmánya őrízte meg John M. Browning nevét?",
+   "valaszok": [
+    "farmernadrág",
+    "pisztoly",
+    "repülőgép",
+    "fúrógép"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen jármű a jet?",
+   "valaszok": [
+    "tankhajó",
+    "repülőgép",
+    "terepjáró autó",
+    "dízelmozdony"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen jármű a szkúner?",
+   "valaszok": [
+    "repülőgép",
+    "léghajó",
+    "lovas kocsi",
+    "vitorlás hajó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen járműveket gyártottak Louis Blériot üzemében?",
+   "valaszok": [
+    "repülőépeket",
+    "tengeralattjárókat",
+    "merev vázú léghajókat",
+    "gőzhajókat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen mértékegység a hektár?",
+   "valaszok": [
+    "térfogat",
+    "tömeg",
+    "terület",
+    "hosszúság"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen mértékegység az ár?",
+   "valaszok": [
+    "hossz",
+    "súly",
+    "terület",
+    "űr"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nemzetiségű volt Nikolausz Kopernikusz, a neves csillagász?",
+   "valaszok": [
+    "lengyel",
+    "görög",
+    "orosz",
+    "német"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen találmányuk kapta nevét a Mauser-fivérekről?",
+   "valaszok": [
+    "hőlégballon",
+    "fényképezőgép",
+    "írógép",
+    "lőfegyver"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek a mellékterméke az író?",
+   "valaszok": [
+    "borpréselés",
+    "vajkészítés",
+    "sörfőzés",
+    "papírgyártás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek az úttörője volt Louis Daguerre?",
+   "valaszok": [
+    "repülés",
+    "űrkutatás",
+    "fényképezés",
+    "gőzgépgyártás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mire használják Alexander Bell találmányát?",
+   "valaszok": [
+    "motorozásra",
+    "telefonálásra",
+    "repülésre",
+    "távírásra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire használják a fritőzt?",
+   "valaszok": [
+    "sütésre",
+    "hajszárításra",
+    "fagyasztásra",
+    "tálalásra"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit nevez a népnyelv hullócsillagnak?",
+   "valaszok": [
+    "üstökös",
+    "szupernova",
+    "meteor",
+    "kvazár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit tervezett Benjamin Franklin?",
+   "valaszok": [
+    "telefont",
+    "fonográfot",
+    "villámhárítót",
+    "szikratávírót"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A KRESZ szerint melyik jármű az \"elektromos felsővezetékhez kötött gépkocsi\"?",
+   "valaszok": [
+    "villamos",
+    "trolibusz",
+    "libegő",
+    "fogaskerekű"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A Naprendszer melyik bolygója van legtávolabb a Naptól?",
+   "valaszok": [
+    "Neptunusz",
+    "Jupiter",
+    "Plútó",
+    "Szaturnusz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A Naprendszer melyik égitestét nevezik \"vörös bolygónak\"?",
+   "valaszok": [
+    "Jupiter",
+    "Vénusz",
+    "Mars",
+    "Merkúr"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik nem amerikai autómárka?",
+   "valaszok": [
+    "Ford",
+    "Cadillac",
+    "Buick",
+    "Renault"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket fedezte fel Charles Goodyear?",
+   "valaszok": [
+    "a kaucsuk vulkanizálását",
+    "a hőálló üveget",
+    "a parafint",
+    "a nitroglicerint"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy hívták a rádió elődjének számító telefonos szolgáltatást?",
+   "valaszok": [
+    "telehírnök",
+    "telefonhírmondó",
+    "rádiótelefon",
+    "telefonhíradó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol lépett előszőr ember a Holdra?",
+   "valaszok": [
+    "az Unalom Tengerén",
+    "a Portengeren",
+    "a Nyugalom Tengerén",
+    "a Zabhegyen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol találták fel a hőmérséklet-változásokra érzéketlen üveget?",
+   "valaszok": [
+    "Müchenben",
+    "Weimarban",
+    "Jénában",
+    "Herenden"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol tárolja a számítógép a programokat?",
+   "valaszok": [
+    "a memoriterben",
+    "a memóriában",
+    "a memoárban",
+    "a memorandumban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Honnan lőtték fel a világ első műholdját?",
+   "valaszok": [
+    "Egyesült Államokból",
+    "Szovjetunióból",
+    "Kínából",
+    "Nagy-Britanniából"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány Nobel-díj átadáson vett részt az alapító, Alfred Nobel?",
+   "valaszok": [
+    "csak az elsőn",
+    "ötön",
+    "tizen",
+    "egyen sem"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány centiméter egy kilométer?",
+   "valaszok": [
+    "1000.0",
+    "10000.0",
+    "100000.0",
+    "1000000.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány fokosak az egyenlő oldalú háromszög szögei?",
+   "valaszok": [
+    "30",
+    "60",
+    "90",
+    "120"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány utasa volt az első kínai űrhajónak?",
+   "valaszok": [
+    "egy",
+    "kettő",
+    "három",
+    "öt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hányas számrendszer a bináris számrendszer?",
+   "valaszok": [
+    "tizes",
+    "hetes",
+    "tizenkettes",
+    "kettes"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki fedezte fel az X-sugarakat?",
+   "valaszok": [
+    "Henri Becquerel",
+    "Marie Curie-Sklodowska",
+    "Guglielmo Marconi",
+    "Conrad Röntgen"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki találta fel a fonográfot?",
+   "valaszok": [
+    "Thomas Edison",
+    "Benjamin Franklin",
+    "Puskás Tivadar",
+    "Robert Fulton"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki tervezte az első, gyakorlatban is használható szénszálas izzólámpát?",
+   "valaszok": [
+    "Thomas Alva Edison",
+    "Luigi Galvani",
+    "Alessandro Volta",
+    "James Watt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt angol az alábbi híres feltalálók közül?",
+   "valaszok": [
+    "George Stephenson",
+    "Benjamin Franklin",
+    "Thomas Edison",
+    "Robert Fulton"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a nevéhez fűződik a szénszálas izzólámpa feltalálása?",
+   "valaszok": [
+    "Thomas Alva Edison",
+    "Sir Thomas Philips",
+    "Alexander Bell",
+    "John Tungsram"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mely égitestek állnak izzó gázokból?",
+   "valaszok": [
+    "a holdak",
+    "a kisbolygók",
+    "a csillagok",
+    "a fekete lyukak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik az a mértani test, amelynek minden pontja egyenlő távolságra van a középponttól?",
+   "valaszok": [
+    "kocka",
+    "gömb",
+    "téglatest",
+    "henger"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik betűvel jelölik a kör sugarát a matematikában?",
+   "valaszok": [
+    "g",
+    "s",
+    "r",
+    "d"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik bolygón véltek mesterséges építményeket felfedezni egykor a csillagászok?",
+   "valaszok": [
+    "a Vénuszon",
+    "az Uránuszon",
+    "a Marson",
+    "a Plútón"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik felfogás tekintette a Földet a világegyetem középpontjának?",
+   "valaszok": [
+    "geocentrikus",
+    "heliocentrikus",
+    "centrifugális",
+    "univerzális"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik fizikai mennyiség SI-egysége a watt?",
+   "valaszok": [
+    "munka",
+    "teljesítmény",
+    "erő",
+    "ellenállás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik fém latin neve az aurum?",
+   "valaszok": [
+    "arany",
+    "alumínium",
+    "ezüst",
+    "réz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik kémiai elem alkotja a levegő nagyobb részét?",
+   "valaszok": [
+    "oxigén",
+    "nátrium",
+    "hidrogén",
+    "nitrogén"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik kémiai elem latin elnevezése a karbon?",
+   "valaszok": [
+    "kálcium",
+    "szén",
+    "kén",
+    "réz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik kémiai elem módosulata az ózon?",
+   "valaszok": [
+    "ólom",
+    "ozmium",
+    "ón",
+    "oxigén"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik kémiai elem vegyjele a B?",
+   "valaszok": [
+    "bárium",
+    "bór",
+    "bróm",
+    "bizmut"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik kémiai elem vegyjele a Ca?",
+   "valaszok": [
+    "kálium",
+    "kalcium",
+    "kobalt",
+    "klór"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik kémiai elem vegyjele a Cr?",
+   "valaszok": [
+    "cirkónium",
+    "klór",
+    "króm",
+    "cink"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik kémiai elem vegyjele a Ni?",
+   "valaszok": [
+    "nátrium",
+    "nitrogén",
+    "nikkel",
+    "neon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik kémiai elem vegyjele az Ag?",
+   "valaszok": [
+    "argon",
+    "arany",
+    "vas",
+    "ezüst"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik két kémiai elem vegyülete a metán?",
+   "valaszok": [
+    "vas és oxigén",
+    "szén és hidrogén",
+    "kén és hidrogén",
+    "nitrogén és oxigén"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szoros szabályozásának tervét készítette Vásárhelyi Pál?",
+   "valaszok": [
+    "Bering",
+    "Vaskapu",
+    "Thermopülai",
+    "Gibraltári"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik számrendszeren alapul a számítógép működése?",
+   "valaszok": [
+    "kettes",
+    "hetes",
+    "tízes",
+    "tizenkettes"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik síkidom az alábbiak közül?",
+   "valaszok": [
+    "henger",
+    "gömb",
+    "gúla",
+    "deltoid"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik tudományág atyjának tekintik Hippokratészt?",
+   "valaszok": [
+    "történetírás",
+    "orvostudomány",
+    "ábrázoló geometria",
+    "csillagászat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik tárgyat tanította a marosvásárhelyi református kollégiumban Bolyai Farkas?",
+   "valaszok": [
+    "matematikát",
+    "biológiát",
+    "nyelvészetet",
+    "történelmet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik űrhajótípus volt egyszemélyes?",
+   "valaszok": [
+    "Voszhod",
+    "Apollo",
+    "Mercury",
+    "Szojuz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyikre használják a bergmanncsövet?",
+   "valaszok": [
+    "villanyvezetékek védelmére",
+    "vízvezetékek készítésére",
+    "autókarosszériák erősítésére",
+    "lefolyócsövek készítésére"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mennyi idő alatt kerüli meg a Vénusz bolygó a Napot?",
+   "valaszok": [
+    "88 nap",
+    "225 nap",
+    "365 nap",
+    "1,88 év"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a cotangens matematikai kifejezés hivatalos, szótár szerinti rövidítése?",
+   "valaszok": [
+    "c",
+    "cg",
+    "ctg",
+    "ctng"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a hidrogén-klorid vizes oldatának köznapi neve?",
+   "valaszok": [
+    "konyhasó",
+    "salétromsav",
+    "sósav",
+    "hangyasav"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a nemzetközi mértékegységrendszer közismert rövidítése?",
+   "valaszok": [
+    "SI",
+    "NM",
+    "IS",
+    "INS"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a neve a hordozható, hajlékony számítógépes mágneses adattároló-lemeznek?",
+   "valaszok": [
+    "CD-ROM",
+    "szkenner",
+    "floppy disc",
+    "DVD"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a porcelángyártás fő alapanyaga?",
+   "valaszok": [
+    "kvarc",
+    "gyanta",
+    "kaolin",
+    "polisztirol"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi az aszkorbinsav közismert neve?",
+   "valaszok": [
+    "aminosav",
+    "sósav",
+    "C-vitamin",
+    "metán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi az idő jele a fizikában?",
+   "valaszok": [
+    "s",
+    "t",
+    "r",
+    "i"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt a foglalkozása Bánki Donátnak, a híres feltalálónak?",
+   "valaszok": [
+    "vegyészmérnök",
+    "gépészmérnök",
+    "orvos",
+    "biológus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt a neve az első népautónak, amelyet Henry Ford gyártott 1908-tól?",
+   "valaszok": [
+    "S-modell",
+    "F-modell",
+    "T-modell",
+    "H-modell"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi állt a heliocentrikus világkép középpontjában?",
+   "valaszok": [
+    "a Föld",
+    "a Hold",
+    "a Nap",
+    "a Tejút"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miből épült a jurta?",
+   "valaszok": [
+    "téglából",
+    "fából és nemezből",
+    "kőből és nádból",
+    "hóból"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mikkel foglalkozik elsősorban a trigonometria?",
+   "valaszok": [
+    "körökkel",
+    "szabályos sokszögekkel",
+    "rombuszokkal",
+    "háromszögekkel"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mikor lesz egy fénykép alulexponált?",
+   "valaszok": [
+    "ha sok a fény",
+    "ha kevés a fény",
+    "ha nagy a távolság",
+    "ha alacsony a fényképész"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mikor van vége a csillagászati télnek?",
+   "valaszok": [
+    "január 6.",
+    "február 28.",
+    "március 15.",
+    "március 21."
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen fegyver kapta nevét Flobert francia feltalálóról?",
+   "valaszok": [
+    "bicska",
+    "kard",
+    "puska",
+    "rakéta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen fegyvert neveztek flintának?",
+   "valaszok": [
+    "vadásztőrt",
+    "revolvert",
+    "puskát",
+    "ágyút"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen gyárat alapított Anthony Fokker?",
+   "valaszok": [
+    "repülőgépgyárat",
+    "autógyárat",
+    "hajógyárat",
+    "sörgyárat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen gyártmányú holdjármű volt a Lunohod?",
+   "valaszok": [
+    "amerikai",
+    "angol",
+    "szovjet",
+    "francia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen mérték volt a köböl?",
+   "valaszok": [
+    "hossz",
+    "terület",
+    "űr",
+    "súly"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen találmányt köszönhet Európa Gutenberg Jánosnak?",
+   "valaszok": [
+    "a villanyégőt",
+    "a kerékpárt",
+    "a könyvnyomtatást",
+    "a gőzgépet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minek az elődje volt a dagerrotípia?",
+   "valaszok": [
+    "gépkocsi",
+    "fénykép",
+    "dinamó",
+    "távcső"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit mérünk a radiánnal?",
+   "valaszok": [
+    "hőmérsékletet",
+    "síkszöget",
+    "anyagmennyiséget",
+    "fényerősséget"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel foglalkozik az antropológus?",
+   "valaszok": [
+    "emberrel",
+    "növénnyel",
+    "állattal",
+    "őslénnyel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A Naprendszer melyik bolygóját övezi gyűrű?",
+   "valaszok": [
+    "Neptunusz",
+    "Uránusz",
+    "Jupiter",
+    "Szaturnusz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A fizika mely területével foglalkozik a kinematika?",
+   "valaszok": [
+    "mozgás",
+    "hőmérséklet",
+    "fény",
+    "áramvezetés"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A legenda szerint mit mondott Arkhimédész későbbi gyilkosának?",
+   "valaszok": [
+    "Te is fiam, Brutus?",
+    "Az asszony ingatag!",
+    "Ne álld el előlem a napot!",
+    "Ne zavard köreimet!"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A matematikának melyik ága foglalkozik a szögfüggvényekkel?",
+   "valaszok": [
+    "algebra",
+    "trigonometria",
+    "függvénytan",
+    "kombinatorika"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik anyag készül vulkanizálással?",
+   "valaszok": [
+    "gumi",
+    "acél",
+    "alumínium",
+    "üveg"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy nevezik a geometriában egy görbe két pontját összekötő szakaszt?",
+   "valaszok": [
+    "átfogó",
+    "érintő",
+    "húr",
+    "sugár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik a sokszögek két nem szomszédos csúcspontját összekötő egyenest?",
+   "valaszok": [
+    "átló",
+    "sugár",
+    "átmérő",
+    "érintő"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol folytatta kutatásait Jacques-Yves Cousteau?",
+   "valaszok": [
+    "a tengerek mélyén",
+    "a hóhatár felett",
+    "ausztrál sivatagokban",
+    "afrikai őserdőkben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Honnan indították útjára az első mesterséges holdat?",
+   "valaszok": [
+    "Szovjetunió",
+    "Amerikai Egyesült Államok",
+    "Kína",
+    "Nagy-Britannia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány kategóriában osztanak Nobel-díjat?",
+   "valaszok": [
+    "négy",
+    "hat",
+    "nyolc",
+    "tíz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány milliliter van egy hektóban?",
+   "valaszok": [
+    "egymillió",
+    "százezer",
+    "tízezer",
+    "ezer"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány oldala van a deltoidnak?",
+   "valaszok": [
+    "3",
+    "4",
+    "6",
+    "8"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány szabályos háromszög határol egy oktaédert?",
+   "valaszok": [
+    "4.0",
+    "6.0",
+    "8.0",
+    "12.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány éle van a kockának?",
+   "valaszok": [
+    "6.0",
+    "8.0",
+    "10.0",
+    "12.0"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki folytatott helikopteres kísérleteket a feltalálók közül?",
+   "valaszok": [
+    "Asbóth Oszkár",
+    "Teller Ede",
+    "Szilárd Leó",
+    "Gábor Dénes"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki gyártotta saját szabadalma alapján budai gyárában a vasúti kocsik kéregöntésű kerekeit?",
+   "valaszok": [
+    "Ganz Ábrahám",
+    "Csonka János",
+    "Kandó Kálmán",
+    "Bláthy Ottó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem kapott Nobel-díjat a magyar származású tudósok közül?",
+   "valaszok": [
+    "Szent-Györgyi Albert",
+    "Eötvös Loránd",
+    "Gábor Dénes",
+    "Wigner Jenő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki vett részt több űrutazásban is?",
+   "valaszok": [
+    "Jurij Gagarin",
+    "Valentyina Tyereskova",
+    "Farkas Bertalan",
+    "Neil Armstrong"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt az a magyar származású tudós, aki a stresszkutatásban ért el jelentős eredményeket?",
+   "valaszok": [
+    "Teller Ede",
+    "Gábor Dénes",
+    "Neumann János",
+    "Selye János"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt az első írógépgyáros?",
+   "valaszok": [
+    "Remington",
+    "Gilette",
+    "Singer",
+    "Morse"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mekkora súly volt megközelítőleg egy uncia?",
+   "valaszok": [
+    "kb. 30 gramm",
+    "kb. 500 gramm",
+    "kb. 3000 gramm",
+    "kb. 1500 gramm"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik anyag fagyás- és forráspontja között osztotta be hőmérsékleti skáláját Anders Celsius?",
+   "valaszok": [
+    "higany",
+    "olaj",
+    "alkohol",
+    "víz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik anyagot nevezték régen világítóolajnak?",
+   "valaszok": [
+    "aceton",
+    "benzin",
+    "potróleum",
+    "dízelolaj"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik bolygóról kapta nevét az első amerikai egyszemélyes űrhajótípus?",
+   "valaszok": [
+    "a Vénuszról",
+    "az Uránuszról",
+    "a Marsról",
+    "a Merkúrról"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik elem vegyjele a \"Pb\"?",
+   "valaszok": [
+    "ólom",
+    "ón",
+    "propán",
+    "bután"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik elődjük nevére tesznek esküt a mai orvosok?",
+   "valaszok": [
+    "Vesalius",
+    "Galénosz",
+    "Hippokratész",
+    "Paracelsus"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik feltalálóról neveztek el kémiai elemet?",
+   "valaszok": [
+    "Benjamin Franklin",
+    "Alfred Nobel",
+    "James Watt",
+    "Samuel Morse"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik fizikus nem a 20. században tevékenykedett?",
+   "valaszok": [
+    "Enrico Fermi",
+    "Evangelista Torricelli",
+    "Werner Heisenberg",
+    "Gábor Dénes"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik fém előállításához használják a timföldet?",
+   "valaszok": [
+    "alumínium",
+    "réz",
+    "vas",
+    "nátrium"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik híres filozófus foglalkozott a légnyomás és a hidrodinamika vizsgálatával?",
+   "valaszok": [
+    "Leibniz",
+    "Pascal",
+    "Démokritosz",
+    "Anaxagorász"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik kémiai elem kristályosodott változata a gyémánt?",
+   "valaszok": [
+    "arany",
+    "vas",
+    "szén",
+    "foszfor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik kémiai elem latin eredetű neve a sulfur?",
+   "valaszok": [
+    "kén",
+    "réz",
+    "szelén",
+    "vas"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik kémiai elem vegyjele a Zn?",
+   "valaszok": [
+    "cézium",
+    "króm",
+    "cink",
+    "réz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik kémiai elem vegyjele az Os?",
+   "valaszok": [
+    "ólom",
+    "oxigén",
+    "ón",
+    "ozmium"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem SI-egység a fizikában?",
+   "valaszok": [
+    "karát",
+    "watt",
+    "hertz",
+    "ohm"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik nem a négyütemű motor munkaüteme?",
+   "valaszok": [
+    "szívás",
+    "sűrítés",
+    "kipufogás",
+    "keverés"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem mértani test az alábbiak közül?",
+   "valaszok": [
+    "henger",
+    "gömb",
+    "gúla",
+    "deltoid"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem radioaktív elem az alábbiak közül?",
+   "valaszok": [
+    "magnézium",
+    "polónium",
+    "urán",
+    "rádium"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik nem síkidom az alábbiak közül?",
+   "valaszok": [
+    "trapéz",
+    "rombusz",
+    "hasáb",
+    "deltoid"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik országból származott Marie Curie?",
+   "valaszok": [
+    "Lengyelországból",
+    "Franciaországból",
+    "Csehországból",
+    "Oroszországból"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik tudományág kiválósága volt Jedlik Ányos?",
+   "valaszok": [
+    "fizika",
+    "matematika",
+    "biológia",
+    "nyelvészet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik tudós keresztneve nem Károly?",
+   "valaszok": [
+    "Darwin",
+    "Marx",
+    "Pasteur",
+    "Goodyear"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik űrhajó utasai jártak először a Holdon?",
+   "valaszok": [
+    "Apollo-13",
+    "Mercury-6",
+    "Gemini-8",
+    "Apollo-11"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mennyi a hang terjedési sebessége levegőben?",
+   "valaszok": [
+    "330 km/s",
+    "330 m/s",
+    "400 km/s",
+    "400 m/s"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a foszfor vegyjele a kémiában?",
+   "valaszok": [
+    "P",
+    "Fr",
+    "F",
+    "Ph"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a konyhasó kémiai neve?",
+   "valaszok": [
+    "alumínium-nitrát",
+    "hidrogén-klorid",
+    "nátrium-szulfát",
+    "nátrium-klorid"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi az elektromos ellenállás SI-mértékegysége?",
+   "valaszok": [
+    "amper",
+    "volt",
+    "ohm",
+    "coulomb"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt a neve az első embert szállító kínai űrhajónak?",
+   "valaszok": [
+    "Vörös Sárkány",
+    "Mennyei Hajó",
+    "Hosszú Menetelő",
+    "Mennyei Béke"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miket neveznek a csillagászok szuperóriásoknak?",
+   "valaszok": [
+    "a legnagyobb bolygókat",
+    "a legnagyobb üstökösöket",
+    "a legnagyobb űrkompokat",
+    "a legnagyobb csillagokat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mikor járt először az űrben Neil Armstrong?",
+   "valaszok": [
+    "1966-ban",
+    "1970-ben",
+    "1972-ben",
+    "1977-ben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mikor történt az első, két űrhajó részvételével megvalósított nemzetközi űrrepülés?",
+   "valaszok": [
+    "1957-ben",
+    "1969-ben",
+    "1975-ben",
+    "1998-ban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor van az északi féltekén az őszi napéjegyenlőség?",
+   "valaszok": [
+    "szeptember 23.",
+    "szeptember 27.",
+    "október 23.",
+    "október 27."
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen Nobel-díjat kapott Albert Einstein?",
+   "valaszok": [
+    "nem kapott",
+    "kémiait",
+    "fizikait",
+    "fiziológiait"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen anyagból készül a pergamen?",
+   "valaszok": [
+    "papirusz-sásból",
+    "állatbőrből",
+    "cédrusfa kérgéből",
+    "állatok beléből"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen gyártás melléktermékeként keletkezik a melasz?",
+   "valaszok": [
+    "cukor",
+    "gumi",
+    "cement",
+    "acél"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen gyártású volt az első Concorde utasszállító repülőgép?",
+   "valaszok": [
+    "francia-német",
+    "francia-angol",
+    "amerikai-francia",
+    "amerikai-angol"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen mértékegységben mérik a légnyomást az SI-rendszerben?",
+   "valaszok": [
+    "atmoszféra",
+    "higanymilliméter",
+    "pascal",
+    "joule"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen műszaki berendezés működési elvét alkotta meg Jedlik Ányos?",
+   "valaszok": [
+    "tranzisztor",
+    "dinamó",
+    "robbanómotor",
+    "turbina"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nemzetiségű volt André Marie Ampére, fizikus?",
+   "valaszok": [
+    "francia",
+    "német",
+    "svájci",
+    "angol"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen színű a rézgálic?",
+   "valaszok": [
+    "kék",
+    "vörös",
+    "narancssárga",
+    "zöld"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen újítást vezettek be a gépkocsin a Michelin fivérek?",
+   "valaszok": [
+    "a biztonsági övet",
+    "a dobféket",
+    "a boxermotort",
+    "a gumiabroncsot"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek a hulladéka az ocsú?",
+   "valaszok": [
+    "papírgyártás",
+    "kicsépelt gabona",
+    "lefölözött tej",
+    "bútorgyártás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek az alkatrésze a lőcs?",
+   "valaszok": [
+    "szövőszék",
+    "szekér",
+    "szőlőprés",
+    "kemence"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire használják a kaucsukfa tejnedvét?",
+   "valaszok": [
+    "üdítőital készítésére",
+    "gumigyártásra",
+    "állatok etetésére",
+    "papírgyártásra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire használták a rokkát?",
+   "valaszok": [
+    "kötélverésre",
+    "szövésre",
+    "fonásra",
+    "mosásra"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit jelölnek a matematikában fekvő nyolcassal?",
+   "valaszok": [
+    "a törtszámokat",
+    "az egész számokat",
+    "a végtelent",
+    "a legkisebb prímszámot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit talált fel Eötvös Loránd?",
+   "valaszok": [
+    "a transzformátort",
+    "a torziós ingát",
+    "a gőzfűrészgépet",
+    "a porlasztót"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel foglalkozik a virológia?",
+   "valaszok": [
+    "virágnemesítéssel",
+    "viperák befogásával",
+    "vihar előrejelzésével",
+    "víruskutatással"
+   ],
+   "helyes": 3
+  }
+ ]
+}

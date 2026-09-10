@@ -1,0 +1,3898 @@
+{
+ "id": "kviz-konyha",
+ "nev": "Konyha és gasztronómia",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "A kecskebéka melyik részéből készítenek ételt?",
+   "valaszok": [
+    "a melle húsából",
+    "a combjából",
+    "a májából",
+    "az úszóhártyájából"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy pékáru elnevezése?",
+   "valaszok": [
+    "duci",
+    "pufi",
+    "pici",
+    "buci"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy sütemény elnevezése?",
+   "valaszok": [
+    "macskabajusz",
+    "gólyaorr",
+    "lúdtalp",
+    "lúdláb"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy sütemény neve?",
+   "valaszok": [
+    "anyósnyelv",
+    "nőiszeszély",
+    "pletyka",
+    "nőiszirom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik ehető?",
+   "valaszok": [
+    "a krokett",
+    "a krikett",
+    "a kokott",
+    "a zsakett"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket eszik meg?",
+   "valaszok": [
+    "nyenyec",
+    "kuszkusz",
+    "dumdum",
+    "limlom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy hívják a hosszúnyakú üvegben palackozott barackpálinkát?",
+   "valaszok": [
+    "fittyes",
+    "füttyös",
+    "fityulás",
+    "fütyülős"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy hívják a pálinkafőzéshez erjesztett gyümölcslét?",
+   "valaszok": [
+    "cifra",
+    "cefre",
+    "cvikker",
+    "cekker"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik a kakaó terméséből kisajtolt, a cukrászatban használt zsiradékot?",
+   "valaszok": [
+    "kakaótej",
+    "kakaótúró",
+    "kakaóvaj",
+    "kakaóháj"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik a keskeny csíkokra vágott gyúrt tésztát?",
+   "valaszok": [
+    "vagdalt",
+    "metélt",
+    "szabdalt",
+    "nyiszált"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik a nők kedvelte, édes szeszes italokat?",
+   "valaszok": [
+    "talpalávaló",
+    "daueralávaló",
+    "melíralávaló",
+    "kontyalávaló"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik a sörfogyasztást segítő ételeket?",
+   "valaszok": [
+    "sörszám",
+    "sörkorcsolya",
+    "sörtrojka",
+    "sörcsúszka"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik az apró, csokival bevont nápolyit?",
+   "valaszok": [
+    "pöttöm",
+    "parány",
+    "prücsök",
+    "incifinci"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik \"cukor\" egy édesség neve?",
+   "valaszok": [
+    "birka",
+    "medve",
+    "marha",
+    "szamár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik \"fánk\" egy sütemény neve?",
+   "valaszok": [
+    "tisztviselő",
+    "képviselő",
+    "hadviselő",
+    "megviselő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik \"káposzta\" egy étel elnevezése?",
+   "valaszok": [
+    "csupros",
+    "lucskos",
+    "mocskos",
+    "löttyedt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik \"metélt\" egy levestészta neve?",
+   "valaszok": [
+    "zsinór",
+    "madzag",
+    "cérna",
+    "drót"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik \"méz\" egy édesség neve?",
+   "valaszok": [
+    "tatár",
+    "török",
+    "kuruc",
+    "labanc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik \"torta\" egy sütemény neve?",
+   "valaszok": [
+    "fúvós",
+    "ütős",
+    "dobos",
+    "kobzos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy belsőségből készült étel neve?",
+   "valaszok": [
+    "szalonmáj",
+    "szalonháj",
+    "szalonvese",
+    "szalontüdő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy birsalmából készített kocsonyás édesség?",
+   "valaszok": [
+    "birsalmavaj",
+    "birsalmatúró",
+    "birsalmasajt",
+    "felfújt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy borból és szódából készített ital elnevezése?",
+   "valaszok": [
+    "nagyugrás",
+    "hosszúlépés",
+    "tyúklépés",
+    "bakugrás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy borfajta az alábbiak közül?",
+   "valaszok": [
+    "tizszerüt",
+    "százszoridd",
+    "ezerjó",
+    "milliómámor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy higított mézből erjesztett szeszesital neve?",
+   "valaszok": [
+    "darázskonyak",
+    "méhsör",
+    "kaptárbor",
+    "fullánkpálinka"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy híres magyar étel neve?",
+   "valaszok": [
+    "vadászlé",
+    "madarászlé",
+    "halászlé",
+    "kanászlé"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy húsipari készítmény neve?",
+   "valaszok": [
+    "kölni",
+    "párizsi",
+    "római",
+    "varsói"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy húskészítmény elnevezése az alábbiak közül?",
+   "valaszok": [
+    "kacsatej",
+    "marhavaj",
+    "disznósajt",
+    "lótúró"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy húsétel elnevezése?",
+   "valaszok": [
+    "páncélos",
+    "rostélyos",
+    "buzogányos",
+    "sisakos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy ismert fűszernövény?",
+   "valaszok": [
+    "fehér ború",
+    "fehér derű",
+    "fehér öröm",
+    "fehér üröm"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy kiflivel és virslivel készített étel neve?",
+   "valaszok": [
+    "bulldog",
+    "dán dog",
+    "hot dog",
+    "pitbull"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy levestészta elnevezése?",
+   "valaszok": [
+    "csiperke",
+    "csicsóka",
+    "csipetke",
+    "csuporka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy létező borfajta az alábbiak közül?",
+   "valaszok": [
+    "békacomb",
+    "nyuszifül",
+    "bivalytulok",
+    "juhfark"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy nemzetközi hírnevű magyar étel neve?",
+   "valaszok": [
+    "kondás",
+    "kanász",
+    "gulyás",
+    "juhász"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy növényi termés neve?",
+   "valaszok": [
+    "szegfűsó",
+    "szegfűmustár",
+    "szegfűpaprika",
+    "szegfűbors"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy péksütemény elnevezése?",
+   "valaszok": [
+    "szakadtzsemle",
+    "lezserlinzer",
+    "topisbukta",
+    "rongyoskifli"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy péksütemény neve az alábbiak közül?",
+   "valaszok": [
+    "röffencs",
+    "puffancs",
+    "roppancs",
+    "pukkancs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy salátaöntet neve?",
+   "valaszok": [
+    "tízsziget",
+    "százsziget",
+    "ezersziget",
+    "ezeregysziget"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy sertéshúsfajta elnevezése?",
+   "valaszok": [
+    "puffadó",
+    "duzzadó",
+    "dagadó",
+    "puffogó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy sütemény neve is?",
+   "valaszok": [
+    "nyúlgerinc",
+    "őzgerinc",
+    "báránygerinc",
+    "hegygerinc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy tésztaétel neve?",
+   "valaszok": [
+    "füstös",
+    "szenes",
+    "tüzes",
+    "lángos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy édesség elnevezése az alábbiak közül?",
+   "valaszok": [
+    "csau-csau",
+    "bonbon",
+    "dumdum",
+    "pompon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy édesség neve?",
+   "valaszok": [
+    "diós rékli",
+    "lekváros szűr",
+    "túrós pendely",
+    "mákos guba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy édességfajta neve?",
+   "valaszok": [
+    "kartoncukor",
+    "vászoncukor",
+    "brokátcukor",
+    "selyemcukor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy élelmiszer neve?",
+   "valaszok": [
+    "nyolcszorégett",
+    "hatszorkozmált",
+    "négyszerfőtt",
+    "kétszersült"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy étel elnevezése?",
+   "valaszok": [
+    "cintányéros",
+    "mélytányéros",
+    "réztányéros",
+    "fatányéros"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy étel neve?",
+   "valaszok": [
+    "mafla",
+    "bamba",
+    "málé",
+    "mulya"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy ételtípus elnevezése?",
+   "valaszok": [
+    "lefújt",
+    "kifújt",
+    "elfújt",
+    "felfújt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik eljárással sűrítik az ételt az alábbiak közül?",
+   "valaszok": [
+    "hadarással",
+    "habarccsal",
+    "habarással",
+    "hacukával"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik konyhai eszköz lehet az ágyú szó előtagja?",
+   "valaszok": [
+    "tölcsér",
+    "reszelő",
+    "mozsár",
+    "szita"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szó jelöl egy bortípust?",
+   "valaszok": [
+    "fortyogó",
+    "rotyogó",
+    "tajtékzó",
+    "habzó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szó jelöl egy hagymafajtát?",
+   "valaszok": [
+    "málé",
+    "póré",
+    "kóró",
+    "csálé"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szó jelöl egy palacsintatípust?",
+   "valaszok": [
+    "másztatott",
+    "csúsztatott",
+    "úsztatott",
+    "kúsztatott"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szó jelöli a szeszes italok egyik csoportját?",
+   "valaszok": [
+    "perzselt",
+    "pörkölt",
+    "kozmás",
+    "égetett"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szót használják a kereskedelemben sajtok jelölésére?",
+   "valaszok": [
+    "ömlesztett",
+    "romlasztott",
+    "lyukasztott",
+    "buggyantott"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ételnév?",
+   "valaszok": [
+    "levert tojás",
+    "megvert tojás",
+    "elvert tojás",
+    "bevert tojás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyiket kéri, aki tésztát kíván enni?",
+   "valaszok": [
+    "káposztás cekkert",
+    "káposztás cvikkert",
+    "káposztás cvekedlit",
+    "káposztás cukkinit"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyiknek van konyhai, húsvágó változata is?",
+   "valaszok": [
+    "pallos",
+    "bárd",
+    "szekerce",
+    "jatagán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a derelye másik elnevezése?",
+   "valaszok": [
+    "sógorszeme",
+    "szamárfüle",
+    "barátfüle",
+    "malacfarka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi készül a napraforgó magjából?",
+   "valaszok": [
+    "faggyú",
+    "zsír",
+    "olaj",
+    "vaj"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miből készül egy világszerte ismert egzotikus leves?",
+   "valaszok": [
+    "rozmáragyar",
+    "fókabajusz",
+    "pingvinfészek",
+    "cápauszony"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"hús\" egy nyárson sütött étel neve?",
+   "valaszok": [
+    "rablóhús",
+    "tolvajhús",
+    "betyárhús",
+    "pandúrhús"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen \"kalács\" egy édesség neve?",
+   "valaszok": [
+    "mállós",
+    "nyúlós",
+    "foszlós",
+    "romlós"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"kenyér\" egy tojással készített étel neve?",
+   "valaszok": [
+    "subás",
+    "kucsmás",
+    "bundás",
+    "bekecses"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"pecsenye\" a rövidkaraj egyik része?",
+   "valaszok": [
+    "rák",
+    "szűz",
+    "oroszlán",
+    "vízöntő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen \"pecsenye\" egy húsétel neve?",
+   "valaszok": [
+    "béla",
+    "icus",
+    "nusi",
+    "laci"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"rakás\" egy sütemény?",
+   "valaszok": [
+    "gálya",
+    "máglya",
+    "kicsi",
+    "nagy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen \"tej\" egy tejkészítmény neve?",
+   "valaszok": [
+    "játszott",
+    "evett",
+    "ivott",
+    "aludt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"tojás\" egy népszerű hidegkonyhai étel neve?",
+   "valaszok": [
+    "kaszárnya",
+    "kanaszta",
+    "kaszinó",
+    "katakomba"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"tészta\" egy levesbetét elnevezése?",
+   "valaszok": [
+    "gyík",
+    "kígyó",
+    "béka",
+    "csiga"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"törzs\" egy sütemény neve?",
+   "valaszok": [
+    "fa",
+    "fő",
+    "hajó",
+    "mohikán"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen burgonya egy forró zsiradékban kisütött burgonyaétel neve?",
+   "valaszok": [
+    "trapéz",
+    "deltoid",
+    "hasáb",
+    "kúp"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen ital az aszú?",
+   "valaszok": [
+    "gin",
+    "rum",
+    "bor",
+    "aszaltszilva-lé"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen lehet egy kalács?",
+   "valaszok": [
+    "szövött",
+    "fonott",
+    "horgolt",
+    "kötött"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen olajnak nevezik az egyes tőkehalakból nyert jellegzetes ízű folyadékot?",
+   "valaszok": [
+    "pontyepe",
+    "keszegvese",
+    "csukamáj",
+    "lazaclép"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen pörkölt egy húsétel neve?",
+   "valaszok": [
+    "padlás",
+    "sufni",
+    "kamra",
+    "pince"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mivel tömi a hasát, aki vackort eszik?",
+   "valaszok": [
+    "tengeri herkentyűvel",
+    "nádi poszátával",
+    "vacak cukorral",
+    "vadkörtével"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A sertés mely bontási részéből különböztetnek meg rövdet és hosszút?",
+   "valaszok": [
+    "dagadó",
+    "karaj",
+    "lapocka",
+    "tarja"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A sertés melyik részét készítik el \"pékné módra\"?",
+   "valaszok": [
+    "fülét",
+    "farkát",
+    "csülkét",
+    "orrát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi élelmiszerek közül melyik nélkül nem készülhet omlett?",
+   "valaszok": [
+    "hagyma",
+    "sajt",
+    "tojás",
+    "uborka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy kalácstésztából sütött péksütemény?",
+   "valaszok": [
+    "szabócska",
+    "molnárka",
+    "kovácska",
+    "szatócska"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik húsból készül az Újházy Edéről elnevezett leves?",
+   "valaszok": [
+    "tyúk",
+    "marha",
+    "sertés",
+    "birka"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik nem egy rizzsel készített étel neve?",
+   "valaszok": [
+    "rizottó",
+    "rizibizi",
+    "rizskoch",
+    "rizsma"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik nem marhahús?",
+   "valaszok": [
+    "bélszín",
+    "dagadó",
+    "rostélyos",
+    "felsál"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik sütéséhez használnak kovászt?",
+   "valaszok": [
+    "csirkecomb",
+    "kenyér",
+    "szalmaburgonya",
+    "rablóhús"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik élelmiszer szükséges a majonéz készítéséhez?",
+   "valaszok": [
+    "olaj",
+    "vaj",
+    "tejföl",
+    "tejszín"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy nevezik a húsos, halványsárga hüvelyű babot?",
+   "valaszok": [
+    "tejbab",
+    "vajbab",
+    "túróbab",
+    "sajtbab"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik a sütemény töltésére való savanykás almát?",
+   "valaszok": [
+    "rétesalma",
+    "bélesalma",
+    "pitealma",
+    "lepényalma"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy nevezik a tartályban érlelt pezsgőt?",
+   "valaszok": [
+    "torpedópezsgő",
+    "tankpezsgő",
+    "uszálypezsgő",
+    "kádpezsgő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan készül a flekken?",
+   "valaszok": [
+    "főzik",
+    "abálják",
+    "sütik",
+    "kirántják"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan készül a knédli?",
+   "valaszok": [
+    "sütőben sütik",
+    "kirántják",
+    "főzik",
+    "kemencében pirítják"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan nevezik a nem teljesen átsütött húst?",
+   "valaszok": [
+    "angolosnak",
+    "franciásnak",
+    "törökösnek",
+    "tatárosnak"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik \"fészek\" egy sütemény neve?",
+   "valaszok": [
+    "fecske",
+    "kakukk",
+    "darázs",
+    "varjú"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik a franciasaláta egyik alapanyaga?",
+   "valaszok": [
+    "torma",
+    "cékla",
+    "majonéz",
+    "kapor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik a halászlé alapanyaga?",
+   "valaszok": [
+    "petrezselyem",
+    "sárgarépa",
+    "zeller",
+    "vöröshagyma"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik a tonic üditőital alapanyaga?",
+   "valaszok": [
+    "kinin",
+    "kóladió",
+    "gyömbér",
+    "kávébab"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik borvidékünk jellegzetes bora a szürkebarát?",
+   "valaszok": [
+    "badacsonyi",
+    "etyeki",
+    "móri",
+    "soproni"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik egy fűszerkeverék elnevezése?",
+   "valaszok": [
+    "sherry",
+    "fizz",
+    "curry",
+    "ringli"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy levestészta neve?",
+   "valaszok": [
+    "akáclevél",
+    "eperlevél",
+    "tűlevél",
+    "tölgylevél"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy népszerű szendvicsfajta neve?",
+   "valaszok": [
+    "berliner",
+    "parizer",
+    "hamburger",
+    "amerikáner"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik fővárosról kapta nevét egy népszerű, panírozott húsétel?",
+   "valaszok": [
+    "Bécs",
+    "London",
+    "Berlin",
+    "Varsó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik gyümölcs a máglyarakás alapanyaga?",
+   "valaszok": [
+    "alma",
+    "eper",
+    "málna",
+    "szilva"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik gyümölcs héját használják a Cumberland mártás készítéséhez?",
+   "valaszok": [
+    "banán",
+    "datolya",
+    "narancs",
+    "alma"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ital készül ánizsból?",
+   "valaszok": [
+    "gin",
+    "rum",
+    "konyak",
+    "ouzo"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik italt kínálják forrón?",
+   "valaszok": [
+    "pezsgőt",
+    "sherryt",
+    "grogot",
+    "portóit"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik lehet csicseri az alábbiak közül?",
+   "valaszok": [
+    "borsó",
+    "bab",
+    "lencse",
+    "szója"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik leves készítéséhez nem használnak fűszerpaprikát?",
+   "valaszok": [
+    "halászlé",
+    "palócleves",
+    "bográcsgulyás",
+    "Újházi tyúkhúsleves"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik levest készítik cukorral is?",
+   "valaszok": [
+    "paradicsomlevest",
+    "tojáslevest",
+    "korhelylevest",
+    "lebbencslevest"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik nép nemzeti étele a szusi?",
+   "valaszok": [
+    "japán",
+    "kínai",
+    "koreai",
+    "mongol"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik növény leveleit használják fűszerként?",
+   "valaszok": [
+    "mustár",
+    "vanilia",
+    "ánizs",
+    "banérfa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik növény terméséből nem készítenek lekvárt?",
+   "valaszok": [
+    "fekete bodza",
+    "közönséges bükk",
+    "naspolya",
+    "fürtös áfonya"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik növényt szokták beáztatni hosszabb időre főzés előtt?",
+   "valaszok": [
+    "lencse",
+    "sóska",
+    "sárgarépa",
+    "paraj"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik növényt termesztik ehető leveleiért?",
+   "valaszok": [
+    "karfiol",
+    "brokkoli",
+    "cukkini",
+    "spenót"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szó jelöl egy liszttípust?",
+   "valaszok": [
+    "béles",
+    "rétes",
+    "lángos",
+    "kuglóf"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szó jelöl egy sajtfajtát?",
+   "valaszok": [
+    "gránit",
+    "márvány",
+    "andezit",
+    "tufa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik tökfajtát nem étkezési célra termesztik?",
+   "valaszok": [
+    "úritök",
+    "sütőtök",
+    "lopótök",
+    "spárgatök"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik virág neve jelöl egy fűszerpaprika-típust?",
+   "valaszok": [
+    "tulipán",
+    "liliom",
+    "rózsa",
+    "orgona"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állat húsa a tarja az alábbiak közül?",
+   "valaszok": [
+    "nyúl",
+    "kacsa",
+    "sertés",
+    "pulyka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik élelmiszer a rántás alapanyaga?",
+   "valaszok": [
+    "rizs",
+    "liszt",
+    "zsemlemorzsa",
+    "búzadara"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik élelmiszer nem a lecsó alapanyaga?",
+   "valaszok": [
+    "zöldpaprika",
+    "paradicsom",
+    "vöröshagyma",
+    "burgonya"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik élelmiszer ásványi eredetű?",
+   "valaszok": [
+    "konyhasó",
+    "cukor",
+    "liszt",
+    "étolaj"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik élelmiszert filézhetik az alábbiak közül?",
+   "valaszok": [
+    "karfiolt",
+    "halat",
+    "gombát",
+    "borsót"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik étel készítéséhez nem használnak zsemlemorzsát?",
+   "valaszok": [
+    "lekváros derelye",
+    "sztrapacska",
+    "bécsi szelet",
+    "szilvás gombóc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ételt főzik ki forró vízben?",
+   "valaszok": [
+    "sztrapacskát",
+    "habcsókot",
+    "püspökkenyeret",
+    "omlettet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyikből készítenek levest Kínában?",
+   "valaszok": [
+    "varjúfészek",
+    "darázsfészek",
+    "fecskefészek",
+    "rigófészek"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyikből készítenek nugátot az alábbiak közül?",
+   "valaszok": [
+    "mandula",
+    "alma",
+    "szilva",
+    "körte"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyiket kelesztik?",
+   "valaszok": [
+    "vadhúst",
+    "tésztát",
+    "bort",
+    "kelmét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyiket nem használják a máglyarakás készítéséhez?",
+   "valaszok": [
+    "tej",
+    "tojás",
+    "cukor",
+    "tejszín"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a galuska másik elnevezése?",
+   "valaszok": [
+    "makaróni",
+    "spagetti",
+    "nokedli",
+    "bukta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a ketchup alapanyaga?",
+   "valaszok": [
+    "cékla",
+    "paradicsom",
+    "padlizsán",
+    "paprika"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi készül a köpülőben?",
+   "valaszok": [
+    "vaj",
+    "must",
+    "hurka",
+    "tészta"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miből készítik a kapucíner nevű italt?",
+   "valaszok": [
+    "teából",
+    "gyümölcsléből",
+    "kávéból",
+    "borbol"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miből készül a chips?",
+   "valaszok": [
+    "kukoricából",
+    "burgonyából",
+    "mogyoróból",
+    "gesztenyéből"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miből készül a mazsola?",
+   "valaszok": [
+    "egresből",
+    "naspolyából",
+    "fügéből",
+    "szőlőből"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miből készül a tarhonya?",
+   "valaszok": [
+    "tésztából",
+    "rizsből",
+    "burgonyából",
+    "kölesből"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miből készül az olívaolaj?",
+   "valaszok": [
+    "mogyoróból",
+    "napraforgóból",
+    "olajbogyóból",
+    "tökmagból"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mihez használnak zsiradékot?",
+   "valaszok": [
+    "rántás",
+    "habarás",
+    "legírozás",
+    "derítés"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen \"falatnak\" nevezik a sült vagy főtt baromfi farát?",
+   "valaszok": [
+    "púpos",
+    "püspök",
+    "zsíros",
+    "finom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen \"rizling\" egy kedvelt fehér borszőlő neve?",
+   "valaszok": [
+    "porosz",
+    "olasz",
+    "görög",
+    "spanyol"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen \"szelet\" egy krémmel töltött ostyalapokból álló közkedvelt édesség neve?",
+   "valaszok": [
+    "római",
+    "velencei",
+    "nápolyi",
+    "pármai"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen alakú cukrászati készítmény a rolád?",
+   "valaszok": [
+    "félhold",
+    "tekercs",
+    "kocka",
+    "téglatest"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen fánk lehet egy süteményfajta?",
+   "valaszok": [
+    "gerenda",
+    "szilánk",
+    "fűrészpor",
+    "forgács"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen főzeléknek nevezik, amit borsóból és zöldségekből készítenek?",
+   "valaszok": [
+    "ízes",
+    "finom",
+    "finnyás",
+    "vacak"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen hússal készül a Jókai bableves?",
+   "valaszok": [
+    "sertéscsülök",
+    "libacomb",
+    "rostélyos",
+    "nyúlgerinc"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen ital a tramini?",
+   "valaszok": [
+    "búzasör",
+    "bor",
+    "rum",
+    "narancslé"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen italfajta a szomorodni?",
+   "valaszok": [
+    "konyak",
+    "pezsgő",
+    "bor",
+    "törkölypálinka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen italokból készül a fröccs?",
+   "valaszok": [
+    "bor és szóda",
+    "rum és kóla",
+    "vodka és narancs",
+    "sör és pálinka"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen italt neveznek lőrének?",
+   "valaszok": [
+    "savanyú bort",
+    "búzasört",
+    "csalánteát",
+    "török kávét"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen krémmel készített sütemény a lúdláb?",
+   "valaszok": [
+    "vaníliás",
+    "puncsos",
+    "csokoládés",
+    "mandulás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen közismert élelmiszerfajta viseli a csécsi jelzőt?",
+   "valaszok": [
+    "szalonna",
+    "szalámi",
+    "túró",
+    "sajt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen mázzal vonják be az islert?",
+   "valaszok": [
+    "karamella",
+    "csokoládé",
+    "marcipán",
+    "puncs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen méznek neveznek egy szivacsos, nyúlós édességet?",
+   "valaszok": [
+    "perzsa",
+    "bolgár",
+    "görög",
+    "török"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen termesztett zöldségfajta kapta a \"bogyiszlói vastaghúsú\" nevet?",
+   "valaszok": [
+    "borsó",
+    "fejes káposzta",
+    "paprika",
+    "uborka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen típusú étel a borscs?",
+   "valaszok": [
+    "sütemény",
+    "sült hús",
+    "leves",
+    "pörkölt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen töltelékkel készül a vargabéles?",
+   "valaszok": [
+    "almás",
+    "meggyes",
+    "túrós",
+    "csokoládés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen városról kapta nevét a tequila?",
+   "valaszok": [
+    "brazil",
+    "mexikói",
+    "argentin",
+    "kubai"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen élelmiszer a rokfort?",
+   "valaszok": [
+    "szalámi",
+    "sajt",
+    "kolbász",
+    "túró"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen étel a lebbencs?",
+   "valaszok": [
+    "tésztaféle",
+    "sajtféle",
+    "savanyúság",
+    "halétel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen étel kapta nevét Pálpusztáról?",
+   "valaszok": [
+    "túró",
+    "halászlé",
+    "sajt",
+    "kefir"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen ízesítésű krémmel készül a rigójancsi nevű sütemény?",
+   "valaszok": [
+    "csokoládé",
+    "mandula",
+    "túró",
+    "gesztenye"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen ízesítésű sütemény viseli a Rákóczi nevet?",
+   "valaszok": [
+    "mákos",
+    "túrós",
+    "meggyes",
+    "diós"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen üdítőitalt készítenek gyümölcsből és tejből?",
+   "valaszok": [
+    "koktélt",
+    "turmixot",
+    "csáját",
+    "krampampulit"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinál a gyümölccsel, aki aszalja?",
+   "valaszok": [
+    "tartósítja",
+    "lekvárt főz belőle",
+    "pálinkát készít belőle",
+    "meghámozza"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit készít, aki kappant süt?",
+   "valaszok": [
+    "kakassültet",
+    "disznósültet",
+    "báránysültet",
+    "marhasültet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit készítenek a szilvából, ha szilvóriumot főznek belőle?",
+   "valaszok": [
+    "lekvárt",
+    "levest",
+    "pálinkát",
+    "befőttet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit kíván, aki camambert-re vágyik?",
+   "valaszok": [
+    "vörösbort",
+    "sajtot",
+    "hagymalevest",
+    "pezsgőt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel jelzik az aszúborok minőségét?",
+   "valaszok": [
+    "hordószámmal",
+    "fürtszámmal",
+    "présszámmal",
+    "puttonyszámmal"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbi ételek közül melyikbe nem kell burgonya?",
+   "valaszok": [
+    "sztrapacska",
+    "szilvás gombóc",
+    "túrógombóc",
+    "gránátos kocka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik élelmiszer a székelygulyás alapanyaga?",
+   "valaszok": [
+    "párolt karfiol",
+    "kovászos uborka",
+    "gyalult tök",
+    "savanyú káposzta"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyikből készítik a sóletet?",
+   "valaszok": [
+    "zöldborsó",
+    "lencse",
+    "szárazbab",
+    "sárgaborsó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik másképp a patisszont?",
+   "valaszok": [
+    "úritök",
+    "laskatök",
+    "holdtök",
+    "csillagtök"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan készítik az aranygaluska tésztáját?",
+   "valaszok": [
+    "főzik",
+    "gőzölik",
+    "sütőben sütik",
+    "olajban sütik"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan készül a csöröge?",
+   "valaszok": [
+    "forró zsíradékban sütik",
+    "párolják",
+    "sütőben sütik",
+    "tejben főzik"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mely részét fogyasztják a pisztáciának?",
+   "valaszok": [
+    "magját",
+    "héját",
+    "húsos virágzatát",
+    "leveleit"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik a finomfőzelék alapanyaga?",
+   "valaszok": [
+    "sárgarépa",
+    "száraz bab",
+    "spenót",
+    "lencse"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik a tatárbifsztek egyik alapanyaga?",
+   "valaszok": [
+    "sajt",
+    "tojássárgája",
+    "majonéz",
+    "uborka"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik alapanyag nélkül nem készülhet körözött?",
+   "valaszok": [
+    "túró",
+    "kolbász",
+    "paradicsom",
+    "sárgarépa"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik fűszer a halászlé egyik alapanyaga?",
+   "valaszok": [
+    "majoránna",
+    "pirospaprika",
+    "bazsalikom",
+    "szerecsendió"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem a kovász alapanyaga?",
+   "valaszok": [
+    "víz",
+    "liszt",
+    "élesztő",
+    "sütőpor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik papi méltóságról kapta nevét egy sütemény?",
+   "valaszok": [
+    "érsek",
+    "püspök",
+    "kanonok",
+    "bíboros"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szó jelöl egy retekfajtát?",
+   "valaszok": [
+    "jégecet",
+    "jégdara",
+    "jégcsap",
+    "tűzcsap"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sütemény lapját tekerik össze?",
+   "valaszok": [
+    "francia krémes",
+    "fatörzs",
+    "lúdláb",
+    "képviselőfánk"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állat húsából készítenek brassói aprópecsenyét?",
+   "valaszok": [
+    "nyúl",
+    "liba",
+    "sertés",
+    "hal"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik étel elkészítéséhez nem használnak rizst?",
+   "valaszok": [
+    "kolozsvári rakott káposzta",
+    "lucskos káposzta",
+    "töltött paprika",
+    "ludaskása"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik étel készül tejből?",
+   "valaszok": [
+    "kefir",
+    "margarin",
+    "ruszli",
+    "sprotni"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik étel készül tejföllel?",
+   "valaszok": [
+    "paprikás csirke",
+    "párizsi szelet",
+    "saslik",
+    "brassói aprópecsenye"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ünnepről kapta nevét egy népszerű fánkfajta?",
+   "valaszok": [
+    "farsang",
+    "húsvét",
+    "karácsony",
+    "pünkösd"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyikkel öntik le a mákos gubát?",
+   "valaszok": [
+    "tej",
+    "tejföl",
+    "bor",
+    "konyak"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyikre van szükség a piskótatészta készítéséhez?",
+   "valaszok": [
+    "tojásra",
+    "tejfölre",
+    "tejre",
+    "élesztőre"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a grenadírmars egyik alapanyaga?",
+   "valaszok": [
+    "burgonya",
+    "mák",
+    "káposzta",
+    "dió"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a karamell készítésének alapanyaga?",
+   "valaszok": [
+    "cukor",
+    "tejföl",
+    "fahéj",
+    "kakaó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a prézli közismert neve?",
+   "valaszok": [
+    "búzadara",
+    "zsemlemorzsa",
+    "árpagyöngy",
+    "finomliszt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a rizskoch közismert neve?",
+   "valaszok": [
+    "rizsfelfújt",
+    "rizses hús",
+    "tejberizs",
+    "rizibizi"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miből készítik a brindzát?",
+   "valaszok": [
+    "sertéshúsból",
+    "babból",
+    "kukoricalisztből",
+    "tejből"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miből készül a csipetke?",
+   "valaszok": [
+    "rizs",
+    "liszt",
+    "búzadara",
+    "zsemlemorzsa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miből készül a liptói?",
+   "valaszok": [
+    "szalonnából",
+    "sertéshúsból",
+    "tejből",
+    "szőlőből"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miből készül a ringli?",
+   "valaszok": [
+    "szardellából",
+    "rákból",
+    "osztrigából",
+    "polipból"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mihez használják a shakert?",
+   "valaszok": [
+    "koktélok készítéséhez",
+    "húsok tűzdeléséhez",
+    "zöldségek párolásához",
+    "levesek tálalásához"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen \"kalács\" egy sütemény neve?",
+   "valaszok": [
+    "dobos",
+    "kürtős",
+    "kürtös",
+    "fuvolás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen halból készítik a rácokról elnevezett ételt?",
+   "valaszok": [
+    "csuka",
+    "ponty",
+    "kecsege",
+    "harcsa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen húsból készítik a borsos tokányt az alábbiak közül?",
+   "valaszok": [
+    "liba",
+    "tyúk",
+    "nyúl",
+    "marha"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen húsból készül a bifsztek?",
+   "valaszok": [
+    "sertés",
+    "liba",
+    "marha",
+    "galamb"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen húsból készül a hagymás rostélyos?",
+   "valaszok": [
+    "sertés",
+    "marha",
+    "birka",
+    "nyúl"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen ital a csája?",
+   "valaszok": [
+    "kávé",
+    "tea",
+    "kakaó",
+    "kókusztej"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen italfajta a porter?",
+   "valaszok": [
+    "bor",
+    "sör",
+    "whisky",
+    "borókapálinka"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen marhahús kerül a tatár bifsztekbe?",
+   "valaszok": [
+    "párolt",
+    "nyers",
+    "sült",
+    "főtt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen növényről nevezték el a lila szín egyik árnyalatát?",
+   "valaszok": [
+    "padlizsán",
+    "patisszon",
+    "karalábé",
+    "karfiol"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen ételt neveznek bélesnek?",
+   "valaszok": [
+    "süteményt",
+    "hurkát",
+    "disznósajtot",
+    "töltött húst"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen ízesítésü a svéd gombasaláta?",
+   "valaszok": [
+    "tonhalas",
+    "majonézes",
+    "paradicsomos",
+    "tormás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen ízesítésű a madártej?",
+   "valaszok": [
+    "csokoládés",
+    "diós",
+    "puncsos",
+    "vaníliás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mire nincs szükség a bécsi szelet készítéséhez?",
+   "valaszok": [
+    "tojásra",
+    "zsemlemorzsára",
+    "búzadarára",
+    "lisztre"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mire van szükség a mézeskalács készítéséhez?",
+   "valaszok": [
+    "tejföl",
+    "liszt",
+    "búzadara",
+    "élesztő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinálnak a hússal cigánypecsenye készítésekor?",
+   "valaszok": [
+    "sütik",
+    "bundázzák",
+    "főzik",
+    "ledarálják"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit darabol a szakács, amikor sampinyont szeletel?",
+   "valaszok": [
+    "gombát",
+    "pulykát",
+    "kakast",
+    "rákot"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit eszik az, aki parenyicát falatozik?",
+   "valaszok": [
+    "füstölt kolbászt",
+    "füstölt sajtot",
+    "füstölt halat",
+    "füstölt sonkát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit eszik, aki stanglit reggelizik?",
+   "valaszok": [
+    "ecetes halat",
+    "süteményt",
+    "sült kolbászt",
+    "lágy tojást"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit használnak a hortobágyi palacsinta készítéséhez?",
+   "valaszok": [
+    "tejföl",
+    "dió",
+    "lekvár",
+    "túró"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit szoktak a kelkáposzta-főzelékbe tenni?",
+   "valaszok": [
+    "burgonyát",
+    "zöldbabot",
+    "borsót",
+    "tököt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit teszünk az alábbiak közül az ételbe, ha azt szeretnénk, hogy csípős legyen?",
+   "valaszok": [
+    "tárkonyt",
+    "gyömbért",
+    "chilit",
+    "borsikafüvet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mivel készül a frankfurti leves?",
+   "valaszok": [
+    "karfiol",
+    "virsli",
+    "gomba",
+    "csirkemáj"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel készül a rizibizi?",
+   "valaszok": [
+    "babbal",
+    "borsóval",
+    "burgonyával",
+    "banánnal"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel szokták kenegetni sütéskor a malac bőrét, hogy ropogósabb legyen?",
+   "valaszok": [
+    "sör",
+    "bor",
+    "rum",
+    "vodka"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mivel töltik meg az \"ízes\" palacsintát?",
+   "valaszok": [
+    "túróval",
+    "lekvárral",
+    "kakaóval",
+    "dióval"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel vonják be a dobostorta tetejét?",
+   "valaszok": [
+    "túróval",
+    "marcipánnal",
+    "cukormázzal",
+    "lekvárral"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miért vadásznak a cobolyra?",
+   "valaszok": [
+    "agancsáért",
+    "agyaráért",
+    "ízletes combjáért",
+    "bundájáért"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A hajdina mely részéből készítenek kását?",
+   "valaszok": [
+    "virágjából",
+    "rügyéből",
+    "magjából",
+    "gyökeréből"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi sajtok közül melyiknek a felületét borítja nemespenész-bevonat?",
+   "valaszok": [
+    "trappista",
+    "camembert",
+    "parenyica",
+    "parmezán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy étel elnevezése?",
+   "valaszok": [
+    "rántott libatoll",
+    "töltött libanyak",
+    "sült libacsőr",
+    "meghúzott libafül"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik nem borfajta?",
+   "valaszok": [
+    "bikavér",
+    "Kocsis Irén",
+    "szürkebarát",
+    "szamorodni"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiről nevezték el a szendvicset?",
+   "valaszok": [
+    "egy ír tengerészről",
+    "egy francia énekesnőről",
+    "egy skót szakácsról",
+    "egy angol grófról"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik a borleves egyik alapanyaga?",
+   "valaszok": [
+    "tojássárgája",
+    "tej",
+    "vaj",
+    "tejföl"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik alapanyag nem szükséges a szilvás gombóc készítéséhez?",
+   "valaszok": [
+    "burgonya",
+    "liszt",
+    "zsemlemorzsa",
+    "tej"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy hazánkban is ismert mártás neve?",
+   "valaszok": [
+    "Westminster-mártás",
+    "Woodstock-mártás",
+    "Worcester-mártás",
+    "Wembley-mártás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy savanyú káposztával készült étel?",
+   "valaszok": [
+    "labanckáposzta",
+    "kuruckáposzta",
+    "hajdúkáposzta",
+    "muszkakáposzta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ehető részéért termesztik a tormát?",
+   "valaszok": [
+    "leveléért",
+    "száráért",
+    "gyökeréért",
+    "bogyójáért"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik konyhai művelet része a dunsztolás?",
+   "valaszok": [
+    "sütés",
+    "befőzés",
+    "mosogatás",
+    "fűszerezés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik konyhakerti növényt termesztik ehető virágzatáért?",
+   "valaszok": [
+    "retek",
+    "zeller",
+    "karfiol",
+    "fejes káposzta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem a rizsfelfújt alapanyaga?",
+   "valaszok": [
+    "tojás",
+    "tej",
+    "cukor",
+    "élesztő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem a sertés bontási része?",
+   "valaszok": [
+    "dagadó",
+    "szűzpecsenye",
+    "rövid karaj",
+    "magas hátszín"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nép nemzeti étele a gyros?",
+   "valaszok": [
+    "olasz",
+    "spanyol",
+    "görög",
+    "portugál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik részét fogyasztják a kelbimbónak?",
+   "valaszok": [
+    "levelét",
+    "szárát",
+    "rügyeit",
+    "virágát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sajtfajta görög eredetű?",
+   "valaszok": [
+    "feta",
+    "parmezán",
+    "brie",
+    "brindza"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik tésztába töltik a vargabéles töltelékét?",
+   "valaszok": [
+    "hájas tésztába",
+    "kelt tésztába",
+    "piskótatésztába",
+    "rétestésztába"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állat tejéből készül a rokfort?",
+   "valaszok": [
+    "tehén",
+    "kanca",
+    "kecske",
+    "juh"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik élelmiszer a habcsók egyik alapanyaga?",
+   "valaszok": [
+    "liszt",
+    "tojásfehérje",
+    "tej",
+    "élesztő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik élelmiszer tartalmaz sikért?",
+   "valaszok": [
+    "búzaliszt",
+    "napraforgóolaj",
+    "borecet",
+    "őrölt paprika"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik étel nem savanyú káposztával készül?",
+   "valaszok": [
+    "székelygulyás",
+    "hajdúkáposzta",
+    "kolozsvári rakott káposzta",
+    "paradicsomos káposzta"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik étel választékos elnevezése a serpenyős burgonya?",
+   "valaszok": [
+    "krumplifőzelék",
+    "rakott krumpli",
+    "paprikás krumpli",
+    "krumplis lángos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyiket használják a darázsfészek nevű sütemény készítéséhes az alábbiak közül?",
+   "valaszok": [
+    "mák",
+    "dió",
+    "túró",
+    "meggy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyiket nem használják a kovászos uborka készítésekor?",
+   "valaszok": [
+    "víz",
+    "só",
+    "kenyér",
+    "ecet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyikre nincs szükség a linzertészta készítéséhez?",
+   "valaszok": [
+    "lisztre",
+    "cukorra",
+    "tojásra",
+    "élesztőre"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a Cuba Libre alapanyaga?",
+   "valaszok": [
+    "pezsgő",
+    "rum",
+    "vodka",
+    "gin"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi szükséges a Bloody Mary koktél elkészítéséhez?",
+   "valaszok": [
+    "vérnarancslé",
+    "cseresznyelé",
+    "meggylé",
+    "paradicsomlé"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miből készül a hecsedlilekvár?",
+   "valaszok": [
+    "szilvából",
+    "csipkebogyóból",
+    "eperből",
+    "málnából"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miből készül a japán ital, a szaké?",
+   "valaszok": [
+    "banánból",
+    "ananászból",
+    "rizsből",
+    "cukornádból"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen húsból készül a cigánypecsenye?",
+   "valaszok": [
+    "liba",
+    "kacsa",
+    "sertés",
+    "birka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen húsból készül a flekken?",
+   "valaszok": [
+    "sertés",
+    "marha",
+    "kacsa",
+    "csirke"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen hússal készül a piláf?",
+   "valaszok": [
+    "csirke",
+    "nyúl",
+    "birka",
+    "sertés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen mázzal vonják be az indiánert?",
+   "valaszok": [
+    "csokoládés",
+    "karamellás",
+    "puncsos",
+    "vaníliás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen étel a baklava?",
+   "valaszok": [
+    "báránysült",
+    "sütemény",
+    "leves",
+    "kecskesajt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen étel a gofri?",
+   "valaszok": [
+    "török rablóhús",
+    "amerikai palacsinta",
+    "francia hagymaleves",
+    "angol bélszín"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen étel a ravioli?",
+   "valaszok": [
+    "töltött tészta",
+    "fagylalt",
+    "torta",
+    "sült rák"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen ízesítésű krémmel készül az oroszkrémtorta?",
+   "valaszok": [
+    "puncsos",
+    "vaníliás",
+    "csokoládés",
+    "gesztenyés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyenre színezi az ételeket a sáfrány?",
+   "valaszok": [
+    "sárgára",
+    "zöldre",
+    "vörösre",
+    "barnára"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit csinál a hússal a szakács, amikor spékeli?",
+   "valaszok": [
+    "megtűzdeli",
+    "bundázza",
+    "felszeleteli",
+    "ledarálja"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit csinál a szakács a hússal, amikor irdalja?",
+   "valaszok": [
+    "pácolja",
+    "ledarálja",
+    "bevagdalja",
+    "bundázza"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinálnak a gyümölccsel birsalmasajt készítésekor?",
+   "valaszok": [
+    "aszalják",
+    "főzik",
+    "sütőben sütik",
+    "panírozzák"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinálnak az étellel, amikor flambírozzák?",
+   "valaszok": [
+    "lehűtik",
+    "berántják",
+    "behabarják",
+    "meggyújtják"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit eszik, aki smarnit falatozik?",
+   "valaszok": [
+    "rizsfelfújtat",
+    "sült burgonyát",
+    "császármorzsát",
+    "füstölt halat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit eszik, aki sódart falatozik?",
+   "valaszok": [
+    "újhagymát",
+    "rozskenyeret",
+    "füstölt húst",
+    "pácolt halat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mivel készül a debreceni tokány?",
+   "valaszok": [
+    "kolbásszal",
+    "gombával",
+    "borsóval",
+    "libamájjal"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A marha melyik részéből készül a pacalpörkölt?",
+   "valaszok": [
+    "májából",
+    "veséjéből",
+    "gyomrából",
+    "szegyéből"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi hozzávalók közül melyik nem kell a borscsba?",
+   "valaszok": [
+    "uborka",
+    "cékla",
+    "káposzta",
+    "paradicsom"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbi italok közül melyikkel készítenek madeira mártást?",
+   "valaszok": [
+    "borral",
+    "sörrel",
+    "rummal",
+    "pezsgővel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan készítik a tányérhúst?",
+   "valaszok": [
+    "bundázva kisütik",
+    "főzik",
+    "nyárson sütik",
+    "hagymán párolják"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol készül a hús, ha csőben sütik?",
+   "valaszok": [
+    "sütőben",
+    "szabad tűzön",
+    "roston",
+    "kuktában"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik a flip típusú szeszesitalok egyik alapanyaga?",
+   "valaszok": [
+    "tojás",
+    "paradicsomlé",
+    "citromhéj",
+    "alma"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ehető részéért termesztik a brokkolit?",
+   "valaszok": [
+    "a száráért",
+    "a leveléért",
+    "a virágzatáért",
+    "a gyökértörzséért"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik gyümölcs a marcipán alapanyaga?",
+   "valaszok": [
+    "dió",
+    "mogyoró",
+    "mandula",
+    "meggy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szeszesital a Bloody Mary koktél alapanyaga?",
+   "valaszok": [
+    "rum",
+    "vodka",
+    "whisky",
+    "gin"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állat bontási részét nevezik orjának?",
+   "valaszok": [
+    "sertés",
+    "marha",
+    "kacsa",
+    "nyúl"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik édesség tésztájának készítéséhez nem használnak élesztőt?",
+   "valaszok": [
+    "foszlós kalács",
+    "ízes bukta",
+    "aranygaluska",
+    "képviselőfánk"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik élelmiszer a madártej egyik alapanyaga az alábbiak közül?",
+   "valaszok": [
+    "túró",
+    "tojás",
+    "dió",
+    "lekvár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik élelmiszer a túrógombóc egyik alapanyaga?",
+   "valaszok": [
+    "liszt",
+    "burgonya",
+    "búzadara",
+    "élesztő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik élelmiszert nevezik gömböcnek is?",
+   "valaszok": [
+    "a disznósajtot",
+    "a görögdinnyét",
+    "a derelyét",
+    "a fánkot"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik étel készül kelt tésztából?",
+   "valaszok": [
+    "darázsfészek",
+    "túrós rétes",
+    "dobostorta",
+    "piskótatekercs"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyiket használjuk az aranygaluska készítésénél?",
+   "valaszok": [
+    "mogyoró",
+    "mandula",
+    "dió",
+    "körte"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyikre van szükség a palócleves elkészítéséhez?",
+   "valaszok": [
+    "zöldborsóra",
+    "zöldbabra",
+    "lencsére",
+    "káposztára"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a sörbet?",
+   "valaszok": [
+    "barnasör-fajta",
+    "sörtészta",
+    "sós sörkorcsolya",
+    "édes gyümölcslé"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miből készítenek pörcöt?",
+   "valaszok": [
+    "szalonnából",
+    "hurkából",
+    "kolbászból",
+    "burgonyából"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miből készül a puliszka?",
+   "valaszok": [
+    "búzadarából",
+    "rozslisztből",
+    "kukoricalisztből",
+    "finomlisztből"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miből készül a ramsztek?",
+   "valaszok": [
+    "pulykamell",
+    "marhahátszín",
+    "sertésdagadó",
+    "nyúlgerinc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miből készül a törkölypálinka?",
+   "valaszok": [
+    "barackból",
+    "körtéből",
+    "meggyből",
+    "szőlőből"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen bor az aszú?",
+   "valaszok": [
+    "száraz",
+    "félszáraz",
+    "félédes",
+    "édes"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen eredetű fűszerkeverék a curry az alábbiak közül?",
+   "valaszok": [
+    "kínai",
+    "japán",
+    "indiai",
+    "egyiptomi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen ital a chianti?",
+   "valaszok": [
+    "fehérbor",
+    "vörösbor",
+    "pezsgő",
+    "konyak"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen levest készít, aki kelvirág levest főz?",
+   "valaszok": [
+    "brokkoli",
+    "karfiol",
+    "karalábé",
+    "káposzta"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen szeszesital hozzáadásával készül a grog?",
+   "valaszok": [
+    "vodka",
+    "borovicska",
+    "rum",
+    "vermut"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen étel a huszárcsók?",
+   "valaszok": [
+    "saláta",
+    "lókolbász",
+    "sült hús",
+    "sütemény"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen ízesítésű a Sacher-torta?",
+   "valaszok": [
+    "marcipán",
+    "mandula",
+    "csokoládé",
+    "vanília"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mivel tartósítanak a kandírozás során?",
+   "valaszok": [
+    "sóval",
+    "ecettel",
+    "cukorral",
+    "szesszel"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mivel ízesítik a puncstorta töltelékét?",
+   "valaszok": [
+    "konyakkal",
+    "rummal",
+    "vodkával",
+    "ginnel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A marha melyik részéből készül az ököruszály leves?",
+   "valaszok": [
+    "a füléből",
+    "a tőgyéből",
+    "a farkából",
+    "a veséjéből"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi sertéshúsok közül melyikből készül a sonka?",
+   "valaszok": [
+    "dagadó",
+    "comb",
+    "fartő",
+    "csülök"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbi élelmiszerek közül melyik nem a majonéz alapanyaga?",
+   "valaszok": [
+    "étolaj",
+    "tojássárgája",
+    "tojásfehérje",
+    "citromlé"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi ételek közül melyik nem kelt tésztából készül?",
+   "valaszok": [
+    "aranygaluska",
+    "pirog",
+    "pizza",
+    "sztrapacska"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik nem szőlőfajta?",
+   "valaszok": [
+    "kadarka",
+    "furmint",
+    "bikavér",
+    "kövidinka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik szóval jelölik az édes pezsgőt?",
+   "valaszok": [
+    "brut",
+    "trocken",
+    "sec",
+    "doux"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Erdélyben járva pityókával kínálnak. Mit fogok fogyasztani, ha elfogadom?",
+   "valaszok": [
+    "barackpálinkát",
+    "krumplit",
+    "mézes süteményt",
+    "nagyfröccsöt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik a grillázs egyik alapanyaga az alábbiak közül?",
+   "valaszok": [
+    "tojás",
+    "cukor",
+    "tejföl",
+    "sajt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik a korhelyleves alapanyaga az alábbiak közül?",
+   "valaszok": [
+    "aludttej",
+    "savanyú káposzta leve",
+    "fehérbor",
+    "sűrített paradicsom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem a marha bontási része?",
+   "valaszok": [
+    "bélszín",
+    "magas hátszín",
+    "felsál",
+    "szűzérme"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sajt tartozik a félkemény sajtok közé?",
+   "valaszok": [
+    "trappista",
+    "parmezán",
+    "pálpusztai",
+    "camembert"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik állat bontási része az orja?",
+   "valaszok": [
+    "marha",
+    "borjú",
+    "sertés",
+    "bárány"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik élelmiszer a Holstein módra készített hús tartozéka?",
+   "valaszok": [
+    "tojás",
+    "sajt",
+    "kolbász",
+    "gomba"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik élelmiszert használják a rácponty készítéséhez?",
+   "valaszok": [
+    "édes káposzta",
+    "gomba",
+    "burgonya",
+    "paraj"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ételt nevezik málénak is?",
+   "valaszok": [
+    "tökfőzeléket",
+    "sóskát",
+    "puliszkát",
+    "mákos gubát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi nélkül nem készülhet piláf?",
+   "valaszok": [
+    "padlizsán",
+    "rizs",
+    "burgonya",
+    "száraz bab"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miből készül a Calvados?",
+   "valaszok": [
+    "eper",
+    "alma",
+    "szilva",
+    "barack"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miből készül az orda?",
+   "valaszok": [
+    "sertéshús",
+    "marhamáj",
+    "tej",
+    "tojás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen italfajta az \"ale\"?",
+   "valaszok": [
+    "sör",
+    "whisky",
+    "bor",
+    "rum"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen italt neveznek murcinak?",
+   "valaszok": [
+    "erjedőben lévő újbort",
+    "friss mézsört",
+    "málnalikőrt",
+    "vegyespálinkát"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen szeszesital az armagnac?",
+   "valaszok": [
+    "eperpálinka",
+    "diólikőr",
+    "borpárlat",
+    "búzasör"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen típusú étel a francia bouillon?",
+   "valaszok": [
+    "saláta",
+    "leves",
+    "marhasült",
+    "kenyér"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miről kapta a nevét a parmezán sajt?",
+   "valaszok": [
+    "olasz városról",
+    "tehénfajtáról",
+    "szerzetesrendről",
+    "szicíliai hegyről"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit tesznek a sertésbordához, ha \"hentes módra\" készítik?",
+   "valaszok": [
+    "ecetes uborkát",
+    "savanyú káposztát",
+    "céklát",
+    "tormát"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mivel ízesítik a gabonapálinkát, amikor gint készítenek?",
+   "valaszok": [
+    "ánizzsal",
+    "csipkebogyóval",
+    "borókabogyóval",
+    "ginszenggel"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A borjú melyik bontási részéből vásáról, aki rózsát vesz?",
+   "valaszok": [
+    "a combjából",
+    "a szegyéből",
+    "a karajból",
+    "a szűzpecsenyéből"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A sajtok mely csoportjába tartozik a parmezán?",
+   "valaszok": [
+    "félkemény",
+    "lágy",
+    "kemény",
+    "ömlesztett"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik a stíriai metélt egyik alapanyaga?",
+   "valaszok": [
+    "túró",
+    "kakaó",
+    "lekvár",
+    "dió"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Honnan származik a gin?",
+   "valaszok": [
+    "Angliából",
+    "Kanadából",
+    "Egyesült Államokból",
+    "Ausztráliából"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik ittak először csokoládét?",
+   "valaszok": [
+    "a sumérok",
+    "az aztékok",
+    "a sziámiak",
+    "az etiópok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik a császármorzsa egyik alapanyaga az alábbiak közül?",
+   "valaszok": [
+    "zsemlemorzsa",
+    "liszt",
+    "árpagyöngy",
+    "rizs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik a remuládmártás alapanyaga?",
+   "valaszok": [
+    "ecetes uborka",
+    "cékla",
+    "ecetes torma",
+    "paradicsom"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik gyümölcs neve egyezik meg egy marhahúsféleség nevével?",
+   "valaszok": [
+    "mandula",
+    "ringló",
+    "mogyoró",
+    "dió"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ital a Margarita koktél alapanyaga?",
+   "valaszok": [
+    "tequila",
+    "whisky",
+    "brandy",
+    "calvados"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sütemény tésztájának készítéséhez használnak forró vizet vagy forró tejet?",
+   "valaszok": [
+    "rétes",
+    "képviselőfánk",
+    "francia krémes",
+    "linzer"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyikből készül a fondant?",
+   "valaszok": [
+    "cukor",
+    "búzadara",
+    "liszt",
+    "túró"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyikre van szükség a sopszka saláta készítéséhez?",
+   "valaszok": [
+    "sajt",
+    "sonka",
+    "füstölt tarja",
+    "tejföl"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miből készítik a dödöllét?",
+   "valaszok": [
+    "burgonya",
+    "káposzta",
+    "zöldbab",
+    "borsó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miből készül a borovicska nevű pálinka?",
+   "valaszok": [
+    "borsikafűből",
+    "borsmentából",
+    "borókabogyóból",
+    "borbolyából"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miből készül a konyak?",
+   "valaszok": [
+    "cukornádból",
+    "törkölyből",
+    "gabonából",
+    "borpárlatból"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miből készül a kumisz?",
+   "valaszok": [
+    "kecsketejből",
+    "rozsból",
+    "kancatejből",
+    "mákból"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miből készül a tortilla?",
+   "valaszok": [
+    "kukoricalisztből",
+    "rizslisztből",
+    "maniókából",
+    "kölesből"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miből készül a vaj?",
+   "valaszok": [
+    "tejszínből",
+    "tejfölből",
+    "savóból",
+    "aludttej"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen eredetű sajt a gouda?",
+   "valaszok": [
+    "francia",
+    "holland",
+    "svájci",
+    "dán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen hal kerül a japánok népszerű ételébe, a sushiba?",
+   "valaszok": [
+    "pácolt",
+    "nyers",
+    "sült",
+    "füstölt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen italfajta a siller?",
+   "valaszok": [
+    "bor",
+    "sör",
+    "vermut",
+    "pálinka"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen konyhai művelet az abálás?",
+   "valaszok": [
+    "aprítás",
+    "pirítás",
+    "főzés",
+    "sütés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen típusú étel a talkedli?",
+   "valaszok": [
+    "zöldségleves",
+    "húsleves",
+    "egybesült hús",
+    "édes tészta"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen vízbe áztatják a kékre főzve készített halat?",
+   "valaszok": [
+    "cukros",
+    "boros",
+    "sörös",
+    "ecetes"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen étel a kvargli?",
+   "valaszok": [
+    "sajt",
+    "kolbász",
+    "túró",
+    "pácolt hal"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen étel a prósza?",
+   "valaszok": [
+    "leves",
+    "édesség",
+    "savanyúság",
+    "pörkölt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miről kapta a nevét a rokfort sajt?",
+   "valaszok": [
+    "egy folyóról",
+    "egy szigetről",
+    "egy tehénfajtáról",
+    "egy településről"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit eszik, aki langusztát rendel?",
+   "valaszok": [
+    "rákot",
+    "halat",
+    "kagylót",
+    "csigát"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit nem használnak a barnamártás készítéséhez?",
+   "valaszok": [
+    "cukrot",
+    "tejszínt",
+    "lisztet",
+    "paradicsompürét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A marha melyik bontási része a bélszin?",
+   "valaszok": [
+    "a vesepecsenye",
+    "a magas hátszin",
+    "a fehérpecsenye",
+    "a gömbölyű felsál"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbi borfajták közül melyik spanyol eredetű?",
+   "valaszok": [
+    "portói",
+    "burgundi",
+    "sherry",
+    "bordói"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi élelmiszerek közül melyik szükséges a marinírozáshoz?",
+   "valaszok": [
+    "búzadara",
+    "sajt",
+    "ecet",
+    "tejföl"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi ételek közül melyiket nevezik \"gömböcnek\"?",
+   "valaszok": [
+    "a disznósajtot",
+    "a májas hurkát",
+    "a kecskesajtot",
+    "a rozscipót"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik anyaggal sűrítik az ételt legírozás során?",
+   "valaszok": [
+    "búzadarával",
+    "tojássárgájával",
+    "kukoricaliszttel",
+    "tojásfehérjével"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik nem a babapiskóta alapanyaga?",
+   "valaszok": [
+    "liszt",
+    "tojás",
+    "tej",
+    "cukor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül mit tesznek a buggyantott tojás főzőlevébe?",
+   "valaszok": [
+    "olajat",
+    "ecetet",
+    "cukrot",
+    "babérlevelet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik a kenyér rosszul sült, ragacsos részét?",
+   "valaszok": [
+    "hurka",
+    "kolbász",
+    "szalonna",
+    "mócsing"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan készül a tócsni?",
+   "valaszok": [
+    "abálják",
+    "forró zsiradékban sütik",
+    "főzik",
+    "párolják"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik a bor egyik jellegzetes mellékízének elnevezése?",
+   "valaszok": [
+    "farkasíz",
+    "rókaíz",
+    "görényíz",
+    "borzíz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik koktél készítéséhez használnak rumot?",
+   "valaszok": [
+    "Margarita",
+    "Manhattan",
+    "White Lady",
+    "Daiquiri"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a görög tzatziki alapanyaga?",
+   "valaszok": [
+    "zöldbab",
+    "uborka",
+    "paradicsom",
+    "sárgarépa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen eredetű a calvados nevű ital?",
+   "valaszok": [
+    "francia",
+    "görög",
+    "spanyol",
+    "holland"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen ital a Kir Royal koktél alapanyaga?",
+   "valaszok": [
+    "pezsgő",
+    "vörös bor",
+    "fehér bor",
+    "konyak"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen mártással készülnek a bakonyi módra készített húsok?",
+   "valaszok": [
+    "kolbászos",
+    "gombás",
+    "zöldborsós",
+    "májas"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen töltelékkel készülnek a Stefánia-módra készített húsételek?",
+   "valaszok": [
+    "párizsival",
+    "sajttal",
+    "sonkával",
+    "tojással"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen étel a minestrone?",
+   "valaszok": [
+    "leves",
+    "báránysült",
+    "fagylalt",
+    "pizza"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A kakaó melyik rokonát használják üditőital gyártására?",
+   "valaszok": [
+    "a gyömbért",
+    "a kóladiót",
+    "a kokacserjét",
+    "a kinint"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik ettek először paradicsomot?",
+   "valaszok": [
+    "az inkák",
+    "a kínaiak",
+    "az indiaiak",
+    "a törökök"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik nem fehérborszőlő-fajta az alábbiak közül?",
+   "valaszok": [
+    "leányka",
+    "oportó",
+    "rizlingszilváni",
+    "kéknyelű"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik élelmiszer szükséges a hollandi mártás készítéséhez?",
+   "valaszok": [
+    "tojás",
+    "sajt",
+    "gomba",
+    "metélőhagyma"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen ital a malvázia?",
+   "valaszok": [
+    "sör",
+    "rum",
+    "bor",
+    "tojáslikőr"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen mustárnak nevezik a fehér mustárt?",
+   "valaszok": [
+    "skót",
+    "belga",
+    "angol",
+    "holland"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen mustárnak nevezik másként a fekete mustárt?",
+   "valaszok": [
+    "francia",
+    "belga",
+    "holland",
+    "skót"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen pálinka a román eredetű cujka?",
+   "valaszok": [
+    "szilva",
+    "barack",
+    "boróka",
+    "eper"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Minek a feltalálását tulajdonítják Pérignon francia szerzetesnek?",
+   "valaszok": [
+    "a burgundi bor",
+    "a mustár",
+    "a pezsgő",
+    "a trappista sajt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miről kapta nevét a könnyű vörösborfajta, a chianti?",
+   "valaszok": [
+    "egy toscanai domságról",
+    "egy szicíliai hegyről",
+    "egy korzikai síkságról",
+    "egy lombardiai folyóról"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit főzött a háziasszony, ha csirágot készített?",
+   "valaszok": [
+    "tésztát",
+    "spárgát",
+    "articsókát",
+    "galambot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbi anyagok közül melyik nem a besamelmártás alapanyaga?",
+   "valaszok": [
+    "vaj",
+    "liszt",
+    "tej",
+    "tojás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a japán konyha egyik jellegzetes étele, a tofu?",
+   "valaszok": [
+    "szójaszósz",
+    "bambuszrügy",
+    "szójatúró",
+    "hosszú szemű rizs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen lekvárral készül az eredeti Sacher-torta?",
+   "valaszok": [
+    "szilva",
+    "barack",
+    "eper",
+    "narancs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A borjú melyik bontási részéből vásárol, aki frikandót vesz?",
+   "valaszok": [
+    "gerinc",
+    "szegy",
+    "lapocka",
+    "comb"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A rebarbara melyik részéből készítenek kompótot?",
+   "valaszok": [
+    "a virágából",
+    "a terméséből",
+    "a levélnyeléből",
+    "a gyökeréből"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit eszik, aki himpért falatozgat?",
+   "valaszok": [
+    "burgonyát",
+    "mézet",
+    "mogyorót",
+    "málnát"
+   ],
+   "helyes": 3
+  }
+ ]
+}

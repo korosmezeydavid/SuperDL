@@ -1,0 +1,3028 @@
+{
+ "id": "kviz-sport-nehez",
+ "nev": "Sport — nehezebb",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "Az alábbi olimpiai bajnok atlétáink közül ki nem kalapácsvetésben nyert aranyérmet?",
+   "valaszok": [
+    "Kiss Balázs",
+    "Csermák József",
+    "Németh Miklós",
+    "Zsivótzky Gyula"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi versenyszámok közül melyik nem tartozik az alpesi számok közé?",
+   "valaszok": [
+    "sífutás",
+    "lesiklás",
+    "műlesiklás",
+    "óriás-műlesiklás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbi városok közül melyikben rendeztek csak egyszer olimpiát?",
+   "valaszok": [
+    "Róma",
+    "London",
+    "Párizs",
+    "Los Angeles"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik olimpián nem vettek részt a magyar sportolók?",
+   "valaszok": [
+    "1912 Stockholm",
+    "1920 Antwerpen",
+    "1924 Párizs",
+    "1928 Amszterdam"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy hívták az Aranycsapat szövetségi kapitányát?",
+   "valaszok": [
+    "Illovszky Rudolf",
+    "Baróti Lajos",
+    "Sebes Gusztáv",
+    "Hoffer József"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol rendezték meg a 2000. évi labdarúgó Európa-bajnokságot?",
+   "valaszok": [
+    "Norvégiában és Svédországban",
+    "Portugáliában",
+    "Írország",
+    "Hollandiában és Belgiumban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány bajnokságon kell nyerni teniszben, hogy valaki Grand Slam győztes legyen?",
+   "valaszok": [
+    "hat",
+    "öt",
+    "három",
+    "négy"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány büntetőpont után pontozódik ki egy játékos a vízilabdában?",
+   "valaszok": [
+    "öt",
+    "hat",
+    "négy",
+    "három"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány játékos van egyszerre a vízben egy csapatból a vízilabdában?",
+   "valaszok": [
+    "öt",
+    "hat",
+    "hét",
+    "nyolc"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány olimpia maradt el a II. világháború miatt?",
+   "valaszok": [
+    "egy sem",
+    "egy",
+    "kettő",
+    "három"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki Andre Agassi felesége?",
+   "valaszok": [
+    "Jennifer Capriati",
+    "Venus Williams",
+    "Martina Navratilova",
+    "Steffi Graf"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem ugyanazon az olimpián nyert aranyérmet úszásban?",
+   "valaszok": [
+    "Szabó József",
+    "Egerszegi Krisztina",
+    "Kovács Ágnes",
+    "Darnyi Tamás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nyerte meg a 2003. évi Forma-1-es Magyar Nagydíjat?",
+   "valaszok": [
+    "Alonso",
+    "Raikkönen",
+    "Montoya",
+    "Coulthard"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nyerte meg az első Magyar Nagydíjat a Forma 1-ben?",
+   "valaszok": [
+    "Alain Prost",
+    "Nigel Mansell",
+    "Nelson Piquet",
+    "Ayrton Senna"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit választottak meg a 2000. év sportolónőjének Magyarországon?",
+   "valaszok": [
+    "Nagy Tímeát",
+    "Kőbán Ritát",
+    "Márkus Erzsébetet",
+    "Kovács Ágnest"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik Egyesült Államok-beli városban nem rendeztek soha nyári olimpiai játékokat?",
+   "valaszok": [
+    "Los Angeles",
+    "Atlanta",
+    "Saint Louis",
+    "San Francisco"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik Forma 1-es autóversenyző nyert legtöbbször összetett világbajnokságot?",
+   "valaszok": [
+    "Alain Prost",
+    "Juan Manuel Fangio",
+    "Jackie Stewart",
+    "Emerson Fittipaldi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik Forma-1-es autóversenyző nyerte a 2001. évi futamot a Hungaroringen?",
+   "valaszok": [
+    "Michael Schumacher",
+    "Mika Hakkinen",
+    "David Coulthard",
+    "Ralf Schumacher"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik atlétikai dobószámban nem nyertünk soha olimpiai aranyérmet?",
+   "valaszok": [
+    "gerelyhajítás",
+    "kalapácsvetés",
+    "súlylökés",
+    "diszkoszvetés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik atlétának állítottak még életében szobrot hazájában?",
+   "valaszok": [
+    "Al Oerter",
+    "Paavo Nurmi",
+    "Emil Zátopek",
+    "Jesse Owens"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik csapat lett bronzérmes a legutóbbi franciaországi labdarúgó vb-n?",
+   "valaszok": [
+    "Horvátország",
+    "Hollandia",
+    "Argentína",
+    "Anglia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik európai városban nem rendeztek téli olimpiát az alábbiak közül?",
+   "valaszok": [
+    "Innsbruck",
+    "Oslo",
+    "Grenoble",
+    "Göteborg"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik holland város labdarúgó csapata az Ajax?",
+   "valaszok": [
+    "Rotterdam",
+    "Amszterdam",
+    "Hága",
+    "Eindhoven"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik két magyar labdarúgó klubcsapat mérkőzését nevezik \"örökrangadónak\"?",
+   "valaszok": [
+    "Kispest - MTK",
+    "Újpest - FTC",
+    "FTC - MTK",
+    "Vasas - FTC"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik labdarúgó csapat nyerte el legtöbbször a BEK-et?",
+   "valaszok": [
+    "Real Madrid",
+    "Liverpool",
+    "Ajax",
+    "AC Milan"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik labdarúgónkat tüntették ki az európai Aranylabda díjjal?",
+   "valaszok": [
+    "Puskás Ferenc",
+    "Nyilasi Tibor",
+    "Albert Flórián",
+    "Grosics Gyula"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik olimpiai bajnok birkózónk lett autóbaleset áldozata?",
+   "valaszok": [
+    "Kozma István",
+    "Bóbis Gyula",
+    "Zombori Ödön",
+    "Szilvásy Miklós"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik olimpián nem szerzett aranyérmet ökölvívásban Papp László?",
+   "valaszok": [
+    "1960-ban Rómában",
+    "1952-ben Helsinkiben",
+    "1956-ban Melbourne-ben",
+    "1948-ban Londonban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik olipián szereztük a legtöbb aranyérmet?",
+   "valaszok": [
+    "Helsinki 1952",
+    "Melbourne 1956",
+    "London 1948",
+    "Mexikóváros 1968"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország labdarúgó válogatottjának volt legendás kapusa Dino Zoff?",
+   "valaszok": [
+    "Argentína",
+    "Brazília",
+    "Olaszország",
+    "Spanyolország"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország nyerte meg egymás után hétszer a kardvívás olimpiai csapatbajnokságát?",
+   "valaszok": [
+    "Magyarország",
+    "Olaszország",
+    "Szovjetunió",
+    "Németország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország válogatottja nyerte a 2001. évi női vízilabda Európa-bajnokságot?",
+   "valaszok": [
+    "Jugoszlávia",
+    "Magyarország",
+    "Olaszország",
+    "Hollandia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország válogatottjának volt tagja Eusebio?",
+   "valaszok": [
+    "Portugália",
+    "Spanyolország",
+    "Brazília",
+    "Argentína"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország válogatottjával játszott vízilabdacsapatunk a sydneyi olimpia döntőjében?",
+   "valaszok": [
+    "Oroszország",
+    "Juguszlávia",
+    "Olaszország",
+    "Horvátország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országban nem rendeztek még soha labdarúgó Európa-bajnokságot?",
+   "valaszok": [
+    "Portugália",
+    "Görögország",
+    "Franciaország",
+    "Svédország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban rendezték meg a 2002. évi kajak-kenu Európa-bajnokságot?",
+   "valaszok": [
+    "Németország",
+    "Magyarország",
+    "Franciaország",
+    "Svédország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban született Andre Agassi, a kiváló teniszező?",
+   "valaszok": [
+    "Amerikai Egyesült Államokban",
+    "Olaszországban",
+    "Franciaországban",
+    "Spanyolországban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik poszton játszik Oliver Kahn a Bayern München labdarúgó csapatában?",
+   "valaszok": [
+    "hátvéd",
+    "csatár",
+    "kapus",
+    "középpályás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportolónk nyerte a legtöbb egyéni olimpiai bajnokságot?",
+   "valaszok": [
+    "Gerevich Aladár",
+    "Keleti Ágnes",
+    "Egerszegi Krisztina",
+    "Balczó András"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportág szakkifejezései a csapásszám, az oldalvíz és a térdeplő?",
+   "valaszok": [
+    "kenu",
+    "evezés",
+    "kajak",
+    "vitorlázás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban lett kétszeres olimpiai bajnok Gyulai Zsolt?",
+   "valaszok": [
+    "kajakozás",
+    "birkózás",
+    "vívás",
+    "úszás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban lett olimpiai bajnok 1968-ban Németh Angéla?",
+   "valaszok": [
+    "atlétika",
+    "úszás",
+    "torna",
+    "vívás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban nyert aranyérmet Farkas Péter az 1992-es barcelonai olimpián?",
+   "valaszok": [
+    "ökölvívás",
+    "birkózás",
+    "öttusa",
+    "cselgáncs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett Európa-bajnoki bronzérmet a Ferjáncz-Tandari kettős?",
+   "valaszok": [
+    "autósport",
+    "kajak-kenu",
+    "asztalitenisz",
+    "evezés"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett hét érmet Matt Biondi az 1988-as szöuli olimpián?",
+   "valaszok": [
+    "atlétikában",
+    "úszásban",
+    "tornában",
+    "evezésben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett négy ezüstérmet Risztov Éva a 2002. évi Európa-bajnokságon?",
+   "valaszok": [
+    "atlétika",
+    "úszás",
+    "torna",
+    "kajak-kenu"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város labdarúgó csapata a Haladás?",
+   "valaszok": [
+    "Székesfehérvár",
+    "Szombathely",
+    "Zalaegerszeg",
+    "Békéscsaba"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város labdarúgó klubja a Benfica?",
+   "valaszok": [
+    "Buenos Aires",
+    "Barcelona",
+    "Lisszabon",
+    "Rio de Janeiro"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város látványossága a San Siro nevű stadion?",
+   "valaszok": [
+    "Madrid",
+    "Barcelona",
+    "Róma",
+    "Milánó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városban nem rendeztek még soha olimpiát?",
+   "valaszok": [
+    "Antwerpen",
+    "Brüsszel",
+    "Stockholm",
+    "Helsinki"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban nem rendeztek soha olimpiát?",
+   "valaszok": [
+    "Amszterdam",
+    "Stockholm",
+    "Koppenhága",
+    "Antwerpen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városban található a híres Maracana stadion?",
+   "valaszok": [
+    "Madrid",
+    "Buenos Aires",
+    "Barcelona",
+    "Rio de Janeiro"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik évben volt a legendás 6:3-as magyar-angol mérkőzés?",
+   "valaszok": [
+    "1951.0",
+    "1953.0",
+    "1955.0",
+    "1960.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik úszásnemben lett olimpiai és világbajnok az ausztrál Ian Thorpe?",
+   "valaszok": [
+    "hátúszás",
+    "gyorsúszás",
+    "mellúszás",
+    "pillangóúszás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nemzetiségű Juan Pablo Montoya Forma-1-es autóversenyző?",
+   "valaszok": [
+    "spanyol",
+    "kolumbiai",
+    "brazil",
+    "mexikói"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nemzetiségű a közelmúlt teniszcsillaga, Gabriela Sabatini?",
+   "valaszok": [
+    "argentín",
+    "brazil",
+    "olasz",
+    "svájci"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan nevezik az amerikai kosárlabda-válogatottat?",
+   "valaszok": [
+    "Csodacsapat",
+    "Óriások",
+    "Álomcsapat",
+    "Az elsők"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol rendezték meg a 2003. évi atlétikai világbajnokságot?",
+   "valaszok": [
+    "Sevilla",
+    "Párizs",
+    "Róma",
+    "Göteborg"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol ér véget hagyományosan a Tour de France utolsó szakasza?",
+   "valaszok": [
+    "Marseille-ben",
+    "Calais-ban",
+    "Cannes-ben",
+    "Párizsban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány aranyérmet nyert Mark Spitz amerikai úszó a müncheni olimpián?",
+   "valaszok": [
+    "hatot",
+    "hetet",
+    "ötöt",
+    "nyolcat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány egyéni aranyérmet nyert Egerszegi Krisztina?",
+   "valaszok": [
+    "kettő",
+    "három",
+    "négy",
+    "öt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány méterről dobják a bűntetőt a kézilabdában?",
+   "valaszok": [
+    "négy méterről",
+    "öt méterről",
+    "tizenegy méterről",
+    "hét méterről"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki az egyetlen háromszoros labdarúgó világbajnok?",
+   "valaszok": [
+    "Beckenbauer",
+    "Pelé",
+    "Eusebio",
+    "Maradona"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki kapta a legtöbb magyar olimpiai aranyérmet?",
+   "valaszok": [
+    "Gerevich Aladár",
+    "Kárpáti Rudolf",
+    "Kovács Pál",
+    "Egerszegi Krisztina"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki lett a 2000. év férfi sportolója Magyarországon?",
+   "valaszok": [
+    "Kolonics György",
+    "Balogh Gábor",
+    "Csollány Szilveszter",
+    "Storcz Botond"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem lett \"A nemzet sportolója\" 2004-ben?",
+   "valaszok": [
+    "Egerszegi Krisztina",
+    "Ivánkay Mária",
+    "Keleti Ágnes",
+    "Székely Éva"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem tornában szerzett olimpiai aranyérmet?",
+   "valaszok": [
+    "Magyar Zoltán",
+    "Borkai Zsolt",
+    "Czene Attila",
+    "Csollány Szilveszter"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki szerezte első aranyérmünket a sydneyi olimpián?",
+   "valaszok": [
+    "Kovács Ágnes",
+    "Csollány Szilveszter",
+    "Nagy Tímea",
+    "Kolonics György"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki vitte a magyar csapat zászlaját a 2004-es athéni olimpia megnyitóján?",
+   "valaszok": [
+    "Nagy Tímea",
+    "Benedek Tibor",
+    "Kovács Antal",
+    "Vereckei Ákos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki vitte a magyar zászlót a sydneyi olimpiai megnyitóján?",
+   "valaszok": [
+    "Kovács Ágnes",
+    "Csollány Szilveszter",
+    "Balogh Gábor",
+    "Kőbán Rita"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt a 2002.évi labdarúgó-világbajnokság gólkirálya?",
+   "valaszok": [
+    "Ronaldo",
+    "Raul",
+    "Rivaldo",
+    "Klose"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt a magyar csapat szövetségi kapitánya az 1986-os mexikói futball-világbajnokságon?",
+   "valaszok": [
+    "Mészöly Kálmán",
+    "Verebes József",
+    "Garami József",
+    "Mezey György"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt az Egyesült Államok elnöke az atlantai olimpia idején?",
+   "valaszok": [
+    "George Bush",
+    "Bill Clinton",
+    "Jimmy Carter",
+    "Ronald Reagan"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a nevét viseli az egykori Népstadion?",
+   "valaszok": [
+    "Kocsis Sándor",
+    "Bozsik József",
+    "Puskás Ferenc",
+    "Hidegkuti Nándor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Legkevesebb hány szervával lehet nyerni a teniszben egy játékot?",
+   "valaszok": [
+    "négy",
+    "öt",
+    "hat",
+    "hét"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik angol város labdarúgó csapata a Chelsea?",
+   "valaszok": [
+    "Manchester",
+    "Liverpool",
+    "London",
+    "Leeds"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik atlétikai versenyszám nem szerepelt soha az ókori olimpiákon?",
+   "valaszok": [
+    "távolugrás",
+    "gerelyhajítás",
+    "magasugrás",
+    "diszkoszvetés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik az a sportág, amelyikben 1924-től negyven éven keresztül mindig volt magyar olimpiai bajnok?",
+   "valaszok": [
+    "kajakozás",
+    "kardvívás",
+    "öttusa",
+    "hátúszás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik csapatban fejezte be fantasztikus pályafutását a híres kosaras Michael Jordan?",
+   "valaszok": [
+    "Chicago Bulls",
+    "Utah Jazz",
+    "Los Angeles Lakers",
+    "New York Knicks"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik európai futball-klub nevezetes arénáját hívják Bernabeu stadionnak?",
+   "valaszok": [
+    "Benfica",
+    "Olympique Marseille",
+    "FC Barcelona",
+    "Real Madrid"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik földrészen nem rendeztek még labdarúgó világbajnokságot?",
+   "valaszok": [
+    "Amerika",
+    "Afrika",
+    "Európa",
+    "Ázsia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik hónapban rendezik meg a Magyar Nagydíjat a Forma 1-es autók versenyében?",
+   "valaszok": [
+    "júniusban",
+    "októberben",
+    "augusztusban",
+    "májusban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik labdajátékban létezik horog- illetve tempódobás?",
+   "valaszok": [
+    "röplabda",
+    "kézilabda",
+    "fallabda",
+    "kosárlabda"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik labdarúgó egyesületben játszott Bene Ferenc?",
+   "valaszok": [
+    "MTK",
+    "Ferencváros",
+    "Újpesti Dózsa",
+    "Vasas"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik labdarúgó klub nevezetes stadionja az Old Trafford?",
+   "valaszok": [
+    "Arsenal",
+    "Liverpool",
+    "Manchester United",
+    "Newcastle"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik labdarúgó klubban futballozott húsz évig Fazekas László?",
+   "valaszok": [
+    "FTC",
+    "Vasas",
+    "Újpesti Dózsa",
+    "MTK"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik labdarúgó klubcsapatban folytatta pályafutását 1956 után Puskás Ferenc?",
+   "valaszok": [
+    "Benfica",
+    "Real Madrid",
+    "Barcelona",
+    "Manchester United"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik labdarúgó klubot választották meg az évszázad csapatának?",
+   "valaszok": [
+    "a Real Madridot",
+    "a Manchester Unitedot",
+    "a Bayern Münchent",
+    "a Juventust"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik labdarúgó nyerte el 2000-ben az Aranylabdát?",
+   "valaszok": [
+    "Zinedine Zidane",
+    "Luis Figo",
+    "Rivaldo",
+    "Andrej Sevcsenko"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik labdarúgóklub nagyhírű pályája az Old Trafford?",
+   "valaszok": [
+    "Chelsea",
+    "Liverpool",
+    "Manchester United",
+    "Nottingham Forest"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar futballbíró lett háromszor egymás után a világ legjobb játékvezetője?",
+   "valaszok": [
+    "Puhl Sándor",
+    "Palotai Károly",
+    "Zsolt István",
+    "Vágner László"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik magyar játékvezető szerzett labdarúgóként olimpiai aranyérmet?",
+   "valaszok": [
+    "Palotai Károly",
+    "Vágner László",
+    "Puhl Sándor",
+    "Zsolt István"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik magyar labdarúgó klub klasszis játékosa volt közel másfél évtizedig Mészöly Kálmán?",
+   "valaszok": [
+    "FTC",
+    "Vasas",
+    "Bp. Honvéd",
+    "Újpesti Dózsa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem nőitorna-eszköz az alábbiak közül?",
+   "valaszok": [
+    "karika",
+    "gerenda",
+    "gyűrű",
+    "felemás korlát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem ázsiai harcművészeti ág az alábbiak közül?",
+   "valaszok": [
+    "karate",
+    "dzsiudzsicu",
+    "tékvandó",
+    "feng shui"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik olasz futball-klub játékosait becézik \"zebráknak\"?",
+   "valaszok": [
+    "Internazionale",
+    "Juventus",
+    "Torino",
+    "AC Milan"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik olasz város labdarúgó klubcsapata a Lazio?",
+   "valaszok": [
+    "Milánó",
+    "Torino",
+    "Nápoly",
+    "Róma"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik olimpiai bajnok kezdte pályafutását atlétaként?",
+   "valaszok": [
+    "Bozsik József",
+    "Balczó András",
+    "Papp László",
+    "Hegedűs Csaba"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik olimpián lett először olimpiai bajnok a magyar labdarúgó válogatott?",
+   "valaszok": [
+    "1952-es helsinki",
+    "1960-as római",
+    "1964-es tokiói",
+    "1968-as mexikóvárosi"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik olimpián maradt le Güttler Károly egy századmásodperccel az aranyéremről mellúszásban?",
+   "valaszok": [
+    "Atlanta 1996",
+    "Sydney 2000",
+    "Szöul 1988",
+    "Barcelona 1992"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik olimpián szerzett aranyérmet Kovács (Kokó) István?",
+   "valaszok": [
+    "Szöul 1988",
+    "Barcelona 1992",
+    "Atlanta 1996",
+    "Sydney 2000"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország labdarúgó válogatottját nevezik narancsmezeseknek?",
+   "valaszok": [
+    "Írország",
+    "Portugália",
+    "Hollandia",
+    "Svájc"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország válogatottja rúgta a 2002. évi labdarúgó világbajnokság első gólját?",
+   "valaszok": [
+    "Szenegál",
+    "Németország",
+    "Kamerun",
+    "Franciaország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országból származik a kosárlabda mai változata?",
+   "valaszok": [
+    "Amerikai Egyesült Államok",
+    "Kanada",
+    "Ausztrália",
+    "Svédország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportoló nem abban a sportágban lett olimpiai bajnok, mint a többiek?",
+   "valaszok": [
+    "Kolonics György",
+    "Tatai Tibor",
+    "Kulcsár Győző",
+    "Parti János"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportág kiváló szakvezetője volt Komjádi Béla?",
+   "valaszok": [
+    "úszás",
+    "vívás",
+    "labdarúgás",
+    "vízilabda"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportág kiválósága Vörös Zsuzsanna?",
+   "valaszok": [
+    "öttusa",
+    "úszás",
+    "torna",
+    "vívás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportág kiválósága a sokszoros világcsúcstartó Iharos Sándor?",
+   "valaszok": [
+    "atlétika",
+    "súlyemelés",
+    "úszás",
+    "vívás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportág kiválósága volt Körmöczy Zsuzsa?",
+   "valaszok": [
+    "torna",
+    "tenisz",
+    "műkorcsolyázás",
+    "sakk"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportág kiválósága volt Sonja Hennie?",
+   "valaszok": [
+    "tenisz",
+    "műkorcsolyázás",
+    "torna",
+    "vívás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportág kétszeres olimpiai bajnoka Szabó Bence?",
+   "valaszok": [
+    "vívás",
+    "úszás",
+    "öttusa",
+    "kajak-kenu"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportág olimpiai bajnoka Németh Angéla?",
+   "valaszok": [
+    "atlétika",
+    "vívás",
+    "torna",
+    "kajak-kenu"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportág olimpiai bajnoka Parti János?",
+   "valaszok": [
+    "úszás",
+    "öttusa",
+    "vívás",
+    "kajak-kenu"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportág szakkifejezései a következők: mérlegelés, tárcsa, lökés?",
+   "valaszok": [
+    "birkózás",
+    "diszkoszvetés",
+    "súlyemelés",
+    "súlylökés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportág többszörös olimpiai bajnoka Alberto Tomba?",
+   "valaszok": [
+    "sízés",
+    "tenisz",
+    "úszás",
+    "műkorcsolyázás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban lett mozgássérültként kétszeres olimpiai bajnok Halassy Olivér?",
+   "valaszok": [
+    "atlétika",
+    "birkózás",
+    "lövészet",
+    "vízilabda"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban lett többszörös világbajnok Pesuth Rita?",
+   "valaszok": [
+    "íjászat",
+    "kick-boksz",
+    "kerékpározás",
+    "vívás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban nem nyertünk soha olimpiai aranyérmet?",
+   "valaszok": [
+    "diszkoszvetés",
+    "cselgáncs",
+    "sportlövészet",
+    "lovassport"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban nyert Európa-bajnokságot 2000-ben a Bátorfi-Tóth női páros?",
+   "valaszok": [
+    "asztalitenisz",
+    "kajak kettes",
+    "vitorlázás",
+    "tenisz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban nyert nyolc olimpiai aranyérmet Birgit Fischer?",
+   "valaszok": [
+    "atlétika",
+    "úszás",
+    "kajak-kenu",
+    "torna"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportágban nyert olimpiai aranyérmet Takács Károly?",
+   "valaszok": [
+    "torna",
+    "birkózás",
+    "öttusa",
+    "sportlövészet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett aranyérmet Földi Imre az 1972-es müncheni olimpián?",
+   "valaszok": [
+    "ökölvívás",
+    "birkózás",
+    "kalapácsvetés",
+    "súlyemelés"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett ezüstérmet Bárdosi Sándor a sydneyi olimpián?",
+   "valaszok": [
+    "ökölvívás",
+    "birkózás",
+    "kajak-kenu",
+    "súlyemelés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban volt négyszeres olimpiai bajnok Emil Zatopek?",
+   "valaszok": [
+    "hosszútávfutás",
+    "ökölvívás",
+    "gyorsúszás",
+    "gerelyhajítás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban volt élvonalbeli versenyző Karinthy Ferenc, a kitűnő író?",
+   "valaszok": [
+    "vízilabdában",
+    "labdarúgásban",
+    "teniszben",
+    "atlétikában"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik versenyszámban lett első Gécsek Tibor az 1998-as budapesti Európa-bajnokságon?",
+   "valaszok": [
+    "gerelyhajításban",
+    "kalapácsvetésben",
+    "diszkoszvetésben",
+    "súlylökésben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban rendezték meg 2000-ben a 11. paralimpiai játékokat?",
+   "valaszok": [
+    "Londonban",
+    "Sydneyben",
+    "Tokióban",
+    "Atlantában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ökölvívó nyert háromszor olimpiai bajnokságot nehezsúlyban az alábbiak közül?",
+   "valaszok": [
+    "Joe Frazier",
+    "Teofilo Stevenson",
+    "George Foreman",
+    "Vladimir Klicsko"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik úszásnemben szerzett aranyérmet Kovács Ágnes a sydneyi olipián?",
+   "valaszok": [
+    "gyorsúszásban",
+    "hátúszásban",
+    "mellúszásban",
+    "pillangóúszásban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik úszónemben győzött háromszor Kovács Ági az 1999-es isztambuli Európa-bajnokságon?",
+   "valaszok": [
+    "gyorsúszásban",
+    "hátúszásban",
+    "pillangóúszásban",
+    "mellúszásban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen nemzetiségű Fernando Alonso Forma-1-es pilóta?",
+   "valaszok": [
+    "olasz",
+    "spanyol",
+    "portugál",
+    "kolumbiai"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nemzetiségű a Forma-1-es világbajnok Jacques Villeneuve?",
+   "valaszok": [
+    "svájci",
+    "kanadai",
+    "francia",
+    "belga"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen sportágban versenyzett Valerij Brumel?",
+   "valaszok": [
+    "magasugrás",
+    "síkfutás",
+    "úszás",
+    "birkózás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az Aranycsapat melyik tagját becézték \"Öreg\"-nek?",
+   "valaszok": [
+    "Kocsis Sándor",
+    "Bozsik József",
+    "Hidegkúti Nándor",
+    "Zakariás József"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül ki nem olimpiai aranyérmes sportoló?",
+   "valaszok": [
+    "Kárpáti Rudolf",
+    "Kárpáti Aurél",
+    "Kárpáti Károly",
+    "Kárpáti György"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol rendezik meg a Forma-1-es versenyek Olasz Nagydíját?",
+   "valaszok": [
+    "Torino",
+    "Monza",
+    "San Marino",
+    "Ferrara"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol tartották a legelső teniszbajnokságot?",
+   "valaszok": [
+    "Ausztrália",
+    "Nagy-Britannia",
+    "Franciaország",
+    "Egyesült Államok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol volt az 1998-as téli olimpia?",
+   "valaszok": [
+    "Calgaryban",
+    "Lillehammerben",
+    "Naganóban",
+    "Albertville-ben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány fő van a versenyen a repülő hollandinak nevezett versenyhajóban?",
+   "valaszok": [
+    "1.0",
+    "2.0",
+    "3.0",
+    "4.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány lyuk lehet legfeljebb egy golfpályán?",
+   "valaszok": [
+    "14.0",
+    "18.0",
+    "20.0",
+    "25.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány olimpiai aranyérmet nyertünk vízilabdában?",
+   "valaszok": [
+    "kettőt",
+    "hármat",
+    "ötöt",
+    "hetet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány olimpián nem vett részt a magyar csapat?",
+   "valaszok": [
+    "egyen",
+    "kettőn",
+    "hármon",
+    "mindegyiken részt vett"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hányszor nyert a magyar labdarúgó válogatott olimpiai bajnokságot?",
+   "valaszok": [
+    "kétszer",
+    "háromszor",
+    "négyszer",
+    "egyszer sem"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki az a magyar sportoló, aki három ezüstérem után a negyedik olimpiáján aranyérmet szerzett?",
+   "valaszok": [
+    "Polyák Imre",
+    "Balczó András",
+    "Zsivótzky Gyula",
+    "Kárpáti Rudolf"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki az a magyar sportolónő, aki a II. világháború előtt és után is szerzett olimpiai aranyérmet?",
+   "valaszok": [
+    "Keleti Ágnes",
+    "Gyarmati Olga",
+    "Kádárné Csák Ibolya",
+    "Elek Ilona"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki jelenleg a magyar női vízilabda-válogatott szövetségi kapitánya?",
+   "valaszok": [
+    "Kásás Tamás",
+    "Faragó Tamás",
+    "Kemény Dénes",
+    "Csapó Gábor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem volt tagja a szöuli olimpián győztes öttusa csapatnak?",
+   "valaszok": [
+    "Mizsér Attila",
+    "Balogh Gábor",
+    "Martinek János",
+    "Fábián László"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem volt tagja az 1992-es barcelonai olimpiai aranyérmes női kajak négyesnek?",
+   "valaszok": [
+    "Géczi Erika",
+    "Kőbán Rita",
+    "Dónusz Éva",
+    "Czigány Kinga"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nyerte meg a 2001. évi amerikai nyílt teniszbajnokság női egyes döntőjét?",
+   "valaszok": [
+    "Jennifer Capriati",
+    "Martina Hingis",
+    "Lindsay Davenport",
+    "Venus Williams"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki szerzett aranyérmet a művészeti versenyeken az 1928-as amszterdami olimpián?",
+   "valaszok": [
+    "Mező Ferenc dr.",
+    "Komjádi Béla",
+    "Hajós Alfréd",
+    "Bay Béla"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki vitte a magyar zászlót az atlantai olimpián?",
+   "valaszok": [
+    "Benedek Tibor",
+    "Gyulai Zsolt",
+    "Kovács István",
+    "Szabó Bence"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt a 2004. évi labdarúgó Európa-bajnokság gólkirálya?",
+   "valaszok": [
+    "Wayne Rooney",
+    "Milan Baros",
+    "Ruud van Nistelrooy",
+    "Zinedine Zidane"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik angol futballcsapat beceneve \"az ágyúsok\"?",
+   "valaszok": [
+    "Manchester United",
+    "Arsenal",
+    "Aston Villa",
+    "Liverpool"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik angol város labdarúgó klubja az Arsenal?",
+   "valaszok": [
+    "London",
+    "Birmingham",
+    "Leeds",
+    "Newcastle"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik budapesti kerületben kezdte labdarúgó pályafutását Puskás Ferenc?",
+   "valaszok": [
+    "Ferencváros",
+    "Kispest",
+    "Csepel",
+    "Újpest"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik labdarúgó csapat nyerte meg a Bajnokok Ligája döntőjét 2004-ben?",
+   "valaszok": [
+    "Milan",
+    "Monaco",
+    "Porto",
+    "Real Madrid"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik labdarúgó klub stadionja a Nou Camp?",
+   "valaszok": [
+    "Flamengo",
+    "FC Barcelona",
+    "Real Madrid",
+    "Internazionale"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik labdarúgó klubcsapatban játszott Franz Beckenbauer közel húsz évig?",
+   "valaszok": [
+    "Hamburger SV",
+    "Bayern München",
+    "Borussia Dortmund",
+    "Bayer Leverkusen"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik labdarúgócsapatra volt jellemző a '60-as években a betonvédekezés, a \"catenaccio\"?",
+   "valaszok": [
+    "Fiorentina",
+    "Juventus",
+    "Internazionale",
+    "AC Milan"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar labdarúgó beceneve Döme?",
+   "valaszok": [
+    "Törőcsik András",
+    "Nyilasi Tibor",
+    "Bognár György",
+    "Détári Lajos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik magyar labdarúgó klub legendás csatára volt Bene Ferenc?",
+   "valaszok": [
+    "Ferencváros",
+    "Vasas",
+    "Újpesti Dózsa",
+    "MTK"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar labdarúgó volt a legtöbbször válogatott?",
+   "valaszok": [
+    "Fazekas László",
+    "Hidegkúti Nándor",
+    "Albert Flórián",
+    "Bozsik József"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik német labdarúgó volt legtöbbször válogatott?",
+   "valaszok": [
+    "Gerd Müller",
+    "Lothar Matthaus",
+    "Franz Beckenbauer",
+    "Jürgen Klinsmann"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik olimpiai bajnoknőnk nem atlétikában szerzett aranyérmet?",
+   "valaszok": [
+    "Gyarmati Olga",
+    "Keleti Ágnes",
+    "Kádárné Csák Ibolya",
+    "Németh Angéla"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik olimpián nem szerzett aranyérmet Papp László?",
+   "valaszok": [
+    "1948 London",
+    "1952 Helsinki",
+    "1956 Melbourne",
+    "1960 Róma"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország csapata ellen játszotta legelső mérkőzését a magyar válogatott?",
+   "valaszok": [
+    "Ausztria",
+    "Franciaország",
+    "Anglia",
+    "Olaszország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország labdarúgó válogatottja nem jutott be a legjobb négy közé a 2000. évi Európa Bajnokságon?",
+   "valaszok": [
+    "Hollandia",
+    "Portugália",
+    "Olaszország",
+    "Spanyolország"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország labdarúgó válogatottjának volt szövetségi kapitánya Cesar Luis Menotti?",
+   "valaszok": [
+    "Argentína",
+    "Brazília",
+    "Spanyolország",
+    "Olaszország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország labdarúgói nyertek közvetlenül egymás után világbajnokságot és Európa-bajnokságot?",
+   "valaszok": [
+    "Németország",
+    "Olaszország",
+    "Hollandia",
+    "Franciaország"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország rendezi meg a 2004. évi labdarúgó Európa-bajnokságot?",
+   "valaszok": [
+    "Hollandia",
+    "Svédország",
+    "Spanyolország",
+    "Portugália"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország válogatottja nyerte meg a 2001. évi női kosárlabda Európa-bajnokságot?",
+   "valaszok": [
+    "Franciaország",
+    "Jugoszlávia",
+    "Oroszország",
+    "Litvánia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország válogatottja nyerte meg a férfi labdarúgó tornát a 2004-es athéni olimpián?",
+   "valaszok": [
+    "Argentína",
+    "Brazília",
+    "Kamerun",
+    "Nigéria"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országban rendezik meg a 2010. évi labdarúgó világbajnokságot?",
+   "valaszok": [
+    "Kína",
+    "Brazília",
+    "Egyiptom",
+    "Dél-afrikai Köztársaság"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportág kiválósága Lance Armstrong?",
+   "valaszok": [
+    "autóversenyzés",
+    "kerékpározás",
+    "jégkorongozás",
+    "evezés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportág neves szakedzője Rátgéber László?",
+   "valaszok": [
+    "labdarúgás",
+    "kosárlabda",
+    "kézilabda",
+    "vízilabda"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportág olimpiai bajnoka Dr. Sárosi László?",
+   "valaszok": [
+    "vívás",
+    "öttusa",
+    "vízilabda",
+    "labdarúgás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportág szövetségi kapitányaként ért el nemzetközi sikereket Mocsai Lajos?",
+   "valaszok": [
+    "kajak-kenu",
+    "labdarúgás",
+    "kézilabda",
+    "vízilabda"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportág történetében nyert először magyar világbajnoki aranyérmet a Haller-Pető páros?",
+   "valaszok": [
+    "tenisz",
+    "evezés",
+    "vitorlázás",
+    "asztalitenisz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban nem nyertünk még eddig soha olimpiai aranyérmet?",
+   "valaszok": [
+    "súlyemelés",
+    "evezés",
+    "cselgáncs",
+    "sportlövészet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban nyert Európa-bajnokságot Deák Bárdos Mihály 2001-ben?",
+   "valaszok": [
+    "öttusa",
+    "birkózás",
+    "súlyemelés",
+    "ökölvívás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban nyert két aranyérmet Szőke Katalin az 1952-es helsinki olimpián?",
+   "valaszok": [
+    "torna",
+    "vívás",
+    "úszás",
+    "atlétika"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportágban volt sokszoros világbajnok Vaszilij Alekszejev?",
+   "valaszok": [
+    "diszkoszvetés",
+    "birkózás",
+    "súlyemelés",
+    "ökölvívás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik világhírű atléta nyert négyszer egymás után olimpiai bajnokságot diszkoszvetésben?",
+   "valaszok": [
+    "Al Oerter",
+    "Clarance Houser",
+    "David Weill",
+    "Ludvik Danek"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városban rendezik meg az Egyesült Államok nyílt teniszbajnokságát?",
+   "valaszok": [
+    "New York",
+    "Los Angeles",
+    "Chicago",
+    "Boston"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városban rendezték az 1956-os melbourne-i olimpia lovasversenyeit?",
+   "valaszok": [
+    "Stockholm",
+    "Sydney",
+    "London",
+    "Wellington"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik évben adták át a Népstadiont?",
+   "valaszok": [
+    "1952-ben",
+    "1953-ban",
+    "1950-ben",
+    "1955-ben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik évben rendezték meg az első Forma-1-es autóversenyt a Hungaroringen?",
+   "valaszok": [
+    "1982.0",
+    "1986.0",
+    "1989.0",
+    "1993.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik úszásnemben szerzett négy olimpiai bajnokságot Darnyi Tamás?",
+   "valaszok": [
+    "gyorsúszásban",
+    "pillangóúszásban",
+    "hátúszásban",
+    "vegyesúszásban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi az érvényes találati felület a párbajtőrvívásban?",
+   "valaszok": [
+    "az egész test",
+    "csak a felső test",
+    "a felső test és a fej",
+    "a felső test és a végtagok"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen nemzetiségű játékvezető bíráskodott a 2002. évi labdarúgó-világbajnokság döntőjében?",
+   "valaszok": [
+    "svéd",
+    "holland",
+    "olasz",
+    "dán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mióta szerepel a női párbajtőrvívás az olimpián?",
+   "valaszok": [
+    "Los Angeles 1984",
+    "Barcelona 1992",
+    "Atlanta 1996",
+    "Sydney 2000"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi sportolók közül melyik nem öttusában nyert olimpiai aranyérmet?",
+   "valaszok": [
+    "Németh Ferenc",
+    "Török Gyula",
+    "Martinek János",
+    "Balczó András"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol rendezték az első téli olimpiát 1924-ben?",
+   "valaszok": [
+    "Grenoble",
+    "St. Moritz",
+    "Lake Placid",
+    "Chamonix"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol rendezték meg Lékó Péter és Vlagyimir Kramnyik klasszikus sakkvilágbajnoki döntőjét?",
+   "valaszok": [
+    "Svájc",
+    "Oroszország",
+    "Magyarország",
+    "Belgium"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol van a Nemzetközi Labdarúgó Szövetség (FIFA) székhelye?",
+   "valaszok": [
+    "Zürich",
+    "Párizs",
+    "London",
+    "Amszterdam"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány aranyérmet nyert Gerevich Aladár kardvívásban az olimpiákon?",
+   "valaszok": [
+    "hármat",
+    "ötöt",
+    "hetet",
+    "kilencet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány hiba után pontozódik ki egy játékos a kosárlabdában?",
+   "valaszok": [
+    "kettő",
+    "három",
+    "öt",
+    "hét"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány percig tart a kézilabdában az időleges kiállítás?",
+   "valaszok": [
+    "egy",
+    "kettő",
+    "három",
+    "öt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány világbajnoki ezüstérmet szereztünk labdarúgásban?",
+   "valaszok": [
+    "egyet",
+    "kettőt",
+    "hármat",
+    "négyet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány érmet szereztünk kajak-kenuban a 2004. évi athéni olimpián?",
+   "valaszok": [
+    "2.0",
+    "4.0",
+    "6.0",
+    "8.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hányszor nyert olimpiai aranyérmet magyar férfi vízilabda-válogatott?",
+   "valaszok": [
+    "négyszer",
+    "hatszor",
+    "hétszer",
+    "nyolcszor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hányszor nyert világbajnokságot Brazília labdarúgó válogatottja?",
+   "valaszok": [
+    "háromszor",
+    "négyszer",
+    "ötször",
+    "hatszor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki gyújtotta meg az olimpiai lángot Sydneyben?",
+   "valaszok": [
+    "Marion Jones",
+    "Cathy Freeman",
+    "Susan O'Neill",
+    "Ian Thorpe"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki lett a 2003. év legjobb női sportolója?",
+   "valaszok": [
+    "Vörös Zsuzsanna",
+    "Risztov Éva",
+    "Kovács Katalin",
+    "Mandula Petra"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki minden idők legfiatalabb sakkvilágbajnoka?",
+   "valaszok": [
+    "Karpov",
+    "Szpasszkij",
+    "Kaszparov",
+    "Fischer"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem az 1976-os montreali olimpián nyert aranyérmet?",
+   "valaszok": [
+    "Gyulai Zsolt",
+    "Magyar Zoltán",
+    "Németh Miklós",
+    "Tordasi Ildikó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem nyert olimpiai bajnokságot úszásban?",
+   "valaszok": [
+    "Gyarmati Andrea",
+    "Egerszegi Krisztina",
+    "Szőke Kató",
+    "Temes Judit"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kit választottak Magyarországon az Év női sportolójának 2004-ben?",
+   "valaszok": [
+    "Janics Natasa",
+    "Nagy Tímea",
+    "Igaly Diána",
+    "Vörös Zsuzsanna"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kit választottak meg 2004-ben a világ legjobb labdarúgójának?",
+   "valaszok": [
+    "Ronaldo",
+    "Ronaldinho",
+    "Zinedine Zidane",
+    "Luis Figo"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik angol város labdarúgó klubja az Aston Villa?",
+   "valaszok": [
+    "Liverpool",
+    "Birmingham",
+    "Leeds",
+    "Nottingham"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik atlétikai dobószám nem szerepel a férfi tízpróbában?",
+   "valaszok": [
+    "kalapácsvetés",
+    "súlylökés",
+    "gerelyhajítás",
+    "diszkoszvetés"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik atlétikai versenyszámban nyert aranyérmet Annus Adrián a 2002. évi Európa-bajnokságon?",
+   "valaszok": [
+    "tízpróba",
+    "kalapácsvetés",
+    "távolugrás",
+    "diszkoszvetés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik belga város labdarúgó klubja az Anderlecht?",
+   "valaszok": [
+    "Antwerpen",
+    "Brüsszel",
+    "Gent",
+    "Bruges"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egyesületben úszott Egerszegi Krisztina?",
+   "valaszok": [
+    "Bp. Spartacusban",
+    "Bp. Honvédban",
+    "Újpesti Dózsában",
+    "OTP-Sport Plussz SE-ben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik híres sportolónőnk írt könyvet \"Sírni csak a győzteseknek szabad\" címmel?",
+   "valaszok": [
+    "Egerszegi Krisztina",
+    "Elek Ilona",
+    "Székely Éva",
+    "Gyarmati Andrea"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hónapban volt 1953-ban a legendás angol-magyar labdarúgó mérkőzés?",
+   "valaszok": [
+    "márciusban",
+    "májusban",
+    "szeptemberben",
+    "novemberben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik labdarúgó kapta meg a 2003. évi Aranylabdát?",
+   "valaszok": [
+    "Ronaldo",
+    "Nedved",
+    "Maldini",
+    "Raul"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik labdarúgó lett először aranylabdás?",
+   "valaszok": [
+    "Alfredo di Stefano",
+    "Stanley Matthews",
+    "Luis Suarez",
+    "Josef Masopust"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik labdarúgócsapat nem nyert még magyar bajnokságot?",
+   "valaszok": [
+    "Győri ETO",
+    "Vác",
+    "Videoton",
+    "Dunaferr"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar sportember pályafutását örökítette meg a Küldetés című filmet?",
+   "valaszok": [
+    "Papp László",
+    "Balczó András",
+    "Kárpáti Rudolf",
+    "Grosics Gyula"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik magyar sportolóról szól Mezei András: Halálom után - Tus a halál ellen c. könyve?",
+   "valaszok": [
+    "Kárpáti Rudolf",
+    "Kozma István",
+    "Növényi Norbert",
+    "Hegedűs Csaba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik olimpiai bajnok birkózónk lett kétszeres Európa-bajnok súlyos autóbalesete után?",
+   "valaszok": [
+    "Kozma István",
+    "Farkas Péter",
+    "Hódos Imre",
+    "Hegedűs Csaba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik olimpián szereztünk mindössze egy aranyérmet?",
+   "valaszok": [
+    "1896 Athén",
+    "1900 Párizs",
+    "1912 Stockholm",
+    "1928 Amszterdam"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik olimpián szerzett bronzérmet Kokó ökölvívásban?",
+   "valaszok": [
+    "Barcelona 1992",
+    "Szöul 1988",
+    "Sydney 2000",
+    "Atlanta 1996"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország női kézilabda csapata nyert a legutóbbi három olimpián?",
+   "valaszok": [
+    "Norvégia",
+    "Dél-Korea",
+    "Franciaország",
+    "Dánia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik országban rendezték meg az első Forma-1-es futamot?",
+   "valaszok": [
+    "Argentína",
+    "Nagy-Britannia",
+    "Franciaország",
+    "Amerikai Egyesült Államok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban született az úszófenomén Mark Spitz?",
+   "valaszok": [
+    "USA",
+    "Ausztria",
+    "Nagy-Britannia",
+    "Magyarország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportolónk vitte a magyar csapat zászlaját három egymást követő olimpián?",
+   "valaszok": [
+    "Komáromi Tibor",
+    "Kovács Antal",
+    "Kulcsár Gergely",
+    "Kamuti Jenő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik sportág kiválósága Alekszandr Popov?",
+   "valaszok": [
+    "torna",
+    "tenisz",
+    "vívás",
+    "úszás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportág kiválósága volt Varjú Vilmos?",
+   "valaszok": [
+    "ökölvívó",
+    "súlylökés",
+    "súlyemelés",
+    "birkózás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportág nem szerepel a triatlonban?",
+   "valaszok": [
+    "úszás",
+    "futás",
+    "kerékpározás",
+    "lövészet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik világhírű atléta nyerte meg a távolugrás négy egymást követő olimpián?",
+   "valaszok": [
+    "Bob Beamon",
+    "Viktor Szanyejev",
+    "Carl Lewis",
+    "Jesse Owens"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik világhírű labdarúgóklub elnöke Silvio Berlusconi olasz politikus?",
+   "valaszok": [
+    "Juventus",
+    "Internazionale",
+    "Fiorentina",
+    "AC Milan"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik város labdarúgó csapata a Feyenoord?",
+   "valaszok": [
+    "Amszterdam",
+    "Eindhoven",
+    "Rotterdam",
+    "Hága"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városban rendezik meg minden év januárjában az ausztrál nemzetközi teniszbajnokságot?",
+   "valaszok": [
+    "Sydneyben",
+    "Melbourne-ben",
+    "Canberrában",
+    "Adelaide-ben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik vívónk nem kardvívásban szerzett olimpiai aranyérmet?",
+   "valaszok": [
+    "Pézsa Tibor",
+    "Fenyvesi Csaba",
+    "Kárpáti Rudolf",
+    "Kabos Endre"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nemzetiségű Stephane Peterhansel autóversenyző, a 2005. évi Dakar-rali győztese?",
+   "valaszok": [
+    "osztrák",
+    "francia",
+    "holland",
+    "dán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nemzetiségű játékvezető bíráskodott a 2004. évi labdarúgó Európa Bajnokság döntőjében?",
+   "valaszok": [
+    "svéd",
+    "svájci",
+    "olasz",
+    "német"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen pályán játszanak a wimbledoni nemzetközi teniszbajnokságon?",
+   "valaszok": [
+    "salak",
+    "műanyag borítású",
+    "füves",
+    "bitumen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen sporteszköz a tobogán?",
+   "valaszok": [
+    "szán",
+    "vitorlás hajó",
+    "agyaggalamb",
+    "vívósisak"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen színű trikót visel a szakasz-győztes a Tour de France kerékpárversenyen?",
+   "valaszok": [
+    "kék",
+    "lila",
+    "piros",
+    "sárga"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A lovassport melyik ága nem tartozik az olimpiai versenyszámok közé?",
+   "valaszok": [
+    "díjugratás",
+    "díjlovaglás",
+    "lovastusa",
+    "fogathajtás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbi sportolók közül ki nem az 1976-os montreali olimpián nyert aranyérmet?",
+   "valaszok": [
+    "Magyar Zoltán",
+    "Tordasi Ildikó",
+    "Kulcsár Győző",
+    "Németh Miklós"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol rendezték 1930-ban az első labdarúgó világbajnokságot?",
+   "valaszok": [
+    "Olaszországban",
+    "Franciaországban",
+    "Uruguayban",
+    "Brazíliában"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol rendezték meg a második újkori olimpiai játékokat?",
+   "valaszok": [
+    "Amszterdam",
+    "London",
+    "St. Louis",
+    "Párizs"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hányas számú mezt viselte Puskás Öcsi az Aranycsapatban?",
+   "valaszok": [
+    "10-es",
+    "9-es",
+    "8-as",
+    "11-es"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki a női tornasport legeredményesebb olimpikonja?",
+   "valaszok": [
+    "Nadia Comaneci",
+    "Olga Korbut",
+    "Keleti Ágnes",
+    "Larisza Latinyina"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki az egyetlen olyan magyar focista, akinek két olimpiai arany- és egy bronzérme van?",
+   "valaszok": [
+    "Albert Flórián",
+    "Bozsik József",
+    "Novák Dezső",
+    "Fazekas László"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki lőtte a győzelmet jelentő aranygólt a 2000. Évi futball Európa Bajnokságon?",
+   "valaszok": [
+    "Henry",
+    "Wiltord",
+    "Dugarry",
+    "Trezeguel"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki minden idők legfiatalabb wimbledoni férfi teniszbajnoka?",
+   "valaszok": [
+    "Pete Sampras",
+    "Björn Borg",
+    "Stefan Edberg",
+    "Boris Becker"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem volt tagja a sydneyi olimpián aranyérmet szerzett kajak négyesnek?",
+   "valaszok": [
+    "Vereckei Ákos",
+    "Storcz Botond",
+    "Kammerer Zoltán",
+    "Kolonics György"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nyert 1980-ban és 1984-ben is olipmiai bajnokságot 1500 m-es síkfutásban?",
+   "valaszok": [
+    "Steve Ovett",
+    "Sebastian Coe",
+    "Steve Cram",
+    "Marcus O'Sullivan"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nyerte meg 1999-ben a párizsi Roland Garros tenisztornát?",
+   "valaszok": [
+    "Jevgenyij Kafelnyikov",
+    "Andre Agassi",
+    "Pete Sampras",
+    "Ilie Philippoussis"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nyerte meg a női egyes tenisztornát a sydneyi olimpián?",
+   "valaszok": [
+    "Venus Williams",
+    "Szeles Mónika",
+    "Martina Hingis",
+    "Lindsay Davenport"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik birkózónak nyert két egymást követő olimpián aranyérmet?",
+   "valaszok": [
+    "Kozma István",
+    "Hódos Imre",
+    "Bóbis Gyula",
+    "Hegedűs Csaba"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik labdarúgó Európa-bajnokságon ért el Magyarország 3. helyezést?",
+   "valaszok": [
+    "az 1968-as olaszországi",
+    "az 1964-es spanyolországi",
+    "az 1972-es belgiumi",
+    "az 1960-as franciaországi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik labdarúgónak ítélték oda először az Aranylabdát?",
+   "valaszok": [
+    "Alfredo di Stefano",
+    "Helmut Rahn",
+    "Sir Stanley Matthews",
+    "Eusebio"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik olimpián szereztük első aranyérmünket kajak-kenuban?",
+   "valaszok": [
+    "1952 Helsinki",
+    "1956 Melbourne",
+    "1960 Róma",
+    "1964 Tokió"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik olimpián zárták ki a versenyből Ben Johnson kanadai rövidtávfutót doppinghasználat miatt?",
+   "valaszok": [
+    "Barcelonában",
+    "Szöulban",
+    "Atlantában",
+    "Los Angelesben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország labdarúgó válogatottja nem nyert soha Európa-bajnokságot?",
+   "valaszok": [
+    "Anglia",
+    "Olaszország",
+    "Spanyolország",
+    "Franciaország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország válogatottja ellen játszotta női kézilabda csapatunk az EB-döntőt Bukarestben?",
+   "valaszok": [
+    "Románia",
+    "Oroszország",
+    "Ukrajna",
+    "Dánia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország válogatottja nyerte meg a női vízilabda tornát a 2004-es athéni olimpián?",
+   "valaszok": [
+    "Olaszország",
+    "Magyarország",
+    "Görögország",
+    "Ausztrália"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország válogatottjának legendás kapusa José Luis Chilavert?",
+   "valaszok": [
+    "Paraguay",
+    "Uruguay",
+    "Argentína",
+    "Mexikó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportoló nem atlétikában szerzett olimpiai aranyérmet?",
+   "valaszok": [
+    "Németh Angéla",
+    "Németh Imre",
+    "Németh Miklós",
+    "Németh Ferenc"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportág nemzetközi szövetsége a FIDE?",
+   "valaszok": [
+    "torna",
+    "gyeplabda",
+    "vívás",
+    "sakk"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportág szakkifejezése a fless?",
+   "valaszok": [
+    "birkózás",
+    "torna",
+    "vitorlázás",
+    "vívás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik sportágban szereztük első Európa-bajnoki győzelmünket?",
+   "valaszok": [
+    "evezésben",
+    "műkorcsolyában",
+    "úszásban",
+    "ökölvívásban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban szerzett aranyérmet Csík Ferenc az 1936-os berlini olimpián?",
+   "valaszok": [
+    "atlétika",
+    "úszás",
+    "ökölvívás",
+    "birkózás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban rendeztek kétszer téli olimpiát?",
+   "valaszok": [
+    "Oslo",
+    "Innsbruck",
+    "Grenoble",
+    "Calgary"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ökölvívónk nyert ezüstérmet az 1972-es müncheni olimpián váltósúlyban?",
+   "valaszok": [
+    "Kajdi János",
+    "Gedó György",
+    "Botos András",
+    "Orbán László"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik úszásnemben nem nyertünk soha olimpiai aranyérmet?",
+   "valaszok": [
+    "gyorsúszás",
+    "mellúszás",
+    "pillangóúszás",
+    "hátúszás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor rendeztek rendkívüli olimpiai játékokat?",
+   "valaszok": [
+    "1926-ban",
+    "1922-ben",
+    "1910-ben",
+    "1906-ban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen nemzetiségű játékvezető fújta a sípot a 2000. labdarúgó EB döntőjében?",
+   "valaszok": [
+    "dán",
+    "skót",
+    "svéd",
+    "osztrák"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minek a rövidítése az MTK?",
+   "valaszok": [
+    "Magyar Testnevelési Klub",
+    "Magyar Testgyakorlók Köre",
+    "Magyar Torna Klub",
+    "Magyar Tornászok Köre"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mióta szerepel a női labdarúgás az olimpiai játékok műsorán?",
+   "valaszok": [
+    "1984 Los Angeles",
+    "1988 Szöul",
+    "1996 Atlanta",
+    "2000 Sydney"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A sportlövészet melyik ágában szerzett két olimpiai aranyérmet Takács Károly?",
+   "valaszok": [
+    "gyorstüzelő pisztoly",
+    "légpisztoly",
+    "sportpisztoly",
+    "kisöbű puska, összetett"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány személyi hiba után pontozódik ki egy kosárlabdázó?",
+   "valaszok": [
+    "négy",
+    "öt",
+    "három",
+    "nincs kipontozódás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki szerezte első olimpiai aranyérmünket kardvívásban?",
+   "valaszok": [
+    "Terstyánszky Ödön",
+    "Fuchs Jenő dr.",
+    "Pósta Sándor dr.",
+    "Kabos Endre"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a férfi sakkvilágbajnok 1975 és 1985 között?",
+   "valaszok": [
+    "Borisz Szpasszkij",
+    "Robert Fischer",
+    "Gari Kaszparov",
+    "Anatolij Karpov"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mely csapat ellen játszott labdarúgó-válogatottunk az utolsó vb-n, melyen részt vett?",
+   "valaszok": [
+    "Spanyolország",
+    "Franciaország",
+    "NSZK",
+    "Csehszlovákia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik angol városban játszották az emlékezetes magyar-brazil meccset az 1966-os labdarúgó vb-n?",
+   "valaszok": [
+    "Manchester",
+    "Liverpool",
+    "London",
+    "Birmingham"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik atlétikai dobószám világcsúcstartója volt Paragi Ferenc?",
+   "valaszok": [
+    "súlylökés",
+    "gerelyhajítás",
+    "kalapácsvetés",
+    "diszkoszvetés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik az az egyetlen nyári olimpia, ahol a jégkorongozás is szerepelt a versenyszámok között?",
+   "valaszok": [
+    "1920 Antwerpen",
+    "1912 Stockholm",
+    "1928 Amszterdam",
+    "1908 London"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik olimpián szereztük a legtöbb aranyérmet úszásban?",
+   "valaszok": [
+    "1952 Helsinki",
+    "1992 Barcelona",
+    "1936 Berlin",
+    "2000 Sydney"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik olimpián szerzett Gyarmati Andrea úszásban egy ezüst- és egy bronzérmet?",
+   "valaszok": [
+    "Tokió 1964",
+    "München 1972",
+    "Montreal 1976",
+    "Moszkva 1980"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország labdarúgó válogatottja nyerte meg az 1990. évi világbajnokságot?",
+   "valaszok": [
+    "Argentína",
+    "Németország",
+    "Brazília",
+    "Olaszország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország válogatottja nyerte a sydneyi olimpia labdarúgó tornáját?",
+   "valaszok": [
+    "Chile",
+    "Kamerun",
+    "Spanyolország",
+    "Nigéria"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik spanyol labdarúgó \"beceneve\" a Keselyű?",
+   "valaszok": [
+    "Alfredo di Stefano",
+    "Emilio Butragueno",
+    "Carlos Santillana",
+    "Amaneio Amaro"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sportágban szereztük első világbajnoki aranyérmünket?",
+   "valaszok": [
+    "asztaliteniszben",
+    "vívásban",
+    "műkorcsolyában",
+    "sportlövészetben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik versenyszám nem szerepel a férfi tízpróbában?",
+   "valaszok": [
+    "1500 méteres síkfutás",
+    "súlylökés",
+    "400 méteres gátfutás",
+    "rúdugrás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a klubszíne az FC Barcelona labdarúgó-csapatának?",
+   "valaszok": [
+    "piros-kék",
+    "kék-fekete",
+    "sárga-kék",
+    "piros-fekete"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem szerzett olimpiai aranyérmet az alábbi kenusok közül?",
+   "valaszok": [
+    "Horváth Csaba",
+    "Parti János",
+    "Tatai Tibor",
+    "Wichmann Tamás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem volt tagja az 1960-as római olimpián győztes magyar öttusa csapatnak?",
+   "valaszok": [
+    "Nagy Imre",
+    "Balczó András",
+    "Török Ferenc dr.",
+    "Németh Ferenc"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely sportágban nyerték meg versenyzőink az összes versenyszámot az első világbajnokságon?",
+   "valaszok": [
+    "asztalitenisz",
+    "fogathajtás",
+    "vívás",
+    "öttusa"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik labdarúgó klubcsapat nyerte a legtöbb nemzeti bajnoki címet?",
+   "valaszok": [
+    "Real Madrid",
+    "Juventus",
+    "Anderlecht",
+    "Glasgow Rangers"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik olimpián nyertünk egyszerre arany- és bronzérmet is kalapácsvetésben?",
+   "valaszok": [
+    "Róma 1960",
+    "Mexikó 1968",
+    "London 1948",
+    "Helsinki 1952"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország adott otthont az első labdarúgó Európa-bajnokságnak?",
+   "valaszok": [
+    "Olaszország",
+    "Németország",
+    "Nagy-Britannia",
+    "Franciaország"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik országból ered a jégkorong?",
+   "valaszok": [
+    "Svédországból",
+    "az Egyesült Államokból",
+    "Kanadából",
+    "Finnországból"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen eredménnyel győzött Richard Fosbury magasugrásban a mexikói olimpián?",
+   "valaszok": [
+    "219 cm",
+    "224 cm",
+    "226 cm",
+    "230 cm"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki szerezte első olimpiai aranyérmünket öttusa egyéniben?",
+   "valaszok": [
+    "Török Ferenc",
+    "Balczó András",
+    "Németh Ferenc",
+    "Nagy Imre"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik olimpián lett újra versenyszám az íjászat?",
+   "valaszok": [
+    "Tokióban",
+    "Mexikóban",
+    "Montreálban",
+    "Münchenben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik évben rendezték az első Forma 1-es futamot?",
+   "valaszok": [
+    "1949-ben",
+    "1950-ben",
+    "1952-ben",
+    "1954-ben"
+   ],
+   "helyes": 1
+  }
+ ]
+}

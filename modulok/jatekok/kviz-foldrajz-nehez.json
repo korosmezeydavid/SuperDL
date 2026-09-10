@@ -1,0 +1,3228 @@
+{
+ "id": "kviz-foldrajz-nehez",
+ "nev": "Földrajz és országok — nehezebb",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "A felsorolt országok közül melyik tagja a NATO-nak?",
+   "valaszok": [
+    "Luxemburg",
+    "Svájc",
+    "Svédország",
+    "Ciprus"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A felsorolt országok közül melyik zászlaja nem négyszögletes?",
+   "valaszok": [
+    "Marokkó",
+    "Chile",
+    "Nepál",
+    "San Marino"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az USA melyik szövetségi államában van Los Angeles?",
+   "valaszok": [
+    "Kalifornia",
+    "Nevada",
+    "Colorado",
+    "Texas"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbi kőzetek közül melyik nem vulkanikus eredetű?",
+   "valaszok": [
+    "andezit",
+    "bazalt",
+    "márvány",
+    "tufa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik nem egy földtörténeti időszak neve?",
+   "valaszok": [
+    "jura",
+    "devon",
+    "kambrium",
+    "kadmium"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik ország nem tagja az Európai Uniónak?",
+   "valaszok": [
+    "Svájc",
+    "Ausztria",
+    "Finnország",
+    "Luxemburg"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan nevezik London szórakozónegyedét?",
+   "valaszok": [
+    "Westminster",
+    "East End",
+    "Mayfair",
+    "Soho"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol folyik a Bodrog a Tiszába?",
+   "valaszok": [
+    "Tolcsvánál",
+    "Mádnál",
+    "Sárospataknál",
+    "Tokajnál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol folyik a Zagyva a Tiszába?",
+   "valaszok": [
+    "Csongrádnál",
+    "Tiszaújvárosnál",
+    "Szegednél",
+    "Szolnoknál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol található Magyarország földrajzi középpontja?",
+   "valaszok": [
+    "Ópusztaszer",
+    "Pusztaszabolcs",
+    "Pusztavacs",
+    "Pusztavám"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol található a Nemzetközi Vöröskereszt székhelye?",
+   "valaszok": [
+    "Párizsban",
+    "Genfben",
+    "Brüsszelben",
+    "Bécsben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hova torkollik a Csele-patak?",
+   "valaszok": [
+    "a Dunába",
+    "a Drávába",
+    "a Sióba",
+    "a Sárvízbe"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik éltek a mai Guatemala területén?",
+   "valaszok": [
+    "maják",
+    "cserokik",
+    "pueblók",
+    "kecsuák"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mely ország hírügynöksége az AFP?",
+   "valaszok": [
+    "Ausztria",
+    "Franciaország",
+    "Finnország",
+    "Ausztrália"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely város nevezetessége a hatalmas, kitárt karú Krisztus-szobor?",
+   "valaszok": [
+    "Manila",
+    "Buenos Aires",
+    "Rio de Janeiro",
+    "Veracruz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely városban látogathatjuk meg a Zwingert?",
+   "valaszok": [
+    "Bécsben",
+    "Drezdában",
+    "Berlinben",
+    "Lipcsében"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik a Föld legmélyebb tava?",
+   "valaszok": [
+    "Malawi (Nyasza)-tó",
+    "Bajkál-tó",
+    "Tanganyika-tó",
+    "Nagy-Rabszolga-tó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik afrikai ország nem a Földközi-tenger partján fekszik?",
+   "valaszok": [
+    "Algéria",
+    "Szudán",
+    "Líbia",
+    "Tunézia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik angol városban van a legelőkelőbb magán középiskola?",
+   "valaszok": [
+    "Oxford",
+    "Cambridge",
+    "Eton",
+    "York"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy Baranya megyei település neve az alábbiak közül?",
+   "valaszok": [
+    "Lánycsók",
+    "Legényvágy",
+    "Asszonyszív",
+    "Férfibánat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik európai főváros főterén áll Szent Vencel lovas szobra?",
+   "valaszok": [
+    "Prága",
+    "Varsó",
+    "Róma",
+    "Dublin"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik európai ország zászlajának színei egyeznek meg Németországéival?",
+   "valaszok": [
+    "Hollandia",
+    "Belgium",
+    "Portugália",
+    "Dánia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik folyó mentén található Sárvár?",
+   "valaszok": [
+    "Zala",
+    "Rába",
+    "Duna",
+    "Dráva"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik folyó partján fekszik Arad?",
+   "valaszok": [
+    "Szamos",
+    "Fekete-Körös",
+    "Maros",
+    "Tisza"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik folyó partján fekszik Barcs városa?",
+   "valaszok": [
+    "Tisza",
+    "Duna",
+    "Rába",
+    "Dráva"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik folyó partján fekszik Nagyvárad?",
+   "valaszok": [
+    "Maros",
+    "Temes",
+    "Sebes-Körös",
+    "Szamos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik földrészen található a Teleki-vulkán?",
+   "valaszok": [
+    "Afrika",
+    "Európa",
+    "Ázsia",
+    "Ausztrália"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik földrészhez tartozik a Magellán-szoros?",
+   "valaszok": [
+    "Afrikához",
+    "Ázsiához",
+    "Ausztráliához",
+    "Dél-Amerikához"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik főváros fekszik legészakabbra?",
+   "valaszok": [
+    "Reykjavík",
+    "Tallin",
+    "Vilnius",
+    "Riga"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik főváros nem Ázsiában található?",
+   "valaszok": [
+    "Islamabad",
+    "Tripoli",
+    "Bejrút",
+    "Bangkok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik hegységben fekszik Andorra?",
+   "valaszok": [
+    "az Alpokban",
+    "a Pireneusokban",
+    "az Andokban",
+    "a Kárpátokban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik hegységünkben található Kab-hegy?",
+   "valaszok": [
+    "Bükk",
+    "Vértes",
+    "Cserhát",
+    "Bakony"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik mai ország területén található Ungvár?",
+   "valaszok": [
+    "Szlovákia",
+    "Románia",
+    "Ukrajna",
+    "Horvátország"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik mai ország területén található az egykori Fiume kikötője?",
+   "valaszok": [
+    "Bosznia-Hercegovina",
+    "Szlovénia",
+    "Horvátország",
+    "Olaszország"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik megyénk nem határos a Balatonnal az alábbiak közül?",
+   "valaszok": [
+    "Fejér megye",
+    "Somogy megye",
+    "Zala megye",
+    "Veszprém megye"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik megyénkben található a gyógyfürdőjéről nevezetes Bük község?",
+   "valaszok": [
+    "Vas",
+    "Zala",
+    "Borsod-Abaúj-Zemplén",
+    "Hajdú-Bihar"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik megyénkkel nem határos Zala megye?",
+   "valaszok": [
+    "Vas",
+    "Somogy",
+    "Fejér",
+    "Veszprém"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem Spanyolország része?",
+   "valaszok": [
+    "Asztúria",
+    "Veracruz",
+    "Galícia",
+    "Navarra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem a Duna mellékfolyója az alábbiak közül?",
+   "valaszok": [
+    "Rába",
+    "Hernád",
+    "Sió",
+    "Ipoly"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem alkotmányos monarchia az alábbi észak-európai országok közül?",
+   "valaszok": [
+    "Dánia",
+    "Norvégia",
+    "Svédország",
+    "Izland"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem franciaországi város az alábbiak közül?",
+   "valaszok": [
+    "Lille",
+    "Lyon",
+    "Liége",
+    "Le Havre"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem svéd város az alábbiak közül?",
+   "valaszok": [
+    "Tampere",
+    "Uppsala",
+    "Göteborg",
+    "Malmö"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik nem vulkáni közet az alábbiak közül?",
+   "valaszok": [
+    "andezit",
+    "bazalt",
+    "riolit",
+    "dolomit"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nevezetesség nem Firenzében van?",
+   "valaszok": [
+    "Rialto híd",
+    "Palazzo Vecchio",
+    "Michelangelo Dávid szobra",
+    "Uffizi művészeti gyűjtemény"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik német városban rendeznek évente nemzetközi könyvvásárt?",
+   "valaszok": [
+    "Köln",
+    "Frankfurt",
+    "Hannover",
+    "München"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország Dánia egyetlen szárazföldi szomszédja?",
+   "valaszok": [
+    "Svédország",
+    "Norvégia",
+    "Hollandia",
+    "Németország"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország folyói az Adige, az Arno és a Piave?",
+   "valaszok": [
+    "Olaszország",
+    "Argentína",
+    "Svájc",
+    "Spanyolország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország fővárosa Rabat?",
+   "valaszok": [
+    "Nepál",
+    "Marokkó",
+    "Angola",
+    "Peru"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország fővárosa Tripoli?",
+   "valaszok": [
+    "Libanon",
+    "Libéria",
+    "Líbia",
+    "Litvánia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország határán fekszik Letenye?",
+   "valaszok": [
+    "Ausztria",
+    "Horvátország",
+    "Szlovákia",
+    "Szlovénia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország híres kikötővárosa Casablanca?",
+   "valaszok": [
+    "Marokkó",
+    "Portugália",
+    "Argentína",
+    "Spanyolország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország kikötővárosa Acapulco?",
+   "valaszok": [
+    "Jamaica",
+    "Mexikó",
+    "Venezuela",
+    "Spanyolország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország kikötővárosa Porto?",
+   "valaszok": [
+    "Portugália",
+    "Spanyolország",
+    "Olaszország",
+    "Görögország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország kikötővárosa Várna?",
+   "valaszok": [
+    "Törökország",
+    "Bulgária",
+    "Horvátország",
+    "Románia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország külbirtoka Grönland?",
+   "valaszok": [
+    "Kanada",
+    "Dánia",
+    "Norvégia",
+    "Svédország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország leghosszabb folyója a Visztula?",
+   "valaszok": [
+    "Csehország",
+    "Bulgária",
+    "Lengyelország",
+    "Szlovákia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország nem Afrikában fekszik?",
+   "valaszok": [
+    "Libéria",
+    "Líbia",
+    "Libanon",
+    "Lesotho"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország nem csatlakozott az Európai Unióhoz 2004-ben?",
+   "valaszok": [
+    "Szlovénia",
+    "Bulgária",
+    "Csehország",
+    "Észtország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország nem szigetország?",
+   "valaszok": [
+    "Sri Lanka",
+    "Írország",
+    "Honduras",
+    "Tajvan"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország területén fekszik a híres romváros, Angkor?",
+   "valaszok": [
+    "Kambodzsa",
+    "Japán",
+    "Brazília",
+    "Peru"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország tánca volt eredetileg a tangó?",
+   "valaszok": [
+    "Argentína",
+    "Portugália",
+    "Spanyolország",
+    "Brazília"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország zászlajának színei térnek el a többitől?",
+   "valaszok": [
+    "Hollandia",
+    "Belgium",
+    "Luxemburg",
+    "Franciaország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország őslakói a maorik?",
+   "valaszok": [
+    "Haiti",
+    "Új-Zéland",
+    "Dél-afrikai Köztársaság",
+    "Fülöp-szigetek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban található a Dolomitok nevű hegység?",
+   "valaszok": [
+    "Franciaország",
+    "Olaszország",
+    "Németország",
+    "Svédország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országgal nem határos Belgium?",
+   "valaszok": [
+    "Hollandia",
+    "Franciaország",
+    "Németország",
+    "Dánia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szigethez fekszik legközelebb Málta?",
+   "valaszok": [
+    "Korzika",
+    "Kréta",
+    "Ciprus",
+    "Szicília"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szlovákiai településsel köti össze Esztergomot a Mária Valéria híd?",
+   "valaszok": [
+    "Nyitra",
+    "Korpona",
+    "Párkány",
+    "Fülek"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szín nem szerepel Oroszország lobogóján?",
+   "valaszok": [
+    "kék",
+    "fehér",
+    "vörös",
+    "sárga"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik település nem a Balaton déli partján található?",
+   "valaszok": [
+    "Fonyód",
+    "Badacsony",
+    "Zamárdi",
+    "Siófok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik tó nem Észak-Amerikában található?",
+   "valaszok": [
+    "Ontario-tó",
+    "Viktória-tó",
+    "Felső-tó",
+    "Huron-tó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik vulkán tövében láthatók a Csontváry által megfestett taorminai görög színház romjai?",
+   "valaszok": [
+    "Stromboli",
+    "Elbrusz",
+    "Vezúv",
+    "Etna"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik város Komárom-Esztergom megye székhelye?",
+   "valaszok": [
+    "Komárom",
+    "Tatabánya",
+    "Esztergom",
+    "Tata"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város agglomerációjához tartozik a hírességek lakta Beverly Hills?",
+   "valaszok": [
+    "San Francisco",
+    "Las Vegas",
+    "Los Angeles",
+    "New York"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város fölött magasodik a Cukorsüveg-hegy?",
+   "valaszok": [
+    "Tokió",
+    "Rio de Janeiro",
+    "Isztambul",
+    "Mexikóváros"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város nem Békés megyében található?",
+   "valaszok": [
+    "Gyula",
+    "Szarvas",
+    "Sarkad",
+    "Baja"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik város nevezetes sugárútja az Unter den Linden?",
+   "valaszok": [
+    "Bécs",
+    "Berlin",
+    "München",
+    "Hamburg"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város volt Békés megye székhelye 1949-ig?",
+   "valaszok": [
+    "Gyula",
+    "Békés",
+    "Orosháza",
+    "Szarvas"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városban lehet végigmenni az aranyművesek utcáján?",
+   "valaszok": [
+    "Krakkóban",
+    "Bécsben",
+    "Velencében",
+    "Prágában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városban van a Covent Garden operaház?",
+   "valaszok": [
+    "New York",
+    "Toronto",
+    "Sydney",
+    "London"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városban van az anglikán egyház székhelye?",
+   "valaszok": [
+    "London",
+    "York",
+    "Canterbury",
+    "Salisbury"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állam államformája köztársaság az alábbiak közül?",
+   "valaszok": [
+    "San Marino",
+    "Liechtenstein",
+    "Monaco",
+    "Andorra"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ázsiai ország nem az Indokínai-félszigeten fekszik?",
+   "valaszok": [
+    "Jemen",
+    "Thaiföld",
+    "Kambodzsa",
+    "Laosz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi Belgium nemzetközi autójelzése?",
+   "valaszok": [
+    "BLR",
+    "B",
+    "BER",
+    "BG"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi Raguza mai, horvát neve?",
+   "valaszok": [
+    "Dubrovnik",
+    "Pula",
+    "Split",
+    "Zadar"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi Zágráb folyója?",
+   "valaszok": [
+    "Kulpa",
+    "Száva",
+    "Mura",
+    "Dráva"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a hivatalos nyelv Ománban?",
+   "valaszok": [
+    "francia",
+    "arab",
+    "hindi",
+    "spanyol"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a hivatalos pénznem Indonéziában?",
+   "valaszok": [
+    "dollár",
+    "font",
+    "rúpia",
+    "ringgit"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi az USA Katonai Akadémiájának székhelye?",
+   "valaszok": [
+    "West Point",
+    "North Fork",
+    "East End",
+    "South Park"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi az Ír köztársaság fővárosa?",
+   "valaszok": [
+    "Glasgow",
+    "Belfast",
+    "Cardiff",
+    "Dublin"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen eredetű tánc a flamenco?",
+   "valaszok": [
+    "argentín",
+    "spanyol",
+    "olasz",
+    "görög"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen magas a pisai Ferde torony?",
+   "valaszok": [
+    "20 méter",
+    "55 méter",
+    "120 méter",
+    "255 méter"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek a régi neve Abesszínia?",
+   "valaszok": [
+    "Irán",
+    "Spanyolország",
+    "Ceylon",
+    "Etiópia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek a székhelye a washingtoni Capitolium?",
+   "valaszok": [
+    "az ENSZ-é",
+    "a kongresszusé",
+    "a hadügyminisztériumé",
+    "az elnöki hivatalé"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek az épülete a washingtoni Capitolium?",
+   "valaszok": [
+    "a kongresszus",
+    "a hadügyminisztérium",
+    "a CIA-központ",
+    "az FBI-központ"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit csinálnak az oroszok a kvásszal?",
+   "valaszok": [
+    "megeszik",
+    "megisszák",
+    "zenélnek rajta",
+    "ruhaként viselik"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mióta nevezik az egykori Burmát hivatalosan Mianmarnak?",
+   "valaszok": [
+    "1824.0",
+    "1885",
+    "1948",
+    "1989"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A felsorolt német városok közül melyik nem az Elba partján fekszik?",
+   "valaszok": [
+    "Hamburg",
+    "Wittenberg",
+    "Bréma",
+    "Drezda"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A felsorolt országok közül melyik zászlajában nincs vörös szín?",
+   "valaszok": [
+    "Ausztria",
+    "Kína",
+    "Izrael",
+    "Kanada"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A felsoroltak közül melyik hegység nem tagja az Északi-középhegységnek?",
+   "valaszok": [
+    "Cserhát",
+    "Bükk",
+    "Börzsöny",
+    "Gerecse"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbi miniállamok közül melyiknek van tengerpartja?",
+   "valaszok": [
+    "Monaco",
+    "Andorra",
+    "Liechtenstein",
+    "San Marino"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol folyik a Körös a Tiszába?",
+   "valaszok": [
+    "Körösladányban",
+    "Szegednél",
+    "Csongrádnál",
+    "Szentesnél"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol folyik a Maros a Tiszába?",
+   "valaszok": [
+    "Makónál",
+    "Szegednél",
+    "Battonyánál",
+    "Hódmezővásárhelynél"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol van ma Jalta városa?",
+   "valaszok": [
+    "Oroszországban",
+    "Ukrajnában",
+    "Grúziában",
+    "Lettország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol élnek a hottentották?",
+   "valaszok": [
+    "Kelet-Ázsiában",
+    "Dél-Afrikában",
+    "Észak-Amerikában",
+    "Közép-Ausztráliában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hová ömlik a Volga?",
+   "valaszok": [
+    "a Fekete-tengerbe",
+    "az Azovi-tengerbe",
+    "a Kaszpi-tengerbe",
+    "a Fehér-tengerbe"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik hozták Európába a csokoládét?",
+   "valaszok": [
+    "angolok",
+    "hollandok",
+    "itáliaiak",
+    "spanyolok"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik Európa legnagyobb félszigete?",
+   "valaszok": [
+    "Skandináv-félsziget",
+    "Pireneusi-félsziget",
+    "Balkán-félsziget",
+    "Appennini-félsziget"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik Európa legnagyobb meleg vízű tava?",
+   "valaszok": [
+    "Garda-tó",
+    "Ladoga-tó",
+    "Wörthi-tó",
+    "Hévízi-tó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik a Duna egyetlen bal oldali mellékfolyója Magyarországon?",
+   "valaszok": [
+    "Tarna",
+    "Rába",
+    "Ipoly",
+    "Sió"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik a Föld legnagyobb sivataga?",
+   "valaszok": [
+    "Nagy-Viktória -sivatag",
+    "Szahara",
+    "Góbi-sivatag",
+    "Líbiai-sivatag"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik a legteljesebben átalakult, legrégibb kőszénfajta?",
+   "valaszok": [
+    "antracit",
+    "lignit",
+    "barnakőszén",
+    "feketekőszén"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik a világ legkisebb állama?",
+   "valaszok": [
+    "Monaco",
+    "Vatikán",
+    "San Marino",
+    "Szingapúr"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik dél-amerikai országot nem érinti az Egyenlítő?",
+   "valaszok": [
+    "Brazília",
+    "Bolívia",
+    "Kolumbia",
+    "Ecuador"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik európai főváros nevezetessége az ezredforduló alkalmából felállított óriáskerék?",
+   "valaszok": [
+    "Varsó",
+    "Prága",
+    "London",
+    "Párizs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik folyó partján fekszik Bonn, Németország korábbi fővárosa?",
+   "valaszok": [
+    "Rajna",
+    "Elba",
+    "Majna",
+    "Mosel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik folyó partján fekszik Körmend?",
+   "valaszok": [
+    "Rábca",
+    "Hernád",
+    "Rába",
+    "Duna"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik folyó torkolatánál fekszik Szentpétervár?",
+   "valaszok": [
+    "Léna",
+    "Néva",
+    "Volga",
+    "Jenyiszej"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik földrészen található Patagónia?",
+   "valaszok": [
+    "Ausztrália",
+    "Afrika",
+    "Ázsia",
+    "Dél-Amerika"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik földrészen található az Atlasz-hegység?",
+   "valaszok": [
+    "Afrika",
+    "Ázsia",
+    "Európa",
+    "Ausztrália"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hegységünkben mászhatjuk meg az Istállós-kő nevű hegyet?",
+   "valaszok": [
+    "a Bükkben",
+    "a Bakonyban",
+    "a Kőszegi-hegységben",
+    "a Zempléni-hegységben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hegységünkben található a Szeleta-barlang?",
+   "valaszok": [
+    "a Pilisben",
+    "a Mecsekben",
+    "a Bükkben",
+    "a Börzsönyben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik helység nem a Szentendrei-szigeten fekszik?",
+   "valaszok": [
+    "Tahitótfalu",
+    "Surány",
+    "Zebegény",
+    "Kisoroszi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik híres tengerészről neveztek el egy óceániai szigetcsoportot?",
+   "valaszok": [
+    "James Cook",
+    "Vitus Jonassen Bering",
+    "Francis Drake",
+    "Horatio Nelson"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik két országgal szomszédos Hollandia?",
+   "valaszok": [
+    "Belgium és Franciaország",
+    "Belgium és Luxemburg",
+    "Franciaország és Németország",
+    "Németország és Belgium"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik magyar utazóról neveztek el vulkánt Afrikában?",
+   "valaszok": [
+    "Kittenberger Kálmánról",
+    "Magyar Lászlóról",
+    "Almásy Lászlóról",
+    "Teleki Sámuelről"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik mai ország területén található Eszék városa?",
+   "valaszok": [
+    "Szlovákia",
+    "Horvátország",
+    "Szerbia",
+    "Ukrajna"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mai ország területén található Krasznahorka \"büszke vára\"?",
+   "valaszok": [
+    "Szlovákia",
+    "Ukrajna",
+    "Románia",
+    "Lengyelország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik mai ország területén található Nagyszombat?",
+   "valaszok": [
+    "Szlovákia",
+    "Románia",
+    "Horvátország",
+    "Ukrajna"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik mai ország területén található a népballadában is szereplő \"magos Déva vára\"?",
+   "valaszok": [
+    "Ukrajna",
+    "Románia",
+    "Szlovákia",
+    "Horvátország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mai állam területén található Waterloo?",
+   "valaszok": [
+    "Nagy-Britannia",
+    "Belgium",
+    "Németország",
+    "Hollandia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik megyénkben található Hollókő?",
+   "valaszok": [
+    "Heves",
+    "Komárom-Esztergom",
+    "Nógrád",
+    "Borsod-Abaúj-Zemplén"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik megyénkben található Nyírbátor?",
+   "valaszok": [
+    "Hajdú-Bihar",
+    "Borsod-Abaúj-Zemplén",
+    "Szabolcs-Szatmár-Bereg",
+    "Jász-Nagykun-Szolnok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik megyénkben található a sok látogatót vonzó Bugacpuszta?",
+   "valaszok": [
+    "Csongrád",
+    "Hajdú-Bihar",
+    "Bács-Kiskun",
+    "Pest"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik megyénkben található az Abaligeti-barlang?",
+   "valaszok": [
+    "Somogy",
+    "Baranya",
+    "Csongrád",
+    "Borsod-Abaúj-Zemplén"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik megyénkhez tartozik a Villányi-hegység?",
+   "valaszok": [
+    "Veszprém",
+    "Baranya",
+    "Somogy",
+    "Tolna"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nép tánca a polka?",
+   "valaszok": [
+    "ukrán",
+    "lengyel",
+    "cseh",
+    "bolgár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország címerállata a kivi futómadár?",
+   "valaszok": [
+    "Új-Zéland",
+    "Kolumbia",
+    "Kuvait",
+    "Tanzánia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország fővárosa Skopje?",
+   "valaszok": [
+    "Albánia",
+    "Bosznia-Hercegovina",
+    "Macedónia",
+    "Szlovénia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország híres üdülőhelye Acapulco?",
+   "valaszok": [
+    "Argentína",
+    "Brazília",
+    "Mexikó",
+    "Kuba"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország nem szomszédja Paraguaynak?",
+   "valaszok": [
+    "Argentína",
+    "Brazília",
+    "Bolívia",
+    "Kolumbia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország pénzneme márka az alábbiak közül?",
+   "valaszok": [
+    "Észtország",
+    "Finnország",
+    "Lettország",
+    "Svédország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország része Mandzsúria?",
+   "valaszok": [
+    "Kína",
+    "India",
+    "Oroszország",
+    "Irán"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország területén található a Dekkán-fennsík?",
+   "valaszok": [
+    "Etiópia",
+    "India",
+    "Jordánia",
+    "Afganisztán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország vezet a világ kávétermelésében?",
+   "valaszok": [
+    "Etiópia",
+    "Brazília",
+    "Mexikó",
+    "Venezuela"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország zászlajában nincs félhold?",
+   "valaszok": [
+    "Pakisztán",
+    "Szaúd-Arábia",
+    "Tunézia",
+    "Törökország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban nem euró a hivatalos pénznem?",
+   "valaszok": [
+    "Luxemburg",
+    "Portugália",
+    "Hollandia",
+    "Svédország"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik országban található a Gyilkos-tó?",
+   "valaszok": [
+    "Ausztria",
+    "Szlovákia",
+    "Románia",
+    "Ukrajna"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik országban található a Stonehenge titokzatos kőtömbjei?",
+   "valaszok": [
+    "a Dél-afrikai Köztársaságban",
+    "Angliában",
+    "Ausztráliában",
+    "Kanadában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országgal nem szomszédos Finnország?",
+   "valaszok": [
+    "Észtország",
+    "Svédország",
+    "Oroszország",
+    "Norvégia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országhoz tartozik ma a történelmi Normandia?",
+   "valaszok": [
+    "Nagy-Britannia",
+    "Franciaország",
+    "Svédország",
+    "Belgium"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országot választja ketté a Cook-szoros?",
+   "valaszok": [
+    "Fülöp-szigetek",
+    "Malajzia",
+    "Új-Zéland",
+    "Indonézia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szigetcsoport tagja Hispaniola?",
+   "valaszok": [
+    "Nagy-Antillák",
+    "Bermuda-szigetek",
+    "Fülöp-szigetek",
+    "Baleárok"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik szigetország nem köztársaság az alábbiak közöl?",
+   "valaszok": [
+    "Izland",
+    "Japán",
+    "Sri Lanka",
+    "Málta"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szomszédos országunk váltópénze a lipa?",
+   "valaszok": [
+    "Horvátország",
+    "Románia",
+    "Ukrajna",
+    "Szlovákia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik szín nem szerepel Oroszország zászlajában?",
+   "valaszok": [
+    "zöld",
+    "fehér",
+    "kék",
+    "vörös"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik tenger mossa Grúzia partjait?",
+   "valaszok": [
+    "Fekete-tenger",
+    "Balti-tenger",
+    "Kaszpi-tenger",
+    "Márvány-tenger"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik tenger partján fekszik Tel Aviv?",
+   "valaszok": [
+    "Holt-tenger",
+    "Földközi-tenger",
+    "Vörös-tenger",
+    "Fekete-tenger"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik tengerbe ömlik a Pó folyó?",
+   "valaszok": [
+    "Adriai-tenger",
+    "Ión-tenger",
+    "Tirrén-tenger",
+    "Fekete-tenger"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik város korábbi neve volt Fiume?",
+   "valaszok": [
+    "Opatija",
+    "Rijeka",
+    "Split",
+    "Trieszt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város nem az egykori NDK területén volt?",
+   "valaszok": [
+    "Lipcse",
+    "Bréma",
+    "Rostock",
+    "Drezda"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város színháza a világhírű Metropolitan Operaház?",
+   "valaszok": [
+    "Washington",
+    "London",
+    "New York",
+    "Sydney"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városban található a Nemzetközi Bíróság?",
+   "valaszok": [
+    "Hága",
+    "Genf",
+    "Brüsszel",
+    "Párizs"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városban található a Pergamon Múzeum?",
+   "valaszok": [
+    "Athén",
+    "Berlin",
+    "Bécs",
+    "Párizs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban tekinthető meg az Atomium?",
+   "valaszok": [
+    "Párizs",
+    "Brüsszel",
+    "Amszterdam",
+    "Bern"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ázsiai országnak nincs tengerpartja?",
+   "valaszok": [
+    "Afganisztán",
+    "Jemen",
+    "Pakisztán",
+    "Thaiföld"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi Abbázia mai neve?",
+   "valaszok": [
+    "Split",
+    "Trogir",
+    "Rijeka",
+    "Opatija"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi Bosznia-Hercegovina fővárosa?",
+   "valaszok": [
+    "Szkopje",
+    "Szarajevó",
+    "Belgrád",
+    "Pristina"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a Dél-afrikai Köztársaság fővárosa?",
+   "valaszok": [
+    "Fokváros",
+    "Pretoria",
+    "Johannesburg",
+    "Durban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a cseppkő alapanyaga?",
+   "valaszok": [
+    "agyag",
+    "mészkő",
+    "gránit",
+    "kvarc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a neve a Franciaországot jelképező nőalaknak?",
+   "valaszok": [
+    "Isabelle",
+    "Sophie",
+    "Marianne",
+    "Valentine"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a neve az osztrák-magyar határon található hegycsúcsnak?",
+   "valaszok": [
+    "Csókakő",
+    "Hollókő",
+    "Írott-kő",
+    "Istállós-kő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a párizsi Bois de Boulogne?",
+   "valaszok": [
+    "park",
+    "sugárút",
+    "tér",
+    "kastély"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a rövidítése az Európai Szabadkereskedelmi Társulásnak?",
+   "valaszok": [
+    "EGK",
+    "EFTA",
+    "ECU",
+    "EMS"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi pontosan Kína államformája?",
+   "valaszok": [
+    "köztársaság",
+    "szocialista köztársaság",
+    "népköztársaság",
+    "demokratikus köztársaság"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen minden évben megrendezett eseményről nevezetes Pamplona városa?",
+   "valaszok": [
+    "filmfesztivál",
+    "borverseny",
+    "bikafuttatás",
+    "karnevál"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen szín nem szerepel Németország zászlajában?",
+   "valaszok": [
+    "fekete",
+    "zöld",
+    "sárga",
+    "vörös"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A felsorolt országok közül melyik nem az afrikai földrészen található?",
+   "valaszok": [
+    "Szomália",
+    "Szudán",
+    "Szváziföld",
+    "Suriname"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A felsoroltak közül melyik megyét nem érinti a Tisza?",
+   "valaszok": [
+    "Szabolcs-Szatmár-Bereg",
+    "Jász-Nagykun-Szolnok",
+    "Csongrád",
+    "Békés"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbi országok melyikében használják a svédet is hivatalos nyelvként?",
+   "valaszok": [
+    "Dániában",
+    "Norvégiában",
+    "Finnországban",
+    "Izlandon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik ország zászlaja nem háromszínű?",
+   "valaszok": [
+    "Csehország",
+    "Luxemburg",
+    "Írország",
+    "Lengyelország"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol jelenik meg az International Herald Tribune?",
+   "valaszok": [
+    "Berlinben",
+    "Rómában",
+    "Párizsban",
+    "Madridban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol található a Yellowstone Nemzeti Park?",
+   "valaszok": [
+    "az Andokban",
+    "a Sziklás-hegységben",
+    "az Atlasz-hegységben",
+    "a Pireneusokban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol található az 1856-os leleteiről híressé vált Neander-völgy?",
+   "valaszok": [
+    "Spanyolországban",
+    "Németországban",
+    "Franciaországban",
+    "Ausztriában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt demokrata párti az Egyesült Államok elnökei közül?",
+   "valaszok": [
+    "Nixon",
+    "Eisenhower",
+    "Lincoln",
+    "Kennedy"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki Írország védőszentje?",
+   "valaszok": [
+    "Szent Patrik",
+    "Szent Kristóf",
+    "Szent Jakab",
+    "Szent Péter"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kiről nevezték át 1976-ban Saigon városát?",
+   "valaszok": [
+    "Mao Ce-tung",
+    "Ho Si Minh",
+    "Csang Kaj-sek",
+    "Csou En-laj"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely tenger partján fekszik Rákóczi száműzetésének városa, Rodostó?",
+   "valaszok": [
+    "Márvány-tenger",
+    "Adriai-tenger",
+    "Tirrén-tenger",
+    "Azovi-tenger"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mely város lett az OPEC (Kőolajexportáló Országok Szervezete) székhelye 1965-ben?",
+   "valaszok": [
+    "Zürich",
+    "Bécs",
+    "Rijad",
+    "Kairó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik Európa legkisebb szigetállama?",
+   "valaszok": [
+    "Málta",
+    "Ciprus",
+    "Izland",
+    "Írország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik Magyarország leghosszabb folyója?",
+   "valaszok": [
+    "Rába",
+    "Tisza",
+    "Duna",
+    "Dráva"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik a Föld második legnépesebb állama?",
+   "valaszok": [
+    "India",
+    "Oroszország",
+    "Indonézia",
+    "Amerikai Egyesült Államok"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik a világ legmagasabban fekvő fővárosa?",
+   "valaszok": [
+    "La Paz",
+    "Quito",
+    "Katmandu",
+    "Jereván"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik afrikai ország korábbi neve volt Dél-Rhodesia?",
+   "valaszok": [
+    "Namíbia",
+    "Burkina Faso",
+    "Zimbabwe",
+    "Zambia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik dél-amerikai ország nem a Csendes-óceán partján fekszik?",
+   "valaszok": [
+    "Uruguay",
+    "Peru",
+    "Chile",
+    "Ecuador"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik európai országban ítélkeznek precedensjog alapján?",
+   "valaszok": [
+    "Franciaország",
+    "Olaszország",
+    "Hollandia",
+    "Nagy-Britannia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik európai városban található a Wawel?",
+   "valaszok": [
+    "Berlinben",
+    "Krakkóban",
+    "Prágában",
+    "Pozsonyban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik folyó folyik keresztül a Grand Canyonon?",
+   "valaszok": [
+    "Rio Grande",
+    "Ohio",
+    "Mississippi",
+    "Colorado"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik folyó partján fekszik Köln?",
+   "valaszok": [
+    "Rajna",
+    "Majna",
+    "Duna",
+    "Weser"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik folyó partján fekszik New Orleans?",
+   "valaszok": [
+    "Ohio",
+    "Colorado",
+    "Mississippi",
+    "Red River"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik földrészen található a Limpopo nevű folyó?",
+   "valaszok": [
+    "Afrika",
+    "Ázsia",
+    "Dél-Amerika",
+    "Ausztrália"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik mai ország területén található a Bibliában is szereplő Babilón?",
+   "valaszok": [
+    "Libanon",
+    "Törökország",
+    "Izrael",
+    "Irak"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik mai ország területén található az aranyáról nevezetes Körmöcbánya?",
+   "valaszok": [
+    "Románia",
+    "Ausztria",
+    "Szlovákia",
+    "Szlovénia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik megyénkben található Pannonhalma?",
+   "valaszok": [
+    "Győr-Moson-Sopron",
+    "Veszprém",
+    "Komárom-Esztergom",
+    "Fejér"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik megyénkben található a történelmi levegőjű Szécsény városa?",
+   "valaszok": [
+    "Fejér",
+    "Nógrád",
+    "Győr-Moson-Sopron",
+    "Heves"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem afrikai tó?",
+   "valaszok": [
+    "Viktória-tó",
+    "Rudolf-tó",
+    "Csád-tó",
+    "Titicaca-tó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem svájci város az alábbiak közül?",
+   "valaszok": [
+    "Lausanne",
+    "Luzern",
+    "Leiden",
+    "Locarno"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nép ősi hangszere a kantele?",
+   "valaszok": [
+    "szerb",
+    "holland",
+    "albán",
+    "finn"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország fővárosa Szanaa?",
+   "valaszok": [
+    "Jemen",
+    "Jordánia",
+    "Szaúd-Arábia",
+    "Kuvait"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország mai neve Mianmar?",
+   "valaszok": [
+    "Burma",
+    "Ceylon",
+    "Laosz",
+    "Thaiföld"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország nem az Indokínai-félszigeten fekszik?",
+   "valaszok": [
+    "Malajzia",
+    "Thaiföld",
+    "Koreai Köztársaság",
+    "Kambodzsa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország nem határos Indiával?",
+   "valaszok": [
+    "Irán",
+    "Pakisztán",
+    "Nepál",
+    "Kína"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország nem tagja az OPEC-nek?",
+   "valaszok": [
+    "Irak",
+    "Algéria",
+    "Venezuela",
+    "Brazília"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország területén talalható a Labrador-félsziget?",
+   "valaszok": [
+    "USA",
+    "Argentína",
+    "Kanada",
+    "Mexikó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország zászlója egyszínű zöld?",
+   "valaszok": [
+    "Libanon",
+    "Líbia",
+    "Libéria",
+    "Liechtenstein"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban húzódik a Rila-hegység?",
+   "valaszok": [
+    "Ukrajna",
+    "Bulgária",
+    "Törökország",
+    "Szlovákia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban szavazhatnak a Likudra?",
+   "valaszok": [
+    "Cipruson",
+    "a Dél-afrikai Köztársaságban",
+    "Izraelben",
+    "Új-Zélandon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik országban található Bergen városa?",
+   "valaszok": [
+    "Ausztria",
+    "Németország",
+    "Norvégia",
+    "Dánia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik országban található Bihar nevű szövetségi állam?",
+   "valaszok": [
+    "India",
+    "Brazília",
+    "Nigéria",
+    "Mexikó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országban terül el a Nagy-Viktória-sivatag?",
+   "valaszok": [
+    "Amerikai Egyesült Államok",
+    "Ausztrália",
+    "Kanada",
+    "Dél-afrikai Köztársaság"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országgal nem határos Horvátország az alábbiak közül?",
+   "valaszok": [
+    "Magyarország",
+    "Ausztria",
+    "Szlovénia",
+    "Bosznia-Hercegovina"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országgal nem határos Paraguay?",
+   "valaszok": [
+    "Argentína",
+    "Brazília",
+    "Chile",
+    "Bolívia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik országgal nem szomszédos Chile?",
+   "valaszok": [
+    "Argentína",
+    "Brazília",
+    "Peru",
+    "Bolívia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országhoz tartozik ma Szamarkand, a selyemút fontos állomása?",
+   "valaszok": [
+    "Üzbegisztán",
+    "Törökország",
+    "Irán",
+    "Kína"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országnak nincs területe a Skandináv-félszigeten?",
+   "valaszok": [
+    "Svédországnak",
+    "Dániának",
+    "Finnországnak",
+    "Norvégiának"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sziget nem a Földközi-tengerben fekszik?",
+   "valaszok": [
+    "Korzika",
+    "Ibiza",
+    "Ciprus",
+    "Tenerife"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szigetet fedezte fel Abel Janszoon Tasman?",
+   "valaszok": [
+    "Kuba",
+    "Új-Zéland",
+    "Jamaika",
+    "Haiti"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szigetet nevezték el a portugál hajósok Formosának?",
+   "valaszok": [
+    "Tajvan",
+    "Kuba",
+    "Haiti",
+    "Ceylon"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik szomszédos országgal van a leghosszabb közös határunk?",
+   "valaszok": [
+    "Szlovákia",
+    "Horváthország",
+    "Románia",
+    "Jugoszlávia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik város nevét viselte egy hajlékonyságáról híres acélpenge?",
+   "valaszok": [
+    "Kairó",
+    "Aleppó",
+    "Damaszkusz",
+    "Tripoli"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városban sétálhatunk végig az Unter den Linden sugárúton?",
+   "valaszok": [
+    "Bécs",
+    "Berlin",
+    "Zürich",
+    "München"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban található a világhírű Uffizi képtár?",
+   "valaszok": [
+    "Velence",
+    "Firenze",
+    "Madrid",
+    "Barcelona"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik várost nevezik a vágóhidak városának?",
+   "valaszok": [
+    "Chicagót",
+    "Richmondott",
+    "Denvert",
+    "Bostont"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik öbölből indul ki a Golf-áramlat?",
+   "valaszok": [
+    "Alaszkai",
+    "Bengál",
+    "Mexikói",
+    "Perzsa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi Litvánia fővárosa?",
+   "valaszok": [
+    "Vilnius",
+    "Riga",
+    "Kaunas",
+    "Tallin"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi Macedónia fővárosa?",
+   "valaszok": [
+    "Szarajevó",
+    "Skopje",
+    "Pristina",
+    "Split"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a Perzsa-öböl másik neve?",
+   "valaszok": [
+    "Ománi-öböl",
+    "Katari-öböl",
+    "Arab-öböl",
+    "Iráni-öböl"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a Portugáliában használt váltópénz neve?",
+   "valaszok": [
+    "escudo",
+    "centavo",
+    "peseta",
+    "centimo"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a hivatalos nyelv Elefántcsontparton?",
+   "valaszok": [
+    "angol",
+    "szuahéli",
+    "arab",
+    "francia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi Észtország fővárosa?",
+   "valaszok": [
+    "Vilnius",
+    "Riga",
+    "Minszk",
+    "Tallinn"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen pénznemet használnak Lichtensteinben?",
+   "valaszok": [
+    "koronát",
+    "frankot",
+    "márkát",
+    "schillinget"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat szerepel Dánia címerében?",
+   "valaszok": [
+    "sas",
+    "oroszlán",
+    "farkas",
+    "szarvas"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az USA melyik szövetségi államának fővárosa Atlanta?",
+   "valaszok": [
+    "Arizona",
+    "Maryland",
+    "Georgia",
+    "Tennessee"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol található a Nemzetközi Valutaalap (IMF) székhelye?",
+   "valaszok": [
+    "Brüsszel",
+    "Genf",
+    "Párizs",
+    "Washington"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol található hazánk magasságmérési alappontja?",
+   "valaszok": [
+    "Zsadány",
+    "Nadap",
+    "Pusztavacs",
+    "Kékestető"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol tekinthető meg a Willendorfi Vénusz?",
+   "valaszok": [
+    "Párizsban",
+    "New Yorkban",
+    "Berlinben",
+    "Bécsben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hová torkollik a Szent Lőrinc-folyó?",
+   "valaszok": [
+    "Atlanti-óceán",
+    "Mexikói-öböl",
+    "Csendes-óceán",
+    "Karib-tenger"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik afrikai országban található a Teleki-vulkán?",
+   "valaszok": [
+    "Tanzánia",
+    "Kenya",
+    "Szudán",
+    "Nigéria"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik folyó partján fekszik Kolozsvár?",
+   "valaszok": [
+    "Küküllő",
+    "Szamos",
+    "Fekete-Körös",
+    "Maros"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik folyó partján fekszik Torino?",
+   "valaszok": [
+    "Piave",
+    "Arno",
+    "Pó",
+    "Tevere"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik földrészen húzódik a Nagy-Vízválasztó-hegység?",
+   "valaszok": [
+    "Ausztrália",
+    "Ázsia",
+    "Afrika",
+    "Dél-Amerika"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hegység legmagasabb pontja az Aconcagua?",
+   "valaszok": [
+    "Andok",
+    "Himalája",
+    "Kilimandzsáró",
+    "Alpok"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hegység lábánál fekszik Szarvaskő?",
+   "valaszok": [
+    "Vértes",
+    "Bükk",
+    "Cserhát",
+    "Mecsek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik magyar hegység legmagasabb pontja a Csóványos?",
+   "valaszok": [
+    "Mecsek",
+    "Cserhát",
+    "Bükk",
+    "Börzsöny"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik megyénkben található Zala község?",
+   "valaszok": [
+    "Zala megyében",
+    "Somogy megyében",
+    "Heves megyében",
+    "Vas megyében"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik megyénkben van Egervár nevű község?",
+   "valaszok": [
+    "Jász-Nagykun-Szolnok",
+    "Heves",
+    "Zala",
+    "Somogy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik megyénkben van a Szelidi-tó?",
+   "valaszok": [
+    "Békés megyében",
+    "Bács-Kiskun megyében",
+    "Baranya megyében",
+    "Csongrád megyében"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nagy folyónk határolja az Ormánságot?",
+   "valaszok": [
+    "Duna",
+    "Rába",
+    "Dráva",
+    "Mura"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország fekszik a legközelebb a Déli-sarkhoz?",
+   "valaszok": [
+    "Dél-afrikai Köztársaság",
+    "Chile",
+    "Argentína",
+    "Új-Zéland"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország fővárosa Jereván?",
+   "valaszok": [
+    "Jemen",
+    "Örményország",
+    "Grúzia",
+    "Kazahsztán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország területén található az uniós egyezményéről nevezetes Schengen városa?",
+   "valaszok": [
+    "Ausztria",
+    "Belgium",
+    "Hollandia",
+    "Luxemburg"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország ősi vallása a sintoizmus?",
+   "valaszok": [
+    "Kína",
+    "Indonézia",
+    "Japán",
+    "Mongólia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik országhoz tartoznak a Bermuda-szigetek?",
+   "valaszok": [
+    "Amerikai Egyesült Államok",
+    "Franciaország",
+    "Nagy-Britannia",
+    "Spanyolország"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik országnak van a legtöbb szomszédja?",
+   "valaszok": [
+    "Oroszország",
+    "Kína",
+    "Szudán",
+    "Brazília"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik spanyol történelmi tájegység központja Barcelona?",
+   "valaszok": [
+    "Andalúzia",
+    "Katalónia",
+    "Aragónia",
+    "Kasztília"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik tenger partján fekszik a történelmi emlékű Rodostó városa?",
+   "valaszok": [
+    "Égei-tenger",
+    "Jón-tenger",
+    "Fekete-tenger",
+    "Márvány-tenger"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik tengerben található az Akabai-öböl?",
+   "valaszok": [
+    "Földközi-tenger",
+    "Arab-tenger",
+    "Vörös-tenger",
+    "Karib-tenger"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város nevezetessége a Tate Gallery?",
+   "valaszok": [
+    "New York",
+    "Los Angeles",
+    "Washington",
+    "London"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városban alapították az ENSZ-t?",
+   "valaszok": [
+    "San Franciscóban",
+    "Genfben",
+    "Párizsban",
+    "New Yorkban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ázsiai ország régi elnevezése volt Sziám?",
+   "valaszok": [
+    "Burma",
+    "Thaiföld",
+    "Sri Lanka",
+    "Tajvan"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi Firenze folyója?",
+   "valaszok": [
+    "Arno",
+    "Adige",
+    "Pó",
+    "Reno"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi volt Tajvan korábbi neve?",
+   "valaszok": [
+    "Burma",
+    "Ceylon",
+    "Sziám",
+    "Formosa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi volt a Maluku-szigetek közismert neve?",
+   "valaszok": [
+    "Fahéj-szigetek",
+    "Fűszer-szigetek",
+    "Sáfrány-szigetek",
+    "Orchidea-szigetek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miről kapta nevét a földtörténeti középkor középső szakasza, a jura?",
+   "valaszok": [
+    "egy őshüllőről",
+    "egy régészeti eljárásról",
+    "egy fenyőfajtáról",
+    "egy hegységről"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miről volt nevezetes a spanyolországi Toledo városa?",
+   "valaszok": [
+    "fegyverkészítőiről",
+    "agyagműveseiről",
+    "csodatevő forrásáról",
+    "lótelepéről"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A felsorolt országok közül melyiknek a zászlójában nincs csillag?",
+   "valaszok": [
+    "Szíria",
+    "Vietnam",
+    "Törökország",
+    "Indonézia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbi folyók közül melyiknek van tölcsértorkolata?",
+   "valaszok": [
+    "Duna",
+    "Elba",
+    "Nílus",
+    "Amazonas"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik országban hivatalos pénznem a dinár?",
+   "valaszok": [
+    "Algéria",
+    "Arab Emírségek",
+    "Csád",
+    "Katar"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol található a békekötéséről nevezetes Karlóca?",
+   "valaszok": [
+    "Szlovénia",
+    "Szerbia",
+    "Szlovákia",
+    "Ukrajna"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol találhatók a Maldív-szigetek?",
+   "valaszok": [
+    "Atlanti-óceán",
+    "Karib-tenger",
+    "Csendes-óceán",
+    "Indiai-óceán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol van a székhelye a Reuters hírügynökségnek?",
+   "valaszok": [
+    "London",
+    "Washington",
+    "Berlin",
+    "Párizs"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kiket neveztek mócoknak?",
+   "valaszok": [
+    "galíciai lengyeleket",
+    "erdélyi románokat",
+    "karintiai osztrákokat",
+    "bukovinai székelyeket"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiről kapta nevét a Baffin-öböl?",
+   "valaszok": [
+    "tengeri emlősről",
+    "angol tengerészről",
+    "településnévről",
+    "francia természettudósról"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Magyarország melyik részén található az Ecsedi-láp?",
+   "valaszok": [
+    "a Bodrogközben",
+    "a Szatmári-síkságon",
+    "Nagy-Sárréten",
+    "a Hortobágyon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely országban található a méneséről híres Lipica helység?",
+   "valaszok": [
+    "Horvátország",
+    "Szlovénia",
+    "Ausztria",
+    "Szlovákia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik afrikai ország nem a rajta áthaladó folyóról kapta nevét?",
+   "valaszok": [
+    "Angola",
+    "Gambia",
+    "Szenegál",
+    "Niger"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik folyó torkolatánál épült New York?",
+   "valaszok": [
+    "Mississippi",
+    "Ontario",
+    "Missouri",
+    "Hudson"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik hegységünkben mászhatjuk meg a Nagy-Kevélyt?",
+   "valaszok": [
+    "Bükkben",
+    "Pilisben",
+    "Vértesben",
+    "Börzsönyben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik megyénkben található Nagykarácsony nevű helység?",
+   "valaszok": [
+    "Fejér",
+    "Nógrád",
+    "Tolna",
+    "Heves"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik megyénkben található Ónod, ahol a történelmi országgyűlést tartották?",
+   "valaszok": [
+    "Szabolcs-Szatmár-Bereg megye",
+    "Veszprém megye",
+    "Borsod-Abaúj-Zemplén megye",
+    "Komárom-Esztergom megye"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország egyetlen szomszédja a Dél-afrikai Köztársaság?",
+   "valaszok": [
+    "Malawi",
+    "Lesotho",
+    "Szváziföld",
+    "Botswana"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország folyói a Tambre, a Tajo és az Ebro?",
+   "valaszok": [
+    "Brazília",
+    "Portugália",
+    "Spanyolország",
+    "Peru"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország fővárosa volt 1918 és 1940 között Kaunas?",
+   "valaszok": [
+    "Lettország",
+    "Litvánia",
+    "Észtország",
+    "Moldova"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország külbirtoka Szent Ilona szigete?",
+   "valaszok": [
+    "Nagy-Britannia",
+    "Olaszország",
+    "Franciaország",
+    "Amerikai Egyesült Államok"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országban húzódik a Vogézek nevű középhegység?",
+   "valaszok": [
+    "Franciaországban",
+    "Németországban",
+    "Svédországban",
+    "Csehországban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országban található a Szent András-törésvonal?",
+   "valaszok": [
+    "Ausztrália",
+    "USA",
+    "Mexikó",
+    "Kanada"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országgal nem szomszédos Namíbia?",
+   "valaszok": [
+    "Angola",
+    "Botswana",
+    "Csád",
+    "Dél-afrikai Köztársaság"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szigeten fekszik Brunei?",
+   "valaszok": [
+    "Jáva",
+    "Borneó",
+    "Celebesz",
+    "Új-Guinea"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik tó partján fekszik Chicago?",
+   "valaszok": [
+    "Huron-tó",
+    "Erie-tó",
+    "Michigan-tó",
+    "Ontario-tó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város híres strandja a Copacabana?",
+   "valaszok": [
+    "Barcelona",
+    "Rio de Janeiro",
+    "Havanna",
+    "Buenos Aires"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban látható az Április 25-e híd?",
+   "valaszok": [
+    "Lisszabon",
+    "Róma",
+    "Belgrád",
+    "Hamburg"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik állam zászlaja hasonlít az Egyesült Államok zászlajára, de csak egy csillag található benne?",
+   "valaszok": [
+    "Libéria",
+    "Ausztrália",
+    "Malajzia",
+    "Costa Rica"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi az államformája a Vatikánnak?",
+   "valaszok": [
+    "alkotmányos monarchia",
+    "pápaság",
+    "teokratikus királyság",
+    "köztársaság"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen eredetű tánc a tarantella?",
+   "valaszok": [
+    "spanyol",
+    "portugál",
+    "olasz",
+    "brazil"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az Egyesült Államok melyik szövetségi államának székhelye Salt Lake City?",
+   "valaszok": [
+    "Texas",
+    "Ohio",
+    "Arizona",
+    "Utah"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol hivatalos nyelv a malgas?",
+   "valaszok": [
+    "Indonéziában",
+    "Madagaszkáron",
+    "Nepálban",
+    "Srí Lankán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol található a Veszélyek Tengere?",
+   "valaszok": [
+    "A Horn-foknál",
+    "Borneó és Szumátra között",
+    "A Hebridáknál",
+    "A Holdon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol találhatók a Marshall-szegetek?",
+   "valaszok": [
+    "Atlanti-óceánban",
+    "Földközi-tengerben",
+    "Csendes-óceánban",
+    "Indiai-óceánban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely város volt az indokínai francia gyarmatok fővárosa?",
+   "valaszok": [
+    "Bangkok",
+    "Sanghaj",
+    "Szingapúr",
+    "Saigon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik Franciaország leghosszabb folyója?",
+   "valaszok": [
+    "Szajna",
+    "Rhone",
+    "Garonne",
+    "Loire"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik a földkerekség legkisebb szigetállama?",
+   "valaszok": [
+    "Málta",
+    "Marshall-szigetek",
+    "Nauru",
+    "Seychelle-szigetek"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik folyó partján fekszik Lyon?",
+   "valaszok": [
+    "Szajna",
+    "Loire",
+    "Rhőne",
+    "Garonne"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország nem határos Brazíliával?",
+   "valaszok": [
+    "Ecuador",
+    "Guyana",
+    "Paraguyay",
+    "Bolívia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország nem köztársaság az alábbi európai államok közül?",
+   "valaszok": [
+    "San Marino",
+    "Málta",
+    "Andorra",
+    "Izland"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország területén található a Kalahári-sivatag?",
+   "valaszok": [
+    "Botswana",
+    "Namíbia",
+    "Zimbabwe",
+    "Dél-afrikai Köztársaság"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országgal nem határos Luxemburg?",
+   "valaszok": [
+    "Belgium",
+    "Svájc",
+    "Franciaország",
+    "Németország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országhoz tartozik a Húsvét-sziget?",
+   "valaszok": [
+    "Nagy-Britannia",
+    "Argentína",
+    "Amerikai Egyesült Államok",
+    "Chile"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik országhoz tartoznak a Galápagos-szigetek?",
+   "valaszok": [
+    "Ecuador",
+    "Chile",
+    "Argentína",
+    "Kolumbia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik USA tagállam területén található a Grand Canyon?",
+   "valaszok": [
+    "Nevada",
+    "Colorado",
+    "Arizona",
+    "Utah"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország fővárosa Doha?",
+   "valaszok": [
+    "Gambia",
+    "Kamerun",
+    "Katar",
+    "Bhután"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik folyón utazhatunk dahabiján?",
+   "valaszok": [
+    "a Jangcén",
+    "az Induson",
+    "a Níluson",
+    "az Obon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város történelmi neve volt Christiania?",
+   "valaszok": [
+    "Oslo",
+    "Koppenhága",
+    "Stockholm",
+    "Göteborg"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik amerikai városban található a Harvard Egyetem az alábbiak közül?",
+   "valaszok": [
+    "Trenton",
+    "New York",
+    "Washington",
+    "Cambridge"
+   ],
+   "helyes": 3
+  }
+ ]
+}

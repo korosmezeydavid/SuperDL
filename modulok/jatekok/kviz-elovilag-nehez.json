@@ -1,0 +1,1988 @@
+{
+ "id": "kviz-elovilag-nehez",
+ "nev": "Élővilág — nehezebb",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "A felsoroltak közül melyik nem emberszabású majom?",
+   "valaszok": [
+    "orángután",
+    "csimpánz",
+    "galléros pávián",
+    "gorilla"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A növény melyik részéből bújik elő a sziklevél?",
+   "valaszok": [
+    "az ágából",
+    "a magjából",
+    "a gyökeréből",
+    "a törzséből"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az előlények milyen képessége a mimikri?",
+   "valaszok": [
+    "szárazságtűrés",
+    "fényenergia-átalakítás",
+    "szín- és alakutánzás",
+    "szaganyag-felismerés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az állatok melyik rendjébe tartoznak a narválok?",
+   "valaszok": [
+    "krokodilok",
+    "teknősök",
+    "cetek",
+    "tüdős halak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ha egy betegséget nadállyal gyógyítottak, mi volt a \"csodaszer\"?",
+   "valaszok": [
+    "kanalas orvosság",
+    "pióca",
+    "kamillatea",
+    "iszapfürdő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan lélegeznek a kagylók?",
+   "valaszok": [
+    "gázcserenyílással",
+    "bőrlégzéssel",
+    "kopoltyúval",
+    "tüdővel"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan nevezik az elefánt utódját?",
+   "valaszok": [
+    "pulya",
+    "borjú",
+    "gida",
+    "csikó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan tájékozódnak éjszaka a denevérek?",
+   "valaszok": [
+    "ultrahanggal",
+    "karmaikkal",
+    "szárnyaikkal",
+    "faroktollaikkal"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol honos a puma?",
+   "valaszok": [
+    "Ázsiában",
+    "Ausztráliában",
+    "Afrikában",
+    "Amerikában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol él a kacsacsőrű emlős?",
+   "valaszok": [
+    "Dél-Amerikában",
+    "Afrikában",
+    "Kelet-Ázsiában",
+    "Ausztráliában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol élnek a jegesmedvék?",
+   "valaszok": [
+    "az Északi-sarkon",
+    "a Déli-sarkon",
+    "mindkét sarkvidéken",
+    "Dél-Ausztráliában"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol élnek a nyércek?",
+   "valaszok": [
+    "havas fenyőerdőkben",
+    "vizek mentén",
+    "sivatagokban",
+    "városi padlásokon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Honnan kerültek a Kárpát-medencébe az első komondorok?",
+   "valaszok": [
+    "Észak-Amerikából",
+    "Ázsiából",
+    "Skandináviából",
+    "Skóciából"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek adhat vért a 0 vércsoportú ember?",
+   "valaszok": [
+    "senkinek",
+    "csak 0 vércsoportúnak",
+    "mindenkinek",
+    "csak AB vércsoportúnak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit neveznek \"az anyák megmentőjének\"?",
+   "valaszok": [
+    "Korányi Sándort",
+    "Hőgyes Endrét",
+    "Heim Pált",
+    "Semmelweis Ignácot"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik a leggyorsabb rövidtávfutó szárazföldi állat?",
+   "valaszok": [
+    "emu",
+    "gepárd",
+    "párduc",
+    "jaguár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik betegség ellen védenek a Sabin-cseppek?",
+   "valaszok": [
+    "torokgyík",
+    "gyermekbénulás",
+    "szamárköhögés",
+    "tuberkolózis"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy növénycsalád neve?",
+   "valaszok": [
+    "gólyalábfélék",
+    "gólyafülfélék",
+    "gólyaorrfélék",
+    "gólyaszemfélék"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik emberi szerv szövete az irha?",
+   "valaszok": [
+    "a nyelv",
+    "az agy",
+    "a bőr",
+    "a fül"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik földrészen élnek napjainkban jellemzően a gepárdok?",
+   "valaszok": [
+    "Ázsia",
+    "Afrika",
+    "Ausztrália",
+    "Dél-Amerika"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik kémiai elem hiánya okozza a golyva nevű betegséget?",
+   "valaszok": [
+    "jód",
+    "klór",
+    "kalcium",
+    "bróm"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik madár lehet bügykös az alábbiak közül az elnevezés szerint?",
+   "valaszok": [
+    "sólyom",
+    "fácán",
+    "hattyú",
+    "cinege"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem kihalt állat az alábbiak közül?",
+   "valaszok": [
+    "dinoszaurusz",
+    "mauritiusi dodó",
+    "mamut",
+    "tapír"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem tartozik a sólyomalakúak közé az alábbi madarak közül?",
+   "valaszok": [
+    "kánya",
+    "ölyv",
+    "kondorkeselyű",
+    "seregély"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik növénnyel nem áll rokonságban a paradicsom?",
+   "valaszok": [
+    "a burgonyával",
+    "a padlizsánnal",
+    "a paprikával",
+    "az uborkával"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik növény nem áll rokonságban a tökkel?",
+   "valaszok": [
+    "uborka",
+    "cukkini",
+    "sárgadinnye",
+    "avokádó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik növény nem évelő?",
+   "valaszok": [
+    "petúnia",
+    "muskátli",
+    "gyöngyvirág",
+    "margaréta"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik növény szárított húsa a kopra?",
+   "valaszok": [
+    "kivi",
+    "kókuszdió",
+    "licsi",
+    "kesudió"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik növényt nevezik nősziromnak?",
+   "valaszok": [
+    "a tulipánt",
+    "az orchideát",
+    "az íriszt",
+    "a nárciszt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szervünk betegsége a trachoma?",
+   "valaszok": [
+    "fül",
+    "tüdő",
+    "szem",
+    "gyomor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik vitamin hiánya okozza a farkasvakságot?",
+   "valaszok": [
+    "D vitamin",
+    "K vitamin",
+    "A vitamin",
+    "B vitamin"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állat erszényes?",
+   "valaszok": [
+    "antilop",
+    "panda",
+    "koala",
+    "mosómedve"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állat lehet a pinty előtagja?",
+   "valaszok": [
+    "antilop",
+    "zebra",
+    "tigris",
+    "gácsér"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állat nem a puhatestűek törzsébe tartozik?",
+   "valaszok": [
+    "tintahal",
+    "tavikagyló",
+    "éticsiga",
+    "giliszta"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állat nem tartozik a krokodilok rendjébe?",
+   "valaszok": [
+    "alligátor",
+    "kajmán",
+    "gaviál",
+    "baribál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állat prémje a szilszkin?",
+   "valaszok": [
+    "nyest",
+    "menyét",
+    "fóka",
+    "róka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állat épít magának várat az alábbiak közül?",
+   "valaszok": [
+    "hód",
+    "ürge",
+    "pocok",
+    "nyest"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik állat ősének tekinthető a masztodon?",
+   "valaszok": [
+    "oroszlán",
+    "orrszarvú",
+    "elefánt",
+    "krokodil"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állítás nem igaz a csókára?",
+   "valaszok": [
+    "szürkés, feketés tollazatú",
+    "varjúféle",
+    "társaságban él",
+    "hazánkban nem fordul elő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állítás nem igaz az emura?",
+   "valaszok": [
+    "ember nagyságú",
+    "Ausztráliából származik",
+    "röpképtelen",
+    "trópusi erdők lakója"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a batáta másik elnevezése?",
+   "valaszok": [
+    "csillagtök",
+    "cickafark",
+    "édesburgonya",
+    "spárgakel"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a glaukóma magyar elnevezése?",
+   "valaszok": [
+    "vakbélgyulladás",
+    "fogszuvasodás",
+    "torokgyík",
+    "zöldhályog"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a neve egy Dél-Amerikában honos denevérfajnak?",
+   "valaszok": [
+    "libri",
+    "vámpír",
+    "szamba",
+    "kopasznyakú"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi az appendicitis nevű betegség közismert elnevezése?",
+   "valaszok": [
+    "vakbélgyulladás",
+    "torokgyík",
+    "tüdőgyulladás",
+    "szívgörcs"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi az ókori egyiptomiak szent bogarának, a szkarabeusznak a mai neve?",
+   "valaszok": [
+    "szarvasbogár",
+    "katicabogár",
+    "galacsinhajtó bogár",
+    "kőrisbogár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikből épülnek fel a fehérjék?",
+   "valaszok": [
+    "aminosavakból",
+    "szénhidrátokból",
+    "nukleinsavakból",
+    "polietilénekből"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen fajta fák termelnek terpentint?",
+   "valaszok": [
+    "tölgyek",
+    "fenyők",
+    "bükkök",
+    "fűzek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen gyümölcsfajta kapta az Idared nevet?",
+   "valaszok": [
+    "görögdinnye",
+    "alma",
+    "körte",
+    "szilva"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nemzetiségű volt Konrad Lorenz, a híres zoológus, etológus?",
+   "valaszok": [
+    "német",
+    "osztrák",
+    "holland",
+    "flamand"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen növényrész a barka?",
+   "valaszok": [
+    "rügylevél",
+    "füzérvirágzat",
+    "légggyökér",
+    "termés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat a beo?",
+   "valaszok": [
+    "trópusi pók",
+    "ázsiai madár",
+    "ausztrál erszényes",
+    "az Andokban élő gyík"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat a gödölye?",
+   "valaszok": [
+    "nőstény kiskecske",
+    "hím kisbirka",
+    "kiskakas",
+    "kiscsirke"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen állat a haris?",
+   "valaszok": [
+    "hal",
+    "madár",
+    "rovar",
+    "emlős"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat a pipiske?",
+   "valaszok": [
+    "rovar",
+    "hal",
+    "madár",
+    "emlős"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen élőlények a fülőkék?",
+   "valaszok": [
+    "énekesmadarak",
+    "rágcsálók",
+    "gombák",
+    "makik"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen élőlények a mügék?",
+   "valaszok": [
+    "erszényes rágcsálók",
+    "halak",
+    "trópusi madarak",
+    "növények"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mivel táplálkozott egy brontosaurus?",
+   "valaszok": [
+    "csak növényekkel",
+    "csak állatokkal",
+    "apróvaddal, gyümölccsel",
+    "mindenevő volt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbi növények közül melyik nem spórával szaporodnak?",
+   "valaszok": [
+    "páfrányok",
+    "zsurlók",
+    "mohák",
+    "ciprusfélék"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik a szarvasmarha közeli rokona?",
+   "valaszok": [
+    "emu",
+    "zebu",
+    "tatu",
+    "nandu"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az év mely szakában fenyeget jellemzően a zöldár?",
+   "valaszok": [
+    "nyáron",
+    "ősz közepén",
+    "tél elején",
+    "tél végén"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan élnek általában az elefántok?",
+   "valaszok": [
+    "felnőttek mind egyedül",
+    "nőstények és utódaik együtt",
+    "hímek és utódaik együtt",
+    "kölyökkortól mind egyedül"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol használták régen az édesvízi piócák egyes fajait?",
+   "valaszok": [
+    "a növénynemesítéseknél",
+    "a harcászatban",
+    "a gyógyászatban",
+    "a szakácsművészetben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol vannak planktonok?",
+   "valaszok": [
+    "a tengerekben",
+    "az őserdők fáin",
+    "a magas sziklákon",
+    "a tavaszi réteken"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol él a nyuszt?",
+   "valaszok": [
+    "nagyvárosi pincékben",
+    "nádasokban",
+    "erdőkben",
+    "homoksivatagokban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol él a pele?",
+   "valaszok": [
+    "csak a hóhatár felett",
+    "erdőkben, kertekben",
+    "szikes, száraz földben",
+    "nádasokban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol él a viza?",
+   "valaszok": [
+    "a Jeges-tengerben",
+    "a Karib-tengerben",
+    "az Indiai-óceánban",
+    "a Fekete-tengerben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol él a vöcsök?",
+   "valaszok": [
+    "fenyőerdőkben",
+    "füves pusztákon",
+    "víz közelében",
+    "falusi padláson"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol őshonos a nutria?",
+   "valaszok": [
+    "Afrikában",
+    "Európában",
+    "Ázsiában",
+    "Dél-Amerikában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Honnan szerzik leginkább táplálékukat a kolibrik?",
+   "valaszok": [
+    "fák odvából",
+    "más madarak fészkéből",
+    "virágok kelyhéből",
+    "mocsár iszapjából"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Meddig nevezünk egy tehenet üszőnek?",
+   "valaszok": [
+    "egy hónapos koráig",
+    "míg nem ellik",
+    "két éves koráig",
+    "az utolsó ellésig"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy nem létező madár az alábbiak közül?",
+   "valaszok": [
+    "küszvágó csér",
+    "nagy fakopáncs",
+    "búvár hencser",
+    "csicsörke"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik földrészen él az impala?",
+   "valaszok": [
+    "Ausztrália",
+    "Afrika",
+    "Ázsia",
+    "Dél-Amerika"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik hal másik neve a potyka?",
+   "valaszok": [
+    "keszeg",
+    "sügér",
+    "csuka",
+    "ponty"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik hal úszik majdnem függőleges testtartásban?",
+   "valaszok": [
+    "sünhal",
+    "ebihal",
+    "denevérhal",
+    "csikóhal"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik hiánya játszik szerepet a farkasvakság kialakulásában?",
+   "valaszok": [
+    "A-vitamin",
+    "tiamin",
+    "piridoxin",
+    "D-vitamin"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik madár az alábbi állatok közül?",
+   "valaszok": [
+    "ászka",
+    "szirén",
+    "tengeri pér",
+    "lappantyú"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik növény nem tartozik a pázsitfűfélék közé?",
+   "valaszok": [
+    "kukorica",
+    "cukornád",
+    "len",
+    "árpa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik növény virágjának bimbójából készül fűszer?",
+   "valaszok": [
+    "bazsalikom",
+    "kakukkfű",
+    "szegfűszeg",
+    "citromfű"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik növényt nevezték török búzának?",
+   "valaszok": [
+    "az árpát",
+    "a zabot",
+    "a kukoricát",
+    "a komlót"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szervünk betegsége a gümőkór?",
+   "valaszok": [
+    "a fogé",
+    "a májé",
+    "a bőré",
+    "a tüdőé"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szervünk betegsége a szilikózis?",
+   "valaszok": [
+    "szív",
+    "tüdő",
+    "agy",
+    "máj"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állat mirigyéből nyertek régen a bíborfestéket?",
+   "valaszok": [
+    "bíborkagyló",
+    "bíborpolip",
+    "bíborlepke",
+    "bíborcsiga"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állítás nem igaz a barázdabillegetőre?",
+   "valaszok": [
+    "énekes madár",
+    "hosszú faroktollazatú",
+    "évente kétszer költ",
+    "vízre építi a fészkét"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állítás nem igaz a sünre?",
+   "valaszok": [
+    "éjjel vadászik",
+    "megeszi a csigát",
+    "téli álmot alszik",
+    "nagy családokban él"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a címe Charles Darwin legismertebb művének?",
+   "valaszok": [
+    "A majmok és mi",
+    "Az evolúció és mi",
+    "A fajok eredete",
+    "A homo sapiens eredete"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a hemofília nevű betegség magyar elnevezése?",
+   "valaszok": [
+    "vérzékenység",
+    "fertőző májgyulladás",
+    "cukorbetegség",
+    "szürkehályog"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen alakú baktériumok a bacilusok?",
+   "valaszok": [
+    "pálcika",
+    "gömb",
+    "csavar",
+    "kúp"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen betegséget terjeszt a cecelégy?",
+   "valaszok": [
+    "sárgalázt",
+    "influenzát",
+    "álomkórt",
+    "maláriát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen kutyák közé tartozik egy mudi?",
+   "valaszok": [
+    "terelőkutyák",
+    "harci kutyák",
+    "vadászkutyák",
+    "ölebek"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen madár a szajkó?",
+   "valaszok": [
+    "fecskeféle",
+    "varjúféle",
+    "pintyféle",
+    "verébféle"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen növényrész a becő?",
+   "valaszok": [
+    "termés",
+    "főgyökér",
+    "levélerezet",
+    "fakéreg"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen szetter kutya nincs az alábbiak közül?",
+   "valaszok": [
+    "angol",
+    "ír",
+    "skót",
+    "flamand"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állat a garda?",
+   "valaszok": [
+    "rovar",
+    "madár",
+    "hal",
+    "emlős"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen állat a hárpia?",
+   "valaszok": [
+    "madár",
+    "hal",
+    "ragadozó",
+    "erszényes"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen állat a lilik?",
+   "valaszok": [
+    "hal",
+    "madár",
+    "régcsáló",
+    "vadmacska"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat a lápi póc?",
+   "valaszok": [
+    "béka",
+    "madár",
+    "teknős",
+    "hal"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állat a nóniusz?",
+   "valaszok": [
+    "ló",
+    "szarvas",
+    "sertés",
+    "antilop"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen állat a vadnyugati regényekből ismert coyote?",
+   "valaszok": [
+    "vadló",
+    "szürke medve",
+    "prérifarkas",
+    "bölény"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen állatok tartoznak a csíkfélék közé?",
+   "valaszok": [
+    "halak",
+    "madarak",
+    "rákok",
+    "hüllők"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen állatot nevez a népnyelv emsének?",
+   "valaszok": [
+    "újszülött csokót",
+    "nőstény disznót",
+    "mezei pockot",
+    "vörös szőrű mókust"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állatot nevezhetnek jerkének?",
+   "valaszok": [
+    "tyúkot",
+    "bárányt",
+    "szamarat",
+    "pulykát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen élőlény a susulyka?",
+   "valaszok": [
+    "rovar",
+    "gomba",
+    "énekesmadár",
+    "futóbab"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A csicsóka melyik része ehető?",
+   "valaszok": [
+    "a virágzata",
+    "a levele",
+    "a gyökérgumója",
+    "a magja"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A vanília melyik részéből készítenek fűszert?",
+   "valaszok": [
+    "bimbójából",
+    "terméséből",
+    "kérgéből",
+    "leveléből"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbi női nevek közül melyik nem növénynév?",
+   "valaszok": [
+    "Amarillisz",
+    "Erika",
+    "Xénia",
+    "Georgina"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik növény?",
+   "valaszok": [
+    "pásztorgyűrű",
+    "pásztortáska",
+    "pásztorsíp",
+    "pásztorgém"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik állat lakóhelyét nevezzük kotoréknak?",
+   "valaszok": [
+    "a rókáét",
+    "a medvéét",
+    "a mókusét",
+    "a farkasét"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az állatok mely családjába tartozik a házi patkány?",
+   "valaszok": [
+    "egérfélék",
+    "hódfélék",
+    "hörcsögfélék",
+    "tengerimalac-félék"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol fészkelnek a pacsirták?",
+   "valaszok": [
+    "barlangokban",
+    "talajon",
+    "magas fák tetején",
+    "nádasban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol hasznosítják az ámbráscetekből nyert váladékot?",
+   "valaszok": [
+    "a konyhaművészetben",
+    "a kozmetikai iparban",
+    "a halászatban",
+    "a motorolajgyártásban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol él a kardhal?",
+   "valaszok": [
+    "sarkvidéki tengerekben",
+    "trópusi tengerekben",
+    "Észak-Amerika folyóiban",
+    "Szibéria folyóiban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol él a remeterák?",
+   "valaszok": [
+    "hínárból épített várakban",
+    "vízimadarak fészkében",
+    "üres csigaházakban",
+    "mólók alatt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol él a trópusi gyümölcs nevével megegyezző nevű madár, a kivi?",
+   "valaszok": [
+    "Dél-Amerikában",
+    "Új-Zélandon",
+    "Afrikában",
+    "Szibériában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol élnek Európában természetes körülmények között majomcsapatok?",
+   "valaszok": [
+    "Korzikán",
+    "Gibraltáron",
+    "Krétán",
+    "a Fekete-tenger partján"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol élnek a virágállatok?",
+   "valaszok": [
+    "a fák törzsén",
+    "a tengerekben",
+    "a növények levelén",
+    "a sivatagokban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány évig él általában egy víziló?",
+   "valaszok": [
+    "10.0",
+    "20.0",
+    "40.0",
+    "60.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely állatok nem tartoznak a hártyásszárnyúak rendjébe?",
+   "valaszok": [
+    "darazsak",
+    "méhek",
+    "hangyák",
+    "lepkék"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik az a ruhaipari anyag, amelyet fiatal kecske bőréből készítenek?",
+   "valaszok": [
+    "sevró",
+    "szatén",
+    "velúr",
+    "nubuk"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik medvefajt nevezzük grizzlynek?",
+   "valaszok": [
+    "a fekete medvét",
+    "a szürke medvét",
+    "az örvös medvét",
+    "a jegesmedvét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik növénnyel tartozik egy családba komló?",
+   "valaszok": [
+    "kender",
+    "árpa",
+    "kökörcsin",
+    "mák"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik orvosi műszer méri az agyáramokat?",
+   "valaszok": [
+    "CT - készülék",
+    "CRT - készülék",
+    "EEG - készülék",
+    "EKG - készülék"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik vitamin hiánya okoz fokozott vérzéshajlamot?",
+   "valaszok": [
+    "A vitamin",
+    "K vitamin",
+    "D vitamin",
+    "B vitamin"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban végezte el Christian Barnard professzor az első sikeres emberi szívátültetést?",
+   "valaszok": [
+    "Montrealban",
+    "Melbourne-ben",
+    "Párizsban",
+    "Fokvárosban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állatot nevezik hódpatkánynak is?",
+   "valaszok": [
+    "vidra",
+    "nutria",
+    "menyét",
+    "csincsilla"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ízt érezzük a nyelv tövében?",
+   "valaszok": [
+    "édeset",
+    "sóst",
+    "savanyút",
+    "keserűt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen anyagok közé sorolható a keményítő?",
+   "valaszok": [
+    "zsírok",
+    "fehérjék",
+    "szénhidrátok",
+    "vitaminok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen mitológiai lények nevét viseli a tengeri tehenek rendje?",
+   "valaszok": [
+    "valkűrök",
+    "szirének",
+    "hérák",
+    "hetérák"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen növény a borbolya?",
+   "valaszok": [
+    "moha",
+    "fenyőféle",
+    "páfrány",
+    "gombaféle"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen növényi rész az ételek ízesítésére használt kapri?",
+   "valaszok": [
+    "bimbó",
+    "termés",
+    "mag",
+    "gyökérgumó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen orvoshoz fordul az, aki dermatológushoz megy?",
+   "valaszok": [
+    "fogorvoshoz",
+    "bőrgyógyászhoz",
+    "szemészhez",
+    "nőgyógyászhoz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat a csuszka?",
+   "valaszok": [
+    "gyík",
+    "hal",
+    "madár",
+    "emlős"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen állat a póling?",
+   "valaszok": [
+    "vízimadár",
+    "mérges kígyó",
+    "akváriumi hal",
+    "nagymacska"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen állatok a fürkészek?",
+   "valaszok": [
+    "rovarok",
+    "hüllők",
+    "halak",
+    "madarak"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mivel táplálkoznak a hódok?",
+   "valaszok": [
+    "édesvízi halakkal",
+    "fák kérgével, rügyeivel",
+    "apróbb madártojásokkal",
+    "rovarokkal, gyíkokkal"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Testünk melyik részén található a csuklyás izom?",
+   "valaszok": [
+    "a karon",
+    "a lábon",
+    "a fejen",
+    "a háton"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A halak mely rendjébe tartozik a szardella?",
+   "valaszok": [
+    "heringalakúak",
+    "sügéralakúak",
+    "gömbhalalakúak",
+    "angolnaalakúak"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy növény neve?",
+   "valaszok": [
+    "galambepe",
+    "varjúháj",
+    "sólyomszem",
+    "gólyaláb"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Egy állat bundájának mely része a mál?",
+   "valaszok": [
+    "nyaki",
+    "has alatti",
+    "fartájéki",
+    "boka körüli"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy hívják a moszatok és a gombák hasznos együttéléséből létrejövő növényi telepet?",
+   "valaszok": [
+    "zuzmó",
+    "páfrány",
+    "moha",
+    "alga"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol él a varacskos disznó?",
+   "valaszok": [
+    "faodúkban",
+    "föld alatti lyukakban",
+    "sárból tapasztott vackokban",
+    "dús aljnövényzetben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki fedezte fel a penicilint?",
+   "valaszok": [
+    "Sir Alexander Fleming",
+    "Paul Ehrlich",
+    "Howard Temin",
+    "Robert Koch"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik földrészen honos a mosómedve?",
+   "valaszok": [
+    "Afrika",
+    "Ázsia",
+    "Amerika",
+    "Ausztrália"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik gyümölcs nem a szilva rokona?",
+   "valaszok": [
+    "mandula",
+    "őszibarack",
+    "meggy",
+    "dió"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik madár tartozik a papagájalakúak közé az alábbiak közül?",
+   "valaszok": [
+    "kócsag",
+    "kanári",
+    "kakadu",
+    "kenderike"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik növény görög eredetű elnevezése a pelargónia?",
+   "valaszok": [
+    "muskátli",
+    "óriáskaktusz",
+    "szomorúfűz",
+    "törpefenyő"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik növény nem a szelíd gesztenye rokona?",
+   "valaszok": [
+    "vadgesztenye",
+    "közönséges bükk",
+    "kocsányos tölgy",
+    "paratölgy"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik növény nem tartozik a rózsafélék családjába?",
+   "valaszok": [
+    "alma",
+    "málna",
+    "naspolya",
+    "tubarózsa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik növény rokonai a cédrusok?",
+   "valaszok": [
+    "vörösfenyő",
+    "kocsányos tölgy",
+    "bükk",
+    "szelídgesztenye"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik szervünk betegsége a Basedow-kór?",
+   "valaszok": [
+    "agykéreg",
+    "hasnyálmirigy",
+    "pajzsmirigy",
+    "gerincvelő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik tengerben él az ízletes húsú hekk?",
+   "valaszok": [
+    "Arab-tenger",
+    "Dél-kínai-tenger",
+    "Földközi-tenger",
+    "Északi-tenger"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik testrészünk csontja a singcsont?",
+   "valaszok": [
+    "a koponyáé",
+    "az alkaré",
+    "a törzsé",
+    "a lábszáré"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik testrészünkben találhatók csapok és pálcikák?",
+   "valaszok": [
+    "a fülben",
+    "a fogban",
+    "az orrban",
+    "a szemben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állat WWF (Vadvédelmi világalapítvány) címerállata?",
+   "valaszok": [
+    "koala",
+    "óriáspanda",
+    "oroszlán",
+    "kenguru"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állat lehet kilencöves?",
+   "valaszok": [
+    "tatu",
+    "hangyász",
+    "medúza",
+    "teknős"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik állatnak van csáprágója?",
+   "valaszok": [
+    "a szitakötőnek",
+    "a tarisznyaráknak",
+    "a pontytetűnek",
+    "a póknak"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állattal áll szoros rokonságban a vidra?",
+   "valaszok": [
+    "fóka",
+    "menyét",
+    "patkány",
+    "hidra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állítás nem igaz a pelefélékre?",
+   "valaszok": [
+    "éjszakai életet élnek",
+    "némelyik téli álmot alszik",
+    "ragadozók",
+    "a farkuk bozontos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen növényi rész a kaszat?",
+   "valaszok": [
+    "gyökér",
+    "szár",
+    "termés",
+    "levél"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen állat a szipoly?",
+   "valaszok": [
+    "kártevő bogár",
+    "mocsári bolha",
+    "tavaszi szúnyog",
+    "barlangi denevér"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki vezette be Magyarországon a veszettség elleni védőoltást?",
+   "valaszok": [
+    "Szent-Györgyi Albert",
+    "Hőgyes Endre",
+    "Korányi Sándor",
+    "id. Bókay János"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a gyermekorvostan első tanára hazánkban?",
+   "valaszok": [
+    "id. Bókay János",
+    "Heim Pál",
+    "Schöpf-Mérei Ágoston",
+    "Korányi Sándor"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik egy kengurufajta neve?",
+   "valaszok": [
+    "lófejű",
+    "kaktuszevő",
+    "fakúszó",
+    "fületlen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik gyümölcs terem lágyszárú növényen?",
+   "valaszok": [
+    "a füge",
+    "a mangó",
+    "a banán",
+    "a datolya"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik halnak nincs pikkelye?",
+   "valaszok": [
+    "csuka",
+    "harcsa",
+    "rózsás márna",
+    "dévérkeszeg"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem bogár az alábbi állatok közül?",
+   "valaszok": [
+    "kék futrinka",
+    "óriás csibor",
+    "mezei tücsök",
+    "nagy hőscincér"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szervünk vizsgálatáért kapott orvosi Nobel-díjat Békésy György?",
+   "valaszok": [
+    "az agy",
+    "a szem",
+    "a fül",
+    "a szív"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állat fajtái a mezei, grönlandi, sarki, sivatagi, tibeti, havasi?",
+   "valaszok": [
+    "egér",
+    "medve",
+    "róka",
+    "nyúl"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állat tetteti magát halottnak vészhelyzetben?",
+   "valaszok": [
+    "pávián",
+    "oposszum",
+    "ugróegér",
+    "gekkó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állatnév előtagja lehet még a pézsma a pockon kívül?",
+   "valaszok": [
+    "rája",
+    "szarvas",
+    "mókus",
+    "gödény"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a neve a főként tűlevelű fákból álló erdőövezetnek?",
+   "valaszok": [
+    "tundra",
+    "szavanna",
+    "tajga",
+    "sztyepp"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen kártevő támadja meg a szőlőt, ha filoxéra pusztítja?",
+   "valaszok": [
+    "gomba",
+    "atka",
+    "tetű",
+    "darázs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen színű nyáron a hermelin bundája?",
+   "valaszok": [
+    "fekete",
+    "szürke",
+    "barna",
+    "fehér"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen termesztett növényfajta az Afuz Ali?",
+   "valaszok": [
+    "rózsa",
+    "tulipán",
+    "szőlő",
+    "görögdinnye"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen állat a kazuár?",
+   "valaszok": [
+    "ausztráliai hüllő",
+    "macskaféle",
+    "futómadár",
+    "medúza"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen állatokkal foglalkozik egy entomológus?",
+   "valaszok": [
+    "madarakkal",
+    "rovarokkal",
+    "őslényekkel",
+    "hüllőkkel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A növények mely családjába tartozik a lótuszvirág?",
+   "valaszok": [
+    "varázsdiófélék",
+    "vénuszhajfélék",
+    "tündérrózsafélék",
+    "liliomfafélék"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik növendékállatot nevezik toklyónak?",
+   "valaszok": [
+    "a szarvasmarhát",
+    "a juhot",
+    "a pulykát",
+    "a kecskét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik növény nem rokona a körtének?",
+   "valaszok": [
+    "japánbirs",
+    "naspolya",
+    "galagonya",
+    "gránátalma"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik növényt alkalmazták szemölcs ellen?",
+   "valaszok": [
+    "árvacsalán",
+    "vérehulló fecskefű",
+    "fehér mályva",
+    "fagyöngy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szervünk termeli az inzulint?",
+   "valaszok": [
+    "a pajzsmirigy",
+    "a hasnyálmirigy",
+    "a mellékvese",
+    "az agyalapi mirigy"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állat készít a vakondéhoz hasonló túrásokat?",
+   "valaszok": [
+    "mongúz",
+    "földikutya",
+    "krill",
+    "cickány"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik állat nem erszényes?",
+   "valaszok": [
+    "oposszum",
+    "kuszkusz",
+    "pele",
+    "vombat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor és hol született az első lombikbébi?",
+   "valaszok": [
+    "1985, Szovjetunió",
+    "1954, USA",
+    "1967, Dél-Afrikai Közt.",
+    "1978, Nagy-Britannia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állat a hosszúfarkú tobzoska?",
+   "valaszok": [
+    "ritka díszmadár",
+    "sivatagi gyík",
+    "trópusi emlős",
+    "kis méretű aligátor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen élőlény a henye boroszlán?",
+   "valaszok": [
+    "növény",
+    "hal",
+    "futómadár",
+    "sörényes borz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A sáfrány melyik részéből készítenek fűszert?",
+   "valaszok": [
+    "porzószálaiból",
+    "rügyeiből",
+    "magházából",
+    "bibeszálából"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik növény hatóanyaga a kapszaicin?",
+   "valaszok": [
+    "kamilla",
+    "gyöngyvirág",
+    "paprika",
+    "csalán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik íz érzékelhető a nyelv hátsó részén (a nyelvgyökön)?",
+   "valaszok": [
+    "keserű",
+    "édes",
+    "savanyú",
+    "sós"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a növényi sejtfalakat felípítő szénhidrát neve?",
+   "valaszok": [
+    "laktóz",
+    "cellulóz",
+    "maltóz",
+    "glükóz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen növény a manna?",
+   "valaszok": [
+    "moha",
+    "zuzmó",
+    "mezei zsurló",
+    "szőlőfajta"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat a petymeg?",
+   "valaszok": [
+    "énekes madár",
+    "futómadár",
+    "rágcsáló emlős",
+    "ragadozó emlős"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit vizsgál az orvos, ha a mandibulát tapogatja?",
+   "valaszok": [
+    "az orrot",
+    "a homlokot",
+    "az állkapcsot",
+    "a térdet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi gombafajták közül melyik mérgező?",
+   "valaszok": [
+    "nagy őzlábgomba",
+    "császárgomba",
+    "trombitagomba",
+    "parlagi tölcsérgomba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbi növények közül melyik nem mérgező?",
+   "valaszok": [
+    "gyöngyvirág",
+    "nadragulya",
+    "fekete hunyor",
+    "fehér üröm"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyek növények az alábbi élőlények közül?",
+   "valaszok": [
+    "tengericsillagok",
+    "tengeriuborkák",
+    "tengerisaláták",
+    "tengerililiomok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbi növények közül melyik lombhullató?",
+   "valaszok": [
+    "libanoni cédrus",
+    "vörösfenyő",
+    "duglászfenyő",
+    "atlaszcédrus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen orvoshoz fordulunk panaszunkkal, ha fáj a fauxunk?",
+   "valaszok": [
+    "bőrgyógyászhoz",
+    "urológushoz",
+    "fogorvoshoz",
+    "gégészhez"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állatok porozzák be a világ legnagyobb virágát, a Rafflesiat?",
+   "valaszok": [
+    "termeszek",
+    "kolibrik",
+    "legyek",
+    "vadméhek"
+   ],
+   "helyes": 2
+  }
+ ]
+}

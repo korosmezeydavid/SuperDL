@@ -1,0 +1,2218 @@
+{
+ "id": "kviz-magyar-nyelv-nehez",
+ "nev": "Magyar nyelv — nehezebb",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "Az alábbiak közül melyik a krampampuli?",
+   "valaszok": [
+    "a Mikulás segédei",
+    "terelőkutya",
+    "egy szeszesital",
+    "krumplistészta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket nevezi a népnyelv vinkónak?",
+   "valaszok": [
+    "a lótolvajt",
+    "a savanykás bort",
+    "a bő termést",
+    "a napszámost"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket nevezik hajdinának?",
+   "valaszok": [
+    "díszes fejéket",
+    "pengetős hangszert",
+    "edényfajtát",
+    "növényfajt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül mit nevezett a népnyelv csutorának?",
+   "valaszok": [
+    "bajuszkötőt",
+    "pipaszár szipókáját",
+    "dohánylevelet",
+    "lóápoló kefét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az orosz embert régen muszkának nevezték. Mi a muszka szó eredete?",
+   "valaszok": [
+    "Moszkva városa",
+    "egy puliszkaszerű étel",
+    "a szibériai usánkanyúl",
+    "egy kicsike lábbeli"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy nevezik az orgona kézi billentyűzetét?",
+   "valaszok": [
+    "manuál",
+    "manuszkript",
+    "manézs",
+    "manipulátor"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan nevezik másképpen a sárgarigót?",
+   "valaszok": [
+    "bülbül",
+    "csalogány",
+    "pacsirta",
+    "málinkó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezték a csuklyás, körgalléros, álarcos jelmezbáli ruhát?",
+   "valaszok": [
+    "marokkó",
+    "dominó",
+    "dzsenga",
+    "makaó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezték régen a március hónapot?",
+   "valaszok": [
+    "megkésett hó hava",
+    "tavaszvárás hava",
+    "farsangsirató hava",
+    "böjtmás hava"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezzük az utolérhetetlen, felülmúlhatatlan dolgokat?",
+   "valaszok": [
+    "know-how",
+    "sine qua non",
+    "non plus ultra",
+    "nota bene"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan választjuk el helyesen a magyar szabályok szerint a következő nevet?",
+   "valaszok": [
+    "Bau-de-lai-re",
+    "Ba-u-de-la-i-re",
+    "Baude-laire",
+    "Baud-e-lair-e"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol beszélik a tuareg nyelvjárásokat?",
+   "valaszok": [
+    "Észak-Afrikában",
+    "Dél-Afrikában",
+    "Elő-Indiában",
+    "Távol-Keleten"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol dolgozott a pikoló?",
+   "valaszok": [
+    "étteremben",
+    "festőműhelyben",
+    "ötvösműhelyben",
+    "sörgyárban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol van, aki egy ámbituson tartózkodik?",
+   "valaszok": [
+    "vívószőnyegen",
+    "oszlopos tornácon",
+    "alföldi kaszálón",
+    "nyitott oldalú magtárban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiket vagy miket nevezünk régiesen filozoptereknek?",
+   "valaszok": [
+    "a szitakötőket",
+    "a helikoptereket",
+    "az ókori filozófusokat",
+    "a bölcsészhallgatókat"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kiknek a neve elé szokás kitenni Olaszországban a fra szócskát, például Fra Angelico festő esetében?",
+   "valaszok": [
+    "férfiági felmenők",
+    "orvosok",
+    "szerzetesek",
+    "diákok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a koporsója lebeg a közmondás szerint?",
+   "valaszok": [
+    "Damoklész",
+    "Mohamed",
+    "Szent László",
+    "Krisztus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiről nevezték el a társaiknál jóval többet vállaló élmunkásokat?",
+   "valaszok": [
+    "Buharinról",
+    "Pugacsovról",
+    "Sztahanovról",
+    "Csapajevről"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kiről nevezték el vulkánnak a tűzhányókat?",
+   "valaszok": [
+    "egy római istenről",
+    "egy mongol uralkodóról",
+    "egy szigetről",
+    "egy ókori városról"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kit vagy mit neveztek a középkorban igricnek?",
+   "valaszok": [
+    "énekmondót",
+    "egrest",
+    "fülemülét",
+    "apródot"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kivel működött együtt, aki kollaboráns?",
+   "valaszok": [
+    "a tanszékvezetővel",
+    "az uralkodóval",
+    "az ellenséggel",
+    "a kórboncnokkal"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely része egy nemzetközi szerződésnek a preambulum?",
+   "valaszok": [
+    "bevezetés",
+    "cikkelyek kifejtése",
+    "titkos záradék",
+    "aláírások helye"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik csillagkép latin neve Canis Maior?",
+   "valaszok": [
+    "Nagy Kutya",
+    "Kis Kutya",
+    "Nagy Medve",
+    "Kis Medve"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik egy divattal kapcsolatos kifejezés az alábbiak közül?",
+   "valaszok": [
+    "hors-d'oeuvre",
+    "honestas publica",
+    "hic et nunc",
+    "haute couture"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik foglalkozás régies neve a kaszab?",
+   "valaszok": [
+    "vándorköszörűs",
+    "kovács",
+    "mészáros",
+    "cirkuszi késdobáló"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik helytelen az alábbi szólások közül?",
+   "valaszok": [
+    "Nem az én asztalom",
+    "Elhúzza a csíkot",
+    "Nehéz fába vágta a fejszéjét",
+    "Egy gyékényen árulnak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik keresztnevünk latin eredetű?",
+   "valaszok": [
+    "Dusán",
+    "Abigél",
+    "Vladimír",
+    "Stella"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik kifejezés jelenti az állami költségvetés kiadásait meghaladó bevételeket?",
+   "valaszok": [
+    "deficit",
+    "szufficit",
+    "explicit",
+    "implicit"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik magyar település neve jelenti azt, hogy \"magaslaton lévő vár\"?",
+   "valaszok": [
+    "Komárom",
+    "Esztergom",
+    "Visegrád",
+    "Drégely"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem héber eredetű név az alábbiak közül?",
+   "valaszok": [
+    "Dániel",
+    "Dávid",
+    "Jonatán",
+    "Jeromos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem iráni nyelv az alábbiak közül?",
+   "valaszok": [
+    "méd",
+    "pártus",
+    "kurd",
+    "provanszál"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szó édességnév és növénynév is egyben?",
+   "valaszok": [
+    "cinkapanna",
+    "borzaskata",
+    "búbosborcsa",
+    "szeplősbarbi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik évszámot tartalmazó kifejezés írásmódja helytelen?",
+   "valaszok": [
+    "1848 előtt",
+    "1848 mártírjai",
+    "1848. márciusi",
+    "1848. márciusában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik írásmód helytelen az alábbiak közül?",
+   "valaszok": [
+    "ötheti adag",
+    "háromhavi elmaradás",
+    "huszonegy napi út",
+    "két ütemű motor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a bujtás?",
+   "valaszok": [
+    "ruhadísz",
+    "növényszaporítási módszer",
+    "barlangi patak",
+    "csatornaelem"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a fenyér?",
+   "valaszok": [
+    "péksütemény",
+    "iskolai fenyítőeszköz",
+    "gyér, füves terület",
+    "fényévnél kisebb táv"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a káptalan?",
+   "valaszok": [
+    "egyházi testület",
+    "templomi helyiség",
+    "templomszolga",
+    "misekellék"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a neve a magas, felfelé keskenyedő emlékoszlopnak?",
+   "valaszok": [
+    "obszidián",
+    "odaliszk",
+    "obeliszk",
+    "odeon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi az alpaka?",
+   "valaszok": [
+    "hegyi állat",
+    "fémötvözet",
+    "ruhadísz",
+    "kis testű madár"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi lehetett az alábbiak közül rakoncás?",
+   "valaszok": [
+    "szekér",
+    "gondozott birtok",
+    "káposztás étel",
+    "kisgyermek"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi történt azzal, aki épp most maturált?",
+   "valaszok": [
+    "gyermeket szült",
+    "megházasodott",
+    "leérettségizett",
+    "doktori címet szerzett"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miket takarnak a következő elnevezések: perm, triász, szilur, karbon?",
+   "valaszok": [
+    "a Jupiter holdjait",
+    "görög szigeteket",
+    "földtörténeti időszakokat",
+    "a szén vegyületeit"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen a maródi ember?",
+   "valaszok": [
+    "gyengélkedő",
+    "civakodó",
+    "hűséges",
+    "izmos"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen az a vállalat, amelynek likviditási problémái vannak?",
+   "valaszok": [
+    "környezetszennyező",
+    "műszakilag elmaradott",
+    "exportképtelen",
+    "fizetésképtelen"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen az invenciózus ember?",
+   "valaszok": [
+    "erőszakos",
+    "következetes",
+    "hagyománytisztelő",
+    "leleményes"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen emberre mondjuk, hogy pákosztos?",
+   "valaszok": [
+    "magas",
+    "irigy",
+    "lassú",
+    "torkos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen eredetű a polgár, a borbély és a herceg szavunk?",
+   "valaszok": [
+    "német",
+    "szláv",
+    "török",
+    "latin"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen eredetű parfüm szavunk?",
+   "valaszok": [
+    "szláv",
+    "finnugor",
+    "francia",
+    "ógörög"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen irodalmi műfaj a fabula?",
+   "valaszok": [
+    "sírvers",
+    "tanmese",
+    "levélregény",
+    "bujdosóének"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire használták régen a fidibuszt?",
+   "valaszok": [
+    "ruhakészítésre",
+    "tűzgyújtásra",
+    "utazásra",
+    "vadászatra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit adott a tanár a diákoknak, amikor kiszabta a penzumot?",
+   "valaszok": [
+    "osztályzatot",
+    "intőt",
+    "leckét",
+    "egérutat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál a háziasszony, amikor staubol?",
+   "valaszok": [
+    "behabarja az ételt",
+    "ruhát foltoz",
+    "húst paníroz",
+    "inget keményít"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit csinál az, aki elbúcsúzik a kapufélfától?",
+   "valaszok": [
+    "lebontja a házát",
+    "beveri a fejét",
+    "megszökik otthonról",
+    "aludni tér"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit csinál, aki kalibrál?",
+   "valaszok": [
+    "mérőeszközt hitelesít",
+    "fegyvert tisztít",
+    "rajzol",
+    "tőkét fektet be"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit falatozik, aki tojásgyümölcsöt eszik?",
+   "valaszok": [
+    "paradicsomot",
+    "padlizsánt",
+    "egrest",
+    "ringlót"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit hordott, aki klepetust viselt?",
+   "valaszok": [
+    "köpönyeget",
+    "fülbevalót",
+    "gyűrűt",
+    "karkötőt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit jelent Attila hun vezér neve?",
+   "valaszok": [
+    "hatalmas",
+    "atyácska",
+    "kegyetlen",
+    "az ég ura"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit jelent a cívisváros kifejesésben a cívis szó?",
+   "valaszok": [
+    "mező",
+    "vásár",
+    "polgár",
+    "hűséges"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit jelent a mondás? \"Errare humanum est.\"",
+   "valaszok": [
+    "A kocka el van vetve",
+    "Ismétlés a tudás anyja",
+    "Tévedni emberi dolog",
+    "Fejétől bűzlik a hal"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit jelent az intervenció?",
+   "valaszok": [
+    "közjáték",
+    "beavatkozás",
+    "értékcsökkenés",
+    "figyelmeztetés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit jelent ez a kifejezés: casus belli?",
+   "valaszok": [
+    "jelenlegi helyzet",
+    "enyhítő körülmény",
+    "háborús ok",
+    "szépasszony"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit nevez a népnyelv zsibogónak?",
+   "valaszok": [
+    "óvodát",
+    "ócskapiacot",
+    "baromfiudvart",
+    "lőteret"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveznek a népnyelvben csanaknak az alábbiak közül?",
+   "valaszok": [
+    "hatalmas lábbelit",
+    "kis edényt",
+    "dunai halászbárkát",
+    "kopottas fejfedőt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveznek diabolónak?",
+   "valaszok": [
+    "játékot",
+    "pálinkát",
+    "oszlopfajtát",
+    "vasvillát"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit neveztek kamáslinak?",
+   "valaszok": [
+    "a teáskannát",
+    "a csokornyakkendőt",
+    "a virágcsokrot",
+    "a bokavédőt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit neveztek magisztrátusnak Magyarországon?",
+   "valaszok": [
+    "városi hivatalt",
+    "iskolai vizsgát",
+    "állami adót",
+    "nyári idénymunkát"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit neveztek régen meszelynek?",
+   "valaszok": [
+    "a cinegét",
+    "a hangyát",
+    "egy űrmértéket",
+    "egy hosszmértéket"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit szeret olvasni, aki gyakran forgat poliglottokat?",
+   "valaszok": [
+    "többkötetes könyveket",
+    "többnyelvű könyveket",
+    "barkácskönyveket",
+    "gyermekkönyveket"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel foglalkozik a gerontológia tudománya?",
+   "valaszok": [
+    "öröklődéssel",
+    "öregedéssel",
+    "környezetvédelemmel",
+    "földrengésekkel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Régies szövegekben gyakran találkozhatunk a \"föld nemtöje\" kifejezéssel. Mit jelent a nemtő?",
+   "valaszok": [
+    "gazdatiszt",
+    "talajlazító bogár",
+    "védőszellem",
+    "föld nélküli jobbágy"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A hagyomány szerint melyikről kapta nevét a batiszt?",
+   "valaszok": [
+    "normandiai síkságról",
+    "szerzetesrendről",
+    "francia takácsról",
+    "burgundiai faluról"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A katonák mijét nevezték kepinek?",
+   "valaszok": [
+    "zsoldkönyvét",
+    "zubbonyát",
+    "szuronyát",
+    "sapkáját"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Apostol szavunk a görög \"aposztolosz\" szóból származik. Mi a szó eredeti jelentése?",
+   "valaszok": [
+    "tanítvány",
+    "küldött",
+    "pásztor",
+    "kőszikla"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbi \"corpusok\" közül melyiket használják ügyvédek?",
+   "valaszok": [
+    "corpus juris",
+    "corpus Domini",
+    "corpus Iuteum",
+    "corpus vitreum"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbi helyek közül hova ment hazánkban az, aki a Kúriára ment?",
+   "valaszok": [
+    "bíróságra",
+    "csendőrőrsre",
+    "kórházba",
+    "országgyűlésre"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbi kelet-európai nyelvek közül melyik újlatin nyelv?",
+   "valaszok": [
+    "bolgár",
+    "török",
+    "román",
+    "szerb"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül kit neveztek inzsellérnek?",
+   "valaszok": [
+    "nyári idénymunkást",
+    "mérnököt",
+    "szabót",
+    "adóbehajtót"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezték a porosz nemesi nagybirtokost?",
+   "valaszok": [
+    "kasperl",
+    "junker",
+    "bürger",
+    "bauer"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezik a hármas osztatú oltárképet?",
+   "valaszok": [
+    "triumvirátus",
+    "triptichon",
+    "tripartitum",
+    "trikolór"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan nevezik azt a gyermeket, akit a név eredete szerint Dionüszosznak ajánlanak?",
+   "valaszok": [
+    "Daniella",
+    "Dália",
+    "Dávid",
+    "Dénes"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan írják helyesen az ismert festő nevét?",
+   "valaszok": [
+    "Gogin",
+    "Gaugin",
+    "Gauguin",
+    "Gauguine"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol találhatunk szilákat?",
+   "valaszok": [
+    "gyümölcsösben",
+    "cetek szájában",
+    "hegyvidéken",
+    "tükörboltban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Honnan kapta nevét a tejjel higított feketekávé, a kapucíner?",
+   "valaszok": [
+    "Újkapu városáról",
+    "egy szerzetesruha színéről",
+    "egy török bég nevéből",
+    "középkori vámszedőkről"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az ordonánc?",
+   "valaszok": [
+    "falusi orvos",
+    "katonai küldönc",
+    "királyi étekfogó",
+    "alföldi betyár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik tanultak a medreszében?",
+   "valaszok": [
+    "református diákok",
+    "párizsi medikusok",
+    "buddhista szerzetesek",
+    "muzulmán diákok"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kiket nevezünk hidalgóknak?",
+   "valaszok": [
+    "japán harcművészeket",
+    "ókori hídépítőket",
+    "spanyol nemeseket",
+    "francia forradalmárokat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit neveztek ódondásznak?",
+   "valaszok": [
+    "régészt",
+    "történelemtanárt",
+    "régiségkereskedő",
+    "restaurátor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik a helyes írásmód?",
+   "valaszok": [
+    "könyvritkasággyűjtemény",
+    "könyvritkaság gyűjtemény",
+    "könyvritkaság-gyűjtemény",
+    "könyv ritkaság-gyűjtemény"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik fém nevével köthető össze Ciprus szigete?",
+   "valaszok": [
+    "arany",
+    "vas",
+    "ezüst",
+    "réz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik görög eredetű női név jelentése bölcsesség?",
+   "valaszok": [
+    "Beáta",
+    "Regina",
+    "Renáta",
+    "Zsófia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik híres történelmi személyiségünk neve van helytelenül leírva?",
+   "valaszok": [
+    "Kossuth Lajos",
+    "Vörösmarty Mihály",
+    "Széchenyi István",
+    "Batthány Lajos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik kifejezés írásmódja helytelen az alábbiak közül?",
+   "valaszok": [
+    "Gárdonyi-szerű",
+    "Eötvös-féle",
+    "Julianus barát szobor",
+    "József Attila díj"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik kutyafajta neve ered egy ország latin elnevezéséből?",
+   "valaszok": [
+    "komondor",
+    "uszkár",
+    "spániel",
+    "kuvasz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem germán nyelv az alábbiak közül?",
+   "valaszok": [
+    "fríz",
+    "jiddis",
+    "longobard",
+    "vend"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik női név jelentése kismackó, medvebocs?",
+   "valaszok": [
+    "Emese",
+    "Ulrika",
+    "Barbara",
+    "Orsolya"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik rokonunkat nevezzük ipának a népnyelv szerint?",
+   "valaszok": [
+    "apósunkat",
+    "nagyapánkat",
+    "bátyánkat",
+    "sógorunkat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik szó írásmódja helytelen a magyar helyesírás szabályai szerint?",
+   "valaszok": [
+    "fotocella",
+    "fotómodell",
+    "fotoriporter",
+    "fotográfia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyiket csinálja egy karakül az alábbiak közül?",
+   "valaszok": [
+    "legel",
+    "vadászik",
+    "lovagol",
+    "hangszeren játszik"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyiket készítik halinából?",
+   "valaszok": [
+    "kását",
+    "ruhát",
+    "hangszert",
+    "horgászcsalit"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a flódni?",
+   "valaszok": [
+    "fúvós hangszer",
+    "sütemény",
+    "vadászpuska",
+    "szalmakalap"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a herefojtó aranka?",
+   "valaszok": [
+    "középkori kínzóeszköz",
+    "gyomnövény",
+    "mérges kígyó",
+    "vadászcsapda"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a morotva?",
+   "valaszok": [
+    "fodrászeszköz",
+    "emlősállat",
+    "népi hangszer",
+    "folyók mederkanyarulata"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a palimdrom szavak jellemzője?",
+   "valaszok": [
+    "elválaszthatatlanok",
+    "többszörösen összetettek",
+    "kiejthetetlenek",
+    "visszafelé is ugyanazok"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miket neveztek a nyelvújítás korában így: olvanos, nyilanos, kalászonos, mustonos?",
+   "valaszok": [
+    "a hét napjait",
+    "a hónapokat",
+    "foglalkozásokat",
+    "életkorokat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen eredetű szerda és csütörtök szavunk?",
+   "valaszok": [
+    "német",
+    "szláv",
+    "latin",
+    "finnugor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen eredetű szó a fjord?",
+   "valaszok": [
+    "angol",
+    "finn",
+    "holland",
+    "norvég"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen munkához használták a guzsalyt?",
+   "valaszok": [
+    "főzéshez",
+    "marhatereléshez",
+    "szántáshoz",
+    "fonáshoz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen mára elavult jelentése volt évszázadokkal ezelőtt a \"marha\" szónak?",
+   "valaszok": [
+    "vagyon",
+    "családi",
+    "ügyetlen lovas",
+    "alattvaló"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen nyelvek közé tartozik a csuvas, a gagauz és a baskír nyelv?",
+   "valaszok": [
+    "dravida",
+    "török",
+    "kaukázusi",
+    "polinéz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nyelven íródtak az ókori szent könyvek, a védák?",
+   "valaszok": [
+    "görög",
+    "egyiptomi",
+    "latin",
+    "szanszkrit"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen tulajdonság jellemez egy konjunktúralovagot?",
+   "valaszok": [
+    "hűséges",
+    "gáncs nélküli",
+    "ügyeskedő",
+    "lovagiatlan"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen építmény a kutrica?",
+   "valaszok": [
+    "kukoricatároló",
+    "fészer",
+    "titkos pálinkafőzde",
+    "ól"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mire használják a bandázst?",
+   "valaszok": [
+    "lovak idomítására",
+    "sebkötözésre",
+    "kézfertőtlenítésre",
+    "hegedűk gyantázására"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire használták a sajkát?",
+   "valaszok": [
+    "hajózásra",
+    "tehénfejésre",
+    "vízhordásra",
+    "szüretelésre"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mire szolgált az ókorban a fibula?",
+   "valaszok": [
+    "tűzgyújtásra",
+    "ruha összekapcsolására",
+    "főzésre",
+    "írásra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinálnak az olaszok a cannellonival?",
+   "valaszok": [
+    "megeszik",
+    "utaznak rajta",
+    "zenélnek vele",
+    "megisszák"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit jelent a festményeken gyakran látható, a név után írt px. rövidítés?",
+   "valaszok": [
+    "másolta",
+    "megrendelésére",
+    "tulajdona",
+    "festette"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit jelent a görög kifejezés? \"Panta rhei.\"",
+   "valaszok": [
+    "Az élet véges",
+    "Minden mozdulatlan",
+    "Minden folyik",
+    "A hatalom eltorzít"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit jelentett régen a \"remek\" kifejezés?",
+   "valaszok": [
+    "vizsgamunkát",
+    "feldolgozást",
+    "silány minőséget",
+    "olcsó hazai árut"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit neveznek a katonai nyelvben trénnek?",
+   "valaszok": [
+    "fogolyszökést",
+    "vezérkari gyűlést",
+    "kiképzőterepet",
+    "szállítóoszlopot"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit neveznek a népnyelvben csobolyónak?",
+   "valaszok": [
+    "patakocskát",
+    "ivóedényt",
+    "cserebogarat",
+    "csalánmezőt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveznek a törökök halvának?",
+   "valaszok": [
+    "egy édességfajtát",
+    "egy turbánfajtát",
+    "a szultán háremét",
+    "a török kávéházat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit szakít meg egyoldalúan az a kormány, amelyik embargót vezet be?",
+   "valaszok": [
+    "politikai kapcsolatokat",
+    "kereskedelmi kapcsolatokat",
+    "az állampogárok utazási jogát",
+    "a parlament üléseit"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit tartanak egy átalagban?",
+   "valaszok": [
+    "aprópénzt",
+    "bort",
+    "füstölt húsokat",
+    "gazdasági iratokat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit árult a milimári?",
+   "valaszok": [
+    "baromfit",
+    "tejet",
+    "szenet",
+    "kalapot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "\"Itt a kezem, nem disznóláb!\" - szól a mondás. Mit neveztek akkoriban disznólábnak?",
+   "valaszok": [
+    "fegyvert",
+    "sertéscombot",
+    "vándorbotot",
+    "kesztyűt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik a tatárlonc?",
+   "valaszok": [
+    "mongol táltos",
+    "cserjefajta",
+    "középkori fejék",
+    "ázsiai lófajta"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik lehet a japán császár megnevezése és ruhadarab neve is?",
+   "valaszok": [
+    "kendo",
+    "kimonó",
+    "mikádó",
+    "haiku"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik lehet rezonőr?",
+   "valaszok": [
+    "a kalauz régi neve",
+    "színházi szerepkör",
+    "pásztorkutya",
+    "vámhivatalnok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik a címerekkel foglalkozó történeti segédtudományt?",
+   "valaszok": [
+    "numizmatika",
+    "heraldika",
+    "paleográfia",
+    "kronológia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol beszélik a cserkesz nyelvet?",
+   "valaszok": [
+    "a Sziklás-hegységben",
+    "a Kaukázusban",
+    "az Atlasz-hegységben",
+    "az Andokban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol élnek nyelvrokonaink, a komik?",
+   "valaszok": [
+    "Finnországban",
+    "az Uráltól északnyugatra",
+    "a Kaukázusban",
+    "a Fekete-tenger partján"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik vagy mik a bodobácsok?",
+   "valaszok": [
+    "rovarok",
+    "mezei virágok",
+    "középkori céhmesterek",
+    "tetőfedők"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik voltak a kínai mandarinok?",
+   "valaszok": [
+    "hercegi utódok",
+    "hivatalnokok",
+    "katonatisztek",
+    "a díszkertek gondozói"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiket neveztek régen peregrinusnak?",
+   "valaszok": [
+    "a király jegyzőit",
+    "a papnövendékeket",
+    "a vándordiákokat",
+    "a kódexmásolókat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit vagy mit neveztek régen cenknek?",
+   "valaszok": [
+    "olcsó ércet",
+    "hitvány embert",
+    "értéktelen aprópénzt",
+    "fenyőfa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely nyelv tartozik az indoeurópai nyelvcsaládba?",
+   "valaszok": [
+    "arab",
+    "üzbég",
+    "baskir",
+    "szárd"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy finnugor nép neve?",
+   "valaszok": [
+    "szamojéd",
+    "szingaléz",
+    "alemann",
+    "méd"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik fém régies neve a cin?",
+   "valaszok": [
+    "antimon",
+    "ólom",
+    "réz",
+    "ón"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik mesterséges nyelv az alábbiak közül?",
+   "valaszok": [
+    "cserkesz",
+    "volapük",
+    "nyenyec",
+    "joruba"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem török-magyar eredetű név?",
+   "valaszok": [
+    "Zoltán",
+    "Géza",
+    "Örs",
+    "László"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik uralkodói cím egy kártyajáték elnevezése is?",
+   "valaszok": [
+    "cár",
+    "kán",
+    "fáraó",
+    "szultán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyiket nevezték a középkorban borlátónak?",
+   "valaszok": [
+    "a borkimérés ellenőrét",
+    "a kapatos lovagokat",
+    "a kocsmát",
+    "a boroshordót"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a \"buddha\" szó jelentése?",
+   "valaszok": [
+    "vágy nélküli",
+    "megvilágosodott",
+    "égi küldött",
+    "csend fia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a daktilológia?",
+   "valaszok": [
+    "ujjlenyomatok rögzítése",
+    "verselési technika",
+    "gépírás",
+    "jelbeszéd"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a kriptográfia?",
+   "valaszok": [
+    "titkosírás",
+    "sírfelirat",
+    "plakáttervezés",
+    "kórtörténet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a piszton?",
+   "valaszok": [
+    "lőfegyver",
+    "háztartási eszköz",
+    "óriáskígyó",
+    "fúvós hangszer"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a szoljanka?",
+   "valaszok": [
+    "húros hangszer",
+    "levesfajta",
+    "édesség",
+    "lengyel népi tánc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a tutyi?",
+   "valaszok": [
+    "nadrág",
+    "lábbeli",
+    "bajuszkötő",
+    "sodrófa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mikor keletkezett a magyar nyelv \"tanár\" szava?",
+   "valaszok": [
+    "a XV. században",
+    "a török hódoltság alatt",
+    "a finnugor együttéléskor",
+    "a nyelvújítás korában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen jelzővel illeti a szaknyelv az indiánok ősi művészetét?",
+   "valaszok": [
+    "prekolumbiánus",
+    "precorteziánus",
+    "preizabelliánus",
+    "prevespucciánus"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mire utal egy összetett szó esetében a lakto- előtag?",
+   "valaszok": [
+    "zsírra",
+    "tejre",
+    "cukorra",
+    "tojásra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinált, aki stencilezett?",
+   "valaszok": [
+    "dátumozott",
+    "bélyegzett",
+    "aláírt",
+    "sokszorosított"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit jelent a kifejezés: sub rosa?",
+   "valaszok": [
+    "titokban",
+    "a kerten túl, a nagyvilágban",
+    "rózsaszínben látja a világot",
+    "virágnyelven"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit jelent földrajzi neveink -grád végződése?",
+   "valaszok": [
+    "folyónál épült hely",
+    "domb, halom",
+    "sziget",
+    "vár, város"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit jelent műalkotások címében az \"hommage\" szó?",
+   "valaszok": [
+    "tiszteletadás",
+    "magasztosság",
+    "zenei átirat",
+    "harmónia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit jelentett eredetileg a miniszter szó?",
+   "valaszok": [
+    "hadvezér",
+    "szónok",
+    "kisbirtokos",
+    "szolga"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit neveznek űrbélnek?",
+   "valaszok": [
+    "űrhajók rakterét",
+    "csalánozók szervét",
+    "fekete lyukakat",
+    "madarak szervét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit tesz az, aki \"tabula rasa\"-t csinál?",
+   "valaszok": [
+    "mesét mond",
+    "tiszta lapot kezd",
+    "bosszút forral",
+    "megadja magát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit vagy kit neveztek régen bülbülnek?",
+   "valaszok": [
+    "török egyházi énekest",
+    "fertőző betegséget",
+    "rózsafajtát",
+    "csalogányt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mivel foglalkozik egy balneológus?",
+   "valaszok": [
+    "nyelvújítással",
+    "barlangokkal",
+    "cetekkel",
+    "gyógyfürdőkkel"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "\"Isa por és homu vogymuk.\"-mondja a Halotti beszéd. Mit jelentett a XII. században az \"isa\" szó?",
+   "valaszok": [
+    "lehet",
+    "hiszen",
+    "csak",
+    "bizony"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik a helytelen írásmód?",
+   "valaszok": [
+    "díszszázad",
+    "nagygyűlés",
+    "kulcscsont",
+    "észszerű"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik elválasztás helyes?",
+   "valaszok": [
+    "Sha-kes-pe-are",
+    "Sha-ke-spe-a-re",
+    "Shake-speare",
+    "Shakes-peare"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyiket nevezik gorgonzolának?",
+   "valaszok": [
+    "mitológiai szörnyet",
+    "tintahalfajt",
+    "vonós hangszert",
+    "sajtféleséget"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan írjuk helyesen nagy drámaírónk raggal ellátott nevét?",
+   "valaszok": [
+    "Madácscsal",
+    "Madáccsal",
+    "Madáchcsal",
+    "Madách-csal"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan ültették át magyar nyelvre elődeink az albán nemzeti hős, Szkander bég eredeti nevét?",
+   "valaszok": [
+    "Hodzsa János",
+    "Szkipetár Ali",
+    "Kasztrióta György",
+    "Hegyvidéki Tamás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik voltak az alánok?",
+   "valaszok": [
+    "iráni nomád nép",
+    "dél-amerikai indiánok",
+    "belső-afrikai törzs",
+    "szibériai halásznép"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik a helyes írásmód, ha a forró vizet szolgáltató csapról közlünk valamit?",
+   "valaszok": [
+    "meleg vízcsap",
+    "melegvíz-csap",
+    "melegvízcsap",
+    "melegvíz csap"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik kémiai elem neve jelenti azt, hogy \"fényt hozó\"",
+   "valaszok": [
+    "arany",
+    "foszfor",
+    "oxigén",
+    "magnézium"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik madár régies neve a filoméla?",
+   "valaszok": [
+    "galamb",
+    "gólya",
+    "csalogány",
+    "kócsag"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem holt nyelv az alábbiak közül?",
+   "valaszok": [
+    "illír",
+    "fríg",
+    "párthus",
+    "cseremisz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik női név jelentése liliom?",
+   "valaszok": [
+    "Mária",
+    "Erzsébet",
+    "Katalin",
+    "Zsuzsanna"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szó elválasztása helytelen?",
+   "valaszok": [
+    "dzsör-zé-szok-nya",
+    "bo-dza-bo-kor",
+    "fut-ball-ed-ző",
+    "be-ton-dzsun-gel"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyikről kapta nevét a kardigán?",
+   "valaszok": [
+    "egy norvég színészről",
+    "egy angol nemesről",
+    "egy skót szövetfajtáról",
+    "egy ír birkafajtáról"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a Plejádok nevű csillaghalmaz népies elnevezése?",
+   "valaszok": [
+    "Nagy Medve",
+    "Fiastyúk",
+    "Kaszáscsillag",
+    "Dél Keresztje"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a ricset?",
+   "valaszok": [
+    "babétel",
+    "nadrág",
+    "kártyajáték",
+    "rizspapír"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi az a favella?",
+   "valaszok": [
+    "kezdetleges evőeszköz",
+    "modern társastánc",
+    "mexikói étel",
+    "viskó Dél-Amerikában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi az alkörmös?",
+   "valaszok": [
+    "fenyítőeszköz",
+    "kártyajáték",
+    "növény",
+    "patkó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen eredetű a joghurt szavunk?",
+   "valaszok": [
+    "finn",
+    "török",
+    "orosz",
+    "francia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit jelent a Vosztok űrhajó neve?",
+   "valaszok": [
+    "dél",
+    "vörös",
+    "csillag",
+    "kelet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit jelent az advent szó?",
+   "valaszok": [
+    "áldozat",
+    "titok",
+    "eljövetel",
+    "feltámadás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit jelent az improptu?",
+   "valaszok": [
+    "négykezes zongorajáték",
+    "zenei rögtönzés",
+    "viharos zenei előadás",
+    "dalok gyűjteménye"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit jelent az imát lezáró \"ámen\" szó?",
+   "valaszok": [
+    "vége",
+    "az Úrhoz",
+    "mindörökké",
+    "úgy legyen"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit jelent magyarul a \"Gaudeamus\", a ballagási ének címe?",
+   "valaszok": [
+    "Keljünk útra!",
+    "Vígadjunk!",
+    "Búcsúzzunk el!",
+    "Éljünk a mának!"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveznek a Kecskemét környéki nyelvjárásban garabónak?",
+   "valaszok": [
+    "egy téli pulóvert",
+    "egy füles kosarat",
+    "a gólyát",
+    "a jól tanuló diákot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A meztelen testet ábrázoló alkotást aktnak nevezzük. Mi a jelentése az alapjául szolgáló latin szónak?",
+   "valaszok": [
+    "szépség",
+    "cselekvés",
+    "tisztaság",
+    "nyíltság"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik voltak a soltészek?",
+   "valaszok": [
+    "udvari tanítók",
+    "tehénpásztorok",
+    "falusi elöljárók",
+    "városi csavargók"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kiknek készült régen a tabulatúra?",
+   "valaszok": [
+    "építészeknek",
+    "zenészeknek",
+    "bíráknák",
+    "katonáknak"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiről vagy miről kapta nevét a mokka nevű kávéfajta?",
+   "valaszok": [
+    "etióp hegységről",
+    "jemeni kikötővárosról",
+    "arab sejkről",
+    "búr ültetvényesről"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit neveztek régen kurírnak?",
+   "valaszok": [
+    "az utcai hírlapárust",
+    "a kisbírót",
+    "a vándordalnokot",
+    "a futárt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nagy utazónk írta meg a török-tatár nyelvek etimológiai szótárát?",
+   "valaszok": [
+    "Vámbéry Ármin",
+    "Hopp Ferenc",
+    "Kőrösi Csoma Sándor",
+    "Germanus Gyula"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik nyelv módosult, önálló változata az afrikaans?",
+   "valaszok": [
+    "holland",
+    "angol",
+    "francia",
+    "német"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a szecesszió szó magyar jelentése?",
+   "valaszok": [
+    "vibráló",
+    "mozgalmas",
+    "kivonulás",
+    "nyitás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi az eszkimó szó jelentése?",
+   "valaszok": [
+    "nyershús-evő",
+    "hóban élő",
+    "jégházlakó",
+    "halra vadászó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen tulajdonságú emberre mondták Székelyföldön, hogy szigorú?",
+   "valaszok": [
+    "a mély hangúra",
+    "a kétszínűre",
+    "az elégedetlenkedőre",
+    "a véznára"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit jelent a bibliai mondás: \"Noli me tangere!\"?",
+   "valaszok": [
+    "\"Ne érints meg!\"",
+    "\"Jöjj hozzám, fiam!\"",
+    "\"Hallgass meg, Uram!\"",
+    "\"Ne szólj szám!\""
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit nevezett a népnyelv szentjánosáldásnak?",
+   "valaszok": [
+    "italozások utolsó poharát",
+    "a keresztelőt",
+    "a termés megszentelését",
+    "étkezések első falatját"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mitől írtózik az alábbiak közül az arachnofóbiában szenvedő ember?",
+   "valaszok": [
+    "a madaraktól",
+    "a magasságtól",
+    "a pókoktól",
+    "a zárt terektől"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mivel foglalkozik az, aki a manieriuzmust tanulmányozza?",
+   "valaszok": [
+    "egy festészeti technikával",
+    "pénzügyletekkel",
+    "filozófiával",
+    "egy művészeti stílussal"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik nyelv tartozik a neolatin nyelvek közé?",
+   "valaszok": [
+    "holland",
+    "breton",
+    "cseh",
+    "katalán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mely ország beszélt nyelvei: francia, volot, szerer, mandinak, diola?",
+   "valaszok": [
+    "Guinea",
+    "Szenegál",
+    "Niger",
+    "Kamerun"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik bibliai név jelentése galamb?",
+   "valaszok": [
+    "Noé",
+    "Jónás",
+    "Sára",
+    "Ráhel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik fűszernövényt nevezik csombornak?",
+   "valaszok": [
+    "a bazsalikomot",
+    "a borsikafüvet",
+    "a tárkonyt",
+    "a kaprot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik kémiai elem elnevezése nem latin eredetű földrajzi névből származik?",
+   "valaszok": [
+    "gallium",
+    "vanádium",
+    "lutécium",
+    "polónium"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a dauer szó eredeti jelentése?",
+   "valaszok": [
+    "göndör",
+    "tartósság",
+    "hullámzó",
+    "csavaros"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen eredetű szó az ombudsman?",
+   "valaszok": [
+    "angol",
+    "svéd",
+    "német",
+    "dán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek az elnevezése volt a népnyelvben a toklyó?",
+   "valaszok": [
+    "jól tojó tyúk",
+    "fiatal juh",
+    "apró bőrtáska",
+    "üstház"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit játszik az, aki iringál?",
+   "valaszok": [
+    "babázik",
+    "jégen csúszkál",
+    "hintázik",
+    "fogócskázik"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit neveztek középkori elődeink lábítónak?",
+   "valaszok": [
+    "a kengyelt",
+    "a pedált",
+    "a meztelen talpat",
+    "egy kínzóeszközt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Honnan kapta a nevét a Plantagenet angol uralkodócsalád?",
+   "valaszok": [
+    "egy bokorfajta után",
+    "egy agárfaj után",
+    "egy kurtizán neve után",
+    "egy pázsitfajta után"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki született a keresztneve jelentése szerint karácsonykor?",
+   "valaszok": [
+    "Krisztián",
+    "János",
+    "Dominika",
+    "Natália"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kit neveztek elődeink krájzlerosnak?",
+   "valaszok": [
+    "az osztrák katonát",
+    "a vándorköszörűst",
+    "a bádogost",
+    "a szatócsot"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a szputnyik szó magyar megfelelője?",
+   "valaszok": [
+    "üstökös",
+    "útitárs",
+    "rakéta",
+    "gömb"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miről kapta a nevét a rottweiler kutyafajta?",
+   "valaszok": [
+    "egy juhfajtáról",
+    "egy színről",
+    "egy város nevéről",
+    "egy tenyésztő nevéről"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit jelent magyarul Costa Rica neve?",
+   "valaszok": [
+    "jó szerencse",
+    "gazdag tengerpart",
+    "vastag föld",
+    "bővízű folyó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit jelentett az ókori görögöknél a sztoikus filozófiai irányzatnak nevet adó sztoa?",
+   "valaszok": [
+    "vásárteret",
+    "nyitott folyosót",
+    "hadi taktikát",
+    "az istenek lakomáját"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit jelent eredeti értelmében a negédes szó?",
+   "valaszok": [
+    "finom",
+    "büszke",
+    "gyáva",
+    "ravasz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit jelent magyarul a még ma is létező mohikán törzs neve?",
+   "valaszok": [
+    "a bölény fia",
+    "sebes ló",
+    "medve",
+    "farkas"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik növényt nevezték hazánkban törökborsnak?",
+   "valaszok": [
+    "a fehér borsot",
+    "a mustárt",
+    "a paprikát",
+    "a tormát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit neveztek Erdélyben kenéznek?",
+   "valaszok": [
+    "a falu bíráját",
+    "a falu papját",
+    "a falu tanítóját",
+    "a falu csendőrét"
+   ],
+   "helyes": 0
+  }
+ ]
+}

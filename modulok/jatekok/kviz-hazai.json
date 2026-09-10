@@ -1,0 +1,1598 @@
+{
+ "id": "kviz-hazai",
+ "nev": "Magyarország — további kérdések",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "Milyen \"barát\" a badacsonyi borvidék híres borfajtája?",
+   "valaszok": [
+    "fele",
+    "jó",
+    "kebel",
+    "szürke"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol nem áll középkori vár?",
+   "valaszok": [
+    "Diósgyőr",
+    "Sümeg",
+    "Veszprém",
+    "Mezőhegyes"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol áll a kilenclyukú híd?",
+   "valaszok": [
+    "Szegeden",
+    "Bugacpusztán",
+    "Tokajban",
+    "a Hortobágyon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik budapesti hegyen található a Citadella?",
+   "valaszok": [
+    "Gellért-hegy",
+    "János-hegy",
+    "Széchenyi-hegy",
+    "Várhegy"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik egy nagy múltú fürdőváros az alábbiak közül?",
+   "valaszok": [
+    "Dorog",
+    "Harkány",
+    "Monor",
+    "Pomáz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik várost köti össze Budapesttel az M5-ös autópálya?",
+   "valaszok": [
+    "Kecskemét",
+    "Győr",
+    "Székesfehérvár",
+    "Komárom"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városunkban látogatható meg a Zrínyi Miklós Vármúzeum?",
+   "valaszok": [
+    "Eger",
+    "Kőszeg",
+    "Szigetvár",
+    "Nagyvázsony"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunkban található atomerőmű?",
+   "valaszok": [
+    "Dunaújvárosban",
+    "Ózdon",
+    "Pakson",
+    "Százhalombattán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi Aggtelek nevezetessége?",
+   "valaszok": [
+    "barokk kastély",
+    "kelta sírok",
+    "vízesés",
+    "cseppkőbarlang"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a híres budapesti épület neve: \"Gül Baba …\"",
+   "valaszok": [
+    "turbánja",
+    "türbéje",
+    "kaftánja",
+    "bülbülje"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen gyáráról nevezetes Herend?",
+   "valaszok": [
+    "papír",
+    "porcelán",
+    "bútor",
+    "konzerv"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol láthatjuk a rianásnak nevezett természeti jelenséget?",
+   "valaszok": [
+    "a Hortobágyon",
+    "a Balatonon",
+    "a Mátrában",
+    "a Duna-kanyarban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol látható római kori amfiteátrum romjai Budapesten?",
+   "valaszok": [
+    "Óbudán",
+    "Városligetben",
+    "Margitszigeten",
+    "Gellérthegyen"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a nevét viseli egyetem Budapesten?",
+   "valaszok": [
+    "Eötvös Loránd",
+    "Szilárd Leó",
+    "Teller Ede",
+    "Jedlik Ányos"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik híd budai oldalán áll a 0. kilométerkő?",
+   "valaszok": [
+    "Margit híd",
+    "Erzsébet híd",
+    "Lánchíd",
+    "Szabadság híd"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem egy budapesti híd neve?",
+   "valaszok": [
+    "Erzsébet",
+    "Margit",
+    "Árpád",
+    "Mária Valéria"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városunk határában található a Lővérek nevű hegyvidéki üdülőövezet?",
+   "valaszok": [
+    "Eger",
+    "Pécs",
+    "Sopron",
+    "Veszprém"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunk jelképe a Tűztorony?",
+   "valaszok": [
+    "Eger",
+    "Tata",
+    "Sopron",
+    "Kőszeg"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunkban rendezik februárban a busójárást?",
+   "valaszok": [
+    "Mohácson",
+    "Szigetváron",
+    "Baján",
+    "Pécsett"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városunkban tekinthető meg a Dobó István Vármúzeum?",
+   "valaszok": [
+    "Szigetváron",
+    "Veszprémben",
+    "Komáromban",
+    "Egerben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a neve a Balatonnál található megkövesedett kagylónak?",
+   "valaszok": [
+    "macskaköröm",
+    "varjúköröm",
+    "oroszlánköröm",
+    "kecskeköröm"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a neve a Kapolcs nevéhez kötődő nyári kulturális fesztiválnak?",
+   "valaszok": [
+    "Művészetek Völgye",
+    "Művészetek Hegye",
+    "Művészetek Dombja",
+    "Művészetek Mezeje"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen jármű nem közlekedik Szegeden?",
+   "valaszok": [
+    "villamos",
+    "trolibusz",
+    "autóbusz",
+    "földalatti vasút"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állatokról nevezetes Alag község?",
+   "valaszok": [
+    "versenylovakról",
+    "ott-telelő gólyákról",
+    "hattyúkról",
+    "birkaterelő malacokról"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A felsorolt városok közül melyikben található a Fellegvár?",
+   "valaszok": [
+    "Esztergomban",
+    "Székesfehérvárott",
+    "Győrött",
+    "Visegrádon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Budapest mely részén található a Magyar Mezőgazdasági Múzeum?",
+   "valaszok": [
+    "Városligetben",
+    "Budavári Palotában",
+    "Tabánban",
+    "Margitszigeten"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol tekinthető meg a Feszty-körkép?",
+   "valaszok": [
+    "Székesfehérvár",
+    "Pannonhalma",
+    "Somogyvár",
+    "Ópusztaszer"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a tervei szerint készült az első hazai villamosított vasútvonal?",
+   "valaszok": [
+    "Kandó Kálmán",
+    "Ganz Ábrahám",
+    "Bánki Donát",
+    "Jedlik Ányos"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mely népcsoport művészeti értékeit őrzi Hollókő?",
+   "valaszok": [
+    "vend",
+    "bunyevác",
+    "sokác",
+    "palóc"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mely település nevezetessége a Rákóczi-vár?",
+   "valaszok": [
+    "Eperjes",
+    "Sárospatak",
+    "Késmárk",
+    "Bártfa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely városunk nagy részét pusztította el árvíz 1879-ben?",
+   "valaszok": [
+    "Győr",
+    "Szeged",
+    "Mohács",
+    "Szolnok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik Balaton-parti településen látogatható meg a József Attila Emlékmúzeum?",
+   "valaszok": [
+    "Siófok",
+    "Balatonszárszó",
+    "Balatonfüred",
+    "Balatonszemes"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik folyónkon épült a kiskörei vízlépcső?",
+   "valaszok": [
+    "Duna",
+    "Bodrog",
+    "Tisza",
+    "Sajó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar városban található a Savaria Múzeum?",
+   "valaszok": [
+    "Szombathely",
+    "Sopron",
+    "Székesfehérvár",
+    "Pécs"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik magyar várost nevezik a \"vizek városának\"?",
+   "valaszok": [
+    "Siófok",
+    "Tata",
+    "Szeged",
+    "Debrecen"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mai állam területén látható Munkács vára?",
+   "valaszok": [
+    "Ukrajna",
+    "Szlovákia",
+    "Horvátország",
+    "Románia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik megyénkben található Göcsej nevű tájegység?",
+   "valaszok": [
+    "Bács-Kiskun",
+    "Somogy",
+    "Zala",
+    "Békés"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik megyénkben található a Gerecsei Tájvédelmi Körzet?",
+   "valaszok": [
+    "Csongrád",
+    "Heves",
+    "Komárom-Esztergom",
+    "Zala"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik megyénkben található a Hortobágyi Nemzeti Park?",
+   "valaszok": [
+    "Jász-Nagykun-Szolnok",
+    "Borsod-Abaúj-Zemplén",
+    "Hajdú-Bihar",
+    "Csongrád"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik megyénkben található a hagymájáról híres Makó városa?",
+   "valaszok": [
+    "Heves",
+    "Bács-Kiskun",
+    "Csongrád",
+    "Hajdú-Bihar"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem határváros az alábbiak közül?",
+   "valaszok": [
+    "Sátoraljaújhely",
+    "Balassagyarmat",
+    "Püspökladány",
+    "Szentgotthárd"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik településünket nevezik a Hűség városának?",
+   "valaszok": [
+    "Kőszeg",
+    "Sopron",
+    "Székesfehérvár",
+    "Esztergom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város nem a 4-es főút mentén fekszik?",
+   "valaszok": [
+    "Paks",
+    "Karcag",
+    "Cegléd",
+    "Püspökladány"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városhoz tartozik a borospincéiről nevezetes Szépasszony-völgy?",
+   "valaszok": [
+    "Tokaj",
+    "Sopron",
+    "Villány",
+    "Eger"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik várost hívták az 50-es években Sztálinvárosnak?",
+   "valaszok": [
+    "Tiszaújváros",
+    "Balmazújváros",
+    "Sátoraljaújhely",
+    "Dunaújváros"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városunkban tekinthető meg a Gárdonyi Géza Emlékmúzeum?",
+   "valaszok": [
+    "Kőszeg",
+    "Eger",
+    "Szigetvár",
+    "Komárom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városunkban van a Storno-ház?",
+   "valaszok": [
+    "Sopronban",
+    "Kőszegen",
+    "Veszprémben",
+    "Tatán"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városunkban van állatkert?",
+   "valaszok": [
+    "Eger",
+    "Siófok",
+    "Pápa",
+    "Veszprém"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi tette világhírűvé Kiskunhalast?",
+   "valaszok": [
+    "porcelángyártás",
+    "csipkekészítés",
+    "lótenyésztés",
+    "kékfestés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt Fertőd korábbi neve?",
+   "valaszok": [
+    "Eszterháza",
+    "Széchénylaka",
+    "Rákócziváralja",
+    "Bethlenfalva"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen \"völgy\" az Eger melletti, borospincéiről nevezetes völgy?",
+   "valaszok": [
+    "Jóasszony",
+    "Kisasszony",
+    "Szépasszony",
+    "Komámasszony"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miről nevezetes Alcsútdoboz?",
+   "valaszok": [
+    "középkori téglaváráról",
+    "dzsámijáról",
+    "skanzenjéről",
+    "arborétumáról"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Miről nevezetes Csopak?",
+   "valaszok": [
+    "boráról",
+    "méneséről",
+    "gulyájáról",
+    "virágkertészetéről"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol látható hazánkban a Nemzeti Történelmi Emlékpark?",
+   "valaszok": [
+    "Ópusztaszer",
+    "Székesfehérvár",
+    "Somogyvár",
+    "Esztergom"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol látogatható barlangfürdő?",
+   "valaszok": [
+    "Bicskén",
+    "Miskolctapolcán",
+    "Bátonyterenyén",
+    "Füzesabonyban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol tekinthető meg a Bocskai István Múzeum?",
+   "valaszok": [
+    "Szolnokon",
+    "Hajdúszoboszlón",
+    "Kaposváron",
+    "Veszprémben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol tekinthető meg a Lehel kürtjeként ismert régészeti lelet?",
+   "valaszok": [
+    "Veszprémben",
+    "Jászberényben",
+    "Debrecenben",
+    "Sopronban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely városban volt szovjet katonai reptér az alábbiak közül?",
+   "valaszok": [
+    "Gyömrő",
+    "Tököl",
+    "Gödöllő",
+    "Dömsöd"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik borvidékünk lett a világörökség része 2002-ben?",
+   "valaszok": [
+    "Tokaj-hegyalja",
+    "badacsonyi",
+    "siklósi",
+    "szekszárdi"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik falunkat nyilvánították a világörökség részének?",
+   "valaszok": [
+    "Hollóháza",
+    "Szirák",
+    "Hollókő",
+    "Buják"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik fővárosi intézmény létesült Xantus János kezdeményezésére?",
+   "valaszok": [
+    "Állat- és Növénykert",
+    "Fűvészkert",
+    "Nemzeti Múzeum",
+    "Magyar Tudományos Akadémia"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik megyénkben található a vácrátóti botanikus kert?",
+   "valaszok": [
+    "Nógrád",
+    "Fejér",
+    "Pest",
+    "Komárom-Esztergom"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik megyével nem határos Nógrád megye?",
+   "valaszok": [
+    "Szabolcs-Szatmár-Bereg",
+    "Borsod-Abaúj-Zemplén",
+    "Heves",
+    "Pest"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik nem határállomás az alábbi települések közül?",
+   "valaszok": [
+    "Rajka",
+    "Rédics",
+    "Röszke",
+    "Ráckeve"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik település nevezetes csokigyáráról?",
+   "valaszok": [
+    "Orosháza",
+    "Herend",
+    "Szerencs",
+    "Karcag"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik település nevét viselte egy 1896-ban alapított művésztelep?",
+   "valaszok": [
+    "Rudabánya",
+    "Besztercebánya",
+    "Tatabánya",
+    "Nagybánya"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik településünkön látható a Salamon-torony?",
+   "valaszok": [
+    "Esztergomban",
+    "Nagyvázsonyban",
+    "Visegrádon",
+    "Egerben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik török személyiség után nem maradt fenn építészeti emlék Pécsett?",
+   "valaszok": [
+    "Gázi Kászim pasa",
+    "Jakováli Hasszán pasa",
+    "Memi pasa",
+    "Gül baba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városunk nevezetessége a református Nagytemplom?",
+   "valaszok": [
+    "Miskolc",
+    "Kecskemét",
+    "Szeged",
+    "Debrecen"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városunkban látogatható a Fűszerpaprika Múzeum?",
+   "valaszok": [
+    "Szegeden",
+    "Makón",
+    "Kalocsán",
+    "Gyulán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunkban látogatható a Szent István Király Múzeum?",
+   "valaszok": [
+    "Budapest",
+    "Esztergom",
+    "Székesfehérvár",
+    "Veszprém"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunkban van a Keresztény Múzeum?",
+   "valaszok": [
+    "Székesfehérvár",
+    "Visegrád",
+    "Esztergom",
+    "Pécs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyikről nevezetes Zirc?",
+   "valaszok": [
+    "arborétumáról",
+    "dzsámijáról",
+    "római kori palotaromjáról",
+    "várszínházáról"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbi helyek közül hol található Kocsimúzeum?",
+   "valaszok": [
+    "Hollókő",
+    "Parád",
+    "Herend",
+    "Mezőkövesd"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol látogathatjuk meg Magyarországon a Kovács Margit Múzeumot?",
+   "valaszok": [
+    "Kaposváron",
+    "Pécsett",
+    "Pápán",
+    "Szentendrén"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol található Magyarországon a Brunszvik-kastély?",
+   "valaszok": [
+    "Sátoraljaújhelyen",
+    "Szirákon",
+    "Aszódon",
+    "Martonvásáron"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol volt eredetileg a budapesti fogaskerekű végállomása?",
+   "valaszok": [
+    "Hármashatár-hegyen",
+    "Sváb-hegyen",
+    "János-hegyen",
+    "Gellért-hegyen"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiről kapta nevét a szarvasi székhelyű főiskola?",
+   "valaszok": [
+    "Tessedik Sámuelről",
+    "Hermann Ottóról",
+    "Apáczai Csere Jánosról",
+    "Kőrösi Csoma Sándorról"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik főúri család építtetett kastélyt Gödöllőn?",
+   "valaszok": [
+    "Esterházy",
+    "Grassalkovich",
+    "Festetics",
+    "Széchenyi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik magyar városban található a Rippl-Rónai Múzeum?",
+   "valaszok": [
+    "Zalaegerszeg",
+    "Kaposvár",
+    "Pécs",
+    "Szeged"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik magyar várost nevezik \"kálvinista Rómának\"?",
+   "valaszok": [
+    "Szegedet",
+    "Sárospatakot",
+    "Pápát",
+    "Debrecent"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik megyénkben fekszik a népművészetéről híres Matyóföld?",
+   "valaszok": [
+    "Nógrád",
+    "Somogy",
+    "Vas",
+    "Borsod-Abaúj-Zemplén"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik megyénkben található Nagykanizsa?",
+   "valaszok": [
+    "Zala",
+    "Baranya",
+    "Somogy",
+    "Vas"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik megyénkben található Szentes városa?",
+   "valaszok": [
+    "Békés",
+    "Heves",
+    "Csongrád",
+    "Tolna"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik megyénkben található a nagycenki Széchenyi-kastély?",
+   "valaszok": [
+    "Fejér",
+    "Vas",
+    "Győr-Moson-Sopron",
+    "Komárom-Esztergom"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik neves család épített kastélyt Fertődön?",
+   "valaszok": [
+    "Batthyány",
+    "Széchenyi",
+    "Esterházy",
+    "Rákóczi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város nem érseki székhely?",
+   "valaszok": [
+    "Eger",
+    "Veszprém",
+    "Esztergom",
+    "Kalocsa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városunkban látogatható a Keresztény Múzeum?",
+   "valaszok": [
+    "Eger",
+    "Pécs",
+    "Debrecen",
+    "Esztergom"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városunkban látogatható meg a Balassi Bálint Múzeum?",
+   "valaszok": [
+    "Esztergomban",
+    "Tatán",
+    "Egerben",
+    "Győrött"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városunkban látogatható meg a Matyó Múzeum?",
+   "valaszok": [
+    "Mezőkövesd",
+    "Hódmezővásárhely",
+    "Hollókő",
+    "Kapuvár"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városunkban áll a Jókai-villa?",
+   "valaszok": [
+    "Keszthely",
+    "Siófok",
+    "Balatonfüred",
+    "Fonyód"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt az első balatoni gőzhajó neve?",
+   "valaszok": [
+    "Martinovics",
+    "Búvár Kund",
+    "Széchenyi",
+    "Kisfaludy"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mikor építették a budai Várhegy alatti alagutat?",
+   "valaszok": [
+    "az 1850-es években",
+    "az 1890-es években",
+    "az 1920-as években",
+    "az 1960-as években"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol látható a Kámoni arborétum?",
+   "valaszok": [
+    "Szombathelyen",
+    "Vácrátóton",
+    "Szarvason",
+    "Sopronban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol található a \"Pepi-kert\" nevű arborétum?",
+   "valaszok": [
+    "Zircen",
+    "Vácott",
+    "Debrecenben",
+    "Szarvason"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol van hazánkban a lipicai lófajta tenyésztésének központja?",
+   "valaszok": [
+    "Parádon",
+    "Szilvásváradon",
+    "Mezőkövesden",
+    "Mátrafüreden"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol áll az egykori Sándor palota?",
+   "valaszok": [
+    "a visegrádi várban",
+    "a budai Várhegyen",
+    "az egri várban",
+    "a siklósi várban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki alapított egyetemet Nagyszombatban 1635-ben?",
+   "valaszok": [
+    "Zrínyi Miklós",
+    "Heltai Gáspár",
+    "Pázmány Péter",
+    "Károli Gáspár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik lakják Mezőkövesdet a néprajzi elnevezés szerint?",
+   "valaszok": [
+    "sokácok",
+    "böszörmények",
+    "matyók",
+    "rutének"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek az emlékmúzeumát látogathatjuk meg Széphalmon?",
+   "valaszok": [
+    "Honthy Hanna",
+    "Kossuth Lajos",
+    "Kazinczy Ferenc",
+    "Stróbl Alajos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik balatoni város nevezetessége a Tagore-emlékfa?",
+   "valaszok": [
+    "Tihany",
+    "Siófok",
+    "Keszthely",
+    "Balatonfüred"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik magyar városban található a Déri Múzeum?",
+   "valaszok": [
+    "Szolnokon",
+    "Békéscsabán",
+    "Debrecenben",
+    "Miskolcon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyarországi népcsoporthoz köthető a busójárás?",
+   "valaszok": [
+    "vendek",
+    "sokácok",
+    "ruszinok",
+    "palócok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik megyénkben látogatható meg az alcsúti arborétum?",
+   "valaszok": [
+    "Fejér",
+    "Nógrád",
+    "Somogy",
+    "Pest"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik megyénkben található a tavasbarlangjáról híres Tapolca?",
+   "valaszok": [
+    "Veszprém",
+    "Somogy",
+    "Nógrád",
+    "Baranya"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik nemzeti parkunkban található a bugaci puszta?",
+   "valaszok": [
+    "Hortobágyi Nemzeti Park",
+    "Körös-Maros Nemzeti Park",
+    "Kiskunsági Nemzeti Park",
+    "Duna-Dráva Nemzeti Park"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunk nevezetessége a reneszánsz stílusú Bakócz-kápolna?",
+   "valaszok": [
+    "Eger",
+    "Esztergom",
+    "Visegrád",
+    "Székesfehérvár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városunkban látogatható meg a Móra Ferenc Múzeum?",
+   "valaszok": [
+    "Győr",
+    "Eger",
+    "Szeged",
+    "Pécs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunkban látogatható meg az Erkel Múzeum?",
+   "valaszok": [
+    "Szeged",
+    "Pápa",
+    "Sopron",
+    "Gyula"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városunkban található a Jurisics Miklós Múzeum?",
+   "valaszok": [
+    "Eger",
+    "Sopron",
+    "Székesfehérvár",
+    "Kőszeg"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városunkban található a királysírokat rejtő középkori Romkert?",
+   "valaszok": [
+    "Esztergom",
+    "Pécs",
+    "Székesfehérvár",
+    "Szombathely"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunkban van a Szórakaténusz Játékmúzeum?",
+   "valaszok": [
+    "Kecskeméten",
+    "Szegeden",
+    "Debrecenben",
+    "Egerben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városunkban épült vár az Öreg-tó partján?",
+   "valaszok": [
+    "Tata",
+    "Sárospatak",
+    "Siklós",
+    "Eger"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol látható Magyarországon barokk kőhíd?",
+   "valaszok": [
+    "Egerben",
+    "Kalocsán",
+    "Szentendrén",
+    "Vácott"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol található II. Szulejmán szultán dzsámija?",
+   "valaszok": [
+    "Pécsett",
+    "Siklóson",
+    "Szigetváron",
+    "Pécsváradon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol található Magyarországon Kékfestő Múzeum?",
+   "valaszok": [
+    "Sümeg",
+    "Veszprém",
+    "Pápa",
+    "Zirc"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol található Magyarországon a Mátra Múzeum?",
+   "valaszok": [
+    "Parádon",
+    "Egerben",
+    "Gyöngyösön",
+    "Mátrafüreden"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol található Magyarországon a Tessedik Sámuel Múzeum?",
+   "valaszok": [
+    "Mezőkövesden",
+    "Szarvason",
+    "Sárospatakon",
+    "Őriszentpéteren"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol van a Művészetek völgyéről híressé vált Kapolcs?",
+   "valaszok": [
+    "Alpokalja",
+    "Balaton-felvidék",
+    "Villányi-hegység",
+    "Dunakanyar"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol él jelentősebb számban Magyarországon a bunyevác népcsoport?",
+   "valaszok": [
+    "Miskolc környékén",
+    "Sopron környékén",
+    "Baja környékén",
+    "Gyula környékén"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar városban harangoznak 11 órakor is?",
+   "valaszok": [
+    "Szombathelyen",
+    "Győrben",
+    "Sopronban",
+    "Kőszegen"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik magyar várost nevezték \"Bodrog-parti Athén\"-nak?",
+   "valaszok": [
+    "Tokaj",
+    "Sátoraljaújhely",
+    "Sárospatak",
+    "Tolcsva"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik megyénkben láthatók a sümegi vár romjai?",
+   "valaszok": [
+    "Veszprém",
+    "Fejér",
+    "Komárom-Esztergom",
+    "Győr-Moson-Sopron"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik megyénkben található a tatárjárás kori csatájáról nevezetes Muhi község?",
+   "valaszok": [
+    "Baranya",
+    "Borsod-Abaúj-Zemplén",
+    "Csongrád",
+    "Hajdú-Bihar"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik megyénkben található az 1705-ös országgyűlésről nevezetes Szécsény városa?",
+   "valaszok": [
+    "Szabolcs-Szatmár-Bereg",
+    "Nógrád",
+    "Hajdú-Bihar",
+    "Borsod-Abaúj-Zemplén"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik múzeum nem Pécsett látogatható?",
+   "valaszok": [
+    "Amerigo Tot Múzeum",
+    "Csontváry Múzeum",
+    "Ferenczy Múzeum",
+    "Zsolnai Múzeum"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szerzetesrend tulajdonában van a pannonhalmi apátság?",
+   "valaszok": [
+    "domonkos",
+    "bencés",
+    "pálos",
+    "ferences"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik településünkön őrzik a tihanyi apátság alapítólevelének eredeti példányát?",
+   "valaszok": [
+    "Győr",
+    "Pannonhalma",
+    "Tihany",
+    "Esztergom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik uralkodónk nevét viselte a budapesti Szabadság híd?",
+   "valaszok": [
+    "Mária Terézia",
+    "Mátyás király",
+    "Ferenc József",
+    "Könyves Kálmán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik várost nevezték a századfordulón \"Körös-parti Párizsnak\"?",
+   "valaszok": [
+    "Gyula",
+    "Nagybánya",
+    "Nagyvárad",
+    "Békéscsaba"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunkban látható Szent László hermája?",
+   "valaszok": [
+    "Budapesten",
+    "Székesfehérváron",
+    "Győrben",
+    "Esztergomban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunkban látható a Gizella-kápolna?",
+   "valaszok": [
+    "Veszprémben",
+    "Székesfehérvárott",
+    "Győrben",
+    "Egerben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városunkban található a Csontváry Múzeum?",
+   "valaszok": [
+    "Szentendrén",
+    "Pécsett",
+    "Szombathelyen",
+    "Győrött"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mikor vezették be Magyarországon a polgári esküvőt?",
+   "valaszok": [
+    "1736-ban",
+    "1848-ban",
+    "1894-ben",
+    "1947-ben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol található Magyarországon lámpamúzeum?",
+   "valaszok": [
+    "Mór",
+    "Tata",
+    "Zsámbék",
+    "Sopron"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol található a Balaton Múzeum?",
+   "valaszok": [
+    "Keszthely",
+    "Siófok",
+    "Balatonfüred",
+    "Fonyód"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol van a Szent István Egyetem székhelye?",
+   "valaszok": [
+    "Pécsett",
+    "Gödöllőn",
+    "Debrecenben",
+    "Szegeden"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hányan laktak megközelítőleg Budapesten 1873-ban a városrészek egyesítésekor?",
+   "valaszok": [
+    "ötvenezren",
+    "háromszázezren",
+    "nyolcszázezren",
+    "egymillióan"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki az a nyelvész, akiről szülővárosában, Zircen könyvtárat és múzeumot neveztek el?",
+   "valaszok": [
+    "Budenz József",
+    "Reguly Antal",
+    "Sajnovics János",
+    "Gyarmathi Sámuel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik Pest megye legnépesebb városa?",
+   "valaszok": [
+    "Vác",
+    "Szentendre",
+    "Érd",
+    "Cegléd"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város bábszínháza a híres Harlekin Bábszínház?",
+   "valaszok": [
+    "Eger",
+    "Győr",
+    "Sopron",
+    "Pécs"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városunkban látható a Ferenczy-művészcsalád múzeuma?",
+   "valaszok": [
+    "Vácott",
+    "Győrött",
+    "Szentendrén",
+    "Pécsett"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunkban található a Fabricius-ház?",
+   "valaszok": [
+    "Sopron",
+    "Székesfehérvár",
+    "Eger",
+    "Pécs"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városunkban tekinthető meg a Palóc Múzeum?",
+   "valaszok": [
+    "Salgótarjánban",
+    "Egerben",
+    "Balassagyarmaton",
+    "Pásztón"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunkban áll a Gályarabok Emlékoszlopa?",
+   "valaszok": [
+    "Veszprém",
+    "Mohács",
+    "Szigetvár",
+    "Debrecen"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik várunkban látható a Vöröstorony?",
+   "valaszok": [
+    "a sárospataki várban",
+    "a siklósi várban",
+    "az egri várban",
+    "a budai várban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mit hozott létre Tessedik Sámuel Szarvason?",
+   "valaszok": [
+    "vadrezervátumot",
+    "tanítóképző egyetemet",
+    "dohánygyárat",
+    "mezőgazdasági iskolát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol látogathatjuk meg neves festőnk, Szőnyi Sándor emlékmúzeumát?",
+   "valaszok": [
+    "Nagymaroson",
+    "Visegrádon",
+    "Zebegényben",
+    "Dömösön"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol létesítettek Magyarországon medvemenhelyet?",
+   "valaszok": [
+    "Karcagon",
+    "Kisújszálláson",
+    "Veresegyházon",
+    "Szabadszálláson"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hegységünkben látható Boldogkő vára?",
+   "valaszok": [
+    "a Mecsekben",
+    "a Bakonyban",
+    "a Cserhátban",
+    "a Zempléni-hegységben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik terület lett a világörökség része 2001-ben?",
+   "valaszok": [
+    "a Kis-Balaton",
+    "a Fertő-tó",
+    "az egri borvidék",
+    "az Őrség"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város gyógyfürdője Zsórifürdő?",
+   "valaszok": [
+    "Mezőkövesd",
+    "Eger",
+    "Kecskemét",
+    "Szolnok"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városunkban látogatható a Türr István Múzeum?",
+   "valaszok": [
+    "Hatvan",
+    "Tata",
+    "Baja",
+    "Nagykanizsa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunkban látogatható meg a Bakonyi Természettudományi Múzeum?",
+   "valaszok": [
+    "Pápa",
+    "Bakonybél",
+    "Zirc",
+    "Veszprém"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városunkban tanított Comenius, a híres pedagógus?",
+   "valaszok": [
+    "Debrecen",
+    "Sárospatak",
+    "Pécs",
+    "Pápa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen intézményt nyitott Teleki Blanka Pesten?",
+   "valaszok": [
+    "leánynevelő intézetet",
+    "kórházat",
+    "óvodát",
+    "közkönyvtárat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hazánk melyik nevezetes könyvtárterme található a Szent Márton-hegyen lévő kolostorban?",
+   "valaszok": [
+    "a pécsváradi apátságé",
+    "a bakonybéli apátságé",
+    "a pannonhalmi apátságé",
+    "a zalavári apátságé"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar város nevezetessége a Munkácsy Múzeum?",
+   "valaszok": [
+    "Szeged",
+    "Sopron",
+    "Békéscsaba",
+    "Veszprém"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen építészeti emlék áll Zsurkon és Nyírbátorban is?",
+   "valaszok": [
+    "gótikus templomrom",
+    "honfoglalás kori földvár",
+    "csónak alakú fejfa",
+    "fa harangtorony"
+   ],
+   "helyes": 3
+  }
+ ]
+}

@@ -1,0 +1,1228 @@
+{
+ "id": "kviz-gyerek",
+ "nev": "Gyerekeknek",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "Hogy hívják a 102 kiskutya című film gonosz főhősnőjét?",
+   "valaszok": [
+    "Szörnyella De Frász",
+    "Madame Sin Tér",
+    "Bundás Berta",
+    "Könyörtelen Klára"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan folytatódik a mondás? \"Madarat tolláról, …\"",
+   "valaszok": [
+    "medvét bundájáról",
+    "cápát uszonyáról",
+    "embert barátjáról",
+    "marslakót csészealjáról"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem volt a Hófehérke és a hét törpe című Disney-rajzfilm törpéje?",
+   "valaszok": [
+    "Kuka",
+    "Szende",
+    "Korgó",
+    "Morgó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a megszólításán gondolkodott Petőfi egész úton hazafelé a vers szerint?",
+   "valaszok": [
+    "apja",
+    "anyja",
+    "öccse",
+    "a szomszéd kislány"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egy péksütemény neve?",
+   "valaszok": [
+    "mákos szatyor",
+    "diós cekker",
+    "almás bőrönd",
+    "túrós táska"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állat lehet csörgő?",
+   "valaszok": [
+    "gőte",
+    "polip",
+    "teknős",
+    "kígyó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi történik a szólás szerint, ha nincs otthon a macska?",
+   "valaszok": [
+    "cincognak az egerek",
+    "csiripelnek a verebek",
+    "kihűl a forró kása",
+    "ásítozik a kutya"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen \"gyűrűk\" láthatóak egy fatörzs keresztmetszetén?",
+   "valaszok": [
+    "perc",
+    "hónap",
+    "év",
+    "arany"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen háztartási eszköz a mesebeli boszorkányok közlekedési eszköze?",
+   "valaszok": [
+    "sodrófa",
+    "seprű",
+    "palacsintasütő",
+    "hólapát"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen lábon forgó kastélyok szerepelnek a mesékben?",
+   "valaszok": [
+    "kacsa",
+    "pulyka",
+    "tyúk",
+    "egér"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen mesebeli lény a bábfilmhős Süsü?",
+   "valaszok": [
+    "kobold",
+    "sárkány",
+    "dagadt madár",
+    "radírpók"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mitől nő meg a rajzfilmhős Popeye ereje?",
+   "valaszok": [
+    "tökfőzeléktől",
+    "sóskától",
+    "spenóttól",
+    "vaddisznósülttől"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy nagy termetű mentőkutya neve?",
+   "valaszok": [
+    "budavári",
+    "csíkpataki",
+    "szalajkavölgyi",
+    "bernáthegyi"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Fekete István melyik regényéből készült egész estés rajzfilm?",
+   "valaszok": [
+    "Csí",
+    "Vuk",
+    "Kele",
+    "Hú"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan folytatódik Weöres Sándor verse? \"Csiribiri csiribiri …\"",
+   "valaszok": [
+    "zabszalma",
+    "babszéna",
+    "vadmálna",
+    "zöldsóska"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik Disney-rajzfilm címszereplője őz?",
+   "valaszok": [
+    "Bambi",
+    "Dumbo",
+    "Pongó",
+    "Goofy"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik kifejezést használják a malom nevű játékban?",
+   "valaszok": [
+    "tingli-tangli",
+    "csiga-biga",
+    "csiki-csuki",
+    "ipi-apacs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik uralkodói cím egyezik meg a francia kártya egyik lapjának nevével?",
+   "valaszok": [
+    "cár",
+    "király",
+    "szultán",
+    "fáraó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik égitesten járt már ember?",
+   "valaszok": [
+    "a Marson",
+    "a Vénuszon",
+    "a Jupiteren",
+    "a Holdon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a neve a legismertebb magyar mentőkutyának?",
+   "valaszok": [
+    "Morzsa",
+    "Mancs",
+    "Bogáncs",
+    "Bubi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mije volt Mosó Masának a gyerekkönyv címében?",
+   "valaszok": [
+    "mosodája",
+    "mosógépe",
+    "mosogatórongya",
+    "mosolya"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen ember az, aki hórihorgas?",
+   "valaszok": [
+    "duci",
+    "magas",
+    "alacsony",
+    "púpos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mire használják a sodrófát?",
+   "valaszok": [
+    "tészta nyújtásához",
+    "házépítéshez",
+    "ruha mosásához",
+    "pipagyújtáshoz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miért kell kijönnie a tubarózsának a \"Cifra palota\" kezdetű gyerekdalban?",
+   "valaszok": [
+    "mert süt a nap",
+    "mert kívül tágasabb",
+    "mert várja a viola",
+    "mert megjött a postás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A kőszívű ember milyen családtagjai szerepelnek a Jókai-regény címében?",
+   "valaszok": [
+    "leányai",
+    "fiai",
+    "feleségei",
+    "ükunokái"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik nem egy halmazállapot megjelölése?",
+   "valaszok": [
+    "cseppfolyós",
+    "színtelen",
+    "légnemű",
+    "szilárd"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Egészítse ki a közmondást! \"Amit ma megtehetsz, ...\"",
+   "valaszok": [
+    "gondold át még egyszer!",
+    "ne kapkodd el!",
+    "ne halaszd holnapra!",
+    "holnap megteheti más"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan nevezik az egyszer elindított, örökké mozgó gépet?",
+   "valaszok": [
+    "exkavátor",
+    "perpetuum mobile",
+    "persona non grata",
+    "aggregátor"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem Balaton-parti település az alábbiak közül?",
+   "valaszok": [
+    "Zamárdi",
+    "Gárdony",
+    "Zánka",
+    "Tihany"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban ragadta magához a hatalmat Bonaparte Napóleon 1799-ben?",
+   "valaszok": [
+    "Angliában",
+    "Olaszországban",
+    "Franciaországban",
+    "Németországban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állat nevezetes gyors testszínváltoztató képességéről?",
+   "valaszok": [
+    "páva",
+    "sarki róka",
+    "szöcske",
+    "kaméleon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ókori népnek köszönhetjük az olimpiai játékokat?",
+   "valaszok": [
+    "sumérok",
+    "egyiptomiak",
+    "görögök",
+    "rómaiak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a neve a békák kopoltyús lárvájának?",
+   "valaszok": [
+    "békalencse",
+    "ebihal",
+    "bébihal",
+    "kopoltyús brekkencs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a neve a néhány madárfaj egyedeinek fején található tollcsomónak?",
+   "valaszok": [
+    "simléder",
+    "satyek",
+    "bóbita",
+    "usánka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi az öngól?",
+   "valaszok": [
+    "magázódás a fociban",
+    "a játékos a saját kapujába talál",
+    "a bíró rúg gólt",
+    "hazai pályán rúgott gól"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen ruhadarab a sombrero?",
+   "valaszok": [
+    "nadrág",
+    "cipő",
+    "kalap",
+    "kesztyű"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A felsorolt országok közül melyik lobogójának színei egyeznek meg a magyar zászlóéval?",
+   "valaszok": [
+    "Franciaország",
+    "Olaszország",
+    "Németország",
+    "Ausztria"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány színész ad elő egy monológot?",
+   "valaszok": [
+    "egy",
+    "kettő",
+    "három",
+    "sok"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki árulja el a Pál utcai fiúkat Molnár Ferenc regényében?",
+   "valaszok": [
+    "Áts Feri",
+    "Boka",
+    "Nemecsek",
+    "Geréb"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik növény nem tartozik a káposztafélék közé?",
+   "valaszok": [
+    "karfiol",
+    "karalábé",
+    "bimbós kel",
+    "spenót"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik testrészünkhöz tartozik a sípcsont?",
+   "valaszok": [
+    "koponya",
+    "lábszár",
+    "felkar",
+    "gerincoszlop"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város fekszik a Mecsek déli lejtőjén?",
+   "valaszok": [
+    "Miskolc",
+    "Pécs",
+    "Veszprém",
+    "Kaposvár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi Szlovákia fővárosa?",
+   "valaszok": [
+    "Pozsony",
+    "Ljubljana",
+    "Kassa",
+    "Prága"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a neve Toldi Miklós gonosz testvérének az Arany-műben?",
+   "valaszok": [
+    "Toldi Mihály",
+    "Toldi Lőrinc",
+    "Toldi György",
+    "Toldi Sebestyén"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a pollen másik, közismert neve?",
+   "valaszok": [
+    "gyökérsüveg",
+    "virágpor",
+    "levélnyél",
+    "sziklevél"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi jelöli a beírandó karakter helyét a számítógép monitorján?",
+   "valaszok": [
+    "klaviatúra",
+    "szkenner",
+    "kurzor",
+    "ikon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mire száll fel, aki ringlispílre vált jegyet?",
+   "valaszok": [
+    "hullámvasútra",
+    "körhintára",
+    "szellemvasútra",
+    "csacsifogatra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogyan szaporodnak az ékszerteknősök?",
+   "valaszok": [
+    "osztódással",
+    "ikrákkal",
+    "elevenszüléssel",
+    "tojással"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol van, aki egy jurtában tartózkodik?",
+   "valaszok": [
+    "vasúti kocsiban",
+    "sátorban",
+    "jégkunyhóban",
+    "laktanyában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol érzi magát a szólás szerint az, aki kedvező helyzetbe került?",
+   "valaszok": [
+    "létrán",
+    "nyeregben",
+    "toronyszobában",
+    "bársonyszékben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik belső szervben működnek billentyűk?",
+   "valaszok": [
+    "a gyomorban",
+    "a tüdőben",
+    "a vesében",
+    "a szívben"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik együttest alapította Szikora Róbert?",
+   "valaszok": [
+    "Dolly Roll",
+    "Neoton",
+    "R-Go",
+    "Bonanza Banzai"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem halmazállapot-változás az alábbiak közül?",
+   "valaszok": [
+    "égés",
+    "olvadás",
+    "forrás",
+    "párolgás"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik szervünk a vérkeringés központja?",
+   "valaszok": [
+    "tüdő",
+    "agy",
+    "vese",
+    "szív"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szín hiányzik Hollandia zászlajából az alábbiak közül?",
+   "valaszok": [
+    "vörös",
+    "fehér",
+    "kék",
+    "zöld"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik vár ostromát írta meg Zrínyi Miklós híres eposzában?",
+   "valaszok": [
+    "Buda",
+    "Szolnok",
+    "Eger",
+    "Szigetvár"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a közismert neve az amerikai légierő egyik repülőgéptípusának?",
+   "valaszok": [
+    "Lopakodó",
+    "Settenkedő",
+    "Osonó",
+    "Surranó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen élőlény a kabóca?",
+   "valaszok": [
+    "gomba",
+    "énekes madár",
+    "rovar",
+    "bogyós gyümölcs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit kap meg kis Balázs József Attila versében? \"…, mint üveggolyót, megkapod.\"",
+   "valaszok": [
+    "a messzeséget",
+    "a távolságot",
+    "az ég kékjét",
+    "az álom enyhét"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány évig volt Buda török kézen?",
+   "valaszok": [
+    "45.0",
+    "95.0",
+    "145.0",
+    "195.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki a főhőse a Notre-Dame-i toronyőr című Disney-rajzfilmnek?",
+   "valaszok": [
+    "Frankenstein",
+    "Quasimodo",
+    "Pinocchio",
+    "Don Quijote"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik az a fém, amelyik szobahőmérsékleten cseppfolyós?",
+   "valaszok": [
+    "nikkel",
+    "mangán",
+    "higány",
+    "cink"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik kifejezés rövidítése az UFO?",
+   "valaszok": [
+    "ismeretlen fényjelenség",
+    "titokzatos légköri esemény",
+    "azonosítatlan repülő tárgy",
+    "Ugyan mi a Fene az Ott"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem mérges kígyó az alábbiak közül?",
+   "valaszok": [
+    "anakonda",
+    "pápaszemes kobra",
+    "pufogó vipera",
+    "lándzsakígyó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik növény tartozik a lágyszárúak közé?",
+   "valaszok": [
+    "nád",
+    "kökény",
+    "tölgy",
+    "akác"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik sportágban mérkőznek a Davis Kupáért?",
+   "valaszok": [
+    "labdarúgásban",
+    "teniszben",
+    "kosárlabdában",
+    "atlétikában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város Nógrád megye székhelye?",
+   "valaszok": [
+    "Balassagyarmat",
+    "Kecskemét",
+    "Salgótarján",
+    "Szécsény"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt a keresztneve Petőfi testvérének?",
+   "valaszok": [
+    "László",
+    "István",
+    "Zoltán",
+    "Júlia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen járművel tette felfedezőútjait James Cook kapitány?",
+   "valaszok": [
+    "repülővel",
+    "hajóval",
+    "automobillal",
+    "léghajóval"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A felsoroltak közül melyik nem páros emberi szerv?",
+   "valaszok": [
+    "tüdő",
+    "vese",
+    "máj",
+    "fül"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A magyar kártya melyik lapjait nevezik filkónak?",
+   "valaszok": [
+    "felsőket",
+    "alsókat",
+    "királyokat",
+    "heteseket"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki alkotta meg az elemek periódusos rendszerét?",
+   "valaszok": [
+    "Lavoisier",
+    "Mengyelejev",
+    "Niels Bohr",
+    "Faraday"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiket neveztek régen oszmánoknak?",
+   "valaszok": [
+    "a tatárokat",
+    "a törököket",
+    "az oroszokat",
+    "az osztrákokat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a könyvtárából származnak a corvináknak nevezett kódexek?",
+   "valaszok": [
+    "Könyves Kálmán",
+    "III. Béla",
+    "Károly Róbert",
+    "I. Mátyás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik fém latin elnevezése a ferrum?",
+   "valaszok": [
+    "alumínium",
+    "vas",
+    "réz",
+    "mangán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik kutyát szokták szánhúzásra alkalmazni?",
+   "valaszok": [
+    "rottweiler",
+    "német juhász",
+    "husky",
+    "kuvasz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország nem szomszédja Magyarországnak?",
+   "valaszok": [
+    "Horvátország",
+    "Csehország",
+    "Szlovénia",
+    "Ukrajna"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ételt nevezik gránátoskockának?",
+   "valaszok": [
+    "franciakrémes",
+    "krumplis tészta",
+    "káposztás tészta",
+    "lekváros derelye"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miből készül a tartármártás?",
+   "valaszok": [
+    "tormából",
+    "ketchupból",
+    "majonézből",
+    "paprikából"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan írjuk helyesen a sportág nevét?",
+   "valaszok": [
+    "pinpong",
+    "pingpong",
+    "pin-pong",
+    "ping-pong"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki a főhőse George Lucas Baljós árnyak című filmjének?",
+   "valaszok": [
+    "Luke Skywalker",
+    "Han Solo",
+    "Leila Organa",
+    "Anakin Skywalker"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik hangszert kezelte virtuóz módon Liszt Ferenc?",
+   "valaszok": [
+    "a hegedűt",
+    "a klarinétot",
+    "a zongorát",
+    "a gordonkát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hónapban van Vízkereszt ünnepe?",
+   "valaszok": [
+    "januárban",
+    "márciusban",
+    "májusban",
+    "decemberben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik művészeti ágban alkotott Vincent van Gogh?",
+   "valaszok": [
+    "komolyzene",
+    "költészet",
+    "festészet",
+    "szobrászat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik ország elnökének rezidenciája a Fehér Ház?",
+   "valaszok": [
+    "Egyesült Államok",
+    "Kanada",
+    "Nagy-Britannia",
+    "Mexikó"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország labdarúgó válogatottjának volt csatára Diegó Maradona?",
+   "valaszok": [
+    "Argentína",
+    "Spanyolország",
+    "Brazília",
+    "Olaszország"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik uralkodói udvar támogatásával járt Kolumbusz először Amerikában?",
+   "valaszok": [
+    "portugál",
+    "nápolyi",
+    "velencei",
+    "spanyol"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mivel foglalkozik a genetika tudománya?",
+   "valaszok": [
+    "atomenergiával",
+    "űrkutatással",
+    "öröklődéssel",
+    "időjárással"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül mit neveztek régen kacagánynak?",
+   "valaszok": [
+    "a hiénát",
+    "egy fegyvert",
+    "egy felsőruhát",
+    "a vásári bohócot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Honnan érkezik Los Angelesbe a Terminátor című film címszereplője?",
+   "valaszok": [
+    "a Vénuszról",
+    "a jövőből",
+    "a múltból",
+    "a Marsról"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány mesterfokozat van a karate sportban?",
+   "valaszok": [
+    "öt",
+    "hat",
+    "tíz",
+    "tizenkettő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik fáraó síremléke a legmagasabb gizai piramis?",
+   "valaszok": [
+    "Tutanhamon",
+    "Dzsószer",
+    "Kheopsz",
+    "Khephrén"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik opera két bájos figurája Papageno és Papagena?",
+   "valaszok": [
+    "Beethoven: Fidelio",
+    "Rossini: A sevillai borbély",
+    "Mozart: A varázsfuvola",
+    "Offenbach: Hoffmann meséi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik színpadi mű írója Csiky Gergely?",
+   "valaszok": [
+    "Csongor és Tünde",
+    "Liliomfi",
+    "Buborékok",
+    "Bánk bán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik tenger partján található Odessza kikötője?",
+   "valaszok": [
+    "Balti-tenger",
+    "Fekete-tenger",
+    "Adriai-tenger",
+    "Földközi-tenger"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a beceneve az NBA chicagói kosárlabdacsapatnak?",
+   "valaszok": [
+    "zsiráfok",
+    "bikák",
+    "majmok",
+    "nyulak"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik növény olaját használják rágógumi ízesítésére?",
+   "valaszok": [
+    "boros menta",
+    "mustár",
+    "majoránna",
+    "méhfű"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik országban játszódik Mozart: Szöktetés a szerájból című operája?",
+   "valaszok": [
+    "Spanyolország",
+    "Törökország",
+    "Magyarország",
+    "Görögország"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város nevezetessége a Kinizsi-vár?",
+   "valaszok": [
+    "Sümeg",
+    "Kanizsa",
+    "Nagyvázsony",
+    "Gyula"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állat a világ legnagyobb melegvérű ragadozója?",
+   "valaszok": [
+    "a kőszáli sas",
+    "a jegesmedve",
+    "a kardszárnyú delfin",
+    "az oroszlán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi Ausztrália fővárosa?",
+   "valaszok": [
+    "Sydney",
+    "Melbourne",
+    "Canberra",
+    "Adelaide"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen építészeti stílusban épült a híres párizsi Notre Dame székesegyház?",
+   "valaszok": [
+    "román",
+    "gótikus",
+    "klasszicista",
+    "barokk"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a nevét viseli a Csepel-sziget a legenda szerint?",
+   "valaszok": [
+    "a hét vezér egyikének",
+    "Álmos fiának",
+    "Árpád lovászának",
+    "Szent István vitézének"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik király udvarában vív meg Toldi a cseh vitézzel?",
+   "valaszok": [
+    "Nagy Lajos",
+    "Könyves Kálmán",
+    "Szent László",
+    "Mátyás király"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik szervünk enzimje a pepszin?",
+   "valaszok": [
+    "gyomor",
+    "tüdő",
+    "vese",
+    "szív"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik tornaszer döntőjében nyert aranyérmet Csollány Szilveszter?",
+   "valaszok": [
+    "talaj",
+    "nyújtó",
+    "gyűrű",
+    "korlát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik énekes nagylemezei a Bad, a Thriller és a Dangerous?",
+   "valaszok": [
+    "Michael Jackson",
+    "Jon Bon Jovi",
+    "George Michael",
+    "Rod Stewart"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mikor süllyedt el a Titanic?",
+   "valaszok": [
+    "1852-ben",
+    "1872-ben",
+    "1912-ben",
+    "1942-ben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol született Kossuth Lajos?",
+   "valaszok": [
+    "Monokon",
+    "Pozsonyban",
+    "Kassán",
+    "Göncön"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki komponálta a Gyermekeknek című magyar népdalokat feldolgozó zongoraciklust?",
+   "valaszok": [
+    "Liszt Ferenc",
+    "Kodály Zoltán",
+    "Dohnányi Ernő",
+    "Bartók Béla"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt II. Rákóczi Ferenc édesanyja?",
+   "valaszok": [
+    "Kanizsai Dorottya",
+    "Zrínyi Ilona",
+    "Zách Klára",
+    "Bethlen Kata"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik nem mészkőhegység az alábbiak közül?",
+   "valaszok": [
+    "Bakony",
+    "Bükk",
+    "Mecsek",
+    "Mátra"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a munka SI-mértékegysége?",
+   "valaszok": [
+    "newton",
+    "pascal",
+    "joule",
+    "watt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen növényből vont ki elsőként C-vitamint Szent Györgyi Albert?",
+   "valaszok": [
+    "paradicsom",
+    "paprika",
+    "citrom",
+    "narancs"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik várost védi a bűnözőktől Batman?",
+   "valaszok": [
+    "Gotham Cityt",
+    "New Yorkot",
+    "Washingtont",
+    "Metropolist"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miket gyűjt egy numizmata?",
+   "valaszok": [
+    "lepkéket",
+    "bélyegeket",
+    "érméket",
+    "képeslapokat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nemzetiségű Rubens Barrichello Forma-1-es versenyző?",
+   "valaszok": [
+    "spanyol",
+    "brazil",
+    "francia",
+    "német"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik hegységünkben lehet megmászni a Nagy-Csikóvár nevű csúcsot?",
+   "valaszok": [
+    "Mátra",
+    "Börzsöny",
+    "Pilis",
+    "Vértes"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem egy bagolyfajta neve?",
+   "valaszok": [
+    "fülesbagoly",
+    "ugróbagoly",
+    "macskabagoly",
+    "gyöngybagoly"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ország címerében látható kaktusz?",
+   "valaszok": [
+    "Mexikó",
+    "Mongólia",
+    "Omán",
+    "Egyiptom"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki vett részt az egyik leghíresebb autó, a Ford T-modell tervezésében?",
+   "valaszok": [
+    "Galamb József",
+    "Kandó Kálmán",
+    "Csonka János",
+    "Bánki Donát"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hegységünkben mászhatjuk meg a Nagy-Hideg-hegyet?",
+   "valaszok": [
+    "Pilis",
+    "Cserhát",
+    "Börzsöny",
+    "Visegrádi-hegység"
+   ],
+   "helyes": 2
+  }
+ ]
+}

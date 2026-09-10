@@ -1,0 +1,3698 @@
+{
+ "id": "kviz-vallas",
+ "nev": "Vallás és mitológia",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "Hogy hívják a Háromkirályokat?",
+   "valaszok": [
+    "Gáspár, Menyhért, Boldizsár",
+    "Szervác, Pongrác, Bonifác",
+    "Sándor, József, Benedek",
+    "Márk, Máté, Lukács"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan győzte le Dávid Góliátot?",
+   "valaszok": [
+    "Szkanderben lenyomta",
+    "Dárdájával eltalálta",
+    "Elgáncsolta",
+    "Parittyával leterítette"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki Castor ikertestvére a görög és a római mitológiában?",
+   "valaszok": [
+    "Delux",
+    "Cellux",
+    "Pollux",
+    "Pollen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt a szerelmi költészet múzsája az ókori görögöknél?",
+   "valaszok": [
+    "Idillia",
+    "Erato",
+    "Intimé",
+    "Sexualissima"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a viaszszárnyai olvadtak fel a Nap közelében?",
+   "valaszok": [
+    "Daidalosz",
+    "Ikarosz",
+    "Boeingosz",
+    "Tupoljevosz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik hegycsúcson feneklett meg Noé bárkája?",
+   "valaszok": [
+    "a Sváb-hegyen",
+    "a Mount Everesten",
+    "az Araráton",
+    "Ferihegyen"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik állat csábította el Évát, hogy szakítson a tiltott fa gyümölcséből?",
+   "valaszok": [
+    "szamár",
+    "holló",
+    "kígyó",
+    "teve"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit használt az első emberpár \"ruha\" gyanánt a Paradicsomban?",
+   "valaszok": [
+    "almahéjat",
+    "fügefalevelet",
+    "kígyóbőrt",
+    "kacagányt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ádám melyik testrészéből teremtette az Úr Évát?",
+   "valaszok": [
+    "karjából",
+    "köldökéből",
+    "kijujjából",
+    "oldalbordájából"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A mitológia szerint milyen volt Helené, aki miatt kitört a trójai háború?",
+   "valaszok": [
+    "okos",
+    "házias",
+    "szép",
+    "szorgalmas"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt Káin és Ábel anyja a Biblia szerint?",
+   "valaszok": [
+    "Rebekka",
+    "Eszter",
+    "Éva",
+    "Sára"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik bibliai várost emlegetjük, ha valaminek a zűrzavaros állapotát akarjuk kifejezni?",
+   "valaszok": [
+    "Jerevánt",
+    "Jerikót",
+    "Bábelt",
+    "Damaszkuszt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik papi méltóság lehet a lila szín jelzője?",
+   "valaszok": [
+    "püspök",
+    "káplán",
+    "káptalan",
+    "érsek"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik vallás temploma a mecset?",
+   "valaszok": [
+    "katolikus",
+    "buddhista",
+    "iszlám",
+    "zsidó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város ostromát okozta Szép Heléna megszöktetése a mítosz szerint?",
+   "valaszok": [
+    "Trója",
+    "Róma",
+    "Karthágó",
+    "Alexandria"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ünnepet előzi meg közvetlenül az advent?",
+   "valaszok": [
+    "húsvétot",
+    "karácsonyt",
+    "hamvazószerdát",
+    "mindenszenteket"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milye volt Ariadnénak a mitológiai történetben?",
+   "valaszok": [
+    "cérnája",
+    "fonala",
+    "szalagja",
+    "drótkötele"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen fa levelével takarta el magát Ádám és Éva a Paradicsomban?",
+   "valaszok": [
+    "almafa",
+    "fügefa",
+    "körtefa",
+    "tölgyfa"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állata volt Bálámnak, a mezopotámiai jósnak?",
+   "valaszok": [
+    "tevéje",
+    "bolhája",
+    "kutyája",
+    "szamara"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek az istennője volt Flora az ókori Rómában?",
+   "valaszok": [
+    "hajók",
+    "csillagok",
+    "virágok",
+    "szerelem"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit épített Daidalosz Minótaurosznak a mitológia szerint?",
+   "valaszok": [
+    "piramist",
+    "mauzóleumot",
+    "labirintust",
+    "amfiteátrumot"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miért zuhant le repülés közben Ikarosz az ókori monda szerint?",
+   "valaszok": [
+    "Zeusz villáma lesúlytotta",
+    "túl közel repült a Naphoz",
+    "viharba került",
+    "összeütközött Apolló szekerével"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A görög mitológia mely alakja híresült el számtalan szerelmi kalandjáról?",
+   "valaszok": [
+    "Nárcisszosz",
+    "Zeusz",
+    "Pallasz Athéné",
+    "Erató"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az ókori görög mitológiában ki a szőlő és a bor istene?",
+   "valaszok": [
+    "Apolló",
+    "Dionüszosz",
+    "Zeusz",
+    "Poszeidón"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy hívják Káin testvérét a Bibliában?",
+   "valaszok": [
+    "Áron",
+    "Ábrahám",
+    "Ádám",
+    "Ábel"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy hívták Jézus édesanyját?",
+   "valaszok": [
+    "Magdolna",
+    "Mária",
+    "Erzsébet",
+    "Sára"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy hívták a napistent a görög mitológiában?",
+   "valaszok": [
+    "Héliosz",
+    "Mars",
+    "Apolló",
+    "Hermész"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy nevezik a görög mitológia félig ember félig ló testű lényeit?",
+   "valaszok": [
+    "szfinx",
+    "kentaur",
+    "szatír",
+    "gorgó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol laktak a görög főistenek?",
+   "valaszok": [
+    "a Parnasszuson",
+    "a Helikonon",
+    "az Olümposzon",
+    "Dodonában"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol született Jézus?",
+   "valaszok": [
+    "Jeruzsálemben",
+    "Haifában",
+    "Betlehemben",
+    "Názáretben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány parancsolatot tartalmaznak a mózesi törvények a Bibliában?",
+   "valaszok": [
+    "három",
+    "hét",
+    "tíz",
+    "harminchárom"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány szeme van a mitológiai küklopsznak?",
+   "valaszok": [
+    "egy",
+    "három",
+    "harminc",
+    "száz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki Ikarosz apja a görög mitológiában?",
+   "valaszok": [
+    "Minótaurosz",
+    "Daidalosz",
+    "Apollón",
+    "Zeusz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki a fagyosszentek egyike az alábbiak közül?",
+   "valaszok": [
+    "Boldizsár",
+    "Teofil",
+    "Bonifác",
+    "Kleofás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki a legfőbb isten a római mitológiában?",
+   "valaszok": [
+    "Mars",
+    "Jupiter",
+    "Pluto",
+    "Zeusz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki a tenger istene a római mitológiában?",
+   "valaszok": [
+    "Neptunus",
+    "Mercurius",
+    "Pluto",
+    "Saturnus"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki hívja imára a hívőket az iszlám vallásban?",
+   "valaszok": [
+    "imám",
+    "próféta",
+    "kalifa",
+    "müezzin"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem görög mitológiai alak az alábbiak közül?",
+   "valaszok": [
+    "Héphaisztosz",
+    "Epimétheusz",
+    "Kreón",
+    "Visnu"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem tartozik a bibliai Háromkirályok közé?",
+   "valaszok": [
+    "Boldizsár",
+    "Benjámin",
+    "Menyhért",
+    "Gáspár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem tartozik a napkeleti bölcsek közé?",
+   "valaszok": [
+    "Gáspár",
+    "Menyhért",
+    "Máté",
+    "Boldizsár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki szólítja imára a híveket a minaretből?",
+   "valaszok": [
+    "kádi",
+    "dervis",
+    "müezzin",
+    "kalifa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki tartotta vállán az égboltot a görög mitológiában?",
+   "valaszok": [
+    "Uranosz",
+    "Atlasz",
+    "Prométheusz",
+    "Akhilleusz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a tudományok és a művészetek istennője a római mitológiában?",
+   "valaszok": [
+    "Juno",
+    "Venus",
+    "Diana",
+    "Minerva"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kik rejtőztek a mitológiai történet szerint a falóban?",
+   "valaszok": [
+    "háborgó istenek",
+    "görög harcosok",
+    "nimfák és faunok",
+    "római légiósok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a repülése ért tragikusan véget a görög mitológia szerint?",
+   "valaszok": [
+    "Erósz",
+    "Hermész",
+    "Ikarosz",
+    "Daidalosz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit győzött le Dávid egy parittyával a Biblia szerint?",
+   "valaszok": [
+    "Salamont",
+    "Sámsont",
+    "Jeremiást",
+    "Góliátot"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik bibliai uralkodó nevéhez tapadt a \"bölcs\" jelző?",
+   "valaszok": [
+    "Salamon",
+    "Dávid",
+    "Saul",
+    "Heródes"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik bibliai városhoz kötődik a nyelvzavar fogalma?",
+   "valaszok": [
+    "Bábel",
+    "Jeruzsálem",
+    "Jerikó",
+    "Szodoma"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hit nagy tekintélyű vallástudósa az imám?",
+   "valaszok": [
+    "buddhista",
+    "hindu",
+    "iszlám",
+    "sinto"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik hónapunk kapta nevét a római hadistenről?",
+   "valaszok": [
+    "július",
+    "augusztus",
+    "december",
+    "március"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik istenség tartozik a germán mitológiához az alábbiak közül?",
+   "valaszok": [
+    "Ámon-Ré",
+    "Siva",
+    "Minerva",
+    "Thor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik mitológia csodás lényei a kentaurok?",
+   "valaszok": [
+    "kelta",
+    "germán",
+    "görög",
+    "sumer"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik mitológiai alak nem az indiai hitvilág szereplője?",
+   "valaszok": [
+    "Indra",
+    "Manu",
+    "Ráma",
+    "Marduk"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nép mitológiai alakja volt Merlin varázsló?",
+   "valaszok": [
+    "görög",
+    "hindu",
+    "kelta",
+    "római"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szentet illetik a \"Sárkányölő\" melléknévvel?",
+   "valaszok": [
+    "Szent Lászlót",
+    "Szent Györgyöt",
+    "Szent Andrást",
+    "Szent Ágostont"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik vallás temploma a dzsámi?",
+   "valaszok": [
+    "zsidó",
+    "buddhista",
+    "hindu",
+    "iszlám"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városban feszítették keresztre Jézust?",
+   "valaszok": [
+    "Betlehemben",
+    "Jeruzsálemben",
+    "Rómában",
+    "Názáretben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik épület nem a muszlim valláshoz tartozik?",
+   "valaszok": [
+    "dzsámi",
+    "sztúpa",
+    "minaret",
+    "mecset"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi előtt áll az iszlám hívő, ha a ramadánra készül?",
+   "valaszok": [
+    "szent háború",
+    "böjti hónap",
+    "rituális öngyilkosság",
+    "esküvői lakoma"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi vezette a napkeleti bölcseket a kis Jézushoz?",
+   "valaszok": [
+    "egy arkangyal",
+    "egy csillag",
+    "egy galamb",
+    "egy lángnyelv"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miben különbözik a mitológiai Pegazus a földi világ lovaitól?",
+   "valaszok": [
+    "két feje van",
+    "vért iszik",
+    "szárnya van",
+    "színarany sörényű"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miből készített magának és fiának szárnyakat Daidalosz a görög monda szerint?",
+   "valaszok": [
+    "faágakból és kövekből",
+    "marhabőrből és nádból",
+    "papiruszból és fából",
+    "tollakból és viaszból"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen \"tárgya\" van Pandorának a mitológiai történetben?",
+   "valaszok": [
+    "tarisznyája",
+    "szelencéje",
+    "talizmánja",
+    "szekercéje"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen fegyverrel győzte le Dávid Góliátot?",
+   "valaszok": [
+    "bumeránggal",
+    "parittyával",
+    "dárdával",
+    "szekercével"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen természeti csapás kapcsolódik Noé nevéhez a Bibliában?",
+   "valaszok": [
+    "földrengés",
+    "vulkánkitörés",
+    "tűzvész",
+    "vízözön"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen vasárnapnak nevezzük a karácsonyt közvetlenül megelőző utolsó vasárnapot?",
+   "valaszok": [
+    "márvány",
+    "arany",
+    "gyémánt",
+    "platina"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen élőlény a görög mitológiából ismert szirén?",
+   "valaszok": [
+    "félig nő, félig hal",
+    "félig férfi, félig ló",
+    "félig nő, félig ló",
+    "félig férfi, félig hal"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miről volt nevezetes a mitológiai Héraklész?",
+   "valaszok": [
+    "énekhangjáról",
+    "jóstehetségéről",
+    "hatalmas erejéről",
+    "gondolatolvasó-készségéről"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mivel a kezében szokás ábrázolni Erószt, a szerelem istenét a képzőművészeti alkotásokon?",
+   "valaszok": [
+    "nyíl",
+    "korbács",
+    "bilincs",
+    "szív"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A Biblia szerint ki mosta kezeit Jézus elítélésekor?",
+   "valaszok": [
+    "Pontius Pilátus",
+    "Kajafás",
+    "Júdás",
+    "Heródes"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik volt Pallasz Athéné szent állata?",
+   "valaszok": [
+    "bagoly",
+    "nyúl",
+    "sas",
+    "macska"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol imádkoznak a buddhista szerzetesek?",
+   "valaszok": [
+    "dzsámiban",
+    "pagonyban",
+    "pagodában",
+    "minaretben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol jelent meg a Károlyi Gáspár által fordított első magyar nyelvű Biblia?",
+   "valaszok": [
+    "Debrecen",
+    "Pápa",
+    "Kalocsa",
+    "Vizsoly"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol keresztelték meg Jézust?",
+   "valaszok": [
+    "a Nílusban",
+    "a Jordán folyó vizében",
+    "a Genezáreti-tóban",
+    "a Holt-tengerben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol található a Siratófal?",
+   "valaszok": [
+    "Jeruzsálemben",
+    "Betlehemben",
+    "Názáretben",
+    "Tel Avivban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hová volt zárva Minótaurosz a görög mitológiai történet szerint?",
+   "valaszok": [
+    "víz alatti várba",
+    "óriások barlangjába",
+    "alvilági toronyba",
+    "labirintusba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hányan voltak a Gráciák, a kellem és báj istennői a görög mitológiában?",
+   "valaszok": [
+    "hárman",
+    "heten",
+    "kilencen",
+    "tizenketten"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Jézus melyik tanítványára illik a hitetlen jelző?",
+   "valaszok": [
+    "Andrásra",
+    "Tamásra",
+    "Péterre",
+    "Mátéra"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki Cupido anyja a római mitológiában?",
+   "valaszok": [
+    "Juno",
+    "Minerva",
+    "Vénusz",
+    "Diana"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki az a titán, akit lázadásáért azzal bűntetett Zeusz, hogy az égboltot kell tartania?",
+   "valaszok": [
+    "Prométeusz",
+    "Uranosz",
+    "Atlasz",
+    "Kronosz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki az alvilág görög istenének, Hádésznak a római megfelelője?",
+   "valaszok": [
+    "Pollux",
+    "Pygmalion",
+    "Pluto",
+    "Pallasz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki irgalmas a bibliai példázat szerint?",
+   "valaszok": [
+    "a farizeus",
+    "a szamaritánus",
+    "a lévita",
+    "a szaddoceus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem római istennő az alábbiak közül?",
+   "valaszok": [
+    "Diana",
+    "Venus",
+    "Freyja",
+    "Minerva"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem volt esztergomi érsek az alábbiak közül?",
+   "valaszok": [
+    "Vitéz János",
+    "Fráter György",
+    "Pázmány Péter",
+    "Károli Gáspár"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt Delila kedvese a Bibliában?",
+   "valaszok": [
+    "Dávid",
+    "Sámson",
+    "Mózes",
+    "József"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a római mitológiában a háború istene?",
+   "valaszok": [
+    "Plútó",
+    "Mars",
+    "Uránus",
+    "Sol"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik a gigászok a görög mitológiában?",
+   "valaszok": [
+    "kígyóarcú asszonyok",
+    "kígyólábú óriások",
+    "Héra szeretői",
+    "Ámor pufók kistestvérei"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a felesége Júnó a római mitológiában?",
+   "valaszok": [
+    "Zeusz",
+    "Mercurius",
+    "Jupiter",
+    "Mars"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a leánya volt Pallasz Athéné a mitológiában?",
+   "valaszok": [
+    "Odüsszeusz",
+    "Zeusz",
+    "Herkules",
+    "Prométheusz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek vannak szárnyak a saruján a görög mitológiában?",
+   "valaszok": [
+    "Zeusz",
+    "Hermész",
+    "Mars",
+    "Poszeidón"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit kent fel királlyá Sámuel próféta a bibliai történetben?",
+   "valaszok": [
+    "Sámsont",
+    "Józsefet",
+    "Dávidot",
+    "Mózest"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit tiszteltek a tűzoltók védőszentjükként?",
+   "valaszok": [
+    "Szent Rókust",
+    "Szent Balázst",
+    "Szent Flóriánt",
+    "Szent Györgyöt"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit tiszteltek az ókori görögök Thália személyében?",
+   "valaszok": [
+    "múzsát",
+    "hetérát",
+    "szirént",
+    "hárpiát"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kivel azonosítja a kereszténység a bárányt?",
+   "valaszok": [
+    "Máriával",
+    "Péterrel",
+    "Jézussal",
+    "Júdással"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mely vallás kelléke az imaszőnyeg?",
+   "valaszok": [
+    "görög-keleti",
+    "unitárius",
+    "iszlám",
+    "mormon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik a hét \"szent napja\" a zsidó vallásban?",
+   "valaszok": [
+    "a vasárnap",
+    "a szombat",
+    "a szerda",
+    "a kedd"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik egyiptomi isten feladata volt a holtak balzsamozásának felügyelete?",
+   "valaszok": [
+    "Anubisz",
+    "Nofertum",
+    "Hathor",
+    "Szehmet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik evangelista Velence védőszentje?",
+   "valaszok": [
+    "Máté",
+    "Márk",
+    "Lukács",
+    "János"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik istennőt szokták szárnyakkal ábrázolni?",
+   "valaszok": [
+    "Artemisz",
+    "Diké",
+    "Niké",
+    "Auróra"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik madár égeti el magát, majd születik újjá ötszáz évenként a hiedelem szerint?",
+   "valaszok": [
+    "griff",
+    "főnix",
+    "turul",
+    "falkon"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mitológiai lényhez hasonlítják a titokzatos, hallgatag embert?",
+   "valaszok": [
+    "a kentaurhoz",
+    "a szfinxhez",
+    "a gigászhoz",
+    "a küklopszhoz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik római isten a megfelelője Héphaisztosznak, a görög istenek kovácsának?",
+   "valaszok": [
+    "Neptunusz",
+    "Vulcanus",
+    "Mercurius",
+    "Pluto"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik vallás legfőbb istensége Jahve?",
+   "valaszok": [
+    "hindu",
+    "zsidó",
+    "iszlám",
+    "buddhista"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik vallás temploma a zsinagóga?",
+   "valaszok": [
+    "katolikus",
+    "iszlám",
+    "zsidó",
+    "buddhista"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik vallásban jelenti a pihenés napját a sabbat?",
+   "valaszok": [
+    "iszlám",
+    "zsidó",
+    "keresztény",
+    "hindu"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik városban található a Bibliában is szereplő Getszemáni kert?",
+   "valaszok": [
+    "Jeruzsálemben",
+    "Betlehemben",
+    "Jerikóban",
+    "Názáretben"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ünnepet előzi meg közvetlenül a virágvasárnap?",
+   "valaszok": [
+    "gyertyaszentelőt",
+    "húsvétot",
+    "pünkösdöt",
+    "karácsonyt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi Dionüszosz görög isten kedvenc itala?",
+   "valaszok": [
+    "kecsketej",
+    "az örök élet vize",
+    "nektár",
+    "bor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a gyászmise közismert elnevezése?",
+   "valaszok": [
+    "kyrie",
+    "tedeum",
+    "missa solemnis",
+    "rekviem"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a nevük a görög mitológia egyszemű óriásainak?",
+   "valaszok": [
+    "párkák",
+    "küklopszok",
+    "phaiákok",
+    "argonauták"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a római neve a kecskebak formájú, emberhez hasonló félistennek?",
+   "valaszok": [
+    "fátum",
+    "fárosz",
+    "faun",
+    "faust"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen hangszeren szokás ábrázolni Apollón görög istent?",
+   "valaszok": [
+    "pánsíp",
+    "furulya",
+    "lant",
+    "dob"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen szenteknek nevezik a Heródes által legyilkoltatott kisdedeket?",
+   "valaszok": [
+    "pólyás",
+    "betlehemi",
+    "apró",
+    "napkeleti"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minek az istene Morpheusz a görög mitológiában?",
+   "valaszok": [
+    "étvágy",
+    "szerelem",
+    "álom",
+    "szerencse"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Minek az istene volt Héliosz a görög mitológiában?",
+   "valaszok": [
+    "a Holdnak",
+    "a Napnak",
+    "a szeleknek",
+    "a tengereknek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek az istene volt Poszeidón a görög mitológiában?",
+   "valaszok": [
+    "a kovácsművesség",
+    "a tenger",
+    "a bor",
+    "a bölcsesség"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek az istene volt az ókori Rómában Vesta?",
+   "valaszok": [
+    "a tűzhely",
+    "a termékenység",
+    "a kenyér",
+    "a bor"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "A Biblia szerint hány nap alatt teremtette az Úr a világot?",
+   "valaszok": [
+    "tíz",
+    "hat",
+    "hét",
+    "három"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A Biblia szerint kit akart Ábrahám feláldozni?",
+   "valaszok": [
+    "Ézsaut",
+    "Jákobot",
+    "Illést",
+    "Izsákot"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik nevezetes nap a nagyböjt kezdete?",
+   "valaszok": [
+    "mindenszentek napja",
+    "pünkösd vasárnap",
+    "hamvazószerda",
+    "húsvét hétfő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy hívták Orpheusz feleségét?",
+   "valaszok": [
+    "Aglaia",
+    "Eurüdiké",
+    "Euphroszüné",
+    "Thaleia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik az \"Ígéret földjét\" a Bibliában?",
+   "valaszok": [
+    "Jeruzsálem",
+    "Kánaán",
+    "Nirvána",
+    "Babilón"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol olvashatjuk az Énekek énekét?",
+   "valaszok": [
+    "a Koránban",
+    "a védákban",
+    "az Ószövetségben",
+    "az Újszövetségben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hová menekült a szent család a betlehemi gyermekgyilkosságok elől?",
+   "valaszok": [
+    "Szíriába",
+    "Mezopotámiába",
+    "Babilonba",
+    "Egyiptomba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hány \"szűk\" és \"bő\" esztendőről olvashatunk a Bibliában?",
+   "valaszok": [
+    "három",
+    "hét",
+    "tíz",
+    "tizenkettő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki Pallasz Athéné megfelelője a római mitológiában?",
+   "valaszok": [
+    "Diana",
+    "Juno",
+    "Minerva",
+    "Venus"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki az apja Héraklésznak a görög mitológiában?",
+   "valaszok": [
+    "Odüsszeusz",
+    "Thészeusz",
+    "Zeusz",
+    "Mars"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem múzsa az alábbi mitológiai személyek közül?",
+   "valaszok": [
+    "Thália",
+    "Uránia",
+    "Erató",
+    "Héra"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem volt a zsidók királya a Biblia szerint?",
+   "valaszok": [
+    "Saul",
+    "Dávid",
+    "Salamon",
+    "Dániel"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt az a személy, akit Pilátus Jézus helyett szabadon engedett?",
+   "valaszok": [
+    "Júdás",
+    "Barabbás",
+    "Lázár",
+    "Tamás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az első pápa?",
+   "valaszok": [
+    "Szent Miklós",
+    "Szent Pál",
+    "I. Pius",
+    "Szent Péter"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kije volt Izsák Ábrahámnak a Biblia szerint?",
+   "valaszok": [
+    "fia",
+    "testvére",
+    "apja",
+    "nagybátyja"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kiket nevezünk premontreieknek?",
+   "valaszok": [
+    "az inkvizítorokat",
+    "őskeresztény vértanúkat",
+    "újkori eretnekeket",
+    "egy szerzetesi rendet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a felesége vált sóbálvánnyá, amikor hátranézett?",
+   "valaszok": [
+    "Clinton",
+    "Lót",
+    "Putifár",
+    "Noé"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a teremtését ábrázolja a Sixtus-kápolna mennyezetfreskója?",
+   "valaszok": [
+    "Ádám",
+    "Jákob",
+    "József",
+    "Noé"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek mutatta az utat a labirintusban Ariadné fonala?",
+   "valaszok": [
+    "Minótaurosznak",
+    "Perszeusznak",
+    "Thészeusznak",
+    "Minósznak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek volt a hajában az ereje?",
+   "valaszok": [
+    "Héraklész",
+    "Sámson",
+    "Góliát",
+    "Akhilleusz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit lestek meg a vének fürdőzés közben a Biblia szerint?",
+   "valaszok": [
+    "Zsuzsannát",
+    "Salómét",
+    "Esztert",
+    "Juditot"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik az uralkodó vallás Indiában?",
+   "valaszok": [
+    "hindu",
+    "buddhista",
+    "szikh",
+    "muzulmán"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik bibliai alak nem az Ószövetségben szerepel?",
+   "valaszok": [
+    "Lázár",
+    "Jónás",
+    "Sámson",
+    "Dániel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik bibliai alak viselt bélyeget a homlokán?",
+   "valaszok": [
+    "Ádám",
+    "Júdás",
+    "Káin",
+    "Jónás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik bibliai városba küldte az Úr Jónást, hogy lakóit bűnbánatra intse?",
+   "valaszok": [
+    "Ninive",
+    "Jerikó",
+    "Szodoma",
+    "Jeruzsálem"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hegyen feneklett meg Noé bárkája a Biblia szerint?",
+   "valaszok": [
+    "Ararát",
+    "Sínai-hegy",
+    "Olümposz",
+    "Elbrusz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hegyen feszítették keresztre Jézust a Biblia szerint?",
+   "valaszok": [
+    "a Koponyák hegyén",
+    "a Sion-hegyen",
+    "a Hóreb-hegyen",
+    "az Olajfák hegyén"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik mesebeli csodás állat neve azonos az ősmagyar hitvilág sámánjainak nevével?",
+   "valaszok": [
+    "griff",
+    "baziliszkusz",
+    "táltos",
+    "kentaur"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik mitológia alakja Hórusz, a solyómfejű isten?",
+   "valaszok": [
+    "germán",
+    "kelta",
+    "egyiptomi",
+    "római"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik mitológia szereplője Médeia?",
+   "valaszok": [
+    "germán",
+    "óorosz",
+    "görög",
+    "kelta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik mitológiában nevezték Lunának a hold istennőjét?",
+   "valaszok": [
+    "görög",
+    "germán",
+    "római",
+    "egyiptomi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik mitológiából ismert Fortuna, a változékony sors istennője?",
+   "valaszok": [
+    "sumér",
+    "római",
+    "kelta",
+    "germán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szent született Assisi városában?",
+   "valaszok": [
+    "Szent János",
+    "Szent Ferenc",
+    "Szent Benedek",
+    "Szent Ágoston"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik sziget királya volt Odüsszeusz?",
+   "valaszok": [
+    "Náxosz",
+    "Kréta",
+    "Ithaka",
+    "Mílosz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik tengeren keltek át a zsidók Egyiptomból menekülve?",
+   "valaszok": [
+    "Fekete-tenger",
+    "Holt-tenger",
+    "Földközi-tenger",
+    "Vörös-tenger"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik vallás egyik kulcsfogalma a nirvána?",
+   "valaszok": [
+    "iszlám",
+    "buddhista",
+    "zsidó",
+    "katolikus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik vallás két fő irányzata a szunita és a síita?",
+   "valaszok": [
+    "kereszténység",
+    "buddhizmus",
+    "hinduizmus",
+    "iszlám"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik vallás törvényeinek gyűjteménye a Talmud?",
+   "valaszok": [
+    "iszlám",
+    "görögkeleti",
+    "zsidó",
+    "hindu"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a mondabeli Akhilleusz egyetlen sebezhető pontja?",
+   "valaszok": [
+    "szíve",
+    "sarka",
+    "nyaka",
+    "tarkója"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt Orfeusz hangszere?",
+   "valaszok": [
+    "lant",
+    "csengettyű",
+    "fuvola",
+    "pánsíp"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Miknek a megtestesítője Fama a római mitológiában?",
+   "valaszok": [
+    "fény és árnyék",
+    "hírek és álhírek",
+    "hadüzenet és béke",
+    "öröm és bánat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen alakban rabolta el Zeusz Európát, a görög királylányt?",
+   "valaszok": [
+    "kentaur",
+    "aranyeső",
+    "villám",
+    "bika"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen anyagból készül a mitológia szerint életre kelthető óriásszobor, a gólem?",
+   "valaszok": [
+    "bronz",
+    "márvány",
+    "agyag",
+    "fa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nyelven íródott a Korán?",
+   "valaszok": [
+    "latin",
+    "arab",
+    "hindi",
+    "héber"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat nyelte le Jónást a Bibliában?",
+   "valaszok": [
+    "víziló",
+    "krokodil",
+    "cethal",
+    "oroszlán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A Biblia szerint kit jelölt ki az Úr, hogy szabadítsa ki Izrael népét az egyiptomi fogságból?",
+   "valaszok": [
+    "Ábrahámot",
+    "Dávidot",
+    "Mózest",
+    "Jézust"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik a buddhista vallásban a teljes megnyugvás állapotát?",
+   "valaszok": [
+    "karuná",
+    "máitri",
+    "nirvána",
+    "muditá"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik az iszlám aszkéta életű, misztikus vallásfelfogású szerzeteseit?",
+   "valaszok": [
+    "kádik",
+    "mamelukok",
+    "eunuchok",
+    "dervisek"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol született Mózes?",
+   "valaszok": [
+    "Szíriában",
+    "Egyiptomban",
+    "Perzsiában",
+    "Babilóniában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol tekinthető meg Szent Antal sírja?",
+   "valaszok": [
+    "Rapallóban",
+    "Padovában",
+    "Ravennában",
+    "Capuában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol van a görög mitológia szerint, aki a Tartaroszba került?",
+   "valaszok": [
+    "Zeusz palotájában",
+    "a hősi halottak földjén",
+    "Aphrodité ligetében",
+    "az alvilágban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol építettek templomot Ámon-Ré tiszteletére?",
+   "valaszok": [
+    "Egyiptomban",
+    "Babilónban",
+    "Perzsiában",
+    "Görögországban"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hová küldte az Úr Jónást, hogy prédikáljon a bűnös város ellen?",
+   "valaszok": [
+    "Ninivébe",
+    "Szodomába",
+    "Jerikóba",
+    "Kánaánba"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány feje van a mitológiai Cerberosznak?",
+   "valaszok": [
+    "kettő",
+    "három",
+    "hét",
+    "tizenkettő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány felesége lehet egy hithű muzulmánnak?",
+   "valaszok": [
+    "egy",
+    "kettő",
+    "három",
+    "négy"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki adta el elsőszülöttségét egy tál lencséért?",
+   "valaszok": [
+    "Izsák",
+    "Jákob",
+    "Ézsau",
+    "Elizeus"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki az utazók, vándorok védőszentje?",
+   "valaszok": [
+    "Szent Kristóf",
+    "Szent Bertalan",
+    "Szent Flórián",
+    "Szent Márton"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki jegyezte le az arabok szent könyvét, a koránt?",
+   "valaszok": [
+    "Ibrahim",
+    "Izmail",
+    "Mohamed",
+    "Mózes"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki lopta el az istenek tüzét az emberek számára a görög mitológiában?",
+   "valaszok": [
+    "Odüsszeusz",
+    "Héraklész",
+    "Prométheusz",
+    "Akhilleusz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki tagadta meg háromszor Jézust?",
+   "valaszok": [
+    "Tamás",
+    "Júdás",
+    "Pál",
+    "Péter"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt Dávid és Betsabé közös gyermeke?",
+   "valaszok": [
+    "Saul",
+    "Salamon",
+    "Adónia",
+    "Sámuel"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Pügmalión ciprusi királylány felesége?",
+   "valaszok": [
+    "egy nővé vált őz",
+    "egy sellő",
+    "egy életre keltett szobor",
+    "egy athéni virágáruslány"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt a jezsuita rend megalapítója?",
+   "valaszok": [
+    "Assisi Szent Ferenc",
+    "Xavéri Ferenc",
+    "Loyolai Szent Ignác",
+    "Aquinói Szent Tamás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt az a trójai királylány, akit Apollo azzal büntetett, hogy ne higgyék el a jóslatait?",
+   "valaszok": [
+    "Cassandra",
+    "Püthia",
+    "Helena",
+    "Hekabé"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a fejét kérte Salomé táncáért cserébe Heródes királytól?",
+   "valaszok": [
+    "Szent János",
+    "Szent Péter",
+    "Holofernes",
+    "Sámson"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a küldöttei a valkűrök?",
+   "valaszok": [
+    "Zeusz",
+    "Ozirisz",
+    "Káli",
+    "Odin"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a parancsára követték el a betlehemi gyermekgyilkosságokat?",
+   "valaszok": [
+    "Kajafás",
+    "Heródes",
+    "Pilátus",
+    "Antipatrosz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kivel lépett félre Odüsszeusz?",
+   "valaszok": [
+    "Antigoné",
+    "Kirké",
+    "Pandóra",
+    "Léda"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kivel élt Odüsszeusz hét évig hosszú bolyongása során?",
+   "valaszok": [
+    "Szép Helénával",
+    "Calypso nimfával",
+    "Dido királynővel",
+    "Andromakhéval"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely vallás egyes jogtudósainak megszólítása a molla?",
+   "valaszok": [
+    "buddhizmus",
+    "iszlám",
+    "hindu",
+    "görögkeleti"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik apostol mélyesztette ujjait Jézus sebeibe azért, hogy meggyőződjön feltámadásáról?",
+   "valaszok": [
+    "Péter",
+    "Jakab",
+    "Tamás",
+    "András"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik az iszlám színe?",
+   "valaszok": [
+    "zöld",
+    "sárga",
+    "fehér",
+    "fekete"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik bibliai apostol neve jelent sziklát?",
+   "valaszok": [
+    "Tamás",
+    "Péter",
+    "Júdás",
+    "Jakab"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik bibliai személyhez köthető a Hegyi beszéd?",
+   "valaszok": [
+    "Mózes",
+    "Pál apostol",
+    "Salamon",
+    "Jézus"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik bibliai szereplő álmában jelenik meg egy égbe vezető lajtorja?",
+   "valaszok": [
+    "Izsák",
+    "Jób",
+    "Jákob",
+    "József"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik görög istennel azonosították a római Mercuriust?",
+   "valaszok": [
+    "Dionüszosszal",
+    "Hermésszel",
+    "Pánnal",
+    "Apollónnal"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik hős szállt le az alvilágba, hogy halott feleségét visszahozza?",
+   "valaszok": [
+    "Daidalosz",
+    "Héraklész",
+    "Orfeusz",
+    "Akhilleusz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik mitológiai lény a költői képzelet, az ihlet jelképe?",
+   "valaszok": [
+    "Diana",
+    "Pegazus",
+    "Cerberus",
+    "Nesszosz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik mitológiában találkozhatunk bacchánsnőkkel?",
+   "valaszok": [
+    "hindu",
+    "germán",
+    "római",
+    "kelta"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik országban nevezték a protestánsokat hugenottáknak?",
+   "valaszok": [
+    "Németország",
+    "Franciaország",
+    "Hollandia",
+    "Svájc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik próféta vonakodott teljesíteni a küldetését?",
+   "valaszok": [
+    "Jeremiás",
+    "Illés",
+    "Ezékiel",
+    "Jónás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szerzetesrend-alapító tevékenykedett Assisiben?",
+   "valaszok": [
+    "Szent Benedek",
+    "Szent Domonkos",
+    "Szent Ferenc",
+    "Szent Ágoston"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szerzetesrendet alapította Loyolai Szent Ignác?",
+   "valaszok": [
+    "kapucinus",
+    "bencés",
+    "jezsuita",
+    "domonkos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik vallás főpapja a metropolita?",
+   "valaszok": [
+    "zsidó",
+    "iszlám",
+    "görögkeleti",
+    "mormon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik vallás híveit keresztelik meg kizárólag felnőtt korban?",
+   "valaszok": [
+    "unitárius",
+    "református",
+    "baptista",
+    "görögkeleti"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik vallás istentiszteleti tárgya a frigyláda?",
+   "valaszok": [
+    "zsidó",
+    "keresztény",
+    "iszlám",
+    "buddhista"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik vallás ünnepe a purim?",
+   "valaszok": [
+    "iszlám",
+    "zsidó",
+    "katolikus",
+    "buddhista"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mennyi pénzért árulta el Júdás Jézust?",
+   "valaszok": [
+    "ötven aranyért",
+    "harminc ezüstért",
+    "negyven ezüstért",
+    "húsz aranyért"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a bencés szerzetesrend jelmondata?",
+   "valaszok": [
+    "Párizs megér egy misét!",
+    "Ora et labora!",
+    "Kelj fel és járj!",
+    "Carpe diem!"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a jelentése a pünkösd szónak?",
+   "valaszok": [
+    "feltámadás",
+    "tavasz",
+    "ötven",
+    "kegyelem"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt Sziszüphosz király alvilági büntetésének eszköze?",
+   "valaszok": [
+    "egy kard",
+    "egy szikla",
+    "egy kancsó bor",
+    "egy bot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mije volt a görög mitológiából ismert Kharónnak?",
+   "valaszok": [
+    "szamárfeje",
+    "ladikja",
+    "mérhetetlen kincse",
+    "varázserejű nyila"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen kapcsolat van Héphaisztosz és Aphrodité között a görög mitológiában?",
+   "valaszok": [
+    "apa és lánya",
+    "anya és fia",
+    "ikertestvéri",
+    "házastársi"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen néven viselte tisztségét mindezidáig a legtöbb pápa az alábbiak közül?",
+   "valaszok": [
+    "Pius",
+    "Pál",
+    "Benedek",
+    "János"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen növényt hozott Noénak a galamb a Bibliában?",
+   "valaszok": [
+    "szőlővesszőt",
+    "olajágat",
+    "pálmalevelet",
+    "fügefalevelet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen állat lakmározott a leláncolt Prométeusz májából?",
+   "valaszok": [
+    "farkas",
+    "hiéna",
+    "keselyű",
+    "oroszlán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen ételért adta el Ézsau az elsőszülöttségi jogot Jákobnak a Biblia szerint?",
+   "valaszok": [
+    "egy tányér levesért",
+    "egy csupor mézért",
+    "egy tál lencséért",
+    "egy kosár mannáért"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mit őriz a görög mitológiában Cerberus?",
+   "valaszok": [
+    "Zeusz palotáját",
+    "az alvilág kapuját",
+    "az istenek álmát",
+    "a tüzet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit őriztek a Vesta-szűzek a római mitológiában?",
+   "valaszok": [
+    "Apollón marháit",
+    "Héra tisztességét",
+    "a szent tűzet",
+    "az utazók álmát"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mivel a kezében szokás ábrázolni Poszeidón istent?",
+   "valaszok": [
+    "törött kard",
+    "szigony",
+    "fűzfaág",
+    "fáklya"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A Biblia szerint ki rendelte el a betlehemi gyermekgyilkosságot?",
+   "valaszok": [
+    "Pontius Pilatus",
+    "Heródes",
+    "Kajafás",
+    "Augustus császár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A Biblia szerint milyen állat állkapcsával ütött agyon Sámson ezer filiszteust?",
+   "valaszok": [
+    "kecske",
+    "szamár",
+    "oroszlán",
+    "borjú"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "A hét melyik napja számít ünnepnek az iszlám vallásban?",
+   "valaszok": [
+    "szombat",
+    "kedd",
+    "péntek",
+    "vasárnap"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül ki nem tartozott az ún. \"nagy próféták\" közé?",
+   "valaszok": [
+    "Jeremiás",
+    "Ézsaiás",
+    "Mózes",
+    "Dániel"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy hívták a kelta papokat?",
+   "valaszok": [
+    "pontifex",
+    "haruspex",
+    "druida",
+    "magicoturmix"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan nevezik a bíborosok pápaválasztó gyűlését?",
+   "valaszok": [
+    "konvent",
+    "konkordátum",
+    "kongregáció",
+    "konklávé"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan ábrázolják Justitiát, az igazság istennőjét?",
+   "valaszok": [
+    "lándzsával a kezében",
+    "törvénykönyvvel a kezében",
+    "bekötött szájjal",
+    "bekötött szemmel"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol őrzik Budapesten a Szent Jobbot?",
+   "valaszok": [
+    "a Nemzeti Múzeumban",
+    "az Országházban",
+    "a Bazilikában",
+    "a Mátyás-temploban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány évig élt Matuzsálem?",
+   "valaszok": [
+    "1000.0",
+    "969.0",
+    "850.0",
+    "925.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hányan voltak a mitológiai Danaiosz király lányai, a Danaidák?",
+   "valaszok": [
+    "hárman",
+    "heten",
+    "harmincan",
+    "ötvenen"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki a férje Aphroditének, a szerelem istennőjének?",
+   "valaszok": [
+    "Apolló",
+    "Dionüszosz",
+    "Héphaisztosz",
+    "Arész"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki az utazók védőszentje?",
+   "valaszok": [
+    "Szent Borbála",
+    "Szent Kristóf",
+    "Szent Jeromos",
+    "Szent Márton"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki mondta a Hegyi beszédet?",
+   "valaszok": [
+    "Buddha",
+    "Mohamed",
+    "Mózes",
+    "Jézus"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem próféta a Biblia szerint?",
+   "valaszok": [
+    "Ézsaiás",
+    "Jeremiás",
+    "Saul",
+    "Sámuel"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem tartozik az Újszövetség négy evangéliumának szerzői közé?",
+   "valaszok": [
+    "Pál",
+    "Máté",
+    "Márk",
+    "Lukács"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem tartozott az apostolok közé a Biblia szerint?",
+   "valaszok": [
+    "Jakab",
+    "Fülöp",
+    "József",
+    "Tamás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt Akhilleusz legjobb barátja, aki Trója alatt halt meg?",
+   "valaszok": [
+    "Hektór",
+    "Philoktétész",
+    "Menelaosz",
+    "Patroklosz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt Salamon apja a Bibliában?",
+   "valaszok": [
+    "Jákob",
+    "Saul",
+    "Noé",
+    "Dávid"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kik voltak az ókori római mitológiában a kellem és a báj istennői?",
+   "valaszok": [
+    "gráciák",
+    "hórák",
+    "danaidák",
+    "párkák"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik voltak jósnők az alábbi mitológiai lények közül?",
+   "valaszok": [
+    "hárpiák",
+    "fúriák",
+    "szirének",
+    "szibillák"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kiknek a \"cselekedeteikről\" szól az Újszövetség egyik könyve?",
+   "valaszok": [
+    "Apostolok",
+    "Prédikátorok",
+    "Királyok",
+    "Bírák"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik apostol került Júdás halála után a megüresedett helyre?",
+   "valaszok": [
+    "Jakab",
+    "Mátyás",
+    "Fülöp",
+    "Tamás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik isteni származású görög hős vált halhatatlanná az égbe emelkedve halotti máglyájáról?",
+   "valaszok": [
+    "Eurüdiké",
+    "Télemakhosz",
+    "Kháron",
+    "Héraklész"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik prófétát vetették oroszlánok elé?",
+   "valaszok": [
+    "Ezékielt",
+    "Jeremiást",
+    "Ézsaiást",
+    "Dánielt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik városban nevelkedett fel Jézus a Biblia szerint?",
+   "valaszok": [
+    "Jeruzsálem",
+    "Betlehem",
+    "Jerikó",
+    "Názáret"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi a neve a hajósokat énekével elpusztító tündérnek a német hiedelemvilágban?",
+   "valaszok": [
+    "Villő",
+    "Hárpia",
+    "Lorelei",
+    "Szirén"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi szokott lenni Szent Péter kezében az őt ábrázoló képeken?",
+   "valaszok": [
+    "pálca",
+    "rózsafüzér",
+    "esernyő",
+    "kulcs"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi volt Dávid király eredeti foglalkozása a Biblia szerint?",
+   "valaszok": [
+    "pásztor",
+    "kereskedő",
+    "halász",
+    "katona"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi volt Pál apostol eredeti neve?",
+   "valaszok": [
+    "Sámuel",
+    "Salamon",
+    "Saul",
+    "Simeon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt Péter apostol eredeti foglalkozása?",
+   "valaszok": [
+    "tanító",
+    "halász",
+    "kufár",
+    "fazekas"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen vallásúak a kabil törzsek?",
+   "valaszok": [
+    "buddhista",
+    "hindu",
+    "iszlám",
+    "párszi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A Biblia szerint hova került József, miután testvérei eladták?",
+   "valaszok": [
+    "Föníciába",
+    "Szíriába",
+    "Perzsiába",
+    "Egyiptomba"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "A Biblia szerint ki vezette a zsidó népet az Ígéret földjére Mózes halála után?",
+   "valaszok": [
+    "Józsué",
+    "Áron",
+    "Dávid",
+    "Jákob"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy hívják Mózes bátyját a Bibliában?",
+   "valaszok": [
+    "Ábel",
+    "Ádám",
+    "Ámos",
+    "Áron"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy hívták Mózes bátyját?",
+   "valaszok": [
+    "Ábel",
+    "Áron",
+    "Bálám",
+    "Saul"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy hívták Mózes feleségét a Bibliában?",
+   "valaszok": [
+    "Mirjam",
+    "Ráchel",
+    "Cippora",
+    "Debóra"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy hívták Ábrahám és Sára idős korukban született gyermekét?",
+   "valaszok": [
+    "Izsák",
+    "Izmael",
+    "Rebekka",
+    "Lót"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy nevezik a szokásjog és a Korán alapján ítélkező muzulmán bírót?",
+   "valaszok": [
+    "dervis",
+    "hodzsa",
+    "kádi",
+    "díván"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan nevezzük az iszlám szent háborúját?",
+   "valaszok": [
+    "szunna",
+    "hidzsra",
+    "ramadán",
+    "dzsihád"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan szól a bencés rend jelmondata?",
+   "valaszok": [
+    "Higgy és tégy!",
+    "Teremts és adakozz!",
+    "Bízz és szeress!",
+    "Imádkozz és dolgozz!"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol hordják a püspökök a mitrát?",
+   "valaszok": [
+    "a derekuk körül",
+    "a lábukon",
+    "a nyakukban",
+    "a fejükön"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol található Borobudur, a világ legnagyobb buddhista templomegyüttese?",
+   "valaszok": [
+    "India",
+    "Indonézia",
+    "Thaiföld",
+    "Sri Lanka"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány csapással sújtotta az Úr Egyiptomot?",
+   "valaszok": [
+    "száz",
+    "tizenkettő",
+    "tíz",
+    "hét"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hány stációt járt végig Jézus Krisztus a keresztúton?",
+   "valaszok": [
+    "7.0",
+    "14.0",
+    "10.0",
+    "12.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hány évig vándorolt Mózes népe a pusztában, míg elért Kánaánba a Biblia szerint?",
+   "valaszok": [
+    "10.0",
+    "25.0",
+    "40.0",
+    "70.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hányszor imádkozik naponta egy igazhitű muzulmán?",
+   "valaszok": [
+    "háromszor",
+    "hétszer",
+    "ötször",
+    "négyszer"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Jézus melyik tanítványa tagadta meg háromszor mesterét a Biblia szerint?",
+   "valaszok": [
+    "Tamás",
+    "János",
+    "Péter",
+    "Máté"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki Apollón görög isten ikertestvére?",
+   "valaszok": [
+    "Héliosz",
+    "Mars",
+    "Héra",
+    "Artemisz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki az ókori görögök fő istenének, Zeusznak az anyja?",
+   "valaszok": [
+    "Héra",
+    "Gaia",
+    "Rheia",
+    "Léda"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki került börtönbe Putifárné miatt?",
+   "valaszok": [
+    "József",
+    "Jákob",
+    "Mózes",
+    "Dávid"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem arkangyal a Biblia szerint?",
+   "valaszok": [
+    "Mihály",
+    "Gábriel",
+    "Ezékiel",
+    "Ráfael"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt Argosz, akinek nevéből az árgus szavunk ered?",
+   "valaszok": [
+    "egyszemű óriás",
+    "százszemű szörny",
+    "az aranygyapjú őrzője",
+    "az alvilág őre"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt József apja az Ószövetség szerint?",
+   "valaszok": [
+    "Noé",
+    "Jákob",
+    "Izsák",
+    "Mózes"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt József és Benjámin anyja az Ószövetség szerint?",
+   "valaszok": [
+    "Sára",
+    "Ráchel",
+    "Rebekka",
+    "Lea"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt Oresztész testvére a görög mitológiában?",
+   "valaszok": [
+    "Antigoné",
+    "Oidipusz",
+    "Élektra",
+    "Orpheusz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt a sakálfejű isten az egyiptomi mitológiában?",
+   "valaszok": [
+    "Ozirisz",
+    "Ízisz",
+    "Anubisz",
+    "Ámon-Ré"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt a zsidók első királya?",
+   "valaszok": [
+    "Saul",
+    "Salamon",
+    "Dávid",
+    "Sámuel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt az ókori Salamon király anyja?",
+   "valaszok": [
+    "Szemirámisz",
+    "Salome",
+    "Betsabé",
+    "Zsuzsanna"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik irányították az Eötvös Lóránd Tudományegyetem jogelődjének számító egyetemet 1773-ig?",
+   "valaszok": [
+    "bencések",
+    "piaristák",
+    "jezsuiták",
+    "ferencesek"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik ők a görög mitológiában: Daphné, Kalüpszó, Kallisztó?",
+   "valaszok": [
+    "Apollón feleségei",
+    "nimfák",
+    "múzsák",
+    "Zeusz lányai"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiknek a mitológiájában szerepelt Quetzalcoatl isten?",
+   "valaszok": [
+    "egyiptomiak",
+    "aztékok",
+    "vikingek",
+    "perzsák"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a palotája volt a mitológia szerint a Valhalla?",
+   "valaszok": [
+    "Morrigan",
+    "Krisna",
+    "Odin",
+    "Ozirisz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek volt varázsereje az alábbi mitológiai szereplők közül?",
+   "valaszok": [
+    "Antigoné",
+    "Püthia",
+    "Cassandra",
+    "Kirké"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mely isten papnője jósolt az ókori Delphoiban?",
+   "valaszok": [
+    "Poszeidón",
+    "Hermész",
+    "Hádész",
+    "Apollón"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik az uralkodó vallás a Fülöp-szigeteken?",
+   "valaszok": [
+    "hindu",
+    "iszlám",
+    "buddhista",
+    "katolikus"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik bibliai nőalak mentette meg a perzsa birodalomban elő zsidókat a kiirtástól?",
+   "valaszok": [
+    "Judit",
+    "Zsuzsanna",
+    "Eszter",
+    "Rebeka"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik bibliai személy nevezetes közel 100 zsoltáráról is?",
+   "valaszok": [
+    "Sámuel",
+    "Dávid",
+    "Izsák",
+    "Illés"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik elveszett állatról szól Jézus egyik példabeszéde?",
+   "valaszok": [
+    "szamár",
+    "kutya",
+    "bárány",
+    "disznó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik isten jellegzetes fegyvere a kalapács?",
+   "valaszok": [
+    "Mars",
+    "Ozirisz",
+    "Apollón",
+    "Thor"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik isten követői a bakkhánsnők?",
+   "valaszok": [
+    "Apollón",
+    "Poszeidón",
+    "Dionüszosz",
+    "Zeusz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik növény kapta nevét az ókori görög mitológia saját képmásába beleszerető ifjáról?",
+   "valaszok": [
+    "jácint",
+    "liliom",
+    "nárcisz",
+    "mimóza"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szerzetesrend tagjai tesznek hallgatási fogadalmat?",
+   "valaszok": [
+    "jezsuiták",
+    "bencések",
+    "karthauziak",
+    "domonkosok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik szerzetesrendet nevezik kegyesrendnek is?",
+   "valaszok": [
+    "ciszterci",
+    "bencés",
+    "piarista",
+    "jezsuita"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik városban született Mohamed próféta?",
+   "valaszok": [
+    "Mekka",
+    "Bagdad",
+    "Medina",
+    "Damaszkusz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városból kellett menekülnie a bibliai történetben Lótnak?",
+   "valaszok": [
+    "Szodomából",
+    "Ninivéből",
+    "Jerikóból",
+    "Jeruzsálemből"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik állat Szent Márk evangélista jelképe?",
+   "valaszok": [
+    "medve",
+    "bika",
+    "sas",
+    "oroszlán"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik állat hozható kapcsolatba Szent Mártonnal?",
+   "valaszok": [
+    "kutya",
+    "lúd",
+    "szarvas",
+    "galamb"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ószövetségi személyhez köti a hagyomány az Énekek éneke című költői iratot?",
+   "valaszok": [
+    "Salamon",
+    "Mózes",
+    "Ábrahám",
+    "Dávid"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi a neve a szegedi dómnak?",
+   "valaszok": [
+    "Szent István székesegyház",
+    "Fogadalmi templom",
+    "Szent György-templom",
+    "Kálvária-templom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen alakban ábrázolták az ókori egyiptomiak Hórusz istent?",
+   "valaszok": [
+    "bagoly",
+    "sólyom",
+    "tehén",
+    "sakál"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen néven vált ismertté Gautama Sziddhartha?",
+   "valaszok": [
+    "Visnu",
+    "Siva",
+    "Brahma",
+    "Buddha"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen állatként ábrázolták Hórusz egyiptomi istent?",
+   "valaszok": [
+    "krokodil",
+    "tehén",
+    "íbisz",
+    "sólyom"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Minek az istennője volt Artemisz a görög mitológiában?",
+   "valaszok": [
+    "családi tűzhely",
+    "vadászat",
+    "szivárvány",
+    "szépség"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit jelent az imákban gyakran használt malaszt szó?",
+   "valaszok": [
+    "áhitat",
+    "kegyelem",
+    "menedék",
+    "segítség"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mózes melyik könyvének latin elnevezése az Exodus?",
+   "valaszok": [
+    "Teremtés könyve",
+    "Leviták könyve",
+    "Kivonulás könyve",
+    "Számok könyve"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A Biblia könyvei közül melyik az Apokalipszis?",
+   "valaszok": [
+    "Apostolok cselekedetei",
+    "Bölcsességek könyve",
+    "Jelenések könyve",
+    "Próféták könyve"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "A Biblia szerint hány éves volt Sára, amikor megszülte Izsákot?",
+   "valaszok": [
+    "75.0",
+    "90.0",
+    "120.0",
+    "333.0"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik a zsidó húsvétot?",
+   "valaszok": [
+    "Peszah",
+    "Purim",
+    "Jom kippur",
+    "macesz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogyan született a mitológia szerint Aphrodité?",
+   "valaszok": [
+    "a tenger habjaiból",
+    "egy hattyútojásból",
+    "a Nap sugaraiból",
+    "egy almamagból"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki Akhilleusz anyja a görög mitológiában?",
+   "valaszok": [
+    "Héra",
+    "Andromakhé",
+    "Iphigénia",
+    "Thetisz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem szerepel Salome történetében?",
+   "valaszok": [
+    "Heródes Antipas",
+    "Keresztelő János",
+    "Heródiás",
+    "Salamon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem volt főisten az alábbi istenségek közül?",
+   "valaszok": [
+    "Indra",
+    "Dágón",
+    "Istár",
+    "Aton"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt Jakab testvére az Újszövetség szerint?",
+   "valaszok": [
+    "János",
+    "Júdás",
+    "Péter",
+    "Máté"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt Jákob testvére a Bibliában?",
+   "valaszok": [
+    "Izsák",
+    "Mózes",
+    "József",
+    "Ézsau"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt Polüphémosz?",
+   "valaszok": [
+    "egyszemű óriás",
+    "milétoszi filozófus",
+    "krétai király",
+    "trójai hős"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt nőnemű az alábbi egyiptomi istenek közül?",
+   "valaszok": [
+    "Ozirisz",
+    "Ízisz",
+    "Anubisz",
+    "Hórusz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik voltak a danaidák a görög mitológiában?",
+   "valaszok": [
+    "a sors istennői",
+    "férjgyilkos asszonyok",
+    "Zeusz törvénytelen lányai",
+    "tengeri tündérek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek adja Párisz Erisz aranyalmáját a mitológiai szépségverseny bírájaként?",
+   "valaszok": [
+    "Aphroditének",
+    "Pallasz Athénének",
+    "Hérának",
+    "Helénának"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek az ereklyéje a Szent Grál a legenda szerint?",
+   "valaszok": [
+    "Mózes",
+    "Jézus",
+    "Szent Fülöp",
+    "Máté evangélista"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit lesett meg fürdőzés közben Dávid a palotája tetejéről a Biblia szerint?",
+   "valaszok": [
+    "Juditot",
+    "Zsuzsannát",
+    "Ráchelt",
+    "Betsabét"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kit neveztek dagadtlábúnak a görög mitológiában?",
+   "valaszok": [
+    "Odüsszeuszt",
+    "Oidipuszt",
+    "Akhilleuszt",
+    "Pánt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik bibliai nőalak vágta le Holofernész, asszír hadvezér fejét?",
+   "valaszok": [
+    "Eszter",
+    "Sára",
+    "Judit",
+    "Zsuzsanna"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik bibliai személlyel hozható kapcsolatba Putifárné?",
+   "valaszok": [
+    "Dávid",
+    "József",
+    "Mózes",
+    "Sámson"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik indiai istenséget szokás gyakran táncolva ábrázolni?",
+   "valaszok": [
+    "Káli",
+    "Ganésa",
+    "Brahma",
+    "Siva"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik könyv nem része az Ószövetségnek?",
+   "valaszok": [
+    "Prédikátorok könyve",
+    "Bírák könyve",
+    "Jelenések könyve",
+    "Királyok könyve"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik mitológiai hős nem járt életében az alvilágban?",
+   "valaszok": [
+    "Oidipusz",
+    "Odüsszeusz",
+    "Aeneas",
+    "Héraklész"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország területén található Mekka, az iszlám szent városa?",
+   "valaszok": [
+    "Szaúd-Arábia",
+    "Irak",
+    "Jordánia",
+    "Jemen"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik szerzetesrend jelmondata: \"Imádkozzál és dolgozzál!\"?",
+   "valaszok": [
+    "ferencesek",
+    "bencések",
+    "pálosok",
+    "domonkosok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szerzetesrendhez tartozik a tihanyi apátság?",
+   "valaszok": [
+    "ferences",
+    "bencés",
+    "cisztercita",
+    "domonkos"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város királya volt Agamemnón a görög mitológia szerint?",
+   "valaszok": [
+    "Spárta",
+    "Mükéné",
+    "Pülosz",
+    "Mütiléné"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt Máté evangélista eredeti foglalkozása?",
+   "valaszok": [
+    "vámszedő",
+    "halász",
+    "tanító",
+    "ács"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi volt Péter apostol eredeti neve a Biblia szerint?",
+   "valaszok": [
+    "Tamás",
+    "Jakab",
+    "Fülöp",
+    "Simon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen bokor égett, amiben megjelent az Úr Mózesnek a Biblia szerint?",
+   "valaszok": [
+    "kökénybokor",
+    "bodzabokor",
+    "csipkebokor",
+    "galagonyabokor"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen magyar néven ismert Augustinus hippói püspök?",
+   "valaszok": [
+    "Szent Antal",
+    "Szent Anzelm",
+    "Szent Ágoston",
+    "Szent Ambrus"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nyelven íródott az Újszövetség?",
+   "valaszok": [
+    "görög",
+    "arab",
+    "latin",
+    "héber"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Minek az istennője a görög mitológiában Hébé?",
+   "valaszok": [
+    "az ifjúság",
+    "a békés öregkor",
+    "a bajvívás",
+    "a dicsőség"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy nevezik Mária édesanyját a keresztény hagyomány szerint?",
+   "valaszok": [
+    "Anna",
+    "Magdolna",
+    "Erzsébet",
+    "Miriam"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hány fia volt Noénak a Biblia szerint?",
+   "valaszok": [
+    "kettő",
+    "három",
+    "hét",
+    "tíz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem nőnemű az alábbi mitológiai alakok közül?",
+   "valaszok": [
+    "Erisz",
+    "Déméter",
+    "Daphnis",
+    "Khrüszéisz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki szabadította meg a leláncolt Prométheuszt?",
+   "valaszok": [
+    "Héraklész",
+    "Pallasz Athéné",
+    "Thészeusz",
+    "Odüsszeusz"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt Antigoné apja a görög mitológia szerint?",
+   "valaszok": [
+    "Oidipusz",
+    "Kreon",
+    "Zeusz",
+    "Agamemnon"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt Keresztelő János apja a Bibliában?",
+   "valaszok": [
+    "Zakariás",
+    "Jonatán",
+    "Elizeus",
+    "Fülöp"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik éltek a görög mitológiában az elíziumi mezőkön?",
+   "valaszok": [
+    "a sors istennői",
+    "a boldog lelkek",
+    "a múzsák",
+    "az elkárhozott lelkek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a lánya Iphigeneia a görög mítosz szerint?",
+   "valaszok": [
+    "Artemisz",
+    "Perszephoné",
+    "Klütaimnésztra",
+    "Iokaszté"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek volt lázadó fia Absalom a Bibliában?",
+   "valaszok": [
+    "Ábrahám",
+    "Noé",
+    "Salamon",
+    "Dávid"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik angyal vitte hírül Máriának Jézus eljövendő megszületését a Lukács-evangélium szerint?",
+   "valaszok": [
+    "Ráfael",
+    "Uriel",
+    "Gábriel",
+    "Mihály"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik az egyetlen magyarországi alapítású szerzetesrend?",
+   "valaszok": [
+    "ciszterciek",
+    "domonkosok",
+    "bencések",
+    "pálosok"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik mitológiai hős volt szerelmes saját tükörképébe?",
+   "valaszok": [
+    "Ekhó",
+    "Narkisszosz",
+    "Nemezisz",
+    "Daphne"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik országban terjedt el a zen buddhizmus?",
+   "valaszok": [
+    "Thaiföldön",
+    "Indiában",
+    "Nepálban",
+    "Japánban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik próféta kente fel Sault Izrael első királyává a Biblia szerint?",
+   "valaszok": [
+    "Sámuel",
+    "Illés",
+    "Jeremiás",
+    "Ezékiel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik vallás kultikus építményei a sztúpák?",
+   "valaszok": [
+    "iszlám",
+    "hindu",
+    "buddhista",
+    "görögkeleti"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város szülötte volt a híres görög mitológiai hős, Hektór?",
+   "valaszok": [
+    "Trója",
+    "Korinthosz",
+    "Mükéné",
+    "Théba"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik városban végezték ki Pál apostolt a hagyomány szerint?",
+   "valaszok": [
+    "Jeruzsálem",
+    "Róma",
+    "Korinthosz",
+    "Damaszkusz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hányszor kell körbejárnia egy iszlám hívőnek Mekkában a Kába-követ?",
+   "valaszok": [
+    "háromszor",
+    "hétszer",
+    "ötször",
+    "tízszer"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki a tragédia múzsája a görög mitológiában?",
+   "valaszok": [
+    "Thalia",
+    "Melpomené",
+    "Euterpé",
+    "Terpszikhoré"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki alapította a pálos rendet?",
+   "valaszok": [
+    "Szent Pál",
+    "Boldog Özséb",
+    "Szent Benedek",
+    "Szent Adalbert"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem tagja a hinduizmus legfőbb istenhármasságának, a trimúrtinak?",
+   "valaszok": [
+    "Visnu",
+    "Siva",
+    "Indra",
+    "Brahma"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit lesett meg a tettéért szarvassá változtatott Aktaión a mítosz szerint?",
+   "valaszok": [
+    "Pallasz Athénét",
+    "Hérát",
+    "Artemiszt",
+    "Aphroditét"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kivel nem létesített szerelmi kapcsolatot Zeusz a görög mitológia szerint?",
+   "valaszok": [
+    "Antiopéval",
+    "Szemelével",
+    "Létóval",
+    "Kalüpszóval"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik apostolt tartja a hagyomány a jelenések könyve szerzőjének?",
+   "valaszok": [
+    "Máté",
+    "János",
+    "Pál",
+    "Lukács"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik ószövetségi szereplő neve jelenti azt, hogy a \"sokaság atyja\"?",
+   "valaszok": [
+    "Ábrahám",
+    "Matuzsálem",
+    "Jákob",
+    "Salamon"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Minek volt az istennője a görög mitológiában Nemezis?",
+   "valaszok": [
+    "költészet",
+    "családi béke",
+    "újjászületés",
+    "megtorlás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki nem volt Noé fia a Biblia szerint?",
+   "valaszok": [
+    "Sém",
+    "Hám",
+    "Lévi",
+    "Jáfet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki vagy mi volt a mitológia szerint Romolus és Remus édesanyja?",
+   "valaszok": [
+    "egy farkas",
+    "Juno",
+    "Minerva",
+    "Rhea Silvia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kit akarnak feláldozni egy tengeri szörnynek Poszeidón kiengesztelésére a motológiai történetben?",
+   "valaszok": [
+    "Alkménét",
+    "Amaltheiát",
+    "Andromakhét",
+    "Andromédát"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik országban található a híres keresztény zarándokhely, Fatima?",
+   "valaszok": [
+    "Olaszországban",
+    "Spanyolországban",
+    "Portugáliában",
+    "Lengyelországban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város püspöke volt Szent Miklós, akit a Mikulással azonosítunk?",
+   "valaszok": [
+    "Hippo",
+    "Bizánc",
+    "Antiokheia",
+    "Myra"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi történik a halott lelkekkel az alvilági Léthe folyó vízétől a mitológia szerint?",
+   "valaszok": [
+    "újjászületnek",
+    "elfelejtik földi életüket",
+    "megtisztulnak",
+    "megsemmisülnek"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nyelvű bibliafordítás a Vulgata?",
+   "valaszok": [
+    "görög",
+    "héber",
+    "latin",
+    "olasz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nyelvű fordítása az Ószövetségnek a Szeptuaginta?",
+   "valaszok": [
+    "görög",
+    "olasz",
+    "latin",
+    "arab"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hogy nevezik a buddhista szerzetesrendet?",
+   "valaszok": [
+    "hinajána",
+    "szangha",
+    "dharma",
+    "mahájána"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a szerelmi ajánlatát utasította vissza a jövendőlátó trójai királylány, Kasszandra?",
+   "valaszok": [
+    "Zeusz",
+    "Arész",
+    "Poszeidón",
+    "Apollón"
+   ],
+   "helyes": 3
+  }
+ ]
+}

@@ -1,0 +1,3058 @@
+{
+ "id": "kviz-muveszet",
+ "nev": "Képzőművészet és építészet",
+ "tipus": "quiz",
+ "verzio": 1,
+ "kerdesek": [
+  {
+   "kerdes": "Hogy nevezik az építészetben a csavarvonalban emelkedő lépcsőt?",
+   "valaszok": [
+    "gólyalépcső",
+    "zsiráflépcső",
+    "csigalépcső",
+    "bagolylépcső"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kik a \"névadói\" Buda egyik nevezetességének, a Schulek Frigyes tervezte bástyának?",
+   "valaszok": [
+    "vadászok",
+    "halászok",
+    "madarászok",
+    "lovászok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiket örökített meg Székely Bertalan egyik híres történelmi festményén?",
+   "valaszok": [
+    "a szögedi lányokat",
+    "a budai úrhölgyeket",
+    "a makói asszonyokat",
+    "az egri nőket"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik egy építmény elnevezése az alábbiak közül?",
+   "valaszok": [
+    "harangfül",
+    "harangnyelv",
+    "harangkéz",
+    "harangláb"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi az összefoglaló neve a gyümölcsöket, virágokat ábrázoló képeknek?",
+   "valaszok": [
+    "flórapiktúra",
+    "fénykép",
+    "csendélet",
+    "csittskicc"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miknek a tava szerepel Csajkovszkij klasszikus balettjének címében?",
+   "valaszok": [
+    "békák",
+    "kiskacsák",
+    "hattyúk",
+    "hat tyúk"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"bástya\" épült Schulek Frigyes tervei szerint a budai Várhegyen?",
+   "valaszok": [
+    "vadász",
+    "íjász",
+    "halász",
+    "madarász"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen \"jancsi\" a magyar bábjátékok híres figurája?",
+   "valaszok": [
+    "rigó",
+    "paprika",
+    "ringló",
+    "padlizsán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen Rózsikáról írt balettet Csajkovszkij?",
+   "valaszok": [
+    "pamut",
+    "gyapjú",
+    "bársony",
+    "csipke"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen családról szólnaka a L'art pour l'art Társulat jelenetei?",
+   "valaszok": [
+    "Szabó",
+    "Urdu",
+    "Csonka",
+    "Besenyő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen konyhai eszköz szerepel Csajkovszkij világhírű balettjének címében?",
+   "valaszok": [
+    "húsklopfoló",
+    "mákdaráló",
+    "sodrófa",
+    "diótörő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogyan nevezik az ajtó- vagy ablakkeret felső vízszintes fáját?",
+   "valaszok": [
+    "szempillafa",
+    "szemtengelyfa",
+    "szemöldökfa",
+    "szemüvegfa"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik művészeti ág jeles képviselője Markó Iván?",
+   "valaszok": [
+    "szobrászat",
+    "balett",
+    "irodalom",
+    "festészet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művészeti ág kiválósága volt Csók István?",
+   "valaszok": [
+    "festészet",
+    "balett",
+    "komolyzene",
+    "színművészet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen kapunak nevezik a háztetőszerűen fedett, faragott kaput?",
+   "valaszok": [
+    "mór",
+    "székely",
+    "szláv",
+    "dór"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen képzőművészeti alkotás az akvarell?",
+   "valaszok": [
+    "vízfestmény",
+    "olajfestmény",
+    "rézkarc",
+    "fametszet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik nem volt ókori görög építészeti stílus?",
+   "valaszok": [
+    "dór",
+    "ión",
+    "korinthoszi",
+    "akkád"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hogy nevezik a lágy, színes krétát, illetve a vele készült képet?",
+   "valaszok": [
+    "tempera",
+    "akvarell",
+    "pasztell",
+    "sgraffito"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol láthatóak Szinyei Merse Pál Majális című képének központi figurái?",
+   "valaszok": [
+    "vásári forgatagban",
+    "füves domboldalban",
+    "feldíszített ház előtt",
+    "fenyőerdő tisztásán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kit ábrázol Izsó Miklós legismertebb szobra?",
+   "valaszok": [
+    "töprengő kondást",
+    "bóbiskoló gulyást",
+    "flótázó pásztort",
+    "búsuló juhászt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik az a festői technika, melynek képviselői kisebb tárgyakat ragasztanak a képekre?",
+   "valaszok": [
+    "bandázs",
+    "grillázs",
+    "kollázs",
+    "masszázs"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik híres épületnek nincs kupolája?",
+   "valaszok": [
+    "római Pantheon",
+    "vatikáni Szent-Péter-bazilika",
+    "isztambuli Hagia Sophia",
+    "athéni Parthenon"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik művészeti területen lett ismert Ferencsik János?",
+   "valaszok": [
+    "építészet",
+    "zene",
+    "festészet",
+    "költészet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művészeti ágban vált világhírűvé Kocsis Zoltán?",
+   "valaszok": [
+    "zene",
+    "festészet",
+    "filmművészet",
+    "építészet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik művészeti ágban vált világhírűvé Solti György?",
+   "valaszok": [
+    "szobrászat",
+    "festészet",
+    "filmművészet",
+    "zeneművészet"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik építménynek szögletes az alaprajza?",
+   "valaszok": [
+    "a pisai ferde torony",
+    "Stonehenge",
+    "az athéni Parthenón",
+    "a római Colosseum"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi keres egy szerzőt Pirandello művének címe szerint?",
+   "valaszok": [
+    "két rajongó",
+    "négy hitelező",
+    "hat szerep",
+    "nyolc szereplő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Miket készít egy graffitiművész?",
+   "valaszok": [
+    "rézkarcokat",
+    "fémszobrokat",
+    "falfirkákat",
+    "olajfestményeket"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen alaprajzú a híres ókori amfiteátrum, a Colosseum?",
+   "valaszok": [
+    "téglalap",
+    "nyolcszögletű",
+    "ellipszis",
+    "kör"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen alaprajzú a pisai ferde torony?",
+   "valaszok": [
+    "hatszög",
+    "kör",
+    "négyzet",
+    "trapéz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen művei tették ismertté a francia Hervét?",
+   "valaszok": [
+    "festményei",
+    "operettjei",
+    "mozaikjai",
+    "szobrai"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen művészeti ág képviselője Luciano Pavarotti?",
+   "valaszok": [
+    "filmrendező",
+    "operaénekes",
+    "balett-táncos",
+    "kubista festő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen művészeti ág képviselője Markó Iván?",
+   "valaszok": [
+    "népdalénekes",
+    "zongoraművész",
+    "balettművész",
+    "bábművész"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen nemzedékhez tartozott Allen Ginsberg és Jack Kerouac?",
+   "valaszok": [
+    "metalista",
+    "swing",
+    "beat",
+    "boogie-woogie"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen származású a híres festő, Victor Vasarely?",
+   "valaszok": [
+    "görög",
+    "ír",
+    "szicíliai",
+    "magyar"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen testhelyzetben ábrázolja a híres szobrász, Rodin a gondolkodó embert?",
+   "valaszok": [
+    "hátrafelé pillantó",
+    "a térdén könyöklő",
+    "guggoló",
+    "az oldalán fekvő"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinál, aki kuplét ad elő?",
+   "valaszok": [
+    "bűvészkedik",
+    "monológot szaval",
+    "pantomimszámot ad elő",
+    "énekel"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbi művészeti ágak közül melyiket gyakorolta Josephine Baker?",
+   "valaszok": [
+    "költészet",
+    "tánc",
+    "szobrászat",
+    "festészet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Egészítse ki az ismert Repin-festmény címét! \"… a Volgán\"",
+   "valaszok": [
+    "kalózhajók",
+    "hajóvontatók",
+    "hajóvonták találkozása",
+    "modern duzzasztógátak"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik a középkori épületek homlokfalából kinyúló vízelvezető csöveket?",
+   "valaszok": [
+    "vízöntő",
+    "víznyelő",
+    "vízhányó",
+    "vízköpő"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol van a festményekről is ismert fontainebleau-i erdő?",
+   "valaszok": [
+    "Brüsszel közelében",
+    "Hága közelében",
+    "Párizs közelében",
+    "Genf közelében"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Honnan kapta a címét Picasso Guernica című képe?",
+   "valaszok": [
+    "egy színárnyalatról",
+    "egy városról",
+    "egy balett-táncosnőről",
+    "egy mecénás lányáról"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki tervezte az Országház épületét?",
+   "valaszok": [
+    "Lotz Károly",
+    "Steindl Imre",
+    "Schulek Frigyes",
+    "Alpár Ignác"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt ismert bábművész?",
+   "valaszok": [
+    "Domján Edit",
+    "Váradi Hédi",
+    "Havas Gertrúd",
+    "Kiss Manyi"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt németalföldi az alábbi festők közül?",
+   "valaszok": [
+    "Turner",
+    "Goya",
+    "Gauguin",
+    "Rembrandt"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki írt balettet egy diótörőről?",
+   "valaszok": [
+    "Schubert",
+    "Csajkovszkij",
+    "Rimszkij-Korszakov",
+    "Delibes"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiket látunk a puttókat ábrázoló képzőművészeti alkotásokon?",
+   "valaszok": [
+    "szüretelő munkásokat",
+    "mitológiai szörnyeket",
+    "pufók angyalokat",
+    "ókeresztény vértanúkat"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kiről írt balettet Csajkovszkij?",
+   "valaszok": [
+    "Hamupipőke",
+    "Csipkerózsika",
+    "Piroska",
+    "Hüvelyk Panna"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik a stukkókészítés egyik alapanyaga az alábbiak közül?",
+   "valaszok": [
+    "fenyőfa",
+    "vas",
+    "gipsz",
+    "réz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik egy XX. század eleji magyar művészcsoport neve?",
+   "valaszok": [
+    "Hármak",
+    "Nyolcak",
+    "Tizenötök",
+    "Harmincak"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik híres festőnek volt kék és rózsaszín korszaka?",
+   "valaszok": [
+    "Chagallnak",
+    "Dalinak",
+    "Picassónak",
+    "Braque-nak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik képzőművészeti alak nevezetes titokzatos mosolyáról?",
+   "valaszok": [
+    "Michelangelo Dávidja",
+    "Leonardo Mona Lisája",
+    "Rodin Gondolkodója",
+    "Botticelli Vénusza"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művészeti stílus következett a gótika után?",
+   "valaszok": [
+    "román",
+    "reneszánsz",
+    "barokk",
+    "klasszicista"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művészeti stílusirányzat a legkorábbi az alábbiak közül?",
+   "valaszok": [
+    "expresszionizmus",
+    "akadémizmus",
+    "reneszánsz",
+    "gótika"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik művészeti területen tevékenykedett Borsos Miklós?",
+   "valaszok": [
+    "komolyzene",
+    "szobrászat",
+    "néptánc",
+    "klasszikus balett"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művészeti területen vált híressé Csortos Gyula?",
+   "valaszok": [
+    "zeneszerzőként",
+    "festőként",
+    "szobrászként",
+    "színészként"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik művészeti ág kiválósága volt Muráti Lili?",
+   "valaszok": [
+    "színészet",
+    "festészet",
+    "költészet",
+    "szobrászat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik térséget tartják a reneszánsz szülőhazájának?",
+   "valaszok": [
+    "Skóciát",
+    "Észak-Itáliát",
+    "Kasztíliát",
+    "Bajorországot"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik város nevezetessége a Tretyakov Képtár?",
+   "valaszok": [
+    "Szentpétervár",
+    "Moszkva",
+    "Varsó",
+    "Krakkó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a műfaja Offenbach Szép Heléna című színpadi művének?",
+   "valaszok": [
+    "opera",
+    "operett",
+    "balett",
+    "tragédia"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mikor épült a budapesti Városligetben álló Vajdahunyad vára?",
+   "valaszok": [
+    "IV. Béla korában",
+    "a Hunyadiak korában",
+    "a 17. század végén",
+    "a 19. század végén"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen embert ábrázol Rodin szobra?",
+   "valaszok": [
+    "építő",
+    "labdázó",
+    "nevető",
+    "gondolkodó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen mester néven ismerük egy festőt, akinek csak a monogramja maradt fenn?",
+   "valaszok": [
+    "M. E.",
+    "S. K.",
+    "M. S.",
+    "S. M. S"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen művei tették világhírűvé Franz con Suppé nevét?",
+   "valaszok": [
+    "némafilmjei",
+    "operettjei",
+    "festményei",
+    "drámái"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen építmény a türbe?",
+   "valaszok": [
+    "arab iskola",
+    "síremlék",
+    "fürdő",
+    "óratorony"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Zömmel milyen építészeti stílusban épült Jákon a bencés apátság temploma?",
+   "valaszok": [
+    "gótikus",
+    "román",
+    "reneszánsz",
+    "barokk"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbi cseh művészek közül melyik filmrendező?",
+   "valaszok": [
+    "Karel Capek",
+    "Leos Janácek",
+    "Bohumil Hrabal",
+    "Milos Forman"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik készült az ókorban?",
+   "valaszok": [
+    "Mózes",
+    "Diszkoszvető",
+    "Amor és Psyche",
+    "Salome tánca"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hogy nevezik a gótikus katedrálisok homlokzatának nagy, kerek ablakait?",
+   "valaszok": [
+    "napablak",
+    "glóriaablak",
+    "rózsaablak",
+    "holdablak"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogy nevezik az épületeken oszlopot helyettesítő kőből faragott férfialakot?",
+   "valaszok": [
+    "adonisz",
+    "apolló",
+    "atlasz",
+    "artemisz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Honnan kapta az elnevezését a kubizmus festészeti irányzat?",
+   "valaszok": [
+    "egy festőcsoportról",
+    "egy helységről",
+    "egy versről",
+    "egy mértani testről"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hányan vannak az asztal körül Leonardo Utolsó vacsora című művén?",
+   "valaszok": [
+    "3.0",
+    "7.0",
+    "13.0",
+    "24.0"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki a főalak Delacroix A Szabadság vezeti a népet című festményén?",
+   "valaszok": [
+    "egy katona",
+    "egy fiatal nő",
+    "egy király",
+    "egy sólyom"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki készítette a firenzei Dávid szobrot?",
+   "valaszok": [
+    "Michelangelo",
+    "Leonardo",
+    "Amerigo Tot",
+    "Caravaggio"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt a modellje a Mona Lisának a XVI. századi festő és művészeti író, Giorgio Vasari leírása szerint?",
+   "valaszok": [
+    "egy firenzei polgár felesége",
+    "a velencei dózse lánya",
+    "a pápa unokahúga",
+    "egy ismeretlen szolgálónő"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki ásít egy nagyot Munkácsy festményén?",
+   "valaszok": [
+    "egy katona",
+    "egy börtönőr",
+    "egy parasztasszony",
+    "egy inas"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek az alkotása a híres szimbólum, a békegalamb?",
+   "valaszok": [
+    "Dali",
+    "Picasso",
+    "Klee",
+    "Matisse"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely városban tekinthető meg Leonardo az Utolsó vacsora című freskója?",
+   "valaszok": [
+    "Firenzében",
+    "Milánóban",
+    "Rómában",
+    "Velencében"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik festészeti irányzatot képviselte Salvador Dali?",
+   "valaszok": [
+    "barokk",
+    "akadémizmus",
+    "impresszionizmus",
+    "szürrealizmus"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik festő életéről szól Pierre la Mure Moulin Rouge című regénye?",
+   "valaszok": [
+    "Matisse",
+    "Gauguin",
+    "Picasso",
+    "Toulouse-Lautrec"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik festőről nevezték el a vörös szín egyik árnyalatát?",
+   "valaszok": [
+    "Tiziano",
+    "Raffaello",
+    "Leonardo",
+    "Tintoretto"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ma is látható híres templom épült a legkorábban?",
+   "valaszok": [
+    "szegedi dóm",
+    "esztergomi bazilika",
+    "budapesti Szt. István bazilika",
+    "jáki római katolikus templom"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik művészeti ág irányzata volt a kubizmus?",
+   "valaszok": [
+    "festészet",
+    "költészet",
+    "tánc",
+    "építészet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik művészeti ág kiválósága volt Donatello?",
+   "valaszok": [
+    "egyházi zene",
+    "költészet",
+    "szobrászat",
+    "ikonfestészet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik művészeti ág kiválósága volt Edvard Munch?",
+   "valaszok": [
+    "balett",
+    "festészet",
+    "költészet",
+    "komolyzene"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művészeti ág kiválósága volt Róna Viktor?",
+   "valaszok": [
+    "balett",
+    "költészet",
+    "szobrászat",
+    "festészet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik művészeti ág kiválósága volt Sulyok Mária?",
+   "valaszok": [
+    "színészet",
+    "költészet",
+    "festészet",
+    "szobrászat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik művészeti ág képviselője Cameron Diaz?",
+   "valaszok": [
+    "festő",
+    "szobrász",
+    "színész",
+    "énekes"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik művészeti ág képviselője volt Errol Flynn?",
+   "valaszok": [
+    "zene",
+    "színművészet",
+    "szobrászat",
+    "festészet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művészeti ág képviselőjeként vált híressé Amerigo Tot?",
+   "valaszok": [
+    "szobrászként",
+    "szabaduló-művészként",
+    "illuzionistaként",
+    "költőként"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik művészeti ágban alkot Kurtág György?",
+   "valaszok": [
+    "zene",
+    "szobrászat",
+    "festészet",
+    "irodalom"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik ország szülötte a festő, Joan Miró?",
+   "valaszok": [
+    "Olaszország",
+    "Spanyolország",
+    "Franciaország",
+    "Belgium"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik szobor maradt ránk torzóként?",
+   "valaszok": [
+    "az írnok szobra",
+    "Diszkoszvető",
+    "Milói Vénusz",
+    "Laokoón"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik világhírű festmény viseli a Gioconda nevet is?",
+   "valaszok": [
+    "Renoir: Az olvasó nő",
+    "Goya: Meztelen Maya",
+    "Leonardo: Mona Lisa",
+    "Szinyei: A lilaruhás nő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik város lángjai szerepelnek Aszafjev balettjének címében?",
+   "valaszok": [
+    "Moszkva",
+    "Párizs",
+    "Róma",
+    "London"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik épület kupoláját tervezte Michelangelo?",
+   "valaszok": [
+    "firenzei dóm",
+    "Szent Pál-katedrális",
+    "Szent Péter-bazilika",
+    "Pantheon"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen anyagból készült Michelangelo Dávidja?",
+   "valaszok": [
+    "bazalt",
+    "gránit",
+    "márvány",
+    "bronz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen előadáson találkozhatunk mimussal?",
+   "valaszok": [
+    "árnyjáték",
+    "bábjáték",
+    "pantomim",
+    "opera"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen művészeti területen tevékenykedett az Ilf-Petrov páros?",
+   "valaszok": [
+    "festészet",
+    "színészet",
+    "irodalom",
+    "tánc"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen stílusban épült a versailles-i kastély?",
+   "valaszok": [
+    "klasszicista",
+    "barokk",
+    "copf",
+    "reneszánsz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen szakmát tanult Munkácsy Mihály, mielőtt festeni kezdett?",
+   "valaszok": [
+    "asztalos",
+    "pék",
+    "hentes",
+    "takács"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen állatok láthatók a Laokón-csoport nevű híres szobron?",
+   "valaszok": [
+    "sasok",
+    "kígyók",
+    "oroszlánok",
+    "farkasok"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek az eleme a szarufa?",
+   "valaszok": [
+    "ajtótok",
+    "tetőszerkezet",
+    "parketta",
+    "ablakszárny"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit jelent a híres festő, El Greco neve?",
+   "valaszok": [
+    "a grúz",
+    "a görög",
+    "a gregorián",
+    "a grönlandi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit kerülnek munkáik során az absztrakt művészek?",
+   "valaszok": [
+    "színek használatát",
+    "tárgyábrázolást",
+    "érintkezést a külvilággal",
+    "kilétük felfedését"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbi festménytémák közül melyik lehet pieta?",
+   "valaszok": [
+    "egy gyümölcsöstál",
+    "a fiát sirató Mária",
+    "csatajelenet",
+    "mitológiai jelenet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Az alábbi művészek közül ki a fotóművész?",
+   "valaszok": [
+    "Varró Dániel",
+    "Gryllus Vilmos",
+    "Korniss Péter",
+    "Wahorn András"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik egy XIX. századi festészeti irányzat neve?",
+   "valaszok": [
+    "pszeudo-rembrandisták",
+    "poszt-leonarditák",
+    "preraffaeliták",
+    "transzholbeiniták"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hogyan ábrázolja Mátyás királyt Fadrusz János szobra?",
+   "valaszok": [
+    "trónon ülve",
+    "lovon ülve",
+    "vadászaton",
+    "ítélkezés közben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol láthatták eredetileg a bajadérok táncát?",
+   "valaszok": [
+    "Japánban",
+    "Argentínában",
+    "Egyiptomban",
+    "Indiában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol látható Michelangelo Utolsó Ítélet című freskója?",
+   "valaszok": [
+    "Firenzében",
+    "Velencében",
+    "Milánóban",
+    "Rómában"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol született Amerigo Tot szobrászművész?",
+   "valaszok": [
+    "Olaszországban",
+    "Magyarországon",
+    "az USA-ban",
+    "Kanadában"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol tekinthető meg a milói Vénusz?",
+   "valaszok": [
+    "Athénban",
+    "Firenzében",
+    "Párizsban",
+    "Madridban"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hol ábrázolja Jan Eyck festménye az Arnolfini házaspárt?",
+   "valaszok": [
+    "a természetben",
+    "a templomban",
+    "a szobában",
+    "az utcán"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Honnan emelkedik ki a nőalak Botticelli Vénusz születése című festményén?",
+   "valaszok": [
+    "felhők közül",
+    "sziklák mögül",
+    "egy lángoszlopból",
+    "a tengerből"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Honnan származik az ikonfestészet?",
+   "valaszok": [
+    "Egyiptomból",
+    "Bizáncból",
+    "Új-Guineából",
+    "Rómából"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki alapította a Győri Balettet?",
+   "valaszok": [
+    "Markó Iván",
+    "Keveházi Gábor",
+    "Seregi László",
+    "Szakály György"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki festette a Mária kútja Názáretben című képet?",
+   "valaszok": [
+    "Benczúr Gyula",
+    "Csontváry Kosztka Tivadar",
+    "Szinyei Merse Pál",
+    "Munkácsy Mihály"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki küzd meg a sárkánnyal a Kolozsvári testvérek egyetlen fennmaradt szobrán?",
+   "valaszok": [
+    "Szent György",
+    "Szent Márk",
+    "Szent Vencel",
+    "Szent Flórián"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem volt koreográfus az alábbi orosz művészek közül?",
+   "valaszok": [
+    "Nurejev",
+    "Mojszejev",
+    "Gyagilev",
+    "Prokofjev"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt impresszionista az alábbi festők közül?",
+   "valaszok": [
+    "Repin",
+    "Goya",
+    "Monet",
+    "Rubens"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki írt emlékiratokat Bánk bán elmondja címmel?",
+   "valaszok": [
+    "Simándy József",
+    "Bessenyei Ferenc",
+    "Sinkovits Imre",
+    "Réti József"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik a központi alakjai Munkácsy Ecce homo című festményének?",
+   "valaszok": [
+    "Júdás és Kajafás",
+    "Jézus és Pilátus",
+    "Mária és Gábriel arkangyal",
+    "Péter, Jakab, János"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a műve a Gellért-hegyi Felszabadulási emlékmű?",
+   "valaszok": [
+    "Borsos Miklós",
+    "Izsó Miklós",
+    "Kisfaludi Stróbl Zsigmond",
+    "Zala György"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a szobra díszíti Watt mellett a budapesti Keleti pályaudvar főhomlokzatát?",
+   "valaszok": [
+    "Robert Fulton",
+    "George Stephenson",
+    "Baross Gábor",
+    "Kandó Kálmán"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a tervei szerint épült a budai Várhegy alatti Alagút?",
+   "valaszok": [
+    "Ybl Miklós",
+    "Clark Ádám",
+    "Pollack Mihály",
+    "Hild József"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mely város köthető Dante, Boccaccio, Petrarca, Machiavelli nevéhez?",
+   "valaszok": [
+    "Milánó",
+    "Siena",
+    "Genova",
+    "Firenze"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik 1684-ben született művész festett gyakran bohócokat és vándorkomédiásokat?",
+   "valaszok": [
+    "Gillot",
+    "Boucher",
+    "Watteau",
+    "Fragonard"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik balettben szerepelnek egerek?",
+   "valaszok": [
+    "Csajkovszkij: Diótörő",
+    "Hacsaturján: Spartacus",
+    "Delibes: Coppélia",
+    "Csajkovszkij: Csipkerózsika"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik híres reneszánsz festő foglalkozott anatómiai és optikai kísérletekkel is?",
+   "valaszok": [
+    "Raffaello",
+    "Leonardo",
+    "Michelangelo",
+    "Tiziano"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik lehet irodalmi és zenei műfaj is az alábbiak közül?",
+   "valaszok": [
+    "epigramma",
+    "gesta",
+    "eposz",
+    "ballada"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik művész műfaja a kollázs?",
+   "valaszok": [
+    "festőművész",
+    "táncművész",
+    "filmrendező",
+    "költő"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik művészeti ág jeles képviselője a világhírű Marcel Marceau?",
+   "valaszok": [
+    "operaénekes",
+    "pantomimművész",
+    "szobrász",
+    "zongoraművész"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művészeti ág képviselője volt Piero della Francesca?",
+   "valaszok": [
+    "komolyzene",
+    "festészet",
+    "színművészet",
+    "himnuszköltészet"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művészeti ág képviselőjeként kezdte pályafutását Esztergályos Cecília?",
+   "valaszok": [
+    "balett-művészként",
+    "filmrendezőként",
+    "operaénekesnőként",
+    "zongoraművészként"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik művészeti ág képviselőjeként vált híressé Maurice Chevalier?",
+   "valaszok": [
+    "színészet",
+    "szobrászat",
+    "festészet",
+    "költészet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik művészeti ágban jelentkezett a pointilizmus irányzata?",
+   "valaszok": [
+    "komolyzene",
+    "festészet",
+    "költészet",
+    "színjátszás"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik reneszánsz művész tervezett repülőgépet?",
+   "valaszok": [
+    "Dante",
+    "Leonardo da Vinci",
+    "Giorgio Vasari",
+    "Michelangelo Buonarroti"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik stílus kiválósága volt a festő Mányoki Ádám?",
+   "valaszok": [
+    "reneszánsz",
+    "barokk",
+    "romantika",
+    "historizmus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik stílusirányzatban alkotott pályája jelentős, korai szakaszában Paul Gauguin?",
+   "valaszok": [
+    "expresszionizmus",
+    "impresszionizmus",
+    "kubizmus",
+    "szürrealizmus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik történelmi alak látható felravatalozva Madarász Viktor egyik festményén?",
+   "valaszok": [
+    "Hunyadi László",
+    "Zrínyi Ilona",
+    "II. András",
+    "Napóleon"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik világhírű festményt raboltál el fegyveresek 2004 augusztusában?",
+   "valaszok": [
+    "Van Gogh: Napraforgók",
+    "Munch: Sikoly",
+    "Goya: Leány korsóval",
+    "Tiziano: Urbinói Vénusz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik építész dolgozott a népművészeti és keleti elemeket is felvonultató szecessziós stílusban?",
+   "valaszok": [
+    "Lechner Ödön",
+    "Ybl Miklós",
+    "Pollack Mihály",
+    "Steindl Imre"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik építészeti stílus követte a román stílust?",
+   "valaszok": [
+    "reneszánsz",
+    "gótika",
+    "barokk",
+    "klasszicizmus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi látható Mona Lisa hátterében a képen?",
+   "valaszok": [
+    "táj",
+    "drapéria",
+    "szobabelső",
+    "oltár"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi volt a foglalkozása Otto Klemperernek?",
+   "valaszok": [
+    "karmester",
+    "operaénekes",
+    "pantomimművész",
+    "filmrendező"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mikor alakult a Győri Balett?",
+   "valaszok": [
+    "1969-ben",
+    "1979-ben",
+    "1989-ben",
+    "1999-ben"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen a cédrus Csontváry képének címe szerint?",
+   "valaszok": [
+    "kiszáradt",
+    "hatalmas",
+    "magányos",
+    "virágzó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen díjat alapított Baumgarten Ferenc Ferdinánd?",
+   "valaszok": [
+    "komolyzenei",
+    "irodalmi",
+    "képzőművészeti",
+    "színművészeti"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen kisasszonyok címmel festette meg Picasso 1907-ben az első jelentős kubista alkotást?",
+   "valaszok": [
+    "sevillai",
+    "avignoni",
+    "madridi",
+    "párizsi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen különleges madár a címszereplője Sztravinszkij táncjátékának?",
+   "valaszok": [
+    "Jégmadár",
+    "Viharmadár",
+    "Tűzmadár",
+    "Griffmadár"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen magas Michelangelo Dávid szobra?",
+   "valaszok": [
+    "alig fél méter",
+    "éppen másfél méter",
+    "éppen két méter",
+    "négy méternél magasabb"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen művész volt a világhírű Maria Callas?",
+   "valaszok": [
+    "balett-táncos",
+    "szobrász",
+    "operaénekesnő",
+    "festő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen művészeket képzett iskolájában Rákosi Szidi?",
+   "valaszok": [
+    "festőket",
+    "szobrászokat",
+    "keramikusokat",
+    "színészeket"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen nemzetiségű a világhírű Riverdance táncegyüttes?",
+   "valaszok": [
+    "ír",
+    "skót",
+    "finn",
+    "svéd"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen néven vált ismertté Kanczler Katalin?",
+   "valaszok": [
+    "Kovács Kati",
+    "Koncz Zsuzsa",
+    "Karády Katalin",
+    "Katona Klári"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen stílusban alkotott Victor Vasarely?",
+   "valaszok": [
+    "op-art",
+    "art nouveau",
+    "pop-art",
+    "art brut"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen származású volt Rubens?",
+   "valaszok": [
+    "itáliai",
+    "flamand",
+    "spanyol",
+    "német"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Minek a művészete a kalligráfia?",
+   "valaszok": [
+    "fafaragás",
+    "könyvkötés",
+    "tiszta hang",
+    "szépírás"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mit ábrázol a képzőművészeti alkotás, ha Pietá címet viseli?",
+   "valaszok": [
+    "Krisztust és Máriát",
+    "Ádámot és Évát",
+    "az apostolokat",
+    "angyalokat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Zömében milyen műtárgyakból állt Hopp Ferenc magyar államnak adományozott gyűjteménye?",
+   "valaszok": [
+    "itáliai reneszánsz",
+    "francia impresszionista",
+    "távol-keleti",
+    "közép-afrikai"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül melyik területen alkotott világszínvonalút Ferenczy Noémi?",
+   "valaszok": [
+    "kerámia",
+    "falikárpit",
+    "terrakotta",
+    "mozaik"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ha egy régi festményen a donátor is szerepel, akkor ki van a képen?",
+   "valaszok": [
+    "maga a művész",
+    "a helyi püspök",
+    "az adományozó",
+    "az uralkodó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Hollósy Simon melyik festményének ugyanaz a címe, mint egy Arany-balladának?",
+   "valaszok": [
+    "Ágnes asszony",
+    "Vörös Rébék",
+    "Tengerihántás",
+    "Tetemre hívás"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki kaphat Balázs Béla-díjat az alábbiak közül?",
+   "valaszok": [
+    "filmrendező",
+    "koreográfus",
+    "költő",
+    "zeneszerző"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem festőművész az alábbiak közül?",
+   "valaszok": [
+    "Vincent van Gogh",
+    "Jan van Eyck",
+    "Marco van Basten",
+    "Anthonis van Dyck"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki vagy mi riad meg a villámlástól Delacroix festményén?",
+   "valaszok": [
+    "egy kisfiú",
+    "egy szarvas",
+    "egy cselédlány",
+    "egy ló"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt Dido királynő kedvese, akinek elutazása után megölte magát?",
+   "valaszok": [
+    "Odüsszeusz",
+    "Antonius",
+    "Aeneas",
+    "Thészeusz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt Isadora Duncan?",
+   "valaszok": [
+    "színésznő",
+    "írónő",
+    "táncosnő",
+    "orvosnő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt Szőke Szakáll?",
+   "valaszok": [
+    "filmszínész",
+    "festő",
+    "szobrász",
+    "fotóművész"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt VIII. Henrik udvari festője?",
+   "valaszok": [
+    "Anthonis van Dyck",
+    "ifj. Hans Holbein",
+    "Jan van Eyck",
+    "Thomas Gainsborough"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt a magyar avantgarde vezető alakja az alábbiak közül?",
+   "valaszok": [
+    "Mécs László",
+    "Kassák Lajos",
+    "Lengyel Menyhért",
+    "Herczeg Ferenc"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az a festő, aki főleg erdőrészleteket festett?",
+   "valaszok": [
+    "Egry József",
+    "Paál László",
+    "Hollósy Simon",
+    "Kernstok Károly"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kik szerepelnek az orosz festő, Repin egyik legismertebb festményén?",
+   "valaszok": [
+    "matrózok",
+    "hajóácsok",
+    "hajóvontatók",
+    "hídépítők"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a nevét viseli a moszkvai Tretyakov képtár?",
+   "valaszok": [
+    "egy műgyűjtőét",
+    "egy hercegét",
+    "egy festőét",
+    "egy építészét"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mely művészeti ág képviselője volt Gombaszögi Ella és Gombaszögi Frida?",
+   "valaszok": [
+    "színészet",
+    "költészet",
+    "festészet",
+    "szobrászat"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik festő érdemelte ki képeivel a \"paraszt\" jelzőt?",
+   "valaszok": [
+    "Filippo Lippi",
+    "id. Pieter Brueghel",
+    "Amadeo Modigliani",
+    "Nicolas Poussin"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik folyó felett ívelt a Csontváry által megfestett mostari híd?",
+   "valaszok": [
+    "Neretva",
+    "Száva",
+    "Dráva",
+    "Morava"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik helyszín nem szerepel Csontváry-képen?",
+   "valaszok": [
+    "Taormina",
+    "Balaton",
+    "Hortobágy",
+    "Názáret"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik híres festő keresztneve volt Amadeo?",
+   "valaszok": [
+    "Klimt",
+    "Matisse",
+    "Chirico",
+    "Modigliani"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik képzőművészeti irányzat jellegzetes ábrázolási eszközei a geometriai formák?",
+   "valaszok": [
+    "eklekticizmus",
+    "fauvizmus",
+    "kubizmus",
+    "aktvivizmus"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik művészeti stílus kedvelt építészeti díszítőeleme volt a girland?",
+   "valaszok": [
+    "gótika",
+    "román",
+    "copf",
+    "funkcionalizmus"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik művészeti ág képviselője Maurice Béjart?",
+   "valaszok": [
+    "táncművészet",
+    "festészet",
+    "szobrászat",
+    "fotóművészet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik művészeti ágban tevékenykedett Solti György?",
+   "valaszok": [
+    "festészet",
+    "táncművészet",
+    "zene",
+    "építészet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik művészünk készített két festményt is Mostar városáról?",
+   "valaszok": [
+    "Benczúr Gyula",
+    "Paál László",
+    "Munkácsy Mihály",
+    "Csontváry Kosztka Tivadar"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik ország szülötte Marc Chagall, a Franciaországban élt festő?",
+   "valaszok": [
+    "Németország",
+    "Svájc",
+    "Lengyelország",
+    "Oroszország"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik szín egyik árnyalatát nevezték el a híres festőről, Tizianóról?",
+   "valaszok": [
+    "kék",
+    "zöld",
+    "vörös",
+    "sárga"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik történelmi alakról írt balettot Aram Hacsaturján?",
+   "valaszok": [
+    "Napóleon",
+    "Spartacus",
+    "Miltiadész",
+    "Kolumbusz"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik építmény tervezője volt Adam Clark?",
+   "valaszok": [
+    "Lánchíd",
+    "budai Alagút",
+    "Palatinus Strandfürdő",
+    "Széchenyi-kilátó"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi a címe Rodin ismert szoborcsoportjának?",
+   "valaszok": [
+    "Párizsi kommünárok",
+    "Lyoni takácsok",
+    "Calais-i polgárok",
+    "Avignoni bíborosok"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi lesz a végeredmény, ha egy képzőművész hermát készít?",
+   "valaszok": [
+    "népies falvédő",
+    "absztrakt olajfestmény",
+    "kisméretű rézkarc",
+    "fém ereklyetartó"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi van Vénusz lába alatt Botticelli Vénusz születése című képén?",
+   "valaszok": [
+    "szikla",
+    "virágos domboldal",
+    "kagylóhéj",
+    "fehér drapéria"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi volt a foglalkozása Darvas Lilinek, Molnár Ferenc feleségének?",
+   "valaszok": [
+    "festő",
+    "színész",
+    "költő",
+    "szobrász"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Miként lett világhírű a magyar származású Joseph Kosma?",
+   "valaszok": [
+    "filmrendezőként",
+    "festőként",
+    "zeneszerzőként",
+    "színészként"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen Madonnának nevezik Leonardo Párizsban kiállított alkotását?",
+   "valaszok": [
+    "erdei",
+    "alvó",
+    "sziklás",
+    "áhitatos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen eljárással alkotta Michelangelo az Ádám teremtése című alkotását?",
+   "valaszok": [
+    "olajfestmény",
+    "rézkarc",
+    "freskó",
+    "akvarell"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen eredetű tánc a habanera?",
+   "valaszok": [
+    "kubai",
+    "brazil",
+    "argentin",
+    "portugál"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen foglalkozást űzött Csontváry negyven éves koráig?",
+   "valaszok": [
+    "tanár",
+    "gyógyszerész",
+    "gazdálkodó",
+    "sebész"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen hangszeren játszik Edvin Marton, az ifjú virtuóz?",
+   "valaszok": [
+    "hegedűn",
+    "zongorán",
+    "orgonán",
+    "gitáron"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen madárról írt balettet Sztravinszkij?",
+   "valaszok": [
+    "jégmadár",
+    "tűzmadár",
+    "főnixmadár",
+    "viharmadár"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen rokoni viszony volt a genfi oltárt készítő festők, Hubert és Jan van Eyck között?",
+   "valaszok": [
+    "apa-fiúi",
+    "nagyapa-unokai",
+    "dédapa-dédunokai",
+    "testvéri"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen szakmát tanult Munkácsy Mihály mielőtt festő lett?",
+   "valaszok": [
+    "órás",
+    "asztalos",
+    "borbély",
+    "jegyző"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mitől riad meg egy ló Delacroix festményén?",
+   "valaszok": [
+    "farkastól",
+    "villámlástól",
+    "ostortól",
+    "kürtszótól"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mivel foglalkozik Ascher Tamás?",
+   "valaszok": [
+    "rendező",
+    "operaénekes",
+    "balett-táncos",
+    "festő"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Anglia mely kiválóságát festette meg lányai körében Munkácsy Mihály?",
+   "valaszok": [
+    "Morus Tamás",
+    "Cromwell",
+    "Milton",
+    "I. Erzsébet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Az alábbiak közül kinek nincs olyan híres műve, mely címében viseli a szerelmet?",
+   "valaszok": [
+    "Gaetano Donizetti",
+    "Szabó István",
+    "Déry Tibor",
+    "Donatello"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Hol alakult ki az ikonfestészet központja a X. században?",
+   "valaszok": [
+    "Avignonban",
+    "Ravennában",
+    "Bizáncban",
+    "Kijevben"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki az a festő, akit elsősorban illusztrációi tettek ismertté?",
+   "valaszok": [
+    "Zichy Mihály",
+    "Tornyai János",
+    "Rudnay Gyula",
+    "Koszta József"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki az a híres festő, aki levágta a saját fülét?",
+   "valaszok": [
+    "Gauguin",
+    "Cézanne",
+    "Van Gogh",
+    "Tolulouse-Lautrec"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt az az üvegfestő mester, aki többek között az Országház üvegképeit is készítette?",
+   "valaszok": [
+    "Róth Miksa",
+    "Kmetty János",
+    "Konecsni György",
+    "Glatz Oszkár"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt az olümpiai arany-elefántcsont Zeusz-szobor alkotója?",
+   "valaszok": [
+    "Krítiosz",
+    "Leókharész",
+    "Pheidiasz",
+    "Polükleitosz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt festő az alábbi művészek közül?",
+   "valaszok": [
+    "Ferenczy István",
+    "Ferenczy Károly",
+    "Ferenczy Béni",
+    "Ferenczy Noémi"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki írt balettet Spartacusról, a római rabszolgafelkelés vezéréről?",
+   "valaszok": [
+    "Sztravinszkij",
+    "Hacsaturján",
+    "Sosztakovics",
+    "Prokofjev"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a felkérésére festette Raffaello Az athéni iskola című freskót?",
+   "valaszok": [
+    "a spanyol király",
+    "a német-római császár",
+    "a velencei dózse",
+    "a pápa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a holttestét találják meg Székely Bertalan festményén?",
+   "valaszok": [
+    "Szent Imre",
+    "Szent Gellért",
+    "I. Ulászló",
+    "II. Lajos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a megkeresztelését ábrázolja Benczúr Gyula ismert festménye?",
+   "valaszok": [
+    "Jézus",
+    "Szent János",
+    "Vajk",
+    "Szent Gellért"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kinek a népét festette meg Madarász Viktor a kép címe szerint?",
+   "valaszok": [
+    "Attila",
+    "Álmos",
+    "Mátyás",
+    "Dózsa"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik festő nem itáliai az alábbiak közül?",
+   "valaszok": [
+    "Caravaggio",
+    "Tiepolo",
+    "Mantegna",
+    "Murillo"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik festőművész múzeuma nem Szentendrén látható?",
+   "valaszok": [
+    "Csontváry Kosztka Tivadar",
+    "Barcsay Jenő",
+    "Korniss Dezső",
+    "Kmetty János"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik hangszer muzsikusa Horgas Eszter?",
+   "valaszok": [
+    "fuvola",
+    "hegedű",
+    "hárfa",
+    "zongora"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik múzeum törzsanyagát alapozta meg az Esterházy-képtár?",
+   "valaszok": [
+    "Nemzeti Múzeum",
+    "Szépművészeti Múzeum",
+    "Nemzeti Galéria",
+    "Storno-ház"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művész nem dolgozta fel Rómeo és Júlia történetét?",
+   "valaszok": [
+    "Szergej Prokofjev",
+    "Franco Zeffirelli",
+    "Romin Rolland",
+    "Charles Gounod"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik művész nem festményeiről vált ismertté?",
+   "valaszok": [
+    "Ivan Ivanovics Siskin",
+    "Tommaso Albinoni",
+    "Pietro Perugino",
+    "William Hogarth"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művész nem vett részt a budapesti Operaház freskóinak elkészítésében?",
+   "valaszok": [
+    "Lotz Károly",
+    "Madarász Viktor",
+    "Than Mór",
+    "Feszty Árpád"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művészeti ág kiválósága volt Szergej Obrazcov?",
+   "valaszok": [
+    "balettművészet",
+    "bábművészet",
+    "építészet",
+    "szobrászat"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művészeti ág képviselőjeként szerzett még hírnevet Gina Lollobrigida?",
+   "valaszok": [
+    "költőként",
+    "zongoraművészként",
+    "fotóművészként",
+    "festőként"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik művészeti ágban tevékenykedett Bruno Walter?",
+   "valaszok": [
+    "szobrászat",
+    "színművészet",
+    "zeneművészet",
+    "festészet"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik művészeti ágban vált ismertté Szőkefalvi-Nagy Katalin?",
+   "valaszok": [
+    "festészet",
+    "tánc",
+    "iparművészet",
+    "zene"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik nem képzőművészeti alkotás?",
+   "valaszok": [
+    "Milói Vénusz",
+    "Alvó Vénusz",
+    "Urbinói Vénusz",
+    "Murányi Vénusz"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik vidék festőjének nevezik Egry Józsefet?",
+   "valaszok": [
+    "a Balaton",
+    "a Hortobágy",
+    "Budapest",
+    "Szeged"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mi Szent Márk szimbóluma a képzőművészeti alkotásokon?",
+   "valaszok": [
+    "bika",
+    "szárnyas ember",
+    "oroszlán",
+    "sas"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mi a címe Edvard Munch 1939-es képének, mely egy rémült, kétségbeesett alakot ábrázol?",
+   "valaszok": [
+    "A sokk",
+    "A sikoly",
+    "A megriadt ló",
+    "A rémület arca"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mi volt a híres középkori szobrászok, a Kolozsvári testvérek keresztneve?",
+   "valaszok": [
+    "Péter és Pál",
+    "János és Tamás",
+    "Ferenc és István",
+    "Márton és György"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi volta foglalkozása Fjodor Saljapinnak?",
+   "valaszok": [
+    "karmester",
+    "hegedűművész",
+    "operaénekes",
+    "ikonfestő"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Mikor épült a pisai Ferde torony?",
+   "valaszok": [
+    "9. század",
+    "12. század",
+    "15. század",
+    "18. század"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen nőt ábrázol Munkácsy ismert, 1873-as képe?",
+   "valaszok": [
+    "korsóvívő",
+    "bordóruhás",
+    "rőzsehordó",
+    "gyermekét tartó"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen rokonsági kapcsolat volt az ugyanazt a nevet viselő festők, a két Pieter Brueghel között?",
+   "valaszok": [
+    "apa-fiúi",
+    "apa-dédunokai",
+    "távoli unokatestvéri",
+    "csak névrokoni"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen stílusban épült az esztergomi főszékesegyház?",
+   "valaszok": [
+    "barokk",
+    "neoromán",
+    "neoreneszánsz",
+    "klasszicista"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Milyen szerelemről írt balettet Manuel de Falla?",
+   "valaszok": [
+    "titkos",
+    "bűvös",
+    "fájó",
+    "boldog"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Mit csinál egy anya kislánya társaságában Munkácsy egyik festményén?",
+   "valaszok": [
+    "köpül",
+    "rőzsét hord",
+    "fát hasogat",
+    "tyúkot vág"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Hol van Zrínyi és Frangepán Madarász Viktor festményén?",
+   "valaszok": [
+    "Szigetvár falain",
+    "a bécsújhelyi börtönben",
+    "vadkanvadászaton",
+    "a török táborban"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki alapította a Pécsi Balett társulatát?",
+   "valaszok": [
+    "Eck Imre",
+    "Markó Iván",
+    "Harangozó Gyula",
+    "Róna Viktor"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki az a XIX. századi művész, akinek közismertek fivéréhez, Theóhoz írt levelei?",
+   "valaszok": [
+    "Maupassant",
+    "Rimbaud",
+    "Wagner",
+    "Van Gogh"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki festette A hús feltámadása című képet?",
+   "valaszok": [
+    "Salvador Dalí",
+    "Gustave Courbet",
+    "Eugene Delacroix",
+    "Pierre-Auguste Renoir"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki készítette az Operaház nézőterének mennyezetfreskóit?",
+   "valaszok": [
+    "Lotz Károly",
+    "Feszty Árpád",
+    "Benczúr Gyula",
+    "Székely Bertalan"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki nem festett freskókat az alábbi művészek közül?",
+   "valaszok": [
+    "Masaccio",
+    "Michelangelo",
+    "Mantegna",
+    "Marinetti"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki volt a barokk portréfestészet kiemelkedő alakja?",
+   "valaszok": [
+    "Benczúr Gyula",
+    "Mányoki Ádám",
+    "Fényes Adolf",
+    "Than Mór"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki volt az a festő, aki főleg balettjeleneteket, táncosnőket festett?",
+   "valaszok": [
+    "Degas",
+    "Monet",
+    "Goya",
+    "Renoir"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt az absztrakt művészet megteremtője az alábbi festők közül?",
+   "valaszok": [
+    "Kandinszkij",
+    "Munch",
+    "Cézanne",
+    "Altdorfer"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki volt az alábbiak közül Frank Sinatra felesége?",
+   "valaszok": [
+    "Mia Farrow",
+    "Judy Garland",
+    "Liza Minnelli",
+    "Grace Kelly"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kik találkoznak M.S. mester Visitatio című képén?",
+   "valaszok": [
+    "Mátyás és Beatrix",
+    "Mária és Erzsébet",
+    "Jézus és Mária Magdolna",
+    "II. Lajos és Szapolyai János"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek a képe az Orsós Madonna, melyet egy skóciai kastélyból loptak el 2003 augusztusában?",
+   "valaszok": [
+    "Rembrandt",
+    "Rubens",
+    "Goya",
+    "Leonardo da Vinci"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a nevéhez fűződik a Züzü-sorozat?",
+   "valaszok": [
+    "Csók István",
+    "Paál László",
+    "Pór Bertalan",
+    "Szőnyi István"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Kinek a szerepe volt Charlotte von Stein?",
+   "valaszok": [
+    "Richard Wagner",
+    "Johann Sebastian Bach",
+    "Johann Wolfgang Goethe",
+    "Thomas Mann"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Kit tartanak a magyar irodalmi kabaré megteremtőjének?",
+   "valaszok": [
+    "Nagy Endrét",
+    "Karinthy Frigyest",
+    "Békeffy Istvánt",
+    "Kellér Dezsőt"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Mely országból származott a neves festő, Edvard Munch?",
+   "valaszok": [
+    "Anglia",
+    "Svédország",
+    "Norvégia",
+    "Skócia"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik alkotás nem a Louvre gyűjteményében van?",
+   "valaszok": [
+    "Mona Lisa",
+    "Milói Vénusz",
+    "Hammurapi törvénykönyve",
+    "Villámlástól megvadult ló"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik francia impresszionista festő festette meg Miksa császár kivégzését?",
+   "valaszok": [
+    "Paul Cézanne",
+    "Edouard Manet",
+    "Claude Monet",
+    "Pierre-Auguste Renoir"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik képet festette Paul Gauguin az alábbiak közül?",
+   "valaszok": [
+    "Fekete sertések",
+    "Gyönyörök kertje",
+    "Darázskirály",
+    "Harlekin családjával"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik magyar festő kedvelt témája volt a fontainebleau-i erdő?",
+   "valaszok": [
+    "Hollósy Simon",
+    "Aba Novák Vilmos",
+    "Paál László",
+    "Iványi-Grünwald Béla"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik magyar festő volt báró?",
+   "valaszok": [
+    "Mányoki Ádám",
+    "Benczúr Gyula",
+    "Ferenczy Károly",
+    "Mednyánszky László"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik művészeti stílus késői francia változata volt a flamboyant stílus?",
+   "valaszok": [
+    "román",
+    "gótikus",
+    "barokk",
+    "klasszicista"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művészeti ág kiválósága volt a magyar származású Robert Capa?",
+   "valaszok": [
+    "fotóművészet",
+    "irodalom",
+    "képzőművészet",
+    "építészet"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen stílusban épült a lébényi apátsági templom?",
+   "valaszok": [
+    "román",
+    "reneszánsz",
+    "barokk",
+    "klasszicista"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen építészeti stílusban épült a budapesti Halászbástya?",
+   "valaszok": [
+    "neogótikus",
+    "barokk",
+    "neoromán",
+    "klasszicista"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen építészeti stílusban épült a budapesti Operaház?",
+   "valaszok": [
+    "klasszicista",
+    "neoreneszánsz",
+    "neobarokk",
+    "neogótikus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Hol nem találkozunk arabeszkkel?",
+   "valaszok": [
+    "az arab építészetben",
+    "a klasszikus zenében",
+    "a balettben",
+    "a szobrászatban"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki a magyar biedermeier festészet kiemelkedő alakja az alábbiak közül?",
+   "valaszok": [
+    "Barabás Miklós",
+    "Kondor Béla",
+    "Márffy Ödön",
+    "Kernstok Károly"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki alapította az Orosz Balettot?",
+   "valaszok": [
+    "Szergej Gyagilev",
+    "Mihail Fokin",
+    "Igor Sztravinszkij",
+    "Vaclav Nizsinszkij"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Ki készített bronz Dávid-szobrot a Mediciek számára?",
+   "valaszok": [
+    "Michelangelo",
+    "Donatello",
+    "Bernini",
+    "Pisano"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki készített illusztrációkat Dante Isteni színjátékához?",
+   "valaszok": [
+    "Caravaggio",
+    "Botticelli",
+    "Giorgione",
+    "Piombo"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki készített portrét II. Gyula pápáról?",
+   "valaszok": [
+    "Veronese",
+    "Tintoretto",
+    "Raffaello",
+    "Giorgione"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki készített portrét VIII. Henrikről és Rotterdami Erasmusról is?",
+   "valaszok": [
+    "Rubens",
+    "Rembrandt",
+    "ifj. Hans Holbein",
+    "id. Pieter Bruegel"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki tervezte a firenzei Uffizi palotát?",
+   "valaszok": [
+    "Giocomo Vignola",
+    "Giorgio Vasari",
+    "Andrea Palladio",
+    "Leon Battista Alberti"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kinek az ismert festménye a Bűnbánó Magdolna és Az ötödik pecsét feltörése?",
+   "valaszok": [
+    "Raffaello",
+    "El Greco",
+    "Veronese",
+    "Tintoretto"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Kiről nem festett portrét Barabás Miklós?",
+   "valaszok": [
+    "Széchenyi István",
+    "Petőfi Sándor",
+    "Liszt Ferenc",
+    "Kazinczy Ferenc"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kit kért II. Gyula pápa saját síremlékének megtervezésére?",
+   "valaszok": [
+    "Leonardo da Vincit",
+    "Michelangelót",
+    "Raffaellót",
+    "Donatellót"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik festményével nyert aranyérmet Munkácsy Mihály 1870-ben Párizsban?",
+   "valaszok": [
+    "Tépéscsinálók",
+    "Ásító inas",
+    "Siralomház",
+    "Éjjeli csavargók"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik festészeti irányzat kiválósága volt Dominique Ingres?",
+   "valaszok": [
+    "barokk",
+    "klasszicizmus",
+    "impresszionizmus",
+    "szürrealizmus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik királyunk nem szerepel a Hősök terén látható millenniumi emlékművön?",
+   "valaszok": [
+    "Zsigmond",
+    "IV. Béla",
+    "Nagy Lajos",
+    "II. András"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Melyik kép nem Munkácsy Trilógiájának része?",
+   "valaszok": [
+    "Ecce Homo!",
+    "Krisztus Pilátus előtt",
+    "Golgota",
+    "Krisztus az Olajfák hegyén"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Melyik képzőművész volt az orosz cár udvari festője?",
+   "valaszok": [
+    "Than Mór",
+    "Zichy Mihály",
+    "Székely Bertalan",
+    "Kmetty János"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik képzőművészeti irányzat legismertebb képviselője volt Vasarely?",
+   "valaszok": [
+    "pop-art",
+    "op-art",
+    "dadaizmus",
+    "funkcionalizmus"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Milyen anyagból készült az ősi termékenység-szobrocska, a Willendorfi Vénusz?",
+   "valaszok": [
+    "márvány",
+    "terrakotta",
+    "mészkő",
+    "bronz"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen felkérésre készítette Rembrandt az Éjjeli őrjárat című festményt?",
+   "valaszok": [
+    "egy polgármesterére",
+    "egy pápáéra",
+    "egy lövészegyletére",
+    "egy kaszárnyáéra"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen művészeti ággal foglalkozó ember találkozik tanulmányai során az Arnolfini házaspárral?",
+   "valaszok": [
+    "festészettel",
+    "irodalommal",
+    "szobrászattal",
+    "színművészettel"
+   ],
+   "helyes": 0
+  },
+  {
+   "kerdes": "Milyen zsiráf szerepel Salvador Dali híres képén?",
+   "valaszok": [
+    "harántcsíkos",
+    "lángoló",
+    "nyolclábú",
+    "kétfejű"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki festette meg több képén is Piacsek bácsit?",
+   "valaszok": [
+    "Csók István",
+    "Hollósy Simon",
+    "Rippl-Rónai József",
+    "Gulácsi Lajos"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki nem osztrák az alábbi ismert képzőművészek közül?",
+   "valaszok": [
+    "Egon Schiele",
+    "Max Ernst",
+    "Oskar Kokoschka",
+    "Gustav Klimt"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki nem volt a Nyolcak nevű festőcsoport tagja?",
+   "valaszok": [
+    "Kernstok Károly",
+    "Czóbel Béla",
+    "Berény Róbert",
+    "Vajda Lajos"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a műhelyében tanult Leonardo da Vinci?",
+   "valaszok": [
+    "Mantegna",
+    "Masaccio",
+    "Veronese",
+    "Verrocchio"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Kinek a tanítványa volt Rippl-Rónai József?",
+   "valaszok": [
+    "Paál László",
+    "Munkácsy Mihály",
+    "Benczúr Gyula",
+    "Székely Bertalan"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik dinasztiáról kapta nevét egy késő gótikus angol építészeti stílus?",
+   "valaszok": [
+    "York",
+    "Lancaster",
+    "Tudor",
+    "Stuart"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik művész alkotott a quattrocento időszakában?",
+   "valaszok": [
+    "Giotto",
+    "Donatello",
+    "Bernini",
+    "Tintoretto"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Melyik művészeti stílus nem a szecesszió más országban használt elnevezése?",
+   "valaszok": [
+    "Jugendstil",
+    "art nouveau",
+    "biedermeier",
+    "modern style"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik nem egy árnyékfajta elnevezése a képzőművészetben?",
+   "valaszok": [
+    "vetett árnyék",
+    "önárnyék",
+    "telített árnyék",
+    "bevetett árnyék"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen művészeti produktum a xilográfia?",
+   "valaszok": [
+    "ötvösmű",
+    "fametszet",
+    "kőnyomat",
+    "agyagmunka"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki az a festő, akinek gyakori témája volt a sevillai piactér?",
+   "valaszok": [
+    "Caravaggio",
+    "Goya",
+    "El Greco",
+    "Velázquez"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki festette a \"Gyönyörök kertje\" című triptichont?",
+   "valaszok": [
+    "Albrecht Dürer",
+    "Hieronymus Bosch",
+    "Giovanni Bellini",
+    "Anthonis van Dyck"
+   ],
+   "helyes": 1
+  },
+  {
+   "kerdes": "Ki festette az Urbinói Vénusz című képet?",
+   "valaszok": [
+    "Raffaello",
+    "Tintoretto",
+    "Tiziano",
+    "Velázquez"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Ki volt Rembrandt modellje élete utolsó éveiben?",
+   "valaszok": [
+    "Cybille",
+    "Saskia",
+    "Hendrickje",
+    "Kirsten"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Melyik művész nem készített freskót a Sixtus-kápolnában?",
+   "valaszok": [
+    "Michelangelo",
+    "Botticelli",
+    "Perugino",
+    "Ghiberti"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Mi volt az a téma, amit Rembrandt majdnem minden évben megfestett?",
+   "valaszok": [
+    "apja portréja",
+    "felesége aktja",
+    "önarcképe",
+    "szobabelső"
+   ],
+   "helyes": 2
+  },
+  {
+   "kerdes": "Milyen származású volt a budapesti Margit híd tervezője?",
+   "valaszok": [
+    "angol",
+    "belga",
+    "porosz",
+    "francia"
+   ],
+   "helyes": 3
+  },
+  {
+   "kerdes": "Ki tervezte a debreceni Arany Bika Szálló épületét?",
+   "valaszok": [
+    "Hild József",
+    "Hajós Alfréd",
+    "Ybl Miklós",
+    "Pollack Mihály"
+   ],
+   "helyes": 1
+  }
+ ]
+}
