@@ -279,3 +279,51 @@ def test_a_torolt_naplo_nem_riaszt_de_utana_megint_figyelunk(omlas):
 def test_a_hianyzo_naplo_nem_okoz_hibat(omlas):
     omlas._olvasatlan_beolvas()
     assert omlas.uj_osszeomlas() is False
+
+
+# ---- 6. az összeomlás-jelzés NE okozzon összeomlást (4.6.7) -------------
+
+def test_az_osszeomlas_jelzes_nem_nyit_modalis_ablakot():
+    """⚠️ EZ A LEGKÍNOSABB HIBA A SOROZATBAN: a figyelmeztetés, amelyik az
+    összeomlásokról szólt volna, MAGA OKOZOTT összeomlást.
+
+    Dr. Kiss István jelentése (2026-09-11) szó szerint ebben a függvényben
+    fogta meg a natív hibát (`0x8001010d` =
+    `RPC_E_CANTCALLOUT_ININPUTSYNCCALL`): időzítő-visszahívásból nyitott
+    modális ablak és rendszerértesítés COM-ot hív, miközben a háttérben az
+    időjárás-lekérdezés SSL-környezetet épít.
+
+    A teszt a FORRÁSKÓDOT nézi, mert wx nélkül nem futtatható — de pont ez
+    a lényeg: ha valaki „javításként" visszateszi a párbeszédet, itt bukik
+    el, és elolvassa, miért nem szabad."""
+    import re
+    from pathlib import Path
+    forras = Path(__file__).resolve().parent.parent / "superdl_gui.py"
+    sz = forras.read_text(encoding="utf-8")
+    eleje = sz.index("def _osszeomlas_utan_szol")
+    vege = sz.index("def _on_diagnostics", eleje)
+    test = sz[eleje:vege]
+    # a docstring MAGYARÁZZA a tiltást, ezért a kódrészt külön nézzük
+    kod = test[test.index('"""', test.index('"""') + 3) + 3:]
+    assert "MessageDialog" not in kod, (
+        "Az összeomlás-jelzés NEM nyithat modális ablakot: időzítőből hívott "
+        "COM-művelet, és pontosan ez ölte meg a programot (0x8001010d).")
+    assert "ShowModal" not in kod
+    assert "toast=True" not in kod, (
+        "A rendszerértesítés is COM-on megy – ezen az úton nem való.")
+    assert "toast=False" in kod, (
+        "Mondjuk KI, hogy nincs értesítés – különben az alapérték némán "
+        "visszahozhatja.")
+
+
+def test_az_osszeomlas_jelzes_keson_es_CallAfter_rel_indul():
+    """A 2,5 másodperc pont az indulási COM-forgalom közepére esett. A
+    `CallAfter` kilépteti a hívást az időzítő kontextusából."""
+    from pathlib import Path
+    forras = Path(__file__).resolve().parent.parent / "superdl_gui.py"
+    sz = forras.read_text(encoding="utf-8")
+    i = sz.index("_osszeomlas_utan_szol)")
+    korny = sz[max(0, i - 400):i + 60]
+    assert "CallAfter" in korny
+    szam = [x for x in ("8000", "9000", "10000", "12000") if x in korny]
+    assert szam, "Az indulás utáni késleltetés legyen legalább 8 másodperc."

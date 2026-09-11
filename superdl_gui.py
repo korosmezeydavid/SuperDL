@@ -2562,32 +2562,42 @@ class MainFrame(wx.Frame):
         **Egyszer szól, és csak ÚJ összeomlásra.** Egy figyelmeztetés, ami
         minden induláskor megszólal ugyanarra a régi esetre, pontosan annyit
         ér, mint a néma program — a felhasználó egy hét alatt megtanulja
-        elengedni a füle mellett."""
+        elengedni a füle mellett.
+
+        ⚠️ **EZ A FÜGGVÉNY ÖSSZEOMLÁST OKOZOTT (4.6.7 javítás).**
+        Dr. Kiss István jelentése (2026-09-11) szó szerint EBBEN a
+        függvényben fogta meg a natív hibát:
+
+            Windows fatal exception: code 0x8001010d
+              File "superdl_gui.py", ... in _osszeomlas_utan_szol
+              File "wx\\core.py", ... in Notify
+
+        A `0x8001010d` = `RPC_E_CANTCALLOUT_ININPUTSYNCCALL`: COM-hívás nem
+        indítható, amíg a program bemenet-szinkron hívást dolgoz fel. Az
+        időzítő visszahívásából (`Notify`) nyitott **modális párbeszéd** és a
+        **rendszerértesítés** is COM-ot hív — miközben a háttérben épp az
+        időjárás-lekérdezés SSL-környezetet épített. Az összeomlást tehát az
+        a figyelmeztetés okozta, amelyik az összeomlásokról akart szólni.
+
+        Ezért mostantól: **se modális ablak, se rendszerértesítés** ezen az
+        úton. Marad az állapotsor + napló + képernyőolvasó (`_announce`), és
+        a mondat maga mondja meg, mit lehet tenni. Kevesebb, mint amit
+        terveztem — de működik, és nem dönti le a programot."""
         try:
             from superdl import osszeomlas
             if not osszeomlas.uj_osszeomlas():
                 return
         except Exception:
             return
+        # ⚠️ `toast=False`: a rendszerértesítés COM-on megy. Ezen az úton az
+        # volt az egyik gyanúsított — és egy értesítés nem ér annyit, hogy
+        # kockáztassuk érte a program életét.
         self._announce(
-            "A SuperDL a legutóbbi futásakor váratlanul bezárult. A nyoma "
-            "megvan, és el tudod küldeni nekünk.", ok=False, toast=True)
-        dlg = wx.MessageDialog(
-            self,
-            "A SuperDL a legutóbbi futásakor váratlanul bezárult.\n\n"
-            "Ez nem a te hibád, és nem veszett el semmi: a letöltési sor "
-            "megmaradt. A program feljegyezte, mi történt.\n\n"
-            "Elkészítsem most a hibajelentést? A vágólapra kerül, és onnan "
-            "egy Control V-vel beilleszthető egy levélbe.\n\n"
-            "(A jelentés nem tartalmaz jelszót, kulcsot vagy személyes "
-            "adatot.)",
-            "A program legutóbb váratlanul bezárult",
-            wx.YES_NO | wx.ICON_INFORMATION)
-        dlg.SetYesNoLabels("&Jelentés a vágólapra", "&Most nem")
-        valasz = dlg.ShowModal()
-        dlg.Destroy()
-        if valasz == wx.ID_YES:
-            self._on_diagnostics()
+            "A SuperDL a legutóbbi futásakor váratlanul bezárult. Nem "
+            "veszett el semmi, a letöltési sor megmaradt. A program "
+            "feljegyezte, mi történt: ha elküldöd nekünk, megnézzük — "
+            "Súgó menü, Hibajelentés vágólapra.",
+            ok=False, toast=False)
 
     def _on_diagnostics(self, event=None):
         """Titok-mentes diagnosztikai jelentés a VÁGÓLAPRA (hibajelentéshez).
@@ -3841,7 +3851,14 @@ def main():
     # eszébe sem jut hibajelentést írni – a napló tehát örökre a gépén marad.
     # Késleltetve, hogy ne az indulás zajába vesszen.
     if not background:
-        wx.CallLater(2500, frame._osszeomlas_utan_szol)
+        # ⚠️ 2500 → 8000, és `CallAfter`-rel (4.6.7). Dr. Kiss gépén a
+        # 2,5 másodperc pont az indulási forgalom közepére esett: a háttérben
+        # az időjárás-lekérdezés épp SSL-környezetet épített, és az
+        # időzítő-visszahívásból induló COM-hívás megölte a programot
+        # (0x8001010d). A `CallAfter` kilépteti a hívást az időzítő
+        # kontextusából, a nyolc másodperc pedig kivárja az indulást.
+        wx.CallLater(8000,
+                     lambda: wx.CallAfter(frame._osszeomlas_utan_szol))
     app.MainLoop()
 
 

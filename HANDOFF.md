@@ -162,7 +162,55 @@ nyers bájtként keresi a fájlokban.)
 
 ---
 
-### 🔨 4.6.6 MEGÉPÜLT (2026-09-11) – egy figyelő szál + RPC-műszer
+### 🔨 4.6.7 (2026-09-11) – A SAJÁT FIGYELMEZTETÉSÜNK ÖLTE MEG A PROGRAMOT
+
+**Dr. Kiss István jelentése (2026-09-11, 4.6.4)** – az új napló hozta, és a
+legkínosabb hibát fogta meg a sorozatban.
+
+```
+Windows fatal exception: code 0x8001010d
+  File "superdl_gui.py", line 2576 in _osszeomlas_utan_szol
+  File "wx\core.py", line 3550 in Notify
+```
+
+**Az a funkció, amit a 4.6.4-ben azért tettem be, hogy az ÖSSZEOMLÁSOKRÓL
+szóljon, MAGA OKOZOTT összeomlást.**
+
+`0x8001010d` = `RPC_E_CANTCALLOUT_ININPUTSYNCCALL`: COM-hívás nem indítható,
+amíg a program bemenet-szinkron hívást dolgoz fel. Az időzítő
+visszahívásából (`wx.CallLater` → `Notify`) nyitott **modális párbeszéd** és
+a **rendszerértesítés** is COM-ot hív — miközben a naplóban látszik, hogy a
+háttérszál épp `ssl.create_default_context`-et futtatott (időjárás).
+
+⚠️ **EZ UGYANAZ A `0x8001010d`, amit 2026-09-10-én Dávid gépén is láttam
+kétszer** (`windows-naplo-es-diagnosztika.md`), és amit akkor a NEGYEDIK
+bajtípus („fut, de halott") gyanújaként írtam fel. **Megvan az oka, és a
+miénk volt.**
+
+**Javítás:**
+- se `wx.MessageDialog`, se `ShowModal`, se `toast=True` ezen az úton —
+  marad az `_announce` (állapotsor + napló + képernyőolvasó), és a mondat
+  maga mondja meg, mit lehet tenni (Súgó → Hibajelentés vágólapra);
+- `wx.CallLater(2500)` → `wx.CallLater(8000, lambda: wx.CallAfter(...))`:
+  a `CallAfter` kilépteti a hívást az időzítő kontextusából, a nyolc
+  másodperc pedig kivárja az indulási forgalmat.
+
+**Teszt:** a `tests\test_naplo_diagnosztika.py` két új tesztje a FORRÁST
+nézi (wx nélkül nem futtatható) — ha valaki „javításként" visszateszi a
+párbeszédet, elbukik és elolvassa, miért nem szabad.
+
+**⚠️ EGY MÁSIK MODULBÓL is jött összeomlás ugyanebből a naplóból**, NEM ez a
+téma javítja: `mail_mod\mailwin.py:4968` —
+`GetSelection() can't be used with multiple-selection listboxes`. Enter a
+levéllistán → azonnali programhalál. **Átadva a mail-témának.**
+
+---
+
+### ✅ 4.6.6 KIADVA (2026-09-11) – egy figyelő szál + RPC-műszer
+
+**Kiadás megtörtént.** Commit `06313b3` (5 fájl, +486/−24), push,
+`gh release create v4.6.6 … --latest`. Kulcs-szken tiszta (346 fájl),
+**mind a 6 URL 200**.
 
 **Funkciómentes kiadás.** Szándékosan: ekkora szerkezeti változás mellé nem
 teszünk új funkciót. Terv: `claude/windows-torrent-nagy-terv.md`.
