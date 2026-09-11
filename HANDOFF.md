@@ -162,6 +162,49 @@ nyers bájtként keresi a fájlokban.)
 
 ---
 
+### 🔨 4.6.6 MEGÉPÜLT (2026-09-11) – egy figyelő szál + RPC-műszer
+
+**Funkciómentes kiadás.** Szándékosan: ekkora szerkezeti változás mellé nem
+teszünk új funkciót. Terv: `claude/windows-torrent-nagy-terv.md`.
+
+**⚠️ ELŐBB A MÉRÉSEK, mert kettő megcáfolt egy-egy feltevést:**
+
+| # | Kérdés | Eredmény |
+|---|---|---|
+| M2 | Blokkolja a `check-integrity` az RPC-t? | **NEM.** 768 MB / 2 mp, max válaszidő 0,03 mp → **a 4.6.5 magyarázata téves volt** |
+| M6 | A régi felépítés (6 szál, kapcsolatonként új TCP, közös zár) elromlik terhelés alatt? | **NEM.** 240 hívás, 0 hiba, max 0,062 mp → **H2 és H3 kiesett** |
+| M3 | Mit küld a trackernek? | `peer_id=A2-1-37-0-`, UA `aria2/1.37.0` |
+| M4 | Küld `stopped`-ot? | **IGEN**, szabályosan |
+
+**A gyökérok tehát NINCS MEG.** A maradék gyanú: lemez-telítődés lassú
+meghajtón (H1) — innen nem bizonyítható. Ezért készült a műszer.
+
+**Amit építettem:**
+
+1. **`Figyelo` (torrent.py)** — EGY szál kérdezi a motort MINDEN torrentről,
+   `tellActive`+`tellWaiting`+`tellStopped` hívással. Mérve: 3 hívás/mp a
+   torrentek számától FÜGGETLENÜL (régen N), zárvárakozás 0,000 mp.
+   ⚠️ **Nem a gyökérok javítása, hanem szerkezeti tartalék:** egy torrent
+   baja ne vihesse el a többit, bármi is okozza.
+2. **`allapot()` a KORÁT is visszaadja.** Elavult adatot sosem adunk
+   frissként — ez a „fut, de halott" tükörképe lenne.
+3. **RPC-műszer**: hívásszám, hibaszám, 1 mp fölötti hívások, leglassabb
+   válasz; `LASSÚ RPC` és `RPC HIBA` sorok a naplóba, zárvárakozással együtt.
+   Mindez bekerül a hibajelentésbe is. **A következő előforduláskor nem kell
+   hipotézist gyártani.**
+4. **`requests.Session`** tartós kapcsolattal (hívásonként új TCP helyett).
+5. **`gid` bekerült a `KEYS`-be** — a `tellActive` CSAK a kért mezőket adja
+   vissza; nélküle a figyelő némán üres maradna.
+
+⚠️ **Élesben próbálva** (3 torrent, valódi aria2): 76 RPC-hívás 28 mp alatt,
+0 hiba, a figyelő a végén 0 gid-et követ. Az ELSŐ próbán hamis riasztás volt
+induláskor („a motor nem válaszol"), mert a figyelő első köre még nem futott
+le — javítva: a „még nem láttuk" és az „elnémult" két külön eset.
+
+**Új:** `tests\test_figyelo.py` (10 teszt). Teljes pytest **EXITCODE=0**.
+
+---
+
 ### ✅ 4.6.5 KIADVA (2026-09-11) – az első jelentés az új naplóval
 
 **Kiadás megtörtént.** Commit `2284424` (13 fájl, +795/−54), push,

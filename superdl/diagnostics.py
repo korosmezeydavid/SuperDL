@@ -167,7 +167,15 @@ def _motor_sorok() -> list[str]:
            "  fut: %s" % ("igen" if adat.get("fut") else "NEM")]
     for kulcs, cimke in (("verzio", "aria2 verzió"), ("port", "vezérlő port"),
                          ("aktiv", "aktív letöltés"),
-                         ("varakozo", "várakozó"), ("leallt", "leállt")):
+                         ("varakozo", "várakozó"), ("leallt", "leállt"),
+                         # MŰSZER (4.6.6) – ezek zárják le a „miért némult el
+                         # a motor" kérdést, hipotézis helyett méréssel
+                         ("rpc_hivasok", "vezérlő hívások"),
+                         ("rpc_hibak", "ebből hibás"),
+                         ("rpc_lassu", "1 mp-nél lassabb"),
+                         ("rpc_leglassabb", "leglassabb válasz"),
+                         ("figyelo_utolso_valasz", "a figyelő utolsó válasza"),
+                         ("figyelo_utolso_hiba", "a figyelő utolsó hibája")):
         if kulcs in adat:
             out.append("  %s: %s" % (cimke, adat[kulcs]))
     if adat.get("megjegyzes"):

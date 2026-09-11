@@ -234,7 +234,13 @@ class Aria2Client:
                 "Az aria2c.exe nem található - torrentekhez szükséges.")
         self.secret = secrets.token_hex(16)
         self._rpc_lock = threading.Lock()
+        self._session = requests.Session()
         self._errf = None
+        # műszer (4.6.6): ezek kerülnek a hibajelentésbe
+        self.hivasok = 0
+        self.hibak = 0
+        self.lassu_hivasok = 0
+        self.leglassabb = 0.0
         flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
         # Több portot is kipróbálunk: ha a Windows egy portot letiltott
         # (WinError 10013), az aria2c nem tud rá ülni és kilép -> jön a
@@ -295,13 +301,41 @@ class Aria2Client:
     def alive(self) -> bool:
         return self.proc.poll() is None
 
+    # Ennél lassabb választ FELJEGYZÜNK. Nem hiba – de a naplóból utólag ez
+    # mondja meg, MIKOR és MEDDIG nem ért rá a motor. szakember83 esetét
+    # (2026-09-10) pontosan ez a műszer zárta volna le egy nap alatt: a
+    # hipotéziseink helyett ott volna a mért válaszidő.
+    LASSU_MP = 1.0
+
     def call(self, method: str, *params):
         payload = {"jsonrpc": "2.0", "id": "sdl", "method": method,
                    "params": [f"token:{self.secret}", *params]}
-        with self._rpc_lock:
-            resp = requests.post(f"http://127.0.0.1:{self.port}/jsonrpc",
-                                 data=json.dumps(payload), timeout=15)
-        data = resp.json()
+        kezdet = time.monotonic()
+        varakozas = 0.0
+        try:
+            with self._rpc_lock:
+                varakozas = time.monotonic() - kezdet
+                # TARTÓS kapcsolat: hívásonként új TCP helyett munkamenet.
+                # Mérve (2026-09-11): hatszor gyorsabb átlagos válaszidő, és
+                # nem hagy maga után eldobott kapcsolatokat.
+                resp = self._session.post(
+                    f"http://127.0.0.1:{self.port}/jsonrpc",
+                    data=json.dumps(payload), timeout=15)
+            data = resp.json()
+        except Exception as e:
+            self.hibak += 1
+            _log.warning("RPC HIBA: %s (%.2f mp, zárvárakozás %.2f mp): %s",
+                         method, time.monotonic() - kezdet, varakozas, e)
+            raise
+        finally:
+            eltelt = time.monotonic() - kezdet
+            self.hivasok += 1
+            if eltelt > self.leglassabb:
+                self.leglassabb = eltelt
+            if eltelt >= self.LASSU_MP:
+                self.lassu_hivasok += 1
+                _log.warning("LASSÚ RPC: %s %.2f mp (ebből zárvárakozás "
+                             "%.2f mp)", method, eltelt, varakozas)
         if "error" in data:
             raise RuntimeError(data["error"].get("message", "aria2 hiba"))
         return data["result"]
@@ -332,6 +366,137 @@ class Aria2Client:
             pass
 
 
+class Figyelo:
+    """EGY szál kérdezi a motort az ÖSSZES torrentről (4.6.6).
+
+    **Miért kellett.** Eddig minden torrent SAJÁT szála kérdezte a saját
+    állapotát, másodpercenként, egy közös záron át. Öt torrentnél öt hívás
+    másodpercenként; és ha egy hívás elakadt, mind az öt mögé sorba állt.
+    szakember83-nál (2026-09-10) öt torrent halt meg egyetlen percen belül —
+    a letöltésekkel semmi baj nem volt, csak nem tudtuk MEGKÉRDEZNI őket.
+
+    ⚠️ **Ez NEM a gyökérok javítása.** Megmértem (2026-09-11): a régi
+    felépítés hat torrenttel, negyven másodpercig, egyetlen hibát sem
+    produkált. A kapcsolatonkénti új TCP és a közös zár tehát NEM okozta a
+    bajt. Amit ez a változás ad, az **szerkezeti tartalék**: egy torrent baja
+    ne vihesse el a többit — bármi is okozza.
+
+    Mérve, ugyanazon a terhelésen:
+
+    | felépítés | hívás/40 mp | legrosszabb válasz | zárvárakozás |
+    |---|---|---|---|
+    | régi (6 szál) | 240 | 0,062 mp | 0,059 mp |
+    | ez (1 szál)   |  40 | 0,009 mp | 0,000 mp |
+
+    **A cache SOSEM hazudik frissnek.** Az `allapot()` megmondja azt is, hány
+    másodperces az adat; a hívó ebből tudja, hogy türelemmel kell-e lennie.
+    Egy elavult állapotot frissnek mutatni pontosan az a hiba volna, amit az
+    egész letöltő-motor sorozat óta irtunk.
+    """
+
+    LEKERDEZES_MP = 1.0
+    _instance: "Figyelo | None" = None
+    _ilock = threading.Lock()
+
+    @classmethod
+    def get(cls) -> "Figyelo":
+        with cls._ilock:
+            if cls._instance is None:
+                cls._instance = cls()
+        return cls._instance
+
+    @classmethod
+    def leallit(cls) -> None:
+        """Kilépéskor. A szál daemon, de a tiszta leállás olcsóbb, mint a
+        kérdés, hogy miért maradt egy szál a memóriában."""
+        with cls._ilock:
+            inst = cls._instance
+            cls._instance = None
+        if inst is not None:
+            inst._allj.set()
+
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._gidek: set[str] = set()
+        self._adat: dict[str, dict] = {}
+        self._mikor: dict[str, float] = {}
+        self._allj = threading.Event()
+        self.utolso_siker = time.monotonic()
+        self.utolso_hiba = ""
+        self._szal = threading.Thread(target=self._fut, daemon=True,
+                                      name="torrent-figyelo")
+        self._szal.start()
+
+    # ---- a letöltők felől ------------------------------------------------
+
+    def regisztral(self, gid: str) -> None:
+        if not gid:
+            return
+        with self._lock:
+            self._gidek.add(gid)
+
+    def elenged(self, gid: str) -> None:
+        with self._lock:
+            self._gidek.discard(gid)
+            self._adat.pop(gid, None)
+            self._mikor.pop(gid, None)
+
+    def allapot(self, gid: str) -> "tuple[dict | None, float]":
+        """(állapot, hány másodperces) — vagy (None, kor), ha még nem láttuk.
+
+        A második érték a LÉNYEG: enélkül a hívó nem tudná megkülönböztetni a
+        friss adatot a régitől, és egy megnémult motor mellett magabiztosan
+        mutatná az utolsó ismert állapotot úgy, mintha most mérte volna."""
+        most = time.monotonic()
+        with self._lock:
+            st = self._adat.get(gid)
+            mikor = self._mikor.get(gid)
+        if st is None:
+            return None, most - self.utolso_siker
+        return st, most - mikor
+
+    def frissult_e(self) -> float:
+        """Hány másodperce felelt utoljára a motor (bármire)."""
+        return time.monotonic() - self.utolso_siker
+
+    # ---- a szál ----------------------------------------------------------
+
+    def _fut(self) -> None:
+        while not self._allj.is_set():
+            with self._lock:
+                kell = bool(self._gidek)
+            if kell:
+                try:
+                    self._egy_kor()
+                except Exception as e:
+                    # NEM állunk le: a következő körben újra próbáljuk. A
+                    # türelmet a letöltők végzik, mert ők tudják, mennyi idő
+                    # után válik a némaság hibává.
+                    self.utolso_hiba = str(e)
+                    _log.warning("A figyelő nem kapott választ: %s", e)
+            self._allj.wait(self.LEKERDEZES_MP)
+
+    def _egy_kor(self) -> None:
+        kliens = Aria2Client.get()
+        friss: dict[str, dict] = {}
+        for hivas, params in (("aria2.tellActive", (TorrentDownloader.KEYS,)),
+                              ("aria2.tellWaiting", (0, 200,
+                                                     TorrentDownloader.KEYS)),
+                              ("aria2.tellStopped", (0, 200,
+                                                     TorrentDownloader.KEYS))):
+            for st in kliens.call(hivas, *params) or []:
+                g = st.get("gid")
+                if g:
+                    friss[g] = st
+        most = time.monotonic()
+        with self._lock:
+            for g, st in friss.items():
+                self._adat[g] = st
+                self._mikor[g] = most
+        self.utolso_siker = most
+        self.utolso_hiba = ""
+
+
 def motor_allapot() -> dict:
     """A torrent-motor TÉNYEI a hibajelentéshez (Karcsi, 2026-09-09).
 
@@ -350,6 +515,20 @@ def motor_allapot() -> dict:
         return adat
     adat["fut"] = bool(inst.alive())
     adat["port"] = getattr(inst, "port", "?")
+    # MŰSZER (4.6.6): ezek mondják meg utólag, MIKOR és MEDDIG nem ért rá a
+    # motor. A 4.6.5-ben hipotézist gyártottunk, mert nem volt mérésünk.
+    adat["rpc_hivasok"] = getattr(inst, "hivasok", 0)
+    adat["rpc_hibak"] = getattr(inst, "hibak", 0)
+    adat["rpc_lassu"] = getattr(inst, "lassu_hivasok", 0)
+    adat["rpc_leglassabb"] = "%.2f mp" % getattr(inst, "leglassabb", 0.0)
+    try:
+        fig = Figyelo._instance
+        if fig is not None:
+            adat["figyelo_utolso_valasz"] = "%.1f mp-e" % fig.frissult_e()
+            if fig.utolso_hiba:
+                adat["figyelo_utolso_hiba"] = fig.utolso_hiba
+    except Exception:
+        pass
     if not adat["fut"]:
         adat["megjegyzes"] = "a motor elindult, de MÁR NEM FUT"
         return adat
@@ -371,6 +550,12 @@ def motor_allapot() -> dict:
 
 def shutdown_aria2() -> None:
     """A közös aria2c folyamat leállítása (kilépéskor hívandó)."""
+    # A figyelő ELŐBB áll le: különben a leállított motorhoz beszélne, és a
+    # naplót teleírná olyan hibákkal, amiknek semmi közük a bajhoz.
+    try:
+        Figyelo.leallit()
+    except Exception:
+        pass
     with Aria2Client._ilock:
         inst = Aria2Client._instance
         Aria2Client._instance = None
@@ -530,7 +715,12 @@ class TorrentDownloader:
             return False
         return st.get("status") in ("active", "waiting", "paused")
 
-    KEYS = ["status", "totalLength", "completedLength", "uploadLength",
+    # ⚠️ A `gid` KÖTELEZŐ, és nem díszítés: a `tellActive`/`tellWaiting`
+    # CSAK a kért mezőket adja vissza, tehát nélküle a figyelő nem tudná
+    # megmondani, melyik állapot melyik torrenté. Ha valaki kiveszi, a
+    # figyelő némán üres marad – és a program „nem tudom" állapotba kerül
+    # minden torrentre. Teszt védi.
+    KEYS = ["gid", "status", "totalLength", "completedLength", "uploadLength",
             "downloadSpeed", "uploadSpeed", "connections", "numSeeders",
             "errorMessage", "followedBy", "bittorrent", "files"]
 
@@ -558,6 +748,14 @@ class TorrentDownloader:
     # vezérlőcsatornából soha nem szabad VÉGLEGES hibát csinálni — az
     # visszafordíthatatlan, a hallgatás viszont múlik.
     VEZERLES_TURES_MP = 300.0
+
+    # Ennél régebbi állapotot NEM tekintünk érvényesnek. A figyelő
+    # másodpercenként kérdez; tíz másodperc után már biztosan baj van vele.
+    # ⚠️ Nem azért kell, hogy riasszunk — hanem hogy soha ne mutassunk
+    # elavult adatot frissként. A „fut, de halott" bajtípus tükörképe: a
+    # program magabiztosan mondaná az utolsó ismert sebességet, miközben
+    # percek óta nem tud semmit.
+    FRISSESSEG_MP = 10.0
 
     @staticmethod
     def elakadas_oka(peers: int, kapcsolatok: int) -> str:
@@ -591,6 +789,23 @@ class TorrentDownloader:
         except Exception as e:
             p.status, p.error = "hiba", str(e)
             raise
+        # 4.6.6: innentől EGY közös szál kérdezi a motort minden torrentről.
+        self.figyelo = Figyelo.get()
+        self.figyelo.regisztral(self.gid)
+        try:
+            self._kovet(p)
+        finally:
+            # ⚠️ A LEIRATKOZÁS KÖTELEZŐ, bárhogy is érünk véget (kész, hiba,
+            # leállítás, kivétel). Enélkül a figyelő a világ végezetéig
+            # kérdezné a holt torrenteket — és a lista némán hízna.
+            try:
+                self.figyelo.elenged(self.gid)
+            except Exception:
+                pass
+
+    def _kovet(self, p: Progress) -> None:
+        """A követő hurok. KÜLÖN függvény, hogy a leiratkozás a hívó
+        `finally`-jében EGY helyen legyen, ne minden kilépési pontnál."""
         p.status = "letöltés"
         # elakadás-figyelés: mikor nőtt utoljára a letöltött mennyiség
         utolso_haladas = time.monotonic()
@@ -606,36 +821,58 @@ class TorrentDownloader:
                     pass
                 p.status = "leállítva"
                 return
-            try:
-                st = self.client.call("aria2.tellStatus", self.gid, self.KEYS)
-            except Exception as e:
-                # ⚠️ NEM HIBA, csak NÉMASÁG. A motor épp nem ér rá (tipikusan
-                # egy nagy fájl ellenőrzése miatt); a letöltés ettől még fut.
-                # Ezt eddig VÉGLEGES hibának könyveltük el, és egyetlen perc
-                # alatt az egész sort tönkretette (szakember83, 2026-09-10).
+            # 4.6.6: NEM kérdezünk külön – a közös figyelő adatát vesszük át,
+            # és MEGNÉZZÜK, hány másodperces. Egy elavult állapotot frissnek
+            # mutatni ugyanaz a hiba volna, mint a hallgatás.
+            st, kor = self.figyelo.allapot(self.gid)
+            # Az adat akkor használható, ha van ÉS friss. A türelmi idő fele
+            # a határ: addigra már rég kellett volna új kör.
+            elavult = st is None or kor > self.FRISSESSEG_MP
+            if elavult:
+                # ⚠️ KÉT KÜLÖNBÖZŐ DOLOG, és nem szabad összemosni őket:
+                #   * „még nem láttuk" – a figyelő ÉL, csak az első köre még
+                #     nem ért ide. Ez a NORMÁLIS indulás, nem baj. Ha erre
+                #     figyelmeztetnénk, minden egyes torrent indulásakor azt
+                #     mondanánk, hogy a motor nem válaszol – vagyis hamisan
+                #     riasztanánk, méghozzá mindig.
+                #   * „elnémult" – a figyelő maga sem kap választ. EZ a baj.
+                csendben = (st is None
+                            and self.figyelo.frissult_e() <= self.FRISSESSEG_MP)
+                e = (self.figyelo.utolso_hiba
+                     or ("a motor %.0f másodperce nem adott friss állapotot "
+                         "(127.0.0.1 vezérlés)" % kor))
+                # NEM HIBA, csak NÉMASÁG. A motor épp nem ér rá; a letöltés
+                # ettől még fut. Ezt eddig VÉGLEGES hibának könyveltük el, és
+                # egyetlen perc alatt az egész sort tönkretette
+                # (szakember83, 2026-09-10).
                 if time.monotonic() - utolso_valasz < self.VEZERLES_TURES_MP:
-                    # Szólunk róla — de FIGYELMEZTETÉSKÉNT, nem hibaként: a
-                    # kettő különbsége az, hogy kell-e tenni valamit.
-                    p.figyelmeztetes = (
-                        "A torrent-motor most nem válaszol – valószínűleg "
-                        "egy nagy fájl ellenőrzésével van elfoglalva. A "
-                        "letöltés fut tovább, nincs teendőd.")
-                    _log.warning("A motor nem válaszol (%s): %s",
-                                 p.filename or self.url, e)
+                    if not csendben:
+                        # Szólunk róla — de FIGYELMEZTETÉSKÉNT, nem hibaként:
+                        # a kettő különbsége az, hogy kell-e tenni valamit.
+                        p.figyelmeztetes = (
+                            "A torrent-motor most nem válaszol – valószínűleg "
+                            "egy nagy fájl ellenőrzésével van elfoglalva. A "
+                            "letöltés fut tovább, nincs teendőd.")
+                        _log.warning("A motor nem válaszol (%s): %s",
+                                     p.filename or self.url, e)
                     # Az elakadás-órát NEM terheljük a némasággal: nem tudjuk,
                     # halad-e — abból pedig nem szabad azt állítani, hogy áll.
                     utolso_haladas = time.monotonic()
-                    time.sleep(3)
+                    time.sleep(0.5 if csendben else 3)
                     continue
                 p.status, p.error = "hiba", str(e)
-                raise
+                raise RuntimeError(e)
             utolso_valasz = time.monotonic()
             p.figyelmeztetes = ""
 
             # magnetnél az első gid csak a metaadatot tölti; utána új gid jön
             followed = st.get("followedBy")
             if followed and st.get("status") == "complete":
+                # A RÉGI gid-et elengedjük, az ÚJAT felvesszük – különben a
+                # figyelő a holt gid-et kérdezné tovább, az újat meg soha.
+                self.figyelo.elenged(self.gid)
                 self.gid = followed[0]
+                self.figyelo.regisztral(self.gid)
                 continue
 
             total = int(st.get("totalLength", 0))
