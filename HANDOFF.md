@@ -162,7 +162,24 @@ nyers bájtként keresi a fájlokban.)
 
 ---
 
-### 🔨 4.6.5 MEGÉPÜLT (2026-09-11) – az első jelentés az új naplóval
+### ✅ 4.6.5 KIADVA (2026-09-11) – az első jelentés az új naplóval
+
+**Kiadás megtörtént.** Commit `2284424` (13 fájl, +795/−54), push,
+`gh release create v4.6.5 … --latest`. Kulcs-szken tiszta (346 fájl),
+**mind a 6 URL 200**. Hírlevél a listára + személyes válasz szakember83-nak.
+
+⚠️ **EBBEN A KIADÁSBAN VAN A PRIVÁT TRACKER JAVÍTÁS IS** – lásd lentebb és
+`claude/windows-privat-tracker-szivargas.md`. A kiadást emiatt MEGÁLLÍTOTTAM
+és újraépítettem: a 4.6.5 első buildje még a hibás kódot tartalmazta.
+
+**Fejlesztői nyilatkozat a felhasználóknak** (privát tracker supportjának
+továbbküldhető, magyar + angol):
+`C:\Users\msn\Documents\SuperDL-tracker-magyarazat.md`
+
+**Kommunikációs döntés (Dávid):** a hírlevélben NEM csinálunk belőle ügyet
+(felesleges pánik), de a kiadási jegyzetben tárgyilagos mondat szerepel
+róla. Indok: a mentőlevél csak akkor bizonyíték, ha van nyilvános, dátumozott
+hivatkozási alapja.
 
 **A napló a kiadás után 40 PERCCEL megfogta a hibát — és kettőt a
 sajátjainkból is.** szakember83 jelentése (2026-09-10 23:35, 4.6.4).
