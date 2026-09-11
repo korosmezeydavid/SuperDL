@@ -2096,7 +2096,8 @@ class MainFrame(wx.Frame):
             p.filename or kovetkezo.url, p.status, p.error,
             utkozes=bool(p.conflict), probak=getattr(kovetkezo, "retries", 0),
             elakadt=bool(getattr(p, "elakadt", False)),
-            elakadas_oka=getattr(p, "elakadas_oka", ""))
+            elakadas_oka=getattr(p, "elakadas_oka", ""),
+            ismert=getattr(p, "error_ismert", None))
         # a javítás-billentyűt CSAK ott ajánljuk fel, ahol tényleg van mit
         # tenni egy gombbal – a hamis ígéret rosszabb, mint a hallgatás
         if p.conflict or p.status == "hiba":
@@ -2135,7 +2136,8 @@ class MainFrame(wx.Frame):
                 nev, p.status, p.error,
                 utkozes=bool(p.conflict), probak=getattr(job, "retries", 0),
                 elakadt=bool(getattr(p, "elakadt", False)),
-                elakadas_oka=getattr(p, "elakadas_oka", ""))
+                elakadas_oka=getattr(p, "elakadas_oka", ""),
+                ismert=getattr(p, "error_ismert", None))
         else:
             mondat = f"{nev}: állapota {p.status}, most nincs vele teendő."
         # A KORÁBBI hiba akkor is elhangzik, ha most épp fut. Ez az egyetlen
@@ -2225,8 +2227,17 @@ class MainFrame(wx.Frame):
                 dlg.Destroy()
                 if not do:
                     return
+            # A VÁRHATÓ LASSULÁST is kimondjuk (szakember83, 2026-09-10).
+            # Az újraindítás hash-ellenőrzést kér: egy több gigabájtos
+            # torrentnél ez percekig tart, és közben a motor a TÖBBI
+            # letöltésről sem tud beszámolni. Ha ezt elhallgatjuk, a
+            # felhasználó azt látja, hogy a javítás után az EGÉSZ program
+            # megbolondult – és pontosan ez történt nála.
             self._announce(f"Kényszerített újraindítás: {nev}. "
-                           "A meglévő adat megmarad.")
+                           "A meglévő adat megmarad. Nagy fájlnál az "
+                           "ellenőrzés több percig tarthat, és közben a "
+                           "többi torrent állapota is később frissül – "
+                           "ez nem hiba.")
             threading.Thread(
                 target=lambda: self.mgr.kenyszeritett_ujrainditas(job),
                 daemon=True).start()
@@ -2859,9 +2870,16 @@ class MainFrame(wx.Frame):
                     # nyers motorüzenet (lásd hibaszoveg.olvashato), a NYERS
                     # szöveg viszont menjen a naplóba, hogy továbbküldhesd.
                     nev = p.filename or j.url
-                    msg = f"Hiba: {nev} – {hibaszoveg.olvashato(p.error)}"
-                    if p.error and not hibaszoveg.van_javaslat(p.error):
-                        self._naplo(f"[{nev}] nyers hibaszöveg: {p.error}")
+                    # ⚠️ A MENTETT választ használjuk, nem kérdezzük meg újra
+                    # (4.6.5). A `p.error` ekkor MÁR lefordított magyar
+                    # mondat; újra megvizsgálva „ismeretlennek" látszana, és
+                    # a 4.6.4-ben pont ezért cseréltük le a jó magyarázatot a
+                    # „nem ismerjük fel" szövegre. A naplóba a NYERS megy.
+                    ismert = getattr(p, "error_ismert", None)
+                    msg = f"Hiba: {nev} – {hibaszoveg.olvashato(p.error, ismert)}"
+                    nyers = getattr(p, "error_nyers", "") or p.error
+                    if nyers and ismert is False:
+                        self._naplo(f"[{nev}] nyers hibaszöveg: {nyers}")
                     self._announce(msg, ok=False, toast=True, sound="error")
                     self.selfvoice.announce("download", "error")
                     self._feed_pending.pop(j.id, None)

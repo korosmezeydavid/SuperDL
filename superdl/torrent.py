@@ -22,7 +22,7 @@ from pathlib import Path
 
 import requests
 
-from . import store
+from . import bencode, store
 from .segment import Progress
 
 _log = logging.getLogger("superdl.torrent")
@@ -96,7 +96,17 @@ def halozati_kapcsolok(dht_fajl=None) -> list[str]:
         # gép ugyanazt tölti, ez ingyen sebesség.
         "--bt-enable-lpd=true",
         "--listen-port=6881-6999",
-        f"--bt-tracker={','.join(TRACKEREK)}",
+        # ⚠️ A KIEGÉSZÍTŐ TRACKEREK INNEN SZÁNDÉKOSAN HIÁNYOZNAK (4.6.5).
+        # A 4.6.1-ben itt állt egy `--bt-tracker=…`, hat nyilvános trackerrel.
+        # Mérve 2026-09-11: **az aria2 ezeket a PRIVÁT torrentekre is ráteszi**
+        # (a `tellStatus` `announceList`-jében ott vannak). Vagyis egy privát
+        # tracker torrentjét bejelentettük hat nyilvános trackernek — amit
+        # minden privát tracker szabályzata tilt, és aminek kitiltás a
+        # következménye. A felhasználó fizetett volna egy olyan döntésért,
+        # amit mi hoztunk helyette, a háta mögött.
+        # A trackerek mostantól LETÖLTÉSENKÉNT kerülnek be (`_add()`), és csak
+        # oda, ahol szabad. Ha ide valaha visszakerülne egy globális
+        # `--bt-tracker`, az csendben visszahozná a hibát — ezért teszt védi.
         # --- magnet: a metaadat ne vesszen el ------------------------------
         # Enélkül MINDEN újraindítás újra letölti a metaadatot, mielőtt
         # egyáltalán elkezdene tölteni. Laci pontosan ezt látta: „újraindításra
@@ -397,6 +407,7 @@ class TorrentDownloader:
         self._stop = threading.Event()
         self.gid: str | None = None
         self.client: Aria2Client | None = None
+        self._privat: bool | None = None    # lásd `privat()` – egyszer számol
 
     def stop(self) -> None:
         self._stop.set()
@@ -438,11 +449,66 @@ class TorrentDownloader:
             # validál, és CSAK a sérült/hiányzó darabokat tölti újra (a kész
             # torrent így kérdés nélkül seedel tovább, nem indul elölről).
             opts["allow-overwrite"] = "true"
+        # ---- KIEGÉSZÍTŐ TRACKEREK: CSAK NYILVÁNOS TORRENTRE (4.6.5) -------
+        # Mérve 2026-09-11: az aria2 a globális `--bt-tracker`-t a privát
+        # torrentekre is ráteszi. Ezért a döntést MI hozzuk meg, torrentenként,
+        # a fájl `private` jelzője alapján. Privát torrentnél a fájlban lévő
+        # tracker az EGYETLEN, amivel szabad beszélni.
+        if not self.privat():
+            opts["bt-tracker"] = ",".join(TRACKEREK)
         path = Path(self.url)
         if not self.url.lower().startswith("magnet:") and path.is_file():
             blob = base64.b64encode(path.read_bytes()).decode()
             return self.client.call("aria2.addTorrent", blob, [], opts)
         return self.client.call("aria2.addUri", [self.url], opts)
+
+    def privat(self) -> bool:
+        """Privát tracker torrentje-e? (Egyszer számoljuk ki, utána emlékszünk.)
+
+        A magnet-linket NYILVÁNOSNAK vesszük: privát trackeren a magnet
+        gyakorlatilag használhatatlan, mert a DHT és a partnercsere ott ki van
+        kapcsolva – metaadat nélkül pedig nincs mit letölteni. Aki mégis
+        privát magnetet használ, annál a fájl nem elérhető, tehát a kérdés
+        nem is merül fel."""
+        if self._privat is None:
+            if bencode.magnet_e(self.url):
+                self._privat = False
+            else:
+                self._privat = bencode.privat_torrent(self.url)
+                if self._privat:
+                    _log.info("PRIVÁT torrent: kiegészítő trackerek NÉLKÜL "
+                              "indul (%s)", self.url)
+        return self._privat
+
+    # Hányszor próbáljuk a hozzáadást, ha a motor épp nem válaszol.
+    HOZZAADAS_PROBAK = 5
+
+    def _add_turelemmel(self) -> str:
+        """`_add()`, de egy elfoglalt motort KIVÁR (szakember83, 2026-09-10).
+
+        A megkülönböztetés lényeges: a „nem válaszolsz" MÚLIK, a „ezt az
+        infohasht már ismerem" NEM. Az elsőn várni kell, a másodikon várni
+        merő időpocsékolás — és a felhasználó addig sem tudja meg, mi a baj."""
+        utolso = None
+        for proba in range(self.HOZZAADAS_PROBAK):
+            if self._stop.is_set():
+                raise RuntimeError("A letöltést leállították.")
+            try:
+                return self._add()
+            except Exception as e:
+                szoveg = str(e).lower()
+                # ÉRDEMI válasz a motortól – ezen nincs mit próbálkozni
+                if "already registered" in szoveg or "duplicate" in szoveg:
+                    raise
+                utolso = e
+                _log.warning("A hozzáadás nem sikerült (%d/%d): %s",
+                             proba + 1, self.HOZZAADAS_PROBAK, e)
+                self.progress.figyelmeztetes = (
+                    "A torrent-motor most elfoglalt, várok vele. "
+                    "Nincs teendőd.")
+                time.sleep(5)
+        raise utolso if utolso is not None else RuntimeError(
+            "A torrentet nem sikerült hozzáadni.")
 
     def regisztralt(self) -> bool:
         """Igaz, ha ez a torrent MÉG él az aria2-ben (aktív, várakozó vagy
@@ -474,6 +540,25 @@ class TorrentDownloader:
     # késői – a felhasználó megtanulná figyelmen kívül hagyni.
     ELAKADAS_MASODPERC = 180.0
 
+    # Meddig tűrjük, hogy a MOTOR ne válaszoljon a vezérlésre (szakember83
+    # jelentése, 2026-09-10).
+    #
+    # ⚠️ Ez a 4.6.4 legsúlyosabb tanulsága. Nála öt torrent hasalt el
+    # egyszerre, egyetlen perc alatt, mind ugyanazzal a hibával:
+    # `HTTPConnectionPool(host='127.0.0.1', port=41142): Read timed out`.
+    # A letöltésekkel SEMMI baj nem volt — csak épp nem tudtuk MEGKÉRDEZNI
+    # őket. A kényszerített újraindítás `check-integrity`-t kér, az aria2
+    # pedig egy több gigabájtos fájl hash-ellenőrzése alatt nem szolgálja ki
+    # a vezérlést. A mi hívásaink EGYETLEN közös záron mennek át, 15
+    # másodperces korláttal, öt szál másodpercenként kérdez — így az egész
+    # sor egyszerre futott bele.
+    #
+    # A tanulság ugyanaz, mint a NEGYEDIK bajtípusnál, fordítva: **attól,
+    # hogy nem kapunk választ, a letöltés még él.** Egy elnémult
+    # vezérlőcsatornából soha nem szabad VÉGLEGES hibát csinálni — az
+    # visszafordíthatatlan, a hallgatás viszont múlik.
+    VEZERLES_TURES_MP = 300.0
+
     @staticmethod
     def elakadas_oka(peers: int, kapcsolatok: int) -> str:
         """MIÉRT áll. Nem elég azt mondani, hogy elakadt – abból a felhasználó
@@ -497,7 +582,12 @@ class TorrentDownloader:
         p = self.progress
         try:
             self.client = Aria2Client.get()
-            self.gid = self._add()
+            # A HOZZÁADÁS is belefuthat a néma motorba (szakember83
+            # naplójában a `_add()` is időtúllépéssel hasalt el). Egy
+            # elfoglalt motor miatt nem szabad elbukni az indítást: várunk és
+            # újrapróbáljuk. A duplikátum-hibán viszont NINCS mit próbálni,
+            # az érdemi válasz — azon nem kísérletezünk tovább.
+            self.gid = self._add_turelemmel()
         except Exception as e:
             p.status, p.error = "hiba", str(e)
             raise
@@ -505,6 +595,8 @@ class TorrentDownloader:
         # elakadás-figyelés: mikor nőtt utoljára a letöltött mennyiség
         utolso_haladas = time.monotonic()
         utolso_kesz = -1
+        # vezérlés-kimaradás: mikor kaptunk utoljára VÁLASZT a motortól
+        utolso_valasz = time.monotonic()
 
         while True:
             if self._stop.is_set():
@@ -517,8 +609,28 @@ class TorrentDownloader:
             try:
                 st = self.client.call("aria2.tellStatus", self.gid, self.KEYS)
             except Exception as e:
+                # ⚠️ NEM HIBA, csak NÉMASÁG. A motor épp nem ér rá (tipikusan
+                # egy nagy fájl ellenőrzése miatt); a letöltés ettől még fut.
+                # Ezt eddig VÉGLEGES hibának könyveltük el, és egyetlen perc
+                # alatt az egész sort tönkretette (szakember83, 2026-09-10).
+                if time.monotonic() - utolso_valasz < self.VEZERLES_TURES_MP:
+                    # Szólunk róla — de FIGYELMEZTETÉSKÉNT, nem hibaként: a
+                    # kettő különbsége az, hogy kell-e tenni valamit.
+                    p.figyelmeztetes = (
+                        "A torrent-motor most nem válaszol – valószínűleg "
+                        "egy nagy fájl ellenőrzésével van elfoglalva. A "
+                        "letöltés fut tovább, nincs teendőd.")
+                    _log.warning("A motor nem válaszol (%s): %s",
+                                 p.filename or self.url, e)
+                    # Az elakadás-órát NEM terheljük a némasággal: nem tudjuk,
+                    # halad-e — abból pedig nem szabad azt állítani, hogy áll.
+                    utolso_haladas = time.monotonic()
+                    time.sleep(3)
+                    continue
                 p.status, p.error = "hiba", str(e)
                 raise
+            utolso_valasz = time.monotonic()
+            p.figyelmeztetes = ""
 
             # magnetnél az első gid csak a metaadatot tölti; utána új gid jön
             followed = st.get("followedBy")

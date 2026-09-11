@@ -162,7 +162,66 @@ nyers bájtként keresi a fájlokban.)
 
 ---
 
-### 🔨 4.6.4 MEGÉPÜLT (2026-09-10) – „mi a fene történik a háttérben?"
+### 🔨 4.6.5 MEGÉPÜLT (2026-09-11) – az első jelentés az új naplóval
+
+**A napló a kiadás után 40 PERCCEL megfogta a hibát — és kettőt a
+sajátjainkból is.** szakember83 jelentése (2026-09-10 23:35, 4.6.4).
+
+**A VALÓDI HIBA.** Öt torrent hasalt el egy percen belül, mind ugyanezzel:
+`HTTPConnectionPool(host='127.0.0.1', port=41142): Read timed out`.
+A `motor_allapot()` szerint az aria2 FUT, de nem válaszol. Az időrend:
+
+| idő | mi történt |
+|---|---|
+| 23:28:37–39 | négy torrent „elakadt" |
+| **23:28:40** | **Ctrl+F6 — kényszerített újraindítás** |
+| 23:29:01-től | mind az öt torrent RPC-időtúllépéssel elhasal |
+
+A kényszerített újraindítás `check-integrity`-t kér; az aria2 egy több GB-os
+fájl hash-ellenőrzése alatt nem szolgálja ki az RPC-t. A mi hívásaink
+EGYETLEN `_rpc_lock`-on át mennek, 15 mp korláttal, öt szál másodpercenként
+kérdez → az egész sor belefut. **A letöltésekkel semmi baj nem volt: csak
+nem tudtuk MEGKÉRDEZNI őket** — és ebből csináltunk VÉGLEGES hibát.
+
+**A négy javítás (a logikai sorrend, amiben készültek):**
+
+1. **`Progress.error_nyers` + `error_ismert`** — a „felismertük-e?" kérdésre
+   a fordítás pillanatában, EGYSZER válaszolunk, és mentjük.
+   ⚠️ **Ez a 4.6.4 visszalépésének a javítása:** a `manager` a fordítás UTÁN
+   tölti a `progress.error`-t, az `olvashato()` pedig újra megvizsgálta a
+   kész magyar mondatot, „ismeretlennek" hitte, és lecserélte a „nem
+   ismerjük fel" szövegre. A jó magyarázatot dobtuk el. Egy napig élt, és a
+   SAJÁT NAPLÓNK buktatta le.
+2. **A 127.0.0.1 / localhost időtúllépés külön minta, ELÖL** — eddig a
+   `friendly_error` offline-ága fogta meg, és a felhasználó ezt hallotta:
+   „HÁLÓZATI HIBA… Ellenőrizd az internetkapcsolatot." Egy gépen belüli
+   csatornára. (A `halozati_eredetu()` viszont NEM ismerte fel, tehát
+   „hálózatra vár" állapotba sem került — a két réteg ellentmondott.)
+3. **`osszeomlas`: a frissítés utáni ELSŐ indulás nem riaszt** — jelölő
+   híján az egész eddigi napló újnak látszott, és a hetekkel korábbi
+   összeomlásokra azt állítottuk, „legutóbb". Nála pontosan ez történt.
+   A törölt napló szintén nem riaszt (ez a teszt MEGFORDULT, tudatosan).
+4. **`VEZERLES_TURES_MP = 300`** — a néma motor 5 percig FIGYELMEZTETÉS
+   (`p.figyelmeztetes`), nem hiba; az elakadás-órát sem terheljük a
+   némasággal. `_add_turelemmel()` 5× újrapróbál — de a duplikátum-hibán
+   NEM (az érdemi válasz). A Ctrl+F6 előre kimondja, hogy az ellenőrzés
+   percekig tarthat, és közben a TÖBBI torrent állapota is később frissül.
+
+**Új:** `tests\test_vezerles_es_uzenetek.py` (13 teszt). Teljes pytest
+**EXITCODE=0**.
+
+⚠️ **Három RÉGI teszt elbukott, és ez helyes volt:** a 4.6.4 összeomlás-
+tesztjei a régi viselkedést rögzítették. Átírtam őket a mai elvárásra, nem
+„megjavítottam" a kódot hozzájuk. Az új segéd: `_volt_mar_indulas()`.
+
+---
+
+### ✅ 4.6.4 KIADVA (2026-09-10) – „mi a fene történik a háttérben?"
+
+**Kiadás megtörtént.** Commit `cdae41c` (8 fájl, +791/−13), push,
+`gh release create v4.6.4 … --latest`. Kulcs-szken tiszta (344 fájl),
+**mind a 6 URL 200**. Hírlevél a listára elment (másolat Dávidnak).
+⚠️ A `modules_src\mail\*` változások itt is kimaradtak (külön téma).
 
 **Dávid kérdése**, miután a 4.6.3 kiment: van diagnosztika-menüpont, akkor
 miért nem csatol naplót, mint az androidos változat?

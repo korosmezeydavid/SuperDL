@@ -74,7 +74,17 @@ class Progress:
     downloaded: int = 0
     speed: float = 0.0              # bájt/mp
     status: str = "várakozik"       # várakozik | letöltés | seedelés | kész | hiba | leállítva
-    error: str = ""
+    error: str = ""                 # EMBERI szöveg (már lefordítva)
+    # A NYERS motorüzenet, és hogy FELISMERTÜK-e (4.6.5, szakember83
+    # jelentése). Miért kell mindkettő külön mezőben: az `error` a fordítás
+    # UTÁNI szöveg, és egy kész magyar mondatról utólag MÁR NEM LEHET
+    # eldönteni, hogy felismert hibából lett-e, vagy csak visszakaptuk a
+    # nyerset. A 4.6.4 pontosan ezen bukott el: a felület újra megvizsgálta a
+    # kész mondatot, „ismeretlennek" hitte, és lecserélte a „nem ismerjük
+    # fel" szövegre — vagyis eldobta azt a magyarázatot, amit meg akart
+    # őrizni. A kérdésre EGYSZER kell válaszolni, a fordítás pillanatában.
+    error_nyers: str = ""
+    error_ismert: bool = True
     filename: str = ""
     connections: int = 1
     up_speed: float = 0.0           # feltöltés (torrentnél)

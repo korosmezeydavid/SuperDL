@@ -48,15 +48,26 @@ def test_a_tobbi_felderitesi_csatorna_is_be_van_kapcsolva(tmp_path):
     assert "--bt-save-metadata=true" in k
 
 
-def test_a_kiegeszito_trackerek_egyetlen_kapcsoloban_mennek(tmp_path):
-    """Az aria2 vesszővel elválasztva várja őket. Ha külön kapcsolókként
-    adnánk át, csak az UTOLSÓ érvényesülne — és ezt semmi nem jelezné."""
+def test_a_kiegeszito_trackerek_NEM_a_parancssorban_mennek(tmp_path):
+    """⚠️ EZ A TESZT 4.6.5-BEN MEGFORDULT, és ez tudatos döntés.
+
+    A 4.6.1-ben ez a teszt azt védte, hogy a hat kiegészítő tracker EGYETLEN
+    `--bt-tracker=` kapcsolóban, a motor parancssorában menjen. A kapcsoló
+    formája jó volt — a HELYE nem. Mérve 2026-09-11: a globális
+    `--bt-tracker`-t az aria2 a PRIVÁT torrentekre is ráteszi, vagyis egy
+    privát tracker (nCore, iNSANE) torrentjét bejelentettük hat nyilvános
+    trackernek. Ezt minden privát tracker szabályzata tiltja, és kitiltás
+    jár érte — a felhasználó önhibáján kívül.
+
+    A trackerek mostantól LETÖLTÉSENKÉNT kerülnek be, és csak nyilvános
+    torrentre (lásd `tests/test_privat_tracker.py`). Itt már csak azt
+    ellenőrizzük, hogy a parancssorba NEM kerülnek vissza."""
     k = torrent.halozati_kapcsolok(tmp_path / "dht.dat")
-    tr = [x for x in k if x.startswith("--bt-tracker=")]
-    assert len(tr) == 1
-    lista = tr[0].split("=", 1)[1].split(",")
-    assert len(lista) >= 3
-    assert all(x.startswith(("udp://", "http://", "https://")) for x in lista)
+    assert not any(x.startswith("--bt-tracker") for x in k)
+    # a lista maga megvan, csak máshol használjuk
+    assert len(torrent.TRACKEREK) >= 3
+    assert all(x.startswith(("udp://", "http://", "https://"))
+               for x in torrent.TRACKEREK)
 
 
 def test_egyetlen_kapcsolo_sem_ures(tmp_path):

@@ -72,12 +72,23 @@ def _olvasatlan_beolvas() -> None:
     try:
         eddig = int(_OLVASVA.read_text(encoding="utf-8").strip() or 0)
     except (OSError, ValueError):
-        eddig = 0
-    # Ha a fájl ZSUGORODOTT (a felhasználó törölte), kezdjük elölről –
-    # különben a jelölő örökre a fájl vége mögött állna, és soha többé nem
-    # vennénk észre semmit.
+        # ⚠️ NINCS JELÖLŐ: ez az ELSŐ indulás a frissítés után. Ilyenkor az
+        # egész eddigi napló „újnak" látszana, és a hetekkel ezelőtti
+        # összeomlásokra azt állítanánk, hogy „a LEGUTÓBBI futáskor" történt.
+        # Ez hazugság, méghozzá pont az a fajta, ami ellen az egész funkció
+        # készült: a felhasználó egy nem létező mai hibát kezdene keresni.
+        # (szakember83 jelentése, 2026-09-10: nála pontosan ez történt.)
+        # A régi nyomok NEM vesznek el – a hibajelentés továbbra is csatolja
+        # őket –, csak nem riasztunk rájuk.
+        _uj_resz = ""
+        _jelolo_ir(meret)
+        return
+    # Ha a fájl ZSUGORODOTT (a felhasználó törölte), NE kezdjük elölről: a
+    # törölt napló nem összeomlás. Csak a jelölőt igazítjuk a fájl végéhez.
     if eddig > meret:
-        eddig = 0
+        _uj_resz = ""
+        _jelolo_ir(meret)
+        return
     try:
         with open(NAPLO, encoding="utf-8", errors="replace") as f:
             f.seek(eddig)

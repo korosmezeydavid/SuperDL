@@ -345,7 +345,16 @@ class DownloadManager:
                 # kimaradásból megint HIBA lenne – vagyis az MK2-t
                 # csendben visszacsinálnánk.
                 if job.progress.status == "hiba":
-                    job.progress.error = hibaszoveg.emberi(job.progress.error)
+                    # ⚠️ A KÉRDÉSRE ITT, EGYSZER válaszolunk: felismertük-e a
+                    # hibát? (4.6.5) A fordítás UTÁN ez már eldönthetetlen —
+                    # egy kész magyar mondatról nem látszik, hogy felismert
+                    # hibából lett-e. A 4.6.4-ben a felület újra megkérdezte,
+                    # rosszul válaszolt, és a jó magyarázatot lecserélte a
+                    # „nem ismerjük fel" szövegre. A választ MENTJÜK.
+                    nyers = job.progress.error
+                    job.progress.error_nyers = nyers
+                    job.progress.error_ismert = hibaszoveg.van_javaslat(nyers)
+                    job.progress.error = hibaszoveg.emberi(nyers)
                     # Karcsi (2026-09-09): innentől a magyarázat TÚLÉLI a
                     # program bezárását. A nyers szöveget tesszük el, nem a
                     # fordítást: ha holnap felismerünk egy mintát, a régi

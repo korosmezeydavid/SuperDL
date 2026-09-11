@@ -201,11 +201,28 @@ NYOM = ("Windows fatal exception: code 0x8001010d\n"
         '  File "wx\\core.py", line 2254 in MainLoop\n')
 
 
-def test_az_uj_osszeomlast_eszrevesszuk(omlas):
+def _volt_mar_indulas(omlas):
+    """Egy korábbi indulás szimulálása: a jelölő a napló végére kerül.
+
+    ⚠️ 4.6.5 óta EZ KELL az összeomlás-tesztekhez. A frissítés utáni ELSŐ
+    indulásnál ugyanis SZÁNDÉKOSAN nem riasztunk (szakember83 jelentése):
+    jelölő híján az egész eddigi napló újnak látszana, és hetekkel korábbi
+    összeomlásokra állítanánk, hogy „legutóbb" történtek."""
     omlas.NAPLO.parent.mkdir(parents=True, exist_ok=True)
-    omlas.NAPLO.write_text("=== SuperDL indult ===\n" + NYOM,
-                           encoding="utf-8")
+    if not omlas.NAPLO.exists():
+        omlas.NAPLO.write_text("", encoding="utf-8")
     omlas._olvasatlan_beolvas()
+
+
+def _omlast_ir(omlas, szoveg):
+    with open(omlas.NAPLO, "a", encoding="utf-8") as f:
+        f.write(szoveg)
+    omlas._olvasatlan_beolvas()
+
+
+def test_az_uj_osszeomlast_eszrevesszuk(omlas):
+    _volt_mar_indulas(omlas)
+    _omlast_ir(omlas, "=== SuperDL indult ===\n" + NYOM)
     assert omlas.uj_osszeomlas() is True
 
 
@@ -213,10 +230,8 @@ def test_ugyanARRA_masodszor_MAR_NEM_szolunk(omlas):
     """⚠️ Ez a teszt védi meg a funkciót önmagától. Egy figyelmeztetés, ami
     minden induláskor megszólal ugyanarra a régi esetre, pontosan annyit ér,
     mint a néma program – a felhasználó egy hét alatt megtanulja elengedni."""
-    omlas.NAPLO.parent.mkdir(parents=True, exist_ok=True)
-    omlas.NAPLO.write_text("=== SuperDL indult ===\n" + NYOM,
-                           encoding="utf-8")
-    omlas._olvasatlan_beolvas()
+    _volt_mar_indulas(omlas)
+    _omlast_ir(omlas, "=== SuperDL indult ===\n" + NYOM)
     assert omlas.uj_osszeomlas() is True
     # következő indulás: a napló nem változott
     omlas._olvasatlan_beolvas()
@@ -224,16 +239,12 @@ def test_ugyanARRA_masodszor_MAR_NEM_szolunk(omlas):
 
 
 def test_az_UJABB_osszeomlasra_megint_szolunk(omlas):
-    omlas.NAPLO.parent.mkdir(parents=True, exist_ok=True)
-    omlas.NAPLO.write_text("=== SuperDL indult ===\n" + NYOM,
-                           encoding="utf-8")
-    omlas._olvasatlan_beolvas()
+    _volt_mar_indulas(omlas)
+    _omlast_ir(omlas, "=== SuperDL indult ===\n" + NYOM)
     omlas._olvasatlan_beolvas()
     assert omlas.uj_osszeomlas() is False
-    # új összeomlás kerul a napló végére
-    with open(omlas.NAPLO, "a", encoding="utf-8") as f:
-        f.write("\n=== SuperDL indult ===\n" + NYOM)
-    omlas._olvasatlan_beolvas()
+    # új összeomlás kerül a napló végére
+    _omlast_ir(omlas, "\n=== SuperDL indult ===\n" + NYOM)
     assert omlas.uj_osszeomlas() is True
 
 
@@ -247,14 +258,21 @@ def test_a_sima_indulas_nem_osszeomlas(omlas):
     assert omlas.uj_osszeomlas() is False
 
 
-def test_a_torolt_naplo_utan_ujra_kezdjuk(omlas):
-    """Ha a felhasználó törli a naplót, a jelölő a fájl vége mögé kerülne, és
-    SOHA többé nem vennénk észre semmit – némán."""
+def test_a_torolt_naplo_nem_riaszt_de_utana_megint_figyelunk(omlas):
+    """⚠️ EZ A TESZT 4.6.5-BEN MEGFORDULT, és ez tudatos döntés.
+
+    Korábban a zsugorodott naplónál nulláztuk a jelölőt, tehát a maradék
+    tartalmat újnak vettük — vagyis a napló TÖRLÉSE riasztást váltott ki.
+    A törölt napló azonban nem összeomlás. Most csak a jelölőt igazítjuk a
+    végéhez: nem riasztunk, de a KÖVETKEZŐ igazi összeomlást észrevesszük —
+    tehát nem is némulunk el örökre, ami az eredeti félelem volt."""
     omlas.NAPLO.parent.mkdir(parents=True, exist_ok=True)
     omlas.NAPLO.write_text("x" * 5000, encoding="utf-8")
     omlas._olvasatlan_beolvas()
-    omlas.NAPLO.write_text(NYOM, encoding="utf-8")     # rovidebb lett
+    omlas.NAPLO.write_text(NYOM, encoding="utf-8")     # rövidebb lett
     omlas._olvasatlan_beolvas()
+    assert omlas.uj_osszeomlas() is False
+    _omlast_ir(omlas, NYOM)                            # egy IGAZI, új omlás
     assert omlas.uj_osszeomlas() is True
 
 

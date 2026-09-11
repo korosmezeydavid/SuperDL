@@ -53,6 +53,23 @@ def _torrent_es_szegmens(m: str) -> str:
         return ("A torrent-motor (aria2) nem indult el. A program általában "
                 "magától letölti – indítsd újra a letöltést; ha nem segít, a "
                 "Súgó, majd a Frissítések keresése telepíti újra a motort.")
+    # ⚠️ EZ A MINTA ELÖL ÁLL, és ennek oka van (szakember83, 2026-09-10).
+    # A `127.0.0.1` a SAJÁT GÉP: ez a program és a torrent-motor közötti
+    # belső vezérlőcsatorna, semmi köze az internethez. A `friendly_error`
+    # viszont a „timed out" mintára ráillesztette az offline-ágat, és a
+    # felhasználó ezt hallotta: „HÁLÓZATI HIBA: az oldal nem érhető el.
+    # Ellenőrizd az internetkapcsolatot." Elküldtük a routert bütykölni,
+    # miközben a netje kifogástalan volt, és a saját belső kapcsolatunk
+    # akadt meg. A hamis magyarázat órákat lop el – ezért ELŐZI MEG az
+    # általános mintákat.
+    if ("127.0.0.1" in m or "localhost" in m) and (
+            "timed out" in m or "timeout" in m or "connection" in m):
+        return ("A torrent-motor nem válaszolt időben a program kérdésére. "
+                "Ez a gépen BELÜLI kapcsolat – az internetkapcsolatoddal "
+                "nincs baj, és a letöltés sem veszett el. Rendszerint akkor "
+                "fordul elő, amikor a motor épp egy nagy fájl ellenőrzésével "
+                "van elfoglalva: ilyenkor néhány percig nem tud válaszolni. "
+                "Hagyd a sorban, magától rendeződik.")
     if "rpc" in m and ("refused" in m or "timed out" in m or "timeout" in m):
         return ("A torrent-motor nem válaszol. Állítsd le a letöltést, és "
                 "indítsd újra. Ha ez ismétlődik, indítsd újra a programot – "
@@ -127,7 +144,7 @@ ISMERETLEN_MONDAT = (
     "szövege az eseménynaplóban van: Control E. Ha elküldöd, megnézzük.")
 
 
-def olvashato(uzenet: str) -> str:
+def olvashato(uzenet: str, ismert: bool | None = None) -> str:
     """Amit a FELOLVASÓNAK adunk – sosem nyers angol motorüzenet.
 
     Karcsi jelentése (2026-09-09) tette világossá, hogy a kettőt szét kell
@@ -139,19 +156,31 @@ def olvashato(uzenet: str) -> str:
     meg ŐSZINTÉN, és megmondjuk, hol a pontos szöveg.
 
     Kitalálni egy magyarázatot továbbra sem szabad: az órákat lop el
-    (ez volt a tvmusor tanulsága)."""
+    (ez volt a tvmusor tanulsága).
+
+    ⚠️ **Az `ismert` paraméter a 4.6.4 hibájának a javítása.** A hívó
+    általában MÁR LEFORDÍTOTT szöveget ad ide (a `manager` a `progress.error`
+    mezőt a fordítás után tölti). Egy kész magyar mondatról viszont utólag
+    nem lehet megmondani, hogy felismert hibából lett-e — a `van_javaslat()`
+    ilyenkor „nem"-et mond, és pont a jó magyarázatot cserélnénk le a
+    „nem ismerjük fel" szövegre. Ezért aki TUDJA a választ (mert a fordítás
+    pillanatában elmentette), adja át; csak akkor találgatunk, ha nem tudja.
+    """
     uzenet = (uzenet or "").strip()
     if not uzenet:
         return ""
-    # SZÁNDÉKOSAN a meglévő `van_javaslat()`-ot használjuk, nem egy saját,
-    # ugyanolyan vizsgálatot: két külön „ismerjük-e" válasz előbb-utóbb
-    # széttart, és akkor a felület mást hinne, mint a fordító.
-    return emberi(uzenet) if van_javaslat(uzenet) else ISMERETLEN_MONDAT
+    if ismert is None:
+        # Nincs mentett válasz (régi hívó, vagy nyers szöveget kaptunk).
+        # SZÁNDÉKOSAN a meglévő `van_javaslat()`-ot használjuk, nem egy saját,
+        # ugyanolyan vizsgálatot: két külön „ismerjük-e" válasz előbb-utóbb
+        # széttart, és akkor a felület mást hinne, mint a fordító.
+        ismert = van_javaslat(uzenet)
+    return emberi(uzenet) if ismert else ISMERETLEN_MONDAT
 
 
 def gond_mondat(nev: str, allapot: str, uzenet: str, utkozes: bool = False,
                 probak: int = 0, elakadt: bool = False,
-                elakadas_oka: str = "") -> str:
+                elakadas_oka: str = "", ismert: bool | None = None) -> str:
     """Az MK6 ugrás után elhangzó EGY mondat: mi a baj, és mit tegyél.
 
     A név elöl van, mert vakon először azt kell tudni, MELYIK elemről beszélünk
@@ -175,14 +204,14 @@ def gond_mondat(nev: str, allapot: str, uzenet: str, utkozes: bool = False,
         # el ezen az ágon. Aki elakadt sorban ragadt, az soha nem tudta meg,
         # hogy közben a motor jelzett-e valamit – pedig épp az árulná el,
         # miért nem indul újra. Ha van ilyen, a mondat végére kerül.
-        korabbi = olvashato(uzenet)
+        korabbi = olvashato(uzenet, ismert)
         if korabbi:
             mondat += f" A legutóbbi hibaüzenet: {korabbi}"
         return mondat
     reszek = [f"{nev}:"]
     if probak:
         reszek.append(f"{probak} sikertelen próbálkozás után.")
-    szoveg = olvashato(uzenet)
+    szoveg = olvashato(uzenet, ismert)
     if szoveg:
         reszek.append(szoveg)
     elif allapot:
