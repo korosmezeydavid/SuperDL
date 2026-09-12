@@ -291,9 +291,13 @@ def build_report(settings: dict | None = None,
     try:
         from . import osszeomlas
         if osszeomlas.volt_osszeomlas():
+            # A TELJES utolsó nyomot csatoljuk, a fejlécével együtt – abban
+            # van a hiba KÓDJA. A korábbi 80 soros sorfark a nyom közepét
+            # vágta ki, és pont az ok maradt le róla.
+            nyom = (osszeomlas.utolso_osszeomlas()
+                    or osszeomlas.naplo_szoveg(120))
             lines += ["", "⚠️ ÖSSZEOMLÁS-NAPLÓ (natív hiba nyoma):"]
-            lines += ["  " + ln for ln
-                      in osszeomlas.naplo_szoveg(80).splitlines()]
+            lines += ["  " + ln for ln in nyom.splitlines()]
     except Exception:
         pass
 

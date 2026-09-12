@@ -20,10 +20,13 @@ def _bot(k, ki):
     if "indulás" in kl:
         return "1"
     # keressük a legutóbbi állás-sort, és válasszunk nem üres tálat/gödröt
+    # (4.6.8 óta a körönkénti bemondás RÖVID: „Tálaid – 1: 6, 2: 6, …",
+    #  a teljes tábla csak az „állás" szóra hangzik el – NVDA-panasz nyomán)
     for _, szoveg in reversed(ki):
-        m = re.search(r"(?:tálaid|gödreid) \(1-6\): ([\d ]+)", str(szoveg))
+        m = re.search(r"(?:Tálaid|Gödreid)\s*[–-]\s*((?:\d+: \d+(?:, )?)+)",
+                      str(szoveg))
         if m:
-            szamok = [int(x) for x in m.group(1).split()]
+            szamok = [int(x.split(":")[1]) for x in m.group(1).split(", ")]
             for i, db in enumerate(szamok, 1):
                 if db > 0:
                     return str(i)

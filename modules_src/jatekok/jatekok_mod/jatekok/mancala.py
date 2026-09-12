@@ -85,10 +85,19 @@ def _maja_gep_valaszt(g):
 
 
 def _maja_allas(g):
-    a = " ".join(str(g["A"][r]) for r in range(1, 7))
-    b = " ".join(str(g["B"][r]) for r in range(1, 7))
-    return (f"A tálaid (1-6): {a}. Gyűjtőd: {g['SA']}. "
-            f"A gép táljai (1-6): {b}. A gép gyűjtője: {g['SB']}.")
+    """A TELJES állás – csak kérésre („állás")."""
+    a = ", ".join(f"{r}: {g['A'][r]}" for r in range(1, 7))
+    b = ", ".join(f"{r}: {g['B'][r]}" for r in range(1, 7))
+    return (f"A tálaid: {a}. Gyűjtőd: {g['SA']}. "
+            f"A gép táljai: {b}. A gép gyűjtője: {g['SB']}.")
+
+
+def _maja_sajat(g):
+    """A KÖRÖNKÉNTI, RÖVID bemondás: a saját tálak és a két pontszám.
+    (Lásd a `_awari_sajat` indoklását – NVDA-val a teljes tábla körönkénti
+    felolvasása követhetetlen.)"""
+    a = ", ".join(f"{r}: {g['A'][r]}" for r in range(1, 7))
+    return f"Tálaid – {a}. Pontok: te {g['SA']}, gép {g['SB']}."
 
 
 def _maja_vege(ctx, g, ki_ures):
@@ -132,8 +141,9 @@ def jatek_maja(ctx):
                 yield from _maja_vege(ctx, g, soros)
                 break
             if soros == "A":
-                yield ctx.mond(_maja_allas(g))
-                v = yield ctx.kerdez("Melyik tálad? (1-6, vagy: állás)")
+                yield ctx.mond(_maja_sajat(g))
+                v = yield ctx.kerdez("Melyik táladat veted el? Egy szám "
+                                     "1-től 6-ig. A teljes állásért: állás")
                 t = (v or "").strip().lower()
                 if t.startswith("áll") or t.startswith("all"):
                     yield ctx.mond(_maja_allas(g))
@@ -146,7 +156,7 @@ def jatek_maja(ctx):
                     yield ctx.mond("Ebben a tálban nincs semmi!")
                     continue
                 ujra = _maja_vet(g, "A", n)
-                yield ctx.mond(f"A {n}. táladat elvetetted. " + _maja_allas(g))
+                yield ctx.mond(f"A {n}. táladat elvetetted.")
                 if ujra:
                     yield ctx.mond("Az utolsó golyó a gyűjtődbe került – újra "
                                    "te jössz!")
@@ -158,7 +168,7 @@ def jatek_maja(ctx):
                     yield from _maja_vege(ctx, g, "B")
                     break
                 ujra = _maja_vet(g, "B", n)
-                yield ctx.mond(f"Én a {n}. tálamat vetem el. " + _maja_allas(g))
+                yield ctx.mond(f"Én a {n}. tálamat vetem el.")
                 if ujra:
                     yield ctx.mond("Az utolsó golyóm a gyűjtőmbe került – újra "
                                    "én jövök!")
@@ -242,10 +252,23 @@ def _awari_gep_valaszt(b):
 
 
 def _awari_allas(b):
-    j = " ".join(str(b[i]) for i in range(0, 6))
-    g = " ".join(str(b[i]) for i in range(12, 6, -1))
-    return (f"A gödreid (1-6): {j}. A raktárad: {b[_JATEKOS_RAKTAR]}. "
-            f"A gép gödrei (1-6): {g}. A gép raktára: {b[_GEP_RAKTAR]}.")
+    """A TELJES állás – csak kérésre („állás")."""
+    j = ", ".join(f"{i + 1}: {b[i]}" for i in range(0, 6))
+    g = ", ".join(f"{13 - i}: {b[i]}" for i in range(12, 6, -1))
+    return (f"A gödreid: {j}. A raktárad: {b[_JATEKOS_RAKTAR]}. "
+            f"A gép gödrei: {g}. A gép raktára: {b[_GEP_RAKTAR]}.")
+
+
+def _awari_sajat(b):
+    """A KÖRÖNKÉNTI, RÖVID bemondás: csak a SAJÁT gödreid és a két pontszám.
+
+    Bizik Péter Károly (NVDA) jelezte: a körönkénti teljes tábla-felolvasás
+    normál felolvasási sebességnél követhetetlen, és a „(1-6)" betoldás miatt
+    a számok összefolynak. Ezért körönként csak az kerül bemondásra, ami a
+    döntéshez kell; a teljes tábla az „állás" szóval bármikor kérhető."""
+    j = ", ".join(f"{i + 1}: {b[i]}" for i in range(0, 6))
+    return (f"Gödreid – {j}. Pontok: te {b[_JATEKOS_RAKTAR]}, "
+            f"gép {b[_GEP_RAKTAR]}.")
 
 
 def _awari_vege(ctx, b):
@@ -288,17 +311,25 @@ def jatek_awari(ctx):
                 yield from _awari_vege(ctx, b)
                 break
             # a játékos lép
-            yield ctx.mond(_awari_allas(b))
-            v = yield ctx.kerdez("Mit lépsz? (1-6, vagy: állás)")
+            yield ctx.mond(_awari_sajat(b))
+            v = yield ctx.kerdez("Melyik gödrödből lépsz? Egy szám 1-től "
+                                 "6-ig. A teljes állásért írd: állás")
             t = (v or "").strip().lower()
             if t.startswith("áll") or t.startswith("all"):
+                yield ctx.mond(_awari_allas(b))     # KÉRTE – meg is kapja
                 continue
             n = szam(t, 1, 6)
-            if n is None or b[n - 1] == 0:
-                yield ctx.mond("Illegális lépés!")
+            if n is None:
+                yield ctx.mond("1 és 6 közötti gödörszámot kérek.")
                 continue
+            if b[n - 1] == 0:
+                yield ctx.mond(f"A {n}. gödröd üres, abból nem tudsz lépni.")
+                continue
+            elotte = b[_JATEKOS_RAKTAR]
             _awari_lep(b, n - 1, _JATEKOS_RAKTAR)
-            yield ctx.mond("Léptél. " + _awari_allas(b))
+            nyert = b[_JATEKOS_RAKTAR] - elotte
+            yield ctx.mond(f"A {n}. gödröd." + (f" Ütöttél: {nyert} mag."
+                                                if nyert else ""))
             if b[_JATEKOS_RAKTAR] >= 19 or not _awari_gep_godrok(b):
                 yield from _awari_vege(ctx, b)
                 break
@@ -307,9 +338,12 @@ def jatek_awari(ctx):
             if gm is None:
                 yield from _awari_vege(ctx, b)
                 break
+            gep_elotte = b[_GEP_RAKTAR]
             _awari_lep(b, gm, _GEP_RAKTAR)
-            yield ctx.mond(f"Az én lépésem: a {gm - 6}. gödröm. "
-                           + _awari_allas(b))
+            gep_nyert = b[_GEP_RAKTAR] - gep_elotte
+            yield ctx.mond(f"Én a {gm - 6}. gödrömből léptem."
+                           + (f" Ütöttem: {gep_nyert} mag." if gep_nyert
+                              else ""))
         v = yield ctx.kerdez("Ismét? (igen/nem)")
         if not igen(v, False):
             break

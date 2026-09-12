@@ -478,6 +478,11 @@ def level_fejlec_info(msg):
             msg.get("List-Unsubscribe-Post", "")),
         "valasz_erre": (msg.get("In-Reply-To", "") or "").strip(),
         "hivatkozasok": (msg.get("References", "") or "").strip(),
+        # AUTOMATA VÁLASZ reteszeihez: maga a levél automata-e, és üres-e a
+        # visszaút (a kézbesítési hibaüzenetek jellemzője a „<>” Return-Path)
+        "auto_submitted": _norm_fejlec(msg.get("Auto-Submitted", "")),
+        "precedence": precedence,
+        "vissza_ut": (msg.get("Return-Path", "") or "").strip(),
     }
 
 
@@ -935,6 +940,14 @@ _ALTALANOS_ALAP = {"auto_ellenoriz": True, "ellenoriz_perc": 3,
                    "valasz_zarja_eredetit": False,
                    # a levél fontosságát jelezzük-e (lista + bemondás)
                    "prioritas_jelzes": True,
+                   # AUTOMATA VÁLASZOK FŐKAPCSOLÓJA. Kikapcsolva egyetlen
+                   # szabály automata válasza sem megy el – egy mozdulattal
+                   # leáll az összes, nem kell szabályonként végigmenni.
+                   "autovalasz_be": True,
+                   # A LEGÚJABB LEVÉL HELYE a listában. False = felül (a
+                   # megszokott), True = alul. Csak MEGJELENÍTÉSI sorrend: a
+                   # program továbbra is a legfrissebb leveleket tölti le.
+                   "legujabb_alul": False,
                    # ALAPÉRTELMEZETT FORDÍTÓ (F9). "kerdez" = minden
                    # fordításnál kérdezzen; "offline" = helyben, a gépen;
                    # "mymemory" = ingyenes online; "ai" = saját AI-kulccsal
@@ -1100,8 +1113,13 @@ class ImapKliens:
     _FEJLEC_FETCH = ("(UID FLAGS RFC822.SIZE BODY.PEEK[HEADER.FIELDS "
                      "(FROM SUBJECT DATE TO CC MESSAGE-ID LIST-ID "
                      "LIST-UNSUBSCRIBE LIST-UNSUBSCRIBE-POST PRECEDENCE REPLY-TO "
-                     "IN-REPLY-TO REFERENCES X-PRIORITY IMPORTANCE PRIORITY)] "
+                     "IN-REPLY-TO REFERENCES X-PRIORITY IMPORTANCE PRIORITY "
+                     "AUTO-SUBMITTED RETURN-PATH)] "
                      "BODYSTRUCTURE)")
+    # Az AUTO-SUBMITTED és a RETURN-PATH az AUTOMATA VÁLASZ reteszeihez kell:
+    # ezekből derül ki, hogy a levél maga is automata (vagy kézbesítési
+    # hibaüzenet), amire soha nem szabad automata választ küldeni – különben két
+    # program képes egymást a végtelenségig válaszolgatni. [MK2, 2026-09-05]
 
     def lista(self, mappa="INBOX", limit=50, offset=0):
         """A mappa leveleinek fejléc-infói (LEGÚJABB ELÖL), LAPOZÁSSAL.

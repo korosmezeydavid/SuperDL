@@ -28,6 +28,11 @@ FAJL = "emlekeztetok.json"
 
 HALASZT = "halaszt"
 VALASZ_VARAS = "valasz"
+# SZABÁLY-EMLÉKEZTETŐ (MK3): csak SZÓL a megadott időben, a levelet nem
+# mozgatja sehova. Azért nem a HALASZT-ot használjuk rá, mert az áthelyezi a
+# levelet a Halasztott mappába – egy szabályban ez ütközne az áthelyezéssel,
+# és a felhasználó nem értené, hova tűnt a levele. [2026-09-05]
+JELZES = "jelzes"
 
 
 def alap_mappa() -> str:
@@ -162,8 +167,28 @@ def levesz(tetel: dict, mappa: str = "") -> None:
     ment(maradek, mappa)
 
 
+def jelez(azonosito: str, fiok: str, targy: str, felado: str,
+          mikor: float, mappa: str = "") -> None:
+    """Szabályból kért emlékeztető: a megadott időben SZÓL, nem mozgat.
+
+    Ugyanarra a levélre csak EGY jelzés áll: ha a szabály újra lefutna rá,
+    a régit felülírja, nem gyűjt tízet ugyanabból."""
+    if not azonosito:
+        return
+    tetelek = [t for t in betolt(mappa)
+               if not (t.get("fajta") == JELZES
+                       and t.get("azonosito") == azonosito)]
+    tetelek.append({"fajta": JELZES, "azonosito": azonosito, "fiok": fiok,
+                    "targy": targy, "felado": felado, "mikor": float(mikor),
+                    "letrehozva": time.time()})
+    ment(tetelek, mappa)
+
+
 def tetel_szoveg(t: dict) -> str:
     mikor = datetime.fromtimestamp(float(t.get("mikor", 0)))
+    if t.get("fajta") == JELZES:
+        return ("Emlékeztető egy levélre: %s – „%s”"
+                % (t.get("felado", ""), t.get("targy", "")))
     if t.get("fajta") == HALASZT:
         return ("Elhalasztott levél: %s – „%s” – %s"
                 % (t.get("felado", ""), t.get("targy", ""),

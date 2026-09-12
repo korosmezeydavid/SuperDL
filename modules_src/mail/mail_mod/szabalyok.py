@@ -80,6 +80,15 @@ MUV_TOROL = "torol"
 MUV_NINCS_HANG = "nincs_hang"
 MUV_FONTOS = "fontos"
 MUV_MEGALL = "megall"
+# AUTOMATA VÁLASZ: az érték maga a levél SZÖVEGE (nem igaz/hamis kapcsoló).
+# A tárgy külön kulcson, mert üresen hagyva „Re: <eredeti tárgy>” lesz belőle.
+MUV_AUTOVALASZ = "autovalasz"
+MUV_AUTOVALASZ_TARGY = "autovalasz_targy"
+# MK3 – további műveletek
+MUV_EMLEKEZTETO = "emlekezteto"   # érték: MÁSODPERC (mennyi idő múlva szóljon)
+MUV_NAPTARBA = "naptarba"         # True: a levél a SuperDL naptárába kerül
+MUV_TOVABBIT = "tovabbit"         # érték: e-mail cím
+MUV_BEMONDAS = "bemondas"         # érték: a szöveg, ami érkezéskor elhangzik
 
 MUVELET_NEVEK = {
     MUV_ATHELYEZ: "áthelyezés ide",
@@ -89,7 +98,79 @@ MUVELET_NEVEK = {
     MUV_NINCS_HANG: "ne szóljon értesítő hang",
     MUV_FONTOS: "megjelölés fontosként",
     MUV_MEGALL: "a további szabályok kihagyása",
+    MUV_AUTOVALASZ: "automata válasz",
+    MUV_AUTOVALASZ_TARGY: "az automata válasz tárgya",
+    MUV_EMLEKEZTETO: "emlékeztess rá",
+    MUV_NAPTARBA: "bejegyzés a naptárba",
+    MUV_TOVABBIT: "továbbítás ide",
+    MUV_BEMONDAS: "mondja ki érkezéskor",
 }
+
+# Az emlékeztető választható idői – felolvasható címkével, mert egy
+# másodperc-szám vakon semmit nem mond.
+EMLEKEZTETO_IDOK = [
+    (3600, "egy óra múlva"),
+    (4 * 3600, "négy óra múlva"),
+    (24 * 3600, "holnap ilyenkor"),
+    (3 * 24 * 3600, "három nap múlva"),
+    (7 * 24 * 3600, "egy hét múlva"),
+]
+
+
+def emlekezteto_szoveg(mp) -> str:
+    """A tárolt másodpercből felolvasható idő."""
+    try:
+        mp = int(mp)
+    except (TypeError, ValueError):
+        return "ismeretlen idő"
+    for ertek, cimke in EMLEKEZTETO_IDOK:
+        if ertek == mp:
+            return cimke
+    if mp >= 86400:
+        return "%d nap múlva" % round(mp / 86400)
+    return "%d óra múlva" % max(1, round(mp / 3600))
+
+
+def muvelet_leiras(kulcs: str, ertek=True) -> str:
+    """EGY művelet felolvasható mondata.
+
+    Ez jelenik meg a szabály-szerkesztő Műveletek listájában és a szabály
+    összefoglaló mondatában is – egy helyen írjuk meg, hogy a kettő sose
+    mondjon mást. [MK3, 2026-09-05]"""
+    nev = MUVELET_NEVEK.get(kulcs, kulcs)
+    if kulcs == MUV_EMLEKEZTETO:
+        return "%s %s" % (nev, emlekezteto_szoveg(ertek))
+    if kulcs == MUV_BEMONDAS:
+        return "%s: „%s”" % (nev, ertek)
+    if kulcs == MUV_AUTOVALASZ:
+        # A teljes levélszöveget NEM olvassuk fel: egy tízsoros válasz minden
+        # nyíl-lépésnél végigmenne. A hossza viszont elhangzik, hogy tudd,
+        # van-e benne egyáltalán valami.
+        return "%s (%s)" % (nev, _hossz_szoveg(ertek))
+    if isinstance(ertek, str) and ertek:
+        return "%s: %s" % (nev, ertek)
+    return nev
+
+
+# A szerkesztőben FELKÍNÁLT műveletek, ebben a sorrendben. Az „autovalasz_targy”
+# szándékosan nincs köztük: az az automata válasz része, nem önálló művelet.
+VALASZTHATO_MUVELETEK = [
+    MUV_ATHELYEZ, MUV_MASOL, MUV_OLVASOTT, MUV_FONTOS, MUV_TOROL,
+    MUV_NINCS_HANG, MUV_BEMONDAS, MUV_AUTOVALASZ, MUV_TOVABBIT,
+    MUV_EMLEKEZTETO, MUV_NAPTARBA, MUV_MEGALL,
+]
+
+# Melyik művelethez KELL érték, és milyen fajta? A felület ebből tudja,
+# mit kérdezzen meg – így egy új művelet felvétele egy sor.
+MUVELET_ERTEK = {
+    MUV_ATHELYEZ: "mappa",
+    MUV_MASOL: "mappa",
+    MUV_BEMONDAS: "szoveg",
+    MUV_AUTOVALASZ: "level",
+    MUV_TOVABBIT: "cim",
+    MUV_EMLEKEZTETO: "ido",
+}
+
 
 FAJL = "szabalyok.json"
 
@@ -108,6 +189,14 @@ def _norm(sz) -> str:
     sz = unicodedata.normalize("NFKD", sz)
     sz = "".join(c for c in sz if not unicodedata.combining(c))
     return sz.casefold().strip()
+
+
+def _hossz_szoveg(szoveg) -> str:
+    """„3 soros szöveg” / „nincs megírva” – a szabály mondatához."""
+    sorok = [s for s in str(szoveg or "").splitlines() if s.strip()]
+    if not sorok:
+        return "a szöveg még nincs megírva"
+    return "%d soros szöveg" % len(sorok)
 
 
 # ====================================================================
@@ -152,13 +241,39 @@ class Szabaly:
             felt = "ha " + kotoszo.join(f.leiras() for f in self.feltetelek)
         tettek = []
         for kulcs, ertek in self.muveletek.items():
-            nev = MUVELET_NEVEK.get(kulcs, kulcs)
-            tettek.append(f"{nev}: {ertek}" if isinstance(ertek, str) and ertek
-                          else nev)
+            # Az automata válasz TÁRGYA nem önálló művelet – a válasz
+            # mondatában szerepel, külön sorként csak zajt csinálna.
+            if kulcs == MUV_AUTOVALASZ_TARGY:
+                continue
+            tettek.append(muvelet_leiras(kulcs, ertek))
         tett = ", ".join(tettek) if tettek else "nem csinál semmit"
         eleje = self.nev + " – " if self.nev else ""
         vege = "" if self.be else "  (kikapcsolva)"
         return f"{eleje}{felt} → {tett}{vege}"
+
+
+def utkozes(muveletek) -> str:
+    """Egymásnak ellentmondó műveletek egy szabályon belül.
+
+    Üres szöveg = rendben. Miért kell: eddig némán az egyik győzött, és a
+    felhasználó nem tudta, miért nem oda került a levele, ahova várta.
+    [MK3, 2026-09-05]"""
+    m = dict(muveletek or {})
+    if m.get(MUV_TOROL) and m.get(MUV_ATHELYEZ):
+        return ("a szabály Kukába is tenné és át is helyezné a levelet – "
+                "a kettő közül csak az egyik történhet meg")
+    if m.get(MUV_TOROL) and m.get(MUV_EMLEKEZTETO):
+        return ("a szabály Kukába teszi a levelet, de emlékeztetne is rá – "
+                "a Kukából viszont a szolgáltató bármikor kitakaríthatja")
+    if m.get(MUV_TOROL) and m.get(MUV_FONTOS):
+        return ("a szabály fontosnak jelöli, de közben Kukába is teszi a "
+                "levelet")
+    cel = str(m.get(MUV_ATHELYEZ, "") or "").strip()
+    mas = str(m.get(MUV_MASOL, "") or "").strip()
+    if cel and mas and _norm(cel) == _norm(mas):
+        return ("a másolás és az áthelyezés ugyanabba a mappába megy – "
+                "a másolásnak így nincs értelme")
+    return ""
 
 
 def _feltetel_be(d):

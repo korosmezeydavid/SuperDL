@@ -7,6 +7,8 @@ hogy ne legyen zsúfolt és könnyű legyen képernyőolvasóval bejárni.
 
 import wx
 
+from . import aiclient
+
 AUDIO_FORMATS = ["MP3", "M4A", "OPUS", "FLAC", "WAV", "AAC"]
 VIDEO_FORMATS = ["MP4", "MKV", "WEBM"]
 AUDIO_BITRATES = ["128", "192", "256", "320"]
@@ -530,9 +532,23 @@ class SettingsDialog(wx.Dialog):
         self.ai_provider.SetSelection(
             next((i for i, (_, k) in enumerate(AI_PROVIDERS) if k == prov), 0))
         self._row(p, v, "Alapértelmezett &szolgáltató:", self.ai_provider)
-        self.ai_model = wx.TextCtrl(p, value=self.ai.get("model", ""))
-        self.ai_model.SetHint("pl. gpt-4o / gemini-2.5-pro / claude-opus-4 …")
-        self._row(p, v, "&Modell (opcionális):", self.ai_model)
+        # SZOLGÁLTATÓNKÉNT külön modellmező. Korábban EGY közös mező szolgálta
+        # mind a négyet: ha oda pl. OpenAI-modell került, a videóelemzés (ami
+        # mindig Geminit hív) a gpt-… nevet küldte a Google végpontjára →
+        # „unexpected model name format" (400); fordítva 404.
+        self.ai = aiclient.migralt_modellek(self.ai)
+        self.ai_models = {}
+        for cimke, kulcs, pelda in (
+                ("OpenAI-&modell (opcionális):", "openai", "gpt-4o-mini"),
+                ("Gemini-mo&dell (opcionális):", "gemini", "gemini-2.5-flash"),
+                ("Claude-mode&ll (opcionális):", "anthropic",
+                 "claude-sonnet-4-6"),
+                ("Gro&k-modell (opcionális):", "xai", "grok-2-vision-latest")):
+            mezo = wx.TextCtrl(
+                p, value=self.ai.get(aiclient.model_mezo(kulcs), ""))
+            mezo.SetHint(f"üresen: {pelda}")
+            self._row(p, v, cimke, mezo)
+            self.ai_models[kulcs] = mezo
         p.SetSizer(v)
         return p
 
@@ -645,6 +661,9 @@ class SettingsDialog(wx.Dialog):
             "anthropic_key": self.ai_anthropic.GetValue().strip(),
             "xai_key": self.ai_xai.GetValue().strip(),
             "provider": AI_PROVIDERS[self.ai_provider.GetSelection()][1],
-            "model": self.ai_model.GetValue().strip(),
+            "model": "",        # a régi, KÖZÖS mező megszűnt (migrálva)
         }
+        for kulcs, mezo in self.ai_models.items():
+            self.result_ai[aiclient.model_mezo(kulcs)] = \
+                mezo.GetValue().strip()
         evt.Skip()       # ID_OK-kal zárja a párbeszédet

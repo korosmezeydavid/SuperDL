@@ -85,8 +85,15 @@ class JatekokFrame(wx.Frame):
 
         self._build()
         self.CreateStatusBar()
-        self._announce("Válassz játékot a listából. Fülváltás: Ctrl+Tab. "
-                       "Súgó: F1.")
+        # KÉT lista van, két külön fülön. Bizik Péter Károly jelezte, hogy a
+        # Póker „kimaradt": a Retró listában kereste, holott a SAJÁT játékok
+        # fülön van. Ezért indításkor MEGMONDJUK, mi hol található.
+        self._announce(
+            "Két lista van. Az első a Retró játékok, a második a Saját "
+            "játékok – ott van például a Póker, az UNO, a Blackjack, a "
+            "Milliomos, a Szerencsekerék és az Ország-Város. Váltás a két "
+            "lista között: Ctrl+Tab. A listában fel-le nyíl, indítás: Enter. "
+            "Súgó: F1.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self.Bind(wx.EVT_CHAR_HOOK, self._on_key)
 

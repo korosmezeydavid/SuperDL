@@ -1,10 +1,10 @@
 {
   "id": "konyvek",
   "name": "Könyvek",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "entry": "konyvek_mod",
   "category": "Könyvek",
-  "description": "Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3, választható hanggal és sebességgel). ÚJ: a kész hangoskönyv kérésre a KÖNYV MELLÉ kerül (oda, ahonnan betallóztad); darabolásnál mindig külön almappába; a végén hangjelzés (fanfár sikernél, másik jelzés hibánál), és a darab-hossz mező csak akkor jelenik meg, ha a darabolás be van kapcsolva.",
+  "description": "JAVÍTVA (Dr. Kiss István összeomlás-naplója nyomán): A KÖNYV- ÉS HANGFÁJL-VÁLASZTÁS MOSTANTÓL A SUPERDL SAJÁT VÁLASZTÓJÁVAL MEGY, nem a Windowséval. Egy felhasználónál a program natívan KILÉPETT, miközben épp a könyv kiválasztásánál járt. Ez nem a program hibája volt: a Windows fájlválasztójába idegen bővítmények épülnek be (bélyegkép-készítő, felhő-szinkron, vírusirtó), és ha egyikük elszáll, viszi magával az egész programot – ezt a programból nem lehet elkapni. A SuperDL saját választója SEMMILYEN rendszerbővítményt nem tölt be, és vakon kényelmesebb is: két lista (mappák és fájlok), Enter a mappán belépés, Backspace vissza a szülőmappába, gyorshelyek (Asztal, Dokumentumok, Letöltések, meghajtók), és gépeléssel szűrhető, a program pedig mondja, hány találat maradt. Mind az öt helyen ez jön: könyv kiválasztása, célmappa, hangfájl megnyitása, hangoskönyv-mappa, könyv megnyitása. Ha a saját választó bármi miatt nem érhető el, a program visszalép a rendszerére – inkább a régi viselkedés, mint egy működésképtelen menüpont. Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3, választható hanggal és sebességgel). ÚJ: a kész hangoskönyv kérésre a KÖNYV MELLÉ kerül (oda, ahonnan betallóztad); darabolásnál mindig külön almappába; a végén hangjelzés (fanfár sikernél, másik jelzés hibánál), és a darab-hossz mező csak akkor jelenik meg, ha a darabolás be van kapcsolva.",
   "min_core_api": "1.0",
   "min_core_version": "4.3.0",
   "requires_tools": [],

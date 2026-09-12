@@ -14,12 +14,15 @@ A hívások hálózatot igényelnek; a hiányzó kulcsot és a hibákat érthet�
 """
 
 import base64
+import logging
 import mimetypes
 import os
 
 import requests
 
 from . import store
+
+_log = logging.getLogger(__name__)
 
 OPENAI_CHAT = "https://api.openai.com/v1/chat/completions"
 OPENAI_TRANSCRIBE = "https://api.openai.com/v1/audio/transcriptions"
@@ -77,11 +80,72 @@ def _gemini_key(cfg: dict) -> str:
     return k
 
 
+def model_mezo(provider: str) -> str:
+    """A szolgáltató SAJÁT modellmezőjének neve a beállításokban."""
+    return f"model_{provider}"
+
+
+def _csalad(model: str) -> str | None:
+    """Melyik szolgáltatóhoz tartozik a modell NEVE? (None = nem ismerjük fel.)
+    Csak a biztos jeleket nézzük; ismeretlen nevet nem sorolunk sehová."""
+    low = (model or "").strip().lower()
+    if not low:
+        return None
+    if "gemini" in low:
+        return "gemini"
+    if "claude" in low:
+        return "anthropic"
+    if "grok" in low:
+        return "xai"
+    if "gpt" in low or "whisper" in low or low.startswith(("o1", "o3", "o4")):
+        return "openai"
+    return None
+
+
+def _maseknal(model: str, provider: str) -> bool:
+    """Igaz, ha a modellnév BIZONYOSAN MÁSIK szolgáltatóé. Ismeretlen nevet
+    nem utasítunk el – lehet új, még nem ismert modell."""
+    cs = _csalad(model)
+    return cs is not None and cs != provider
+
+
 def _model(cfg: dict, provider: str, override: str | None = None) -> str:
+    """A szolgáltatóhoz tartozó modellnév.
+
+    A GOND, amit orvosol (Bizik Péter Károly jelentése): korábban EGYETLEN,
+    közös „model" mező szolgálta mind a négy szolgáltatót. Ha oda OpenAI-modell
+    került, a videóelemzés (ami MINDIG Geminit hív) a Gemini végpontra küldte a
+    gpt-… nevet → „unexpected model name format" (400); fordítva 404. Ezért:
+    szolgáltatónkénti mező, és a más családba tartozó nevet ELDOBJUK."""
     if override:
         return override
-    m = (cfg.get("model") or "").strip()
+    m = (cfg.get(model_mezo(provider)) or "").strip()
+    if not m:
+        kozos = (cfg.get("model") or "").strip()      # régi, közös mező
+        if kozos and not _maseknal(kozos, provider):
+            m = kozos
+    if m and _maseknal(m, provider):
+        _log.warning("A(z) %s modellnév nem a(z) %s szolgáltatóé; "
+                     "helyette az alapértelmezett %s megy.",
+                     m, provider, DEFAULT_MODELS[provider])
+        m = ""
     return m or DEFAULT_MODELS[provider]
+
+
+def migralt_modellek(cfg: dict) -> dict:
+    """A régi, közös „model" mezőt az ELSŐDLEGES szolgáltató saját mezőjébe
+    teszi (ha oda még nincs érték), és a közöset kiüríti. A beállítások
+    párbeszéd ezt használja, hogy a régi érték ne vesszen el."""
+    uj = dict(cfg)
+    kozos = (uj.get("model") or "").strip()
+    if kozos:
+        cel = _csalad(kozos) or (uj.get("provider") or "openai")
+        if cel not in ALL_PROVIDERS:
+            cel = "openai"
+        if not (uj.get(model_mezo(cel)) or "").strip():
+            uj[model_mezo(cel)] = kozos
+    uj["model"] = ""
+    return uj
 
 
 def available_providers(cfg: dict | None = None) -> list[str]:
@@ -358,6 +422,12 @@ def _check(r):
     if r.status_code == 404:
         raise AIError(f"Nincs ilyen modell vagy végpont ({r.status_code}). "
                       f"Próbálj másik modellt az AI fülön. – {detail}")
+    if r.status_code == 400 and "model" in low and (
+            "format" in low or "not found" in low):
+        raise AIError("A megadott modellnév nem ehhez a szolgáltatóhoz "
+                      "tartozik. A Beállítások → AI fülön SZOLGÁLTATÓNKÉNT "
+                      "külön modellmező van; hagyd üresen, ha az "
+                      "alapértelmezett jó. – " + detail)
     if r.status_code == 429:
         raise AIError(f"Túl sok kérés, vagy elfogyott a kereted ({r.status_code})."
                       f" – {detail}")

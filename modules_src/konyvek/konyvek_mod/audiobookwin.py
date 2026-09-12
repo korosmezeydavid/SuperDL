@@ -12,6 +12,7 @@ import wx
 
 from .audiobook_player import (AudioBookPlayer, AudioLibrary, konyv_kulcs,
                                mappa_savok, audio_fajl, ido_str)
+from . import valaszto                         # beépített fájlválasztó
 
 _HANG_WILDCARD = ("Hangfájl (*.mp3;*.m4a;*.aac;*.ogg;*.opus;*.wav;*.flac)|"
                   "*.mp3;*.m4a;*.aac;*.ogg;*.oga;*.opus;*.wav;*.flac;*.wma;"
@@ -194,15 +195,16 @@ class AudioBookFrame(wx.Frame):
 
     # ---- megnyitás ----
     def _open_file(self):
-        with wx.FileDialog(self, "Hangfájl megnyitása", wildcard=_HANG_WILDCARD,
-                           style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as dlg:
-            if dlg.ShowModal() == wx.ID_OK:
-                self._open_any(dlg.GetPath())
+        ut = valaszto.egy_fajl(self, "Hangfájl megnyitása",
+                               valaszto.HANG_KITERJESZTESEK,
+                               wildcard=_HANG_WILDCARD)
+        if ut:
+            self._open_any(ut)
 
     def _open_folder(self):
-        with wx.DirDialog(self, "Hangoskönyv-mappa megnyitása") as dlg:
-            if dlg.ShowModal() == wx.ID_OK:
-                self._open_any(dlg.GetPath())
+        ut = valaszto.egy_mappa(self, "Hangoskönyv-mappa megnyitása")
+        if ut:
+            self._open_any(ut)
 
     def _open_any(self, path):
         if self._closing:

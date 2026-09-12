@@ -1,0 +1,68 @@
+BRAILAB-SZERŰ SAJÁT HANG – HANGOLÁSI MŰHELY
+===========================================
+
+Cél: a BraiLab PC hangzásához közel álló, TELJESEN SAJÁT hang, amiben egyetlen
+idegen fájl sincs. Alap: a SuperDL-be épített eSpeak-NG **Klatt** motorja
+(`hu+klatt5`), a `superdl/retrovoice.py` rétegen keresztül.
+
+ÁLLAPOT: NINCS integrálva. A fejlesztő döntése alapján itt megállt a munka;
+ez a mappa azért van, hogy bármikor pontosan innen lehessen folytatni.
+
+
+MÉRT ÉRTÉKEK (az autentikus BraiLab-felvételről)
+------------------------------------------------
+alaphang (F0) ........ 83,3 Hz
+formánsok F1/F2/F3 ... 422 / 1448 / 2414 Hz
+formáns-sávszélesség . 20 / 66 / 67 Hz   (nagyon szűk = „csengő” hang)
+színkép-lejtés ....... −11,4 dB/oktáv
+sávok (1/2/3/4 kHz) .. −15,8 / −26,5 / −36,0 / −44,5 dB
+tempó ................ 3,5 szótag/mp
+dallam-terjedelem .... 10,0 félhang, ingadozás 5,75
+   (a nyers klatt5-é ehhez képest CSAK 5,3 félhang / 2,08 – ez volt a
+    legfeltűnőbb eltérés, ettől hatott „lapos eSpeaknek”)
+
+
+AMI A HANG-VÁLTOZAT FÁJLBAN TÉNYLEG HAT (méréssel igazolva)
+------------------------------------------------------------
+   pitch <alsó> <felső>   – FIGYELEM: alsó–felső HATÁRPÁR, nem alap+tartomány!
+                            (fordítva megadva a hang 302 Hz-re ugrik)
+   formant <n> <frekvencia%> <erősség%> <szélesség%>
+   flutter, echo, consonants, stressAdd
+   klatt <1..6>
+
+AMIT EZ AZ ESPEAK CSENDBEN ELDOB (bitre azonos hangot ad!)
+   tone, voicing, breath, intonation, roughness, formant 0
+
+Parancssorból: -p (hangfekvés), -s (tempó), -g (szóköz), -k, valamint
+SSML-lel (-m): <prosody range='...'> – ez is HAT (0% = monoton, 200% = tág),
+de ha `range` és `pitch` együtt van, a `pitch` figyelmen kívül marad.
+
+
+A LEGJOBBNAK ÍTÉLT BEÁLLÍTÁS (a fejlesztő füle szerint is jó irány)
+--------------------------------------------------------------------
+`valtozatok/blh1`:  klatt 5 + `pitch 45 110`,  hívás: -p 0 -s 138
+   → F0 86 Hz, dallam-terjedelem 8,7 félhang (a nyers 5,3 helyett)
+`valtozatok/blh5`:  ugyanez + `echo 12 20` („dobozos”) – EZ volt a favorit.
+
+NYITOTT KÉRÉS a folytatáshoz: **kisebb, illetve VÁLASZTHATÓ intonáció.**
+A `pitch` felső határa a szabályzó: 110 helyett 95–100 = visszafogottabb
+dallam. Érdemes 3 fokozatot adni a felületen (visszafogott / közepes / élénk),
+ugyanúgy, ahogy a tempó és a hangmagasság is állítható.
+
+
+A MAPPA TARTALMA
+----------------
+kozos.py .......... a MÉRŐSZALAG: sávprofil, formánsok, F0, dallam, pontszám
+                    (a `CEL` szótár az autentikus BraiLab mért értékeit tartja;
+                     az igazi felvétel önmagára 0,07-et kap – ez a nullapont)
+hangsuly.py ....... a végleges dallam/hangsúly-minták legyártása
+pitch_kal.py ...... a `pitch <alsó> <felső>` kalibrálása
+prozodia.py ....... melyik szabályzó hat egyáltalán (SSML és parancssor)
+menu2.py .......... egytényezős minta-sorozat (egyszerre EGY dolog változik)
+referencia_igazi_brailab.wav – a mérési alap (16 kHz, mono)
+
+A minták a `Documents` mappába készülnek (`hs_*.wav`, `bl_*.wav`, `klatt_*.wav`).
+
+FONTOS: a hangolás során írt hang-változat fájlok a
+`bin/espeak-ng-data/voices/!v/` mappában vannak (bl*, brail*). Ezek NEM
+kerültek kiadásra, csak a fejlesztői gépen léteznek.

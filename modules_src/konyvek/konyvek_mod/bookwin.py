@@ -16,7 +16,7 @@ import wx
 from superdl import audiobook, booktext, store, tts   # megosztott backend a Core-ból
 from superdl.audioengine import Player                 # megosztott lejátszó a Core-ból
 
-from . import kimenet
+from . import kimenet, valaszto
 
 
 def _mondd(main, szoveg):
@@ -353,13 +353,11 @@ class BookFrame(wx.Frame):
     # ---- könyv --------------------------------------------------------
 
     def _on_pick_book(self, e):
-        dlg = wx.FileDialog(
-            self, "Könyv kiválasztása",
+        path = valaszto.egy_fajl(
+            self, "Könyv kiválasztása", valaszto.KONYV_KITERJESZTESEK,
             wildcard="Könyvek (*.txt;*.docx;*.epub;*.pdf)|"
-                     "*.txt;*.docx;*.epub;*.pdf|Minden fájl|*.*",
-            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-        if dlg.ShowModal() == wx.ID_OK:
-            path = dlg.GetPath()
+                     "*.txt;*.docx;*.epub;*.pdf|Minden fájl|*.*")
+        if path:
             self.book_txt.SetValue(path)
             self.info_lbl.SetLabel("Könyv beolvasása…")
 
@@ -372,7 +370,6 @@ class BookFrame(wx.Frame):
                 wx.CallAfter(self._book_loaded, bk)
 
             threading.Thread(target=work, daemon=True).start()
-        dlg.Destroy()
 
     def _book_loaded(self, bk):
         self.book = bk
@@ -383,10 +380,9 @@ class BookFrame(wx.Frame):
             self._hova_mond()     # „a könyv mellé" módban rögtön hallja, hova megy
 
     def _on_pick_dir(self, e):
-        dlg = wx.DirDialog(self, "Célmappa", self.out_txt.GetValue())
-        if dlg.ShowModal() == wx.ID_OK:
-            self.out_txt.SetValue(dlg.GetPath())
-        dlg.Destroy()
+        mappa = valaszto.egy_mappa(self, "Célmappa", self.out_txt.GetValue())
+        if mappa:
+            self.out_txt.SetValue(mappa)
 
     # ---- darabolás / kimenet-beállítások -------------------------------
 

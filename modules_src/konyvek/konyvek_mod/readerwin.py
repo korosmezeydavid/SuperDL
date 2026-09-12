@@ -13,6 +13,7 @@ import wx
 
 from superdl import audiobook, booktext, tts   # megosztott backend a Core-ból
 from .readengine import ReadEngine             # a felolvasó-motor a modulban van
+from . import valaszto                         # beépített fájlválasztó
 
 READ_ENGINE_KEYS = ["sapi", "edge"]     # csak az élő felolvasáshoz alkalmasak
 WILDCARD = ("Könyvek|*.txt;*.docx;*.epub;*.pdf|Szöveg (*.txt)|*.txt|"
@@ -321,11 +322,11 @@ class ReaderFrame(wx.Frame):
     # ---- könyv megnyitása ---------------------------------------------
 
     def _on_open(self):
-        dlg = wx.FileDialog(self, "Könyv megnyitása", wildcard=WILDCARD,
-                            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-        if dlg.ShowModal() == wx.ID_OK:
-            self._open_path(dlg.GetPath())
-        dlg.Destroy()
+        ut = valaszto.egy_fajl(self, "Könyv megnyitása",
+                               valaszto.KONYV_KITERJESZTESEK,
+                               wildcard=WILDCARD)
+        if ut:
+            self._open_path(ut)
 
     def _open_path(self, path):
         self.SetStatusText(f"Könyv beolvasása: {os.path.basename(path)} …")

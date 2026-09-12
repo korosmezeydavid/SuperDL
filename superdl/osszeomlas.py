@@ -155,6 +155,94 @@ def naplo_szoveg(sorok: int = 200) -> str:
     return "".join(tartalom[-int(sorok):])
 
 
+_FEJLECEK = ("Windows fatal exception", "Fatal Python error",
+             "Current thread", "Thread 0x")
+
+
+def utolso_osszeomlas(max_sorok: int = 300) -> str:
+    """A LEGUTÓBBI összeomlás TELJES nyoma – a fejlécétől a végéig.
+
+    MIÉRT NEM ELÉG A SORFARK: a hibajelentés eddig `naplo_szoveg(80)`-at
+    csatolt, vagyis a napló utolsó 80 sorát. Egy natív összeomlás nyoma
+    viszont ennél hosszabb (minden szál verme), így a jelentésbe a nyom
+    KÖZEPE került – pont az a fejléc maradt le róla, amiben a hiba KÓDJA van
+    (`Windows fatal exception: code 0x...`). Dr. Kiss István 4.6.4-es
+    jelentésében emiatt nem lehetett megmondani, mi ölte meg a programot:
+    a verem látszott, az ok nem. Egy féllel elvágott bizonyíték rosszabb,
+    mint a semmi, mert azt hisszük, hogy van bizonyítékunk.
+
+    Ezért itt a napló VÉGÉTŐL visszafelé megkeressük a legutóbbi
+    összeomlás-blokk kezdetét (az azt megelőző „SuperDL indult" sortól), és
+    azt adjuk vissza egészben. Ha így is túl hosszú, az ELEJÉT tartjuk meg –
+    ott van az ok –, és jelezzük, hogy rövidítettünk."""
+    try:
+        with open(NAPLO, encoding="utf-8", errors="replace") as f:
+            sorok = f.read().splitlines()
+    except OSError:
+        return ""
+    # hol kezdődik az utolsó összeomlás-nyom?
+    kezdet = None
+    for i in range(len(sorok) - 1, -1, -1):
+        if any(j in sorok[i] for j in _FEJLECEK):
+            kezdet = i
+            break
+    if kezdet is None:
+        return ""
+    # onnan még visszalépünk a blokkot nyitó „SuperDL indult" sorra, hogy
+    # kiderüljön, MELYIK verzió omlott össze
+    for i in range(kezdet, -1, -1):
+        if "SuperDL indult" in sorok[i]:
+            kezdet = i
+            break
+    blokk = sorok[kezdet:]
+    if len(blokk) > max_sorok:
+        blokk = blokk[:max_sorok] + [
+            "… (a nyom hosszabb; a jelentés az ELEJÉT tartotta meg, "
+            "mert az ok ott van)"]
+    return "\n".join(blokk)
+
+
+def fajlvalaszto_figyelese() -> None:
+    """Minden NATÍV fájl-/mappaválasztó nyisson nyomot a naplóban.
+
+    A `jegyzet()` évek óta megvan erre a célra, de SOHA nem hívta senki –
+    ugyanaz a minta, mint magánál az összeomlás-naplónál. Pedig pont ez a
+    hiányzó láncszem: a natív összeomlás vermében látszik, hogy a program a
+    fájlválasztóban járt, de nem látszik, MELYIK mappában – márpedig ezeket a
+    kilépéseket tipikusan a rendszer fájlválasztójába épülő idegen bővítmény
+    okozza (bélyegkép-készítő, felhő-szinkron, vírusirtó), és az mappafüggő.
+
+    Egyetlen helyen kötjük be, a `wx.FileDialog`/`wx.DirDialog` osztály
+    `ShowModal`-jára – így a program mind a hetven hívási helye nyomot hagy,
+    anélkül hogy hetven helyen kellene módosítani."""
+    try:
+        import wx
+    except Exception:
+        return
+    for osztaly, nev in ((wx.FileDialog, "fájlválasztó"),
+                         (wx.DirDialog, "mappaválasztó")):
+        if getattr(osztaly, "_superdl_figyelt", False):
+            continue
+        eredeti = osztaly.ShowModal
+
+        def burok(self, _eredeti=eredeti, _nev=nev):
+            try:
+                hol = self.GetDirectory() or self.GetPath() or ""
+            except Exception:
+                hol = ""
+            jegyzet(f"NATÍV {_nev} megnyitása ({hol})")
+            try:
+                return _eredeti(self)
+            finally:
+                jegyzet(f"NATÍV {_nev} bezárva")
+
+        try:
+            osztaly.ShowModal = burok
+            osztaly._superdl_figyelt = True
+        except Exception:
+            pass
+
+
 def volt_osszeomlas() -> bool:
     """Van-e a naplóban natív összeomlás nyoma? (A faulthandler ezt a fejlécet
     írja ki.) BÁRMIKORI – a hibajelentéshez ez a jó kérdés; az indulási

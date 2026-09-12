@@ -3758,6 +3758,11 @@ def main():
     try:
         from superdl import osszeomlas
         osszeomlas.bekapcsol()
+        # Minden NATÍV fájl-/mappaválasztó hagyjon nyomot: ezek a kilépések
+        # tipikusan a Windows választójába épülő idegen bővítmény miatt
+        # történnek, és mappafüggők – a napló eddig azt mutatta, hogy a
+        # választóban jártunk, de azt nem, hogy hol.
+        osszeomlas.fajlvalaszto_figyelese()
     except Exception:
         pass
     # ALKALMAZÁS-NAPLÓ (Karcsi, 2026-09-09). A `logging`-hoz eddig EGYETLEN

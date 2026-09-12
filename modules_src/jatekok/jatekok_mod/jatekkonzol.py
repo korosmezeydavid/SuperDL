@@ -12,6 +12,7 @@ AKADÁLYMENTESSÉG:
   sorba állítva; Escape azonnal elnémítja. Kikapcsolva a képernyőolvasó
   (selfvoice) mondja a sorokat – így MINDIG pontosan egy hangcsatorna szól.
 """
+import logging
 import queue
 import threading
 import time
@@ -22,7 +23,22 @@ from superdl import retrospeech as RS
 
 from . import brailab
 
+_log = logging.getLogger(__name__)
+
 _HANG_CFG = "jatekok.json"                 # közös a Hangbeállítással
+
+
+class _NevAccessible(wx.Accessible):
+    """A vezérlő akadálymentességi NEVÉT közvetlenül adja meg – független a
+    „az előtte álló StaticText a név" heurisztikától és a Z-sorrendtől. Így a
+    beviteli mező neve maga az AKTUÁLIS kérdés lehet."""
+
+    def __init__(self, name: str):
+        super().__init__()
+        self._name = name
+
+    def GetName(self, childId):
+        return (wx.ACC_OK, self._name)
 
 
 def _retro_hang_be() -> bool:
@@ -200,10 +216,12 @@ class JatekKonzol(wx.Dialog):
         self.atirat.SetName(f"{self.jatek.nev} – játék szövege")
         v.Add(self.atirat, 1, wx.EXPAND | wx.ALL, 8)
 
-        v.Add(wx.StaticText(self, label="&Válaszod (írd be, majd Enter):"),
-              0, wx.LEFT, 8)
+        self.kerdes_cimke = wx.StaticText(
+            self, label="&Válaszod (írd be, majd Enter):")
+        v.Add(self.kerdes_cimke, 0, wx.LEFT, 8)
         self.bemenet = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.bemenet.SetName("Válaszod")
+        self._accessibles = []       # a wx.Accessible-eket TARTANI kell
         self.bemenet.Bind(wx.EVT_TEXT_ENTER, lambda e: self._kuld())
         v.Add(self.bemenet, 0, wx.EXPAND | wx.ALL, 8)
 
@@ -323,7 +341,7 @@ class JatekKonzol(wx.Dialog):
                 return
             if typ == "kerdez":
                 self._ki(payload)
-                self._var_bemenet(True)
+                self._var_bemenet(True, kerdes=payload)
                 return
             if typ == "vege":
                 if payload:
@@ -580,12 +598,42 @@ class JatekKonzol(wx.Dialog):
         except Exception:
             pass
 
-    def _var_bemenet(self, van):
+    def _var_bemenet(self, van, kerdes: str = ""):
+        """A bemeneti mező be/ki, ÉS – ha kérdés érkezett – a mező NEVE maga a
+        kérdés.
+
+        A GOND (Bizik Péter Károly, NVDA): a játék felolvassa a kérdést, de
+        közvetlenül utána a fókusz a beviteli mezőre ugrik, és a képernyőolvasó
+        a SAJÁT bemondásával („Válaszod, szerkesztés") FÉLBESZAKÍTJA. Így a
+        játékos egy néma szövegdobozban áll, és csak rossz adat beírásával
+        tudja meg, mit vár a játék. Ha viszont a mező NEVE a kérdés, akkor a
+        képernyőolvasó bemondása MAGA a kérdés – nincs mit félbeszakítani."""
         self._var = van
         self.bemenet.Enable(van)
         self.kuld_gomb.Enable(van)
+        if kerdes:
+            self._bemenet_neve(kerdes)
         if van and not self._closing:
             self.bemenet.SetFocus()
+
+    _BEMENET_MAX = 160        # a név ne legyen végtelen
+
+    def _bemenet_neve(self, kerdes: str):
+        szoveg = " ".join((kerdes or "").split())[:self._BEMENET_MAX]
+        if not szoveg:
+            return
+        try:
+            self.kerdes_cimke.SetLabel(szoveg)
+            self.kerdes_cimke.GetParent().Layout()
+        except Exception:
+            pass
+        try:
+            self.bemenet.SetName(szoveg)
+            acc = _NevAccessible(szoveg)
+            self.bemenet.SetAccessible(acc)
+            self._accessibles.append(acc)     # a hivatkozást TARTANI kell
+        except Exception:
+            pass
 
     # ---- ábécé-megállítás (abcstop): a JÁTÉKOS dönti el a betűt --------
 
@@ -749,50 +797,60 @@ def indithato(kulcs: str) -> bool:
     return JR.van(kulcs) or kulcs in _ABLAK_JATEKOK
 
 
+def _ablak_osztaly(kulcs):
+    """Az ablakos játékokhoz tartozó osztály – IMPORTÁLVA. (Külön függvény,
+    hogy az import hibája is a naplóba kerüljön.)"""
+    if kulcs == "orszagvaros":
+        from .orszagvaroswin import OrszagVarosAblak
+        return OrszagVarosAblak
+    if kulcs == "szerencsekerek":
+        from .szerencsekerek_online import SzerencseAblak
+        return SzerencseAblak
+    if kulcs == "uno":
+        from .unowin import UnoAblak
+        return UnoAblak
+    if kulcs == "blackjack21":
+        from .blackjackwin import BlackjackAblak
+        return BlackjackAblak
+    if kulcs == "poker":
+        from .pokerwin import PokerAblak
+        return PokerAblak
+    return None
+
+
 def indit_jatek(main, jatek, gep_getter):
-    """Létrehozza és megjeleníti a játék ablakát (nem-modális). Az Ország-Város
-    a saját, lapfüles indító/tanító ablakát kapja (Játszunk! + A játék
-    tanítása); minden más a közös JatekKonzolt."""
-    if jatek.kulcs == "orszagvaros":
+    """Létrehozza és megjeleníti a játék ablakát (nem-modális). Az ablakos
+    játékok (Ország-Város, Szerencsekerék, UNO, Blackjack, Póker) a saját
+    ablakukat kapják; minden más a közös JatekKonzolt.
+
+    FONTOS: ha egy ablakos játék elindítása elszáll, azt EL KELL MONDANI. A
+    korábbi néma `except: pass` visszaesett a konzolra, ahol a játék nincs a
+    REGISZTER-ben, így a felhasználó azt látta, hogy a játék „eltűnt" – a hiba
+    pedig sehol nem jelent meg (Bizik Péter Károly: „kimaradt a póker")."""
+    osztaly = None
+    try:
+        osztaly = _ablak_osztaly(jatek.kulcs)
+    except Exception:
+        _log.exception("A(z) %s ablakos játék betöltése nem sikerült",
+                       jatek.kulcs)
+    if osztaly is not None:
         try:
-            from .orszagvaroswin import OrszagVarosAblak
-            ablak = OrszagVarosAblak(main, jatek, gep_getter)
+            ablak = osztaly(main, jatek, gep_getter)
             ablak.Show()
             return ablak
         except Exception:
-            pass                          # ha bármi gond van, essen vissza a konzolra
-    if jatek.kulcs == "szerencsekerek":
+            _log.exception("A(z) %s ablakos játék indítása nem sikerült",
+                           jatek.kulcs)
+    if osztaly is not None or (jatek.kulcs in _ABLAK_JATEKOK
+                               and not JR.van(jatek.kulcs)):
         try:
-            from .szerencsekerek_online import SzerencseAblak
-            ablak = SzerencseAblak(main, jatek, gep_getter)
-            ablak.Show()
-            return ablak
-        except Exception:
-            pass
-    if jatek.kulcs == "uno":
-        try:
-            from .unowin import UnoAblak
-            ablak = UnoAblak(main, jatek, gep_getter)
-            ablak.Show()
-            return ablak
-        except Exception:
-            pass                          # baj esetén essen vissza a konzolra
-    if jatek.kulcs == "blackjack21":
-        try:
-            from .blackjackwin import BlackjackAblak
-            ablak = BlackjackAblak(main, jatek, gep_getter)
-            ablak.Show()
-            return ablak
+            wx.MessageBox(
+                f"A(z) {jatek.nev} saját ablaka nem indult el. A részletek a "
+                "naplóban vannak (Súgó → Diagnosztika küldése).",
+                "Nem sikerült elindítani", wx.OK | wx.ICON_ERROR, main)
         except Exception:
             pass
-    if jatek.kulcs == "poker":
-        try:
-            from .pokerwin import PokerAblak
-            ablak = PokerAblak(main, jatek, gep_getter)
-            ablak.Show()
-            return ablak
-        except Exception:
-            pass
+        return None
     kon = JatekKonzol(main, jatek, gep_getter)
     kon.Show()
     return kon
