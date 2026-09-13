@@ -45,6 +45,8 @@ class KeveroLejatszo:
         self.on_attunes_ido = on_attunes_ido
         self.on_hiba = on_hiba
         self.attunes_megy = True      # amíg be nem bizonyosodik az ellenkezője
+        self.fo_hangero = 1.0         # a felhasználó által beállított hangerő
+        self._szorzo = 1.0            # ideiglenes szorzó (elalvás-elhalkulás)
         self._hossz = 0.0
         self._nemzedek = 0
         self._jelezve = False
@@ -66,7 +68,7 @@ class KeveroLejatszo:
             self._hossz = max(0.0, float(hossz or 0.0))
             self._masik.stop()
             self._aktiv.stop()
-            self._aktiv.set_volume(1.0)
+            self._aktiv.set_volume(self._cel())
             self._aktiv.on_state = self._allapot_kezelo(gen)
             self._aktiv.play(ut)
 
@@ -126,8 +128,9 @@ class KeveroLejatszo:
                 if gen != self._nemzedek:
                     return
                 try:
-                    be.set_volume(arany)
-                    ki.set_volume(1.0 - arany)
+                    cel = self._cel()
+                    be.set_volume(arany * cel)
+                    ki.set_volume((1.0 - arany) * cel)
                 except Exception:
                     pass
             time.sleep(LEPES_MP)
@@ -136,7 +139,7 @@ class KeveroLejatszo:
                 return          # közben másik számra váltottak – ne nyúlj bele
             try:
                 ki.stop()
-                ki.set_volume(1.0)
+                ki.set_volume(self._cel())
             except Exception:
                 pass
             self._aktiv, self._masik = be, ki
@@ -168,8 +171,27 @@ class KeveroLejatszo:
     def szol(self) -> bool:
         return self._aktiv.is_active()
 
-    def hangero(self, v: float) -> None:
-        self._aktiv.set_volume(max(0.0, min(1.0, v)))
+    def _cel(self) -> float:
+        """A pillanatnyi célhangerő: a beállított hangerő × az ideiglenes
+        szorzó (utóbbi az elalvás-elhalkuláshoz kell)."""
+        return max(0.0, min(1.0, self.fo_hangero * self._szorzo))
+
+    def hangero(self, szorzo: float = 1.0) -> None:
+        """Ideiglenes szorzó (1.0 = teljes). Az elalvás ezzel halkít le."""
+        self._szorzo = max(0.0, min(1.0, szorzo))
+        try:
+            self._aktiv.set_volume(self._cel())
+        except Exception:
+            pass
+
+    def fo_hangero_allit(self, v: float) -> float:
+        """A felhasználó hangereje 0 és 1 között. Visszaadja a beállítottat."""
+        self.fo_hangero = max(0.0, min(1.0, v))
+        try:
+            self._aktiv.set_volume(self._cel())
+        except Exception:
+            pass
+        return self.fo_hangero
 
     def leallit(self) -> None:
         with self._zar:

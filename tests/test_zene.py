@@ -7,6 +7,7 @@ A hangsúly azon van, ami NÉMÁN tud elromlani: a mappabejárás, és hogy az
 import importlib
 import inspect
 import json
+import re
 import threading
 
 import pytest
@@ -202,11 +203,89 @@ def test_a_lista_egyszeres_kijelolesu():
     assert "wx.LB_SINGLE" in f
 
 
+# ---- a Média almenü és a helyi menü ---------------------------------------
+
+def test_a_media_almenube_kerul_nem_kulon_fomenube():
+    """Egy zenelejátszó miatt nem nyitunk új főmenüt."""
+    init = importlib.import_module(BASE)
+    f = inspect.getsource(init.register)
+    assert '"&Média"' in f
+    assert 'add_submenu' in f
+    # tartalék, ha a Core nem tud almenüt
+    assert 'core.add_menu(' in f
+
+
+def test_van_helyi_menu_es_minden_muvelet_benne_van():
+    win = importlib.import_module(BASE + ".zenewin")
+    f = inspect.getsource(win.ZeneFrame._helyi_menu)
+    for varhato in ("Szünet", "Előző szám", "Következő szám", "Hangerő fel",
+                    "Ismétlés", "Elalvás", "Keresés", "Ugrás &mappára",
+                    "Véletlen szám", "Hol tartunk", "vágólapra", "Intézőben",
+                    "újraolvasása", "Súgó"):
+        assert varhato in f, f"hiányzik a helyi menüből: {varhato}"
+
+
+def test_a_helyi_menu_a_lista_helyi_menu_esemenyere_nyilik():
+    win = importlib.import_module(BASE + ".zenewin")
+    f = inspect.getsource(win.ZeneFrame._build)
+    assert "EVT_CONTEXT_MENU" in f
+
+
+def test_a_helyi_menu_a_gyorsbillentyut_is_mutatja():
+    """Vakon ez a tanulás útja: a menü mondja be, mi a billentyűje."""
+    win = importlib.import_module(BASE + ".zenewin")
+    f = inspect.getsource(win.ZeneFrame._helyi_menu)
+    for gyors in ("\\tCtrl+R", "\\tCtrl+S", "\\tCtrl+F", "\\tSzóköz"):
+        assert gyors.replace("\\\\t", "\\t") in f
+
+
+def test_a_kapcsolok_pipaval_latszanak():
+    win = importlib.import_module(BASE + ".zenewin")
+    f = inspect.getsource(win.ZeneFrame._helyi_menu)
+    assert "AppendCheckItem" in f
+
+
+def test_az_uj_muveletek_billentyuvel_is_mennek():
+    win = importlib.import_module(BASE + ".zenewin")
+    f = inspect.getsource(win.ZeneFrame._on_key)
+    for betu in ('ord("F")', 'ord("G")', 'ord("T")', 'ord("C")'):
+        assert betu in f
+    assert "WXK_F3" in f and "WXK_F5" in f
+    assert "WXK_WINDOWS_MENU" in f and "WXK_F10" in f
+    assert "ctrl and kod == wx.WXK_UP" in f
+
+
+def test_a_kereses_korbefordul():
+    win = importlib.import_module(BASE + ".zenewin")
+    f = inspect.getsource(win.ZeneFrame._talalat_keres)
+    assert "% n" in f, "a keresésnek körbe kell fordulnia a lista végén"
+
+
+def test_a_hangero_megmarad_a_kovetkezo_szamra():
+    """Ha csak az aktuális lejátszóra állítanánk, a következő szám megint
+    teljes hangerőn indulna – éjjel ez ébresztő."""
+    kl = importlib.import_module(BASE + ".keverolejatszo")
+    f = inspect.getsource(kl.KeveroLejatszo.jatszik)
+    assert "self._cel()" in f
+    a = inspect.getsource(kl.KeveroLejatszo._attun)
+    assert "self._cel()" in a
+
+
+def test_az_elalvas_es_a_hangero_nem_uti_egymast():
+    """Az elalvás-elhalkulás SZORZÓ, nem abszolút érték: ha a felhasználó
+    60 százalékra vette, az elhalkulás onnan induljon, ne 100-ról."""
+    kl = importlib.import_module(BASE + ".keverolejatszo")
+    f = inspect.getsource(kl.KeveroLejatszo._cel)
+    assert "fo_hangero" in f and "_szorzo" in f
+
+
 def test_a_manifest_ep():
     import pathlib
     gy = pathlib.Path(__file__).resolve().parents[1]
     m = json.loads((gy / "modules_src" / "zene" / "manifest.json")
                    .read_text(encoding="utf-8"))
     assert m["id"] == "zene" and m["entry"] == "zene_mod"
-    assert m["version"] == "1.0.0"
+    # a verziót NEM rögzítjük: minden kiadásnál elbukna, és az a fajta teszt,
+    # amit az ember gépiesen átír, nem véd semmitől
+    assert re.fullmatch(r"\d+\.\d+\.\d+", m["version"])
     assert len(m["description"]) > 200

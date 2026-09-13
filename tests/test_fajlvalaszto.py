@@ -63,9 +63,18 @@ def test_gepeles_szerinti_szures():
 
 
 def test_gyorshelyek_letezo_mappak():
+    """Minden gyorshely valódi mappa – EGY kivétellel.
+
+    A lista első eleme mostantól a „Ez a gép" szint (üres út, `FV.GEP`): ez
+    nem könyvtár, hanem a MEGHAJTÓK listája. Azért került be, mert a meghajtó
+    gyökeréből (C:\\) korábban nem lehetett kilépni – a `_szulo()` ott
+    zsákutcát mondott –, tehát memóriakártyára vagy pendrive-ra átmenni csak
+    ezen a legördülőn át lehetett, ha valaki megtalálta. Ez a teszt a RÉGI
+    szerződést írta le; a szerződés szándékosan változott."""
     helyek = FV.gyorshelyek()
     assert helyek, "legalább a saját mappa mindig van"
-    for nev, ut in helyek:
+    assert helyek[0][1] == FV.GEP, "az első elem az Ez a gép szint"
+    for nev, ut in helyek[1:]:
         assert nev and os.path.isdir(ut), "%s (%s) nem létezik" % (nev, ut)
 
 

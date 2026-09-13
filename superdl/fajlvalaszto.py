@@ -35,6 +35,30 @@ def _meret_szoveg(bajt: int) -> str:
     return "%d bájt" % bajt
 
 
+GEP = ""      # a „Ez a gép" szint: nem valódi mappa, a MEGHAJTÓK listája
+
+
+def meghajtok() -> list:
+    """A jelenleg ELÉRHETŐ meghajtók gyökerei (C:\\, D:\\ …).
+
+    MINDIG frissen kérdezzük le, nem az induláskor egyszer: a pendrive vagy a
+    memóriakártya menet közben is bekerülhet, és akkor ott kell lennie.
+    Az üres kártyaolvasó-slot `isdir`-je hamis, tehát az magától kimarad.
+    """
+    if os.name != "nt":
+        return ["/"]
+    return ["%s:\\" % b for b in string.ascii_uppercase
+            if os.path.isdir("%s:\\" % b)]
+
+
+def gyoker_e(ut: str) -> bool:
+    """Meghajtó gyökere-e? (C:\\ – innen fölfelé a „Ez a gép" szint jön.)"""
+    if not ut:
+        return False
+    p = os.path.abspath(ut)
+    return os.path.dirname(p.rstrip("\\/")) in ("", p) or p == os.path.dirname(p)
+
+
 def gyorshelyek() -> list:
     """(név, útvonal) párok: ahova a leggyakrabban megyünk."""
     haza = Path.home()
@@ -47,12 +71,11 @@ def gyorshelyek() -> list:
         ("Képek", haza / "Pictures"),
         ("Saját mappa", haza),
     ]
-    ki = [(nev, str(ut)) for nev, ut in jeloltek if ut.is_dir()]
-    if os.name == "nt":
-        for betu in string.ascii_uppercase:
-            gyoker = "%s:\\" % betu
-            if os.path.isdir(gyoker):
-                ki.append(("%s meghajtó" % betu, gyoker))
+    # „Ez a gép" MINDIG az első: innen érhető el az összes meghajtó, és ez az
+    # a hely, ahová a meghajtó gyökeréből a Backspace visz.
+    ki = [("Ez a gép (meghajtók)", GEP)]
+    ki += [(nev, str(ut)) for nev, ut in jeloltek if ut.is_dir()]
+    ki += [("%s meghajtó" % m[0], m) for m in meghajtok()]
     return ki
 
 
@@ -60,7 +83,14 @@ def tartalom(mappa: str, kiterjesztesek=()) -> tuple:
     """(mappák, fájlok) a megadott könyvtárban, ábécében.
 
     A rejtett és a hozzáférhetetlen elemeket csendben kihagyjuk – egy
-    rendszermappa miatt ne álljon meg a böngészés."""
+    rendszermappa miatt ne álljon meg a böngészés.
+
+    A `GEP` (üres út) a „Ez a gép" szint: ott a MEGHAJTÓK a mappák. Enélkül a
+    meghajtó gyökeréből nem lehetett kilépni, tehát másik meghajtóra (kártya,
+    pendrive) csak a legördülő gyorshelyen át lehetett átmenni – ha valaki
+    megtalálta. Vakon ez zsákutca volt."""
+    if not mappa:
+        return meghajtok(), []
     mappak, fajlok = [], []
     kit = tuple(k.lower() for k in (kiterjesztesek or ()))
     try:
@@ -200,7 +230,15 @@ class FajlValaszto(wx.Dialog):
         self.mappa_lista.Set(mappak or [])
         if self.fajl_lista is not None:
             self.fajl_lista.Set(fajlok or [])
-        self.hely.SetLabel("Jelenlegi hely: %s" % self._mappa)
+        hely_nev = "Ez a gép – meghajtók" if self._mappa == GEP else self._mappa
+        self.hely.SetLabel("Jelenlegi hely: %s" % hely_nev)
+        if self._mappa == GEP:
+            uzenet = "Ez a gép – %d meghajtó. Enterrel lépsz be." % len(mappak)
+            if minta:
+                uzenet += " (szűrve erre: %s)" % minta
+            if not csendes:
+                self._mondd(uzenet)
+            return uzenet
         uzenet = ("%s – %d mappa, %d fájl"
                   % (self._mappa, len(mappak), len(fajlok)))
         if minta:
@@ -213,7 +251,10 @@ class FajlValaszto(wx.Dialog):
         i = self.mappa_lista.GetSelection()
         if i < 0 or i >= len(self._mappak):
             return
-        uj = os.path.join(self._mappa, self._mappak[i])
+        nev = self._mappak[i]
+        # A „Ez a gép" szinten a lista elemei MAGUK a meghajtók gyökerei
+        # (C:\), nem a jelenlegi mappa alatti nevek.
+        uj = nev if self._mappa == GEP else os.path.join(self._mappa, nev)
         if not os.path.isdir(uj):
             self._mondd("Ez a mappa nem nyitható meg.")
             return
@@ -223,11 +264,27 @@ class FajlValaszto(wx.Dialog):
         self.mappa_lista.SetFocus()
 
     def _szulo(self):
+        """Egy szinttel feljebb — a meghajtó gyökeréből a MEGHAJTÓK listájára.
+
+        ⚠️ EZ VOLT A HIBA: a `C:\\` szülője önmaga, tehát a Backspace itt
+        „Ez már a legfelső szint"-et mondott, és onnan nem lehetett másik
+        meghajtóra (memóriakártya, pendrive) átmenni. Volt ugyan egy legördülő
+        gyorshely a meghajtókkal, de vakon, listában nyilazva ez zsákutcának
+        látszott — és a felhasználó azt hiszi el, amit a program mond."""
+        if self._mappa == GEP:
+            self._mondd("Ez már a legfelső szint: itt a meghajtók vannak.")
+            return
+        if gyoker_e(self._mappa):
+            self._mappa = GEP
+            self.szuro_mezo.SetValue("")
+            self._mondd(self._frissit())
+            self.mappa_lista.SetFocus()
+            return
         szulo = os.path.dirname(self._mappa.rstrip("\\/")) or self._mappa
         if szulo == self._mappa:
-            self._mondd("Ez már a legfelső szint.")
-            return
-        self._mappa = szulo
+            self._mappa = GEP
+        else:
+            self._mappa = szulo
         self.szuro_mezo.SetValue("")
         self._mondd(self._frissit())
         self.mappa_lista.SetFocus()
@@ -242,6 +299,11 @@ class FajlValaszto(wx.Dialog):
 
     # ---------------------------------------------------- eredmény
     def _kesz(self):
+        if self._mappa == GEP:
+            # a „Ez a gép" szint nem mappa – ne adjunk vissza üres utat
+            self._mondd("Előbb válassz egy meghajtót: nyilazz rá, majd Enter.")
+            self.mappa_lista.SetFocus()
+            return
         if self._mappat:
             self.eredmeny = [self._mappa]
             self.EndModal(wx.ID_OK)
