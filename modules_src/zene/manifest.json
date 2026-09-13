@@ -1,0 +1,12 @@
+{
+  "id": "zene",
+  "name": "Zene (egyszerű lejátszó)",
+  "version": "1.0.0",
+  "entry": "zene_mod",
+  "category": "Média",
+  "description": "A lehető legegyszerűbb zenelejátszó – szándékosan nem tud mást, csak lejátszani. Kiválasztasz EGY mappát, és minden szám, ami alatta van (akárhány almappában, akármilyen mélyen), bekerül egy listába. A választásod megjegyződik, legközelebb magától betölt. FEL-LE NYÍL: előző és következő szám – és azonnal szól, nem kell külön indítani. BAL-JOBB NYÍL: tekerés a számon belül, öt másodpercenként. SZÓKÖZ: szünet, és újra szóköz: folytatás. CTRL+R: ismétlés be és ki. CTRL+E: a szám végén álljon meg, vagy menjen a következőre. CTRL+S: elalvás időzítő – egy nyilazható lista öt perctől hatvan percig, ötösével; a lejárat előtt tíz másodperccel a zene lassan elhalkul, nem hirtelen vág el. CTRL+I: hol tartunk – a szám neve, az eltelt idő, a kapcsolók állása és a hátralévő elalvás-idő, egyetlen mondatban. ÁTTŰNÉS: a számok között három másodperces áttűnés van, az előző elhalkul, közben a következő feljön. Ha a hangkártya nem engedélyez két egyidejű hangfolyamot, áttűnés nem lesz, de a következő szám AKKOR IS elindul – néma lejátszó rosszabb volna, mint áttűnés nélküli. A zenemappát a SuperDL SAJÁT, bővítménymentes fájlválasztójával adod meg, nem a Windowséval: abba idegen bővítmények épülnek be, és ha egyikük elszáll, viszi magával az egész programot. A lista soraiban a fájlnév és a mappanév szerepel, nem előadó-cím: a címkék kiolvasása több ezer számnál percekbe kerülne, ez a program pedig azért van, hogy azonnal induljon. Amit tudatosan NEM tud: lejátszási lista, keverés, kedvencek, hangerő-csúszka, címke-szerkesztés.",
+  "min_core_api": "1.0",
+  "min_core_version": "4.6.8",
+  "requires_tools": [],
+  "author": "Kőrösmezey Dávid"
+}

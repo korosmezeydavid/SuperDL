@@ -32,7 +32,15 @@ def frissit(mod_id: str) -> str:
         if m["id"] == mod_id:
             break
     else:
-        raise SystemExit(f"nincs ilyen modul a modules.json-ban: {mod_id}")
+        # ÚJ MODUL: nem hiba, hanem a normál első kiadás. Korábban itt
+        # kilépett a szkript, és a bejegyzést kézzel kellett beírni — egy
+        # több ezer karakteres leírást kézzel másolni pont az a művelet,
+        # ami némán elromlik.
+        m = {"id": mod_id, "name": man["name"],
+             "category": man.get("category", "Egyéb"),
+             "description": "", "latest": {"version": "—"}}
+        kat_adat["modules"].append(m)
+        kat_adat["modules"].sort(key=lambda x: x["id"])
 
     regi = m["latest"]["version"]
     m["name"] = man["name"]

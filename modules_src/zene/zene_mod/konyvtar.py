@@ -1,0 +1,142 @@
+# -*- coding: utf-8 -*-
+"""A zenetár: mappabejárás, a számok listája, és a szám hossza.
+
+Tudatosan NEM olvas címkéket (előadó, cím). 550 mappánál az több ezer fájl
+megnyitását jelentené, és ez a program azért van, hogy AZONNAL induljon. A
+sorok a fájlnévből és a mappanévből állnak — az a név, amit a felhasználó
+adott nekik, tehát ő is arra emlékszik.
+"""
+
+import json
+import os
+import subprocess
+from pathlib import Path
+
+KITERJESZTESEK = (".mp3", ".m4a", ".aac", ".ogg", ".oga", ".opus", ".wav",
+                  ".flac", ".wma", ".mp2", ".mka", ".m4b", ".aif", ".aiff",
+                  ".ape", ".wv", ".alac")
+
+BEALLITAS = Path.home() / ".superdl" / "zene.json"
+
+
+class Szam:
+    """Egy szám a listában. Szándékosan könnyű: csak az út és két név."""
+
+    __slots__ = ("ut", "cim", "mappa")
+
+    def __init__(self, ut: str, cim: str, mappa: str):
+        self.ut = ut
+        self.cim = cim
+        self.mappa = mappa
+
+    def felirat(self) -> str:
+        return f"{self.cim} – {self.mappa}" if self.mappa else self.cim
+
+
+def zenei_fajl(nev: str) -> bool:
+    return os.path.splitext(nev)[1].lower() in KITERJESZTESEK
+
+
+def beolvas(gyoker, megall=None) -> tuple[list, int]:
+    """A gyökér ALATT MINDEN almappa, tetszőleges mélységig.
+
+    Visszaad: (számok listája, bejárt mappák száma). A `megall` egy
+    `threading.Event`; ha beáll, a bejárás félbehagyható — az ablak bezárása
+    ne várjon egy fél percet egy hálózati meghajtón.
+
+    A rejtett és a hozzáférhetetlen mappákat csendben kihagyjuk: egy
+    rendszermappa miatt ne álljon meg az egész beolvasás.
+    """
+    gyoker = str(gyoker or "").strip()
+    if not gyoker or not os.path.isdir(gyoker):
+        return [], 0
+    tovek = Path(gyoker)
+    szamok, mappak = [], 0
+    for to, alkonyvtarak, fajlok in os.walk(gyoker, onerror=lambda e: None):
+        if megall is not None and megall.is_set():
+            break
+        alkonyvtarak[:] = [d for d in alkonyvtarak if not d.startswith(".")]
+        mappak += 1
+        try:
+            rel = str(Path(to).relative_to(tovek))
+        except ValueError:
+            rel = os.path.basename(to)
+        mappanev = "" if rel == "." else rel.replace(os.sep, " / ")
+        for f in fajlok:
+            if zenei_fajl(f):
+                szamok.append(Szam(os.path.join(to, f),
+                                   os.path.splitext(f)[0], mappanev))
+    szamok.sort(key=lambda s: (s.mappa.lower(), s.cim.lower()))
+    return szamok, mappak
+
+
+# ---- a szám hossza (az áttűnéshez kell) --------------------------------
+
+def hossz(ut: str) -> float:
+    """A szám hossza másodpercben, vagy 0.0, ha nem deríthető ki.
+
+    Az ffprobe-bal kérdezzük le (mérve: ~66 ezredmásodperc fájlonként), és
+    CSAK az éppen szóló meg a következő számra — több ezer fájlra ez percekbe
+    kerülne. Ha nincs ffprobe vagy nem ad számot, 0.0 megy vissza: olyankor
+    nincs áttűnés, de a következő szám AKKOR IS elindul, mert a lejátszó a
+    „vége” jelzésre is lép.
+    """
+    exe = _ffprobe()
+    if not exe or not ut:
+        return 0.0
+    try:
+        r = subprocess.run(
+            [exe, "-v", "quiet", "-show_entries", "format=duration",
+             "-of", "csv=p=0", str(ut)],
+            capture_output=True, text=True, timeout=10,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        return max(0.0, float((r.stdout or "").strip()))
+    except Exception:
+        return 0.0
+
+
+def _ffprobe() -> str:
+    try:
+        from superdl.ffmpeg import find_ffmpeg
+        p = find_ffmpeg()
+    except Exception:
+        p = None
+    if not p:
+        return ""
+    p = Path(p)
+    jelolt = p.with_name("ffprobe.exe") if p.suffix else p / "ffprobe.exe"
+    try:
+        return str(jelolt) if jelolt.exists() else ""
+    except OSError:
+        return ""
+
+
+# ---- a megjegyzett gyökérmappa -----------------------------------------
+
+def gyoker_betolt() -> str:
+    try:
+        d = json.loads(BEALLITAS.read_text(encoding="utf-8"))
+        return str(d.get("gyoker") or "")
+    except Exception:
+        return ""
+
+
+def gyoker_ment(ut: str) -> None:
+    try:
+        BEALLITAS.parent.mkdir(parents=True, exist_ok=True)
+        BEALLITAS.write_text(
+            json.dumps({"gyoker": str(ut or "")}, ensure_ascii=False),
+            encoding="utf-8")
+    except OSError:
+        pass
+
+
+def ido_szoveg(mp: float) -> str:
+    """Másodperc → „3 perc 25 másodperc” (felolvasásra, nem 3:25-re)."""
+    mp = max(0, int(mp))
+    perc, masodperc = divmod(mp, 60)
+    if perc and masodperc:
+        return f"{perc} perc {masodperc} másodperc"
+    if perc:
+        return f"{perc} perc"
+    return f"{masodperc} másodperc"

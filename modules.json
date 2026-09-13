@@ -3,171 +3,6 @@
   "core_api": "1.0",
   "modules": [
     {
-      "id": "docconvert",
-      "name": "Dokumentum-konverter",
-      "category": "Könyvek",
-      "description": "JAVÍTVA (Laci jelzésére): az UTF-16 kódolású szövegfájlok (a Jegyzettömb „Unicode” mentése) eddig úgy jöttek át, hogy a betűk közé szóköz került; mostantól a program felismeri őket, BOM-mal és anélkül is. A fájl→fájl átalakításnál a TABULÁTOROS TAGOLÁS és a sorkezdő behúzás is megmarad (műsorlisták, táblázatos jegyzetek). Dokumentumok átalakítása formátumok közt (TXT, DOCX, EPUB, PDF, HTML, RTF, ODT, Markdown…), beépített PDF-fel és OCR-rel. ÚJ: kötegelt mód – több fájl vagy egy egész mappa egyszerre, mindegyik a saját fájljába VAGY egyetlen fájlba összefűzve.",
-      "latest": {
-        "version": "1.3.3",
-        "min_core_api": "1.0",
-        "min_core_version": "4.0.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-docconvert-1.3.3/docconvert-1.3.3.zip",
-        "sha256": "6d9673c057cc22ff1dadbb45068520158be6f2272167ebf32f6222305cc33176",
-        "size": 16736
-      }
-    },
-    {
-      "id": "p2p",
-      "name": "Fájl- és mappaküldés, megosztás",
-      "category": "Eszközök",
-      "description": "Fájl VAGY egész mappa eljuttatása valaki máshoz. Gépről gépre, felhő nélkül, bemondható kóddal és végpontok közötti titkosítással (magic-wormhole) – vagy ha a másik fél nincs a gépénél, feltöltés ideiglenes tárhelyre, lejáratot számon tartó megosztási előzményekkel.",
-      "latest": {
-        "version": "1.2.0",
-        "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-p2p-1.2.0/p2p-1.2.0.zip",
-        "sha256": "961ae3bf2e678c5c9e442dfec06f215a5ea52b846fb368a5b2c1d60fdccc2b23",
-        "size": 32530
-      }
-    },
-    {
-      "id": "mediatools",
-      "name": "Média-eszközök",
-      "category": "Média",
-      "description": "ÚJ FORMÁTUMOK (Miki jelzésére): a konvertáló és a médiaelemző mostantól látja a ritkább hangformátumokat is – .ape (Monkey's Audio), .wv, .tta, .tak, .mpc, .dsf, .dff, .aiff, .au, .amr, .caf, .spx, .ac3, .dts, .mka, .oga, .w64 –, tehát nem kell az „összes fájl” kerülőút. Ha a Windows fájlválasztója összeomlik a gépeden (idegen bővítmény miatt), a konvertáló a SuperDL beépített, biztonságos fájlválasztóját használja. Médiakészítő és -elemző eszközök egy csomagban: kötegelt médiakonvertáló, beszélő médiaelemző (LUFS/EBU R128), iPhone csengőhang-készítő, videókészítő (kép+zene) és videóvágó-összefűző. ÚJ: a DVD-s VOB (és a többi DVD/AVCHD formátum: m2v, m2ts, mts) mostantól MAPPÁBÓL is bekerül a listába, nem csak fájlonként kiválasztva; és a DVD több VOB-darabját (VTS_01_1, VTS_01_2 …) kérésre EGY filmmé fűzi össze (bájtszintű összefűzéssel, ahogy a DVD-hez való), a menü-fájlt kihagyva – és a végén ELLENŐRZI a kész film hosszát, hogy soha ne kapj néma féleredményt.",
-      "latest": {
-        "version": "1.4.10",
-        "min_core_api": "1.0",
-        "min_core_version": "4.0.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.10/mediatools-1.4.10.zip",
-        "sha256": "ad5aa377a79f2e80cab5d9750416018b64b9e6e98c002592310b1663264ecbc7",
-        "size": 46168
-      }
-    },
-    {
-      "id": "szervezes",
-      "name": "Szervezés",
-      "category": "Szervezés",
-      "description": "Szervezés-eszközök egy csomagban: akadálymentes Hírolvasó (RSS), Podcast-felfedező, Naptár/teendők/jegyzetek (emlékeztetővel, ICS-szinkronnal) ÚJ rezsi/költség-kalkulátor füllel (havi/éves összesítés, naptári emlékeztetők, opcionális PIN-lakat), és Napi infó (időjárás, névnap).",
-      "latest": {
-        "version": "1.3.2",
-        "min_core_api": "1.0",
-        "min_core_version": "4.0.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.3.2/szervezes-1.3.2.zip",
-        "sha256": "7d231aa3726aa46f43e284a4a26ad12ea2477c013cc7919339478f0ccd14cd45",
-        "size": 30421
-      }
-    },
-    {
-      "id": "konyvek",
-      "name": "Könyvek",
-      "category": "Könyvek",
-      "description": "JAVÍTVA (Dr. Kiss István összeomlás-naplója nyomán): A KÖNYV- ÉS HANGFÁJL-VÁLASZTÁS MOSTANTÓL A SUPERDL SAJÁT VÁLASZTÓJÁVAL MEGY, nem a Windowséval. Egy felhasználónál a program natívan KILÉPETT, miközben épp a könyv kiválasztásánál járt. Ez nem a program hibája volt: a Windows fájlválasztójába idegen bővítmények épülnek be (bélyegkép-készítő, felhő-szinkron, vírusirtó), és ha egyikük elszáll, viszi magával az egész programot – ezt a programból nem lehet elkapni. A SuperDL saját választója SEMMILYEN rendszerbővítményt nem tölt be, és vakon kényelmesebb is: két lista (mappák és fájlok), Enter a mappán belépés, Backspace vissza a szülőmappába, gyorshelyek (Asztal, Dokumentumok, Letöltések, meghajtók), és gépeléssel szűrhető, a program pedig mondja, hány találat maradt. Mind az öt helyen ez jön: könyv kiválasztása, célmappa, hangfájl megnyitása, hangoskönyv-mappa, könyv megnyitása. Ha a saját választó bármi miatt nem érhető el, a program visszalép a rendszerére – inkább a régi viselkedés, mint egy működésképtelen menüpont. Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3, választható hanggal és sebességgel). ÚJ: a kész hangoskönyv kérésre a KÖNYV MELLÉ kerül (oda, ahonnan betallóztad); darabolásnál mindig külön almappába; a végén hangjelzés (fanfár sikernél, másik jelzés hibánál), és a darab-hossz mező csak akkor jelenik meg, ha a darabolás be van kapcsolva.",
-      "latest": {
-        "version": "1.3.0",
-        "min_core_api": "1.0",
-        "min_core_version": "4.3.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-konyvek-1.3.0/konyvek-1.3.0.zip",
-        "sha256": "d3e2d680e518351922f2046944173fd2bb124a4d0293d4f6705007b00c3148e3",
-        "size": 36832
-      }
-    },
-    {
-      "id": "iptv",
-      "name": "Internetes TV",
-      "category": "Média",
-      "description": "Akadálymentes internetes TV (legális IPTV): saját m3u/Xtream forrás csatornái, felolvasott műsorújság (EPG), felvétel és emlékeztető, hangalámondás-sáv és élő felirat-felolvasás. ÚJ: ha nincs internet, akadálymentes felugró jelzi, újratesztelés-gombbal. Csak legális, saját előfizetésű forrásokhoz.",
-      "latest": {
-        "version": "1.0.8",
-        "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iptv-1.0.8/iptv-1.0.8.zip",
-        "sha256": "43f18fc00008f6c632db01c6364b239615cbb71dd80f21227f265b13a17154b2",
-        "size": 17643
-      }
-    },
-    {
-      "id": "tvmusor",
-      "name": "TV műsor (tévéújság)",
-      "category": "Média",
-      "description": "JAVÍTÁS (Laci jelzésére): a KEDVENC-EMLÉKEZTETŐ végre tényleg működik. Eddig minden próbálkozásra azt mondta, hogy „a naptár nem érhető el, a Szervezés modul naptára kell hozzá” – akkor is, ha a Szervezés fel volt telepítve. A hiba a mi oldalunkon volt: a modul rossz néven kereste a program naptárkezelőjét, ezért sosem találta meg. A funkció a megjelenése óta nem működött, most viszont igen; és ha valami mégis félremegy, a program megmondja, mi az igazi ok, nem küld többé rossz helyre. ÚJ (Laci kérésére): NAP-VÁLASZTÓ a Csatornák lapon – nemcsak „mostantól” nézhető a műsor, hanem ma, holnap, holnapután és tovább, ameddig a forrás adatot ad (a nagy csatornáknál általában ma + 3-4 nap). Ilyenkor a nap TELJES műsora látszik, a reggeliekkel együtt; a hajnalig tartó filmek az előző naphoz tartoznak. A választék csatornánként igazodik ahhoz, amennyi adat valóban van. Akadálymentes, FELOLVASOTT TÉVÉÚJSÁG – és a legjobb: IPTV-előfizetés NÉLKÜL is működik. Ha csak egy szimpla antennád van (vagy semmid), akkor is megnézheted, mi megy MOST az RTL-en, a TV2-n, az m1-en, a Dunán és több mint száz további csatornán. Négy nézet: „Mi megy most?” (minden csatorna épp futó műsora), „Ma este” (a 20:00–23:00 közti főműsoridő, kezdés szerint), „Csatornák” (válassz csatornát, alatta a műsora mostantól) és „Keresés” – ez utóbbival egyetlen kérdésre megkapod, MIKOR és MELYIK csatornán adják a kedvencedet (ékezet nélkül is megtalálja, és a műsor leírásában is keres). Minden lista fel/le nyíllal navigálható, a képernyőolvasó minden sort felolvas, a kijelölt műsor részletei (pontos idő, hossz, leírás) külön mezőben olvashatók. ÚJ – KEDVENC-FIGYELŐ: írd be a kedvenc filmjeid és sorozataid címét (akár többet is; elég egy jellemző rész, ékezet nélkül is), és a program magától szól, ha jön valamelyik: „Helló! Lesz a kedvenced: …, ezen a csatornán, ekkor.” A jelzés ki-be kapcsolható, és bármikor le is kérdezhető, hogy mikor jönnek a kedvenceid. ÚJ: NAPTÁRI EMLÉKEZTETŐ is kérhető a kedvenc műsorokra – egyesével vagy mindre –, és a SuperDL naptára a kezdés előtt (állítható perccel) meg is szólal: „Figyelem! 10 perc múlva kezdődik a kedvenced…”. Az is beállítható, hogy az új kedvenc-műsorokra magától tegyen be emlékeztetőt; ugyanarra a műsorra sosem kerül be kétszer. A műsoradat egy nyilvános műsorújság-forrásból (szabványos XMLTV) érkezik, ami a Beállítás fülön bármikor felülírható; ha a forrás nem elérhető, automatikusan tartalékot próbálunk, és a korábban letöltött műsor offline is megmarad. A műsoradat a forrás szolgáltatójáé – a SuperDL csak megjeleníti, nem tárolja és nem terjeszti; a műsorváltozás jogát a csatornák fenntartják.",
-      "latest": {
-        "version": "1.2.2",
-        "min_core_api": "1.0",
-        "min_core_version": "4.2.7",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-tvmusor-1.2.2/tvmusor-1.2.2.zip",
-        "sha256": "b66048996f29106ca8ba4bcb26a396c99e53925904734a7a67507ed2ba42e061",
-        "size": 19093
-      }
-    },
-    {
-      "id": "supermedia",
-      "name": "Super Media",
-      "category": "Média",
-      "description": "Hang-műsorszóró stúdió, felvevő, szerkesztő és multistream egy csomagban: Super M (rádió-stúdió + médialejátszó, BASS-motor), Super Recorder (akadálymentes felvevő + fülre-szerkesztő: markeres vágás, 22 effekt, vokóder/harmonizer/ének-eltávolítás/2-sáv, undo/redo), VALÓS IDEJŰ VOICE CHANGER (élő mikrofon: hangmagasság + DX8-effektek monitorozva) és Super Stream (élő multistream). A BASS/bass_fx/numpy-runtime a Core-ból jön (core 3.28.5+ ajánlott).",
-      "latest": {
-        "version": "1.3.3",
-        "min_core_api": "1.0",
-        "min_core_version": "4.0.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supermedia-1.3.3/supermedia-1.3.3.zip",
-        "sha256": "17cd96bd1e931d0a43fc0ac9b52ba53392eca6d2f8096fdf8420e761062e716c",
-        "size": 72089
-      }
-    },
-    {
-      "id": "felolvaso",
-      "name": "Felirat-felolvasó lejátszó",
-      "category": "Média",
-      "description": "Idegen nyelvű film (vagy hangfájl) lejátszása úgy, hogy a magyar (vagy bármely szöveges) feliratot SZINKRONBAN, választható hanggal (helyi SAPI, Edge neurális online, vagy beépített eSpeak) felolvassa – így vakon is követhető az idegen nyelvű film. A film mellé tett .srt/.vtt feliratot magától megtalálja, a fájlba ágyazott szöveges feliratsávot is kezeli. A YouTube-link is beilleszthető – a videó hangját streameli, a feliratot (kézi, vagy a YouTube automatikus, magyarra fordított feliratát) letölti és felolvassa. A felolvasás TEMPÓJA állítható (alapból gyors, hogy tartsa a lépést a filmfelirattal), és a következő sort előre legyártja, így a neurális hang sem csúszik. ÚJ: a hangerő (Ctrl+fel/le) és az F-billentyűk (F1/F6/F7/F8) most MINDEN vezérlőn működnek, az F8 állapot-bemondás képernyőolvasó-módban is hallható, és ha a választott hang hibázik, HALLOD az okát (nem csak eSpeak-re vált némán).",
-      "latest": {
-        "version": "1.4.8",
-        "min_core_api": "1.0",
-        "min_core_version": "3.29.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-felolvaso-1.4.8/felolvaso-1.4.8.zip",
-        "sha256": "3f0d81a3709faacc5918db68dd2d4142e1a2238d3c591347ff004f780b348f53",
-        "size": 23641
-      }
-    },
-    {
-      "id": "radio",
-      "name": "Internetes rádió",
-      "category": "Média",
-      "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: JAVÍTVA a saját állomás hozzáadása (eddig a „Hozzáadás” gomb nem mentett – most valóban a Kedvencek közé kerül, és a fókusz oda is ugrik, kijelölve az új állomást). ÚJ: „Jobb minőségű forrás” gomb – egy meglévő állomáshoz (pl. Kossuth) magasabb bitrátás stream-cím adható, előre kitöltött párbeszéddel, így jobb minőségben vehetsz fel. Az időzített felvételnél megadhatod, hogy EGYSZERI legyen, MEGADOTT SZÁMÚ alkalommal fusson, vagy KIKAPCSOLÁSIG ismételjen. Némítás (Ctrl+M). Ha nincs internet, akadálymentes felugró jelzi újratesztelés-gombbal.",
-      "latest": {
-        "version": "1.1.8",
-        "min_core_api": "1.0",
-        "min_core_version": "4.2.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.8/radio-1.1.8.zip",
-        "sha256": "49fbb653d29a0b3391a9400d353f5b0f95482ea00eaa8c8d8bff45a90f3ae6c9",
-        "size": 20200
-      }
-    },
-    {
-      "id": "hangalamondas",
-      "name": "AI hangalámondás",
-      "category": "AI",
-      "description": "AI hangalámondás (audio description) videóhoz: a videó képi tartalmát AI írja le és hanggal mondja el, az eredeti hang alatta halkítva – így a videó vakon is „nézhető”. A leírás részletessége és elhelyezése (párbeszéd-szünet / kiterjesztett) választható; a saját AI-kulcsoddal megy.",
-      "latest": {
-        "version": "1.0.6",
-        "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-hangalamondas-1.0.6/hangalamondas-1.0.6.zip",
-        "sha256": "b5e4097d01b241ecd83316814f739cc6351c86a1f7af3996117cb8b73d06af42",
-        "size": 11626
-      }
-    },
-    {
-      "id": "jatekok",
-      "name": "Játékok",
-      "category": "Játékok",
-      "description": "JAVÍTVA (Bizik Péter Károly jelzésére, NVDA-val tesztelve): A JÁTÉKBA LÉPVE EDDIG EGY NÉMA SZÖVEGDOBOZBAN TALÁLTAD MAGAD. A játék felolvasta a kérdést, de a fókusz azonnal a beviteli mezőre ugrott, és a képernyőolvasó saját bemondása („Válaszod, szerkesztés”) FÉLBESZAKÍTOTTA – így csak akkor derült ki, mit vár a játék, ha rossz adatot írtál be. Mostantól a beviteli mező NEVE maga az aktuális kérdés, tehát a képernyőolvasó bemondása MAGA a kérdés. Ez minden szöveges játékra hat, nem csak arra az egyre, ahol kiderült. JAVÍTVA: AZ AWARI ÉS A MAYA KÖRÖNKÉNTI BEMONDÁSA követhetetlen volt normál felolvasási sebességnél: körönként kétszer is elhangzott a teljes tábla, puszta számsorként, „(1-6)” betoldással – mire az ember felfogta, körbefutott a szöveg. Mostantól csak a SAJÁT gödreid, illetve tálaid és a két pontszám hangzik el, és minden szám a sorszámával jár („Gödreid – 1: 0, 2: 2, 3: 4”); a teljes tábla az „állás” szóra bármikor kérhető – és az „állás” most tényleg VÁLASZOL is rá, eddig csak a következő kör ismétlésére támaszkodott. Lépés után csak a lépés és az ütés hangzik el, nem az egész tábla. A kérdés pedig megmondja, mit vár és mi a kiút: „Egy szám 1-től 6-ig. A teljes állásért: állás”. JAVÍTVA: A PÓKER NEM TŰNT EL. A modulnak KÉT listája van – Retró játékok és Saját játékok –, és a Póker, az UNO, a Blackjack, a Milliomos, a Szerencsekerék meg az Ország-Város a MÁSODIKON van. Indításkor a program most megmondja, hogy két lista van és mi hol található (váltás: Ctrl+Tab). Emellett: ha egy saját ablakos játék indítása elszállt, a program eddig NÉMÁN visszaesett a szöveges konzolra, ahol az a játék nincs regisztrálva – így úgy tűnt, mintha kimaradt volna a csomagból. Mostantól a hiba a naplóba kerül, és a program meg is mondja. JAVÍTVA (felhasználói jelzésre): a BRAILLE GYAKORLAT eddig az ANGOL pontírás-táblát tanította. Mostantól a HIVATALOS MAGYAR tábla van benne, két hiteles forrással egyeztetve: a z helyesen 1-2-6 (nem 1-3-5-6), a q 1-2-3-4-6, és végre benne van mind a kilenc ékezetes magánhangzó (á é í ó ö ő ú ü ű), valamint a hét kétjegyű mássalhangzó (cs, gy, ly, ny, sz, ty, zs), amelyek a magyar pontírásban EGYETLEN jelet kapnak. A játék indításkor megkérdezi, mit gyakorolnál: alapbetűk, ékezetesek, kétjegyűek vagy a teljes magyar ábécé; rossz válasznál a valódi Braille-cellát is megmutatja. Akadálymentes játékok két menüben: Retró játékok és SuperDL saját játékok. ÚJ JÁTÉKOK: Az országút harcosa – teljes, elágazó kalandkönyv (Ian Livingstone nyomán, Dr. Földi János programja szerint), Fighting Fantasy statisztikákkal és harcrendszerrel; Maya és Awari – klasszikus gödörjátékok (mancala) a gép ellen, vak-first; Varázsgömb – figyelem-játék (Schuck Antal nyomán); Ki nevet a végén – a klasszikus társas a gép ellen; Egy szó mint száz – szó-dedukció meghatározással. A SZERENCSEKERÉK helyi módja MODERN, vakosan szép felületet kapott: pörgetés GOMBBAL, majd BEÍRSZ egy betűt a mezőbe – bármelyikre tippelhetsz, MAGÁN- és MÁSSALHANGZÓRA egyaránt (nincs többé „magánhangzó-vétel”, sem helyben, sem online) –, vagy beírod a teljes megfejtést; 2–4 fő (te + gépi ellenfelek), minden felolvasva, a gépek beszólnak és él a közönség. Az élő tesztelők kérésére korábban finomodott (helyben ÉS online): a kategória és a szószám MINDEN fordulóban elhangzik, a megfejtendő sor mindig a szerkesztőmező alján, külön mezőben van (nem kell felfelé nyilazni), a forró billentyűk megbízhatóbbak (Alt+P, T, G, és Enter a beviteli mezőben), és az ismételt betűre már azt mondja, hogy elhangzott. Az online Szerencsekerékhez csak internet kell. ÚJ: az UNO, a BLACKJACK, a PÓKER és az ORSZÁG-VÁROS mostantól ONLINE is játszható több gépről, egymástól távol – host-hiteles játékkal, csevegéssel; csak internet kell. A PÓKER ötlapos húzós, tétkörökkel (ante, passz/megadás/emel/bedob, csere, leleplezés); mindenki csak a saját lapjait látja a leleplezésig. Az Ország-Város online valós idejű: MINDEN gép helyben pörgeti az ábécét, és aki ELSŐKÉNT nyomja meg a STOP-ot, annak a betűje lesz a köré (sosem a gép dönt!); utána mindenki beírja a kategóriánkénti szavakat, a pontozás a szó jóságáért jár PLUSZ egyediségi bónusz, ha csak te írtad. A kártyáknál a host meg is állíthatja (szüneteltetheti) a játékot. Az UNO-nál MINDENKI CSAK A SAJÁT lapjait látja (más lapjaiból csak a darabszámot); a Blackjackben egy közös osztó ellen mentek, a lapok nyíltak, csak az osztó egyik lapja rejtett a felfedésig. 104 rejtvény; a hangok a fejlesztő saját, jogtiszta anyaga. Korábbról: Ország-Város-Fiú-Lány, Kockapóker, Totó, Számfejtő, Malom, Mozaik, Gépi ének, Milliomos kvíz és sok más.",
-      "latest": {
-        "version": "1.16.0",
-        "min_core_api": "1.0",
-        "min_core_version": "4.1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.16.0/jatekok-1.16.0.zip",
-        "sha256": "a334efa9718caeae3a959c4d15cf009aa20a61ed5e720b66603880b4f4c24b7b",
-        "size": 14772150
-      }
-    },
-    {
       "id": "atjaro",
       "name": "Átjáró (telefon)",
       "category": "Eszközök",
@@ -179,34 +14,6 @@
         "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-atjaro-1.0.2/atjaro-1.0.2.zip",
         "sha256": "19a3d2d3f24cd7d755f3b1c052b01e9484833aea609f4b1af60b868ad7279f45",
         "size": 20053
-      }
-    },
-    {
-      "id": "mail",
-      "name": "Super Mail (e-mail)",
-      "category": "Kommunikáció",
-      "description": "JAVÍTVA (Dr. Kiss István hibajelentése nyomán): AZ ENTER A LEVÉLLISTÁN BEZÁRHATTA AZ EGÉSZ PROGRAMOT. Ha a levéllistán nem volt kijelölve levél – például egy frissítés után –, és Entert ütöttél, nem a levélmodul állt meg, hanem a teljes SuperDL kilépett, figyelmeztetés nélkül. Az ok a lista természetében volt: a levéllistán TÖBB levelet is ki lehet jelölni, és az ilyen listától a rendszer nem engedi megkérdezni, hogy „melyik az egy kijelölt sor” – aki mégis megkérdezi, azt a rendszer megállítja. A program három helyen kérdezte így, mindig pont arra az esetre tartalékként, amikor nincs kijelölés – vagyis maga a tartalék volt a hiba. Ugyanez ott volt a listát újrarajzoló ágban is (a megjelenítendő mezők módosításakor), és az ráadásul a többszörös kijelölést is elvesztette; mostantól mindet visszateszi. És ha tényleg nincs kijelölt levél, a program NEM hallgat: megmondja, hogy a fel-le nyíllal válassz egyet. ÚJ (Dávid kérésére): ÖSSZETETT SZABÁLYOK – ÖT ÚJ MŰVELET ÉS ÁTÉPÍTETT SZERKESZTŐ. A szabály műveletei mostantól VÉGIGNYILAZHATÓ LISTÁT alkotnak, ugyanúgy, ahogy a feltételek – Új művelet, Szerkesztés, Törlés gombokkal. Eddig pipa-oszlop volt: nyolc pipánál még elfért, tizenháromnál már nem, és felolvasva minden pipa egy külön nyíl-lépés volt akkor is, ha nem érdekelt. Most minden sor EGY MONDAT: „áthelyezés ide: Számlák”, „emlékeztess rá holnap ilyenkor”, „mondja ki érkezéskor: Megjött a NAV”. ÖT ÚJ MŰVELET: EMLÉKEZTESS RÁ (egy óra, négy óra, holnap ilyenkor, három nap vagy egy hét múlva – a program a megadott időben SZÓL a levélről; szándékosan nem mozgatja sehova, mert az ütközne az áthelyezéssel, és nem értenéd, hova tűnt a leveled); BEJEGYZÉS A NAPTÁRBA (a levél a SuperDL naptárába kerül a saját időpontjával – a levél SZÖVEGÉBEN talált időpont kiolvasása továbbra is a megnyitott levél Ctrl+D-je, mert a szabályok csak a fejléceket látják); TOVÁBBÍTÁS IDE (a levél továbbmegy egy megadott címre – ez levélküldés a nevedben, ezért a program KIMONDJA, a kimenőn át megy, tehát a Ctrl+Z visszavonja, és a saját címedre sosem továbbít, hogy ne keletkezzen végtelen kör); MONDJA KI ÉRKEZÉSKOR (saját mondat, ami az ilyen levél megjöttekor elhangzik – „Megjött a NAV levele”); és a már meglévő AUTOMATA VÁLASZ, ami most szintén a művelet-listából állítható be, tárggyal együtt. ÜTKÖZÉS-ELLENŐRZÉS MENTÉSKOR: ha egy szabály Kukába is tenné és át is helyezné a levelet, vagy ugyanabba a mappába másolna és helyezne át, a program szól – eddig némán az egyik győzött, és nem lehetett tudni, miért nem oda került a levél, ahova vártad. A művelet-szerkesztőben mindig CSAK annyi mező van, amennyi az adott művelethez kell: mappát választasz, időt választasz, vagy szöveget írsz – a többi mező eltűnik, és a program kimondja, mit kell megadni. A régi szabályaid változatlanul betöltődnek, a fájlformátum nem változott. JAVÍTVA (Dávid jelzésére): az AUTOMATA VÁLASZ a GYORS ÚTON is ott van. A Ctrl+Shift+R („Szabály ebből a levélből”) a leggyakoribb út – rááll a levélre, egy billentyű, kész –, az automata válasz viszont először csak a teljes szabály-szerkesztőbe került bele, így a gyors párbeszédben hiába kereste. Mostantól ott is van egy pipa és egy szövegmező; a tárgy ilyenkor „Re:” és az eredeti levél tárgya. ÚJ (Dávid kérésére): AUTOMATA VÁLASZ A SZABÁLYOKBAN. Egy szabályhoz megírhatsz egy levelet, és akire a szabály illik, az megkapja válaszul – például „minden ettől a feladótól” mellé egy „megkaptam, holnap válaszolok” üzenetet. A szabály szerkesztőjében egy pipa, egy tárgy-mező (üresen hagyva „Re:” és az eredeti tárgy) és egy szövegmező. A szövegbe írhatod: [feladó], [cím], [tárgy], [dátum], [idő] – ezeket a program kitölti; amit elgépelsz, az NEM tűnik el némán, hanem úgy megy el, ahogy beírtad, mert a néma elnyelés vakon sokkal rosszabb, mint a látható hiba. A PRÓBA gomb megmutatja, pontosan milyen levél menne és kinek – küldés nélkül. A válasz a MEGLÉVŐ kimenő soron megy: visszavonható a Ctrl+Z-vel, ott lesz az Elküldött mappában, és ugyanúgy naplózódik, mint bármi, amit te küldesz – nem lesz belőle külön, átláthatatlan csatorna. Szabályos válasz: In-Reply-To és References fejléccel a beszélgetéshez fűződik, és „Auto-Submitted: auto-replied” jelöléssel közli a másik oldal programjával, hogy ez gép volt, ne válaszoljon rá. RETESZEK, amiket nem lehet kikapcsolni: egy címre naponta EGY válasz megy (ha ugyanaz a feladó napon belül tízszer ír, egy választ kap); és SOHA nem megy automata válasz levelezőlistára (ott a válasz a lista minden tagjához menne), hírlevélre vagy reklámra, no-reply és mailer-daemon típusú címre, kézbesítési hibaüzenetre, tömeges küldeményre, más automata levélre, sem a saját címedre. A küldést a program KI IS MONDJA – nem megy levél a nevedben a hátad mögött. Egyetlen főkapcsoló a Beállítások → Általános lapon: „Az automata válaszok engedélyezve” – ezzel egy mozdulattal leáll az összes, nem kell szabályonként végigmenni. És ha bepipálod az automata választ, de nem írsz hozzá szöveget, a mentés rákérdez, mert egy „bekapcsoltam, de nem működik” hiba vakon órákig kereshető. FONTOS TISZTÁZÁS: az „egy levélre több szabály” már eddig is működött, csak nem volt látható – egy szabályba több művelet is tehető (áthelyezés ÉS jelölés ÉS automata válasz), és ha egy levélre két szabály illik, a műveleteik összeadódnak. ÚJ (Dávid kérésére): MEGFORDÍTHATÓ LEVÉLSORREND. Eddig mindig a legújabb levél volt legfelül. Van, akinek az a kényelmes, ha a legfrissebb LEGALUL van – mostantól ez beállítható: Beállítások → Általános → „A legújabb levél helye”. Menet közben, egyetlen mappára is megfordíthatod a Ctrl+Shift+E-vel (ez nem írja felül a mentett beállítást), és ott van a Fiók menüben meg a Parancsok listájában (Ctrl+K) is. Fontos, hogy mit NEM változtat: a program továbbra is ugyanazokat a legfrissebb leveleket tölti le, csak a felolvasás sorrendje más – és a kurzor MINDIG a legfrissebb levélre áll, akárhol is legyen az, mert nem a pozíció számít, hanem hogy az új levél ott legyen az ujjad alatt. Két apróságra külön figyeltünk: fordított sorrendnél a „B betűvel tölthetsz be továbbiakat” mondat a lista TETEJÉN hangzik el (mert a régebbi levelek oda kerülnek), és a lapozással behúzott régebbi adag is a lista elejére megy, nem a végére – így a sorrend sosem keveredik össze. Az Összes bejövő, a keresés, az Okos mappák és a Beszélgetések nézet is követi a beállítást. ÚJ (Dávid kérésére): A FIÓK-BEÁLLÍTÁSNÁL CSAK AZ A PROTOKOLL MEZŐI LÁTSZANAK, AMELYIKET VÁLASZTOTTAD. Ha POP3-at jelölsz be, eltűnik az IMAP szerver és port; ha IMAP-ot, eltűnik a POP3 szerver és port. Vakon ez nem szépészeti kérdés: minden fölösleges mező egy külön lépés a nyíllal, és egy „ezt is ki kell tölteni?” bizonytalanság. Az SMTP mindig ott marad, mert a küldés mindkét protokollnál azzal megy. TISZTÁZVA: MIÉRT CSAK A BEÉRKEZETT LÁTSZIK POP3-NÁL. Mert a POP3 protokoll nem ismeri a mappákat: a szolgáltatónál egyetlen postaláda van, az Elküldött, a Piszkozatok és a Kuka pedig IMAP-fogalmak. Ez nem a program hibája és nem is a szolgáltatóé – csak eddig ezt nem MONDTUK meg, ezért volt, aki több szolgáltatót is végigpróbált, hátha nálunk a baj. Mostantól a program elmondja, miért van így, és azt is, hogy IMAP-ra váltva minden mappát látnál – ha ismerjük a szolgáltatód IMAP-szerverét, meg is mondja a nevét. JAVÍTVA (Dávid jelzésére): a HELYBEN FUTÓ FORDÍTÓ nem jelent meg az F9 listájában – csak a két olyan fordítót ajánlotta fel, amelyiknél a levél szövege elhagyja a gépet. Pedig a helyben futó motor ott volt a programban, végig. Az ok: a kész programból helytakarékosságból kimarad a fordítómotor egy alcsomagja (a modell-ÁTALAKÍTÓ, ami 365 megabájt fölösleget hozna magával), a motor viszont indításkor feltétel nélkül kereste – így a program azt hitte, egyáltalán nincs helyben futó fordítás, és szó nélkül elhagyta a listáról. Forrásból futtatva sosem látszott a hiba. Most már megjelenik; ez a modulfrissítés a program újraépítése nélkül is meghozza. ÚJ: ALAPÉRTELMEZETT FORDÍTÓ (felhasználói kérésre). Eddig minden F9 egy kérdéssel indult: melyik fordítóval? Akinek megvan a döntése, annak ez naponta tíz fölösleges párbeszéd volt. Mostantól a Beállítások → Általános lapon egy legördülő listából kiválaszthatod az alapértelmezett fordítót (helyben a gépeden / ingyenes online / saját AI-kulcs), és az F9 attól kezdve azonnal fordít, kérdés nélkül. Az alapértelmezés továbbra is a „kérdezzen rá” – aki nem nyúl hozzá, annál semmi nem változik, és a levél szövege sosem hagyja el a gépet a háta mögött. HA A HELYBEN FUTÓ FORDÍTÁST VÁLASZTOD, A NYELVI CSOMAGOK MAGUKTÓL, CSENDBEN LETÖLTŐDNEK: mentéskor a háttérben megkezdi az angol csomag letöltését (ezen keresztül fordul minden más nyelv magyarra), a program közben végig használható, és a végén egy rövid mondattal szól, hogy kész. Ha később olyan nyelvű levél jön, amihez még hiányzik csomag, azt is magától letölti fordítás közben – csak annyit mond, hogy ezért tart tovább. Ha a letöltés nem sikerül, nem kapsz hibaablakot: a fordítás online motorral akkor is megy, és később újra próbálja. Ha a beállított fordító egy régebbi programverzióban nem elérhető, a program nem hibázik, hanem visszalép a kérdésre. JAVÍTVA (Farkas István jelzésére): a levél fordítása közben feljöhetett egy nyers, angol hibaüzenet – „HTTP Error 429: Too Many Requests”. Ez az ingyenes fordító napi kerete, de a felhasználó ebből semmit nem tudott meg. A programban benne volt a szép magyar figyelmeztetés, csak sosem jutott el odáig: a szolgáltató kétféleképpen közli a korlátot, és a HTTP-hibaként érkező változat megkerülte az ellenőrzést. Mostantól érthető mondatot kapsz, a kiúttal együtt (helyben futó fordítás vagy saját AI-kulcs); ugyanígy beszédes üzenet jön a szolgáltatói üzemzavarra és arra is, ha nincs internet. ÚJ: LEVÉL-FONTOSSÁG. A levélírás ablakában beállítható, mennyire sürgős a levél (alacsony / közepes / magas / nagyon sürgős) – a címzett levelezőprogramja ezt jelzi neki. A beérkező fontos és sürgős leveleknél a jelzés a listasor ELEJÉN hangzik el, érkezéskor pedig a program ki is mondja („SÜRGŐS levél!”); a megnyitott levélnél a fontosság a feladó előtt hangzik el. A közepes sosem hangzik el (az az alapeset). Kikapcsolható: Beállítások → Általános → „Mondja be és jelezze a levél fontosságát”. JAVÍTVA (István jelzésére): a CSATOLMÁNY végre látszik a levéllistában, és az új levél érkezésekor a program KI IS MONDJA. Eddig soha nem jelent meg a jelzés, mert a listához csak a fejléceket töltjük le, a melléklet viszont a levél testében van – mostantól a levél szerkezetét is lekérjük, így a melléklet a levél letöltése nélkül is kiderül. A levélbe ágyazott képek és a digitális aláírások NEM számítanak mellékletnek. ÚJ BEÁLLÍTÁS (felhasználói kérésre): „Válasz után záruljon be az eredeti levél ablaka” – ha külön ablakban olvasol egy levelet és válaszolsz rá, az eredeti alapból nyitva marad (így vissza tudsz olvasni belőle); ezzel a pipával viszont bezárul, és csak a válasz marad. A Válasz mindenkinek és a levelezőlistára válasz is így viselkedik. NAGY FRISSÍTÉS. SZABÁLYOK: a levelek automatikus rendezése mappákba (levelezőlista, hírlevél, feladó, tárgy, méret, csatolmány szerint), a mappát a program létre is hozza; a leggyorsabb út a Ctrl+Shift+R: szabály a KIJELÖLT levélből. Próba gomb (megmondja, mire illene, mozgatás nélkül), sorrend, ki-be kapcsolás, és a rendezés VISSZAVONHATÓ. KÜLDÉS VISSZAVONÁSA: a levél 10 másodpercig (állítható) még nálad vár, a Ctrl+Z visszavonja. IDŐZÍTETT KÜLDÉS (Ctrl+Shift+I) akár ÉVENTE ISMÉTLŐDVE (születésnap): a levél a SuperDL naptárában is megjelenik, és a küldés előtti napon a program rákérdez. BIZTONSÁG: a program kimondja, ha a feladó neve és a valódi címe nem stimmel, ha a cím megtévesztően hasonló, ha a levél jelszót kér és sürget, ha egy hivatkozás máshova visz, mint amit mutat, vagy ha a csatolmány programot indítana. LEIRATKOZÁS EGY BILLENTYŰVEL (Ctrl+U). TÉRTIVEVÉNY: kérhető visszajelzés az elolvasásról, és látod, melyikre jött meg – őszintén jelezve, hogy ez kérés, nem nyugta; ha tőled kérik, a program megkérdez, és soha nem küld a hátad mögött. EMLÉKEZTESS RÁ KÉSŐBB (Ctrl+H): a levél a választott időpontban magától visszajön a Beérkezettbe; küldéskor kérhető jelzés, ha 5 napon belül nincs válasz. IDŐPONT A NAPTÁRBA (Ctrl+D): a levélben említett időpont egy billentyűvel a SuperDL naptárába kerül. SABLONOK (Ctrl+Shift+T) kitölthető helyekkel. OKOS MAPPÁK (Ctrl+Shift+O): mentett szűrők – Olvasatlan, Csatolmányos, Hírlevelek, Levelezőlisták, Számlák, Nagy levelek. CSATOLMÁNY FELOLVASÁSA (Ctrl+Shift+L): a PDF/Word/EPUB csatolmány szövege felolvasható mezőben, külön program nélkül. BESZÉLGETÉSEK (Ctrl+Shift+B) és IDÉZET-ÁTUGRÁS (Ctrl+I): a válaszban alapból csak az ÚJ rész látszik. PARANCSOK (Ctrl+K): minden művelet egy listában. TAKARÍTÁS: hírlevelek, listás és nagy levelek tömeges rendezése – előnézettel és visszavonással. OFFLINE OLVASÁS: hálózat nélkül a helyi másolat. BECENEVEK a címjegyzékben. POSTAFIÓK MENTÉSE szabványos mbox-fájlba: az adatod a tiéd. Vak-first, teljesen akadálymentes e-mail kliens – kizárólag emailezés: leveleket olvasol, küldesz és keresel (IMAP, POP3, SMTP). Hitelesítés APP-JELSZÓVAL: a valódi fő-jelszavadat sosem adod meg, hanem egy dedikált, csak a Super Mailhez szóló app-jelszót, amit te hozol létre a saját fiókodban és bármikor visszavonhatsz – így az azonosságod és a fiókod végig a te kezedben marad. Bármilyen szolgáltató kézzel is beállítható (Freemail, Citromail, céges, saját domain): a szerver-nevek és a portok felülírhatók. Adatvédelem az első helyen: az első indításkor hozzájárulást kérünk, és világosan közöljük, hogy SEMMIT, DE SEMMIT nem továbbítunk sehová – a program közvetlenül a te e-mail-szolgáltatód szerveréhez csatlakozik, semmi máshoz, a fiók-adatok pedig a te gépeden, a Windows DPAPI-titkosításával élnek. Nincs naptár, nincs telemetria, nincs felhő, nincs külső belépés. A HTML-levelek távoli képei alapból nem töltődnek be (nyomkövetés ellen). Bármikor visszavonható: a fiók törlésével a tárolt app-jelszó véglegesen törlődik. ÚJ: HELYESÍRÁS-ELLENŐRZŐ a levélíráshoz – a Windows beépített (magyar) szótárával, tehát nincs letöltendő szótár; a levél szövegének helyi menüjéből (jobb gomb) bármikor be- és kikapcsolható, F7-tel azonnal indítható, és vak-first: a hibákat FELSOROLJA javaslatokkal, amiket Enterrel cserélhetsz (vagy felveheted a szót a szótáradba). Csak a saját fiókjaidhoz. ÚJ: válasznál a kurzor rögtön a levél szövegének elejére ugrik; „Összes bejövő” a mappalista élén, időrendben; a lista szélén hangjelzés az ismételgetés helyett. ÚJ: PISZKOZAT – bezáráskor rákérdez, és a szolgáltatód Piszkozatok mappájába menti (Ctrl+S menet közben); ALÁÍRÁS – szabadon szerkeszthető, a levél alján mindig ott a „Super Mail-lel küldve.” sor; a küldés-kérdés kikapcsolható (és bármikor visszakapcsolható). ÚJ: BESZÚRÁS – hivatkozás (nem kötelező magyarázó szöveggel), kép a levél testébe, videó-hivatkozás; ilyenkor HTML-t ÉS sima szöveget is küld. Ctrl+V-vel a vágólapon lévő fájl vagy kép csatol",
-      "latest": {
-        "version": "1.5.0",
-        "min_core_api": "1.0",
-        "min_core_version": "4.2.7",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mail-1.5.0/mail-1.5.0.zip",
-        "sha256": "c0c42277354d4c8c9f6d64939e962c22e7846b30f96a3c8e16790bf474f3af3c",
-        "size": 205665
-      }
-    },
-    {
-      "id": "tavsegitseg",
-      "name": "Távsegítség (távvezérlés)",
-      "category": "Kommunikáció",
-      "description": "Vak-first, akadálymentes TÁVSEGÍTSÉG: egy megbízható ember távolról segíthet a gépeden, vagy te segíthetsz valakinek – szoba-kóddal, szerver nélkül, csak internettel (mint a Csevejcenternél). Két szerep: „Segítséget kérek” (téged irányítanak) és „Segítek” (te irányítasz). A segített szobát nyit, kap egy rövid, bemondható kódot, és elküldi a MEGBÍZHATÓ segítőjének. Amint a kapcsolat él, a segítő HALLJA a segített gépét – benne a képernyőolvasó beszédét is (rendszerhang-átvitel) –, így vak is tud vaknak segíteni. Az IRÁNYÍTÁST a segített KÜLÖN, egy leokézható beleegyezés után engedélyezi; ekkor a segítő billentyűi (a képernyőolvasó-parancsok is) a másik gépre mennek. BIZTONSÁG az első helyen és felügyelt módban: minden munkamenetet a segített indít és minden irányítást ő engedélyez; a Ctrl+Alt+Pause rendszer-gyorsbillentyű (vagy a pánik gomb) bármikor AZONNAL bontja a vezérlést; nincs felügyelet nélküli, rejtett hozzáférés. A JAWS Tandem / NVDA Remote alternatívája, mert mindkét fél már fenn van a SuperDL-en (nincs külön licenc/bővítmény). Kizárólag megbízható, kölcsönös segítségre – az irányítás bizalmi funkció.",
-      "latest": {
-        "version": "1.0.1",
-        "min_core_api": "1.0",
-        "min_core_version": "4.2.7",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-tavsegitseg-1.0.1/tavsegitseg-1.0.1.zip",
-        "sha256": "35fae75d5b315e1668c4ab60004ed3dfec94599642a8fd6d7a23ffc646e14934",
-        "size": 26476
       }
     },
     {
@@ -224,6 +31,47 @@
       }
     },
     {
+      "id": "docconvert",
+      "name": "Dokumentum-konverter",
+      "category": "Könyvek",
+      "description": "JAVÍTVA (Laci jelzésére): az UTF-16 kódolású szövegfájlok (a Jegyzettömb „Unicode” mentése) eddig úgy jöttek át, hogy a betűk közé szóköz került; mostantól a program felismeri őket, BOM-mal és anélkül is. A fájl→fájl átalakításnál a TABULÁTOROS TAGOLÁS és a sorkezdő behúzás is megmarad (műsorlisták, táblázatos jegyzetek). Dokumentumok átalakítása formátumok közt (TXT, DOCX, EPUB, PDF, HTML, RTF, ODT, Markdown…), beépített PDF-fel és OCR-rel. ÚJ: kötegelt mód – több fájl vagy egy egész mappa egyszerre, mindegyik a saját fájljába VAGY egyetlen fájlba összefűzve.",
+      "latest": {
+        "version": "1.3.3",
+        "min_core_api": "1.0",
+        "min_core_version": "4.0.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-docconvert-1.3.3/docconvert-1.3.3.zip",
+        "sha256": "6d9673c057cc22ff1dadbb45068520158be6f2272167ebf32f6222305cc33176",
+        "size": 16736
+      }
+    },
+    {
+      "id": "felolvaso",
+      "name": "Felirat-felolvasó lejátszó",
+      "category": "Média",
+      "description": "Idegen nyelvű film (vagy hangfájl) lejátszása úgy, hogy a magyar (vagy bármely szöveges) feliratot SZINKRONBAN, választható hanggal (helyi SAPI, Edge neurális online, vagy beépített eSpeak) felolvassa – így vakon is követhető az idegen nyelvű film. A film mellé tett .srt/.vtt feliratot magától megtalálja, a fájlba ágyazott szöveges feliratsávot is kezeli. A YouTube-link is beilleszthető – a videó hangját streameli, a feliratot (kézi, vagy a YouTube automatikus, magyarra fordított feliratát) letölti és felolvassa. A felolvasás TEMPÓJA állítható (alapból gyors, hogy tartsa a lépést a filmfelirattal), és a következő sort előre legyártja, így a neurális hang sem csúszik. ÚJ: a hangerő (Ctrl+fel/le) és az F-billentyűk (F1/F6/F7/F8) most MINDEN vezérlőn működnek, az F8 állapot-bemondás képernyőolvasó-módban is hallható, és ha a választott hang hibázik, HALLOD az okát (nem csak eSpeak-re vált némán).",
+      "latest": {
+        "version": "1.4.8",
+        "min_core_api": "1.0",
+        "min_core_version": "3.29.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-felolvaso-1.4.8/felolvaso-1.4.8.zip",
+        "sha256": "3f0d81a3709faacc5918db68dd2d4142e1a2238d3c591347ff004f780b348f53",
+        "size": 23641
+      }
+    },
+    {
+      "id": "hangalamondas",
+      "name": "AI hangalámondás",
+      "category": "AI",
+      "description": "AI hangalámondás (audio description) videóhoz: a videó képi tartalmát AI írja le és hanggal mondja el, az eredeti hang alatta halkítva – így a videó vakon is „nézhető”. A leírás részletessége és elhelyezése (párbeszéd-szünet / kiterjesztett) választható; a saját AI-kulcsoddal megy.",
+      "latest": {
+        "version": "1.0.6",
+        "min_core_api": "1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-hangalamondas-1.0.6/hangalamondas-1.0.6.zip",
+        "sha256": "b5e4097d01b241ecd83316814f739cc6351c86a1f7af3996117cb8b73d06af42",
+        "size": 11626
+      }
+    },
+    {
       "id": "iphone",
       "name": "iPhone (zene, fotó, videó)",
       "category": "Eszközök",
@@ -235,6 +83,172 @@
         "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iphone-1.1.0/iphone-1.1.0.zip",
         "sha256": "5cf1fe57971307988129e930afab1a340176afa0b7e50849de4f5ef1e72e0d99",
         "size": 38479
+      }
+    },
+    {
+      "id": "iptv",
+      "name": "Internetes TV",
+      "category": "Média",
+      "description": "Akadálymentes internetes TV (legális IPTV): saját m3u/Xtream forrás csatornái, felolvasott műsorújság (EPG), felvétel és emlékeztető, hangalámondás-sáv és élő felirat-felolvasás. ÚJ: ha nincs internet, akadálymentes felugró jelzi, újratesztelés-gombbal. Csak legális, saját előfizetésű forrásokhoz.",
+      "latest": {
+        "version": "1.0.8",
+        "min_core_api": "1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-iptv-1.0.8/iptv-1.0.8.zip",
+        "sha256": "43f18fc00008f6c632db01c6364b239615cbb71dd80f21227f265b13a17154b2",
+        "size": 17643
+      }
+    },
+    {
+      "id": "jatekok",
+      "name": "Játékok",
+      "category": "Játékok",
+      "description": "JAVÍTVA (Bizik Péter Károly jelzésére, NVDA-val tesztelve): A JÁTÉKBA LÉPVE EDDIG EGY NÉMA SZÖVEGDOBOZBAN TALÁLTAD MAGAD. A játék felolvasta a kérdést, de a fókusz azonnal a beviteli mezőre ugrott, és a képernyőolvasó saját bemondása („Válaszod, szerkesztés”) FÉLBESZAKÍTOTTA – így csak akkor derült ki, mit vár a játék, ha rossz adatot írtál be. Mostantól a beviteli mező NEVE maga az aktuális kérdés, tehát a képernyőolvasó bemondása MAGA a kérdés. Ez minden szöveges játékra hat, nem csak arra az egyre, ahol kiderült. JAVÍTVA: AZ AWARI ÉS A MAYA KÖRÖNKÉNTI BEMONDÁSA követhetetlen volt normál felolvasási sebességnél: körönként kétszer is elhangzott a teljes tábla, puszta számsorként, „(1-6)” betoldással – mire az ember felfogta, körbefutott a szöveg. Mostantól csak a SAJÁT gödreid, illetve tálaid és a két pontszám hangzik el, és minden szám a sorszámával jár („Gödreid – 1: 0, 2: 2, 3: 4”); a teljes tábla az „állás” szóra bármikor kérhető – és az „állás” most tényleg VÁLASZOL is rá, eddig csak a következő kör ismétlésére támaszkodott. Lépés után csak a lépés és az ütés hangzik el, nem az egész tábla. A kérdés pedig megmondja, mit vár és mi a kiút: „Egy szám 1-től 6-ig. A teljes állásért: állás”. JAVÍTVA: A PÓKER NEM TŰNT EL. A modulnak KÉT listája van – Retró játékok és Saját játékok –, és a Póker, az UNO, a Blackjack, a Milliomos, a Szerencsekerék meg az Ország-Város a MÁSODIKON van. Indításkor a program most megmondja, hogy két lista van és mi hol található (váltás: Ctrl+Tab). Emellett: ha egy saját ablakos játék indítása elszállt, a program eddig NÉMÁN visszaesett a szöveges konzolra, ahol az a játék nincs regisztrálva – így úgy tűnt, mintha kimaradt volna a csomagból. Mostantól a hiba a naplóba kerül, és a program meg is mondja. JAVÍTVA (felhasználói jelzésre): a BRAILLE GYAKORLAT eddig az ANGOL pontírás-táblát tanította. Mostantól a HIVATALOS MAGYAR tábla van benne, két hiteles forrással egyeztetve: a z helyesen 1-2-6 (nem 1-3-5-6), a q 1-2-3-4-6, és végre benne van mind a kilenc ékezetes magánhangzó (á é í ó ö ő ú ü ű), valamint a hét kétjegyű mássalhangzó (cs, gy, ly, ny, sz, ty, zs), amelyek a magyar pontírásban EGYETLEN jelet kapnak. A játék indításkor megkérdezi, mit gyakorolnál: alapbetűk, ékezetesek, kétjegyűek vagy a teljes magyar ábécé; rossz válasznál a valódi Braille-cellát is megmutatja. Akadálymentes játékok két menüben: Retró játékok és SuperDL saját játékok. ÚJ JÁTÉKOK: Az országút harcosa – teljes, elágazó kalandkönyv (Ian Livingstone nyomán, Dr. Földi János programja szerint), Fighting Fantasy statisztikákkal és harcrendszerrel; Maya és Awari – klasszikus gödörjátékok (mancala) a gép ellen, vak-first; Varázsgömb – figyelem-játék (Schuck Antal nyomán); Ki nevet a végén – a klasszikus társas a gép ellen; Egy szó mint száz – szó-dedukció meghatározással. A SZERENCSEKERÉK helyi módja MODERN, vakosan szép felületet kapott: pörgetés GOMBBAL, majd BEÍRSZ egy betűt a mezőbe – bármelyikre tippelhetsz, MAGÁN- és MÁSSALHANGZÓRA egyaránt (nincs többé „magánhangzó-vétel”, sem helyben, sem online) –, vagy beírod a teljes megfejtést; 2–4 fő (te + gépi ellenfelek), minden felolvasva, a gépek beszólnak és él a közönség. Az élő tesztelők kérésére korábban finomodott (helyben ÉS online): a kategória és a szószám MINDEN fordulóban elhangzik, a megfejtendő sor mindig a szerkesztőmező alján, külön mezőben van (nem kell felfelé nyilazni), a forró billentyűk megbízhatóbbak (Alt+P, T, G, és Enter a beviteli mezőben), és az ismételt betűre már azt mondja, hogy elhangzott. Az online Szerencsekerékhez csak internet kell. ÚJ: az UNO, a BLACKJACK, a PÓKER és az ORSZÁG-VÁROS mostantól ONLINE is játszható több gépről, egymástól távol – host-hiteles játékkal, csevegéssel; csak internet kell. A PÓKER ötlapos húzós, tétkörökkel (ante, passz/megadás/emel/bedob, csere, leleplezés); mindenki csak a saját lapjait látja a leleplezésig. Az Ország-Város online valós idejű: MINDEN gép helyben pörgeti az ábécét, és aki ELSŐKÉNT nyomja meg a STOP-ot, annak a betűje lesz a köré (sosem a gép dönt!); utána mindenki beírja a kategóriánkénti szavakat, a pontozás a szó jóságáért jár PLUSZ egyediségi bónusz, ha csak te írtad. A kártyáknál a host meg is állíthatja (szüneteltetheti) a játékot. Az UNO-nál MINDENKI CSAK A SAJÁT lapjait látja (más lapjaiból csak a darabszámot); a Blackjackben egy közös osztó ellen mentek, a lapok nyíltak, csak az osztó egyik lapja rejtett a felfedésig. 104 rejtvény; a hangok a fejlesztő saját, jogtiszta anyaga. Korábbról: Ország-Város-Fiú-Lány, Kockapóker, Totó, Számfejtő, Malom, Mozaik, Gépi ének, Milliomos kvíz és sok más.",
+      "latest": {
+        "version": "1.16.0",
+        "min_core_api": "1.0",
+        "min_core_version": "4.1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-jatekok-1.16.0/jatekok-1.16.0.zip",
+        "sha256": "a334efa9718caeae3a959c4d15cf009aa20a61ed5e720b66603880b4f4c24b7b",
+        "size": 14772150
+      }
+    },
+    {
+      "id": "konyvek",
+      "name": "Könyvek",
+      "category": "Könyvek",
+      "description": "JAVÍTVA (Dr. Kiss István összeomlás-naplója nyomán): A KÖNYV- ÉS HANGFÁJL-VÁLASZTÁS MOSTANTÓL A SUPERDL SAJÁT VÁLASZTÓJÁVAL MEGY, nem a Windowséval. Egy felhasználónál a program natívan KILÉPETT, miközben épp a könyv kiválasztásánál járt. Ez nem a program hibája volt: a Windows fájlválasztójába idegen bővítmények épülnek be (bélyegkép-készítő, felhő-szinkron, vírusirtó), és ha egyikük elszáll, viszi magával az egész programot – ezt a programból nem lehet elkapni. A SuperDL saját választója SEMMILYEN rendszerbővítményt nem tölt be, és vakon kényelmesebb is: két lista (mappák és fájlok), Enter a mappán belépés, Backspace vissza a szülőmappába, gyorshelyek (Asztal, Dokumentumok, Letöltések, meghajtók), és gépeléssel szűrhető, a program pedig mondja, hány találat maradt. Mind az öt helyen ez jön: könyv kiválasztása, célmappa, hangfájl megnyitása, hangoskönyv-mappa, könyv megnyitása. Ha a saját választó bármi miatt nem érhető el, a program visszalép a rendszerére – inkább a régi viselkedés, mint egy működésképtelen menüpont. Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3, választható hanggal és sebességgel). ÚJ: a kész hangoskönyv kérésre a KÖNYV MELLÉ kerül (oda, ahonnan betallóztad); darabolásnál mindig külön almappába; a végén hangjelzés (fanfár sikernél, másik jelzés hibánál), és a darab-hossz mező csak akkor jelenik meg, ha a darabolás be van kapcsolva.",
+      "latest": {
+        "version": "1.3.0",
+        "min_core_api": "1.0",
+        "min_core_version": "4.3.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-konyvek-1.3.0/konyvek-1.3.0.zip",
+        "sha256": "d3e2d680e518351922f2046944173fd2bb124a4d0293d4f6705007b00c3148e3",
+        "size": 36832
+      }
+    },
+    {
+      "id": "mail",
+      "name": "Super Mail (e-mail)",
+      "category": "Kommunikáció",
+      "description": "JAVÍTVA (Dr. Kiss István hibajelentése nyomán): AZ ENTER A LEVÉLLISTÁN BEZÁRHATTA AZ EGÉSZ PROGRAMOT. Ha a levéllistán nem volt kijelölve levél – például egy frissítés után –, és Entert ütöttél, nem a levélmodul állt meg, hanem a teljes SuperDL kilépett, figyelmeztetés nélkül. Az ok a lista természetében volt: a levéllistán TÖBB levelet is ki lehet jelölni, és az ilyen listától a rendszer nem engedi megkérdezni, hogy „melyik az egy kijelölt sor” – aki mégis megkérdezi, azt a rendszer megállítja. A program három helyen kérdezte így, mindig pont arra az esetre tartalékként, amikor nincs kijelölés – vagyis maga a tartalék volt a hiba. Ugyanez ott volt a listát újrarajzoló ágban is (a megjelenítendő mezők módosításakor), és az ráadásul a többszörös kijelölést is elvesztette; mostantól mindet visszateszi. És ha tényleg nincs kijelölt levél, a program NEM hallgat: megmondja, hogy a fel-le nyíllal válassz egyet. ÚJ (Dávid kérésére): ÖSSZETETT SZABÁLYOK – ÖT ÚJ MŰVELET ÉS ÁTÉPÍTETT SZERKESZTŐ. A szabály műveletei mostantól VÉGIGNYILAZHATÓ LISTÁT alkotnak, ugyanúgy, ahogy a feltételek – Új művelet, Szerkesztés, Törlés gombokkal. Eddig pipa-oszlop volt: nyolc pipánál még elfért, tizenháromnál már nem, és felolvasva minden pipa egy külön nyíl-lépés volt akkor is, ha nem érdekelt. Most minden sor EGY MONDAT: „áthelyezés ide: Számlák”, „emlékeztess rá holnap ilyenkor”, „mondja ki érkezéskor: Megjött a NAV”. ÖT ÚJ MŰVELET: EMLÉKEZTESS RÁ (egy óra, négy óra, holnap ilyenkor, három nap vagy egy hét múlva – a program a megadott időben SZÓL a levélről; szándékosan nem mozgatja sehova, mert az ütközne az áthelyezéssel, és nem értenéd, hova tűnt a leveled); BEJEGYZÉS A NAPTÁRBA (a levél a SuperDL naptárába kerül a saját időpontjával – a levél SZÖVEGÉBEN talált időpont kiolvasása továbbra is a megnyitott levél Ctrl+D-je, mert a szabályok csak a fejléceket látják); TOVÁBBÍTÁS IDE (a levél továbbmegy egy megadott címre – ez levélküldés a nevedben, ezért a program KIMONDJA, a kimenőn át megy, tehát a Ctrl+Z visszavonja, és a saját címedre sosem továbbít, hogy ne keletkezzen végtelen kör); MONDJA KI ÉRKEZÉSKOR (saját mondat, ami az ilyen levél megjöttekor elhangzik – „Megjött a NAV levele”); és a már meglévő AUTOMATA VÁLASZ, ami most szintén a művelet-listából állítható be, tárggyal együtt. ÜTKÖZÉS-ELLENŐRZÉS MENTÉSKOR: ha egy szabály Kukába is tenné és át is helyezné a levelet, vagy ugyanabba a mappába másolna és helyezne át, a program szól – eddig némán az egyik győzött, és nem lehetett tudni, miért nem oda került a levél, ahova vártad. A művelet-szerkesztőben mindig CSAK annyi mező van, amennyi az adott művelethez kell: mappát választasz, időt választasz, vagy szöveget írsz – a többi mező eltűnik, és a program kimondja, mit kell megadni. A régi szabályaid változatlanul betöltődnek, a fájlformátum nem változott. JAVÍTVA (Dávid jelzésére): az AUTOMATA VÁLASZ a GYORS ÚTON is ott van. A Ctrl+Shift+R („Szabály ebből a levélből”) a leggyakoribb út – rááll a levélre, egy billentyű, kész –, az automata válasz viszont először csak a teljes szabály-szerkesztőbe került bele, így a gyors párbeszédben hiába kereste. Mostantól ott is van egy pipa és egy szövegmező; a tárgy ilyenkor „Re:” és az eredeti levél tárgya. ÚJ (Dávid kérésére): AUTOMATA VÁLASZ A SZABÁLYOKBAN. Egy szabályhoz megírhatsz egy levelet, és akire a szabály illik, az megkapja válaszul – például „minden ettől a feladótól” mellé egy „megkaptam, holnap válaszolok” üzenetet. A szabály szerkesztőjében egy pipa, egy tárgy-mező (üresen hagyva „Re:” és az eredeti tárgy) és egy szövegmező. A szövegbe írhatod: [feladó], [cím], [tárgy], [dátum], [idő] – ezeket a program kitölti; amit elgépelsz, az NEM tűnik el némán, hanem úgy megy el, ahogy beírtad, mert a néma elnyelés vakon sokkal rosszabb, mint a látható hiba. A PRÓBA gomb megmutatja, pontosan milyen levél menne és kinek – küldés nélkül. A válasz a MEGLÉVŐ kimenő soron megy: visszavonható a Ctrl+Z-vel, ott lesz az Elküldött mappában, és ugyanúgy naplózódik, mint bármi, amit te küldesz – nem lesz belőle külön, átláthatatlan csatorna. Szabályos válasz: In-Reply-To és References fejléccel a beszélgetéshez fűződik, és „Auto-Submitted: auto-replied” jelöléssel közli a másik oldal programjával, hogy ez gép volt, ne válaszoljon rá. RETESZEK, amiket nem lehet kikapcsolni: egy címre naponta EGY válasz megy (ha ugyanaz a feladó napon belül tízszer ír, egy választ kap); és SOHA nem megy automata válasz levelezőlistára (ott a válasz a lista minden tagjához menne), hírlevélre vagy reklámra, no-reply és mailer-daemon típusú címre, kézbesítési hibaüzenetre, tömeges küldeményre, más automata levélre, sem a saját címedre. A küldést a program KI IS MONDJA – nem megy levél a nevedben a hátad mögött. Egyetlen főkapcsoló a Beállítások → Általános lapon: „Az automata válaszok engedélyezve” – ezzel egy mozdulattal leáll az összes, nem kell szabályonként végigmenni. És ha bepipálod az automata választ, de nem írsz hozzá szöveget, a mentés rákérdez, mert egy „bekapcsoltam, de nem működik” hiba vakon órákig kereshető. FONTOS TISZTÁZÁS: az „egy levélre több szabály” már eddig is működött, csak nem volt látható – egy szabályba több művelet is tehető (áthelyezés ÉS jelölés ÉS automata válasz), és ha egy levélre két szabály illik, a műveleteik összeadódnak. ÚJ (Dávid kérésére): MEGFORDÍTHATÓ LEVÉLSORREND. Eddig mindig a legújabb levél volt legfelül. Van, akinek az a kényelmes, ha a legfrissebb LEGALUL van – mostantól ez beállítható: Beállítások → Általános → „A legújabb levél helye”. Menet közben, egyetlen mappára is megfordíthatod a Ctrl+Shift+E-vel (ez nem írja felül a mentett beállítást), és ott van a Fiók menüben meg a Parancsok listájában (Ctrl+K) is. Fontos, hogy mit NEM változtat: a program továbbra is ugyanazokat a legfrissebb leveleket tölti le, csak a felolvasás sorrendje más – és a kurzor MINDIG a legfrissebb levélre áll, akárhol is legyen az, mert nem a pozíció számít, hanem hogy az új levél ott legyen az ujjad alatt. Két apróságra külön figyeltünk: fordított sorrendnél a „B betűvel tölthetsz be továbbiakat” mondat a lista TETEJÉN hangzik el (mert a régebbi levelek oda kerülnek), és a lapozással behúzott régebbi adag is a lista elejére megy, nem a végére – így a sorrend sosem keveredik össze. Az Összes bejövő, a keresés, az Okos mappák és a Beszélgetések nézet is követi a beállítást. ÚJ (Dávid kérésére): A FIÓK-BEÁLLÍTÁSNÁL CSAK AZ A PROTOKOLL MEZŐI LÁTSZANAK, AMELYIKET VÁLASZTOTTAD. Ha POP3-at jelölsz be, eltűnik az IMAP szerver és port; ha IMAP-ot, eltűnik a POP3 szerver és port. Vakon ez nem szépészeti kérdés: minden fölösleges mező egy külön lépés a nyíllal, és egy „ezt is ki kell tölteni?” bizonytalanság. Az SMTP mindig ott marad, mert a küldés mindkét protokollnál azzal megy. TISZTÁZVA: MIÉRT CSAK A BEÉRKEZETT LÁTSZIK POP3-NÁL. Mert a POP3 protokoll nem ismeri a mappákat: a szolgáltatónál egyetlen postaláda van, az Elküldött, a Piszkozatok és a Kuka pedig IMAP-fogalmak. Ez nem a program hibája és nem is a szolgáltatóé – csak eddig ezt nem MONDTUK meg, ezért volt, aki több szolgáltatót is végigpróbált, hátha nálunk a baj. Mostantól a program elmondja, miért van így, és azt is, hogy IMAP-ra váltva minden mappát látnál – ha ismerjük a szolgáltatód IMAP-szerverét, meg is mondja a nevét. JAVÍTVA (Dávid jelzésére): a HELYBEN FUTÓ FORDÍTÓ nem jelent meg az F9 listájában – csak a két olyan fordítót ajánlotta fel, amelyiknél a levél szövege elhagyja a gépet. Pedig a helyben futó motor ott volt a programban, végig. Az ok: a kész programból helytakarékosságból kimarad a fordítómotor egy alcsomagja (a modell-ÁTALAKÍTÓ, ami 365 megabájt fölösleget hozna magával), a motor viszont indításkor feltétel nélkül kereste – így a program azt hitte, egyáltalán nincs helyben futó fordítás, és szó nélkül elhagyta a listáról. Forrásból futtatva sosem látszott a hiba. Most már megjelenik; ez a modulfrissítés a program újraépítése nélkül is meghozza. ÚJ: ALAPÉRTELMEZETT FORDÍTÓ (felhasználói kérésre). Eddig minden F9 egy kérdéssel indult: melyik fordítóval? Akinek megvan a döntése, annak ez naponta tíz fölösleges párbeszéd volt. Mostantól a Beállítások → Általános lapon egy legördülő listából kiválaszthatod az alapértelmezett fordítót (helyben a gépeden / ingyenes online / saját AI-kulcs), és az F9 attól kezdve azonnal fordít, kérdés nélkül. Az alapértelmezés továbbra is a „kérdezzen rá” – aki nem nyúl hozzá, annál semmi nem változik, és a levél szövege sosem hagyja el a gépet a háta mögött. HA A HELYBEN FUTÓ FORDÍTÁST VÁLASZTOD, A NYELVI CSOMAGOK MAGUKTÓL, CSENDBEN LETÖLTŐDNEK: mentéskor a háttérben megkezdi az angol csomag letöltését (ezen keresztül fordul minden más nyelv magyarra), a program közben végig használható, és a végén egy rövid mondattal szól, hogy kész. Ha később olyan nyelvű levél jön, amihez még hiányzik csomag, azt is magától letölti fordítás közben – csak annyit mond, hogy ezért tart tovább. Ha a letöltés nem sikerül, nem kapsz hibaablakot: a fordítás online motorral akkor is megy, és később újra próbálja. Ha a beállított fordító egy régebbi programverzióban nem elérhető, a program nem hibázik, hanem visszalép a kérdésre. JAVÍTVA (Farkas István jelzésére): a levél fordítása közben feljöhetett egy nyers, angol hibaüzenet – „HTTP Error 429: Too Many Requests”. Ez az ingyenes fordító napi kerete, de a felhasználó ebből semmit nem tudott meg. A programban benne volt a szép magyar figyelmeztetés, csak sosem jutott el odáig: a szolgáltató kétféleképpen közli a korlátot, és a HTTP-hibaként érkező változat megkerülte az ellenőrzést. Mostantól érthető mondatot kapsz, a kiúttal együtt (helyben futó fordítás vagy saját AI-kulcs); ugyanígy beszédes üzenet jön a szolgáltatói üzemzavarra és arra is, ha nincs internet. ÚJ: LEVÉL-FONTOSSÁG. A levélírás ablakában beállítható, mennyire sürgős a levél (alacsony / közepes / magas / nagyon sürgős) – a címzett levelezőprogramja ezt jelzi neki. A beérkező fontos és sürgős leveleknél a jelzés a listasor ELEJÉN hangzik el, érkezéskor pedig a program ki is mondja („SÜRGŐS levél!”); a megnyitott levélnél a fontosság a feladó előtt hangzik el. A közepes sosem hangzik el (az az alapeset). Kikapcsolható: Beállítások → Általános → „Mondja be és jelezze a levél fontosságát”. JAVÍTVA (István jelzésére): a CSATOLMÁNY végre látszik a levéllistában, és az új levél érkezésekor a program KI IS MONDJA. Eddig soha nem jelent meg a jelzés, mert a listához csak a fejléceket töltjük le, a melléklet viszont a levél testében van – mostantól a levél szerkezetét is lekérjük, így a melléklet a levél letöltése nélkül is kiderül. A levélbe ágyazott képek és a digitális aláírások NEM számítanak mellékletnek. ÚJ BEÁLLÍTÁS (felhasználói kérésre): „Válasz után záruljon be az eredeti levél ablaka” – ha külön ablakban olvasol egy levelet és válaszolsz rá, az eredeti alapból nyitva marad (így vissza tudsz olvasni belőle); ezzel a pipával viszont bezárul, és csak a válasz marad. A Válasz mindenkinek és a levelezőlistára válasz is így viselkedik. NAGY FRISSÍTÉS. SZABÁLYOK: a levelek automatikus rendezése mappákba (levelezőlista, hírlevél, feladó, tárgy, méret, csatolmány szerint), a mappát a program létre is hozza; a leggyorsabb út a Ctrl+Shift+R: szabály a KIJELÖLT levélből. Próba gomb (megmondja, mire illene, mozgatás nélkül), sorrend, ki-be kapcsolás, és a rendezés VISSZAVONHATÓ. KÜLDÉS VISSZAVONÁSA: a levél 10 másodpercig (állítható) még nálad vár, a Ctrl+Z visszavonja. IDŐZÍTETT KÜLDÉS (Ctrl+Shift+I) akár ÉVENTE ISMÉTLŐDVE (születésnap): a levél a SuperDL naptárában is megjelenik, és a küldés előtti napon a program rákérdez. BIZTONSÁG: a program kimondja, ha a feladó neve és a valódi címe nem stimmel, ha a cím megtévesztően hasonló, ha a levél jelszót kér és sürget, ha egy hivatkozás máshova visz, mint amit mutat, vagy ha a csatolmány programot indítana. LEIRATKOZÁS EGY BILLENTYŰVEL (Ctrl+U). TÉRTIVEVÉNY: kérhető visszajelzés az elolvasásról, és látod, melyikre jött meg – őszintén jelezve, hogy ez kérés, nem nyugta; ha tőled kérik, a program megkérdez, és soha nem küld a hátad mögött. EMLÉKEZTESS RÁ KÉSŐBB (Ctrl+H): a levél a választott időpontban magától visszajön a Beérkezettbe; küldéskor kérhető jelzés, ha 5 napon belül nincs válasz. IDŐPONT A NAPTÁRBA (Ctrl+D): a levélben említett időpont egy billentyűvel a SuperDL naptárába kerül. SABLONOK (Ctrl+Shift+T) kitölthető helyekkel. OKOS MAPPÁK (Ctrl+Shift+O): mentett szűrők – Olvasatlan, Csatolmányos, Hírlevelek, Levelezőlisták, Számlák, Nagy levelek. CSATOLMÁNY FELOLVASÁSA (Ctrl+Shift+L): a PDF/Word/EPUB csatolmány szövege felolvasható mezőben, külön program nélkül. BESZÉLGETÉSEK (Ctrl+Shift+B) és IDÉZET-ÁTUGRÁS (Ctrl+I): a válaszban alapból csak az ÚJ rész látszik. PARANCSOK (Ctrl+K): minden művelet egy listában. TAKARÍTÁS: hírlevelek, listás és nagy levelek tömeges rendezése – előnézettel és visszavonással. OFFLINE OLVASÁS: hálózat nélkül a helyi másolat. BECENEVEK a címjegyzékben. POSTAFIÓK MENTÉSE szabványos mbox-fájlba: az adatod a tiéd. Vak-first, teljesen akadálymentes e-mail kliens – kizárólag emailezés: leveleket olvasol, küldesz és keresel (IMAP, POP3, SMTP). Hitelesítés APP-JELSZÓVAL: a valódi fő-jelszavadat sosem adod meg, hanem egy dedikált, csak a Super Mailhez szóló app-jelszót, amit te hozol létre a saját fiókodban és bármikor visszavonhatsz – így az azonosságod és a fiókod végig a te kezedben marad. Bármilyen szolgáltató kézzel is beállítható (Freemail, Citromail, céges, saját domain): a szerver-nevek és a portok felülírhatók. Adatvédelem az első helyen: az első indításkor hozzájárulást kérünk, és világosan közöljük, hogy SEMMIT, DE SEMMIT nem továbbítunk sehová – a program közvetlenül a te e-mail-szolgáltatód szerveréhez csatlakozik, semmi máshoz, a fiók-adatok pedig a te gépeden, a Windows DPAPI-titkosításával élnek. Nincs naptár, nincs telemetria, nincs felhő, nincs külső belépés. A HTML-levelek távoli képei alapból nem töltődnek be (nyomkövetés ellen). Bármikor visszavonható: a fiók törlésével a tárolt app-jelszó véglegesen törlődik. ÚJ: HELYESÍRÁS-ELLENŐRZŐ a levélíráshoz – a Windows beépített (magyar) szótárával, tehát nincs letöltendő szótár; a levél szövegének helyi menüjéből (jobb gomb) bármikor be- és kikapcsolható, F7-tel azonnal indítható, és vak-first: a hibákat FELSOROLJA javaslatokkal, amiket Enterrel cserélhetsz (vagy felveheted a szót a szótáradba). Csak a saját fiókjaidhoz. ÚJ: válasznál a kurzor rögtön a levél szövegének elejére ugrik; „Összes bejövő” a mappalista élén, időrendben; a lista szélén hangjelzés az ismételgetés helyett. ÚJ: PISZKOZAT – bezáráskor rákérdez, és a szolgáltatód Piszkozatok mappájába menti (Ctrl+S menet közben); ALÁÍRÁS – szabadon szerkeszthető, a levél alján mindig ott a „Super Mail-lel küldve.” sor; a küldés-kérdés kikapcsolható (és bármikor visszakapcsolható). ÚJ: BESZÚRÁS – hivatkozás (nem kötelező magyarázó szöveggel), kép a levél testébe, videó-hivatkozás; ilyenkor HTML-t ÉS sima szöveget is küld. Ctrl+V-vel a vágólapon lévő fájl vagy kép csatol",
+      "latest": {
+        "version": "1.5.0",
+        "min_core_api": "1.0",
+        "min_core_version": "4.2.7",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mail-1.5.0/mail-1.5.0.zip",
+        "sha256": "c0c42277354d4c8c9f6d64939e962c22e7846b30f96a3c8e16790bf474f3af3c",
+        "size": 205665
+      }
+    },
+    {
+      "id": "mediatools",
+      "name": "Média-eszközök",
+      "category": "Média",
+      "description": "ÚJ FORMÁTUMOK (Miki jelzésére): a konvertáló és a médiaelemző mostantól látja a ritkább hangformátumokat is – .ape (Monkey's Audio), .wv, .tta, .tak, .mpc, .dsf, .dff, .aiff, .au, .amr, .caf, .spx, .ac3, .dts, .mka, .oga, .w64 –, tehát nem kell az „összes fájl” kerülőút. Ha a Windows fájlválasztója összeomlik a gépeden (idegen bővítmény miatt), a konvertáló a SuperDL beépített, biztonságos fájlválasztóját használja. Médiakészítő és -elemző eszközök egy csomagban: kötegelt médiakonvertáló, beszélő médiaelemző (LUFS/EBU R128), iPhone csengőhang-készítő, videókészítő (kép+zene) és videóvágó-összefűző. ÚJ: a DVD-s VOB (és a többi DVD/AVCHD formátum: m2v, m2ts, mts) mostantól MAPPÁBÓL is bekerül a listába, nem csak fájlonként kiválasztva; és a DVD több VOB-darabját (VTS_01_1, VTS_01_2 …) kérésre EGY filmmé fűzi össze (bájtszintű összefűzéssel, ahogy a DVD-hez való), a menü-fájlt kihagyva – és a végén ELLENŐRZI a kész film hosszát, hogy soha ne kapj néma féleredményt.",
+      "latest": {
+        "version": "1.4.10",
+        "min_core_api": "1.0",
+        "min_core_version": "4.0.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.10/mediatools-1.4.10.zip",
+        "sha256": "ad5aa377a79f2e80cab5d9750416018b64b9e6e98c002592310b1663264ecbc7",
+        "size": 46168
+      }
+    },
+    {
+      "id": "p2p",
+      "name": "Fájl- és mappaküldés, megosztás",
+      "category": "Eszközök",
+      "description": "Fájl VAGY egész mappa eljuttatása valaki máshoz. Gépről gépre, felhő nélkül, bemondható kóddal és végpontok közötti titkosítással (magic-wormhole) – vagy ha a másik fél nincs a gépénél, feltöltés ideiglenes tárhelyre, lejáratot számon tartó megosztási előzményekkel.",
+      "latest": {
+        "version": "1.2.0",
+        "min_core_api": "1.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-p2p-1.2.0/p2p-1.2.0.zip",
+        "sha256": "961ae3bf2e678c5c9e442dfec06f215a5ea52b846fb368a5b2c1d60fdccc2b23",
+        "size": 32530
+      }
+    },
+    {
+      "id": "radio",
+      "name": "Internetes rádió",
+      "category": "Média",
+      "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: JAVÍTVA a saját állomás hozzáadása (eddig a „Hozzáadás” gomb nem mentett – most valóban a Kedvencek közé kerül, és a fókusz oda is ugrik, kijelölve az új állomást). ÚJ: „Jobb minőségű forrás” gomb – egy meglévő állomáshoz (pl. Kossuth) magasabb bitrátás stream-cím adható, előre kitöltött párbeszéddel, így jobb minőségben vehetsz fel. Az időzített felvételnél megadhatod, hogy EGYSZERI legyen, MEGADOTT SZÁMÚ alkalommal fusson, vagy KIKAPCSOLÁSIG ismételjen. Némítás (Ctrl+M). Ha nincs internet, akadálymentes felugró jelzi újratesztelés-gombbal.",
+      "latest": {
+        "version": "1.1.8",
+        "min_core_api": "1.0",
+        "min_core_version": "4.2.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-radio-1.1.8/radio-1.1.8.zip",
+        "sha256": "49fbb653d29a0b3391a9400d353f5b0f95482ea00eaa8c8d8bff45a90f3ae6c9",
+        "size": 20200
+      }
+    },
+    {
+      "id": "supermedia",
+      "name": "Super Media",
+      "category": "Média",
+      "description": "Hang-műsorszóró stúdió, felvevő, szerkesztő és multistream egy csomagban: Super M (rádió-stúdió + médialejátszó, BASS-motor), Super Recorder (akadálymentes felvevő + fülre-szerkesztő: markeres vágás, 22 effekt, vokóder/harmonizer/ének-eltávolítás/2-sáv, undo/redo), VALÓS IDEJŰ VOICE CHANGER (élő mikrofon: hangmagasság + DX8-effektek monitorozva) és Super Stream (élő multistream). A BASS/bass_fx/numpy-runtime a Core-ból jön (core 3.28.5+ ajánlott).",
+      "latest": {
+        "version": "1.3.3",
+        "min_core_api": "1.0",
+        "min_core_version": "4.0.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supermedia-1.3.3/supermedia-1.3.3.zip",
+        "sha256": "17cd96bd1e931d0a43fc0ac9b52ba53392eca6d2f8096fdf8420e761062e716c",
+        "size": 72089
+      }
+    },
+    {
+      "id": "szervezes",
+      "name": "Szervezés",
+      "category": "Szervezés",
+      "description": "Szervezés-eszközök egy csomagban: akadálymentes Hírolvasó (RSS), Podcast-felfedező, Naptár/teendők/jegyzetek (emlékeztetővel, ICS-szinkronnal) ÚJ rezsi/költség-kalkulátor füllel (havi/éves összesítés, naptári emlékeztetők, opcionális PIN-lakat), és Napi infó (időjárás, névnap).",
+      "latest": {
+        "version": "1.3.2",
+        "min_core_api": "1.0",
+        "min_core_version": "4.0.0",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.3.2/szervezes-1.3.2.zip",
+        "sha256": "7d231aa3726aa46f43e284a4a26ad12ea2477c013cc7919339478f0ccd14cd45",
+        "size": 30421
+      }
+    },
+    {
+      "id": "tavsegitseg",
+      "name": "Távsegítség (távvezérlés)",
+      "category": "Kommunikáció",
+      "description": "Vak-first, akadálymentes TÁVSEGÍTSÉG: egy megbízható ember távolról segíthet a gépeden, vagy te segíthetsz valakinek – szoba-kóddal, szerver nélkül, csak internettel (mint a Csevejcenternél). Két szerep: „Segítséget kérek” (téged irányítanak) és „Segítek” (te irányítasz). A segített szobát nyit, kap egy rövid, bemondható kódot, és elküldi a MEGBÍZHATÓ segítőjének. Amint a kapcsolat él, a segítő HALLJA a segített gépét – benne a képernyőolvasó beszédét is (rendszerhang-átvitel) –, így vak is tud vaknak segíteni. Az IRÁNYÍTÁST a segített KÜLÖN, egy leokézható beleegyezés után engedélyezi; ekkor a segítő billentyűi (a képernyőolvasó-parancsok is) a másik gépre mennek. BIZTONSÁG az első helyen és felügyelt módban: minden munkamenetet a segített indít és minden irányítást ő engedélyez; a Ctrl+Alt+Pause rendszer-gyorsbillentyű (vagy a pánik gomb) bármikor AZONNAL bontja a vezérlést; nincs felügyelet nélküli, rejtett hozzáférés. A JAWS Tandem / NVDA Remote alternatívája, mert mindkét fél már fenn van a SuperDL-en (nincs külön licenc/bővítmény). Kizárólag megbízható, kölcsönös segítségre – az irányítás bizalmi funkció.",
+      "latest": {
+        "version": "1.0.1",
+        "min_core_api": "1.0",
+        "min_core_version": "4.2.7",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-tavsegitseg-1.0.1/tavsegitseg-1.0.1.zip",
+        "sha256": "35fae75d5b315e1668c4ab60004ed3dfec94599642a8fd6d7a23ffc646e14934",
+        "size": 26476
+      }
+    },
+    {
+      "id": "tvmusor",
+      "name": "TV műsor (tévéújság)",
+      "category": "Média",
+      "description": "JAVÍTÁS (Laci jelzésére): a KEDVENC-EMLÉKEZTETŐ végre tényleg működik. Eddig minden próbálkozásra azt mondta, hogy „a naptár nem érhető el, a Szervezés modul naptára kell hozzá” – akkor is, ha a Szervezés fel volt telepítve. A hiba a mi oldalunkon volt: a modul rossz néven kereste a program naptárkezelőjét, ezért sosem találta meg. A funkció a megjelenése óta nem működött, most viszont igen; és ha valami mégis félremegy, a program megmondja, mi az igazi ok, nem küld többé rossz helyre. ÚJ (Laci kérésére): NAP-VÁLASZTÓ a Csatornák lapon – nemcsak „mostantól” nézhető a műsor, hanem ma, holnap, holnapután és tovább, ameddig a forrás adatot ad (a nagy csatornáknál általában ma + 3-4 nap). Ilyenkor a nap TELJES műsora látszik, a reggeliekkel együtt; a hajnalig tartó filmek az előző naphoz tartoznak. A választék csatornánként igazodik ahhoz, amennyi adat valóban van. Akadálymentes, FELOLVASOTT TÉVÉÚJSÁG – és a legjobb: IPTV-előfizetés NÉLKÜL is működik. Ha csak egy szimpla antennád van (vagy semmid), akkor is megnézheted, mi megy MOST az RTL-en, a TV2-n, az m1-en, a Dunán és több mint száz további csatornán. Négy nézet: „Mi megy most?” (minden csatorna épp futó műsora), „Ma este” (a 20:00–23:00 közti főműsoridő, kezdés szerint), „Csatornák” (válassz csatornát, alatta a műsora mostantól) és „Keresés” – ez utóbbival egyetlen kérdésre megkapod, MIKOR és MELYIK csatornán adják a kedvencedet (ékezet nélkül is megtalálja, és a műsor leírásában is keres). Minden lista fel/le nyíllal navigálható, a képernyőolvasó minden sort felolvas, a kijelölt műsor részletei (pontos idő, hossz, leírás) külön mezőben olvashatók. ÚJ – KEDVENC-FIGYELŐ: írd be a kedvenc filmjeid és sorozataid címét (akár többet is; elég egy jellemző rész, ékezet nélkül is), és a program magától szól, ha jön valamelyik: „Helló! Lesz a kedvenced: …, ezen a csatornán, ekkor.” A jelzés ki-be kapcsolható, és bármikor le is kérdezhető, hogy mikor jönnek a kedvenceid. ÚJ: NAPTÁRI EMLÉKEZTETŐ is kérhető a kedvenc műsorokra – egyesével vagy mindre –, és a SuperDL naptára a kezdés előtt (állítható perccel) meg is szólal: „Figyelem! 10 perc múlva kezdődik a kedvenced…”. Az is beállítható, hogy az új kedvenc-műsorokra magától tegyen be emlékeztetőt; ugyanarra a műsorra sosem kerül be kétszer. A műsoradat egy nyilvános műsorújság-forrásból (szabványos XMLTV) érkezik, ami a Beállítás fülön bármikor felülírható; ha a forrás nem elérhető, automatikusan tartalékot próbálunk, és a korábban letöltött műsor offline is megmarad. A műsoradat a forrás szolgáltatójáé – a SuperDL csak megjeleníti, nem tárolja és nem terjeszti; a műsorváltozás jogát a csatornák fenntartják.",
+      "latest": {
+        "version": "1.2.2",
+        "min_core_api": "1.0",
+        "min_core_version": "4.2.7",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-tvmusor-1.2.2/tvmusor-1.2.2.zip",
+        "sha256": "b66048996f29106ca8ba4bcb26a396c99e53925904734a7a67507ed2ba42e061",
+        "size": 19093
+      }
+    },
+    {
+      "id": "zene",
+      "name": "Zene (egyszerű lejátszó)",
+      "category": "Média",
+      "description": "A lehető legegyszerűbb zenelejátszó – szándékosan nem tud mást, csak lejátszani. Kiválasztasz EGY mappát, és minden szám, ami alatta van (akárhány almappában, akármilyen mélyen), bekerül egy listába. A választásod megjegyződik, legközelebb magától betölt. FEL-LE NYÍL: előző és következő szám – és azonnal szól, nem kell külön indítani. BAL-JOBB NYÍL: tekerés a számon belül, öt másodpercenként. SZÓKÖZ: szünet, és újra szóköz: folytatás. CTRL+R: ismétlés be és ki. CTRL+E: a szám végén álljon meg, vagy menjen a következőre. CTRL+S: elalvás időzítő – egy nyilazható lista öt perctől hatvan percig, ötösével; a lejárat előtt tíz másodperccel a zene lassan elhalkul, nem hirtelen vág el. CTRL+I: hol tartunk – a szám neve, az eltelt idő, a kapcsolók állása és a hátralévő elalvás-idő, egyetlen mondatban. ÁTTŰNÉS: a számok között három másodperces áttűnés van, az előző elhalkul, közben a következő feljön. Ha a hangkártya nem engedélyez két egyidejű hangfolyamot, áttűnés nem lesz, de a következő szám AKKOR IS elindul – néma lejátszó rosszabb volna, mint áttűnés nélküli. A zenemappát a SuperDL SAJÁT, bővítménymentes fájlválasztójával adod meg, nem a Windowséval: abba idegen bővítmények épülnek be, és ha egyikük elszáll, viszi magával az egész programot. A lista soraiban a fájlnév és a mappanév szerepel, nem előadó-cím: a címkék kiolvasása több ezer számnál percekbe kerülne, ez a program pedig azért van, hogy azonnal induljon. Amit tudatosan NEM tud: lejátszási lista, keverés, kedvencek, hangerő-csúszka, címke-szerkesztés.",
+      "latest": {
+        "version": "1.0.0",
+        "min_core_api": "1.0",
+        "min_core_version": "4.6.8",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-zene-1.0.0/zene-1.0.0.zip",
+        "sha256": "88431441719106fa8dabaec807adbf205a2a2fb065a95039f09b6c67101bad98",
+        "size": 11927
       }
     }
   ]

@@ -62,6 +62,55 @@ TRACKEREK = (
 )
 
 
+def _b36(n: int) -> str:
+    """Egy szám EGY karakterre: 0-9, majd a-z. (35 fölött 'z'.)"""
+    n = max(0, int(n))
+    return "0123456789abcdefghijklmnopqrstuvwxyz"[min(n, 35)]
+
+
+def azonosito_kapcsolok(verzio: str | None = None) -> list[str]:
+    """A SuperDL SAJÁT azonosítója a BitTorrent-hálózaton.
+
+    Az nCore Helpdesk kérése (2026-09-12): „a peer_id és user-agent esetében a
+    saját programod nevét és verziószámát tartalmazza. Erre azért van szükség,
+    hogy meg lehessen különböztetni, ki az aki a te programodat használja és
+    annak melyik verzióját, illetve ki az aki csak szimplán az aria2-t."
+
+    Ez nem kozmetika. Eddig minden SuperDL-felhasználó `A2-1-37-0-` peer_id-vel
+    jelentkezett be, vagyis megkülönböztethetetlen volt a nyers aria2-től. Ha
+    egy tracker valaha korlátozná a nyers parancssori klienseket, a mi
+    felhasználóink is beleesnének — pedig ők egy grafikus programot használnak.
+    Így viszont a tracker látja, hogy SuperDL, és azt is, melyik verzió.
+
+    Három helyen jelenünk meg, mindhármat kimondjuk (nem bízunk alapértékre):
+      * peer_id      – ezt látja a TRACKER a bejelentkezéskor
+      * peer-agent   – ezt látják a TÖBBI PEEREK a kézfogáskor
+      * user-agent   – ez megy a HTTP(S) tracker-bejelentkezéssel
+
+    A peer_id 20 bájt; a 8 karakteres előtag után az aria2 véletlen bájtokkal
+    tölti fel. Az előtag alakja `-SDLxyz-`, ahol x, y, z a fő-, al- és
+    javítóverzió egy-egy karakteren (0-9, majd a-z), tehát a 4.6.10 is elfér.
+    A PONTOS verzió a két ügynök-névben szerepel, teljes alakban.
+    """
+    if verzio is None:
+        try:
+            from . import __version__ as verzio
+        except Exception:
+            verzio = "0.0.0"
+    reszek = (str(verzio).strip().split(".") + ["0", "0", "0"])[:3]
+    szamok = []
+    for r in reszek:
+        jegyek = "".join(c for c in r if c.isdigit())
+        szamok.append(int(jegyek) if jegyek else 0)
+    elotag = "-SDL" + "".join(_b36(n) for n in szamok) + "-"
+    ugynok = f"SuperDL/{verzio}"
+    return [
+        f"--peer-id-prefix={elotag}",
+        f"--peer-agent={ugynok}",
+        f"--user-agent={ugynok}",
+    ]
+
+
 def halozati_kapcsolok(dht_fajl=None) -> list[str]:
     """Az aria2c BitTorrent-hálózati kapcsolói, KÜLÖN függvényben.
 
@@ -80,7 +129,7 @@ def halozati_kapcsolok(dht_fajl=None) -> list[str]:
         dht_fajl.parent.mkdir(parents=True, exist_ok=True)
     except OSError:
         pass
-    return [
+    return azonosito_kapcsolok() + [
         # --- DHT: a peer-keresés gerince ---------------------------------
         "--enable-dht=true",
         f"--dht-entry-point={DHT_BELEPO}",
