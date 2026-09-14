@@ -31,6 +31,15 @@ TORRENT_EXT = ".torrent"
 PROGID_TORRENT = "SuperDL.Torrent"
 MAGNET_SEMA = "magnet"
 
+# --- Super Edit (szövegszerkesztő) -----------------------------------
+# Itt a felhasználó VÁLOGAT: nem mindenki akarja, hogy a .docx-et is a
+# SuperDL nyissa, de a .txt-t igen. Ezért a társítás KITERJESZTÉSENKÉNT
+# kapcsolható, és a választás megjegyződik – különben a következő
+# bekapcsolásnál újra végig kellene kattintani.
+PROGID_TEXT = "SuperDL.Text"
+SZOVEG_EXTS = (".txt", ".md", ".markdown", ".log", ".html", ".htm", ".docx")
+SZOVEG_EXTS_OLVASO = (".pdf", ".epub")     # csak olvasásra – alapból KI
+
 _CLASSES = r"Software\Classes"
 
 
@@ -256,3 +265,63 @@ def unregister_torrent() -> None:
         _delete_tree(winreg, winreg.HKEY_CURRENT_USER,
                      f"{_CLASSES}\\{MAGNET_SEMA}")
     _notify()
+
+
+# ---------------------------------------------------------------------
+# SUPER EDIT — szövegfájlok, KITERJESZTÉSENKÉNT választhatóan
+# ---------------------------------------------------------------------
+
+def szoveg_tarsitasok() -> set:
+    """Mely kiterjesztések nyílnak MOST a Super Editben?
+
+    A rendszerleíróból olvassuk, nem egy külön beállításfájlból: az az
+    IGAZSÁG, amit a Windows tud. Ha a felhasználó közben máshol átállította
+    valamelyiket, itt az látszik, nem az, amit mi hittünk róla."""
+    if os.name != "nt":
+        return set()
+    import winreg
+    ki = set()
+    for e in tuple(SZOVEG_EXTS) + tuple(SZOVEG_EXTS_OLVASO):
+        try:
+            with winreg.OpenKeyEx(
+                    winreg.HKEY_CURRENT_USER,
+                    f"{_CLASSES}\\{e}\\OpenWithProgids", 0,
+                    winreg.KEY_READ) as k:
+                winreg.QueryValueEx(k, PROGID_TEXT)
+            ki.add(e)
+        except OSError:
+            continue
+    return ki
+
+
+def szoveg_beallit(kiterjesztesek) -> set:
+    """A megadott kiterjesztések társítása, a TÖBBIÉ visszavonva.
+
+    Egyetlen függvény a be- és kikapcsolásra: a hívó azt adja meg, mi legyen
+    a VÉGÁLLAPOT, nem azt, mit kapcsoljon. Így nem lehet félúton ragadni.
+    Visszaadja a ténylegesen beállított halmazt."""
+    if not available():
+        raise RuntimeError(
+            "A fájltársítás csak a telepített vagy hordozható SuperDL-nél "
+            "érhető el (Windowson).")
+    import winreg
+    kert = {str(e).lower() for e in (kiterjesztesek or ())}
+    mind = tuple(SZOVEG_EXTS) + tuple(SZOVEG_EXTS_OLVASO)
+    if kert:
+        _ensure_progid(winreg, PROGID_TEXT, "Super Edit – szövegszerkesztő")
+    for e in mind:
+        if e in kert:
+            _assoc_ext(winreg, e, PROGID_TEXT)
+        else:
+            _unassoc_ext(winreg, e, PROGID_TEXT)
+    if not kert:
+        # semmi sincs társítva → a ProgID is menjen, ne maradjon szemét
+        _delete_tree(winreg, winreg.HKEY_CURRENT_USER,
+                     f"{_CLASSES}\\{PROGID_TEXT}")
+    _notify()
+    return szoveg_tarsitasok()
+
+
+def szoveg_registered() -> bool:
+    """Van-e egyáltalán szöveg-társításunk?"""
+    return bool(szoveg_tarsitasok())

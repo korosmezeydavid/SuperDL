@@ -79,6 +79,9 @@ class SelfVoice:
         self._voice = None
         self._lock = threading.Lock()
         self._espeak_proc = None
+        # A magyar SAPI-hang leírása, EGYSZER feloldva – lásd a lenti ⚠️-t.
+        # None = még nem néztük meg; "" = megnéztük, nincs magyar hang.
+        self._magyar_desc = None
         self._init_voice()
 
     def _init_voice(self):
@@ -87,6 +90,36 @@ class SelfVoice:
             self._voice = win32com.client.Dispatch("SAPI.SpVoice")
         except Exception:
             self._voice = None
+        # INDULÁSKOR oldjuk fel, amíg nyugodt a fő szál (nem billentyű- vagy
+        # fókusz-esemény közben) – így a bemondás forró útján már nincs COM.
+        self._magyar_desc_felold()
+
+    def _magyar_desc_felold(self) -> str:
+        """A telepített MAGYAR SAPI-hang leírása, EGYSZER lekérdezve.
+
+        ⚠️ MIÉRT GYORSÍTÓTÁR. A `GetVoices()` COM-hívás, és eddig MINDEN
+        megszólaláskor lefutott, a HÍVÓ (fő) szálon. Ha a bemondás billentyű-
+        vagy fókusz-eseményből indul, a Windows épp „input-synchronous" hívást
+        kézbesít (a képernyőolvasó is így kérdezi a vezérlőket), és ilyenkor a
+        kimenő COM-hívás 0x8001010d (RPC_E_CANTCALLOUT_ININPUTSYNCCALL)
+        hibával elszáll – ez a nyom szerepelt a 4.6.11 összeomlás-naplójában.
+        A telepített hangok listája egy munkameneten belül nem változik, tehát
+        elég egyszer megnézni.
+        """
+        if self._magyar_desc is not None:
+            return self._magyar_desc
+        self._magyar_desc = ""
+        if self._voice:
+            try:
+                for token in self._voice.GetVoices():
+                    d = token.GetDescription()
+                    if any(k in d.lower() for k in
+                           ("hungar", "magyar", "hu-hu", "hu_hu", "szabolcs")):
+                        self._magyar_desc = d
+                        break
+            except Exception:
+                pass
+        return self._magyar_desc
 
     @property
     def available(self) -> bool:
@@ -100,15 +133,9 @@ class SelfVoice:
         angolul olvasná – ez volt a listások „angolul szólal meg" panasza."""
         if self.voice_desc:
             return self.voice_desc
-        if self._voice:                          # van-e telepített MAGYAR SAPI-hang?
-            try:
-                for token in self._voice.GetVoices():
-                    d = token.GetDescription()
-                    if any(k in d.lower() for k in
-                           ("hungar", "magyar", "hu-hu", "hu_hu", "szabolcs")):
-                        return d
-            except Exception:
-                pass
+        magyar = self._magyar_desc_felold()      # gyorsítótárból, COM nélkül
+        if magyar:
+            return magyar
         if espeak_available():                   # beépített magyar tartalék
             return "espeak:hu"
         return ""                                # semmi magyar – marad a rendszeré

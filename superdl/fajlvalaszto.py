@@ -158,7 +158,8 @@ class FajlValaszto(wx.Dialog):
         kozep = wx.BoxSizer(wx.HORIZONTAL)
         bal = wx.BoxSizer(wx.VERTICAL)
         bal.Add(wx.StaticText(p, label="&Mappák  (Enter: belépés, "
-                                       "Backspace: vissza):"), 0, wx.LEFT, 4)
+                                       "Backspace: vissza, "
+                                       "Ctrl+D: meghajtók):"), 0, wx.LEFT, 4)
         self.mappa_lista = wx.ListBox(p, style=wx.LB_SINGLE)
         self.mappa_lista.SetName("Mappák")
         self.mappa_lista.Bind(wx.EVT_LISTBOX_DCLICK, lambda e: self._belep())
@@ -212,6 +213,16 @@ class FajlValaszto(wx.Dialog):
 
     def _bill(self, e):
         k = e.GetKeyCode()
+        # Ctrl+D: EGYENESEN a meghajtók listájára, akárhol is vagyunk. A
+        # Backspace-szel is fel lehet jutni, de aki mélyen bent van egy
+        # mappaszerkezetben, annak az sok lépés – és egyszer már volt ebből
+        # zsákutca. Két út mindig jobb, mint egy.
+        if e.ControlDown() and k in (ord("D"), ord("d")):
+            self._mappa = GEP
+            self.szuro_mezo.SetValue("")
+            self._mondd(self._frissit())
+            self.mappa_lista.SetFocus()
+            return
         if k == wx.WXK_BACK and self.FindFocus() is not self.szuro_mezo:
             self._szulo()
             return

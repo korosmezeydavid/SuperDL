@@ -54,17 +54,33 @@ def clean_for_speech(text: str) -> str:
     # 1) sorvégi elválasztás összevonása (rendes és lágy kötőjel is)
     t = re.sub(r"(\w)[-­]\n(\w)", r"\1\2", t)
     # 2-3) bekezdésenként: oldalszám/üres sorok ki, a többit egy sorba olvasztjuk
+    from . import fejezet as _fej
     out = []
+
+    def _zar(lines):
+        joined = re.sub(r"[ \t]+", " ", " ".join(lines)).strip()
+        if joined:
+            out.append(joined)
+
     for para in re.split(r"\n[ \t]*\n", t):
         lines = []
         for ln in para.split("\n"):
             s = ln.strip()
             if not s or _PAGE_NUM.match(s):
                 continue
+            # ⚠️ A FEJEZETJELÖLŐ MARADJON SAJÁT SORBAN. Ez a tisztító a
+            # bekezdésen belüli sortöréseket szóközzé olvasztja – ami a
+            # felolvasásnak jó, de a jelölőt BEOLVASZTANÁ a szomszédos
+            # mondatba, és a fejezetenkénti darabolás NÉMÁN elromlana:
+            # a hangoskönyv egyben maradna, és a felhasználó csak a kész,
+            # órákig készülő fájlon venné észre.
+            if _fej.jelolo_e(s):
+                _zar(lines)
+                lines = []
+                out.append(s)
+                continue
             lines.append(s)
-        joined = re.sub(r"[ \t]+", " ", " ".join(lines)).strip()
-        if joined:
-            out.append(joined)
+        _zar(lines)
     return "\n\n".join(out)
 
 
@@ -189,10 +205,33 @@ def _ffmpeg_exe(progress=None) -> str:
     return os.path.join(p, "ffmpeg.exe")
 
 
+def fejezet_szamlal(book) -> int:
+    """Hány fejezetjelölő van a könyvben? 0 = nincs fejezetenkénti darabolás.
+
+    A hívó felület ebből tudja, hogy felajánlhatja-e a fejezetenkénti
+    darabolást – felajánlani olyat, ami nem megy, rosszabb a hallgatásnál.
+    """
+    from . import fejezet
+    return fejezet.szamlal(getattr(book, "text", "") or "")
+
+
+def _fejezet_cim_fajlnev(cim: str, sorszam: int) -> str:
+    """A fejezetcímből biztonságos fájlnév-részlet."""
+    tiszta = re.sub(r'[\\/:*?"<>|]+', " ", cim or "").strip()
+    tiszta = re.sub(r"\s+", " ", tiszta)[:60].strip()
+    return "%02d%s" % (sorszam, (" " + tiszta) if tiszta else "")
+
+
 def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
-          api_key="", split_minutes=0, progress=None, cancel=None) -> list[str]:
+          api_key="", split_minutes=0, fejezetenkent=False,
+          progress=None, cancel=None) -> list[str]:
     """Elkészíti a hangoskönyvet. Visszaadja a létrejött fájl(ok) listáját.
     `progress(kész, összes, állapot)` hívható a folyamatjelzéshez.
+
+    `fejezetenkent=True`: percek helyett a FEJEZETJELÖLŐK mentén darabol
+    (`superdl/fejezet.py`; a Super Editben a Ctrl+Shift+J szúrja be őket).
+    Ilyenkor a `split_minutes` figyelmen kívül marad. Ha nincs jelölő a
+    szövegben, egyben marad – NEM esünk vissza némán percekre.
 
     `cancel`: opcionális threading.Event – ha beállítják, a munka a LEGKÖZELEBBI
     biztonságos ponton MEGSZAKAD (`AudiobookCancelled`), és a félkész fájlok
@@ -216,10 +255,33 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
     # Ha a motor BÁJT-alapú korlátot deklarál (Google Cloud), akkor UTF-8
     # bájtban darabolunk – különben a magyar ékezetes szöveg túllépné a limitet.
     _blimit = int(getattr(eng, "byte_limit", 0) or 0)
-    parts = ([INTRO.format(title=book.title)]
-             + chunk_text(book.text, _blimit or eng.char_limit,
-                          by_bytes=bool(_blimit))
-             + [OUTRO])
+    _limit = _blimit or eng.char_limit
+
+    # FEJEZETENKÉNTI DARABOLÁS: a szöveget előbb fejezetekre bontjuk, és
+    # megjegyezzük, melyik hangdarab melyik fejezethez tartozik. Így a végén
+    # fejezetenként fűzünk össze — nem időre vágunk, ami mondat közepén is
+    # elvághatná. A jelölő-sorok maguk NEM kerülnek a felolvasandó szövegbe.
+    fej_cimek: list[str] = []
+    part_fej: list[int] = []
+    if fejezetenkent:
+        from . import fejezet as _fej
+        fejezetek = _fej.fejezetek(book.text)
+        if len(fejezetek) > 1:
+            fej_cimek = [c for c, _t in fejezetek]
+            parts = [INTRO.format(title=book.title)]
+            part_fej = [0]
+            for _i, (_cim, _szoveg) in enumerate(fejezetek):
+                _darabok = chunk_text(_szoveg, _limit, by_bytes=bool(_blimit))
+                parts.extend(_darabok)
+                part_fej.extend([_i] * len(_darabok))
+            parts.append(OUTRO)
+            part_fej.append(len(fejezetek) - 1)
+        else:
+            fejezetenkent = False        # nincs mit fejezetenként vágni
+    if not fejezetenkent:
+        parts = ([INTRO.format(title=book.title)]
+                 + chunk_text(book.text, _limit, by_bytes=bool(_blimit))
+                 + [OUTRO])
     total = len(parts)
     work = Path(tempfile.mkdtemp(prefix="sdl_book_"))
     norm_files: list[Path] = []
@@ -265,7 +327,30 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
         stage = out.parent / f".superdl_kesz_{_uuid.uuid4().hex[:8]}"
         stage.mkdir(parents=True, exist_ok=True)
         stage_dirs.append(stage)
-        if split_minutes and split_minutes > 0:
+        if fejezetenkent and fej_cimek:
+            # FEJEZETENKÉNT: minden fejezethez SAJÁT listafájl és saját
+            # összefűzés. Nem időre vágunk, tehát a vágás sosem esik mondat
+            # közepére, és a fájlnévben ott a fejezet címe.
+            keszek = []
+            for _i, _cim in enumerate(fej_cimek):
+                _sajat = [n for n, _f in zip(norm_files, part_fej) if _f == _i]
+                if not _sajat:
+                    continue
+                _lista = work / ("fej%03d.txt" % _i)
+                _lista.write_text(
+                    "".join(f"file '{n.as_posix()}'\n" for n in _sajat),
+                    encoding="utf-8")
+                _nev = "%s_%s%s" % (out.stem,
+                                    _fejezet_cim_fajlnev(_cim, _i + 1),
+                                    out.suffix)
+                _cel = stage / _nev
+                subprocess.run(
+                    [ff, "-y", "-f", "concat", "-safe", "0",
+                     "-i", str(_lista), "-c", "copy", str(_cel),
+                     "-loglevel", "quiet"],
+                    stdin=subprocess.DEVNULL, creationflags=flags, check=True)
+                keszek.append(_cel)
+        elif split_minutes and split_minutes > 0:
             pattern = str(stage / (out.stem + "_%03d" + out.suffix))
             subprocess.run(
                 [ff, "-y", "-f", "concat", "-safe", "0", "-i", str(listfile),

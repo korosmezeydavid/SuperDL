@@ -374,12 +374,25 @@ class ModuleManagerFrame(wx.Frame):
             self._announce("Rendben, a frissítések a következő indításkor "
                            "lépnek teljesen életbe.")
             return
-        if coremod.restart_app():
-            self._announce("Újraindítás…")
-            wx.CallAfter(self.main.Close)
-        else:
+        if not coremod.restart_app():
             self._announce("Az újraindítást most nem tudom elvégezni – zárd be "
                            "és indítsd el a SuperDL-t.")
+            return
+        self._announce("Újraindítás…")
+        # ⚠️ EZ A HÁROM LÉPÉS EGYÜTT KELL. Egy tesztelő jelezte, hogy az
+        # „Újraindítsam?" IGEN után a modulkezelő nyitva maradt, a programot
+        # csak a tálcáról lehetett bezárni, és újra sem indult.
+        # Az ok: a `main.Close()` HÁTTÉRMÓDBAN nem lép ki, csak a tálcára
+        # minimalizál. Az újraindító kötegfájl viszont a régi példány
+        # kilépésére vár; mivel az sosem lépett ki, végül úgy indított új
+        # példányt, hogy a régi még élt — és az EGYPÉLDÁNYOS őr miatt az új
+        # csendben kilépett, előhozva a RÉGI, még frissítetlen programot.
+        # Ezért: (1) a modulkezelő ablak is záruljon be, (2) a fő ablak
+        # TÉNYLEGESEN lépjen ki (`_quit_app` állítja a `_really_quit`-et),
+        # nem a tálcára megy.
+        self.Close()
+        kilepes = getattr(self.main, "_quit_app", None)
+        wx.CallAfter(kilepes if callable(kilepes) else self.main.Close)
 
     # ---- egyetlen modul telepítése / frissítése ------------------------
 

@@ -2333,6 +2333,11 @@ class MainFrame(wx.Frame):
                     ".wma"}
     _ASSOC_VIDEO = {".mp4", ".mkv", ".avi", ".mov", ".webm", ".m4v", ".ts",
                     ".flv", ".wmv", ".mpg", ".mpeg", ".m2ts"}
+    # Super Edit (szövegszerkesztő modul). A Core AKKOR IS ismeri ezeket, ha a
+    # modul nincs telepítve – így a rákattintott fájlra érthető mondat jön,
+    # nem néma semmi.
+    _ASSOC_SZOVEG = {".txt", ".md", ".markdown", ".log", ".html", ".htm",
+                     ".docx", ".pdf", ".epub"}
 
     def open_media_file(self, path: str):
         """Fájltársításból: a rákattintott médiát a megfelelő modul-ablak nyitja
@@ -2349,6 +2354,8 @@ class MainFrame(wx.Frame):
                 key = "superm_module"
             elif ext in self._ASSOC_VIDEO:
                 key = "felolvaso_module"
+            elif ext in self._ASSOC_SZOVEG:
+                key = "superedit_module"
             else:
                 return
             win = host.open_window(key)

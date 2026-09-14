@@ -36,6 +36,18 @@ hiddenimports += collect_submodules('feedparser')
 hiddenimports += collect_submodules('ebooklib')
 hiddenimports += collect_submodules('pypdf')
 hiddenimports += collect_submodules('fpdf')      # beépített PDF (dok.-konverter)
+# A Super Edit szövegszerkesztő ezekkel nyit és ment. A fagyasztott exe-ben
+# nincs pip: ha ezek kimaradnak, a modul betöltődik, de a Word- és
+# HTML-mentés ImportError-ral hal meg – vagyis „fut, de halott".
+hiddenimports += collect_submodules('docx')
+hiddenimports += collect_submodules('bs4')
+# ⚠️ AMIT CSAK A LETÖLTÖTT MODULOK IMPORTÁLNAK. A Core sehol nem hivatkozik
+# ezekre, ezért a PyInstaller nem látja őket, és a modul a fagyasztott
+# programban „fut, de halott": betöltődik vagy elindul, aztán ImportError.
+# A `tools/modul_importok.py` méri ezt — ha új modul új könyvtárat használ,
+# az a lista ide kerül.
+hiddenimports += ['plistlib']                     # iphone modul (afc.py)
+hiddenimports += collect_submodules('comtypes')   # mail helyesírás, távsegítség
 # A TELJES superdl csomag (a megosztott runtime: videocompose, audioengine,
 # booktext, ocr, extratools…) – a kiemelt MODULOK `from superdl import …`-zal
 # hívják, ezért akkor is bundle-ölni kell, ha a built-in gui már nem importálja.

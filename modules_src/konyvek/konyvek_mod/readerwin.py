@@ -6,6 +6,7 @@ elérhető. A felolvasás SAPI vagy Edge neurális hanggal, fájlba konvertálá
 nélkül szól.
 """
 
+import logging
 import os
 import threading
 
@@ -14,6 +15,8 @@ import wx
 from superdl import audiobook, booktext, tts   # megosztott backend a Core-ból
 from .readengine import ReadEngine             # a felolvasó-motor a modulban van
 from . import valaszto                         # beépített fájlválasztó
+
+_log = logging.getLogger("superdl.module.konyvek")
 
 READ_ENGINE_KEYS = ["sapi", "edge"]     # csak az élő felolvasáshoz alkalmasak
 WILDCARD = ("Könyvek|*.txt;*.docx;*.epub;*.pdf|Szöveg (*.txt)|*.txt|"
@@ -607,10 +610,23 @@ class ReaderFrame(wx.Frame):
         (üres a gyorsítótár), nem zavar."""
         if not path or path.startswith("(beillesztett)"):
             return
+        # ⚠️ A `modules_src.…` útvonal CSAK a forrásfában létezik. A kiadott
+        # programban a modulok a ~/.superdl/modules/<id>/ alá kerülnek, és a
+        # modkit a belépési csomagot (itt: `atjaro_mod`) teszi a sys.path-ra.
+        # Emiatt ez a felajánlás a kiadott programban SOHA nem futott le: a
+        # néma `except` elnyelte az ImportErrort. Előbb a futásidejű nevet
+        # próbáljuk, a forrásfás alak csak tartalék (fejlesztés, tesztek).
         try:
-            from modules_src.atjaro.atjaro_mod import atjaro_core as AC
+            try:
+                from atjaro_mod import atjaro_core as AC
+            except ImportError:
+                from modules_src.atjaro.atjaro_mod import atjaro_core as AC
+        except ImportError:
+            return                     # az Átjáró modul nincs telepítve
+        try:
             tel = AC.telefon_konyvek_betolt()
         except Exception:
+            _log.exception("A telefon-könyvlista beolvasása nem sikerült")
             return
         if not tel:                                    # még nem szinkronizáltunk
             return

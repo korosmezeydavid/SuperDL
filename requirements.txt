@@ -27,3 +27,10 @@ pywin32>=306; sys_platform == "win32"
 # IANA időzóna-adatbázis (Windowson nincs beépítve) – az ICS TZID
 # helyes értelmezéséhez KELL, különben órákkal téves emlékeztetők.
 tzdata>=2024.1
+# ⚠️ A LETÖLTÖTT MODULOK használják (Super Mail helyesírás-ellenőrzés,
+# Távsegítség hangfelvétel). A Core sehol nem importálja, ezért ha innen
+# kimarad, a build gépén nem lesz telepítve, a `collect_submodules('comtypes')`
+# üresen tér vissza, és a modul a kiadott programban „fut, de halott":
+# betöltődik, aztán ImportError. Pontosan így veszett el a 4.6.11 első
+# buildjéből. A jelölő miatt nem-Windowson nem próbálja telepíteni.
+comtypes>=1.2; sys_platform == "win32"

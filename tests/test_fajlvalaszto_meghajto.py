@@ -139,6 +139,16 @@ def test_a_sima_belepes_valtozatlan(monkeypatch):
     assert h._mappa == os.path.join("C:\\", "Zene", "Rock")
 
 
+def test_ctrl_d_egyenesen_a_meghajtokra_visz():
+    """Két út a meghajtókhoz: a Backspace fölfelé, és a Ctrl+D azonnal.
+    Aki mélyen bent van egy mappaszerkezetben, annak a Backspace sok lépés —
+    és ebből egyszer már volt zsákutca."""
+    f = inspect.getsource(FV.FajlValaszto._bill)
+    assert 'ord("D")' in f and "GEP" in f
+    cimke = inspect.getsource(FV.FajlValaszto.__init__)
+    assert "Ctrl+D: meghajtók" in cimke, "a címke mondja is meg"
+
+
 def test_a_GEP_szint_nem_adhato_vissza_mappakent():
     """Üres utat nem szabad eredményként visszaadni."""
     f = inspect.getsource(FV.FajlValaszto._kesz)

@@ -208,9 +208,16 @@ class BookFrame(wx.Frame):
         self.split_lbl = wx.StaticText(p, label="Darab &hossza percben:")
         self.split_sp = wx.SpinCtrl(p, min=1, max=240, initial=30, size=(70, -1))
         self.split_sp.SetName("Darab hossza percben")
+        # FEJEZETENKÉNT: csak akkor van értelme, ha a szövegben VAN
+        # fejezetjelölő – ezért a betöltés után derül ki, látszik-e.
+        self.fej_chk = wx.CheckBox(p, label="Fe&jezetenként darabolja")
+        self.fej_chk.SetName("Percek helyett a szövegben lévő "
+                             "fejezetjelölők mentén darabol")
+        self.fej_chk.Bind(wx.EVT_CHECKBOX, self._on_fejezet_valt)
         r4.Add(self.split_chk, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
         r4.Add(self.split_lbl, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
-        r4.Add(self.split_sp, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 16)
+        r4.Add(self.split_sp, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
+        r4.Add(self.fej_chk, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 16)
         r4.Add(wx.StaticText(p, label="Cél&mappa:"), 0,
                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
         self.out_txt = wx.TextCtrl(p, value=str(Path.home() / "Downloads"),
@@ -373,9 +380,17 @@ class BookFrame(wx.Frame):
 
     def _book_loaded(self, bk):
         self.book = bk
+        # A fejezetjelölők megszámolása a BETÖLTÖTT könyvben – ebből derül ki,
+        # felajánlhatjuk-e a fejezetenkénti darabolást.
+        self._fejezet_allapot_frissit()
+        fej = ("; %d fejezetjelölő" % self._fejezet_db
+               if self._fejezet_db else "")
         self.info_lbl.SetLabel(
             f"„{bk.title}” – {len(bk.sections)} szakasz, "
-            f"{bk.chars} karakter.")
+            f"{bk.chars} karakter{fej}.")
+        if self._fejezet_db:
+            self._mond("Ebben a szövegben %d fejezetjelölő van, tehát "
+                       "fejezetenként is darabolható." % self._fejezet_db)
         if self.melle_chk.GetValue():
             self._hova_mond()     # „a könyv mellé" módban rögtön hallja, hova megy
 
@@ -386,10 +401,49 @@ class BookFrame(wx.Frame):
 
     # ---- darabolás / kimenet-beállítások -------------------------------
 
+    #: hány fejezetjelölő van a betöltött könyvben (0 = nincs)
+    _fejezet_db = 0
+
     def _split_mezo_lathato(self, latszik: bool) -> None:
+        # A perc-mező akkor kell, ha darabolunk ÉS nem fejezetenként.
+        fejezet_be = bool(getattr(self, "fej_chk", None)
+                          and self.fej_chk.IsShown()
+                          and self.fej_chk.GetValue())
         for w in (self.split_lbl, self.split_sp):
-            w.Show(latszik)
+            w.Show(latszik and not fejezet_be)
+        if getattr(self, "fej_chk", None) is not None:
+            self.fej_chk.Show(latszik and self._fejezet_db > 0)
         self.Layout()
+
+    def _fejezet_allapot_frissit(self):
+        """Hány fejezetjelölő van a betöltött könyvben? Ebből derül ki, hogy
+        felajánlhatjuk-e a fejezetenkénti darabolást.
+
+        ⚠️ Felajánlani olyat, ami nem megy, rosszabb a hallgatásnál: ha nincs
+        jelölő, a jelölőnégyzet NEM látszik, és a tab-sorrendből is kiesik.
+        """
+        try:
+            self._fejezet_db = (audiobook.fejezet_szamlal(self.book)
+                                if self.book else 0)
+        except Exception:
+            self._fejezet_db = 0
+        if self._fejezet_db == 0 and getattr(self, "fej_chk", None) is not None:
+            self.fej_chk.SetValue(False)
+        self._split_mezo_lathato(self.split_chk.GetValue())
+
+    def _on_fejezet_valt(self, e=None):
+        be = self.fej_chk.GetValue()
+        self._split_mezo_lathato(self.split_chk.GetValue())
+        self._beallitas_ment()
+        if be:
+            self._mond("Fejezetenkénti darabolás bekapcsolva. %d fejezet van "
+                       "a szövegben; ennyi fájl készül, a fejezet címével a "
+                       "fájlnévben." % self._fejezet_db)
+        else:
+            self._mond("Fejezetenkénti darabolás kikapcsolva, a darabolás "
+                       "percek szerint megy.")
+            self.split_sp.SetFocus()
+        self._hova_mond()
 
     def _on_split_valt(self, e=None):
         be = self.split_chk.GetValue()
@@ -398,10 +452,20 @@ class BookFrame(wx.Frame):
         if be:
             # A megjelenő mezőre RÁ IS UGRUNK, különben vakon keresgélni
             # kellene, hová került az új vezérlő.
-            self.split_sp.SetFocus()
-            self._mond("Darabolás bekapcsolva. Darab hossza percben: %d. "
-                       "A részek külön mappába kerülnek."
-                       % self.split_sp.GetValue())
+            if self.fej_chk.IsShown() and self.fej_chk.GetValue():
+                self.fej_chk.SetFocus()
+                self._mond("Darabolás bekapcsolva, fejezetenként: %d fejezet. "
+                           "A részek külön mappába kerülnek."
+                           % self._fejezet_db)
+            else:
+                self.split_sp.SetFocus()
+                self._mond(
+                    "Darabolás bekapcsolva. Darab hossza percben: %d. "
+                    "A részek külön mappába kerülnek.%s"
+                    % (self.split_sp.GetValue(),
+                       " A szövegben %d fejezetjelölő van, ezért a "
+                       "fejezetenkénti darabolás is választható."
+                       % self._fejezet_db if self._fejezet_db else ""))
         else:
             self._mond("Darabolás kikapcsolva, egyetlen fájl készül.")
         self._hova_mond()
@@ -414,6 +478,7 @@ class BookFrame(wx.Frame):
         self.hang_chk.SetValue(bool(d.get("hangjelzes", True)))
         self.melle_chk.SetValue(bool(d.get("konyv_melle", False)))
         self.split_chk.SetValue(bool(d.get("darabolas", False)))
+        self.fej_chk.SetValue(bool(d.get("fejezetenkent", False)))
         if d.get("darab_perc"):
             try:
                 self.split_sp.SetValue(int(d["darab_perc"]))
@@ -429,6 +494,7 @@ class BookFrame(wx.Frame):
                 "hangjelzes": bool(self.hang_chk.GetValue()),
                 "konyv_melle": bool(self.melle_chk.GetValue()),
                 "darabolas": bool(self.split_chk.GetValue()),
+                "fejezetenkent": bool(self.fej_chk.GetValue()),
                 "darab_perc": int(self.split_sp.GetValue()),
                 "celmappa": self.out_txt.GetValue()})
         except Exception:
@@ -519,12 +585,21 @@ class BookFrame(wx.Frame):
         eng_key = self._engine_key()
         key = self.keys.get(eng_key, "")
         pitch, rate = self.pitch_sp.GetValue(), self.rate_sp.GetValue()
-        split = self.split_sp.GetValue() if self.split_chk.GetValue() else 0
+        # FEJEZETENKÉNT vagy percenként? A fejezetenkénti csak akkor él, ha a
+        # jelölőnégyzet látszik (van jelölő a szövegben) ÉS be van kapcsolva.
+        fejezetenkent = bool(self.split_chk.GetValue()
+                             and self.fej_chk.IsShown()
+                             and self.fej_chk.GetValue()
+                             and audiobook.fejezet_szamlal(book) > 0)
+        split = (0 if fejezetenkent
+                 else (self.split_sp.GetValue()
+                       if self.split_chk.GetValue() else 0))
         # HOVÁ: a könyv mellé vagy a célmappába; darabolásnál MINDIG almappába.
         forras = self.book_txt.GetValue().strip()
         mappa, uzenet = kimenet.celmappa(forras, self.out_txt.GetValue(),
                                          self.melle_chk.GetValue())
-        out_ut = kimenet.kimeneti_ut(mappa, book.title, bool(split))
+        out_ut = kimenet.kimeneti_ut(mappa, book.title,
+                                     bool(split) or fejezetenkent)
         try:
             out_ut.parent.mkdir(parents=True, exist_ok=True)
         except Exception as ex:
@@ -555,7 +630,8 @@ class BookFrame(wx.Frame):
             try:
                 res = audiobook.build(
                     book, eng_key, v.id, out, pitch=pitch, rate=rate,
-                    api_key=key, split_minutes=split, progress=prog,
+                    api_key=key, split_minutes=split,
+                    fejezetenkent=fejezetenkent, progress=prog,
                     cancel=self._cancel)
             except Exception as ex:
                 wx.CallAfter(self._done, None, str(ex))

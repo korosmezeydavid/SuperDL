@@ -180,3 +180,25 @@ def test_restart_app_forrasbol_futva_nem_probalkozik(monkeypatch):
     import sys
     monkeypatch.delattr(sys, "frozen", raising=False)
     assert coremod.restart_app() is False
+
+
+def test_az_ujrainditas_tenyleg_kilep_es_bezarja_a_modulkezelot():
+    """Tesztelői jelzés (2026-09-14): az „Újraindítsam?" IGEN után a
+    modulkezelő nyitva maradt, a programot csak a tálcáról lehetett bezárni,
+    és nem is indult újra.
+
+    ⚠️ AZ OK: a `main.Close()` HÁTTÉRMÓDBAN nem lép ki, csak a tálcára
+    minimalizál. Az újraindító kötegfájl viszont a régi példány kilépésére
+    vár; mivel az sosem lépett ki, végül úgy indított új példányt, hogy a
+    régi még élt — és az EGYPÉLDÁNYOS őr miatt az új CSENDBEN kilépett,
+    előhozva a régi, még frissítetlen programot.
+    """
+    import inspect
+    from superdl import modmanagerwin
+    src = inspect.getsource(
+        modmanagerwin.ModuleManagerFrame._ujraindit_ajanlat)
+    assert "_quit_app" in src, \
+        "a fő ablakot TÉNYLEGESEN ki kell léptetni, nem a tálcára tenni"
+    assert "self.Close()" in src, "a modulkezelő ablak is záruljon be"
+    # a kilépés az újraindító elindítása UTÁN jöjjön, különben nincs mit várni
+    assert src.index("restart_app") < src.index("_quit_app")
