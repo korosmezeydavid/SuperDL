@@ -111,24 +111,85 @@ def _ffprobe() -> str:
         return ""
 
 
-# ---- a megjegyzett gyökérmappa -----------------------------------------
+def szam_utbol(ut: str) -> "Szam":
+    """Egy szám az útjából – a kedvencek listájához.
 
-def gyoker_betolt() -> str:
+    ⚠️ A kedvenc egy ÚT, nem egy listaindex. Ha a felhasználó másik
+    zenemappára vált vagy átrendezi a fájljait, az index elcsúszna, és a
+    kedvencek csendben MÁS számokra mutatnának. Az út ezt kizárja: ami
+    elveszett, az hiányzóként látszik, nem rossz számként szól.
+    """
+    ut = str(ut or "")
+    return Szam(ut, os.path.splitext(os.path.basename(ut))[0],
+                os.path.basename(os.path.dirname(ut)))
+
+
+# ---- beállítások (gyökérmappa, kedvencek, keverés, hangkimenet) ---------
+
+def beallitasok() -> dict:
     try:
         d = json.loads(BEALLITAS.read_text(encoding="utf-8"))
-        return str(d.get("gyoker") or "")
+        return d if isinstance(d, dict) else {}
     except Exception:
-        return ""
+        return {}
+
+
+def beallit(**kv) -> None:
+    """Egy-egy beállítás módosítása a TÖBBI MEGTARTÁSÁVAL.
+
+    ⚠️ A korábbi mentés az egész fájlt felülírta a gyökérmappával. Egy új
+    beállítás bevezetése így a régieket némán kitörölte volna.
+    """
+    d = beallitasok()
+    d.update(kv)
+    try:
+        BEALLITAS.parent.mkdir(parents=True, exist_ok=True)
+        BEALLITAS.write_text(json.dumps(d, ensure_ascii=False),
+                             encoding="utf-8")
+    except OSError:
+        pass
+
+
+def gyoker_betolt() -> str:
+    return str(beallitasok().get("gyoker") or "")
 
 
 def gyoker_ment(ut: str) -> None:
-    try:
-        BEALLITAS.parent.mkdir(parents=True, exist_ok=True)
-        BEALLITAS.write_text(
-            json.dumps({"gyoker": str(ut or "")}, ensure_ascii=False),
-            encoding="utf-8")
-    except OSError:
-        pass
+    beallit(gyoker=str(ut or ""))
+
+
+def kedvencek_betolt() -> list:
+    """A kedvencek ÚTJAI, a felvétel sorrendjében, ismétlés nélkül."""
+    nyers = beallitasok().get("kedvencek")
+    ki, latott = [], set()
+    if isinstance(nyers, list):
+        for u in nyers:
+            u = str(u or "").strip()
+            k = u.lower()
+            if u and k not in latott:
+                latott.add(k)
+                ki.append(u)
+    return ki
+
+
+def kedvencek_ment(utak) -> None:
+    beallit(kedvencek=[str(u) for u in (utak or [])])
+
+
+def keveres_betolt() -> bool:
+    return bool(beallitasok().get("keveres"))
+
+
+def keveres_ment(be: bool) -> None:
+    beallit(keveres=bool(be))
+
+
+def kimenet_betolt() -> str:
+    return str(beallitasok().get("kimenet") or "")
+
+
+def kimenet_ment(nev: str) -> None:
+    beallit(kimenet=str(nev or ""))
 
 
 def ido_szoveg(mp: float) -> str:

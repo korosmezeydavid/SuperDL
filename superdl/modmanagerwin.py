@@ -81,13 +81,23 @@ class ModuleManagerFrame(wx.Frame):
         self.root = modkit.modules_root()
         self._rows = []
         self._busy = False
+        # ⚠️ Ujfalusi Zoltán jelentése (2026-09-14, 4.6.8): a modul-index
+        # letöltése a hálózatról percekig tarthat. Ha közben az ablak
+        # bezárul – a frissítés utáni újraindítás-ajánlat pont ezzel KEZDŐDIK
+        # (`self.Close()`) –, a háttérszál visszahívása egy már megsemmisült
+        # ListCtrl-ra fut: „wrapped C/C++ object of type ListCtrl has been
+        # deleted", ELKAPATLAN KIVÉTEL a fő szálon. Karcsi ezt úgy látta
+        # (2026-09-13), hogy „nem záródik be a program, csak az ablaka tűnik
+        # el". Ezért minden háttérből érkező visszahívás a `_kesobb()`-on megy
+        # át, ami futás előtt megnézi, él-e még az ablak.
+        self._halott = False
 
         self._build()
         self.CreateStatusBar()
         self.SetStatusText("Enter egy soron: telepítés/frissítés. Delete: "
                            "eltávolítás. „Összes frissítése”: mind egyben.")
         self.Bind(wx.EVT_CLOSE, self._on_close)
-        wx.CallAfter(self._refresh_async)
+        self._kesobb(self._refresh_async)
 
     # ---- felépítés ----------------------------------------------------
 
@@ -211,11 +221,11 @@ class ModuleManagerFrame(wx.Frame):
             from . import netdialog
             if not netdialog.ensure_online(self, "a modullista frissítéséhez",
                                            speak=self._announce):
-                wx.CallAfter(self._refresh_offline,
+                self._kesobb(self._refresh_offline,
                              "Nincs internetkapcsolat.")
                 return
             entries = coremod.fetch_index()
-            wx.CallAfter(self._populate, entries, installed)
+            self._kesobb(self._populate, entries, installed)
         threading.Thread(target=work, daemon=True).start()
 
     def _refresh_offline(self, msg):
@@ -307,18 +317,18 @@ class ModuleManagerFrame(wx.Frame):
             from . import netdialog
             if not netdialog.ensure_online(self, "a modulok frissítéséhez",
                                            speak=self._announce):
-                wx.CallAfter(self._update_all_done, [], [],
+                self._kesobb(self._update_all_done, [], [],
                              "Nincs internetkapcsolat.")
                 return
             sikeres, hibas = [], []
             for i, r in enumerate(sorok, 1):
                 nev = r["name"]
-                wx.CallAfter(self._announce,
+                self._kesobb(self._announce,
                              f"{i} / {osszes}: {nev} frissítése…")
 
                 def prog(frac, i=i):
                     egesz = (i - 1 + max(0.0, min(1.0, frac))) / osszes
-                    wx.CallAfter(self.gauge.SetValue, int(egesz * 100))
+                    self._kesobb(self.gauge.SetValue, int(egesz * 100))
 
                 try:
                     man = coremod.install_entry(self.loader, r["entry"], prog,
@@ -332,7 +342,7 @@ class ModuleManagerFrame(wx.Frame):
                 # „Eltávolítás majd Telepítés" mindig megoldotta – itt ezt
                 # automatikusan megtesszük. A modul adatai nem vesznek el, mert
                 # azok a ~/.superdl/modules_data mappában vannak.
-                wx.CallAfter(self._announce,
+                self._kesobb(self._announce,
                              f"{nev}: a helyben-frissítés nem ment, "
                              "újratelepítéssel próbálom…")
                 try:
@@ -341,7 +351,7 @@ class ModuleManagerFrame(wx.Frame):
                     sikeres.append(f"{man.name} {man.version} (újratelepítve)")
                 except Exception as ex2:
                     hibas.append(f"{nev}: {ex2 or elso_hiba}")
-            wx.CallAfter(self._update_all_done, sikeres, hibas, "")
+            self._kesobb(self._update_all_done, sikeres, hibas, "")
 
         threading.Thread(target=work, daemon=True).start()
 
@@ -408,22 +418,22 @@ class ModuleManagerFrame(wx.Frame):
         self._announce(f"{r['name']} letöltése és telepítése…")
 
         def prog(frac):
-            wx.CallAfter(self.gauge.SetValue, int(max(0, min(1, frac)) * 100))
+            self._kesobb(self.gauge.SetValue, int(max(0, min(1, frac)) * 100))
 
         def work():
             from . import netdialog
             if not netdialog.ensure_online(self, "a modul telepítéséhez",
                                            speak=self._announce):
-                wx.CallAfter(self._install_done, False,
+                self._kesobb(self._install_done, False,
                              "Nincs internetkapcsolat.")
                 return
             try:
                 man = coremod.install_entry(self.loader, r["entry"], prog, self.root)
-                wx.CallAfter(self._install_done, True,
+                self._kesobb(self._install_done, True,
                              f"Telepítve: {man.name} ({man.version}). A teljes "
                              "érvényesüléshez indítsd újra a SuperDL-t.")
             except Exception as ex:
-                wx.CallAfter(self._install_done, False,
+                self._kesobb(self._install_done, False,
                              f"A telepítés nem sikerült: {ex}")
         threading.Thread(target=work, daemon=True).start()
 
@@ -449,6 +459,27 @@ class ModuleManagerFrame(wx.Frame):
         self._refresh_async()
 
     def _on_close(self, e):
+        self._halott = True
         if getattr(self.main, "_modmgr_win", None) is self:
             self.main._modmgr_win = None
         self.Destroy()
+
+    # ---- háttérszálból érkező visszahívások ---------------------------
+
+    def _kesobb(self, fv, *args):
+        """`wx.CallAfter` ŐRSZEMMEL: a visszahívás csak élő ablakon fut le.
+
+        A hálózatos munka háttérszálon megy, az eredménye viszont a fő
+        szálon kell hogy landoljon – és mire odaér, az ablak már NEM biztos,
+        hogy létezik. A `_halott` jelző a szándékos bezárást fogja meg, a
+        `not self` a wx-oldali megsemmisülést, a `RuntimeError` pedig azt a
+        rést, ami a sorban állás közben nyílik. Mindhárom ugyanarra a
+        válaszra vezet: ilyenkor nincs teendő, nem hiba."""
+        def biztonsagos():
+            if self._halott or not self:
+                return
+            try:
+                fv(*args)
+            except RuntimeError:
+                pass          # az ablak épp most semmisült meg
+        wx.CallAfter(biztonsagos)

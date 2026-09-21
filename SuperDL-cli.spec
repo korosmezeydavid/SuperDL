@@ -15,6 +15,7 @@ hiddenimports += collect_submodules('yt_dlp')
 hiddenimports += collect_submodules('feedparser')
 hiddenimports += collect_submodules('ebooklib')
 hiddenimports += collect_submodules('pypdf')
+hiddenimports += collect_submodules('pdfminer')
 tmp_ret = collect_all('sounddevice')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('edge_tts')

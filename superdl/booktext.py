@@ -16,6 +16,12 @@ SUPPORTED = (".txt", ".docx", ".epub", ".pdf")
 class Book:
     title: str
     sections: list[str] = field(default_factory=list)
+    # ⚠️ IGAZ, ha a kinyert szöveg GYANÚSAN szétesett (lásd `szetszabdalt`).
+    # A régi kód ilyenkor is némán továbbadta a szemetet – Turai László
+    # NAV-levele így lett „N e m z e ti A d ó - é s V á m h iv a ta l".
+    # A szöveg így is megy (több a semminél), de a hívó MEGTUDJA, és
+    # szólhat a felhasználónak.
+    gyanus: bool = False
 
     @property
     def text(self) -> str:
@@ -106,22 +112,105 @@ def _from_epub(path: Path) -> Book:
     return Book(title=title, sections=sections)
 
 
-def _from_pdf(path: Path) -> Book:
+_UNI_MARADEK = re.compile(r"/uni[0-9A-Fa-f]{4}")
+
+
+def szetszabdalt(szoveg: str) -> float:
+    """Mennyire „szétesett" a kinyert szöveg? 0.0 = ép, 1.0 = minden
+    karakter külön áll. Az egykarakteres „szavak" arányát adja vissza.
+
+    ⚠️ MIÉRT KELL EZ (Turai László, 2026-09-21). Kapott egy hivatalos
+    NAV-levelet PDF-ben, és a TXT-be így került:
+
+        N e m z e ti A d ó - é s  V á m h iv a ta l
+
+    Egy másik PDF ugyanakkor hibátlanul konvertálódott. A hiba tehát nem
+    a konvertálásban volt, hanem abban, hogy a kinyerőnk némán rossz
+    eredményt adott, és senki nem nézte meg, hogy értelmes-e."""
+    szavak = (szoveg or "").split()
+    if not szavak:
+        return 1.0
+    egyes = sum(1 for w in szavak if len(w) == 1)
+    return egyes / len(szavak)
+
+
+# ⚠️ ENNYI SZÓ ALATT NEM ÍTÉLKEZÜNK. A magyarban sok az egybetűs szó
+# („a", „s"), és a számok is külön állnak: „A 4 és 5 közötti szám" mérőszáma
+# 0,50 – pedig tökéletesen ép. Rövid szövegen tehát a mérőszám nem
+# árulkodik, és egy egysoros számlaértesítőt hamisan riasztanánk. Laci
+# NAV-levele 1325 szó volt.
+MINTA_MINIMUM = 40
+
+
+def gyanusan_szetesett(szoveg: str) -> bool:
+    """Elég nagy-e a minta ahhoz, hogy ítéljünk – és ha igen, szétesett-e?"""
+    if len((szoveg or "").split()) < MINTA_MINIMUM:
+        return False
+    return szetszabdalt(szoveg) >= SZETSZABDALT_HATAR
+
+
+def _pdf_pdfminer(path: Path) -> str:
+    """pdfminer.six – ez kezeli helyesen a karakterenként pozicionált
+    (kerningelt) PDF-eket. Laci NAV-levelén 7% egykarakteres szó (ép),
+    a pypdf-nél 75% volt."""
+    from pdfminer.high_level import extract_text
+    return extract_text(str(path)) or ""
+
+
+def _pdf_pypdf(path: Path) -> str:
     from pypdf import PdfReader
     reader = PdfReader(str(path))
-    title = path.stem
-    try:
-        if reader.metadata and reader.metadata.title:
-            title = reader.metadata.title
-    except Exception:
-        pass
     parts = []
     for page in reader.pages:
         try:
             parts.append(page.extract_text() or "")
         except Exception:
             pass
-    return Book(title=title, sections=[_clean("\n".join(parts))])
+    return "\n".join(parts)
+
+
+def _pdf_cim(path: Path) -> str:
+    try:
+        from pypdf import PdfReader
+        reader = PdfReader(str(path))
+        if reader.metadata and reader.metadata.title:
+            return reader.metadata.title
+    except Exception:
+        pass
+    return path.stem
+
+
+def _from_pdf(path: Path) -> Book:
+    """PDF → szöveg. TÖBB kinyerőt próbálunk, és a LEGÉPEBBET használjuk.
+
+    ⚠️ NEM az elsőt, amelyik ad valamit. Pontosan ez volt Laci hibája: a
+    pypdf „sikeresen" kinyerte a szöveget, csak épp minden betű közé
+    szóközt tett – és a program ezt kérdés nélkül elfogadta. A kinyerők
+    erősségei PDF-enként különböznek, ezért a `szetszabdalt()` mérőszámmal
+    döntünk, nem sorrenddel.
+
+    Ha a legjobb is szétesett, a szöveg akkor is megy (több a semminél),
+    de a hívó a `Book.gyanus` mezőből MEGTUDJA, és szólhat a
+    felhasználónak – a néma rossz eredmény volt az igazi baj."""
+    jeloltek = []
+    for nev, fv in (("pdfminer", _pdf_pdfminer), ("pypdf", _pdf_pypdf)):
+        try:
+            szoveg = _UNI_MARADEK.sub("", fv(path) or "")
+        except Exception:
+            continue
+        if szoveg.strip():
+            jeloltek.append((szetszabdalt(szoveg), nev, szoveg))
+    if not jeloltek:
+        return Book(title=_pdf_cim(path), sections=[""], gyanus=True)
+    jeloltek.sort(key=lambda t: t[0])
+    _pont, _nev, legjobb = jeloltek[0]
+    return Book(title=_pdf_cim(path), sections=[_clean(legjobb)],
+                gyanus=gyanusan_szetesett(legjobb))
+
+
+# e fölött a szöveg nyilvánvalóan szétesett (Laci PDF-je 0,75 volt, egy ép
+# dokumentum 0,05–0,10 körül van)
+SZETSZABDALT_HATAR = 0.35
 
 
 def extract(path: str) -> Book:

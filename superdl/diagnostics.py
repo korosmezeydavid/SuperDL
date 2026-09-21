@@ -232,8 +232,13 @@ def build_report(settings: dict | None = None,
             lines.append("Offline fordítás:  elérhető; nyelvi csomagok: "
                          + (parok or "még egy sincs letöltve"))
         else:
-            lines.append("Offline fordítás:  NINCS (a fordítómotor hiányzik "
-                         "ebből a verzióból)")
+            # ⚠️ NE csak azt írjuk, hogy „nincs" – írjuk meg, MI hiányzik
+            # (Farkas István, 2026-09-19). Egy hibajelentésben a „nincs"
+            # semmit nem ér: pont az a kérdés, miért.
+            reszek = "; ".join(offlineford.hianyzo_reszek())
+            lines.append("Offline fordítás:  NINCS – " +
+                         (reszek or "a fordítómotor hiányzik ebből a "
+                                    "verzióból"))
     except Exception as e:
         lines.append(f"Offline fordítás:  nem ellenőrizhető ({e})")
 
@@ -296,7 +301,21 @@ def build_report(settings: dict | None = None,
             # vágta ki, és pont az ok maradt le róla.
             nyom = (osszeomlas.utolso_osszeomlas()
                     or osszeomlas.naplo_szoveg(120))
-            lines += ["", "⚠️ ÖSSZEOMLÁS-NAPLÓ (natív hiba nyoma):"]
+            # A BEFAGYÁS nyoma ugyanebbe a naplóba kerül, de nem ugyanaz:
+            # ott a program ÉLT, csak nem válaszolt. Rossz címke alatt a
+            # fejlesztő is rossz irányba indul. [Tóth László, 2026-09-14]
+            fejlec = ("⚠️ MEGAKADÁS-NAPLÓ (a program nem válaszolt; "
+                      "minden szál verme):"
+                      if osszeomlas.MEGAKADAS_FEJLEC in nyom
+                      else "⚠️ ÖSSZEOMLÁS-NAPLÓ (natív hiba nyoma):")
+            lines += ["", fejlec]
+            # MIKOR és MI TÖRTÉNT AZÓTA. Dr. Kiss István 2026-09-16-i
+            # jelentésében a nyom NÉGY NAPOS volt, egy azóta javított hibáról,
+            # és utána huszonöt indulás következett zavartalanul — a jelentés
+            # élén viszont csak egy dátumtalan ⚠️ állt. Így az is beküldi, akit
+            # épp nem ér baj, és a fejlesztő is rossz irányba indul. A nyom
+            # marad, a KÖRÜLMÉNYE kerül mellé.
+            lines += ["  " + s for s in _nyom_kora_sorok(osszeomlas)]
             lines += ["  " + ln for ln in nyom.splitlines()]
     except Exception:
         pass
@@ -304,3 +323,31 @@ def build_report(settings: dict | None = None,
     lines += ["", "(A jelentés nem tartalmaz API-kulcsot, jelszót vagy "
                   "süti-tartalmat; a felhasználói mappa ~ jellel szerepel.)"]
     return _mask_secrets("\n".join(lines))
+
+
+def _nyom_kora_sorok(osszeomlas) -> list:
+    """A nyom KÖRÜLMÉNYE: mikor, melyik verzióban, és mi volt azóta.
+
+    Külön függvény, hogy tesztelhető legyen a jelentés egésze nélkül."""
+    try:
+        info = osszeomlas.nyom_kora()
+    except Exception:
+        return []
+    if not info:
+        return []
+    ki = []
+    if info.get("ido"):
+        ki.append("MIKOR: %s, a(z) %s verzióban."
+                  % (info["ido"], info.get("verzio") or "ismeretlen"))
+    ota = int(info.get("ota") or 0)
+    if ota:
+        ki.append("AZÓTA: %d indulás, újabb nyom nélkül." % ota)
+    else:
+        ki.append("AZÓTA: ez volt a LEGUTÓBBI indulás — a nyom friss.")
+    regi = info.get("verzio")
+    most = info.get("most")
+    if ota and regi and most and regi != most:
+        ki.append("FIGYELEM: a nyom egy KORÁBBI verzióból való (%s), "
+                  "a program azóta %s. Lehet, hogy a hibát már javítottuk."
+                  % (regi, most))
+    return ki

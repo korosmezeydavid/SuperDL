@@ -143,7 +143,17 @@ HOWITWORKS_TEXT = (
     "kosár, közvetlen letöltés.\n"
     "  • Internetes rádió (Ctrl+Shift+R): élő rádióállomások keresése és "
     "hallgatása, kedvencekkel.\n"
-    "  • Időzítés: megadott időpontban indítja a letöltést.\n"
+    "  • Időzítés: az URL-mező MELLETTI kis mezőbe (Alt+I) beírod, mikor "
+    "induljon a letöltés, és a hivatkozás ott várakozik addig. Amit be lehet "
+    "írni: ÓRA:PERC, például 3:00 – ha az az idő ma már elmúlt, a program "
+    "HOLNAP ugyanakkor indítja. Késleltetés: +2h két óra múlva, +30m harminc "
+    "perc múlva, +1d egy nap múlva. Csak szám a plusz után PERCET jelent: a "
+    "+90 kilencven percet. Pontos nap is megadható: 2026-09-18 03:00. Üresen "
+    "hagyva a letöltés azonnal indul. Az elem állapota „ütemezve\", majd az "
+    "időpontban „várakozik\", és elindul. A programnak futnia kell akkor, "
+    "amikor az idő eljön – de elég, ha a tálcán van. Ha közben kilépsz, "
+    "újraindításkor a program megkérdezi, folytassa-e; igenre az időzítés "
+    "megmarad.\n"
     "  • Folytatás: a félbeszakadt letöltéseket újraindításkor felkínálja.\n"
     "  • Podcast és RSS-olvasó: feliratkozol egy csatorna vagy hírcsatorna "
     "címére (Ctrl+R). A feliratkozásokat a Ctrl+L nyitja meg; ott a kijelölt "
@@ -161,7 +171,10 @@ HOWITWORKS_TEXT = (
 KEYS_TEXT = (
     "Billentyűparancsok\n\n"
     "  Enter (az URL-mezőben)  – a letöltés indítása\n"
-    "  Ctrl+N   – az URL-mező fókuszálása (új letöltés)\n"
+    "  Ctrl+N   – az URL-mező fókuszálása (új letöltés). Akkor is előhozza\n"
+    "               az URL-sort, ha az induláskor rejtve van\n"
+    "  Alt+I    – Időzítés mező: mikor induljon a letöltés (3:00, +2h, +30m,\n"
+    "               +90 = kilencven perc; üresen azonnal)\n"
     "  Ctrl+T   – torrentfájl megnyitása\n"
     "  Ctrl+O   – URL-lista megnyitása fájlból\n"
     "  Ctrl+R   – feliratkozás podcast/RSS-csatornára\n"
@@ -500,10 +513,33 @@ class MainFrame(wx.Frame):
         self.feed_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self._on_feed_timer, self.feed_timer)
         self.feed_timer.Start(15 * 60 * 1000)
+        # KILÉPÉS-ŐRÖK: a modulok ide jegyezhetnek be egy „biztosan kilépsz?"
+        # kérdést (pl. a Szervezés modul beszélő órája, ha fut időzítő).
+        # ⚠️ MIÉRT ÍGY. A modul megtehetné, hogy maga köt EVT_CLOSE-t a
+        # főablakra, de akkor a háttérmód (tálcára minimalizálás) alatt is
+        # kérdezne, holott ott a program nem lép ki – és a névelcsúszás-őr
+        # (tools/attr_audit.py) is jogosan bukna rajta. Így a Core dönti el,
+        # MIKOR kell kérdezni, a modul csak azt mondja meg, MIT kérdezzen.
+        self._kilepes_orok = []
+        # melyik (letöltés, nyers hibaszöveg) párt írtuk már a naplóba –
+        # hogy a Shift+F6 ismételgetése ne töltse tele ugyanazzal
+        self._naplozott_hibak = set()
         self.Bind(wx.EVT_CLOSE, self._on_close)
 
         # induláskor: félbeszakadt letöltések felajánlása + feed-ellenőrzés
-        wx.CallLater(400, self._offer_resume)
+        # ⚠️ `CallAfter`-rel, és ez NEM szőrszálhasogatás. A `CallLater` egy
+        # IDŐZÍTŐ: a `_offer_resume` így közvetlenül a `Notify` visszahívásából
+        # futna, és MODÁLIS ablakot nyit. Pontosan ez a 4.6.7-es szabály, amit
+        # Dr. Kiss gépén egyszer már megsértettünk: időzítő-visszahívásból
+        # nyitott modális ablak + a háttérben épp COM-ot hívó munka (indulás
+        # után az időjárás-lekérdezés SSL-környezetet épít) = 0x8001010d,
+        # `RPC_E_CANTCALLOUT_ININPUTSYNCCALL`. Akkor az összeomlás-jelzésnél
+        # javítottuk ki, EZT AZ EGY HELYET viszont kihagytuk — és Tóth László
+        # meg Ujfalusi Zoltán 4.6.11-es jelentésében pont ez a verem van:
+        #     File "superdl_gui.py", line 1763 in _offer_resume
+        #     File "wx\core.py", line 3550 in Notify
+        # A `CallAfter` kilépteti a hívást az időzítő kontextusából.
+        wx.CallLater(400, lambda: wx.CallAfter(self._offer_resume))
         if self.fm.subs:
             wx.CallLater(3000, lambda: self._check_feeds(quiet=True))
         if self.cm.channels:
@@ -950,9 +986,26 @@ class MainFrame(wx.Frame):
         self.url_entry.SetHint("Illeszd be a hivatkozást, majd nyomj Entert")
         lbl_sched = wx.StaticText(panel, label="&Időzítés:")
         self.sched_entry = wx.TextCtrl(panel, size=(80, -1))
-        self.sched_entry.SetName("Időzített indítás, például 03:00 vagy +2h; "
-                                 "üresen hagyva azonnal indul")
-        self.sched_entry.SetHint("pl. 03:00")
+        # ⚠️ Stolmár Barbi kérdése a listán (2026-09-17): „nem tudom, hogy
+        # kell beírni, hány óra hány perctől töltsön le." A mező NEVE eddig is
+        # hozott egy példát, de azt, hogy ÓRA:PERC alakban kell írni, sehol nem
+        # mondtuk ki — és a `+90` percjelentése végképp sehol nem szerepelt.
+        # A név rövid marad (ez szólal meg MINDEN fókuszáláskor), a teljes
+        # lista a súgóba és a buboréksúgóba került.
+        self.sched_entry.SetName(
+            "Időzítés. Írd be óra kettőspont perc alakban, például 3:00, "
+            "vagy késleltetést: +2h. Üresen hagyva azonnal indul. "
+            "A többi lehetőség az F1 súgóban.")
+        self.sched_entry.SetHint("pl. 3:00")
+        self.sched_entry.SetToolTip(
+            "Mikor induljon a letöltés?\n"
+            "3:00 – ma 3 órakor; ha ma már elmúlt, holnap ugyanakkor\n"
+            "+2h – két óra múlva\n"
+            "+30m – harminc perc múlva\n"
+            "+90 – kilencven perc múlva (szám önmagában = PERC)\n"
+            "+1d – egy nap múlva\n"
+            "2026-09-18 03:00 – pontos nap és idő\n"
+            "üresen – azonnal indul")
         btn_dl = wx.Button(panel, label="Le&töltés")
         btn_dl.SetDefault()
         row1.Add(lbl_url, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
@@ -1331,9 +1384,15 @@ class MainFrame(wx.Frame):
         sched_text = self.sched_entry.GetValue().strip()
         start_at = parse_when(sched_text) if sched_text else None
         if sched_text and start_at is None:
+            # A hibaüzenet MONDJA MEG a szabályt, ne csak példákat soroljon.
+            # Barbi kérdéséből (2026-09-17) az derült ki, hogy épp az óra:perc
+            # alak nem volt magától értetődő — és a puszta szám percjelentése
+            # sehol nem szerepelt.
             self._announce(
-                "Érvénytelen időzítés. Használd pl. a +2h, +30m vagy 14:30 "
-                "formátumot.", ok=False)
+                f"Ezt nem értem: {sched_text}. Az időpont óra kettőspont perc "
+                "alakban megy, például 3:00 – ha az ma már elmúlt, holnap "
+                "indul. Késleltetés: +2h, +30m, +1d; a +90 kilencven percet "
+                "jelent. Üresen hagyva azonnal indul.", ok=False)
             return
         job = mgr.add(url, kind=kind, start_at=start_at)
         self._row_for(job)
@@ -2132,12 +2191,19 @@ class MainFrame(wx.Frame):
         p = job.progress
         nev = p.filename or job.url
         if p.conflict or p.status == "hiba" or getattr(p, "elakadt", False):
+            # ⚠️ ELŐBB ÍRJUK A NAPLÓBA, CSAK UTÁNA ÍGÉRJÜK MEG. Ha a mondat
+            # az lesz, hogy „a pontos szövege az eseménynaplóban van", akkor
+            # ott KELL lennie – Karcsi háromszor futott bele, hogy nincs.
+            # A `van_nyers` dönti el, melyik mondat megy: ha tényleg nincs
+            # nyers szövegünk, nem küldjük üres naplóhoz.
+            van_nyers = self._nyers_hibat_naploz(nev, job)
             mondat = hibaszoveg.gond_mondat(
                 nev, p.status, p.error,
                 utkozes=bool(p.conflict), probak=getattr(job, "retries", 0),
                 elakadt=bool(getattr(p, "elakadt", False)),
                 elakadas_oka=getattr(p, "elakadas_oka", ""),
-                ismert=getattr(p, "error_ismert", None))
+                ismert=getattr(p, "error_ismert", None),
+                van_nyers=van_nyers)
         else:
             mondat = f"{nev}: állapota {p.status}, most nincs vele teendő."
         # A KORÁBBI hiba akkor is elhangzik, ha most épp fut. Ez az egyetlen
@@ -2165,6 +2231,47 @@ class MainFrame(wx.Frame):
             return time.strftime(" (%m. %d. %H:%M)", time.localtime(float(ido)))
         except Exception:
             return ""
+
+    @staticmethod
+    def _nyers_hibaszoveg(job) -> str:
+        """A hiba PONTOS, nyers szövege – ami a naplóba való.
+
+        Három helyről jöhet, ebben a sorrendben:
+          1. `progress.error_nyers` – ezt a fordítás pillanatában tettük el;
+          2. `job.utolso_hiba` – ez TÚLÉLI a program bezárását (ez menti meg
+             az indításkor már hibás sorokat);
+          3. `progress.error` – végszükségben a lefordított mondat is több
+             a semminél.
+        """
+        p = getattr(job, "progress", None)
+        for ertek in (getattr(p, "error_nyers", ""),
+                      getattr(job, "utolso_hiba", ""),
+                      getattr(p, "error", "")):
+            ertek = (ertek or "").strip()
+            if ertek:
+                return ertek
+        return ""
+
+    def _nyers_hibat_naploz(self, nev: str, job) -> bool:
+        """A nyers hibaszöveg naplóba írása. Visszaad: VAN-E mit odaírni.
+
+        ⚠️ EZT KELL HÍVNI MINDENHOL, AHOL AZT MONDJUK, HOGY „a pontos szövege
+        az eseménynaplóban van" (Nagy Károly, 2026-09-18 és 09-21). Karcsi
+        háromszor írta meg, hogy a program odaküldi, és ott nincs semmi:
+        a nyers szöveget eddig CSAK az állapotváltás pillanatában írtuk ki,
+        tehát az indításkor már hibás sorokhoz sosem került oda, a Shift+F6
+        pedig kimondta az ígéretet, de maga sosem írt a naplóba.
+
+        Ugyanazt a szöveget kétszer nem írjuk ki: a napló legyen olvasható."""
+        nyers = self._nyers_hibaszoveg(job)
+        if not nyers:
+            return False
+        kulcs = (getattr(job, "id", None), nyers)
+        if kulcs in self._naplozott_hibak:
+            return True                 # már ott van – az ígéret áll
+        self._naplozott_hibak.add(kulcs)
+        self._naplo(f"[{nev}] a hiba pontos szövege: {nyers}")
+        return True
 
     def _naplo(self, szoveg: str) -> None:
         """CSAK az eseménynaplóba ír: se hang, se felolvasás, se állapotsor.
@@ -2592,9 +2699,22 @@ class MainFrame(wx.Frame):
         terveztem — de működik, és nem dönti le a programot."""
         try:
             from superdl import osszeomlas
-            if not osszeomlas.uj_osszeomlas():
+            baj = osszeomlas.uj_osszeomlas()
+            fagyas = osszeomlas.uj_megakadas()
+            if not (baj or fagyas):
                 return
         except Exception:
+            return
+        # A BEFAGYÁS NEM ÖSSZEOMLÁS. Aki azt látta, hogy a program percekig
+        # nem válaszolt, és végül ő lőtte le, annak azt mondani, hogy
+        # „váratlanul bezárult", pontatlan — és a pontatlan mondat után nem
+        # hiszi el a következőt sem. [Tóth László, 2026-09-14]
+        if fagyas and not baj:
+            self._announce(
+                "A SuperDL a legutóbbi futásakor egy időre megakadt: nem "
+                "válaszolt. Feljegyeztük, hol tartott éppen. Ha elküldöd "
+                "nekünk, megnézzük — Súgó menü, Hibajelentés vágólapra.",
+                ok=False, toast=False)
             return
         # ⚠️ `toast=False`: a rendszerértesítés COM-on megy. Ezen az úton az
         # volt az egyik gyanúsított — és egy értesítés nem ér annyit, hogy
@@ -2893,10 +3013,14 @@ class MainFrame(wx.Frame):
                     # a 4.6.4-ben pont ezért cseréltük le a jó magyarázatot a
                     # „nem ismerjük fel" szövegre. A naplóba a NYERS megy.
                     ismert = getattr(p, "error_ismert", None)
-                    msg = f"Hiba: {nev} – {hibaszoveg.olvashato(p.error, ismert)}"
-                    nyers = getattr(p, "error_nyers", "") or p.error
-                    if nyers and ismert is False:
-                        self._naplo(f"[{nev}] nyers hibaszöveg: {nyers}")
+                    # ⚠️ A NAPLÓZÁS ELŐBB, ÉS MINDEN ISMERETLEN HIBÁRA.
+                    # Régen csak akkor írtuk ki, ha `ismert is False` volt —
+                    # de amikor a mező None (mentett sorból visszatöltött
+                    # hiba), a mondat AKKOR IS az volt, hogy „a pontos
+                    # szövege az eseménynaplóban van", és nem került oda.
+                    van_nyers = self._nyers_hibat_naploz(nev, j)
+                    msg = (f"Hiba: {nev} – "
+                           f"{hibaszoveg.olvashato(p.error, ismert, van_nyers)}")
                     self._announce(msg, ok=False, toast=True, sound="error")
                     self.selfvoice.announce("download", "error")
                     self._feed_pending.pop(j.id, None)
@@ -3132,6 +3256,36 @@ class MainFrame(wx.Frame):
         self._really_quit = True
         self.Close()
 
+    def kilepes_or_hozzaad(self, fn):
+        """Kilépés-őr bejegyzése. `fn()` egy szöveget ad vissza, ha van mit
+        elveszíteni (ezt kérdezzük meg a felhasználótól), különben üreset.
+        A modulok ezen át kérdeznek kilépéskor – lásd a `_kilepes_orok`-nál."""
+        if fn not in self._kilepes_orok:
+            self._kilepes_orok.append(fn)
+
+    def kilepes_or_eltavolit(self, fn):
+        """Kilépés-őr visszavonása (a modul leszerelésekor)."""
+        try:
+            self._kilepes_orok.remove(fn)
+        except ValueError:
+            pass
+
+    def _kilepes_orok_kerdeznek(self, event) -> bool:
+        """True, ha valamelyik őr megvétózta a kilépést."""
+        for fn in list(self._kilepes_orok):
+            try:
+                szoveg = fn()
+            except Exception:
+                log.exception("kilépés-őr hibára futott")
+                continue
+            if not szoveg:
+                continue
+            if wx.MessageBox(szoveg, "SuperDL", wx.YES_NO | wx.ICON_QUESTION,
+                             self) != wx.YES:
+                event.Veto()
+                return True
+        return False
+
     def _on_close(self, event):
         # HÁTTÉRMÓD: az ablak bezárása NE lépjen ki, csak a tálcára minimalizáljon
         # – így az időzített felvételek tovább futnak. Kilépni a tálca menüjéből
@@ -3144,6 +3298,10 @@ class MainFrame(wx.Frame):
                                "tálcaikon menüjéből tudsz.", toast=True)
             if event.CanVeto():
                 event.Veto()
+            return
+        # MODUL-ŐRÖK (pl. fut egy időzítő a beszélő órában). Ide csak akkor
+        # jutunk, ha TÉNYLEG kilépünk – háttérmódban a fenti ág már visszatért.
+        if event.CanVeto() and self._kilepes_orok_kerdeznek(event):
             return
         running = self.mgr and any(
             j.progress.status in ("letöltés", "seedelés")
@@ -3770,6 +3928,12 @@ def main():
         # történnek, és mappafüggők – a napló eddig azt mutatta, hogy a
         # választóban jártunk, de azt nem, hogy hol.
         osszeomlas.fajlvalaszto_figyelese()
+        # MEGAKADÁS-FIGYELŐ (Tóth László, 2026-09-14). A befagyás NEM
+        # összeomlás: a faulthandler csak a haldokló folyamatról ír. Aki a
+        # Feladatkezelővel lövi le a befagyott programot, eddig üres naplót
+        # kapott – „semmi nyoma nem maradt". A figyelő háttérszál most már
+        # kiírja minden szál vermét, ha a fő szál elnémul.
+        osszeomlas.megakadas_figyelese()
     except Exception:
         pass
     # ALKALMAZÁS-NAPLÓ (Karcsi, 2026-09-09). A `logging`-hoz eddig EGYETLEN
@@ -3834,6 +3998,13 @@ def main():
             wx.TheClipboard.GetData(data)
             frame._last_clip = data.GetText().strip()
         wx.TheClipboard.Close()
+    # ÉLETJEL a megakadás-figyelőnek. A hivatkozást a kereten tartjuk: ha
+    # elfogyna, a wx eldobná az időzítőt, és a figyelés NÉMÁN elhalna –
+    # vagyis pont úgy nézne ki, mintha sosem fagyna be a program.
+    try:
+        frame._sziv_ido = osszeomlas.sziv_inditasa(frame)
+    except Exception:
+        pass
     _start_show_listener(frame)   # második indítás → ezt a példányt hozza elő
     if background:
         frame._enter_background()  # REJTVE indul a tálcán (Windows-indításból)

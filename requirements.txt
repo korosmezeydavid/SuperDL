@@ -8,6 +8,13 @@ edge-tts>=6.1
 python-docx>=1.1
 ebooklib>=0.18
 pypdf>=4.0
+# PDF-KINYERÉS: a pypdf a karakterenként pozicionált PDF-eknél
+# szétszabdalja a szöveget (Turai László NAV-levele, 2026-09-21:
+# „N e m z e ti A d ó - é s V á m h iv a ta l"). A pdfminer.six ezeket
+# helyesen kezeli; a booktext a kettő közül a LEGÉPEBB eredményt
+# választja. MIT licenc, tiszta Python, a függőségei (cryptography,
+# charset-normalizer) már benne vannak a csomagban.
+pdfminer.six>=20231228
 fpdf2>=2.7
 beautifulsoup4>=4.12
 # A TITKOSÍTOTT MENTÉSHEZ (superdl/mentes.py, AES-GCM). Ez a csomag eddig

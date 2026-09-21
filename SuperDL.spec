@@ -32,6 +32,7 @@ hiddenimports += collect_submodules('yt_dlp')
 hiddenimports += collect_submodules('feedparser')
 hiddenimports += collect_submodules('ebooklib')
 hiddenimports += collect_submodules('pypdf')
+hiddenimports += collect_submodules('pdfminer')
 hiddenimports += collect_submodules('fpdf')      # beépített PDF (dok.-konverter)
 # A Super Edit szövegszerkesztő ezekkel nyit és ment. A fagyasztott exe-ben
 # nincs pip: ha ezek kimaradnak, a modul betöltődik, de a Word- és

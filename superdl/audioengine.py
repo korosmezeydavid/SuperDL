@@ -8,6 +8,7 @@ szükség a stream újraindítására.
 """
 
 import os
+import re
 import subprocess
 import threading
 import time
@@ -17,6 +18,92 @@ from .ffmpeg import ensure_ffmpeg, find_ffmpeg
 
 RATE = 44100
 CHANNELS = 2
+
+# a „hagyd a rendszerre" választás azonosítója a beállításokban
+RENDSZER_ESZKOZ = ""
+
+
+def eszkoz_nev(nyers: str) -> str:
+    """A hangeszköz nevének FELOLVASHATÓ alakja.
+
+    ⚠️ NEM szépészet. A Windows a bluetooth kihangosítókat így nevezi:
+
+        Fejbeszélő (@System32\\drivers\\bthhfenum.sys,#2;%1 Hands-Free%0
+        ;(WI-C100))
+
+    Ezt a képernyőolvasó karakterenként mondaná ki – egy ilyen listából
+    vakon választani lehetetlen. A lényeg a zárójeles VÉGE: a készülék
+    neve. Azt emeljük ki, a többit eldobjuk."""
+    n = " ".join((nyers or "").replace("\r", " ").replace("\n", " ").split())
+    m = re.search(r";\(([^()]+)\)\)\s*$", n)
+    if m:
+        return "%s (kihangosító)" % m.group(1).strip()
+    m = re.search(r"@System32.*?;\(?([^();]+)\)?\)?\s*$", n)
+    if m and m.group(1).strip():
+        return "%s (kihangosító)" % m.group(1).strip()
+    return n
+
+
+def eszkozok() -> list:
+    """A gép HANGKIMENETEI: [(azonosító, felolvasható név), …].
+
+    Az első elem mindig a rendszer alapértelmezettje. Az azonosító a
+    sounddevice eszköz NYERS neve (nem az indexe!), mert az index eszköz
+    ki-be dugásakor elcsúszik – a név viszont megmarad. A megjelenített
+    név viszont a megtisztított alak.
+
+    ⚠️ MIÉRT KELL (Stolmár Barbi, 2026-09-21): „A zene lejátszóban
+    bluetooth fejhallgatóra váltáskor nincs átváltás, továbbra is az
+    alapértelmezetten marad." A lejátszó eddig mindig a rendszer
+    alapértelmezettjén szólt, és nem is tudott róla, hogy van hová váltani."""
+    ki = [(RENDSZER_ESZKOZ, "Rendszer alapértelmezett kimenete")]
+    latott = set()
+    try:
+        import sounddevice as sd
+        for e in sd.query_devices():
+            if int(e.get("max_output_channels") or 0) <= 0:
+                continue
+            nyers = (e.get("name") or "").strip()
+            if not nyers:
+                continue
+            szep = eszkoz_nev(nyers)
+            # ⚠️ ugyanaz az eszköz több hang-API alatt is megjelenik
+            # (MME, DirectSound, WASAPI). Vakon egy háromszorosan
+            # felsorolt lista használhatatlan – egyszer soroljuk fel.
+            kulcs = szep.lower()
+            if kulcs in latott:
+                continue
+            latott.add(kulcs)
+            ki.append((nyers, szep))
+    except Exception:
+        pass
+    return ki
+
+
+def alapertelmezett_kimenet() -> str:
+    """A rendszer JELENLEGI alapértelmezett kimenetének NYERS neve, vagy üres.
+    Ebből vesszük észre, ha a felhasználó bluetooth fülesre vált."""
+    try:
+        import sounddevice as sd
+        idx = None
+        azon = sd.default.device
+        if isinstance(azon, (list, tuple)) and len(azon) > 1:
+            idx = azon[1]
+        elif isinstance(azon, int):
+            idx = azon
+        if idx is None or idx < 0:
+            # a `sd.default.device` nincs mindig beállítva – a hang-API
+            # saját alapértelmezettje viszont igen
+            for api in sd.query_hostapis():
+                j = api.get("default_output_device", -1)
+                if j is not None and j >= 0:
+                    idx = j
+                    break
+        if idx is None or idx < 0:
+            return ""
+        return (sd.query_devices(idx).get("name") or "").strip()
+    except Exception:
+        return ""
 
 
 def _ffmpeg_exe(progress=None) -> str | None:
@@ -54,6 +141,65 @@ class Player:
         # és HAMIS „vége"/„hiba"-t küldene az ÚJ lejátszásra (a felolvasóban ez
         # állította le a felirat-narrációt tekeréskor). [Herman Tibor: AUDIO-03]
         self._generation = 0
+        # HANGKIMENET. Üres = a rendszer alapértelmezettje. A `_alap_nev` az
+        # a rendszer-alapértelmezett, amivel a jelenlegi stream elindult –
+        # ha ez menet közben megváltozik (bluetooth fejhallgató), a `_feed`
+        # szál észreveszi és ÁTÁLL rá. [Stolmár Barbi + Nagy Károly]
+        self._device = RENDSZER_ESZKOZ
+        self._alap_nev = ""
+        self._device_valt = False
+        # fn(régi_név, új_név) – a felület ebből mondhatja be a váltást.
+        # ⚠️ Vakon a NÉMA átváltás is zavaró: ha a zene egyszer csak a másik
+        # fülön szól, tudni kell, miért.
+        self.on_device_change = None
+
+    # ---- hangkimenet --------------------------------------------------
+
+    @property
+    def device(self) -> str:
+        return self._device
+
+    def set_device(self, azonosito: str) -> None:
+        """A kívánt kimenet NEVE, vagy üres a rendszer alapértelmezettjéhez.
+        A változás a KÖVETKEZŐ pufferrel érvényesül (a `_feed` újranyitja a
+        streamet) – nem kell megállítani és újraindítani a zenét."""
+        self._device = (azonosito or "").strip()
+        self._device_valt = True
+
+    def _stream_nyit(self, sd):
+        """Kimeneti stream nyitása a kívánt eszközre, HIBATŰRŐEN.
+
+        ⚠️ Ha a választott eszköz épp nincs jelen (kihúzott fejhallgató), NEM
+        némulunk el: visszaesünk a rendszer alapértelmezettjére, és ezt a
+        `on_device_change`-en keresztül meg is mondjuk. A néma elnémulás vakon
+        megkülönböztethetetlen attól, hogy a program lefagyott."""
+        kivant = self._device or None
+        try:
+            s = sd.RawOutputStream(samplerate=RATE, channels=CHANNELS,
+                                   dtype="int16", blocksize=2048,
+                                   device=kivant)
+            s.start()
+            self._alap_nev = alapertelmezett_kimenet()
+            self._device_valt = False
+            return s, ""
+        except Exception as e:
+            if not kivant:
+                raise
+            s = sd.RawOutputStream(samplerate=RATE, channels=CHANNELS,
+                                   dtype="int16", blocksize=2048)
+            s.start()
+            self._alap_nev = alapertelmezett_kimenet()
+            self._device = RENDSZER_ESZKOZ
+            self._device_valt = False
+            self._device_hiba(kivant, str(e))
+            return s, kivant
+
+    def _device_hiba(self, kivant: str, ok: str) -> None:
+        if self.on_device_change:
+            try:
+                self.on_device_change(kivant, "")
+            except Exception:
+                pass
 
     # ---- állapot ------------------------------------------------------
 
@@ -172,9 +318,7 @@ class Player:
         import numpy as np
         import sounddevice as sd
         try:
-            stream = sd.RawOutputStream(samplerate=RATE, channels=CHANNELS,
-                                        dtype="int16", blocksize=2048)
-            stream.start()
+            stream, _visszaesett = self._stream_nyit(sd)
         except Exception as e:
             self._emit_gen(gen, f"hiba: nincs hangkimenet ({e})")
             return
@@ -182,11 +326,44 @@ class Player:
         started = False
         failed = False
         err_msg = ""
+        kov_eszkoz_nezes = time.monotonic() + 2.0
         try:
             while not stop_event.is_set():
                 if self._paused.is_set():
                     time.sleep(0.05)
                     continue
+                # ⚠️ ESZKÖZVÁLTÁS MENET KÖZBEN (Barbi + Karcsi, 2026-09-21).
+                # Két ok van rá: (1) a felhasználó választott másik kimenetet;
+                # (2) a WINDOWS váltott alapértelmezettet – ilyenkor kapcsolt
+                # be a bluetooth fejhallgató. A régi kód egyiket sem vette
+                # észre: a stream a lejátszás elején nyílt meg, és ott maradt.
+                most = time.monotonic()
+                uj_alap = ""
+                if most >= kov_eszkoz_nezes:
+                    kov_eszkoz_nezes = most + 2.0
+                    if not self._device:          # a rendszerre bízta
+                        uj_alap = alapertelmezett_kimenet()
+                        if uj_alap == self._alap_nev:
+                            uj_alap = ""
+                if self._device_valt or uj_alap:
+                    regi = self._alap_nev
+                    try:
+                        stream.stop()
+                        stream.close()
+                    except Exception:
+                        pass
+                    try:
+                        stream, _v = self._stream_nyit(sd)
+                    except Exception as e:
+                        failed, err_msg = True, str(e)
+                        break
+                    if self.on_device_change:
+                        try:
+                            self.on_device_change(regi, self._alap_nev
+                                                  if not self._device
+                                                  else self._device)
+                        except Exception:
+                            pass
                 raw = proc.stdout.read(4096)
                 if not raw:
                     break

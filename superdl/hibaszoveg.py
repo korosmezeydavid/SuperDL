@@ -97,6 +97,19 @@ def _torrent_es_szegmens(m: str) -> str:
         return ("A torrent nyilvántartó szervere (tracker) nem válaszol. A "
                 "letöltés a peer-felderítéssel így is elindulhat; hagyd a "
                 "sorban, magától újrapróbálkozik.")
+    # HELYBEN FUTÓ FORDÍTÓ csonka futtatókörnyezete (Farkas István,
+    # 2026-09-19): `module 'ctranslate2' has no attribute 'Translator'`.
+    # A nyers angol mondat vakon nem információ – és a felhasználó azt
+    # hihetné, hogy a SZÖVEGGEL van baj, pedig a programmal van.
+    if "ctranslate2" in m or ("translator" in m and "no attribute" in m):
+        return ("A helyben futó fordító futtatókörnyezete hiányosan van jelen "
+                "a programban, ezért most nem indítható. Ez NEM a te géped és "
+                "nem a szöveg hibája. Addig válaszd az online fordítót; "
+                "javítjuk.")
+    if "sacremoses" in m or "sentencepiece" in m or "subword_nmt" in m:
+        return ("A helyben futó fordítóhoz tartozó egyik segédcsomag hiányzik "
+                "a programból, ezért a helyben fordítás most nem indítható. "
+                "Addig válaszd az online fordítót; javítjuk.")
     if "nem támogatta a range" in m or "not 206" in m or "nem 206" in m:
         return ("Ez a szerver nem engedi a fájl darabokban letöltését, ezért "
                 "a letöltés csak egy szálon megy – lassabb lehet, de működik. "
@@ -143,8 +156,38 @@ ISMERETLEN_MONDAT = (
     "A letöltő-motor olyan hibát jelzett, amit még nem ismerünk fel. A pontos "
     "szövege az eseménynaplóban van: Control E. Ha elküldöd, megnézzük.")
 
+# ⚠️ AMIT ÍGÉRÜNK, AZT TARTSUK IS BE (Nagy Károly, 2026-09-18 és 09-21).
+#
+# Karcsi háromszor írta meg ugyanazt: a program azt mondja, hogy „a pontos
+# szövege az eseménynaplóban van", ő megnyitja a Control E-vel, és ott
+# NINCS OTT. Kétszer is leírta, hogy sem a Shift+F6, sem a napló nem ad
+# többet ugyanannál a mondatnál — vagyis a program egy olyan helyre küldte,
+# ahol nem volt semmi. Ez rosszabb a semminél: elhiteti, hogy van megoldás,
+# és órákat lop el a keresgéléssel.
+#
+# Két hiánya volt a réginek:
+#   1. a nyers szöveget CSAK az állapotváltás pillanatában írtuk a naplóba,
+#      tehát az indításkor már hibás sorokhoz sosem került oda;
+#   2. a Shift+F6 („Miért?") kimondta az ígéretet, de maga SOHA nem írt
+#      a naplóba.
+# Mostantól minden hívó, aki ezt a mondatot kimondja, előbb ODA IS ÍRJA a
+# nyers szöveget; ha pedig tényleg nincs meg, a lenti MÁSIK mondat megy,
+# ami nem küldi a felhasználót üres helyre.
+ISMERETLEN_MONDAT_NINCS_NYOM = (
+    "A letöltő-motor olyan hibát jelzett, amit még nem ismerünk fel, és a "
+    "pontos szövegét ez a bejegyzés már nem őrizte meg. Indítsd újra ezt a "
+    "letöltést a Control F6-tal: akkor a pontos szöveg bekerül az "
+    "eseménynaplóba, és elküldheted nekünk.")
 
-def olvashato(uzenet: str, ismert: bool | None = None) -> str:
+
+def ismeretlen_mondat(van_nyers: bool) -> str:
+    """A helyes „nem ismerjük fel" mondat aszerint, hogy TUDJUK-E adni a
+    pontos szöveget. Ne küldjük a felhasználót üres naplóhoz."""
+    return ISMERETLEN_MONDAT if van_nyers else ISMERETLEN_MONDAT_NINCS_NYOM
+
+
+def olvashato(uzenet: str, ismert: bool | None = None,
+              van_nyers: bool = True) -> str:
     """Amit a FELOLVASÓNAK adunk – sosem nyers angol motorüzenet.
 
     Karcsi jelentése (2026-09-09) tette világossá, hogy a kettőt szét kell
@@ -175,12 +218,13 @@ def olvashato(uzenet: str, ismert: bool | None = None) -> str:
         # ugyanolyan vizsgálatot: két külön „ismerjük-e" válasz előbb-utóbb
         # széttart, és akkor a felület mást hinne, mint a fordító.
         ismert = van_javaslat(uzenet)
-    return emberi(uzenet) if ismert else ISMERETLEN_MONDAT
+    return emberi(uzenet) if ismert else ismeretlen_mondat(van_nyers)
 
 
 def gond_mondat(nev: str, allapot: str, uzenet: str, utkozes: bool = False,
                 probak: int = 0, elakadt: bool = False,
-                elakadas_oka: str = "", ismert: bool | None = None) -> str:
+                elakadas_oka: str = "", ismert: bool | None = None,
+                van_nyers: bool = True) -> str:
     """Az MK6 ugrás után elhangzó EGY mondat: mi a baj, és mit tegyél.
 
     A név elöl van, mert vakon először azt kell tudni, MELYIK elemről beszélünk
@@ -204,14 +248,14 @@ def gond_mondat(nev: str, allapot: str, uzenet: str, utkozes: bool = False,
         # el ezen az ágon. Aki elakadt sorban ragadt, az soha nem tudta meg,
         # hogy közben a motor jelzett-e valamit – pedig épp az árulná el,
         # miért nem indul újra. Ha van ilyen, a mondat végére kerül.
-        korabbi = olvashato(uzenet, ismert)
+        korabbi = olvashato(uzenet, ismert, van_nyers)
         if korabbi:
             mondat += f" A legutóbbi hibaüzenet: {korabbi}"
         return mondat
     reszek = [f"{nev}:"]
     if probak:
         reszek.append(f"{probak} sikertelen próbálkozás után.")
-    szoveg = olvashato(uzenet, ismert)
+    szoveg = olvashato(uzenet, ismert, van_nyers)
     if szoveg:
         reszek.append(szoveg)
     elif allapot:

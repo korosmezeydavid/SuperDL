@@ -38,7 +38,16 @@ EARCONS = {
     # Vakon a hang az egyetlen különbség: szándékosan NEM felfutó (nem
     # lezárás), hanem egy visszatérő, nyitva hagyott kvint.
     "seed":    [(659, 0.09), (523, 0.09), (659, 0.11)],
+    # A BESZÉLŐ ÓRA jingle-je: rövid, kétszótagú jel az időbemondás ELŐTT.
+    # Szándékosan NEM óraütés (nem számol, mindig ugyanaz) és szándékosan
+    # rövid: egy könyv olvasása közben a legkisebb rossz az, ha RÖVIDEN szól
+    # bele. Magasabb és szűkebb, mint a „results", hogy össze ne keverjük.
+    "ora":     [(1175, 0.055), (1568, 0.075)],
 }
+
+# A jingle teljes hossza másodpercben. A bemondó ENNYIT VÁR a beszéd előtt:
+# a lejátszás aszinkron, tehát különben a beszéd BELESZÓLNA a jelbe.
+ORA_JINGLE_HOSSZ = sum(du for _, du in EARCONS["ora"])
 
 _ready = False
 _lock = threading.Lock()
@@ -257,3 +266,12 @@ def play_startup() -> None:
                                | winsound.SND_ASYNC | winsound.SND_NODEFAULT)
     except Exception:
         pass
+
+
+def play_ora_jingle() -> None:
+    """A beszélő óra jingle-je (aszinkron).
+
+    A hívónak `ORA_JINGLE_HOSSZ` másodpercet VÁRNIA kell, mielőtt beszélni
+    kezd: a `winsound` lejátszás aszinkron, tehát a beszéd különben
+    beleszólna a jelbe."""
+    play("ora")

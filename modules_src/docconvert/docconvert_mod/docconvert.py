@@ -450,8 +450,18 @@ def _convert_inner(src, dst, out_format, in_encoding=None, out_encoding="utf-8",
     book = read_document(src, in_encoding)
     _write_any(book, dst, out_format, out_encoding, progress)
     enc = f", {out_encoding} kódolással" if out_format == "txt" else ""
-    return (f"Kész: „{book.title}” → {Path(dst).name} ({out_format.upper()}"
-            f"{enc}). {book.chars} karakter, {len(book.sections)} szakasz.")
+    uzenet = (f"Kész: „{book.title}” → {Path(dst).name} ({out_format.upper()}"
+              f"{enc}). {book.chars} karakter, {len(book.sections)} szakasz.")
+    # ⚠️ HA A SZÖVEG SZÉTESETT, MONDJUK MEG (Turai László, 2026-09-21).
+    # A régi változat ilyenkor is annyit mondott, hogy „Kész" – a
+    # felhasználó pedig csak a fájl megnyitásakor szembesült azzal, hogy
+    # minden betű közé szóköz került. A „kész" szó ilyenkor hazugság.
+    if getattr(book, "gyanus", False):
+        uzenet += (" FIGYELEM: ebből a PDF-ből a szöveg szétesve jött ki "
+                   "(a betűk közé szóközök kerültek). Ez a PDF belső "
+                   "felépítése miatt van, nem a te hibád. A fájl elkészült, "
+                   "de érdemes átnézni; ha fontos, küldd el nekünk a PDF-et.")
+    return uzenet
 
 
 # ---- KÖTEGELT mód: szöveg-kinyerés + több fájl EGY kimenetbe -----------

@@ -49,14 +49,28 @@ def parse_when(text: str) -> float | None:
         if secs < 0:
             return None
         return (now + _dt.timedelta(seconds=secs * mult)).timestamp()
-    for fmt in ("%Y-%m-%d %H:%M", "%Y.%m.%d %H:%M", "%m-%d %H:%M"):
+    for fmt in ("%Y-%m-%d %H:%M", "%Y.%m.%d %H:%M"):
         try:
-            dt = _dt.datetime.strptime(text, fmt)
-            if dt.year == 1900:
-                dt = dt.replace(year=now.year)
-            return dt.timestamp()
+            return _dt.datetime.strptime(text, fmt).timestamp()
         except ValueError:
             pass
+    # ÉV NÉLKÜLI NAP („12-25 03:00"). Az évet MI tesszük hozzá, nem a
+    # `strptime` alapértelmezett 1900-ára támaszkodunk.
+    #
+    # ⚠️ MIÉRT VÁLTOZOTT MEG. A régi megoldás év nélküli formátummal
+    # értelmezett, majd az 1900-as évet cserélte ki a mostanira. A Python
+    # 3.15-től ez az út vagy kivételt dob, vagy MÁS alapértelmezett évet ad
+    # (a 3.14 már figyelmeztet is rá) – vagyis a „12-25 03:00" alak egy
+    # jövőbeli Pythonon csendben elromlana. Így nem tud.
+    #
+    # Az `óra:perc` alakot ez NEM érinti: lemértük, hogy a „3:00" vagy a
+    # „9:17" egyik dátumformátumra sem illeszkedik, tehát nem fordulhat elő,
+    # hogy a 9:17-ből szeptember 17. legyen.
+    try:
+        return _dt.datetime.strptime(
+            "%d-%s" % (now.year, text), "%Y-%m-%d %H:%M").timestamp()
+    except ValueError:
+        pass
     try:  # csak óra:perc -> ma, vagy ha már elmúlt, holnap
         hh, mm = (int(x) for x in text.split(":"))
         target = now.replace(hour=hh, minute=mm, second=0, microsecond=0)

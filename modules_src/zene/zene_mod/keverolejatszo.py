@@ -33,7 +33,8 @@ class KeveroLejatszo:
       on_hiba(szoveg)    – a szám nem játszható le
     """
 
-    def __init__(self, on_vege=None, on_attunes_ido=None, on_hiba=None):
+    def __init__(self, on_vege=None, on_attunes_ido=None, on_hiba=None,
+                 on_kimenet=None):
         from superdl.audioengine import Player
         self._a = Player()
         self._b = Player()
@@ -44,6 +45,11 @@ class KeveroLejatszo:
         self.on_vege = on_vege
         self.on_attunes_ido = on_attunes_ido
         self.on_hiba = on_hiba
+        # a kimenet magától is átállhat (bluetooth fülest kapcsoltak be) –
+        # vakon a NÉMA átváltás zavaró, tehát a felület bemondhassa
+        self.on_kimenet = on_kimenet
+        for p in (self._a, self._b):
+            p.on_device_change = self._kimenet_valtott
         self.attunes_megy = True      # amíg be nem bizonyosodik az ellenkezője
         self.fo_hangero = 1.0         # a felhasználó által beállított hangerő
         self._szorzo = 1.0            # ideiglenes szorzó (elalvás-elhalkulás)
@@ -183,6 +189,28 @@ class KeveroLejatszo:
             self._aktiv.set_volume(self._cel())
         except Exception:
             pass
+
+    def kimenet_allit(self, azonosito: str) -> None:
+        """A hangkimenet MINDKÉT lejátszón.
+
+        ⚠️ Csak az aktívat átállítani elég lenne most, de az áttűnés a
+        MÁSIKAT hozza be – a következő szám a régi eszközön szólalna meg,
+        és a felhasználó azt hinné, a beállítás nem működik."""
+        for p in (self._a, self._b):
+            try:
+                p.set_device(azonosito)
+            except Exception:
+                pass
+
+    def kimenet(self) -> str:
+        return self._aktiv.device
+
+    def _kimenet_valtott(self, regi, uj) -> None:
+        if self.on_kimenet:
+            try:
+                self.on_kimenet(regi, uj)
+            except Exception:
+                pass
 
     def fo_hangero_allit(self, v: float) -> float:
         """A felhasználó hangereje 0 és 1 között. Visszaadja a beállítottat."""

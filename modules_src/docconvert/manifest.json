@@ -1,12 +1,12 @@
 {
   "id": "docconvert",
   "name": "Dokumentum-konverter",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "entry": "docconvert_mod",
   "category": "Könyvek",
-  "description": "JAVÍTVA (Laci jelzésére): az UTF-16 kódolású szövegfájlok (a Jegyzettömb „Unicode” mentése) eddig úgy jöttek át, hogy a betűk közé szóköz került; mostantól a program felismeri őket, BOM-mal és anélkül is. A fájl→fájl átalakításnál a TABULÁTOROS TAGOLÁS és a sorkezdő behúzás is megmarad (műsorlisták, táblázatos jegyzetek). Dokumentumok átalakítása formátumok közt (TXT, DOCX, EPUB, PDF, HTML, RTF, ODT, Markdown…), beépített PDF-fel és OCR-rel. ÚJ: kötegelt mód – több fájl vagy egy egész mappa egyszerre, mindegyik a saját fájljába VAGY egyetlen fájlba összefűzve.",
+  "description": "JAVÍTVA (Turai László PDF-jén mérve): vannak PDF-ek – tipikusan a hivatalos, űrlapszerű értesítők –, amikben a szöveg nem szavanként, hanem KARAKTERENKÉNT van eltárolva, mindegyik betű a maga pontos helyére pozicionálva. Ezekből eddig „N e m z e t i  A d ó -  é s  V á m h i v a t a l” lett: a kiolvasó a karakterhelyeket szóköznek nézte. Mostantól a program KÉT kiolvasóval próbálkozik, és azt az eredményt veszi, amelyik épebb szöveget adott – a konkrét dokumentumon mérve a régi 75 százalékban egybetűs „szavakat” adott, az új 7 százalékban. Ha MINDKETTŐ szétesik, a program FIGYELMEZTET, hogy ez a PDF szétszabdalt szöveget adott, és érdemes átnézni: némán rossz eredményt adni rosszabb, mint megmondani. Ehhez a SuperDL 4.6.12 kell. KORÁBBI: JAVÍTVA (Laci jelzésére): az UTF-16 kódolású szövegfájlok (a Jegyzettömb „Unicode” mentése) eddig úgy jöttek át, hogy a betűk közé szóköz került; mostantól a program felismeri őket, BOM-mal és anélkül is. A fájl→fájl átalakításnál a TABULÁTOROS TAGOLÁS és a sorkezdő behúzás is megmarad (műsorlisták, táblázatos jegyzetek). Dokumentumok átalakítása formátumok közt (TXT, DOCX, EPUB, PDF, HTML, RTF, ODT, Markdown…), beépített PDF-fel és OCR-rel. ÚJ: kötegelt mód – több fájl vagy egy egész mappa egyszerre, mindegyik a saját fájljába VAGY egyetlen fájlba összefűzve.",
   "min_core_api": "1.0",
-  "min_core_version": "4.0.0",
+  "min_core_version": "4.6.12",
   "requires_tools": [],
   "author": "Kőrösmezey Dávid"
 }

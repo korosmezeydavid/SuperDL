@@ -639,19 +639,33 @@ class TvMusorFrame(wx.Frame):
             return
         cimke = {"gyorsitotar": "a mentett (mai) adatból",
                  "halozat": "frissen letöltve",
-                 "regi": "a KORÁBBAN mentett adatból (a forrás most nem elérhető)"}
+                 "regi": "a KORÁBBAN mentett adatból (a forrás most nem "
+                         "elérhető, vagy hiányos adatot ad)",
+                 "hianyos": "de a forrás MOST HIÁNYOS"}
         self._csat_lista.Set([n for _c, n in self._csatornak])
         if self._csatornak:
             self._csat_lista.SetSelection(0)
             self._csatorna_valt()
         self._most_frissit()
         self._este_frissit()
+        honnan_szov = cimke.get(honnan, honnan)
         self._allapot.SetValue("Kész: %d csatorna (%s)."
-                               % (len(self._csatornak),
-                                  cimke.get(honnan, honnan)))
-        self._mond("Megvan a műsorújság: %d csatorna, %s. Válts a fülek közt: "
-                   "Mi megy most, Ma este, Csatornák, Keresés, Kedvencek."
-                   % (len(self._csatornak), cimke.get(honnan, honnan)))
+                               % (len(self._csatornak), honnan_szov))
+        # ⚠️ HA KEVÉS A CSATORNA, MONDJUK MEG, MIÉRT (Turai László, 2026-09-21).
+        # A néma három csatorna volt az igazi hiba: a felhasználó azt hitte,
+        # a PROGRAM romlott el, holott a forrás adott csak hiányos adatot.
+        if honnan == "hianyos" or EM.hianyos_e(self._tv):
+            self._mond(
+                "Figyelem: most csak %d csatornához van műsor. Ez nem a "
+                "program hibája: a műsorújság-forrás ad hiányos adatot. "
+                "Próbáld később a Frissítés gombbal, vagy adj meg másik "
+                "forrást a Beállítás fülön."
+                % len(self._csatornak))
+        else:
+            self._mond(
+                "Megvan a műsorújság: %d csatorna, %s. Válts a fülek közt: "
+                "Mi megy most, Ma este, Csatornák, Keresés, Kedvencek."
+                % (len(self._csatornak), honnan_szov))
         # KEDVENC-FIGYELŐ: ha be van kapcsolva, magától szól, ha jön kedvenc
         if self._ertesites_be():
             wx.CallLater(1200, lambda: self._kedvencek_ellenoriz(kezi=False))

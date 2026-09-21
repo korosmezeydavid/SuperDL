@@ -5,6 +5,7 @@ egyben vagy percenként darabolva.
 Akadálymentes: minden vezérlő címkézett és billentyűzetről elérhető.
 """
 
+import logging
 import os
 import tempfile
 import uuid
@@ -12,6 +13,14 @@ import threading
 from pathlib import Path
 
 import wx
+
+# ⚠️ Dr. Kiss István jelentése (2026-09-16): „hibaüzenettel megszakadt a
+# könyvkészítés" — és a jelentésében SEMMI nyoma nem volt. Az ok: a készítés
+# hibaága eddig csak a felhasználónak szólt (`_done`), a naplóba nem írt.
+# A hibaüzenet így ott maradt a képernyőn, és a jelentésbe már csak annyi
+# jutott, hogy „történt valami". Ugyanaz a minta, mint az alkalmazás-naplónál:
+# nem rossz eszközünk volt, hanem NEM volt eszközünk.
+_log = logging.getLogger("superdl.module.konyvek")
 
 from superdl import audiobook, booktext, store, tts   # megosztott backend a Core-ból
 from superdl.audioengine import Player                 # megosztott lejátszó a Core-ból
@@ -634,6 +643,14 @@ class BookFrame(wx.Frame):
                     fejezetenkent=fejezetenkent, progress=prog,
                     cancel=self._cancel)
             except Exception as ex:
+                # A NAPLÓ ELŐBB, mint a felhasználónak szóló üzenet: ha a
+                # `_done` bármi miatt elhasalna, a nyom akkor is megmarad.
+                # A beállításokat is felírjuk — a hibajelentésből eddig nem
+                # derült ki, hogy fejezetenként vagy percenként darabolt-e.
+                _log.exception(
+                    "A hangoskönyv készítése elhasalt "
+                    "(motor=%s, fejezetenként=%s, perc=%s, kimenet=%s)",
+                    eng_key, fejezetenkent, split, out)
                 wx.CallAfter(self._done, None, str(ex))
                 return
             wx.CallAfter(self._done, res, None)

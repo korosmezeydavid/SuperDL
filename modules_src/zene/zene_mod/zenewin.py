@@ -5,9 +5,12 @@ Egy ablak, egy lista. Minden művelet elérhető BILLENTYŰVEL és a HELYI MENÜ
 is (Alkalmazások billentyű vagy Shift+F10) – aki nem tudja fejből a
 gyorsbillentyűket, az is végignyilazhatja, mit tud a program.
 
-Ez a modul továbbra sem tud lejátszási listát, keverés-módot, kedvenceket,
-címke-szerkesztést. A hozzáadott műveletek mind EGYSZERI parancsok: ugrás,
-keresés, hangerő – nem új üzemmódok, amiket észben kell tartani.
+ÚJ: KEDVENCEK (Ctrl+D jelöl, Ctrl+B átvált rájuk), KEVERÉS (Ctrl+K, és
+megmarad a következő indításra), HANGKIMENET-VÁLASZTÁS (Ctrl+H). Ez három
+állapot, amit észben kell tartani – ezért MINDHÁRMAT bemondja a „Hol
+tartunk?" (Ctrl+I), és mindhárom pipával látszik a helyi menüben.
+
+Címke-szerkesztést ez a modul továbbra sem tud, és nem is fog.
 """
 
 import os
@@ -28,7 +31,8 @@ HANGERO_LEPES = 0.1
 SUGO = """ZENE – EGYSZERŰ LEJÁTSZÓ
 
 MIRE VALÓ
-Zenét játszik. Semmi mást nem tud.
+Zenét játszik. Kedvenceket lehet benne jelölni, és keverve is tud játszani –
+ezen túl nem tud mást, és nem is akar.
 
 INDULÁS
 A „Zenemappa kiválasztása” gombbal (Ctrl+O) adj meg EGY mappát. Ami alatta
@@ -45,7 +49,30 @@ LEJÁTSZÁS
   Ctrl+fel, Ctrl+le .. hangerő fel és le
   Ctrl+R ............. ismétlés be- és kikapcsolása
   Ctrl+E ............. a szám végén álljon meg / menjen a következőre
+  Ctrl+K ............. keverés be- és kikapcsolása (megmarad legközelebbre)
   Ctrl+S ............. elalvás időzítő (5-től 60 percig)
+  Ctrl+H ............. hangkimenet (fejhallgató, hangszóró) kiválasztása
+
+KEDVENCEK
+  Ctrl+D ............. az éppen kijelölt szám kedvenc lesz, vagy már nem az
+  Ctrl+B ............. váltás a teljes lista és a kedvencek listája közt
+A kedvencek a szám ÚTJÁT jegyzik meg, nem a helyét a listában: ha átrendezed
+a zenédet, nem fognak más számra mutatni. Ha egy kedvenc fájl eltűnik, a
+listában „hiányzik" jelzéssel látszik, nem tűnik el csendben. A kedvencek
+listájában is működik minden: keverés, elalvás, keresés.
+
+KEVERÉS
+A Ctrl+K a SZÁM VÉGÉN következő számot teszi véletlenné. A fel-le nyíl
+továbbra is a lista szerint lép – navigálni kiszámíthatóan lehessen. A
+keverés végigmegy az egész listán, mielőtt bármit megismételne, és a
+következő indításkor is bekapcsolva marad.
+
+HANGKIMENET
+A Ctrl+H egy listát nyit a gép hangkimeneteiről. Az első elem a rendszer
+alapértelmezettje: ha ezt hagyod, a zene KÖVETI a rendszert – bluetooth
+fejhallgató bekapcsolásakor magától átvált, és be is mondja. Ha konkrét
+eszközt választasz, azon marad. Ha a választott eszköz eltűnik, nem némul el
+a zene: visszaesik az alapértelmezettre, és megmondja.
 
 TÁJÉKOZÓDÁS EGY NAGY LISTÁBAN
   Ctrl+F ............. keresés a számok közt (a következő találat: F3)
@@ -109,13 +136,20 @@ class ZeneFrame(wx.Frame):
         super().__init__(main, title="SuperDL – Zene", size=(880, 620))
         self.main = main
         self._closing = False
-        self._szamok = []
+        self._osszes = []            # a zenemappa minden száma
+        self._szamok = []            # AMI A LISTÁBAN LÁTSZIK (nézet szerint)
         self._index = -1
         self._ismetles = False
         self._tovabb = True          # a szám végén menjen a következőre
         self._alvas_vege = 0.0       # időbélyeg; 0 = nincs elalvás
         self._hangero = 1.0
         self._keresett = ""
+        self._kedvencek = KT.kedvencek_betolt()      # utak, sorrendben
+        self._kedvenc_kulcsok = {u.lower() for u in self._kedvencek}
+        self._kedvenc_nezet = False
+        self._keveres = KT.keveres_betolt()
+        self._kimenet = KT.kimenet_betolt()
+        self._zsak = []              # a keverés „zsákja": még nem jött sorra
         self._megall = threading.Event()
         self._accessibles = []
         self._lejatszo = None
@@ -194,6 +228,16 @@ class ZeneFrame(wx.Frame):
 
         A gyorsbillentyűket nem kell fejből tudni: itt minden ott van, és a
         menüsor a képernyőolvasónak a gyorsbillentyűt is bemondja."""
+        m = self._menu_epit()
+        self.PopupMenu(m)
+        m.Destroy()
+
+    def _menu_epit(self):
+        """A helyi menü FELÉPÍTÉSE, megnyitás nélkül.
+
+        Külön áll a megnyitástól, hogy a ténylegesen létrejövő menüt lehessen
+        vizsgálni – az ütköző Alt-betűket forrásból nézni félrevezet, mert egy
+        ELÁGAZÁS két felirata sosem kerül egyszerre a menübe."""
         m = wx.Menu()
 
         def tetel(cimke, fv, kapcsolo=None):
@@ -218,10 +262,22 @@ class ZeneFrame(wx.Frame):
         tetel("Hangerő le\tCtrl+Le", lambda: self._hangero_allit(-HANGERO_LEPES))
         m.AppendSeparator()
         tetel("&Ismétlés\tCtrl+R", self._ismetles_valt, self._ismetles)
+        tetel("Ke&verés\tCtrl+K", self._keveres_valt, self._keveres)
         tetel("A szám végén menjen tovább\tCtrl+E", self._tovabb_valt,
               self._tovabb)
         tetel(("Elalvás… (most: %d perc van hátra)" % self._alvas_hatra_perc())
               if self._alvas_vege else "Elalvás…\tCtrl+S", self._alvas_parbeszed)
+        m.AppendSeparator()
+        i = self.lista.GetSelection()
+        kedvenc_e = (0 <= i < len(self._szamok)
+                     and self._kedvenc_e(self._szamok[i]))
+        tetel("Levétel a ke&dvencek közül\tCtrl+D" if kedvenc_e
+              else "Felvétel a ke&dvencek közé\tCtrl+D", self._kedvenc_valt)
+        tetel("A teljes lista\tCtrl+B" if self._kedvenc_nezet
+              else "Csak a kedvencek (%d szám)\tCtrl+B" % len(self._kedvencek),
+              self._kedvenc_nezet_valt)
+        m.AppendSeparator()
+        tetel("&Hangkimenet…\tCtrl+H", self._kimenet_valaszt)
         m.AppendSeparator()
         tetel("&Keresés a számok közt…\tCtrl+F", self._keres)
         tetel("Következő találat\tF3", self._kovetkezo_talalat)
@@ -235,9 +291,7 @@ class ZeneFrame(wx.Frame):
         tetel("Másik zenemappa…\tCtrl+O", self._mappat_valaszt)
         m.AppendSeparator()
         tetel("Súgó\tF1", self._sugo)
-
-        self.PopupMenu(m)
-        m.Destroy()
+        return m
 
     # ---- a zenetár betöltése -------------------------------------------
 
@@ -278,15 +332,139 @@ class ZeneFrame(wx.Frame):
     def _betoltve(self, szamok, mappak):
         if self._closing:
             return
-        self._szamok = szamok
-        self.lista.Set([s.felirat() for s in szamok])
-        self._index = -1
-        if szamok:
-            self.lista.SetSelection(0)
+        self._osszes = szamok
+        self._nezet_frissit(mondja=False)
+        if self._kedvenc_nezet:
+            self._allapot(f"{mappak} mappa, {len(szamok)} szám beolvasva. "
+                          f"A kedvencek listája látszik: "
+                          f"{len(self._szamok)} szám.")
+        elif szamok:
             self._allapot(f"{mappak} mappa, {len(szamok)} szám. "
                           f"A lejátszáshoz nyilazz, vagy nyomj Entert.")
         else:
             self._allapot("Ebben a mappában nincs lejátszható zene.")
+
+    # ---- nézet: minden szám, vagy csak a kedvencek ----------------------
+
+    def _kedvenc_e(self, szam) -> bool:
+        return str(szam.ut).lower() in self._kedvenc_kulcsok
+
+    def _sor(self, szam) -> str:
+        """A lista egy sora.
+
+        ⚠️ A „kedvenc" jelzés a sor ELEJÉN áll, nem a végén: a képernyőolvasó
+        nyilazáskor a sor elejét mondja először, tehát így azonnal hallatszik,
+        a teljes cím kivárása nélkül. Csillag helyett SZÓ, mert a csillagot
+        minden olvasó máshogy (vagy sehogy) mondja ki."""
+        elo = "kedvenc, " if self._kedvenc_e(szam) else ""
+        if not os.path.exists(szam.ut):
+            elo += "hiányzik, "
+        return elo + szam.felirat()
+
+    def _nezet_frissit(self, mondja=True):
+        """A listadoboz újratöltése a jelenlegi nézet szerint.
+
+        A ÉPPEN SZÓLÓ számot megkeressük az új listában, és ha benne van, a
+        kijelölés meg a belső index rá áll – nézetváltáskor ne kezdjen el
+        más számra hivatkozni a „Hol tartunk?" meg a továbblépés."""
+        szolo = (self._szamok[self._index].ut
+                 if 0 <= self._index < len(self._szamok) else "")
+        if self._kedvenc_nezet:
+            terkep = {s.ut.lower(): s for s in self._osszes}
+            self._szamok = [terkep.get(u.lower()) or KT.szam_utbol(u)
+                            for u in self._kedvencek]
+        else:
+            self._szamok = list(self._osszes)
+        self.lista.Set([self._sor(s) for s in self._szamok])
+        try:
+            self.cimke.SetLabel(
+                "&Kedvencek (Ctrl+B: vissza a teljes listára; "
+                "helyi menü: Shift+F10):" if self._kedvenc_nezet
+                else "&Számok (fel-le nyíl: váltás és lejátszás; "
+                     "helyi menü: Shift+F10):")
+        except Exception:
+            pass
+        self._zsak = []
+        self._index = -1
+        for i, s in enumerate(self._szamok):
+            if szolo and s.ut.lower() == szolo.lower():
+                self._index = i
+                break
+        if self._szamok:
+            self.lista.SetSelection(max(0, self._index))
+        if mondja:
+            if not self._szamok:
+                self._allapot("A kedvencek listája üres. Jelölj ki számokat "
+                              "a Ctrl+D-vel." if self._kedvenc_nezet
+                              else "Nincs betöltve zene.")
+            else:
+                self._allapot(
+                    f"A kedvencek listája: {len(self._szamok)} szám."
+                    if self._kedvenc_nezet
+                    else f"A teljes lista: {len(self._szamok)} szám.")
+
+    def _kedvenc_nezet_valt(self):
+        if not self._kedvenc_nezet and not self._kedvencek:
+            self._allapot("Még nincs egyetlen kedvenced sem. A Ctrl+D-vel "
+                          "veheted fel az éppen kijelölt számot.")
+            return
+        self._kedvenc_nezet = not self._kedvenc_nezet
+        self._nezet_frissit()
+        self.lista.SetFocus()
+
+    def _kedvenc_valt(self):
+        """Az ÉPPEN KIJELÖLT szám felvétele a kedvencek közé, vagy levétele."""
+        i = self.lista.GetSelection()
+        if not (0 <= i < len(self._szamok)):
+            self._allapot("Nincs kiválasztott szám.")
+            return
+        szam = self._szamok[i]
+        kulcs = szam.ut.lower()
+        if kulcs in self._kedvenc_kulcsok:
+            self._kedvenc_kulcsok.discard(kulcs)
+            self._kedvencek = [u for u in self._kedvencek
+                               if u.lower() != kulcs]
+            uzenet = f"Levéve a kedvencek közül: {szam.felirat()}."
+        else:
+            self._kedvenc_kulcsok.add(kulcs)
+            self._kedvencek.append(szam.ut)
+            uzenet = f"Kedvenc: {szam.felirat()}."
+        KT.kedvencek_ment(self._kedvencek)
+        if self._kedvenc_nezet:
+            # a levett szám kiesik a listából – a kijelölés maradjon a helyén
+            self._nezet_frissit(mondja=False)
+            self.lista.SetSelection(min(i, len(self._szamok) - 1)
+                                    if self._szamok else wx.NOT_FOUND)
+        else:
+            self.lista.SetString(i, self._sor(szam))
+            self.lista.SetSelection(i)
+        self._allapot(uzenet)
+
+    # ---- keverés ---------------------------------------------------------
+
+    def _keveres_valt(self):
+        self._keveres = not self._keveres
+        self._zsak = []
+        KT.keveres_ment(self._keveres)
+        self._allapot(
+            "Keverés bekapcsolva. A szám végén véletlen szám következik; a "
+            "nyilak továbbra is a lista szerint lépnek."
+            if self._keveres else "Keverés kikapcsolva.")
+
+    def _zsakbol(self) -> int:
+        """A következő szám keveréskor.
+
+        ⚠️ Nem sima `random`: az végtelenszer ismételhetné ugyanazt, és
+        hagyhatna ki számot egy egész estén át. A zsákból húzunk, és csak
+        akkor töltjük újra, ha kiürült – így minden szám egyszer sorra kerül,
+        mielőtt bármi megismétlődne."""
+        n = len(self._szamok)
+        if n <= 1:
+            return 0 if n else -1
+        if not self._zsak:
+            self._zsak = [i for i in range(n) if i != self._index]
+            random.shuffle(self._zsak)
+        return self._zsak.pop()
 
     # ---- lejátszás ------------------------------------------------------
 
@@ -296,9 +474,65 @@ class ZeneFrame(wx.Frame):
             self._lejatszo = KeveroLejatszo(
                 on_vege=lambda: wx.CallAfter(self._szam_vege),
                 on_attunes_ido=lambda: wx.CallAfter(self._attunes_ideje),
-                on_hiba=lambda s: wx.CallAfter(self._hiba, s))
+                on_hiba=lambda s: wx.CallAfter(self._hiba, s),
+                on_kimenet=lambda r, u: wx.CallAfter(self._kimenet_valtott,
+                                                     r, u))
             self._lejatszo.fo_hangero = self._hangero
+            if self._kimenet:
+                self._lejatszo.kimenet_allit(self._kimenet)
         return self._lejatszo
+
+    # ---- hangkimenet -----------------------------------------------------
+
+    def _kimenet_valaszt(self):
+        """Melyik eszközön szóljon a zene? (Stolmár Barbi kérése.)"""
+        try:
+            from superdl import audioengine as AE
+            eszkozok = AE.eszkozok()
+        except Exception as ex:
+            self._allapot(f"A hangkimenetek nem kérdezhetők le. {ex}")
+            return
+        if len(eszkozok) <= 1:
+            self._allapot("Ezen a gépen csak a rendszer alapértelmezett "
+                          "kimenete érhető el.")
+            return
+        nevek = [n for _a, n in eszkozok]
+        d = wx.SingleChoiceDialog(self, "Melyik hangkimeneten szóljon a zene?",
+                                  "Hangkimenet", nevek)
+        try:
+            jelenlegi = [a for a, _n in eszkozok]
+            if self._kimenet in jelenlegi:
+                d.SetSelection(jelenlegi.index(self._kimenet))
+            if d.ShowModal() != wx.ID_OK:
+                return
+            i = d.GetSelection()
+        finally:
+            d.Destroy()
+        self._kimenet = eszkozok[i][0]
+        KT.kimenet_ment(self._kimenet)
+        if self._lejatszo is not None:
+            self._lejatszo.kimenet_allit(self._kimenet)
+        self._allapot(f"Hangkimenet: {nevek[i]}."
+                      + ("" if self._kimenet else
+                         " A zene mostantól követi a rendszert."))
+
+    def _kimenet_valtott(self, regi, uj):
+        """A LEJÁTSZÓ váltott magától (bluetooth füles, vagy eltűnt eszköz).
+
+        ⚠️ Vakon a néma átváltás zavaró: ha a zene egyszer csak a másik fülön
+        szól, tudni kell, miért."""
+        if self._closing:
+            return
+        try:
+            from superdl.audioengine import eszkoz_nev
+        except Exception:
+            eszkoz_nev = lambda x: x          # noqa: E731
+        if uj:
+            self._allapot(f"A zene átváltott erre: {eszkoz_nev(uj)}.")
+        else:
+            self._allapot(
+                f"A választott hangkimenet ({eszkoz_nev(regi)}) most nem "
+                f"érhető el, a zene a rendszer alapértelmezettjén szól.")
 
     def _kijelolt_indul(self):
         i = self.lista.GetSelection()
@@ -318,7 +552,7 @@ class ZeneFrame(wx.Frame):
             m.attunes_ra(szam.ut, h)
         else:
             m.jatszik(szam.ut, h)
-        self._allapot(szam.felirat())
+        self._allapot(self._sor(szam))
 
     def _lep(self, irany):
         if not self._szamok:
@@ -328,8 +562,14 @@ class ZeneFrame(wx.Frame):
         self._indit((max(0, alap) + irany) % len(self._szamok))
 
     def _kovetkezo_index(self):
+        """A szám végén KÖVETKEZŐ szám. Keveréskor a zsákból, különben sorban.
+
+        A fel-le nyíl NEM ezt használja: navigálni kiszámíthatóan kell
+        lehessen, akkor is, ha a keverés be van kapcsolva."""
         if not self._szamok:
             return -1
+        if self._keveres:
+            return self._zsakbol()
         return (self._index + 1) % len(self._szamok)
 
     def _attunes_ideje(self):
@@ -392,6 +632,18 @@ class ZeneFrame(wx.Frame):
             return
         if ctrl and kod in (ord("R"), ord("r")):
             self._ismetles_valt()
+            return
+        if ctrl and kod in (ord("D"), ord("d")):
+            self._kedvenc_valt()
+            return
+        if ctrl and kod in (ord("B"), ord("b")):
+            self._kedvenc_nezet_valt()
+            return
+        if ctrl and kod in (ord("K"), ord("k")):
+            self._keveres_valt()
+            return
+        if ctrl and kod in (ord("H"), ord("h")):
+            self._kimenet_valaszt()
             return
         if ctrl and kod in (ord("E"), ord("e")):
             self._tovabb_valt()
@@ -576,7 +828,17 @@ class ZeneFrame(wx.Frame):
                 reszek.append("szünetel")
         reszek.append("hangerő %d százalék" % round(self._hangero * 100))
         reszek.append("ismétlés be" if self._ismetles else "ismétlés ki")
+        reszek.append("keverés be" if self._keveres else "keverés ki")
         reszek.append("a végén tovább" if self._tovabb else "a végén megáll")
+        reszek.append("a kedvencek listája" if self._kedvenc_nezet
+                      else "a teljes lista, %d kedvenccel"
+                           % len(self._kedvencek))
+        if self._kimenet:
+            try:
+                from superdl.audioengine import eszkoz_nev
+                reszek.append("hangkimenet: " + eszkoz_nev(self._kimenet))
+            except Exception:
+                pass
         if self._alvas_vege:
             hatra = max(0, self._alvas_vege - time.time())
             reszek.append(f"elalvásig {KT.ido_szoveg(hatra)}")

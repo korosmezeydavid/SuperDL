@@ -65,28 +65,115 @@ def ct2():
 
     Megoldás: ha az import a hiányzó converters miatt hasal el, beadunk a
     helyére egy ÜRES pótmodult, és újrapróbáljuk. A DLL-betöltést és a
-    `_ext` bővítményt így is a csomag saját `__init__`-je végzi el."""
+    `_ext` bővítményt így is a csomag saját `__init__`-je végzi el.
+
+    ⚠️ **ÉS AMIT A 4.6.12-BEN JAVÍTOTTUNK** (Farkas István, 2026-09-19):
+
+        module 'ctranslate2' has no attribute 'Translator'
+
+    A fenti pótmodulos trükk „sikeres" importot tudott adni olyan modulra
+    is, amiben a `Translator` NINCS BENNE (csonka telepítés, félbemaradt
+    `__init__`, vagy épp a mi üres pótmodulunk maradt a helyén). A régi
+    `elerheto()` pedig CSAK azt nézte, hogy az import nem dob-e kivételt –
+    tehát igent mondott, a felület felajánlotta a helyben futó fordítót, és
+    a hiba csak a HASZNÁLAT pillanatában csapott le. Ez a legrosszabb fajta
+    hiba: a program megígér valamit, amit nem tud.
+
+    Mostantól a `ct2()` azt is ELLENŐRZI, hogy a `Translator` tényleg ott
+    van-e, és ha nincs, érthető `ImportError`-t dob. A pótmodult pedig
+    kudarc esetén ELTAKARÍTJUK, hogy ne mérgezzen meg egy későbbi, már jó
+    importot."""
     import sys
     import types
+    # ⚠️ A SORREND FONTOS: ELŐBB a teljes behozási tánc, és CSAK A VÉGÉN az
+    # ellenőrzés. Az első változatomban az ellenőrzés az első ág végén volt,
+    # és `ImportError`-t dobott – amit a lenti `except ImportError` elnyelt,
+    # majd a pótmodulos ág KIVETTE a már meglévő modult a sys.modules-ból, és
+    # a hiba végül félrevezető „No module named 'ctranslate2'" lett. Vagyis a
+    # javítás elfedte volna pont azt az okot, amit láthatóvá akartunk tenni.
     try:
-        import ctranslate2
-        return ctranslate2
+        import ctranslate2 as modul
     except ImportError:
-        pass
-    sys.modules.setdefault("ctranslate2.converters",
-                           types.ModuleType("ctranslate2.converters"))
-    sys.modules.pop("ctranslate2", None)
-    import ctranslate2
-    return ctranslate2
+        beadtuk = "ctranslate2.converters" not in sys.modules
+        sys.modules.setdefault("ctranslate2.converters",
+                               types.ModuleType("ctranslate2.converters"))
+        sys.modules.pop("ctranslate2", None)
+        try:
+            import ctranslate2 as modul
+        except Exception:
+            if beadtuk:                # ne hagyjunk magunk után szemetet
+                sys.modules.pop("ctranslate2.converters", None)
+            raise
+    return _ct2_ellenoriz(modul)
+
+
+def _ct2_ellenoriz(modul):
+    """A behozott modul TÉNYLEG használható-e fordításra?
+
+    ⚠️ Nem elég, hogy az `import` lefutott. Farkas István hibája
+    (`has no attribute 'Translator'`) pont olyan modult kapott, ami
+    importálódott, de nem tudott fordítani."""
+    if not hasattr(modul, "Translator"):
+        raise ImportError(
+            "A helyben futó fordító futtatókörnyezete (ctranslate2) "
+            "hiányosan települt: nincs benne Translator. "
+            "A helyben fordítás így nem indítható.")
+    return modul
+
+
+# a helyben fordításhoz MINDEN esetben kellő segédcsomagok (a szövegdaraboló
+# modellfüggő, azt a `_Motor` maga nézi meg)
+_SEGEDEK = ("sacremoses",)
+
+
+def hianyzo_reszek() -> list:
+    """Mi hiányzik a helyben fordításhoz? Üres lista = minden megvan.
+
+    Azért adunk LISTÁT és nem csak igen/nemet, mert a felhasználónak a
+    „miért nem" a használható információ, nem az, hogy „nem"."""
+    ki = []
+    try:
+        ct2()
+    except Exception as e:
+        ki.append("futtatókörnyezet (ctranslate2): %s" % e)
+    for nev in _SEGEDEK:
+        try:
+            __import__(nev)
+        except Exception as e:
+            ki.append("%s: %s" % (nev, e))
+    return ki
 
 
 def elerheto() -> bool:
-    """Van-e a programban fordító-futtatókörnyezet? (Régi Core-ban nincs.)"""
+    """Van-e a programban MŰKÖDŐ fordító-futtatókörnyezet?
+
+    ⚠️ A 4.6.12 előtt ez csak azt nézte, hogy az import nem dob-e kivételt.
+    Egy csonka telepítésnél tehát igent mondott, a felület felajánlotta a
+    helyben fordítást, és a hiba a használatkor jött elő. Most a `ct2()`
+    maga ellenőrzi a `Translator` meglétét, így az igen tényleg igen."""
     try:
         ct2()
         return True
     except Exception:
         return False
+
+
+def miert_nem() -> str:
+    """EGY mondat arról, miért nem megy a helyben fordítás – vagy üres, ha
+    megy. A felületnek ezt kell kimondania a puszta „nem sikerült" helyett.
+
+    ⚠️ Farkas István jelzése (2026-09-19) két bajt mutatott: a nyers angol
+    mondat (`module 'ctranslate2' has no attribute 'Translator'`) vakon nem
+    információ, és a Control E sem adott róla semmit. A nyers szöveg a
+    naplóba való, ez a mondat pedig a felhasználónak."""
+    hianyok = hianyzo_reszek()
+    if not hianyok:
+        return ""
+    return ("A helyben futó fordító most nem indítható, mert a programban "
+            "hiányosan van jelen a futtatókörnyezete. Ez nem a te géped "
+            "hibája, és nem a szövegen múlik. Addig használd az online "
+            "fordítót, mi pedig javítjuk. A pontos, technikai ok: "
+            + "; ".join(hianyok))
 
 
 def telepitett_parok() -> list:
@@ -259,6 +346,14 @@ def fordit(szoveg: str, honnan: str, hova: str = "hu", halad=None) -> str:
     mondatok = mondatokra(szoveg)
     if not mondatok:
         return ""
+    # ⚠️ ELŐBB NÉZZÜK MEG, HOGY EGYÁLTALÁN MŰKÖDIK-E (Farkas István,
+    # 2026-09-19). Enélkül a hiba a `_Motor.__init__`-ből jött ki nyers
+    # angolul (`module 'ctranslate2' has no attribute 'Translator'`), ami
+    # vakon nem információ. Itt egy érthető magyar mondattal állunk meg,
+    # és a technikai ok is benne van – továbbküldhetően.
+    baj = miert_nem()
+    if baj:
+        raise RuntimeError(baj)
     lepesek = [(honnan, hova)] if (modell_mappa() / ("%s_%s" % (honnan, hova))
                                    / "metadata.json").is_file() \
         else [(honnan, "en"), ("en", hova)]

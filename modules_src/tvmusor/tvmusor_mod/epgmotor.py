@@ -20,11 +20,48 @@ import xml.etree.ElementTree as ET
 # Közösségi/hobbi szolgáltatások: ha az egyik nem válaszol, a következőt
 # próbáljuk. A SuperDL semmilyen műsoradatot NEM tárol és NEM terjeszt – csak
 # megjeleníti a választott forrást, forrásmegjelöléssel.
-ALAP_EPG_URL = "https://epgshare01.online/epgshare01/epg_ripper_HU1.xml.gz"
+ALAP_EPG_URL = "https://www.open-epg.com/files/hungary1.xml"
 TARTALEK_URLEK = [
+    "https://www.open-epg.com/files/hungary1.xml",
+    "https://www.open-epg.com/files/hungary3.xml",
     "https://epgshare01.online/epgshare01/epg_ripper_HU1.xml.gz",
     "https://epg.anything.hu/all/guide.xml",
 ]
+
+# ⚠️ EZ ALATT A FORRÁS NYILVÁNVALÓAN HIÁNYOS (Turai László jelzése,
+# 2026-09-21: „a csatornák lapfülre lépve csak 3 db csatornát látok").
+#
+# MIT MÉRTÜNK. Az addigi elsődleges forrás (epgshare01 HU1) aznap 193
+# `<channel>` elemet hirdetett, de MŰSORT csak HÁROMHOZ adott. A régi kód
+# ezt SIKERNEK vette – „van csatorna, tehát jó" –, elmentette a
+# gyorsítótárba, és ezzel FELÜLÍRTA a korábbi, 164 csatornás jó adatot.
+# Onnantól a felhasználó hat órán át három csatornát látott, magyarázat
+# nélkül. A tartalék forrás (epg.anything.hu) közben 523-mal elhalt.
+#
+# Ezért három dolog változott:
+#   1. nem az ELSŐ nem-üres forrás nyer, hanem az első NEM HIÁNYOS;
+#   2. hiányos adat NEM írja felül a gazdagabb gyorsítótárat;
+#   3. a hívó megtudja, hogy hiányos forrásból dolgozik (`hianyos` jelzés).
+#
+# ⚠️ MIÉRT ARÁNY ÉS NEM DARABSZÁM. Első nekifutásra egy egyszerű
+# „húsz csatorna alatt hiányos" küszöböt írtam – de az megbüntette volna
+# azt, aki SZÁNDÉKOSAN ad meg egy kicsi, saját EPG-forrást (öt csatorna,
+# mind a öthöz van műsor: az teljes, nem hiányos). A valódi jel az ARÁNY:
+# Laci forrása 193 csatornát HIRDETETT, és háromhoz adott műsort (1,5%).
+ELEG_CSATORNA = 20          # ez alatt a forrás mérete nem árulkodó
+HIANYOS_ARANY = 0.25        # a hirdetett csatornák ekkora hányada alatt hiányos
+
+
+def hianyos_e(tv) -> bool:
+    """Csonka-e ez a műsorújság? Nem a MÉRETE számít, hanem hogy a
+    HIRDETETT csatornák töredékéhez van csak műsor."""
+    musoros = len(tv.csatorna_lista())
+    if not musoros:
+        return True
+    hirdetett = len(tv.csatornak)
+    return (hirdetett >= ELEG_CSATORNA
+            and musoros < hirdetett * HIANYOS_ARANY)
+
 
 _UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
        "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
@@ -66,6 +103,19 @@ def _norm(s: str) -> str:
     """Kereséshez: kisbetű, ékezet nélkül."""
     s = unicodedata.normalize("NFD", (s or "").lower())
     return "".join(c for c in s if unicodedata.category(c) != "Mn")
+
+
+def szep_nev(nyers: str) -> str:
+    """A csatorna nevének FELOLVASHATÓ alakja.
+
+    ⚠️ Nem szépészet: a forrásokban a technikai toldalékok FELOLVASVA
+    zavaróak. Az open-epg magyar listájában minden név „.hu"-ra végződik
+    („AMC (HD).hu" → a képernyőolvasó „pont hu"-t mond minden sornál), a
+    másik listában „HU - " előtaggal jön. A műsor attól még ugyanaz."""
+    n = " ".join((nyers or "").split())
+    n = re.sub(r"^(?:HU|HUN|HU-TV)\s*[-–—:]\s*", "", n, flags=re.I)
+    n = re.sub(r"\.hu$", "", n, flags=re.I)
+    return n.strip() or (nyers or "").strip()
 
 
 def _letolt_szoveg(url: str, idokorlat: int = 120) -> str:
@@ -166,7 +216,7 @@ class TvMusor:
                 if (dn.text or "").strip():
                     nev = dn.text.strip()
                     break
-            tv.csatornak[cid] = nev or cid
+            tv.csatornak[cid] = szep_nev(nev) or cid
         # 2) műsorok
         for pr in gyoker.findall("programme"):
             cid = (pr.get("channel") or "").strip()
@@ -183,7 +233,7 @@ class TvMusor:
                 (cim_el.text or "").strip() if cim_el is not None else "",
                 (le_el.text or "").strip() if le_el is not None else "",
                 cid))
-            tv.csatornak.setdefault(cid, cid)     # ha nem volt <channel>
+            tv.csatornak.setdefault(cid, szep_nev(cid))  # ha nem volt <channel>
         for lista in tv.musorok.values():
             lista.sort(key=lambda m: m.kezd)
         return tv
@@ -198,41 +248,82 @@ class TvMusor:
                   errors="replace") as f:
             return cls.ertelmez(f.read())
 
+    @staticmethod
+    def _gyorsitotar_olvas(gyt):
+        """(TvMusor, szöveg) a gyorsítótárból, vagy (None, '')."""
+        if not os.path.isfile(gyt):
+            return None, ""
+        try:
+            with open(gyt, encoding="utf-8", errors="replace") as f:
+                szoveg = f.read()
+        except OSError:
+            return None, ""
+        return TvMusor.ertelmez(szoveg), szoveg
+
     @classmethod
     def betolt_okosan(cls, url: str = "", gyorsitotar=True, max_ora: int = 6):
-        """A JAVASOLT betöltés: (1) friss gyorsítótárból azonnal; (2) különben
-        letöltés – a megadott, majd a tartalék forrásokból, amíg egyik sikerül;
-        (3) ha minden forrás elérhetetlen, a RÉGI gyorsítótár (offline is legyen
-        műsor). Visszaad: (TvMusor, honnan: 'gyorsitotar'|'halozat'|'regi'|'')."""
-        utak = [u for u in ([url.strip()] if url and url.strip() else [])
-                + TARTALEK_URLEK if u]
+        """A JAVASOLT betöltés. Visszaad: (TvMusor, honnan), ahol a honnan
+        'gyorsitotar' | 'halozat' | 'regi' | 'hianyos' | ''.
+
+        ⚠️ AMI ITT A LÉNYEG, ÉS AMIÉRT ÁTÍRTUK (Turai László, 2026-09-21).
+        A régi változat az ELSŐ nem-üres forrást fogadta el. Amikor az
+        elsődleges forrás 193 csatornát hirdetett, de műsort csak HÁROMHOZ
+        adott, ez „siker" volt: a három csatornás adat felülírta a
+        gyorsítótárban lévő 164 csatornást, és a felhasználó hat órán át
+        három csatornát látott. Most:
+          • MINDEN forrást megnézünk, és a LEGTÖBB csatornát adó nyer
+            (a bőséges forrásnál persze azonnal megállunk);
+          • ha a legjobb letöltés is hiányos, de a gyorsítótárban TÖBB van,
+            a gyorsítótár nyer, és a hívó 'regi'-t kap;
+          • hiányos adat SOHA nem írja felül a gazdagabb gyorsítótárat;
+          • ha tényleg csak hiányos adat van, 'hianyos'-t adunk vissza, hogy
+            a felület MEGMONDHASSA, mi történt – a néma három csatorna volt
+            az igazi hiba, nem maga a szám.
+        """
+        utak = []
+        for u in ([url.strip()] if url and url.strip() else []) + TARTALEK_URLEK:
+            if u and u not in utak:
+                utak.append(u)
         gyt = _gyorsitotar_ut()
-        if gyorsitotar and _friss_e(gyt, max_ora):
-            try:
-                with open(gyt, encoding="utf-8", errors="replace") as f:
-                    tv = cls.ertelmez(f.read())
-                if tv.csatorna_lista():
-                    return tv, "gyorsitotar"
-            except OSError:
-                pass
+
+        gyt_tv, _ = cls._gyorsitotar_olvas(gyt) if gyorsitotar else (None, "")
+        gyt_db = len(gyt_tv.csatorna_lista()) if gyt_tv else 0
+        # friss ÉS teljes gyorsítótár: azonnal jó. A „friss, de hiányos"
+        # gyorsítótárat NEM fogadjuk el – épp az volt a csapda.
+        if gyt_tv is not None and not hianyos_e(gyt_tv) \
+                and _friss_e(gyt, max_ora):
+            return gyt_tv, "gyorsitotar"
+
+        legjobb_tv, legjobb_szoveg, legjobb_db, legjobb_ok = None, "", 0, False
         for u in utak:
             try:
                 szoveg = (_letolt_szoveg(u) if re.match(r"^https?://", u, re.I)
                           else open(os.path.expanduser(u), encoding="utf-8",
                                     errors="replace").read())
                 tv = cls.ertelmez(szoveg)
-                if tv.csatorna_lista():
-                    if gyorsitotar:
-                        _gyorsitotar_ment(gyt, szoveg)
-                    return tv, "halozat"
+                db = len(tv.csatorna_lista())
             except Exception:
                 continue
-        if os.path.isfile(gyt):                 # minden forrás néma → régi adat
-            try:
-                with open(gyt, encoding="utf-8", errors="replace") as f:
-                    return cls.ertelmez(f.read()), "regi"
-            except OSError:
-                pass
+            if db > legjobb_db:
+                legjobb_tv, legjobb_szoveg, legjobb_db = tv, szoveg, db
+                legjobb_ok = not hianyos_e(tv)
+            if legjobb_ok:
+                break                      # teljes forrás – nincs mit keresni
+
+        if legjobb_ok:
+            if gyorsitotar:
+                _gyorsitotar_ment(gyt, legjobb_szoveg)
+            return legjobb_tv, "halozat"
+
+        # Innentől a hálózat csak hiányosat adott (vagy semmit).
+        if gyt_db > legjobb_db:
+            return gyt_tv, "regi"          # a mentett adat a jobb – ne rontsunk
+        if legjobb_db:
+            # ⚠️ SZÁNDÉKOSAN NEM MENTJÜK: a hiányos adat nem írhatja felül a
+            # következő indulás esélyét egy jobb letöltésre.
+            return legjobb_tv, "hianyos"
+        if gyt_tv is not None:
+            return gyt_tv, "regi"
         return cls(), ""
 
     # ------------------------------------------------------------ lekérdezők

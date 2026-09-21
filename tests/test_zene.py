@@ -217,7 +217,7 @@ def test_a_media_almenube_kerul_nem_kulon_fomenube():
 
 def test_van_helyi_menu_es_minden_muvelet_benne_van():
     win = importlib.import_module(BASE + ".zenewin")
-    f = inspect.getsource(win.ZeneFrame._helyi_menu)
+    f = inspect.getsource(win.ZeneFrame._menu_epit)
     for varhato in ("Szünet", "Előző szám", "Következő szám", "Hangerő fel",
                     "Ismétlés", "Elalvás", "Keresés", "Ugrás &mappára",
                     "Véletlen szám", "Hol tartunk", "vágólapra", "Intézőben",
@@ -234,14 +234,14 @@ def test_a_helyi_menu_a_lista_helyi_menu_esemenyere_nyilik():
 def test_a_helyi_menu_a_gyorsbillentyut_is_mutatja():
     """Vakon ez a tanulás útja: a menü mondja be, mi a billentyűje."""
     win = importlib.import_module(BASE + ".zenewin")
-    f = inspect.getsource(win.ZeneFrame._helyi_menu)
+    f = inspect.getsource(win.ZeneFrame._menu_epit)
     for gyors in ("\\tCtrl+R", "\\tCtrl+S", "\\tCtrl+F", "\\tSzóköz"):
         assert gyors.replace("\\\\t", "\\t") in f
 
 
 def test_a_kapcsolok_pipaval_latszanak():
     win = importlib.import_module(BASE + ".zenewin")
-    f = inspect.getsource(win.ZeneFrame._helyi_menu)
+    f = inspect.getsource(win.ZeneFrame._menu_epit)
     assert "AppendCheckItem" in f
 
 

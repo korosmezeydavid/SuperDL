@@ -99,6 +99,17 @@ def tartalom(mappa: str, kiterjesztesek=()) -> tuple:
                 try:
                     if b.name.startswith("."):
                         continue
+                    # ZÁROLÓFÁJLOK. A Word, az Excel és a PowerPoint minden
+                    # megnyitott dokumentum mellé tesz egy `~$` kezdetű rejtett
+                    # segédfájlt. Ezek NEM dokumentumok: megnyitni nem lehet
+                    # őket, és Schibik Miklós jelzése szerint (2026-09-14) egy
+                    # ilyen `~$`-os DOCX-en „lefagyott az egész, még a JAWS
+                    # is". Vakon ráadásul a lista VÉGÉN sorakoznak, tehát pont
+                    # ott, ahova a legfrissebb fájlt keresve az ember elmegy.
+                    # A Windows rejtettnek jelöli őket, de a `scandir` ezt nem
+                    # nézi – nekünk kell.
+                    if b.name.startswith("~$"):
+                        continue
                     if b.is_dir(follow_symlinks=False):
                         mappak.append(b.name)
                     elif b.is_file(follow_symlinks=False):

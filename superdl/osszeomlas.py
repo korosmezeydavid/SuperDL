@@ -19,6 +19,7 @@ függvény- és fájlneveket a mi kódunkból.
 from __future__ import annotations
 
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -32,6 +33,25 @@ NAPLO = Path.home() / ".superdl" / "osszeomlas.log"
 _OLVASVA = Path.home() / ".superdl" / "osszeomlas_olvasva.txt"
 _fajl = None
 _uj_resz = ""          # ami a legutóbbi indulásunk ÓTA került a naplóba
+
+# --- MEGAKADÁS (befagyás) ---------------------------------------------
+# Tóth László jelzése (2026-09-14): „a fájlválasztóba belefagyott […]
+# hibajelentést azért nem tudtam erről küldeni, mert teljes összeomlás
+# történt, és az eseménynaplóban utána semmi nyoma nem maradt."
+#
+# Ez nem összeomlás, hanem BEFAGYÁS – és ez a kettő MÁS. A `faulthandler`
+# csak akkor ír, ha a folyamat meghal. Ha a program él, de nem válaszol, és
+# a felhasználó a Feladatkezelővel lövi le, a naplóba SEMMI nem kerül. A
+# bizonyíték pont abban a percben nem készül el, amikor a legnagyobb
+# szükség lenne rá.
+MEGAKADAS_FEJLEC = "SuperDL MEGAKADÁS"
+MEGAKADAS_VEGE = "a megakadás nyomának vége"
+MEGAKADAS_MASODPERC = 20.0     # ennyi néma másodperc után írunk nyomot
+_MEGAKADAS_MAX = 3             # egy futásban legfeljebb ennyi nyom
+_sziv = None                   # a fő szál utolsó életjele (monotonic)
+_megakadva = False
+_megakadas_db = 0
+_figyelo = None
 
 
 def bekapcsol() -> bool:
@@ -112,8 +132,34 @@ def uj_osszeomlas() -> bool:
     Erre azért van szükség, mert aki azt látja, hogy „csak bezáródott a
     program", annak eszébe sem jut hibajelentést írni — tehát a nyom, amit
     gondosan feljegyeztünk, örökre a gépén marad. Egyszer szólunk róla, és
-    csak akkor, ha tényleg új."""
-    return _osszeomlas_nyom(_uj_resz)
+    csak akkor, ha tényleg új.
+
+    ⚠️ A MEGAKADÁS NEM ÖSSZEOMLÁS. A megakadás-figyelő verem-nyomot ír a
+    naplóba, és abban ott van a „Current thread" szó is — ha ezt nem vennénk
+    ki, egy olyan befagyás után, amiből a program KIJÖTT, azt állítanánk a
+    felhasználónak, hogy összeomlott. Az pedig pont az a fajta hazugság, ami
+    ellen az egész napló készült."""
+    return _osszeomlas_nyom(_megakadas_nelkul(_uj_resz))
+
+
+def uj_megakadas() -> bool:
+    """Befagyott-e a program a LEGUTÓBBI indulása óta (akár túl is élte)?"""
+    return MEGAKADAS_FEJLEC in _uj_resz
+
+
+def _megakadas_nelkul(szoveg: str) -> str:
+    """A megakadás-blokkok kivágása a szövegből."""
+    ki, benne = [], False
+    for sor in (szoveg or "").splitlines(True):
+        if MEGAKADAS_FEJLEC in sor:
+            benne = True
+            continue
+        if benne:
+            if MEGAKADAS_VEGE in sor:
+                benne = False
+            continue
+        ki.append(sor)
+    return "".join(ki)
 
 
 def _osszeomlas_nyom(szoveg: str) -> bool:
@@ -156,7 +202,59 @@ def naplo_szoveg(sorok: int = 200) -> str:
 
 
 _FEJLECEK = ("Windows fatal exception", "Fatal Python error",
-             "Current thread", "Thread 0x")
+             "Current thread", "Thread 0x", MEGAKADAS_FEJLEC)
+
+
+_INDULT = re.compile(
+    r"===\s*SuperDL indult:\s*(?P<ido>[\d\-: ]+?)\s*"
+    r"\(verzió:\s*(?P<verzio>[^)]*?)\s*\)\s*===")
+
+
+def nyom_kora() -> dict:
+    """MIKOR volt a legutóbbi nyom, MELYIK verzióban, és mi történt AZÓTA.
+
+    ⚠️ MIÉRT KELL. Dr. Kiss István 2026-09-16-i jelentésében a nyom
+    négy nappal korábbi volt, egy AZÓTA JAVÍTOTT hibáról (`bookwin.py`
+    `_on_pick_book`, 4.6.7), és utána huszonöt indulás következett
+    zavartalanul. A jelentés élén viszont csak egy ⚠️ állt, dátum és
+    következmény nélkül — így pontosan úgy nézett ki, mintha a program MOST
+    omlott volna össze. Beküldte, és igaza volt: ezt a jelentésből nem
+    lehetett eldönteni.
+
+    Ez ugyanaz a hibaosztály, mint a féllel elvágott bizonyíték, csak
+    fordítva: a nyom teljes, a KÖRÜLMÉNYE hiányzik. Egy dátum nélküli
+    figyelmeztetés a fejlesztőt is rossz irányba indítja.
+
+    Visszaad: {ido, verzio, ota, most} — vagy üres szótárat, ha nincs nyom.
+    Az `ota` az azóta történt PROBLÉMAMENTES indulások száma."""
+    try:
+        with open(NAPLO, encoding="utf-8", errors="replace") as f:
+            sorok = f.read().splitlines()
+    except OSError:
+        return {}
+    kezdet = None
+    for i in range(len(sorok) - 1, -1, -1):
+        if any(j in sorok[i] for j in _FEJLECEK):
+            kezdet = i
+            break
+    if kezdet is None:
+        return {}
+    # a blokkot nyitó indulás-sor: ez mondja meg, MELYIK verzió hibázott
+    ido = verzio = ""
+    for i in range(kezdet, -1, -1):
+        t = _INDULT.search(sorok[i])
+        if t:
+            ido, verzio = t.group("ido"), t.group("verzio")
+            break
+    # …és hány indulás jött UTÁNA
+    ota = 0
+    most = ""
+    for s in sorok[kezdet + 1:]:
+        t = _INDULT.search(s)
+        if t:
+            ota += 1
+            most = t.group("verzio")
+    return {"ido": ido, "verzio": verzio, "ota": ota, "most": most or verzio}
 
 
 def utolso_osszeomlas(max_sorok: int = 300) -> str:
@@ -248,3 +346,103 @@ def volt_osszeomlas() -> bool:
     írja ki.) BÁRMIKORI – a hibajelentéshez ez a jó kérdés; az indulási
     figyelmeztetéshez viszont az `uj_osszeomlas()`."""
     return _osszeomlas_nyom(naplo_szoveg(400))
+
+
+# ---------------------------------------------------------------------
+# MEGAKADÁS-FIGYELŐ
+# ---------------------------------------------------------------------
+#
+# A MŰKÖDÉS EGY MONDATBAN: a fő (GUI-) szál másodpercenként életjelet ad egy
+# időzítőből, egy háttérszál pedig nézi, hogy jön-e. Ha húsz másodpercig nem
+# jön, a háttérszál KIÍRJA MINDEN SZÁL VERMÉT a naplóba – tehát akkor is lesz
+# bizonyíték, ha a felhasználó a Feladatkezelővel lövi le a programot.
+#
+# MIÉRT MŰKÖDIK EZ A FÁJLVÁLASZTÓNÁL IS: a natív választó a saját modális
+# üzenethurkát futtatja, de UGYANAZON a szálon – a WM_TIMER tehát tovább
+# érkezik, az életjel megy. Ha viszont egy beépülő bővítmény megakasztja az
+# üzenetfeldolgozást, az életjel ELMARAD. Pont ezt akarjuk megfogni.
+#
+# AMIT NEM CSINÁL: nem lő le semmit, nem szól a felhasználónak, nem nyit
+# ablakot. Egy befagyás közben a legrosszabb, amit tehetnénk, az az, hogy
+# COM-ot hívunk (0x8001010d) vagy modális ablakot nyitunk. Csak írunk.
+
+
+def sziv_dobban() -> None:
+    """A fő szál életjele. Időzítőből hívjuk – NEM csinál semmi láthatót."""
+    global _sziv, _megakadva
+    _sziv = time.monotonic()
+    if _megakadva:
+        _megakadva = False
+        jegyzet("A program újra válaszol – a megakadás elmúlt.")
+
+
+def megakadt(most=None) -> bool:
+    """Túl régen volt-e életjel? (Életjel nélkül: nem tudjuk, tehát nem.)"""
+    if _sziv is None:
+        return False
+    if most is None:
+        most = time.monotonic()
+    return (most - _sziv) > MEGAKADAS_MASODPERC
+
+
+def megakadas_nyom() -> bool:
+    """A megakadás nyomának kiírása. Igaz, ha tényleg írtunk.
+
+    Külön függvény, hogy tesztelhető legyen: a háttérszál csak meghívja."""
+    global _megakadva, _megakadas_db
+    eddig = _megakadva
+    _megakadva = True
+    if _fajl is None or eddig or _megakadas_db >= _MEGAKADAS_MAX:
+        return False
+    _megakadas_db += 1
+    try:
+        import faulthandler
+        _fajl.write(
+            "\n=== %s: a fő szál több mint %.0f másodperce nem válaszol "
+            "(%s) ===\n" % (MEGAKADAS_FEJLEC, MEGAKADAS_MASODPERC,
+                            time.strftime("%Y-%m-%d %H:%M:%S")))
+        _fajl.flush()
+        faulthandler.dump_traceback(file=_fajl, all_threads=True)
+        _fajl.write("=== %s ===\n" % MEGAKADAS_VEGE)
+        _fajl.flush()
+        os.fsync(_fajl.fileno())
+        return True
+    except Exception:
+        return False
+
+
+def megakadas_figyelese(lepes: float = 2.0) -> bool:
+    """A figyelő háttérszál indítása. Igaz, ha fut."""
+    global _figyelo
+    if _figyelo is not None:
+        return True
+    import threading
+
+    def kor():
+        while True:
+            time.sleep(lepes)
+            try:
+                if megakadt():
+                    megakadas_nyom()
+            except Exception:
+                pass
+
+    try:
+        _figyelo = threading.Thread(target=kor, name="megakadas-figyelo",
+                                    daemon=True)
+        _figyelo.start()
+        return True
+    except Exception:
+        _figyelo = None
+        return False
+
+
+def sziv_inditasa(ablak, lepes_ms: int = 2000):
+    """A fő szál életjel-időzítője. A visszaadott időzítőt EL KELL TENNI –
+    ha elfogy rá a hivatkozás, a wx eldobja, és némán elhal a figyelés."""
+    import wx
+    ido = wx.Timer(ablak)
+    ablak.Bind(wx.EVT_TIMER, lambda e: sziv_dobban(), ido)
+    sziv_dobban()
+    ido.Start(int(lepes_ms))
+    return ido

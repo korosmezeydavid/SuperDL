@@ -215,6 +215,37 @@ def fejezet_szamlal(book) -> int:
     return fejezet.szamlal(getattr(book, "text", "") or "")
 
 
+def _ffmpeg(parancs: list, flags: int, mit: str) -> None:
+    """ffmpeg-hívás ÉRTELMES hibaüzenettel.
+
+    ⚠️ MIÉRT KELLETT. Eddig minden hívás `-loglevel quiet` + `check=True`
+    volt. Ha az ffmpeg elhasalt, a felhasználó ezt kapta:
+
+        Command '[...]' returned non-zero exit status 1.
+
+    Ebből se ő, se én nem tudtam meg semmit — pedig az ffmpeg PONTOSAN
+    megmondja, mi a baja (nincs hely, túl hosszú az út, rossz a bemenet),
+    csak épp elnémítottuk. Dr. Kiss István 2026-09-16-i jelentése ezért
+    nem volt megfejthető: „hibaüzenettel megszakadt", és kész.
+
+    Mostantól `-loglevel error`: a szokásos fecsegés marad néma, de a
+    HIBA megszólal, és bekerül a kivétel szövegébe — tehát a képernyőre
+    és a naplóba is."""
+    p = subprocess.run(parancs, stdin=subprocess.DEVNULL,
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                       creationflags=flags)
+    if p.returncode == 0:
+        return
+    reszlet = (p.stderr or b"").decode("utf-8", "replace").strip()
+    # az ffmpeg sokszor több sort ír; az UTOLSÓ néhány a lényeg
+    sorok = [s for s in reszlet.splitlines() if s.strip()][-3:]
+    raise RuntimeError(
+        "%s nem sikerült (ffmpeg, kód %s).%s"
+        % (mit, p.returncode,
+           ("\n" + "\n".join(sorok)) if sorok else
+           " Az ffmpeg nem mondta meg, miért."))
+
+
 def _fejezet_cim_fajlnev(cim: str, sorszam: int) -> str:
     """A fejezetcímből biztonságos fájlnév-részlet."""
     tiszta = re.sub(r'[\\/:*?"<>|]+', " ", cim or "").strip()
@@ -296,11 +327,10 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
             raw = eng.synth(text, voice_id, str(work / f"p{i:04d}"),
                             pitch=pitch, rate=rate, api_key=api_key)
             norm = work / f"n{i:04d}.mp3"
-            subprocess.run(
-                [ff, "-y", "-i", raw, "-ar", "44100", "-ac", "2",
-                 "-c:a", "libmp3lame", "-qscale:a", "4", str(norm),
-                 "-loglevel", "quiet"], stdin=subprocess.DEVNULL,
-                creationflags=flags, check=True)
+            _ffmpeg([ff, "-y", "-i", raw, "-ar", "44100", "-ac", "2",
+                     "-c:a", "libmp3lame", "-qscale:a", "4", str(norm),
+                     "-loglevel", "error"],
+                    flags, "A(z) %d. hangdarab átalakítása" % (i + 1))
             norm_files.append(norm)
             try:
                 os.remove(raw)
@@ -344,26 +374,25 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
                                     _fejezet_cim_fajlnev(_cim, _i + 1),
                                     out.suffix)
                 _cel = stage / _nev
-                subprocess.run(
-                    [ff, "-y", "-f", "concat", "-safe", "0",
-                     "-i", str(_lista), "-c", "copy", str(_cel),
-                     "-loglevel", "quiet"],
-                    stdin=subprocess.DEVNULL, creationflags=flags, check=True)
+                _ffmpeg([ff, "-y", "-f", "concat", "-safe", "0",
+                         "-i", str(_lista), "-c", "copy", str(_cel),
+                         "-loglevel", "error"],
+                        flags, "A(z) „%s” fejezet összefűzése" % (_cim or _i))
                 keszek.append(_cel)
         elif split_minutes and split_minutes > 0:
             pattern = str(stage / (out.stem + "_%03d" + out.suffix))
-            subprocess.run(
-                [ff, "-y", "-f", "concat", "-safe", "0", "-i", str(listfile),
-                 "-f", "segment", "-segment_time", str(int(split_minutes * 60)),
-                 "-c", "copy", pattern, "-loglevel", "quiet"],
-                stdin=subprocess.DEVNULL, creationflags=flags, check=True)
+            _ffmpeg([ff, "-y", "-f", "concat", "-safe", "0",
+                     "-i", str(listfile), "-f", "segment",
+                     "-segment_time", str(int(split_minutes * 60)),
+                     "-c", "copy", pattern, "-loglevel", "error"],
+                    flags, "A percenkénti darabolás")
             keszek = sorted(stage.glob(out.stem + "_*" + out.suffix))
         else:
             egy = stage / out.name
-            subprocess.run(
-                [ff, "-y", "-f", "concat", "-safe", "0", "-i", str(listfile),
-                 "-c", "copy", str(egy), "-loglevel", "quiet"],
-                stdin=subprocess.DEVNULL, creationflags=flags, check=True)
+            _ffmpeg([ff, "-y", "-f", "concat", "-safe", "0",
+                     "-i", str(listfile), "-c", "copy", str(egy),
+                     "-loglevel", "error"],
+                    flags, "A hangoskönyv összefűzése")
             keszek = [egy]
 
         # KIMENET-ELLENŐRZÉS: eddig a puszta visszatérési kód számított sikernek,
