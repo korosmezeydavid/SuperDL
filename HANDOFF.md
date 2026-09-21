@@ -158,7 +158,46 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-09-10 · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-21 · dolgozott: Claude
+
+---
+
+### ✅ 4.6.12 KIADVA (2026-09-21) – BESZÉLŐ ÓRA, KEDVENCEK, HAT NÉMA HIBA
+
+Commit `8beee26` (kód) + `5185016` (modules.json).
+Modulok: **zene 1.2.0**, **szervezes 1.4.0**, **tvmusor 1.3.0**,
+**docconvert 1.3.4**, **konyvek 1.3.2**. Mind a 10 letöltési URL **200**,
+`releases/latest = v4.6.12`. Hírlevél **KIMENT** a listára.
+
+Tizenkét tételből tizenegy felhasználói levélből származik. Részletek:
+`claude/windows-kiadas-4-6-12.md`.
+
+**Új:** beszélő óra + időzítő-profilok (`superdl/orahang.py`,
+`superdl/idoora.py`, `szervezes_mod/orawin.py`); a Zene modulban
+hangkimenet-választás (`Ctrl+H`), megmaradó keverés (`Ctrl+K`) és kedvencek
+(`Ctrl+D` / `Ctrl+B`).
+
+**Javítva:** tévéújság hiányos forrása; karakterenként pozicionált PDF;
+a hiba pontos szövege tényleg a naplóba kerül; csonka helyi fordító;
+befagyás-figyelő; a nyom kora a jelentésben; a Modulkezelő halott ablaka;
+a `0x8001010d` második forrása; `~$` zárolófájlok; a hangoskönyv néma hibája.
+
+⚠️ **ÚJ SZABÁLY – a build interpretere.** A
+`tools/build_installer.ps1` alapértelmezett pythonja
+(`…\Local\Python\pythoncore-3.14-64`) **nem tartalmazza a pdfminer-t**.
+Azzal építve a PDF-javítás NÉMÁN nem működött volna a kiadott exében.
+Mindig azzal az interpreterrel építs, amiben a tesztek futnak
+(`…\Local\Programs\Python\Python314`), és build UTÁN ellenőrizd, hogy az
+új függőség tényleg bekerült a `dist\SuperDL\_internal`-ba.
+
+⚠️ **A levélmodul munkapéldánya SZÁNDÉKOSAN kimaradt a commitból**
+(`modules_src/mail/*`, `tests/test_cimjegyzek_szerkesztes.py`) – külön
+beszélgetés dolgozik rajta.
+
+**Nyitva (a hírlevélben megígérve):** Nagy Károly YouTube-tekerése; a
+fájlválasztó rendezés-váltása (Schibik Miklós); Nagy Károly 74 torrentjének
+oka; a beragadt aria2 (Tóth László); a Média-eszközök natív fájlválasztója
+(Turai László); a hangszínszabályzó kérdése.
 
 ---
 
