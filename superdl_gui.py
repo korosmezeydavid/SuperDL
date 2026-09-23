@@ -2151,12 +2151,19 @@ class MainFrame(wx.Frame):
         self._select_job_row(kovetkezo)
         p = kovetkezo.progress
         hol = f"{gondok.index(kovetkezo) + 1}. a {len(gondok)}-ból."
+        # ⚠️ ELŐBB A NAPLÓBA, CSAK UTÁNA AZ ÍGÉRET — ugyanaz a szabály, mint a
+        # Shift+F6-nál. EZ A HELY KIMARADT a 4.6.12-es javításból: az F6 is
+        # azt mondta, hogy „a pontos szövege az eseménynaplóban van", de maga
+        # sosem írt oda semmit. [Nagy Károly, 2026-09-23]
+        nev_g = p.filename or kovetkezo.url
+        van_nyers = self._nyers_hibat_naploz(nev_g, kovetkezo)
         mondat = hibaszoveg.gond_mondat(
-            p.filename or kovetkezo.url, p.status, p.error,
+            nev_g, p.status, p.error,
             utkozes=bool(p.conflict), probak=getattr(kovetkezo, "retries", 0),
             elakadt=bool(getattr(p, "elakadt", False)),
             elakadas_oka=getattr(p, "elakadas_oka", ""),
-            ismert=getattr(p, "error_ismert", None))
+            ismert=getattr(p, "error_ismert", None),
+            van_nyers=van_nyers)
         # a javítás-billentyűt CSAK ott ajánljuk fel, ahol tényleg van mit
         # tenni egy gombbal – a hamis ígéret rosszabb, mint a hallgatás
         if p.conflict or p.status == "hiba":
@@ -2212,14 +2219,41 @@ class MainFrame(wx.Frame):
         # az élő állapottal: a múlt idő itt tájékoztat, nem riaszt.
         korabbi = getattr(job, "utolso_hiba", "")
         if korabbi and korabbi != p.error:
-            mikor = self._hiba_ideje(getattr(job, "utolso_hiba_ideje", None))
-            mondat += (f" Korábban{mikor} ez a hiba történt vele: "
-                       f"{hibaszoveg.olvashato(korabbi)}")
+            ido = getattr(job, "utolso_hiba_ideje", None)
+            mikor = self._hiba_ideje(ido)
+            if self._regi_hiba(ido):
+                # ⚠️ A RÉGI HIBA NEM A MAI MAGYARÁZAT. Tóth László naplójában
+                # (2026-09-23) a mai elakadás („nincs seeder") mellé egy KÉT
+                # NAPPAL korábbi hiba került oda magyarázatként. A kettő nem
+                # ugyanaz, és így a felhasználó is, én is rossz irányba
+                # indulunk. Ez a „dátumtalan nyom" családja – az
+                # összeomlás-naplónál már kimondtuk, itt is ki kell.
+                mondat += (f" Megjegyzés: egy KORÁBBI futásból{mikor} maradt "
+                           f"vele ez a hiba, ami valószínűleg NEM a mostani "
+                           f"állapot oka: {hibaszoveg.olvashato(korabbi)}")
+            else:
+                mondat += (f" Korábban{mikor} ez a hiba történt vele: "
+                           f"{hibaszoveg.olvashato(korabbi)}")
             # a NYERS szöveg a naplóba megy, hogy továbbküldhető legyen
-            self._naplo(f"[{nev}] korábbi hiba nyers szövege: {korabbi}")
+            self._naplo(f"[{nev}] korábbi hiba nyers szövege{mikor}: "
+                        f"{korabbi}")
         self._announce(mondat, ok=False)
         if self.speaker.available:
             self.speaker.speak(mondat)
+
+    # ennél régebbi hiba már nem a mostani állapot magyarázata
+    REGI_HIBA_MP = 3 * 3600
+
+    @classmethod
+    def _regi_hiba(cls, ido) -> bool:
+        """Régi-e ez a hiba? Időpont nélkül IGEN — ha nem tudjuk, mikor volt,
+        nem állíthatjuk róla, hogy a mostani helyzethez tartozik."""
+        if not ido:
+            return True
+        try:
+            return (time.time() - float(ido)) > cls.REGI_HIBA_MP
+        except (TypeError, ValueError):
+            return True
 
     @staticmethod
     def _hiba_ideje(ido) -> str:
@@ -2262,14 +2296,17 @@ class MainFrame(wx.Frame):
         tehát az indításkor már hibás sorokhoz sosem került oda, a Shift+F6
         pedig kimondta az ígéretet, de maga sosem írt a naplóba.
 
-        Ugyanazt a szöveget kétszer nem írjuk ki: a napló legyen olvasható."""
+        ⚠️ MINDIG ÍR, AKKOR IS, HA UGYANAZT MÁR KIÍRTUK. Volt benne egy
+        „ne ismételjük magunkat" gyorsítótár — és pont ez tette az ígéretet
+        bizonytalanná: ha a szöveg egyszer bekerült, a program attól kezdve
+        ÍGÉRTE a naplót anélkül, hogy odaírta volna. Ha a felhasználó közben
+        görgetett, törölt, vagy máshol járt, semmit nem talált. Egy
+        megismételt sor olcsóbb, mint egy be nem tartott ígéret.
+        [Nagy Károly negyedszer, 2026-09-23]"""
         nyers = self._nyers_hibaszoveg(job)
         if not nyers:
             return False
-        kulcs = (getattr(job, "id", None), nyers)
-        if kulcs in self._naplozott_hibak:
-            return True                 # már ott van – az ígéret áll
-        self._naplozott_hibak.add(kulcs)
+        self._naplozott_hibak.add((getattr(job, "id", None), nyers))
         self._naplo(f"[{nev}] a hiba pontos szövege: {nyers}")
         return True
 

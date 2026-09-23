@@ -206,8 +206,35 @@ class MediaSearchFrame(wx.Frame):
     # ---- segédek ------------------------------------------------------
 
     def _announce(self, text: str):
+        """Állapot a sávba, a címkére – ÉS KIMONDVA.
+
+        ⚠️ EDDIG NÉMA VOLT. Csak az állapotsort és egy StaticText-et írt át,
+        amit a képernyőolvasó nem olvas fel magától – tehát a médiakereső
+        minden visszajelzése (hangerő, leállítás, és a 4.6.13-ban bevezetett
+        tekerés-pozíció) LÁTHATATLAN volt annak, aki nem látja a képernyőt.
+        Nagy Károly udvariasan így írta le: „a program nem mondja be hova
+        ugrott, de a zenén hallod" – vagyis megszokta, hogy nem szól.
+        [2026-09-23]
+
+        A sorrend KÖTELEZŐ: előbb a képernyőolvasó, és csak utána a beépített
+        hang. Fordítva képernyőolvasó-módban néma maradna, mert a Core
+        ilyenkor szándékosan némítja a saját hangját."""
         self.SetStatusText(text)
         self.pos_label.SetLabel(text)
+        if not (text or "").strip():
+            return
+        try:
+            from . import screenreader
+            if screenreader.speak(text):
+                return
+        except Exception:
+            pass
+        sv = getattr(self.main, "selfvoice", None)
+        if sv is not None and not getattr(sv, "muted", False):
+            try:
+                sv.speak(text, force=True)
+            except Exception:
+                pass
 
     @staticmethod
     def _from_rec(r: dict) -> S.Result:
