@@ -158,7 +158,48 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-09-23 (harmadik kör) · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-23 (negyedik kör) · dolgozott: Claude
+
+---
+
+### ✅ 4.6.16 + zene 1.3.0 KIADVA (2026-09-23) – HANGSZÍN-SZABÁLYZÓ
+
+Commit `2d505ee` + `5df93d5`. `releases/latest = v4.6.16`, CLI `--diagnose`
+= 4.6.16, mind a 4 URL 200; a zene ZIP sha256 + méret LETÖLTÖTT fájlon
+ellenőrizve. Hírlevél kiment, személyes válasz Stolmár Barbinak.
+Napló: `claude/windows-hangszin-szabalyzo.md`.
+
+**Core 4.6.16** – `audioengine.Player.set_audio_filter()` / `audio_filter`:
+az ffmpeg `-af` lánca, a DEKÓDOLÁSBAN. A setter azt adja vissza, kell-e
+újraindítani a lejátszást (csak ha tényleg változott ÉS épp szól).
+
+**zene 1.3.0** – `hangszin.py` (hat nevesített profil + erősség),
+`hangszinwin.py` (nyilazható lista + EGY csúszka, ÉLŐ alkalmazással),
+`keverolejatszo.hangszin_allit()`, Ctrl+Shift+H.
+
+⚠️ **A forma a lényeg, nem a decibel** – Stolmár Barbival egyeztetve.
+Tíz sáv látva ábra, vakon tíz szám, ami nem mond semmit a HANGRÓL.
+
+⚠️ **A csúszka alja (nulla) mindig az eredeti hang**, és a Mégse
+visszaállít – élő alkalmazásnál a visszaút kötelező.
+
+⚠️ **Az alap az „eredeti"**: aki nem nyúl hozzá, azt hallja, amit eddig.
+
+⚠️ **A Ctrl+Shift+H ága a sima Ctrl+H ELŐTT van** a `_on_key`-ben,
+különben az elnyelné, és a hangkimenet-választó nyílna meg.
+
+⚠️ **Nincs tizedesvessző a szűrőláncban** – magyar Windowson az ffmpeg
+elszállna rajta. `_szam()` mindig pontot ad.
+
+⚠️ **Torzításvédelem (`alimiter`) minden kiemelő profilon. MÉRVE:**
+nélküle egy hangos 70 Hz-es jel **47 460 mintán** ütközött a falnak,
+vele **nullán**. További mérés: basszus +7,4 dB 70 Hz-en, magas +6,0 dB
+10 kHz-en, beszéd +5,4 dB 2,5 kHz-en és −2,5 dB 70 Hz-en (ffmpeg 8.1.1).
+
+Teszt: `tests/test_hangszin.py` (39).
+
+**Ami a hangszínből még nyitva:** Barbitól várom a visszajelzést a NEVEKRE
+és az értékekre – a tábla (`hangszin.PROFILOK`) egy perc alatt hangolható.
 
 ---
 
