@@ -1,10 +1,10 @@
 {
   "id": "radio",
   "name": "Internetes rádió",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "entry": "radio_mod",
   "category": "Média",
-  "description": "Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: JAVÍTVA a saját állomás hozzáadása (eddig a „Hozzáadás” gomb nem mentett – most valóban a Kedvencek közé kerül, és a fókusz oda is ugrik, kijelölve az új állomást). ÚJ: „Jobb minőségű forrás” gomb – egy meglévő állomáshoz (pl. Kossuth) magasabb bitrátás stream-cím adható, előre kitöltött párbeszéddel, így jobb minőségben vehetsz fel. Az időzített felvételnél megadhatod, hogy EGYSZERI legyen, MEGADOTT SZÁMÚ alkalommal fusson, vagy KIKAPCSOLÁSIG ismételjen. Némítás (Ctrl+M). Ha nincs internet, akadálymentes felugró jelzi újratesztelés-gombbal.",
+  "description": "ÚJ (Nagy Károly kérésére, 2026-09-23): A RÁDIÓ MEGJEGYZI A HANGERŐT. „Ha a hangerőt leveszem mondjuk 30-ra, akkor a következő indulás után maradjon is úgy.” Eddig a rádió minden indításkor a lejátszó alapértékén szólalt meg, akármit állítottál be előzőleg. Mostantól a Ctrl+fel / Ctrl+le beállítása megmarad. A némítás (Ctrl+M) NEM mentődik el nullaként: kilépés után a némítás előtti hangerőt kapod vissza, nem néma rádiót. Akadálymentes internetes rádió: élő állomások keresése és hallgatása, azonnali és időzített felvétel. Saját állomás megadása stream-URL-lel, és a saját állomás megosztása a radio-browser közösségi adatbázisában (így mások is megtalálják). ÚJ: JAVÍTVA a saját állomás hozzáadása (eddig a „Hozzáadás” gomb nem mentett – most valóban a Kedvencek közé kerül, és a fókusz oda is ugrik, kijelölve az új állomást). ÚJ: „Jobb minőségű forrás” gomb – egy meglévő állomáshoz (pl. Kossuth) magasabb bitrátás stream-cím adható, előre kitöltött párbeszéddel, így jobb minőségben vehetsz fel. Az időzített felvételnél megadhatod, hogy EGYSZERI legyen, MEGADOTT SZÁMÚ alkalommal fusson, vagy KIKAPCSOLÁSIG ismételjen. Némítás (Ctrl+M). Ha nincs internet, akadálymentes felugró jelzi újratesztelés-gombbal.",
   "min_core_api": "1.0",
   "min_core_version": "4.2.0",
   "requires_tools": [],

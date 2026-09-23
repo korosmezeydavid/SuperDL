@@ -16,6 +16,31 @@ from superdl.audioengine import Player          # megosztott lejátszó a Core-b
 from .radiorecwin import RecordingsDialog, ScheduleDialog   # a modulban
 
 
+_HANGERO_FILE = store.CONFIG_DIR / "radio_beallitasok.json"
+
+
+def _hangero_betolt() -> float:
+    """A megjegyzett rádió-hangerő 0.0 és 1.0 között (alap: 0.7 – a lejátszó
+    saját alapértéke, tehát az első indítás hangja nem változik)."""
+    try:
+        d = store.load_json(_HANGERO_FILE, {}) or {}
+        v = float(d.get("hangero", 0.7))
+    except (TypeError, ValueError, OSError):
+        return 0.7
+    return max(0.0, min(1.0, v))
+
+
+def _hangero_ment(v: float) -> None:
+    try:
+        d = store.load_json(_HANGERO_FILE, {}) or {}
+        if not isinstance(d, dict):
+            d = {}
+        d["hangero"] = max(0.0, min(1.0, float(v)))
+        store.save_json(_HANGERO_FILE, d)
+    except Exception:
+        pass
+
+
 def _ensure_net(win, what):
     """Internet-elő-ellenőrzés VÉDETTEN, AKADÁLYMENTES kétgombos felugróval
     (Újratesztelés / OK). Ha van net, True. Ha nincs, a felugró dönt. Régebbi
@@ -195,6 +220,15 @@ class RadioFrame(wx.Frame):
         self._country_limit = 200        # ország-top találatszám (Tovább növeli)
         self._cur_country: R.Country | None = None
         self._pre_mute_vol = None        # némításkor ide mentjük a hangerőt
+        # ⚠️ A MEGJEGYZETT HANGERŐ. Nagy Károly (2026-09-23): „ez a kérés nem
+        # csak a zene modulra vonatkozik, hanem a rádióra is. Ha a hangerőt
+        # leveszem mondjuk 30-ra, akkor a következő indulás után maradjon is
+        # úgy." A rádió eddig MINDIG a lejátszó alapértékén indult, akármit
+        # állítottál be előzőleg.
+        try:
+            self.player.set_volume(_hangero_betolt())
+        except Exception:
+            pass
 
         self._build()
         self._refresh_fav()
@@ -566,6 +600,7 @@ class RadioFrame(wx.Frame):
     def _vol(self, delta):
         self._pre_mute_vol = None        # kézi hangerő-állítás feloldja a némítást
         self.player.set_volume(self.player.volume + delta)
+        _hangero_ment(self.player.volume)   # megmarad a következő indításra
         self._announce(f"Hangerő: {round(self.player.volume * 100)} százalék"
                        + (f" – {self._cur.name}" if self._cur
                           and self.player.is_active() else "."))

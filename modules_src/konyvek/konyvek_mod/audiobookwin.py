@@ -12,8 +12,11 @@ import threading
 import wx
 
 from .audiobook_player import (AudioBookPlayer, AudioLibrary, konyv_kulcs,
-                               mappa_savok, audio_fajl, ido_str)
+                               mappa_savok, audio_fajl, ido_str,
+                               ido_ertelmez, hangero_betolt, hangero_ment)
 from . import valaszto                         # beépített fájlválasztó
+
+HANGERO_LEPES = 0.05        # ugyanaz a lépés, mint a Zenelejátszóban
 
 _HANG_WILDCARD = ("Hangfájl (*.mp3;*.m4a;*.aac;*.ogg;*.opus;*.wav;*.flac)|"
                   "*.mp3;*.m4a;*.aac;*.ogg;*.oga;*.opus;*.wav;*.flac;*.wma;"
@@ -38,6 +41,10 @@ _SUGO = (
     "VEZÉRLÉS\n"
     "• F5: lejátszás / folytatás.  Ctrl+szóköz: szünet.  Esc: leállítás.\n"
     "• Ctrl+balra / Ctrl+jobbra: 15 másodperc vissza / előre.\n"
+    "• Ctrl+fel / Ctrl+le: hangerő fel / le. A beállított hangerő MEGMARAD a "
+    "következő indításra is.\n"
+    "• Ctrl+G: ugrás egy megadott időpontra a mostani sávon belül. Írhatod "
+    "így: 12:30, 1:02:03, 90 (ennyi másodperc), „5 perc 30”, „2 óra 10 perc”.\n"
     "• Előző/Következő sáv gomb: sávok közt lépés. A sáv vége magától a "
     "következőre lép.\n\n"
     "KÖNYVJELZŐK\n"
@@ -81,6 +88,13 @@ class AudioBookFrame(wx.Frame):
         self._bejaras_megall = threading.Event()
         self.player = AudioBookPlayer(on_track_end=self._on_track_end_bg,
                                       on_error=self._on_error_bg)
+        # ⚠️ A HANGERŐT A LEJÁTSZÓ LÉTREHOZÁSA UTÁN, DE A `_build()` ELŐTT
+        # állítjuk be: a gomb felirata már a betöltött értéket mutassa.
+        self._hangero = hangero_betolt()
+        try:
+            self.player.set_volume(self._hangero)
+        except Exception:
+            pass
         self._build()
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self.CreateStatusBar()
@@ -129,6 +143,11 @@ class AudioBookFrame(wx.Frame):
                 ("Le&állítás (Esc)", lambda e: self._stop()),
                 ("−15 mp", lambda e: self._relseek(-15)),
                 ("+15 mp", lambda e: self._relseek(15)),
+                ("Hangerő &fel (Ctrl+Fel)",
+                 lambda e: self._hangero_allit(HANGERO_LEPES)),
+                ("Hangerő le&jjebb (Ctrl+Le)",
+                 lambda e: self._hangero_allit(-HANGERO_LEPES)),
+                ("&Ugrás időpontra… (Ctrl+G)", lambda e: self._ugras_idopontra()),
                 ("&Előző sáv", lambda e: self._prev_track()),
                 ("&Következő sáv", lambda e: self._next_track()),
                 ("Köny&vjelző (Ctrl+B)", lambda e: self._add_bookmark()),
@@ -177,7 +196,13 @@ class AudioBookFrame(wx.Frame):
         self.Bind(wx.EVT_CHAR_HOOK, self._on_char_hook)
 
         ids = {k: wx.NewIdRef() for k in
-               ("play", "pause", "stop", "back", "fwd", "bm", "bmlist", "help")}
+               ("play", "pause", "stop", "back", "fwd", "bm", "bmlist", "help",
+                "hfel", "hle", "ugras")}
+        self.Bind(wx.EVT_MENU, lambda e: self._hangero_allit(HANGERO_LEPES),
+                  id=ids["hfel"])
+        self.Bind(wx.EVT_MENU, lambda e: self._hangero_allit(-HANGERO_LEPES),
+                  id=ids["hle"])
+        self.Bind(wx.EVT_MENU, lambda e: self._ugras_idopontra(), id=ids["ugras"])
         self.Bind(wx.EVT_MENU, lambda e: self._play(), id=ids["play"])
         self.Bind(wx.EVT_MENU, lambda e: self._toggle(), id=ids["pause"])
         self.Bind(wx.EVT_MENU, lambda e: self._stop(), id=ids["stop"])
@@ -192,6 +217,9 @@ class AudioBookFrame(wx.Frame):
             (wx.ACCEL_NORMAL, wx.WXK_ESCAPE, ids["stop"]),
             (wx.ACCEL_CTRL, wx.WXK_LEFT, ids["back"]),
             (wx.ACCEL_CTRL, wx.WXK_RIGHT, ids["fwd"]),
+            (wx.ACCEL_CTRL, wx.WXK_UP, ids["hfel"]),
+            (wx.ACCEL_CTRL, wx.WXK_DOWN, ids["hle"]),
+            (wx.ACCEL_CTRL, ord('G'), ids["ugras"]),
             (wx.ACCEL_CTRL, ord('B'), ids["bm"]),
             (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('B'), ids["bmlist"]),
             (wx.ACCEL_NORMAL, wx.WXK_F1, ids["help"]),
@@ -490,6 +518,63 @@ class AudioBookFrame(wx.Frame):
                 self._play_selected()
                 return
         e.Skip()
+
+    # ---- hangerő és ugrás időpontra ----
+    def _hangero_allit(self, delta):
+        """Ctrl+fel / Ctrl+le. A beállítás MEGMARAD a következő indításra.
+
+        ⚠️ Turai László (2026-09-23): „a hangoskönyv lejátszóban a hangerőt nem
+        lehet állítani". Nem elromlott – SOHA nem volt benne. A Zenelejátszó
+        1.2.1-ben megkapta, a Hangoskönyv kimaradt."""
+        self._hangero = max(0.0, min(1.0, self._hangero + delta))
+        try:
+            self.player.set_volume(self._hangero)
+        except Exception:
+            pass
+        hangero_ment(self._hangero)
+        self._mond("Hangerő %d százalék." % round(self._hangero * 100))
+
+    def _ugras_idopontra(self):
+        """Ctrl+G – ugrás a mostani sávon belül egy beírt időpontra.
+
+        ⚠️ Turai László javaslata (2026-09-23): „időpontra ugrás egy fájlban".
+        Egy nyolcórás hangoskönyvben a ±15 másodperc nem út, ha tudod, hol
+        tartottál. A beírást többféle alakban elfogadjuk (ld. `ido_ertelmez`),
+        mert vakon a gépelés a gyors út, és egy formátumra kényszeríteni
+        kegyetlenség."""
+        if not self.player.track_count():
+            self._mond("Nincs megnyitott hangoskönyv.")
+            return
+        hossz = self.player.duration()
+        kerdes = ("Melyik időpontra ugorjak a mostani sávon belül?\n"
+                  "Írhatod így: 12:30, vagy 1:02:03, vagy 90 (ennyi "
+                  "másodperc), vagy „5 perc 30”.")
+        if hossz > 0:
+            kerdes += "\nA sáv hossza: " + ido_str(hossz) + "."
+        dlg = wx.TextEntryDialog(self, kerdes, "Ugrás időpontra",
+                                 ido_str(self.player.position()))
+        rc = dlg.ShowModal()
+        szoveg = dlg.GetValue()
+        dlg.Destroy()
+        if rc != wx.ID_OK:
+            return
+        cel = ido_ertelmez(szoveg)
+        if cel is None:
+            self._mond("Ezt az időpontot nem értem: „%s”. Próbáld így: 12:30, "
+                       "vagy 1:02:03, vagy 90." % (szoveg or "").strip())
+            return
+        if hossz > 0 and cel > hossz:
+            self._mond("A sáv csak %s hosszú, ennél tovább nem tudok ugrani."
+                       % ido_str(hossz))
+            return
+        if not self.player.is_active():
+            self.player.play_track(self.player.idx, cel)
+        else:
+            szunetelt = self.player.is_paused()
+            self.player.seek(cel)
+            if szunetelt:
+                self.player.pause()
+        self._mond("Ugrás ide: %s." % ido_str(cel))
 
     # ---- súgó / támogatás / zárás ----
     def _help(self):

@@ -78,6 +78,55 @@ def ido_str(mp: float) -> str:
     return f"{o}:{m:02d}:{s:02d}" if o else f"{m}:{s:02d}"
 
 
+def ido_ertelmez(szoveg: str):
+    """Beírt időpont másodpercben, vagy None, ha nem értelmezhető.
+
+    ⚠️ Turai László kérése (2026-09-23): „időpontra ugrás egy fájlban".
+    Vakon a gépelés a gyors út, ezért TÖBBFÉLE írásmódot elfogadunk, nem
+    kényszerítünk rá egy formátumot:
+      „1:02:03" → 1 óra 2 perc 3 mp | „12:30" → 12 perc 30 mp
+      „90" → 90 MÁSODPERC (a puszta szám mindig másodperc, mert a kettőspontos
+      alak a perces írásmód) | „5 perc" | „5 perc 30" | „2 óra 10 perc" | „90 mp"
+    """
+    sz = (szoveg or "").strip().lower().replace(",", ".")
+    if not sz:
+        return None
+    if ":" in sz:                       # 1:02:03 vagy 12:30
+        darabok = sz.split(":")
+        if len(darabok) > 3:
+            return None
+        try:
+            ertekek = [float(d.strip() or 0) for d in darabok]
+        except ValueError:
+            return None
+        mp = 0.0
+        for e in ertekek:               # balról jobbra: az utolsó a másodperc
+            mp = mp * 60 + e
+        return max(0.0, mp)
+    egysegek = (("óra", 3600), ("ora", 3600), ("h", 3600),
+                ("perc", 60), ("p", 60), ("min", 60), ("m", 60),
+                ("másodperc", 1), ("masodperc", 1), ("mp", 1), ("s", 1))
+    talalt = False
+    mp = 0.0
+    maradek = sz
+    for nev, szorzo in egysegek:
+        m = re.search(r"(\d+(?:\.\d+)?)\s*" + nev + r"\b", maradek)
+        if m:
+            mp += float(m.group(1)) * szorzo
+            maradek = maradek[:m.start()] + " " + maradek[m.end():]
+            talalt = True
+    if talalt:
+        # „5 perc 30" – az egység nélkül maradt szám a másodperc
+        m = re.search(r"\d+(?:\.\d+)?", maradek)
+        if m:
+            mp += float(m.group(0))
+        return max(0.0, mp)
+    try:
+        return max(0.0, float(sz))      # puszta szám: MÁSODPERC
+    except ValueError:
+        return None
+
+
 class AudioBookPlayer:
     def __init__(self, on_track_end=None, on_error=None):
         self.player = Player()
@@ -205,6 +254,44 @@ class AudioBookPlayer:
 
 
 _LIB_FILE = store.CONFIG_DIR / "audiobook_library.json"
+
+# ---- a hangoskönyv-lejátszó beállításai (hangerő) -------------------------
+# ⚠️ Turai László (2026-09-23): „a hangoskönyv lejátszóban a hangerőt nem
+# lehet állítani". Igaza volt: a Zenelejátszó kapott Ctrl+fel/le hangerőt
+# (1.2.1), a Hangoskönyv nem kapott SEMMIT. A tárolás ugyanaz a minta, mint
+# a zenénél (`zene_mod/konyvtar.py`), hogy egy helyen legyen érthető.
+_BEALL_FILE = store.CONFIG_DIR / "audiobook_beallitasok.json"
+
+
+def beallitasok() -> dict:
+    try:
+        d = store.load_json(_BEALL_FILE, {}) or {}
+        return dict(d) if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def beallit(**kv) -> None:
+    d = beallitasok()
+    d.update(kv)
+    try:
+        store.save_json(_BEALL_FILE, d)
+    except Exception:
+        pass
+
+
+def hangero_betolt() -> float:
+    """A megjegyzett hangerő 0.0 és 1.0 között. Alap: 0.7 – ugyanaz, amivel a
+    Core lejátszója indul, tehát az első indítás hangja nem változik."""
+    try:
+        v = float(beallitasok().get("hangero", 0.7))
+    except (TypeError, ValueError):
+        return 0.7
+    return max(0.0, min(1.0, v))
+
+
+def hangero_ment(v: float) -> None:
+    beallit(hangero=max(0.0, min(1.0, float(v))))
 
 
 def konyv_kulcs(path: str, is_dir: bool) -> str:
