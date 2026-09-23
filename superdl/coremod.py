@@ -126,32 +126,90 @@ def modul_frissitesek(root=None, entries=None) -> list:
     return ki
 
 
-def _restart_script(exe: Path, pid: int) -> str:
+def ujraindit_naplo() -> Path:
+    """Az újraindító kötegfájl naplója. KÜLÖN fájl, nem a `naplo.txt`: azt a
+    program írja, ezt viszont egy külső cmd, a program kilépése UTÁN."""
+    return Path.home() / ".superdl" / "ujraindit.log"
+
+
+def _restart_script(exe: Path, pid: int, naplo: Path | None = None) -> str:
     """A programot ÚJRAINDÍTÓ kötegfájl. Megvárja, míg a futó példány (PID)
     tényleg kilép – csak azután indít újat. Ez azért kell, mert a SuperDL
     egypéldányos (mutex): ha azonnal indítanánk, a második példány csendben
-    kilépne, és a felhasználó azt látná, hogy „nem indult újra"."""
+    kilépne, és a felhasználó azt látná, hogy „nem indult újra".
+
+    ⚠️ CSŐVEZETÉK NÉLKÜL VÁR. A korábbi változat a `tasklist … | find …`
+    csővezetékkel nézte, él-e még a régi példány. Konzol nélküli `cmd`-ben
+    (ld. a `restart_app` zászló-megjegyzését) ez BERAGAD, és a kötegfájl
+    soha nem jut el az indításig. A `findstr` egyetlen hívása ugyanazt tudja,
+    cső nélkül.
+
+    ⚠️ NAPLÓT ÍR. Ez a kötegfájl a program kilépése után fut, tehát ha
+    elakad, semmilyen nyom nem marad róla – pontosan ez rejtette el a hibát
+    hónapokig. [Nagy Károly és Tóth Zoltán jelzése, 2026-09-21/22]
+
+    ⚠️ NINCS BENNE ZÁRÓJELES BLOKK. A `cmd` az `if … ( … )` blokkot EGYBEN
+    értelmezi, és a blokkon belüli zárójel elvágja – a program útjában pedig
+    simán lehet zárójel (`C:\\Program Files (x86)\\…`). Ezért minden elágazás
+    `goto`-val megy."""
     sys32 = r"%SystemRoot%\System32"
-    return "\r\n".join([
+    n = str(naplo or ujraindit_naplo())
+
+    def log(szoveg: str) -> str:
+        return f'echo [%DATE% %TIME%] {szoveg}>>"{n}" 2>&1'
+
+    L = [
         "@echo off", "setlocal enableextensions",
+        f'if not exist "{Path(n).parent}\\" md "{Path(n).parent}" 2>NUL',
+        log(f"INDUL, varakozas a {pid} PID kilepesere"),
         "set /a n=0",
         ":wait",
-        f'"{sys32}\\tasklist.exe" /FI "PID eq {pid}" 2>NUL | '
-        f'"{sys32}\\find.exe" "{pid}" >NUL',
+        f'"{sys32}\\tasklist.exe" /FI "PID eq {pid}" /NH /FO CSV 2>NUL'
+        f'>"%TEMP%\\superdl_pid.tmp"',
+        f'"{sys32}\\findstr.exe" /C:"{pid}" "%TEMP%\\superdl_pid.tmp" >NUL',
         "if errorlevel 1 goto run",
         "set /a n+=1",
-        "if %n% GEQ 60 goto run",
+        "if %n% GEQ 60 goto timeout",
         f'"{sys32}\\ping.exe" -n 2 127.0.0.1 >NUL',
         "goto wait",
+        ":timeout",
+        log("IDOTULLEPES: a regi peldany meg fut, megis inditunk"),
         ":run",
+        'del "%TEMP%\\superdl_pid.tmp" 2>NUL',
         f'"{sys32}\\ping.exe" -n 3 127.0.0.1 >NUL',
+        f'if exist "{exe}" goto indit',
+        log("HIBA: nincs meg a program"),
+        "goto vege",
+        ":indit",
+        log("INDITAS"),
         f'start "" "{exe}"',
-        'del "%~f0"', ""])
+        "if errorlevel 1 goto startbaj",
+        log("KESZ"),
+        "goto vege",
+        ":startbaj",
+        log("HIBA: a start nem sikerult"),
+        ":vege",
+        'del "%~f0"', ""]
+    return "\r\n".join(L)
 
 
 def restart_app() -> bool:
     """A SuperDL újraindítása (a modul-frissítések teljes érvényesüléséhez).
-    A hívó a visszatérés után lépjen ki. Csak Windowson; hiba esetén False."""
+    A hívó a visszatérés után lépjen ki. Csak Windowson; hiba esetén False.
+
+    ⚠️ CSAK `CREATE_NO_WINDOW`. Korábban `CREATE_NO_WINDOW | DETACHED_PROCESS`
+    volt – ezt a két zászlót a Windows dokumentációja szerint NEM szabad
+    együtt használni. A `CreateProcess` mégsem hibázik: elfogadja, és az így
+    indult `cmd`-nek egyáltalán nincs konzolja. MÉRVE 2026-09-21, ugyanazzal
+    a kötegfájllal:
+
+        NO_WINDOW | DETACHED  -> nem indult el 25 mp alatt, a bat sem
+                                 torolte magat
+        NO_WINDOW egyedul     -> elindult 6,8 mp alatt
+        CREATE_NEW_CONSOLE    -> elindult 7,2 mp alatt
+
+    Ezért az „Újraindítsam most?" IGEN gombja a funkció bevezetése óta SOHA
+    nem indította újra a programot."""
     import os
     import subprocess
     import sys
@@ -162,11 +220,16 @@ def restart_app() -> bool:
         exe = Path(sys.executable)
         if not getattr(sys, "frozen", False):        # forrásból futunk
             return False
+        naplo = ujraindit_naplo()
+        try:
+            naplo.parent.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            pass
         bat = Path(tempfile.gettempdir()) / "superdl_ujraindit.bat"
-        bat.write_text(_restart_script(exe, os.getpid()), encoding="cp852",
-                       errors="replace")
+        bat.write_text(_restart_script(exe, os.getpid(), naplo),
+                       encoding="cp852", errors="replace")
         subprocess.Popen(["cmd.exe", "/c", str(bat)],
-                         creationflags=0x08000000 | 0x00000008)  # NO_WINDOW
+                         creationflags=0x08000000)   # CREATE_NO_WINDOW
         return True
     except Exception:
         _log.exception("az újraindítás előkészítése nem sikerült")

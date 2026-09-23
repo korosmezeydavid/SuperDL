@@ -35,6 +35,24 @@ DEFAULT_CHUNK = 6000
 _PAGE_NUM = re.compile(r"^[\s.\-—–]*\d{1,4}[\s.\-—–]*$")
 
 
+def mondhato(szoveg: str) -> bool:
+    """Van-e a darabban KIMONDHATÓ jel (betű vagy számjegy)?
+
+    ⚠️ MÉRVE 2026-09-22, Dr. Kiss István hangoskönyve nyomán: az Edge-TTS
+    `NoAudioReceived`-et dob arra a darabra, amiben csak írásjel van —
+
+        „.”          -> NoAudioReceived
+        „—————”      -> NoAudioReceived
+        „* * *”      -> NoAudioReceived
+        „1 2 3”      -> OK
+        „A”          -> OK
+
+    Regényekben a jelenetválasztó `* * *` és a hosszú gondolatjel-sor
+    teljesen szokásos. Egyetlen ilyen darab eddig az EGÉSZ, akár több órás
+    hangoskönyv-készítést elbuktatta, egy érthetetlen angol üzenettel."""
+    return any(ch.isalpha() or ch.isdigit() for ch in (szoveg or ""))
+
+
 def clean_for_speech(text: str) -> str:
     """A könyvszöveget FELOLVASÁSRA/hangoskönyvre tisztítja: a „felesleges"
     sorokat és sortöréseket távolítja el, a tartalmat megtartva.
@@ -313,6 +331,25 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
         parts = ([INTRO.format(title=book.title)]
                  + chunk_text(book.text, _limit, by_bytes=bool(_blimit))
                  + [OUTRO])
+
+    # ⚠️ A KIMONDHATATLAN DARABOK KIHAGYÁSA. Egy csupa írásjelből álló darab
+    # („* * *", „—————") a beszédmotortól NEM kap hangot, és eddig az EGÉSZ
+    # hangoskönyvet elbuktatta a legvégén. Nincs mit felolvasni rajtuk, tehát
+    # kihagyjuk őket — a fejezet-hozzárendelést VELÜK EGYÜTT, különben a
+    # fejezetenkénti összefűzés csúszna el. [Dr. Kiss István, 2026-09-22]
+    if part_fej:
+        _p, _f = [], []
+        for _t, _fi in zip(parts, part_fej):
+            if mondhato(_t):
+                _p.append(_t)
+                _f.append(_fi)
+        parts, part_fej = _p, _f
+    else:
+        parts = [t for t in parts if mondhato(t)]
+    if not parts:
+        raise RuntimeError(
+            "Ebben a szövegben nincs felolvasható tartalom – csak írásjelek "
+            "vagy üres sorok. Ellenőrizd a betöltött könyvet.")
     total = len(parts)
     work = Path(tempfile.mkdtemp(prefix="sdl_book_"))
     norm_files: list[Path] = []
@@ -324,8 +361,18 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
             _ellenoriz()
             if progress:
                 progress(i, total, "felolvasás")
-            raw = eng.synth(text, voice_id, str(work / f"p{i:04d}"),
-                            pitch=pitch, rate=rate, api_key=api_key)
+            try:
+                raw = eng.synth(text, voice_id, str(work / f"p{i:04d}"),
+                                pitch=pitch, rate=rate, api_key=api_key)
+            except Exception as _ex:
+                # ⚠️ A beszédmotor angol kivétele a felhasználónak semmit nem
+                # mond. Megmondjuk, HÁNYADIK darabnál és MILYEN szövegnél
+                # akadt el – abból a következő jelentésben meg lehet találni.
+                _eleje = " ".join((text or "").split())[:60]
+                raise RuntimeError(
+                    "A felolvasás a(z) %d. szövegdarabnál akadt el (összesen "
+                    "%d). A darab eleje: „%s…”. A beszédmotor üzenete: %s"
+                    % (i + 1, total, _eleje, _ex)) from _ex
             norm = work / f"n{i:04d}.mp3"
             _ffmpeg([ff, "-y", "-i", raw, "-ar", "44100", "-ac", "2",
                      "-c:a", "libmp3lame", "-qscale:a", "4", str(norm),

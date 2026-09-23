@@ -20,9 +20,28 @@ SEEK_INTERVALS = [5, 10, 15, 20, 25, 30, 40, 50, 60]
 PAGE = 25
 PLAY_DIR = Path.home() / ".superdl" / "play"   # ideiglenes lejátszó-fájlok
 
+# Tekerés az ELŐHALLGATÁSBAN. Tíz másodperc, nem öt: itt nem egy dalon belül
+# keresgélünk, hanem egy videóba hallgatunk bele. [Nagy Károly, 2026-09-21]
+TEKERES_MP = 10.0
+TEKERES_NAGY_MP = 60.0      # Ctrl+nyíl
+
 
 def _fmt_time(ms: int) -> str:
     return S.human_duration(int(ms) // 1000) or "0:00"
+
+
+def _ido_szoveg(mp: float) -> str:
+    """Másodperc → „2 perc 30 másodperc".
+
+    FELOLVASÁSRA készül, ezért nem „2:30": a képernyőolvasók a kettőspontos
+    alakot hol időnek, hol aránynak mondják, gépenként másképp."""
+    mp = max(0, int(mp))
+    perc, masodperc = divmod(mp, 60)
+    if perc and masodperc:
+        return "%d perc %d másodperc" % (perc, masodperc)
+    if perc:
+        return "%d perc" % perc
+    return "%d másodperc" % masodperc
 
 
 class MediaSearchFrame(wx.Frame):
@@ -39,6 +58,12 @@ class MediaSearchFrame(wx.Frame):
         self._audio_only_play = True
         self._cur = None                 # épp játszott találat
         self._player_mode = False        # lejátszó-vezérlés be van-e kapcsolva
+        # ⚠️ A tekerés ÚJRAINDÍTJA a forrást (`-ss`), tehát a lejátszó megint
+        # „lejátszás" állapotot küld. Enélkül a jelző nélkül minden egyes
+        # nyílleütésre újra felolvasná a teljes „Lejátszás: cím… Szóköz:
+        # szünet, fel/le: hangerő…" mondatot, és a pozíció bemondása el is
+        # veszne alatta.
+        self._tekert = False
         # megbízható streaming hangmotor (ffmpeg → sounddevice), ugyanaz, mint
         # a rádiónál; a kényes wx.media helyett
         self.player = Player()
@@ -564,10 +589,16 @@ class MediaSearchFrame(wx.Frame):
     def _on_player_state(self, text):
         if text == "lejátszás":
             self._player_mode = True
+            if self._tekert:
+                # tekerés utáni ÚJRAINDULÁS: a pozíciót már bemondtuk
+                self._tekert = False
+                return
             t = self._cur.title if self._cur else ""
             self._announce(f"Lejátszás: {t}  (hangerő "
                            f"{round(self.player.volume * 100)}%). Szóköz: "
-                           "szünet, fel/le: hangerő, Escape: leállítás.")
+                           "szünet, fel/le: hangerő, bal/jobb nyíl: tekerés "
+                           "10 másodpercenként (Ctrl-lal egy percenként), "
+                           "Escape: leállítás.")
         elif text.startswith("hiba"):
             self._player_mode = False
             self._announce(f"Nem lejátszható – {text}. Próbálj másikat.")
@@ -613,9 +644,36 @@ class MediaSearchFrame(wx.Frame):
             self.player.set_volume(self.player.volume - 0.05)
             self._announce(f"Hangerő: {round(self.player.volume * 100)} "
                            "százalék.")
+        elif code in (wx.WXK_LEFT, wx.WXK_RIGHT):
+            lepes = TEKERES_NAGY_MP if e.ControlDown() else TEKERES_MP
+            self._teker(-lepes if code == wx.WXK_LEFT else lepes)
         else:
             return False
         return True
+
+    def _teker(self, delta: float) -> None:
+        """Tekerés az előhallgatásban.
+
+        ⚠️ MÉRVE 2026-09-22 (Nagy Károly jelzésére): a feloldott stream-URL-en
+        az ffmpeg `-ss`-e MŰKÖDIK – az első hangminta 0,2–0,6 másodperc alatt
+        megjön, és a videó hosszán TÚLI pozíció üreset ad, tehát tényleg
+        pozicionál, nem csak elindul elölről. Ezért teker a lejátszó itt is
+        a forrás újranyitásával, ugyanúgy, mint helyi fájlnál.
+
+        ⚠️ A `seek()` a `play()`-en át megy, az pedig FELOLDJA a szünetet.
+        Szünetben tekerve a hang tehát magától megszólalna – ez váratlan.
+        Ezért a szünet állapotát megjegyezzük, és visszaállítjuk."""
+        if not self.player.is_active():
+            self._announce("Most nem megy lejátszás.")
+            return
+        szunetelt = self.player.is_paused()
+        cel = max(0.0, self.player.position() + delta)
+        self._tekert = True
+        self.player.seek(cel)
+        if szunetelt:
+            self.player.pause()
+        self._announce(_ido_szoveg(cel)
+                       + (", szünetben." if szunetelt else "."))
 
     # ---- súgó / zárás -------------------------------------------------
 
@@ -633,7 +691,11 @@ class MediaSearchFrame(wx.Frame):
             "Kosár (Ctrl+K): Delete – eltávolítás; „Kosár letöltése” gomb.\n\n"
             "Lejátszás közben (a fókusz a listán marad):\n"
             "  fel/le nyíl – hangerő\n"
-            "  szóköz – szünet/folytatás, Escape – leállítás",
+            "  bal/jobb nyíl – tekerés 10 másodpercenként\n"
+            "  Ctrl+bal/jobb nyíl – tekerés egy percenként\n"
+            "  szóköz – szünet/folytatás, Escape – leállítás\n\n"
+            "A tekerés a forrást újranyitja, ezért fél-egy másodpercet "
+            "vehet igénybe. A program bemondja, hova ugrott.",
             "Médiakereső súgó", wx.OK | wx.ICON_INFORMATION, self)
 
     def _on_close(self, e):

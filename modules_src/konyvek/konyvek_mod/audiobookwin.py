@@ -7,6 +7,7 @@ ugyanaz, amit az Átjáró a telefonnal szinkronizál. Így a felhasználó a PC
 letesz egy könyvjelzőt a sorozat hangsávjában, és a mobilján onnan folytathatja.
 """
 import os
+import threading
 
 import wx
 
@@ -75,6 +76,9 @@ class AudioBookFrame(wx.Frame):
         self._bookkey = ""         # a polc-kulcs (az AudioLibrary-hez)
         self._title = ""
         self._resume_at = None     # (sáv-index, ms) a mentett folytatáshoz
+        # a mappa-bejárás HÁTTÉRSZÁLON megy (ld. `_open_any`)
+        self._bejaras_fut = False
+        self._bejaras_megall = threading.Event()
         self.player = AudioBookPlayer(on_track_end=self._on_track_end_bg,
                                       on_error=self._on_error_bg)
         self._build()
@@ -207,24 +211,53 @@ class AudioBookFrame(wx.Frame):
             self._open_any(ut)
 
     def _open_any(self, path):
+        """Megnyitás. MAPPÁNÁL a bejárás HÁTTÉRSZÁLON megy.
+
+        ⚠️ Ez fagyasztotta be a programot Turai Lászlónál (2026-09-22): a
+        gomb eseménykezelője megvárta a `mappa_savok()` teljes `os.walk`-ját
+        a FŐ SZÁLON. Nagy vagy hálózati mappánál a Windows „nem válaszol"-t
+        ír, és a felhasználó kilövi – ő ezt összeomlásként élte meg."""
         if self._closing:
             return
         self.player.stop()
         is_dir = os.path.isdir(path)
         if is_dir:
-            savok = mappa_savok(path)
-            if not savok:
-                self._mond("Ebben a mappában nincs lejátszható hangfájl.")
+            if self._bejaras_fut:
+                self._mond("Még tart az előző mappa beolvasása.")
                 return
-            self._book = os.path.basename(path.rstrip("/\\")) or path
-            self._title = self._book
-        else:
-            if not os.path.isfile(path) or not audio_fajl(path):
-                self._mond("Ez a hangfájl nem található, vagy nem hangfájl.")
-                return
-            savok = [path]
-            self._book = os.path.basename(path)
-            self._title = os.path.splitext(self._book)[0]
+            self._bejaras_fut = True
+            self._bejaras_megall.clear()
+            # AZONNALI visszajelzés: vakon a néma várakozás
+            # megkülönböztethetetlen a lefagyástól
+            self._mond("Sávok keresése a mappában…")
+
+            def munka():
+                savok = mappa_savok(path, self._bejaras_megall)
+                wx.CallAfter(self._mappa_beolvasva, path, savok)
+
+            threading.Thread(target=munka, daemon=True).start()
+            return
+        if not os.path.isfile(path) or not audio_fajl(path):
+            self._mond("Ez a hangfájl nem található, vagy nem hangfájl.")
+            return
+        self._konyv_betolt(path, False, [path],
+                           os.path.basename(path),
+                           os.path.splitext(os.path.basename(path))[0])
+
+    def _mappa_beolvasva(self, path, savok):
+        """A háttérbejárás eredménye – már a FŐ szálon."""
+        self._bejaras_fut = False
+        if self._closing or self._bejaras_megall.is_set():
+            return
+        if not savok:
+            self._mond("Ebben a mappában nincs lejátszható hangfájl.")
+            return
+        nev = os.path.basename(path.rstrip("/\\")) or path
+        self._konyv_betolt(path, True, savok, nev, nev)
+
+    def _konyv_betolt(self, path, is_dir, savok, book, title):
+        self._book = book
+        self._title = title
         self._bookkey = konyv_kulcs(path, is_dir)
         self.player.load(savok, book_root=(path if is_dir else ""))
         self._resume_at = None
@@ -480,6 +513,9 @@ class AudioBookFrame(wx.Frame):
 
     def _on_close(self, e):
         self._closing = True
+        # a futó mappa-bejárás hagyja abba: a bezárás ne várjon meg egy
+        # hálózati meghajtót
+        self._bejaras_megall.set()
         try:
             self.timer.Stop()
         except Exception:

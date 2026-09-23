@@ -45,12 +45,23 @@ def rel_sav(gyoker: str, ut: str) -> str:
     return os.path.basename(ut)
 
 
-def mappa_savok(mappa: str) -> list:
+def mappa_savok(mappa: str, megall=None) -> list:
     """Egy hangoskönyv-mappa ÖSSZES hangfájlja – az ALMAPPÁKBAN is (pl. kötetek) –,
-    a relatív út szerinti természetes sorrendben (a kötetek egymás után)."""
+    a relatív út szerinti természetes sorrendben (a kötetek egymás után).
+
+    ⚠️ EZ SOKÁIG TARTHAT, és EZÉRT NEM SZABAD A FŐ SZÁLON HÍVNI. Turai László
+    gépén (2026-09-22) az „Ezt a mappát választom" gomb innen fagyasztotta be
+    a programot húsz másodpercnél tovább – a megakadás-figyelő verme pont ezt
+    a sort mutatta. A hívó háttérszálon futtassa, és `wx.CallAfter`-rel vegye
+    át az eredményt.
+
+    A `megall` egy `threading.Event`: ha beáll, a bejárás félbehagyható, hogy
+    az ablak bezárása ne várjon meg egy hálózati meghajtót."""
     talalt = []
     try:
         for gyoker, _dirs, fajlok in os.walk(mappa):
+            if megall is not None and megall.is_set():
+                return []
             for n in fajlok:
                 if audio_fajl(n):
                     talalt.append(os.path.join(gyoker, n))
