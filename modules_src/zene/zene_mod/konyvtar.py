@@ -192,6 +192,24 @@ def kimenet_ment(nev: str) -> None:
     beallit(kimenet=str(nev or ""))
 
 
+def hangero_betolt() -> float:
+    """A megjegyzett hangerő 0 és 1 között; alapból teljes.
+
+    ⚠️ Szabó László kérése (2026-09-23): „megoldható-e, hogy a program
+    megjegyezze az előzőleg beállított hangerőt? Minden újbóli bekapcsoláskor
+    100%-kal indul." Aki halkan hallgat, annak minden indítás egy ijesztő
+    hangrobbanás volt."""
+    try:
+        v = float(beallitasok().get("hangero", 1.0))
+    except (TypeError, ValueError):
+        return 1.0
+    return max(0.0, min(1.0, v))
+
+
+def hangero_ment(v: float) -> None:
+    beallit(hangero=max(0.0, min(1.0, float(v))))
+
+
 def ido_szoveg(mp: float) -> str:
     """Másodperc → „3 perc 25 másodperc” (felolvasásra, nem 3:25-re)."""
     mp = max(0, int(mp))

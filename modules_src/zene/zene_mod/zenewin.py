@@ -142,7 +142,7 @@ class ZeneFrame(wx.Frame):
         self._ismetles = False
         self._tovabb = True          # a szám végén menjen a következőre
         self._alvas_vege = 0.0       # időbélyeg; 0 = nincs elalvás
-        self._hangero = 1.0
+        self._hangero = KT.hangero_betolt()     # megmarad a következő indításra
         self._keresett = ""
         self._kedvencek = KT.kedvencek_betolt()      # utak, sorrendben
         self._kedvenc_kulcsok = {u.lower() for u in self._kedvencek}
@@ -698,6 +698,7 @@ class ZeneFrame(wx.Frame):
         self._hangero = max(0.0, min(1.0, self._hangero + delta))
         if self._lejatszo is not None:
             self._lejatszo.fo_hangero_allit(self._hangero)
+        KT.hangero_ment(self._hangero)      # megmarad a következő indításra
         self._allapot("Hangerő %d százalék." % round(self._hangero * 100))
 
     def _ismetles_valt(self):

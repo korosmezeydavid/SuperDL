@@ -317,6 +317,9 @@ class Player:
         # szál nem küld HAMIS állapotot az új lejátszásra. [Herman Tibor AUDIO-03]
         import numpy as np
         import sounddevice as sd
+        # ⚠️ Ezt a szál INDULÁSAKOR kell elkapni: egy újabb `play()` közben
+        # átírhatja. Azt jelzi, hogy ez a lejátszás TEKERÉSSEL indult.
+        kezdo_pozicio = self._start_offset
         try:
             stream, _visszaesett = self._stream_nyit(sd)
         except Exception as e:
@@ -393,6 +396,18 @@ class Player:
                 self._emit_gen(gen, f"hiba: lejátszás megszakadt – {err_msg}")
             elif failed:
                 self._emit_gen(gen, "hiba: a forrás nem játszható le")
+            elif started:
+                self._emit_gen(gen, "vége")
+            elif kezdo_pozicio > 0:
+                # ⚠️ TEKERÉS A VÉGÉRE, NEM HIBA. Ha a lejátszás `-ss`-szel
+                # indult, és onnantól már nincs hang, az azt jelenti, hogy a
+                # kért időpont a felvétel VÉGÉN (vagy azon túl) van – nem
+                # azt, hogy a fájl hibás. A régi kód itt „a forrás nem
+                # játszható le"-t küldött, és emiatt a hangoskönyv NEM lépett
+                # a következő sávra. [Turai László, 2026-09-23:
+                # „Ha egy fájlt a végére tekerek, nem megy tovább a
+                # következőre a lejátszás, de ha hagyom végig menni, akkor
+                # igen."]
+                self._emit_gen(gen, "vége")
             else:
-                self._emit_gen(gen, "vége" if started else
-                               "hiba: a forrás nem játszható le")
+                self._emit_gen(gen, "hiba: a forrás nem játszható le")

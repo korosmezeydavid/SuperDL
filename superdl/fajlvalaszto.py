@@ -168,12 +168,17 @@ class FajlValaszto(wx.Dialog):
 
         kozep = wx.BoxSizer(wx.HORIZONTAL)
         bal = wx.BoxSizer(wx.VERTICAL)
-        bal.Add(wx.StaticText(p, label="&Mappák  (Enter: belépés, "
-                                       "Backspace: vissza, "
-                                       "Ctrl+D: meghajtók):"), 0, wx.LEFT, 4)
+        mappa_cimke = ("&Mappák  (nyilazz rá, és A KIJELÖLT MAPPA lesz a "
+                       "választás; Enter: belépés, Backspace: vissza, "
+                       "Ctrl+D: meghajtók):" if self._mappat else
+                       "&Mappák  (Enter: belépés, Backspace: vissza, "
+                       "Ctrl+D: meghajtók):")
+        bal.Add(wx.StaticText(p, label=mappa_cimke), 0, wx.LEFT, 4)
         self.mappa_lista = wx.ListBox(p, style=wx.LB_SINGLE)
         self.mappa_lista.SetName("Mappák")
         self.mappa_lista.Bind(wx.EVT_LISTBOX_DCLICK, lambda e: self._belep())
+        # a gomb felirata KÖVESSE a kijelölést (ld. `valasztott_mappa`)
+        self.mappa_lista.Bind(wx.EVT_LISTBOX, lambda e: self._gomb_felirat())
         bal.Add(self.mappa_lista, 1, wx.EXPAND | wx.ALL, 4)
         kozep.Add(bal, 1, wx.EXPAND)
 
@@ -194,8 +199,10 @@ class FajlValaszto(wx.Dialog):
         b_fel = wx.Button(p, label="&Vissza a szülőmappába  (Backspace)")
         b_fel.Bind(wx.EVT_BUTTON, lambda e: self._szulo())
         gs.Add(b_fel, 0, wx.RIGHT, 8)
-        cimke = "Ezt a mappát választom" if self._mappat else "&Kiválasztás"
+        cimke = ("Ezt a mappát választom (a jelenlegi helyet)"
+                 if self._mappat else "&Kiválasztás")
         ok = wx.Button(p, wx.ID_OK, cimke)
+        self.ok_gomb = ok
         ok.SetDefault()
         ok.Bind(wx.EVT_BUTTON, lambda e: self._kesz())
         gs.Add(ok, 0, wx.RIGHT, 8)
@@ -254,6 +261,8 @@ class FajlValaszto(wx.Dialog):
             self.fajl_lista.Set(fajlok or [])
         hely_nev = "Ez a gép – meghajtók" if self._mappa == GEP else self._mappa
         self.hely.SetLabel("Jelenlegi hely: %s" % hely_nev)
+        # a `Set()` törölte a kijelölést – a gomb felirata is álljon vissza
+        self._gomb_felirat()
         if self._mappa == GEP:
             uzenet = "Ez a gép – %d meghajtó. Enterrel lépsz be." % len(mappak)
             if minta:
@@ -320,6 +329,46 @@ class FajlValaszto(wx.Dialog):
             self.mappa_lista.SetFocus()
 
     # ---------------------------------------------------- eredmény
+    def valasztott_mappa(self) -> str:
+        """Melyik mappa a választás: a KIJELÖLT almappa, vagy ha nincs
+        kijelölés, a jelenlegi hely.
+
+        ⚠️ EZ VOLT A HIBA (Turai László, 2026-09-23): „Akkor nyitja meg a
+        mappát, amivel néztem, ha bele is megyek és úgy választom ki. Ha csak
+        ráállok és úgy, akkor nem." A gomb eddig MINDIG a jelenlegi helyet
+        adta vissza, akkor is, ha a felhasználó épp egy almappán állt. Ez
+        vakon különösen rossz: a lista az egyetlen kapaszkodó, és ha ott
+        valamin állsz, azt hiszed, azt választod.
+
+        A belépéskor a `Set()` törli a kijelölést, tehát a kijelölés MINDIG
+        szándékos: a felhasználó odanyilazott."""
+        if self._mappa == GEP:
+            return ""
+        i = self.mappa_lista.GetSelection()
+        if 0 <= i < len(self._mappak):
+            jelolt = os.path.join(self._mappa, self._mappak[i])
+            if os.path.isdir(jelolt):
+                return jelolt
+        return self._mappa
+
+    def _gomb_felirat(self):
+        """A gomb MONDJA MEG, melyik mappát fogja választani.
+
+        Így nem kell találgatni, és nem kell hozzá külön bemondás sem, ami
+        belevágna a képernyőolvasó felolvasásába."""
+        if not self._mappat:
+            return
+        try:
+            ut = self.valasztott_mappa()
+            if ut and ut != self._mappa:
+                self.ok_gomb.SetLabel("Ezt a mappát választom: %s"
+                                      % os.path.basename(ut))
+            else:
+                self.ok_gomb.SetLabel("Ezt a mappát választom (a jelenlegi "
+                                      "helyet)")
+        except Exception:
+            pass
+
     def _kesz(self):
         if self._mappa == GEP:
             # a „Ez a gép" szint nem mappa – ne adjunk vissza üres utat
@@ -327,7 +376,7 @@ class FajlValaszto(wx.Dialog):
             self.mappa_lista.SetFocus()
             return
         if self._mappat:
-            self.eredmeny = [self._mappa]
+            self.eredmeny = [self.valasztott_mappa()]
             self.EndModal(wx.ID_OK)
             return
         if self.fajl_lista is None:
