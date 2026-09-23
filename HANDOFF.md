@@ -158,7 +158,56 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-09-21 · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-23 · dolgozott: Claude
+
+---
+
+### ✅ 4.6.13 KIADVA (2026-09-23) – NÉGY JAVÍTÁS A 4.6.12 VISSZAJELZÉSEIBŐL
+
+Commit `eda8f4e` (kód) + `a772527` (modules.json). Modul: **konyvek 1.3.3**.
+Mind a 6 URL **200**, `releases/latest = v4.6.13`. Hírlevél **KIMENT**,
+személyes válasz mind a négy jelentőnek.
+
+Két nap alatt, négy levélből. Részletek:
+`claude/windows-kiadas-4-6-13.md`.
+
+1. **AZ ÚJRAINDÍTÁS, AMI SOHA NEM MŰKÖDÖTT** (Nagy Károly, Tóth Zoltán).
+   A `coremod.restart_app()` a `CREATE_NO_WINDOW | DETACHED_PROCESS` párral
+   indította a kötegfájlt – a Windows szerint ez a két zászló KIZÁRJA
+   egymást. A `CreateProcess` mégsem hibázik: az így indult `cmd`-nek nincs
+   konzolja, és a `tasklist | find` csővezeték BERAGAD. **Mérve:** a régi 25
+   mp alatt sem indult, az új 6,8 mp alatt igen. Javítva + a kötegfájl
+   mostantól **naplót ír** (`~/.superdl/ujraindit.log`), cső és zárójeles
+   blokk nélkül.
+
+2. **A HANGOSKÖNYV-LEJÁTSZÓ BEFAGYÁSA** (Turai László, konyvek 1.3.3).
+   A `mappa_savok()` `os.walk`-ja a FŐ SZÁLON futott. **A megakadás-figyelő
+   első éles bevetésén fogta meg**, teljes veremmel. Most háttérszálon megy,
+   azonnali bemondással és megállíthatóan.
+
+3. **A KIMONDHATATLAN SZÖVEGDARAB** (Dr. Kiss István). **Mérve:** az
+   Edge-TTS `NoAudioReceived`-et dob a csupa írásjeles darabra (`* * *`,
+   `—————`, `.`), miközben `1 2 3` és `A` rendben van. Egy jelenetválasztó
+   sor eddig az EGÉSZ hangoskönyvet elbuktatta. Kiszűrve, a `part_fej`
+   hozzárendeléssel EGYÜTT.
+
+4. **TEKERÉS A MÉDIAKERESŐBEN** (Nagy Károly). A `_player_key` négy
+   billentyűt ismert; a bal/jobb nyíl SOHA nem volt bekötve. **Mérve:** az
+   ffmpeg `-ss` a feloldott stream-URL-en pozicionál (a hosszon túli
+   időpont üreset ad).
+
+⚠️ **ÚJ ESZKÖZ-TANULSÁG:** a kötegfájlokat CRLF sorvégekkel kell írni – az
+LF-es `.bat`-ot a `cmd` elrontja (`'et' is not recognized`). A
+`Desktop_Commander.write_file` LF-et ír, tehát a `.bat`-okat Pythonból,
+`newline="\r\n"`-nel érdemes előállítani.
+
+⚠️ A levélmodul munkapéldánya továbbra is **szándékosan kimarad** a
+commitokból.
+
+**Nyitva:** a fájlválasztó rendezése (Schibik Miklós, terv kész); Nagy Károly
+74 torrentjének oka (kértem tőle Shift+F6 utáni naplót); a beragadt aria2
+(Tóth László); rádióműsor-újság (Tóth Zoltán ötlete, a listától kértem
+visszajelzést); hangszínszabályzó.
 
 ---
 
