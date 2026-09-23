@@ -158,7 +158,67 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-09-23 (második kör) · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-23 (harmadik kör) · dolgozott: Claude
+
+---
+
+### ✅ 4.6.15 KIADVA (2026-09-23) – A BE NEM TARTOTT ÍGÉRET, NEGYEDSZER
+
+Commit `cbd227c`. Mind a 4 URL 200, `releases/latest = v4.6.15`.
+Hírlevél kiment, 2 személyes válasz (Nagy Károly, Tóth László).
+Napló: `claude/windows-kiadas-4-6-15.md`.
+
+1. **Az F6 is megírja a naplót.** A 4.6.12-es javítás HÁROM hívási helyből
+   csak KETTŐT ért el; az `_on_next_problem` (F6) ugyanazt ígérte („a
+   pontos szövege az eseménynaplóban van: Control E"), és SOHA nem írt oda.
+   Karcsi az elküldött napló-sorával ezt bizonyította be. [Nagy Károly]
+
+2. **A dedup-gyorsítótár tette bizonytalanná az ígéretet.** A
+   `_nyers_hibat_naploz` „ne ismételjük magunkat" halmaza `return True`-t
+   adott ÍRÁS NÉLKÜL. ⚠️ **Egy megismételt sor olcsóbb, mint egy be nem
+   tartott ígéret** – most mindig ír.
+
+3. **A régi hiba nem a mai ok.** `REGI_HIBA_MP = 3*3600`, `_regi_hiba()`:
+   a 3 óránál régebbi (vagy időpont nélküli) korábbi hiba külön
+   megjegyzésként jön, kimondva, hogy valószínűleg NEM a mostani ok.
+   A napló sora is megkapja az időpontot. [Tóth László naplója]
+
+4. **A médiakereső megszólalt.** A `searchwin._announce` CSAK az
+   állapotsort és egy StaticText-et írt át – vakon minden visszajelzése
+   (hangerő, leállítás, 4.6.13-as tekerés-pozíció) NÉMA volt. Most beszél,
+   a kötelező sorrendben: képernyőolvasó → selfvoice. [Nagy Károly]
+
+Teszt: `tests/test_igeret_es_regi_hiba.py` (17).
+
+### ✅ MODULKÖR (2026-09-23) – Könyvek 1.3.4, Rádió 1.1.9
+
+Commit `834bf5c`. Mindkét ZIP 200, a `modules.json` sha256 + méret
+ellenőrizve LETÖLTÖTT fájlon. Hírlevél kiment, 2 személyes válasz.
+
+- **Könyvek 1.3.4** [Turai László]: a hangoskönyv-lejátszóban SOHA nem volt
+  hangerő-állítás (a zene 1.2.1-ben megkapta, ez kimaradt) → Ctrl+fel/le,
+  megjegyezve (`audiobook_beallitasok.json`, alap 0.7 = a `Player` alapja,
+  tehát az ELSŐ indítás hangja senkinél nem változik). Plusz **ugrás
+  időpontra** (Ctrl+G) az `ido_ertelmez()`-zel: 12:30 / 1:02:03 / 90
+  (=másodperc!) / „5 perc 30" / „2 óra 10 perc". A sáv végén túlra nem
+  ugrik, a szünet szünet marad.
+- **Rádió 1.1.9** [Nagy Károly]: a rádió minden indításkor a lejátszó
+  alapértékén szólt. Most megjegyzi (`radio_beallitasok.json`).
+  ⚠️ A némítás (Ctrl+M) **NEM** ment nullát – különben néma rádió fogadna.
+
+Teszt: `tests/test_hangoskonyv_hangero_es_ugras.py` (35).
+
+**Nyitva:** kapcsoló a zene induló mappájára (Turai László javaslata);
+a fájlválasztó rendezése (Schibik Miklós); Nagy Károly 74 torrentje (a
+4.6.15-tel végre lesz nyers hibaszöveg – ezt kell megvárni);
+hangszínszabályzó (forma kész: nyilazható lista + EGY csúszka – Stolmár
+Barbi, a hangszín-lista hiányzik); **rádióműsor-újság – MÁR KETTEN kérték**
+(Tóth Zoltán és Tóth László); a hangoskönyv-készítés „belső hangjai"
+(Tóth László ránéz, pontos leírást küld).
+
+⚠️ **Tamás Bálint levelei kimaradnak a triázsból** – Dávid döntése
+(2026-09-23): nem javítunk, nem tervezünk és nem válaszolunk belőlük,
+amíg ő külön nem kéri.
 
 ---
 
@@ -180,7 +240,7 @@ Napló: `claude/windows-kiadas-4-6-14.md`.
 
 3. **zene 1.2.1**: a hangerő megmarad a következő indításra (Szabó László).
 
-### ⚠️ A KÖVETKEZŐ KÖR ELSŐ TÉTELE: a régi hiba mint mai magyarázat
+### ✅ (MEGOLDVA a 4.6.15-ben) a régi hiba mint mai magyarázat
 
 Tóth László naplója (09-23) megmutatta: a MAI elakadás-üzenethez a program
 egy KÉT NAPPAL KORÁBBI hibát biggyeszt oda magyarázatként („Korábban
