@@ -22,6 +22,7 @@ import time
 import wx
 
 from . import konyvtar as KT
+from . import hangszin as HSZ
 
 ALVAS_PERCEK = (5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60)
 TEKERES_MP = 5.0
@@ -52,6 +53,7 @@ LEJÁTSZÁS
   Ctrl+K ............. keverés be- és kikapcsolása (megmarad legközelebbre)
   Ctrl+S ............. elalvás időzítő (5-től 60 percig)
   Ctrl+H ............. hangkimenet (fejhallgató, hangszóró) kiválasztása
+  Ctrl+Shift+H ....... hangszín (basszus, magas, beszéd, meleg…)
 
 KEDVENCEK
   Ctrl+D ............. az éppen kijelölt szám kedvenc lesz, vagy már nem az
@@ -73,6 +75,23 @@ alapértelmezettje: ha ezt hagyod, a zene KÖVETI a rendszert – bluetooth
 fejhallgató bekapcsolásakor magától átvált, és be is mondja. Ha konkrét
 eszközt választasz, azon marad. Ha a választott eszköz eltűnik, nem némul el
 a zene: visszaesik az alapértelmezettre, és megmondja.
+
+HANGSZÍN
+A Ctrl+Shift+H egy NYILAZHATÓ LISTÁT nyit megnevezett hangszínekkel, és egy
+csúszkát arra, hogy mennyire erősen. Nincs tíz sáv és nincs decibel-szám: azt
+választod, amit HALLANI akarsz.
+
+  Eredeti hang ....... semmilyen szűrés
+  Beszéd ............. hangoskönyvhöz: kevesebb dübörgés, érthetőbb beszéd
+  Basszus ............ teltebb mély – kis hangszórón és fülhallgatón segít
+  Magas .............. csengőbb, levegősebb felső – tompa felvételhez
+  Meleg .............. lágyabb, kevésbé éles – hosszú hallgatáshoz
+  Halk hallgatás ..... éjszakára: a halkat felhozza, a hangosat visszafogja
+
+A lista nyilazása és a csúszka elengedése AZONNAL hallatszik, a zene ott
+folytatódik, ahol tartott – így hallás alapján választhatsz. A csúszka ALJA
+(nulla) mindig az eredeti hang, és a Mégse mindent visszaállít. A beállítás
+megmarad a következő indításra is.
 
 TÁJÉKOZÓDÁS EGY NAGY LISTÁBAN
   Ctrl+F ............. keresés a számok közt (a következő találat: F3)
@@ -149,6 +168,7 @@ class ZeneFrame(wx.Frame):
         self._kedvenc_nezet = False
         self._keveres = KT.keveres_betolt()
         self._kimenet = KT.kimenet_betolt()
+        self._hangszin, self._hangszin_eros = KT.hangszin_betolt()
         self._zsak = []              # a keverés „zsákja": még nem jött sorra
         self._megall = threading.Event()
         self._accessibles = []
@@ -278,6 +298,9 @@ class ZeneFrame(wx.Frame):
               self._kedvenc_nezet_valt)
         m.AppendSeparator()
         tetel("&Hangkimenet…\tCtrl+H", self._kimenet_valaszt)
+        tetel("Hangs&zín… (most: %s)\tCtrl+Shift+H"
+              % HSZ.mondat(self._hangszin, self._hangszin_eros).rstrip("."),
+              self._hangszin_parbeszed)
         m.AppendSeparator()
         tetel("&Keresés a számok közt…\tCtrl+F", self._keres)
         tetel("Következő találat\tF3", self._kovetkezo_talalat)
@@ -480,7 +503,55 @@ class ZeneFrame(wx.Frame):
             self._lejatszo.fo_hangero = self._hangero
             if self._kimenet:
                 self._lejatszo.kimenet_allit(self._kimenet)
+            # ⚠️ A HANGSZÍNT ITT KELL BEÁLLÍTANI, a lejátszó létrejöttekor:
+            # ha csak a párbeszédben állítanánk, a program indítása utáni
+            # ELSŐ szám még a szűretlen hangon szólna, és a felhasználó azt
+            # hinné, a beállítása elveszett.
+            if HSZ.szuro(self._hangszin, self._hangszin_eros):
+                self._lejatszo.hangszin_allit(
+                    HSZ.szuro(self._hangszin, self._hangszin_eros))
         return self._lejatszo
+
+    # ---- hangszín --------------------------------------------------------
+
+    def _hangszin_alkalmaz(self, profil, erosseg, mentsd=True):
+        """A hangszín beállítása a lejátszón (ha van), és megjegyzése.
+
+        ⚠️ A lejátszót NEM hozzuk létre emiatt: aki még el sem indított
+        semmit, attól egy hangszín-választás ne indítson hangmotort."""
+        self._hangszin = profil
+        self._hangszin_eros = int(erosseg)
+        if mentsd:
+            KT.hangszin_ment(self._hangszin, self._hangszin_eros)
+        if self._lejatszo is not None:
+            try:
+                self._lejatszo.hangszin_allit(
+                    HSZ.szuro(self._hangszin, self._hangszin_eros))
+            except Exception:
+                pass
+
+    def _hangszin_parbeszed(self):
+        """Ctrl+Shift+H – nyilazható hangszínlista és EGY csúszka.
+
+        ⚠️ A forma Stolmár Barbival egyeztetve. A párbeszéd ÉLŐBEN állít:
+        vakon a hangszínt csak hallás alapján lehet megválasztani."""
+        from .hangszinwin import HangszinParbeszed
+        kezdo = (self._hangszin, self._hangszin_eros)
+        d = HangszinParbeszed(
+            self, self._hangszin, self._hangszin_eros,
+            alkalmaz=lambda pr, er: self._hangszin_alkalmaz(pr, er,
+                                                            mentsd=False),
+            mond=lambda sz: self._allapot(sz))
+        try:
+            rc = d.ShowModal()
+            pr, er = (d.profil(), d.erosseg()) if rc == wx.ID_OK else kezdo
+        finally:
+            d.Destroy()
+        self._hangszin_alkalmaz(pr, er)      # ez ment is
+        self._allapot("Hangszín: " + HSZ.mondat(pr, er)
+                      + ("" if self._lejatszo is not None and
+                         self._lejatszo.szol()
+                         else " A következő számtól hallik."))
 
     # ---- hangkimenet -----------------------------------------------------
 
@@ -641,6 +712,9 @@ class ZeneFrame(wx.Frame):
             return
         if ctrl and kod in (ord("K"), ord("k")):
             self._keveres_valt()
+            return
+        if ctrl and shift and kod in (ord("H"), ord("h")):
+            self._hangszin_parbeszed()
             return
         if ctrl and kod in (ord("H"), ord("h")):
             self._kimenet_valaszt()
@@ -840,6 +914,12 @@ class ZeneFrame(wx.Frame):
                 reszek.append("hangkimenet: " + eszkoz_nev(self._kimenet))
             except Exception:
                 pass
+        # ⚠️ Csak akkor mondjuk, ha tényleg szűrünk: az „eredeti hang" minden
+        # egyes Ctrl+I-nél fölösleges zaj lenne.
+        if HSZ.szuro(self._hangszin, self._hangszin_eros):
+            reszek.append("hangszín: "
+                          + HSZ.mondat(self._hangszin,
+                                       self._hangszin_eros).rstrip("."))
         if self._alvas_vege:
             hatra = max(0, self._alvas_vege - time.time())
             reszek.append(f"elalvásig {KT.ido_szoveg(hatra)}")

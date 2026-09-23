@@ -202,6 +202,42 @@ class KeveroLejatszo:
             except Exception:
                 pass
 
+    def hangszin_allit(self, szuro: str) -> bool:
+        """A hangszín (ffmpeg `-af`) MINDKÉT lejátszón, és ha épp szól,
+        újraindítás UGYANARRÓL a pozícióról. Visszaadja: hallható-e már.
+
+        ⚠️ Mindkettőn be kell állítani, ugyanazért, amiért a hangkimenetet
+        is: az áttűnés a MÁSIK lejátszót hozza be, és a következő szám a régi
+        hangszínnel szólalna meg.
+
+        ⚠️ ÁTTŰNÉS KÖZBEN NEM indítunk újra: az két számot rántana szét.
+        A beállítás ilyenkor is megtörténik, csak a KÖVETKEZŐ számtól hallik.
+
+        ⚠️ A SZÜNET SZÜNET MARAD. Aki szünetben állítgatja a hangszínt, attól
+        nem várható, hogy a zene magától elinduljon."""
+        kell = False
+        for p in (self._a, self._b):
+            try:
+                if p.set_audio_filter(szuro) and p is self._aktiv:
+                    kell = True
+            except Exception:
+                pass
+        if not kell or self._attunesben:
+            return False
+        ut = getattr(self._aktiv, "_url", "") or ""
+        if not ut:
+            return False
+        hol = self._aktiv.pozicio() if hasattr(self._aktiv, "pozicio") \
+            else self._aktiv.position()
+        szunetelt = self._aktiv.is_paused()
+        cim = getattr(self._aktiv, "title", "")
+        self._aktiv.play(ut, title=cim, start=max(0.0, hol))
+        self._aktiv.set_volume(self._cel())
+        if szunetelt:
+            self._aktiv.pause()
+        self._jelezve = False        # az új pozícióhoz új vég-figyelés tartozik
+        return True
+
     def kimenet(self) -> str:
         return self._aktiv.device
 

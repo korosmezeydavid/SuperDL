@@ -134,6 +134,13 @@ class Player:
         self._played = 0           # eddig megszólaltatott PCM-bájtok száma
         self._url = ""             # az aktuális forrás (a seek-hez)
         self._start_offset = 0.0   # a lejátszás kezdő-időpontja (seek után)
+        # HANGSZÍN: az ffmpeg `-af` szűrőlánca, üres = eredeti hang. A szűrés a
+        # DEKÓDOLÁSKOR történik, tehát nem terheli a Pythont, és minden
+        # forrásra hat (fájl, élő stream). ⚠️ Menet közbeni váltáshoz a
+        # lejátszást ÚJRA KELL INDÍTANI az aktuális pozícióról – ezt a hívó
+        # végzi, mert csak ő tudja, mi számít „aktuálisnak" (ld. a zene modul
+        # `hangszin_allit()`-ját).
+        self._af = ""
         # LEJÁTSZÁS-GENERÁCIÓ: minden play() új generációt kap; a régi _feed szál
         # a SAJÁT stop_eventjét és generációját figyeli, és csak akkor küld
         # állapotot, ha a generációja még az aktuális. Enélkül a gyors stop+play
@@ -210,6 +217,23 @@ class Player:
     def set_volume(self, v: float) -> None:
         self._volume = max(0.0, min(1.0, v))
 
+    @property
+    def audio_filter(self) -> str:
+        return self._af
+
+    def set_audio_filter(self, af: str) -> bool:
+        """A hangszín-szűrő beállítása (ffmpeg `-af`, üres = eredeti).
+
+        Visszaadja: KELL-E újraindítani a lejátszást ahhoz, hogy hallatsszon.
+        Igazat csak akkor ad, ha tényleg változott ÉS épp szól valami — így a
+        hívó nem szakítja meg fölöslegesen a zenét egy ugyanolyan beállítás
+        miatt."""
+        af = (af or "").strip()
+        if af == self._af:
+            return False
+        self._af = af
+        return self.is_active()
+
     def is_active(self) -> bool:
         return self._proc is not None and self._proc.poll() is None
 
@@ -282,6 +306,8 @@ class Player:
         cmd += ["-i", url]
         if audio_track is not None:
             cmd += ["-map", f"0:a:{int(audio_track)}"]
+        if self._af:
+            cmd += ["-af", self._af]
         cmd += ["-f", "s16le", "-ar", str(RATE),
                 "-ac", str(CHANNELS), "-loglevel", "quiet", "-"]
         try:

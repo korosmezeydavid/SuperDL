@@ -210,6 +210,26 @@ def hangero_ment(v: float) -> None:
     beallit(hangero=max(0.0, min(1.0, float(v))))
 
 
+def hangszin_betolt() -> tuple:
+    """A megjegyzett hangszín: (profil-azonosító, erősség százalékban).
+
+    ⚠️ Az alapértelmezés az „eredeti", 100 százalékkal. Aki nem nyúl hozzá,
+    pontosan azt hallja, amit eddig — egy hangszín-szabályzó bevezetése nem
+    változtathatja meg senkinek a hangját magától."""
+    d = beallitasok()
+    profil = str(d.get("hangszin", "eredeti") or "eredeti")
+    try:
+        eros = int(d.get("hangszin_erosseg", 100))
+    except (TypeError, ValueError):
+        eros = 100
+    return profil, max(0, min(100, eros))
+
+
+def hangszin_ment(profil: str, erosseg: int) -> None:
+    beallit(hangszin=str(profil or "eredeti"),
+            hangszin_erosseg=max(0, min(100, int(erosseg))))
+
+
 def ido_szoveg(mp: float) -> str:
     """Másodperc → „3 perc 25 másodperc” (felolvasásra, nem 3:25-re)."""
     mp = max(0, int(mp))
