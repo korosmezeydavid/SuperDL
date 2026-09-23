@@ -158,7 +158,43 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-09-23 · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-23 (második kör) · dolgozott: Claude
+
+---
+
+### ✅ 4.6.14 KIADVA (2026-09-23) – A KIJELÖLT MAPPA, A VÉGÉRE TEKERÉS
+
+Commit `b84972d` + `de18530`. Modul: **zene 1.2.1**. Mind a 6 URL 200,
+`releases/latest = v4.6.14`. Hírlevél kiment, 5 személyes válasz.
+Napló: `claude/windows-kiadas-4-6-14.md`.
+
+1. **A FÁJLVÁLASZTÓ „Ezt a mappát választom" gombja** mindig a jelenlegi
+   helyet adta vissza, a kijelöléstől függetlenül (Turai László). Most a
+   `valasztott_mappa()` a KIJELÖLT almappát adja; a `Set()` törli a
+   kijelölést, tehát az mindig szándékos. A gomb felirata élőben követi.
+   **Hat hívási helyen jön ki.**
+
+2. **A VÉGÉRE TEKERVE nem lépett tovább** (Turai László). A `_feed()`
+   `started=False` esetén hibát küldött – tekeréssel indult lejátszásnál
+   viszont ez a felvétel VÉGE. Most `kezdo_pozicio > 0` esetén „vége".
+
+3. **zene 1.2.1**: a hangerő megmarad a következő indításra (Szabó László).
+
+### ⚠️ A KÖVETKEZŐ KÖR ELSŐ TÉTELE: a régi hiba mint mai magyarázat
+
+Tóth László naplója (09-23) megmutatta: a MAI elakadás-üzenethez a program
+egy KÉT NAPPAL KORÁBBI hibát biggyeszt oda magyarázatként („Korábban
+(09. 21. 15:58) ez a hiba történt vele: …"). A mai tünet („nincs seeder") és
+a régi hiba („már fut") két külön dolog. **Ez a „dátumtalan nyom" családjának
+új alakja** – az összeomlás-naplónál már javítva (MIKOR/AZÓTA), a LETÖLTÉSI
+hibáknál még nem.
+
+⚠️ A levélmodul munkapéldánya továbbra is **szándékosan kimarad**.
+
+**Nyitva:** a fenti torrent-üzenet; a fájlválasztó rendezése (Schibik
+Miklós); Nagy Károly 74 torrentje; hangszínszabályzó (a forma megvan:
+nyilazható lista + EGY csúszka – Stolmár Barbi); rádióműsor-újság (Tóth
+Zoltán); a lejátszási lista sorrendje (Tamás Bálint, konkrét példára vár).
 
 ---
 
