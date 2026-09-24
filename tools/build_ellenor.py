@@ -51,12 +51,33 @@ def elotte() -> int:
     return 1 if baj else 0
 
 
-def utana(gyoker: str) -> int:
+def pyz_nevek(pyz: str) -> set:
+    """A PyInstaller PYZ-archívumában lévő modulnevek.
+
+    ⚠️ A tisztán Python csomagok (pl. joblib) NEM mappaként kerülnek a
+    _internal alá, hanem ebbe az archívumba. Az első változatom csak a
+    mappát nézte, és a joblibot hamisan hiányzónak mondta."""
+    if not pyz or not os.path.isfile(pyz):
+        return set()
+    try:
+        from PyInstaller.archive.readers import ZlibArchiveReader
+        return set(ZlibArchiveReader(pyz).toc.keys())
+    except Exception as e:
+        print("  (a PYZ nem olvasható: %s)" % e)
+        return set()
+
+
+def utana(gyoker: str, pyz: str = "") -> int:
     baj = 0
     print("Build:", gyoker)
+    nevek = pyz_nevek(pyz)
+    if pyz:
+        print("PYZ:", pyz, "(%d modul)" % len(nevek))
     for nev, mappa, miert in KELL:
         ut = os.path.join(gyoker, mappa)
         van = os.path.isdir(ut) and any(os.scandir(ut))
+        if not van and nev != "ctranslate2":
+            van = nev in nevek or any(n.startswith(nev + ".") for n in nevek)
         if nev == "ctranslate2" and van:
             # a motor maga egy natív kiterjesztés – a mappa lehet üres héj is
             van = any(f.name.startswith("_ext") and f.name.endswith(".pyd")
@@ -71,4 +92,5 @@ if __name__ == "__main__":
         sys.exit(elotte())
     gy = next((a for a in sys.argv[1:] if not a.startswith("-")),
               os.path.join("dist", "SuperDL", "_internal"))
-    sys.exit(utana(gy))
+    pyz = os.path.join("build", "SuperDL-onedir", "PYZ-00.pyz")
+    sys.exit(utana(gy, pyz))

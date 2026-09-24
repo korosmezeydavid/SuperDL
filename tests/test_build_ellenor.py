@@ -43,6 +43,31 @@ def test_a_ctranslate2_ures_heja_nem_eleg(tmp_path):
     assert BE.utana(str(tmp_path)) == 1
 
 
+def test_a_tisztan_python_csomagot_a_pyz_ben_is_megtalalja(tmp_path,
+                                                          monkeypatch):
+    """⚠️ A joblib NEM mappaként, hanem a PYZ-archívumban van – az első
+    változatom ezt hamisan hiányzónak mondta."""
+    for _, mappa, _ in BE.KELL:
+        if mappa == "joblib":
+            continue
+        d = tmp_path / mappa
+        d.mkdir()
+        (d / "__init__.py").write_text("")
+    (tmp_path / "ctranslate2" / "_ext.cp314-win_amd64.pyd").write_bytes(b"x")
+    monkeypatch.setattr(BE, "pyz_nevek", lambda p: {"joblib", "joblib.parallel"})
+    assert BE.utana(str(tmp_path), "valami.pyz") == 0
+
+
+def test_a_kesz_program_onprobat_tud():
+    """`SuperDL.exe --onproba <fájl>`: a FAGYASZTOTT programból is ki lehessen
+    olvasni, hogy benne van-e a fordító és hány SAPI-hangot lát."""
+    src = (GYOKER / "superdl_gui.py").read_text(encoding="utf-8")
+    assert '"--onproba"' in src
+    i = src.index('"--onproba"')
+    assert "build_report" in src[i:i + 900]
+    assert 'ENGINES["sapi"].voices()' in src[i:i + 1400]
+
+
 def test_a_build_bat_hasznalja_az_ort():
     """A kiadási lépésekben az őr kötelező (HANDOFF). Itt csak azt nézzük,
     hogy a spec továbbra is gyűjti a fordítót."""

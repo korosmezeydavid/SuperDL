@@ -3984,6 +3984,29 @@ def main():
         naplo.bekapcsol()
     except Exception:
         pass
+    # ⚠️ KIADÁS ELŐTTI ÖNPRÓBA (4.6.18): `SuperDL.exe --onproba <fájl>`
+    # a KÉSZ, fagyasztott programból írja ki a diagnosztikát, GUI nélkül.
+    # Azért kell, mert a CLI-ből a fordító szándékosan ki van hagyva, tehát
+    # a `SuperDL-cli.exe --diagnose` NEM tudja megmondani, hogy a GUI-s
+    # buildben benne van-e – és pont ez csúszott át öt kiadáson (Farkas
+    # István, 2026-09-24).
+    if len(sys.argv) >= 3 and sys.argv[1] == "--onproba":
+        try:
+            from superdl import diagnostics
+            szoveg = diagnostics.build_report({})
+        except Exception as e:                       # noqa: BLE001
+            szoveg = "ONPROBA HIBA: %r" % (e,)
+        try:
+            # a 4.6.17-es 32 bites SAPI-segéd is a KÉSZ programból fusson
+            from superdl import tts
+            hangok = tts.ENGINES["sapi"].voices()
+            szoveg += "\nONPROBA SAPI-hangok: %d (%s)\n" % (
+                len(hangok), ", ".join(h.id for h in hangok[:6]))
+        except Exception as e:                       # noqa: BLE001
+            szoveg += "\nONPROBA SAPI HIBA: %r\n" % (e,)
+        with open(sys.argv[2], "w", encoding="utf-8") as f:
+            f.write(szoveg)
+        return
     # a telepítő (vagy haladó felhasználó) csendben be/kikapcsolhatja a
     # fájltársításokat – GUI nélkül, azonnal kilépve
     _ASSOC_KAPCSOLOK = ("--register-file-assoc", "--unregister-file-assoc",
