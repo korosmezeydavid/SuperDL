@@ -158,7 +158,55 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-09-23 (negyedik kör) · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-24 · dolgozott: Claude
+
+---
+
+### ⚠️ KIADÁSI SZABÁLY 4.6.18 ÓTA: BUILD-ŐR + ÖNPRÓBA
+
+1. `tools\build_ellenor.py --elotte` a build-értelmezőben — hiánynál ÁLLJ.
+2. onedir után `tools\build_ellenor.py` (mappák + PYZ + ctranslate2 `_ext*.pyd`).
+3. A kész exéken: `dist\SuperDL\SuperDL.exe --onproba x.txt` és
+   `dist\SuperDL.exe --onproba y.txt` → „Offline fordítás: elérhető" és
+   „ONPROBA SAPI-hangok: N". A `SuperDL-cli.exe --diagnose` erre VAK (a CLI-ből
+   a fordító szándékosan kimarad).
+4. Helyben a TELJES tesztcsomag fut (a SAPI-tesztekkel együtt), ahogy a CI-n.
+
+⚠️ **Két Python 3.14 van a gépen.** A `...\Programs\Python\Python314` a
+build-értelmező; 2026-09-24 óta ebben is van ctranslate2 4.8.1,
+sentencepiece 0.2.2, sacremoses 0.2.0, joblib 1.5.3, subword-nmt 0.3.8
+(a 4.6.12–4.6.17 között ezek hiányoztak → a fordító némán kiesett).
+
+### ✅ 4.6.18 KIADVA (2026-09-24) – A HELYBEN FUTÓ FORDÍTÓ VISSZA
+
+Commit `dbb7e7e` + `7ea36af`. `releases/latest = v4.6.18`, 4 URL 200, CI zöld.
+Önpróba a KÉSZ exékből (onedir ÉS onefile): 4.6.18, „Offline fordítás:
+elérhető; nyelvi csomagok: en→hu, it→en, pl→en", SAPI-hangok: 18.
+[Farkas István]. Hírlevél (4.6.17+4.6.18 együtt) kiment, személyes válasz
+Farkasnak. Napló: `claude/windows-kiadas-4-6-17-es-4-6-18.md`.
+
+### ✅ 4.6.17 KIADVA (2026-09-24) – ÁRVA TORRENT, HIÁNYZÓ .TORRENT, 32 BITES SAPI
+
+Commit `9caa23b` (a CI-n `test_tts_sapi` elbukott → javítva a 4.6.18-ban).
+1. **Árva torrent átvétele** (Tóth László): a duplikátum error/12
+   „already registered" → a `tellActive` infoHash alapján átvesszük; csak ÁRVÁT
+   (`Figyelo.figyelt_e`).
+2. **Hiányzó .torrent** (Nagy Károly „No URI to download."): `HianyzoTorrentFajl`,
+   kivárás és negyedórás újrapróba nélkül (`nem_mulo_hiba`).
+3. **SAPI 32 biten** (Tóth László): 64 biten 11-ből 9 hang elbukott
+   (BME-TMIT 0x80045001), 32 biten 18/18. SysWOW64 PowerShell,
+   `-EncodedCommand`, base64 soronkénti protokoll. BraiLab: pitch-jelölés →
+   néma WAV → IsNotXML/IsXML + újrapróba.
+4. **Meghajtók érintés nélkül** (Tóth László megakadás-naplója):
+   GetLogicalDrives + GetDriveTypeW.
+5. **Beszélő óra köszöntő hanggal** (Lukács László): `edge:hu-HU-TamasNeural`,
+   `edge:hu-HU-NoemiNeural`; net nélkül eSpeak.
+
+**Nyitva (Turai László, 09-24):** polcról megnyitott könyv + F5 → „kidob a
+főablakba" – NEM reprodukálható a metódushívással (a frame él, a lejátszás
+megy); részleteket és hibajelentést kértem. Javaslatai a következő
+Könyvek-körbe: fel/le nyíl = előző/következő sáv (lépjen ÉS szóljon, mint a
+zenében), elalvás-időzítő, ugrás mappára.
 
 ---
 
