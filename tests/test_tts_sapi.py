@@ -32,8 +32,10 @@ def test_sapi_com_helper_letezik():
     """A SapiEngine maga inicializálja a COM-ot (a synth/voices `_sapi_com`-ot
     használ), nem a hívóra bízza."""
     assert hasattr(tts, "_sapi_com")
-    assert "_sapi_com" in inspect.getsource(tts.SapiEngine.synth)
-    assert "_sapi_com" in inspect.getsource(tts.SapiEngine.voices)
+    # 4.6.17: a 64 bites COM-út a `_synth64`/`_voices64`-be költözött (az
+    # elsődleges út a 32 bites segéd, ami külön folyamat, COM-ot nem kér).
+    assert "_sapi_com" in inspect.getsource(tts.SapiEngine._synth64)
+    assert "_sapi_com" in inspect.getsource(tts.SapiEngine._voices64)
     assert "CoInitialize" in inspect.getsource(tts._sapi_com)
 
 

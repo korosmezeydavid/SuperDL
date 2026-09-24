@@ -42,6 +42,36 @@ def tiszta_sysmodules():
     sys.modules.update(mentve)
 
 
+def _nincs_telepitve():
+    """A „nincs telepítve" állapot szimulálása.
+
+    ⚠️ 4.6.18: ezek a tesztek eddig arra ÉPÍTETTEK, hogy a gépen tényleg nincs
+    ctranslate2 – vagyis épp arra a hibára, ami a fordítót a buildből kiejtette
+    (Farkas István, 2026-09-24). Most, hogy a build-értelmezőben újra van,
+    a hiányt KIFEJEZETTEN szimuláljuk: egy import-kereső, ami a ctranslate2-t
+    „nem találja". (A `sys.modules[...] = None` nem elég: a `ct2()` pótmodulos
+    ága kiveszi a bejegyzést és újra próbál.)"""
+    sys.meta_path.insert(0, _Tilto())
+    sys.modules.pop("ctranslate2", None)
+
+
+class _Tilto:
+    """A `ctranslate2` importját „nincs ilyen csomag"-ra futtatja."""
+
+    def find_spec(self, nev, path=None, target=None):
+        if nev == "ctranslate2" or nev.startswith("ctranslate2."):
+            if nev == "ctranslate2.converters" and nev in sys.modules:
+                return None
+            raise ModuleNotFoundError("No module named %r" % nev)
+        return None
+
+
+@pytest.fixture(autouse=True)
+def _tilto_takaritas():
+    yield
+    sys.meta_path[:] = [f for f in sys.meta_path if not isinstance(f, _Tilto)]
+
+
 def _hamis_ct2(van_translator: bool):
     m = types.ModuleType("ctranslate2")
     if van_translator:
@@ -74,6 +104,7 @@ def test_a_teljes_futtatokornyezet_elerheto(tiszta_sysmodules):
 
 def test_a_hianyzo_csomag_sem_elerheto(tiszta_sysmodules):
     """Ha egyáltalán nincs telepítve, az is nem-et jelent (nem összeomlást)."""
+    _nincs_telepitve()
     assert OF.elerheto() is False
 
 
@@ -83,6 +114,7 @@ def test_kudarc_utan_eltakaritjuk_a_potmodult(tiszta_sysmodules):
     """⚠️ A pótmodulos trükk nem mérgezheti meg a következő importot: ha nem
     sikerült, a beadott üres `ctranslate2.converters` menjen ki."""
     assert "ctranslate2.converters" not in sys.modules
+    _nincs_telepitve()
     with pytest.raises(Exception):
         OF.ct2()
     assert "ctranslate2.converters" not in sys.modules, \
@@ -93,6 +125,7 @@ def test_a_mar_meglevo_converters_bejegyzest_nem_bantjuk(tiszta_sysmodules):
     """Ha nem MI adtuk be, nem is vesszük ki – nem a mi dolgunk."""
     sajat = types.ModuleType("ctranslate2.converters")
     sys.modules["ctranslate2.converters"] = sajat
+    _nincs_telepitve()
     try:
         with pytest.raises(Exception):
             OF.ct2()
