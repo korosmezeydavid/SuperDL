@@ -23,8 +23,11 @@ DAVID_KESZLETE = ["robert", "rob", "max", "Michael", "Denis", "Diogo",
 def test_a_keszlet_pontosan_a_kijelolt_22_valtozat_plusz_az_alap():
     nevek = [n for n, _ in H.keszlet()]
     assert nevek[0] == ""                       # az alaphang az első
-    assert nevek[1:] == DAVID_KESZLETE
-    assert len(nevek) == 23
+    # 4.6.17: az alaphang után a két Edge köszöntő hang jön (Lukács László);
+    # az eSpeak-rész VÁLTOZATLANUL pontosan Dávid 22-es készlete.
+    espeak = [n for n in nevek[1:] if not H.edge_e(n)]
+    assert espeak == DAVID_KESZLETE
+    assert len(nevek) == 23 + len(H.EDGE_HANGOK)
 
 
 def test_minden_kijelolt_valtozat_tenylegesen_megvan():

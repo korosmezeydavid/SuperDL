@@ -11,6 +11,7 @@ import base64
 import json
 import logging
 import random
+import re
 import secrets
 import socket
 import subprocess
@@ -484,6 +485,13 @@ class Figyelo:
         with self._lock:
             self._gidek.add(gid)
 
+    def figyelt_e(self, gid: str) -> bool:
+        """Követi-e már valamelyik letöltőnk ezt a gid-et? (Az átvételnél
+        ettől függ, hogy ÁRVA példányról van-e szó, vagy egy másik, élő
+        listaelemről, amit tényleg kétszer adtak hozzá.)"""
+        with self._lock:
+            return gid in self._gidek
+
     def elenged(self, gid: str) -> None:
         with self._lock:
             self._gidek.discard(gid)
@@ -618,6 +626,46 @@ def _is_exists_conflict(msg: str) -> bool:
     return "control file" in m and "exist" in m
 
 
+# ⚠️ MÉRVE 2026-09-24 (aria2c 1.37.0, saját próbapéldánnyal): ugyanazt a
+# torrentet másodszor hozzáadva az aria2 NEM a hívást utasítja el, hanem egy
+# ÚJ gid-et ad, ami egy másodpercen belül `status=error`, `errorCode=12`,
+# `InfoHash <40 hexa> is already registered.` állapotba fut. Az ELSŐ példány
+# közben zavartalanul fut, és a `tellActive` `infoHash` mezője alapján
+# megtalálható.
+_MAR_REGISZTRALT = re.compile(
+    r"infohash\s+([0-9a-f]{40})\s+is\s+already\s+registered", re.I)
+
+
+def mar_regisztralt_infohash(uzenet: str) -> str:
+    """A motor „már regisztrált" hibájából az infohash (kisbetűvel), vagy ''."""
+    m = _MAR_REGISZTRALT.search(uzenet or "")
+    return m.group(1).lower() if m else ""
+
+
+def nem_mulo_hiba(uzenet: str) -> bool:
+    """Igaz, ha a hibán az idő NEM segít, tehát az automatikus újrapróba
+    értelmetlen: a forrás hiányzik. Nagy Károlynál az ilyen torrent
+    negyedóránként újra és újra ugyanabba a falba futott, és minden körben
+    bemondta, hogy „első próbálkozás, egy perc múlva"."""
+    m = (uzenet or "").lower()
+    return ("a torrentfájl már nincs meg" in m
+            or "a letöltés forrása már nincs meg" in m   # hibaszoveg fordítása
+            or "no uri to download" in m
+            or "uri is not provided" in m)
+
+
+class HianyzoTorrentFajl(RuntimeError):
+    """A sorban lévő torrent .torrent fájlja már nincs meg a helyén.
+
+    ⚠️ MÉRVE 2026-09-24: ha egy NEM LÉTEZŐ helyi utat adunk az aria2
+    `addUri`-jének, az ANGOLUL és félrevezetően azt mondja, hogy
+    `No URI to download.` (Nagy Károly naplójában pontosan ez állt). Mi eddig
+    minden nem-fájl utat az `addUri`-nek adtunk át — és a hibát ráadásul
+    ÖTSZÖR újrapróbáltuk, közben azt mondva, hogy „a torrent-motor most
+    elfoglalt, várok vele". A motor nem volt elfoglalt; a fájl hiányzott.
+    Ez nem múló baj, ezért KÜLÖN típus: ezen nincs mit kivárni."""
+
+
 class TorrentDownloader:
     def __init__(self, url: str, out_dir: str, progress: Progress | None = None,
                  seed_ratio: float = 1.0, limit_bps: int = 0,
@@ -669,7 +717,30 @@ class TorrentDownloader:
             opts["max-upload-limit"] = str(self.upload_limit_bps)
         return opts
 
+    # Amit az aria2 `addUri`-je valóban le tud tölteni. Minden más (helyi út)
+    # CSAK létező .torrent fájlként értelmes.
+    _LETOLTHETO_SEMAK = ("magnet:", "http://", "https://", "ftp://", "sftp://")
+
+    def hianyzo_fajl(self) -> bool:
+        """Igaz, ha a forrás egy HELYI .torrent út, ami már nincs meg."""
+        u = (self.url or "").strip()
+        if u.lower().startswith(self._LETOLTHETO_SEMAK):
+            return False
+        try:
+            return not Path(u).is_file()
+        except (OSError, ValueError):
+            return True
+
     def _add(self) -> str:
+        # ⚠️ ELŐSZÖR ezt: a privát-vizsgálat és az `addUri` is a hiányzó
+        # fájlba futna, az utóbbi a félrevezető „No URI to download"-dal.
+        if self.hianyzo_fajl():
+            ut = Path(self.url)
+            raise HianyzoTorrentFajl(
+                "A torrentfájl már nincs meg ott, ahonnan hozzáadtad: „%s”, "
+                "a(z) %s mappában. Ha áthelyezted vagy törölted, add hozzá "
+                "újra onnan, ahol most van; a már letöltött rész megmarad, ha "
+                "ugyanabba a célmappába teszed." % (ut.name, ut.parent))
         opts = self.aria2_opciok()
         if self.allow_overwrite:
             opts["allow-overwrite"] = "true"
@@ -729,10 +800,19 @@ class TorrentDownloader:
                 raise RuntimeError("A letöltést leállították.")
             try:
                 return self._add()
+            except HianyzoTorrentFajl:
+                # ⚠️ NEM MÚLIK, tehát nem várunk rá, és NEM mondjuk, hogy a
+                # motor elfoglalt – az hazugság volna (Nagy Károly, 09-23).
+                raise
             except Exception as e:
                 szoveg = str(e).lower()
-                # ÉRDEMI válasz a motortól – ezen nincs mit próbálkozni
-                if "already registered" in szoveg or "duplicate" in szoveg:
+                # ÉRDEMI válasz a motortól – ezen nincs mit próbálkozni.
+                # ⚠️ A „No URI to download" / „URI is not provided" is ide
+                # tartozik (MÉRVE 2026-09-24): a motor azonnal, 400-zal
+                # válaszol rá, tehát NEM elfoglalt – a forrás rossz.
+                if ("already registered" in szoveg or "duplicate" in szoveg
+                        or "no uri to download" in szoveg
+                        or "uri is not provided" in szoveg):
                     raise
                 utolso = e
                 _log.warning("A hozzáadás nem sikerült (%d/%d): %s",
@@ -743,6 +823,82 @@ class TorrentDownloader:
                 time.sleep(5)
         raise utolso if utolso is not None else RuntimeError(
             "A torrentet nem sikerült hozzáadni.")
+
+    def meglevo_gid(self, infohash: str) -> "str | None":
+        """Az a gid, amelyik ALATT ez az infohash már fut a motorban.
+
+        Csak élő (aktív / várakozó / szüneteltetett) példányt adunk vissza:
+        egy leállt vagy hibás eredményt „átvenni" semmit nem érne.
+        Hibánál None – a hívó ilyenkor marad a régi viselkedésnél."""
+        ih = (infohash or "").lower()
+        if not ih or self.client is None:
+            return None
+        mezok = ["gid", "status", "infoHash"]
+        for modszer, param in (("aria2.tellActive", (mezok,)),
+                               ("aria2.tellWaiting", (0, 1000, mezok))):
+            try:
+                lista = self.client.call(modszer, *param) or []
+            except Exception:
+                continue
+            for d in lista:
+                if ((d.get("infoHash") or "").lower() == ih
+                        and d.get("status") in ("active", "waiting", "paused")
+                        and d.get("gid")):
+                    return d["gid"]
+        return None
+
+    def _atvesz(self, raw: str, p: Progress) -> bool:
+        """A „már regisztrált" hibánál a MÁR FUTÓ példányt vesszük át.
+
+        ⚠️ Ez Tóth László 09-23-i naplójának a lényege, és valószínűleg Nagy
+        Károly 74 torrentjéé is. A menet:
+
+        1. Induláskor a motor öt nagy torrentet ellenőriz, és percekig nem
+           válaszol (a leglassabb válasz nála 74 másodperc volt).
+        2. A hozzáadás 15 másodperc után időtúllépéssel elhasal NÁLUNK —
+           de a motor később MÉGIS feldolgozza, és a torrent elindul.
+        3. Mi ezt nem tudjuk, újrapróbáljuk, és a motor azt feleli: „ez az
+           infohash már regisztrálva van".
+        4. Ezt eddig HIBÁNAK könyveltük el, négyszer egymás után, és a
+           torrentet „hiba · 4 sikertelen próba" állapotban hagytuk —
+           miközben a motor ugyanazt a torrentet ZAVARTALANUL töltötte.
+           A diagnosztikában ez így látszott: „aktív letöltés: 5", a listában
+           pedig négy „hibás" torrent.
+
+        A megoldás nem az, hogy a hibát szebben mondjuk el, hanem hogy
+        megszűnjön: a futó példány A MIÉNK, tehát átvesszük, és onnan
+        követjük. A duplikátum hibás eredményét eltávolítjuk, hogy a motor
+        „leállt" listája ne hízzon tőle (nála 50 volt)."""
+        ih = mar_regisztralt_infohash(raw)
+        if not ih:
+            return False
+        regi = self.meglevo_gid(ih)
+        if not regi or regi == self.gid:
+            return False
+        # ⚠️ CSAK ÁRVÁT veszünk át. Ha egy MÁSIK élő listaelem követi, akkor
+        # a felhasználó tényleg kétszer adta hozzá — ott a régi „MÁR FUT,
+        # keresd meg a listában" üzenet az igaz, és két elem egy gid-en
+        # osztozva az egyik leállításával a másikat is leállítaná.
+        if self.figyelo.figyelt_e(regi):
+            return False
+        halott = self.gid
+        try:
+            self.figyelo.elenged(halott)
+        except Exception:
+            pass
+        try:
+            self.client.call("aria2.removeDownloadResult", halott)
+        except Exception:
+            pass
+        self.gid = regi
+        self.figyelo.regisztral(regi)
+        _log.info("Már futó torrent átvéve [%s]: a motorban %s alatt fut, "
+                  "a duplikátum (%s) eltávolítva.",
+                  p.filename or self.url, regi, halott)
+        p.status = "letöltés"
+        p.error = ""
+        p.figyelmeztetes = ""
+        return True
 
     def regisztralt(self) -> bool:
         """Igaz, ha ez a torrent MÉG él az aria2-ben (aktív, várakozó vagy
@@ -953,8 +1109,14 @@ class TorrentDownloader:
                 p.status = "leállítva"
                 return
             if status == "error":
-                p.status = "hiba"
                 raw = st.get("errorMessage", "ismeretlen aria2 hiba")
+                # ⚠️ ELŐBB az átvétel: ha ez csak egy ÁRVA, már futó
+                # példányunk duplikátuma, az nem hiba (Tóth László, 09-23).
+                if self._atvesz(raw, p):
+                    utolso_haladas = time.monotonic()
+                    utolso_kesz = -1
+                    continue
+                p.status = "hiba"
                 # A NYERS motorüzenet a naplóba (Karcsi, 2026-09-09). A
                 # felolvasásra fordított változat megy, de a pontos szöveg
                 # nélkül utólag semmit nem lehet kideríteni — és eddig

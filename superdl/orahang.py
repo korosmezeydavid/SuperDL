@@ -50,6 +50,25 @@ KESZLET: list[tuple[str, str]] = [
 ]
 ALAP_VALTOZAT = "f1"
 
+# A SUPERDL SAJÁT, INDULÁSKOR MEGSZÓLALÓ HANGJAI a beszélő órában is.
+# ⚠️ Lukács László kérése (2026-09-23): „belehetne-e rakni valamelyik hangot
+# azokból, amelyek megszólalnak, amikor elindítjuk a SuperDL-t?" A köszöntés
+# az Edge neurális magyar hangjaival szól (`speech.VoiceSpeaker`), az óra
+# viszont eddig CSAK eSpeaket ismert. Ezek természetesebbek, de INTERNET
+# kell hozzájuk – ezért ha épp nincs net, az óra NEM némul el, hanem az
+# eSpeak alaphangján mond be (a néma óra rosszabb, mint a gépies).
+EDGE_ELOTAG = "edge:"
+EDGE_HANGOK: list[tuple[str, str]] = [
+    ("edge:hu-HU-TamasNeural",
+     "Tamás – a SuperDL köszöntő hangja (internet kell hozzá)"),
+    ("edge:hu-HU-NoemiNeural",
+     "Noémi – női köszöntő hang (internet kell hozzá)"),
+]
+
+
+def edge_e(valtozat: str) -> bool:
+    return (valtozat or "").startswith(EDGE_ELOTAG)
+
 # a sor felső határa: ennél több várakozó bemondásnál az ÚJ, nem sürgős
 # bemondást eldobjuk. Öt bemondás ~12 mp beszéd; ennél hosszabb torlódás
 # már nem információ, hanem zaj.
@@ -83,6 +102,8 @@ def ervenyes(valtozat: str) -> bool:
     ⚠️ Ez a NÉMA VISSZAESÉS elleni védelem: az eSpeak magától nem szól."""
     if not valtozat:
         return True
+    if edge_e(valtozat):
+        return valtozat in {n for n, _ in EDGE_HANGOK}
     van = letezo_valtozatok()
     if not van:                    # nincs mappa (pl. teszt) – ne akadályozzunk
         return True
@@ -95,6 +116,9 @@ def keszlet(mind: bool = False) -> list[tuple[str, str]]:
     (a készlet elöl, a többi utána, ábécérendben)."""
     van = letezo_valtozatok()
     alap = [(n, c) for n, c in KESZLET if not n or not van or n.lower() in van]
+    # A köszöntő hangok a lista ELEJÉN, közvetlenül az alaphang után: ezek a
+    # legtermészetesebbek, és egy 22 elemű listában vakon nem kell keresni.
+    alap = alap[:1] + list(EDGE_HANGOK) + alap[1:]
     if not mind:
         return alap
     benne = {n.lower() for n, _ in alap}
@@ -112,7 +136,7 @@ def keszlet(mind: bool = False) -> list[tuple[str, str]]:
 
 def cimke(valtozat: str) -> str:
     """A változat felolvasható neve (ismeretlennél maga a név)."""
-    for n, c in KESZLET:
+    for n, c in list(EDGE_HANGOK) + KESZLET:
         if n == valtozat:
             return c
     return valtozat or "alap"
@@ -145,6 +169,9 @@ class Beszelo:
         self.kepernyoolvaso = bool(kepernyoolvaso)
         self._sor: queue.Queue = queue.Queue()
         self._proc = None
+        self._lejatszo = None        # az Edge-hangok lejátszója (lusta)
+        self._megszakit = threading.Event()
+        self._edge_sorszam = 0
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._szal = threading.Thread(target=self._fut, daemon=True,
@@ -200,6 +227,14 @@ class Beszelo:
     # ---- belül -----------------------------------------------------
 
     def _proc_megallit(self) -> None:
+        # az Edge-lejátszás is álljon le (kilépés, kikapcsolás)
+        self._megszakit.set()
+        lj = self._lejatszo
+        if lj is not None:
+            try:
+                lj.stop()
+            except Exception:
+                pass
         with self._lock:
             p, self._proc = self._proc, None
         if p is not None and p.poll() is None:
@@ -232,7 +267,56 @@ class Beszelo:
             if screenreader.speak(b.szoveg, False):
                 return
             # ha nincs képernyőolvasó, essünk vissza az eSpeakre
+        if edge_e(b.valtozat):
+            if self._edge(b):
+                return
+            # ⚠️ NINCS NET (vagy az Edge nem válaszol): NEM némulunk el, az
+            # eSpeak alaphangja mondja be. A néma óra rosszabb a gépiesnél.
+            b = Bemondas(b.szoveg, "", False, b.surgos)
         self._espeak(b)
+
+    # Egy bemondás felső határa: ennyi után akkor is továbblépünk, ha a
+    # lejátszó valamiért nem jelezne véget (ne akadjon el a sor).
+    EDGE_MAX_MP = 45.0
+
+    def _edge(self, b: Bemondas) -> bool:
+        """Bemondás a SuperDL köszöntő (Edge neurális) hangjával.
+        Igaz, ha megszólalt; hamis, ha nem sikerült (ekkor jön az eSpeak).
+        ⚠️ MEGVÁRJA a végét: a sor lényege, hogy egyszerre egy szól."""
+        from . import tts
+        hang = b.valtozat[len(EDGE_ELOTAG):]
+        mappa = Path.home() / ".superdl" / "speak"
+        self._edge_sorszam += 1
+        alap = str(mappa / ("ora_%d" % (self._edge_sorszam % 2)))
+        try:
+            mappa.mkdir(parents=True, exist_ok=True)
+            ut = tts.ENGINES["edge"].synth(b.szoveg, hang, alap,
+                                           pitch=self.pitch, rate=self.rate)
+        except Exception as e:
+            _log.info("a köszöntő hang most nem elérhető (%s) – eSpeak jön", e)
+            return False
+        try:
+            from .audioengine import Player
+            if self._lejatszo is None:
+                self._lejatszo = Player()
+            lj = self._lejatszo
+            lj.set_volume(max(0.0, min(1.0, self.volume / 100.0)))
+            self._megszakit.clear()
+            lj.play(ut, "")
+        except Exception:
+            _log.exception("a köszöntő hang lejátszása nem sikerült")
+            return False
+        kezdet = time.monotonic()
+        time.sleep(0.3)              # a lejátszó elindulása
+        while (time.monotonic() - kezdet < self.EDGE_MAX_MP
+               and not self._megszakit.is_set() and not self._stop.is_set()):
+            try:
+                if not lj.is_active():
+                    break
+            except Exception:
+                break
+            time.sleep(0.1)
+        return True
 
     def _jingle(self) -> None:
         """Rövid, kétszótagú jel a bemondás ELŐTT. NEM óraütés: nem számol,

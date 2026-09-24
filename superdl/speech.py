@@ -93,7 +93,11 @@ class VoiceSpeaker:
         self.mode = mode if mode in ("auto", "edge", "system") else "auto"
         self.edge_voice = edge_voice
         self._sapi = Speaker()            # rendszerhang + magyar SAPI tartalék
-        self._sapi_voice = self._pick_sapi_voice()
+        # ⚠️ LUSTA: a hanglista 4.6.17 óta a 32 bites segédtől jön, aminek az
+        # első indulása ~5 másodperc (mérve). Ha itt, a program indulásakor,
+        # a FŐ SZÁLON kérdeznénk le, minden indítás öt másodperccel lassulna
+        # — és a hangra csak akkor van szükség, ha az Edge nem elérhető.
+        self._sapi_voice_cache = None
         self._player = None
         self._seq = 0
         self._lock = threading.Lock()
@@ -101,6 +105,14 @@ class VoiceSpeaker:
             SPEAK_DIR.mkdir(parents=True, exist_ok=True)
         except OSError:
             pass
+
+    @property
+    def _sapi_voice(self) -> str:
+        """Az offline tartalékhang – az ELSŐ szükségkor választjuk ki (a
+        `_worker` háttérszálán), nem a program indulásakor."""
+        if self._sapi_voice_cache is None:
+            self._sapi_voice_cache = self._pick_sapi_voice()
+        return self._sapi_voice_cache
 
     @staticmethod
     def _pick_sapi_voice() -> str:

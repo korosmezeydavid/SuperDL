@@ -692,6 +692,17 @@ class DownloadManager:
             return
         if job.progress.conflict:
             return          # a „fájl már létezik" DÖNTÉST vár, nem újrapróbát
+        # ⚠️ A HIÁNYZÓ FORRÁSON AZ IDŐ NEM SEGÍT (4.6.17, Nagy Károly): ha a
+        # .torrent fájl eltűnt a helyéről, a negyedórás újrapróba csak
+        # ugyanazt a hibát ismételné, és minden körben megszólalna. Ha a
+        # felhasználó visszateszi a fájlt, a kézi Folytatás (vagy a program
+        # újraindítása) úgyis azonnal próbál.
+        try:
+            from .torrent import nem_mulo_hiba
+            if nem_mulo_hiba(job.progress.error):
+                return
+        except Exception:
+            pass
         if job.next_retry_at is None:
             job.next_retry_at = now + retrypolicy.szunet(job.retries)
             self._jelez(retrypolicy.uzenet(

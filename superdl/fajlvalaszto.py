@@ -38,17 +38,64 @@ def _meret_szoveg(bajt: int) -> str:
 GEP = ""      # a „Ez a gép" szint: nem valódi mappa, a MEGHAJTÓK listája
 
 
+# GetDriveTypeW értékei
+_DRIVE_REMOVABLE, _DRIVE_FIXED, _DRIVE_REMOTE, _DRIVE_CDROM, _DRIVE_RAMDISK = (
+    2, 3, 4, 5, 6)
+
+
+def _meghajto_betuk():
+    """[(betű, típus)] a Windows meghajtó-bittérképéből — LEMEZHOZZÁFÉRÉS
+    NÉLKÜL. None, ha ez nem kérdezhető le (akkor a régi út jön)."""
+    try:
+        import ctypes
+        k32 = ctypes.windll.kernel32
+        maszk = k32.GetLogicalDrives()
+        if not maszk:
+            return None
+        ki = []
+        for i, b in enumerate(string.ascii_uppercase):
+            if maszk & (1 << i):
+                ki.append((b, k32.GetDriveTypeW("%s:\\" % b)))
+        return ki
+    except Exception:
+        return None
+
+
 def meghajtok() -> list:
     """A jelenleg ELÉRHETŐ meghajtók gyökerei (C:\\, D:\\ …).
 
     MINDIG frissen kérdezzük le, nem az induláskor egyszer: a pendrive vagy a
     memóriakártya menet közben is bekerülhet, és akkor ott kell lennie.
-    Az üres kártyaolvasó-slot `isdir`-je hamis, tehát az magától kimarad.
-    """
+
+    ⚠️ NEM NYÚLUNK A MEGHAJTÓKHOZ (Tóth László, 2026-09-23). Eddig mind a
+    26 betűre `os.path.isdir`-t hívtunk, a FŐ SZÁLON. Egy elalvó külső
+    merevlemez, vagy egy leválasztott hálózati meghajtó erre 20 másodpercnél
+    tovább is várat: nála a fájlválasztó KÉTSZER fagyott le így (a
+    megakadás-napló mindkétszer ide mutatott: `meghajtok`, 51. sor), és ő
+    ezt úgy élte meg, hogy „a kiválasztás nagyon lassan reagált".
+
+    Most a Windows bittérképéből olvassuk ki, milyen betűk léteznek, és
+    milyen típusúak — ez lemezhozzáférés nélkül, azonnal megvan. CSAK a
+    cserélhető és az optikai meghajtót nézzük meg, hogy van-e benne lemez:
+    az üres kártyaolvasó-slot vagy CD-meghajtó azonnal nemet mond, és így a
+    régi jó tulajdonság (az üres slot kimarad) megmarad. A merevlemezt és a
+    hálózati meghajtót érintés nélkül listázzuk: ha alszik, csak akkor
+    ébred fel, amikor a felhasználó TÉNYLEG belép."""
     if os.name != "nt":
         return ["/"]
-    return ["%s:\\" % b for b in string.ascii_uppercase
-            if os.path.isdir("%s:\\" % b)]
+    betuk = _meghajto_betuk()
+    if betuk is None:
+        return ["%s:\\" % b for b in string.ascii_uppercase
+                if os.path.isdir("%s:\\" % b)]
+    ki = []
+    for b, tipus in betuk:
+        gyoker = "%s:\\" % b
+        if tipus in (_DRIVE_REMOVABLE, _DRIVE_CDROM):
+            if os.path.isdir(gyoker):
+                ki.append(gyoker)
+        elif tipus in (_DRIVE_FIXED, _DRIVE_REMOTE, _DRIVE_RAMDISK):
+            ki.append(gyoker)
+    return ki
 
 
 def gyoker_e(ut: str) -> bool:

@@ -287,6 +287,9 @@ def test_a_zene_manifest_emelve_es_koti_a_core_verziot():
     assert d["min_core_version"] == "4.6.16"
 
 
-def test_a_core_verzio_emelve():
+def test_a_core_verzio_legalabb_az_amit_a_zene_ker():
+    """⚠️ Nem pontos egyezés: egy későbbi Core-kiadás ne törje el ezt a
+    tesztet (4.6.17-ben pontosan ez történt)."""
     import superdl
-    assert superdl.__version__ == "4.6.16"
+    v = tuple(int(x) for x in superdl.__version__.split("."))
+    assert v >= (4, 6, 16)

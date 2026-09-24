@@ -34,6 +34,8 @@ _SAJAT_KEZDETEK = (
     # „nem ismerjük fel" szövegre cserélné – vagyis pont azt a magyarázatot
     # dobnánk el, amit most tettünk bele.
     "ez a torrent már fut",
+    # 4.6.17: a hiányzó .torrent fájl saját mondata (torrent.HianyzoTorrentFajl)
+    "a torrentfájl már nincs meg",
 )
 
 
@@ -88,6 +90,17 @@ def _torrent_es_szegmens(m: str) -> str:
                 "lehet hozzáadni. Keresd meg a listában (Control D), és ott "
                 "folytasd. Ha nincs ott, akkor egy korábbi példánya még nem "
                 "állt le: indítsd újra a programot.")
+    if "no uri to download" in m or "uri is not provided" in m:
+        # ⚠️ MÉRVE 2026-09-24: az aria2 ezt mondja, ha egy NEM LÉTEZŐ helyi
+        # .torrent utat kap (Nagy Károly naplójában így állt). Angolul,
+        # „nincs mit letölteni" értelemben — pedig a baj az, hogy a fájl
+        # eltűnt a helyéről. Ez a minta a régi, 4.6.17 előtti sorokra kell;
+        # az új kód ide már el sem jut, mert előbb megnézi a fájlt.
+        return ("A letöltés forrása már nincs meg: rendszerint az a "
+                "torrentfájl hiányzik, amiből a letöltést indítottad – "
+                "áthelyezték vagy törölték. Add hozzá újra onnan, ahol most "
+                "van; a már letöltött rész megmarad, ha ugyanabba a "
+                "célmappába teszed.")
     if "no peers" in m or "no seeds" in m or "0 seeders" in m:
         return ("Ehhez a torrenthez jelenleg NINCS megosztó, ezért nem tud "
                 "haladni. Ez nem a te hibád és nem a programé: várni kell, "
