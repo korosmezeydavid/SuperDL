@@ -8,6 +8,7 @@ letesz egy könyvjelzőt a sorozat hangsávjában, és a mobilján onnan folytat
 """
 import os
 import threading
+import time
 
 import wx
 
@@ -17,6 +18,20 @@ from .audiobook_player import (AudioBookPlayer, AudioLibrary, konyv_kulcs,
 from . import valaszto                         # beépített fájlválasztó
 
 HANGERO_LEPES = 0.05        # ugyanaz a lépés, mint a Zenelejátszóban
+
+# ELALVÁS (Turai László javaslata, 2026-09-24) – ugyanazok a lépések, mint a
+# Zenelejátszóban, hogy ne kelljen két rendszert megtanulni
+ALVAS_PERCEK = (5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 90, 120)
+ALVAS_HALKULAS_MP = 10.0    # ennyivel a vége előtt kezd elhalkulni
+
+
+def valasztek_szoveg(perc: int) -> str:
+    """90 → „másfél óra", 120 → „2 óra", 25 → „25 perc"."""
+    if perc == 90:
+        return "másfél óra"
+    if perc >= 60 and perc % 60 == 0:
+        return "%d óra" % (perc // 60)
+    return "%d perc" % perc
 
 _HANG_WILDCARD = ("Hangfájl (*.mp3;*.m4a;*.aac;*.ogg;*.opus;*.wav;*.flac)|"
                   "*.mp3;*.m4a;*.aac;*.ogg;*.oga;*.opus;*.wav;*.flac;*.wma;"
@@ -47,6 +62,9 @@ _SUGO = (
     "így: 12:30, 1:02:03, 90 (ennyi másodperc), „5 perc 30”, „2 óra 10 perc”.\n"
     "• Ctrl+I: hol tartunk – a könyv, a sáv, az időpont és hogy mennyi van "
     "még hátra a sávból.\n"
+    "• Ctrl+S: elalvás-időzítő (5 perctől 2 óráig). A végén a hang lassan "
+    "elhalkul, a lejátszás leáll, és a program megjegyzi, hol tartottál – "
+    "reggel F5-tel onnan folytatod. Kikapcsolni ugyanitt lehet.\n"
     "• Előző/Következő sáv gomb: sávok közt lépés. A sáv vége magától a "
     "következőre lép.\n\n"
     "KÖNYVJELZŐK\n"
@@ -92,6 +110,7 @@ class AudioBookFrame(wx.Frame):
                                       on_error=self._on_error_bg)
         # ⚠️ A HANGERŐT A LEJÁTSZÓ LÉTREHOZÁSA UTÁN, DE A `_build()` ELŐTT
         # állítjuk be: a gomb felirata már a betöltött értéket mutassa.
+        self._alvas_vege = 0.0     # időbélyeg; 0 = nincs elalvás
         self._hangero = hangero_betolt()
         try:
             self.player.set_volume(self._hangero)
@@ -151,10 +170,12 @@ class AudioBookFrame(wx.Frame):
                  lambda e: self._hangero_allit(-HANGERO_LEPES)),
                 ("&Ugrás időpontra… (Ctrl+G)", lambda e: self._ugras_idopontra()),
                 ("H&ol tartunk? (Ctrl+I)", lambda e: self._hol_tartunk()),
+                ("Elalvás-&időzítő… (Ctrl+S)", lambda e: self._alvas_parbeszed()),
                 ("&Előző sáv", lambda e: self._prev_track()),
                 ("&Következő sáv", lambda e: self._next_track()),
                 ("Köny&vjelző (Ctrl+B)", lambda e: self._add_bookmark()),
-                ("Könyvj&elzők… (Ctrl+Shift+B)",
+                # Alt+E ütközött az Előző sáv gombbal – most Alt+A
+                ("Könyvjelzők listáj&a… (Ctrl+Shift+B)",
                  lambda e: self._show_bookmarks())):
             b = wx.Button(p, label=label)
             b.Bind(wx.EVT_BUTTON, fn)
@@ -200,8 +221,10 @@ class AudioBookFrame(wx.Frame):
 
         ids = {k: wx.NewIdRef() for k in
                ("play", "pause", "stop", "back", "fwd", "bm", "bmlist", "help",
-                "hfel", "hle", "ugras", "hol")}
+                "hfel", "hle", "ugras", "hol", "alvas")}
         self.Bind(wx.EVT_MENU, lambda e: self._hol_tartunk(), id=ids["hol"])
+        self.Bind(wx.EVT_MENU, lambda e: self._alvas_parbeszed(),
+                  id=ids["alvas"])
         self.Bind(wx.EVT_MENU, lambda e: self._hangero_allit(HANGERO_LEPES),
                   id=ids["hfel"])
         self.Bind(wx.EVT_MENU, lambda e: self._hangero_allit(-HANGERO_LEPES),
@@ -225,6 +248,7 @@ class AudioBookFrame(wx.Frame):
             (wx.ACCEL_CTRL, wx.WXK_DOWN, ids["hle"]),
             (wx.ACCEL_CTRL, ord('G'), ids["ugras"]),
             (wx.ACCEL_CTRL, ord('I'), ids["hol"]),
+            (wx.ACCEL_CTRL, ord('S'), ids["alvas"]),
             (wx.ACCEL_CTRL, ord('B'), ids["bm"]),
             (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('B'), ids["bmlist"]),
             (wx.ACCEL_NORMAL, wx.WXK_F1, ids["help"]),
@@ -363,6 +387,12 @@ class AudioBookFrame(wx.Frame):
     def _stop(self):
         if self.player.is_active():
             self._save_resume()
+            # ⚠️ „A helyet megjegyeztem" – akkor az F5 is ONNAN folytassa.
+            # Eddig csak a polcról újranyitva folytatta; ugyanebben az
+            # ablakban az F5 a sáv elejéről indult (az elalvásnál ez reggel
+            # derült volna ki).
+            self._resume_at = (self.player.idx,
+                               int(max(0.0, self.player.position()) * 1000))
         self.player.stop()
         self.SetStatusText("Leállítva. A helyet megjegyeztem.")
 
@@ -417,7 +447,10 @@ class AudioBookFrame(wx.Frame):
             self.SetStatusText("A hangoskönyv végére értem.")
 
     def _tick(self, e):
-        if self._closing or not self.player.tracks:
+        if self._closing:
+            return
+        self._alvas_figyel()
+        if not self.player.tracks:
             return
         if self.player.is_active():
             poz = self.player.position()
@@ -633,7 +666,66 @@ class AudioBookFrame(wx.Frame):
         return mondat + "."
 
     def _hol_tartunk(self):
-        self._mond(self._hol_tartunk_szoveg())
+        szoveg = self._hol_tartunk_szoveg()
+        if self._alvas_vege:
+            szoveg += " Elalvásig %s." % ido_str(
+                max(0.0, self._alvas_vege - time.time()))
+        self._mond(szoveg)
+
+    # ---- elalvás ----
+    def _alvas_parbeszed(self):
+        """Ctrl+S – elalvás-időzítő (Turai László, 2026-09-24)."""
+        valasztek = ["Kikapcsolás"] + [valasztek_szoveg(p)
+                                       for p in ALVAS_PERCEK]
+        cim = "Mennyi idő múlva álljon le a hangoskönyv?"
+        if self._alvas_vege:
+            cim += "\nMost %s van hátra." % ido_str(
+                max(0.0, self._alvas_vege - time.time()))
+        d = wx.SingleChoiceDialog(self, cim, "Elalvás", valasztek)
+        try:
+            if d.ShowModal() != wx.ID_OK:
+                return
+            i = d.GetSelection()
+        finally:
+            d.Destroy()
+        self._alvas_beallit(ALVAS_PERCEK[i - 1] if i > 0 else 0)
+
+    def _alvas_beallit(self, perc: int):
+        """0 = kikapcsolás. A hangerőt mindig visszaállítja (ha épp halkult)."""
+        self._alvas_vege = time.time() + perc * 60 if perc > 0 else 0.0
+        try:
+            self.player.set_volume(self._hangero)
+        except Exception:
+            pass
+        if perc > 0:
+            self._mond("Elalvás %s múlva." % valasztek_szoveg(perc))
+        else:
+            self._mond("Az elalvás kikapcsolva.")
+
+    def _alvas_figyel(self):
+        """A félmásodperces órából. CSAK hangerő és leállítás – ablakot NEM
+        nyit (4.6.7 tanulsága: időzítőből nyitott ablak összeomlást okozott).
+        A hangerő-SZORZÓT nem mentjük: a mentett hangerő a felhasználóé."""
+        if not self._alvas_vege:
+            return
+        hatra = self._alvas_vege - time.time()
+        if hatra <= 0:
+            self._alvas_vege = 0.0
+            if self.player.is_active():
+                self._stop()          # helyet ment, F5 onnan folytatja
+            try:
+                self.player.set_volume(self._hangero)
+            except Exception:
+                pass
+            self.SetStatusText("Az elalvás ideje letelt, a hangoskönyv "
+                               "leállt. A helyet megjegyeztem.")
+            return
+        if hatra <= ALVAS_HALKULAS_MP and self.player.is_active():
+            try:
+                self.player.set_volume(
+                    self._hangero * max(0.0, hatra / ALVAS_HALKULAS_MP))
+            except Exception:
+                pass
 
     # ---- súgó / támogatás / zárás ----
     def _help(self):

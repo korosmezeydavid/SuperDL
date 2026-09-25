@@ -40,6 +40,11 @@ A „Zenemappa kiválasztása” gombbal (Ctrl+O) adj meg EGY mappát. Ami alatt
 van – akárhány almappában, akármilyen mélyen –, az mind bekerül a listába. A
 választásod megjegyződik, legközelebb magától betölt.
 
+Ha inkább üres listával indulnál, a helyi menüben kapcsold ki: „Induláskor
+az előző mappa betöltése". Ilyenkor a mappát nem felejti el: a helyi menüben
+„Az előző mappa betöltése" egy mozdulattal visszahozza, és a Ctrl+O is ott
+nyílik.
+
 MINDEN MŰVELET ELÉRHETŐ A HELYI MENÜBŐL IS: Alkalmazások billentyű vagy
 Shift+F10. Nem kell fejből tudni a gyorsbillentyűket.
 
@@ -183,8 +188,14 @@ class ZeneFrame(wx.Frame):
         self._ora.Start(1000)
 
         gyoker = KT.gyoker_betolt()
-        if gyoker:
+        if gyoker and KT.indulaskor_betolt():
             self._beolvas(gyoker, csendes_kezdet=True)
+        elif gyoker:
+            # a mappát NEM felejtjük el: Ctrl+O ott nyílik, és a helyi
+            # menüből egy mozdulattal visszatölthető
+            self._allapot("Üres lista – az előző mappát nem töltöttem be "
+                          "(így állítottad be). Zenemappa: Ctrl+O, vagy a "
+                          "helyi menüben: Az előző mappa betöltése.")
         else:
             self._allapot("Válassz egy zenemappát: Ctrl+O. Minden művelet "
                           "elérhető a helyi menüből is, Shift+F10.")
@@ -285,6 +296,11 @@ class ZeneFrame(wx.Frame):
         tetel("Ke&verés\tCtrl+K", self._keveres_valt, self._keveres)
         tetel("A szám végén menjen tovább\tCtrl+E", self._tovabb_valt,
               self._tovabb)
+        tetel("Induláskor az előző mappa betöltése",
+              self._indulas_valt, KT.indulaskor_betolt())
+        if not self._szamok and KT.gyoker_betolt():
+            tetel("Az előző mappa betöltése",
+                  lambda: self._beolvas(KT.gyoker_betolt()))
         tetel(("Elalvás… (most: %d perc van hátra)" % self._alvas_hatra_perc())
               if self._alvas_vege else "Elalvás…\tCtrl+S", self._alvas_parbeszed)
         m.AppendSeparator()
@@ -462,6 +478,16 @@ class ZeneFrame(wx.Frame):
             self.lista.SetString(i, self._sor(szam))
             self.lista.SetSelection(i)
         self._allapot(uzenet)
+
+    # ---- induló mappa ----------------------------------------------------
+
+    def _indulas_valt(self):
+        be = not KT.indulaskor_betolt()
+        KT.indulaskor_betolt_ment(be)
+        self._allapot(
+            "Induláskor az előző zenemappa betöltődik." if be else
+            "Induláskor üres lista – a zenemappát te választod ki. "
+            "Az előzőt a helyi menüből egy mozdulattal visszatöltheted.")
 
     # ---- keverés ---------------------------------------------------------
 

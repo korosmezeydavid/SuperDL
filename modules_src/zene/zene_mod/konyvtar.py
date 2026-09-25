@@ -158,6 +158,18 @@ def gyoker_ment(ut: str) -> None:
     beallit(gyoker=str(ut or ""))
 
 
+def indulaskor_betolt() -> bool:
+    """Induláskor töltse-e vissza az előző zenemappát (Turai László kérése,
+    2026-09-23: „nem biztos, hogy a következő indításnál ugyanazt a
+    listát akarja az ember"). Az alap IGAZ – aki nem nyúl hozzá, annak
+    minden marad a régiben."""
+    return bool(beallitasok().get("indulaskor_betolt", True))
+
+
+def indulaskor_betolt_ment(be: bool) -> None:
+    beallit(indulaskor_betolt=bool(be))
+
+
 def kedvencek_betolt() -> list:
     """A kedvencek ÚTJAI, a felvétel sorrendjében, ismétlés nélkül."""
     nyers = beallitasok().get("kedvencek")

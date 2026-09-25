@@ -283,7 +283,8 @@ def test_attunes_kozben_nincs_ujrainditas():
 def test_a_zene_manifest_emelve_es_koti_a_core_verziot():
     d = json.loads((GYOKER / "modules_src/zene/manifest.json")
                    .read_text(encoding="utf-8"))
-    assert d["version"] == "1.3.0"
+    # legalább 1.3.0 – a későbbi zene-körök tovább emelik
+    assert tuple(int(x) for x in d["version"].split(".")) >= (1, 3, 0)
     assert d["min_core_version"] == "4.6.16"
 
 
