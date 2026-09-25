@@ -158,7 +158,7 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-09-24 · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-25 · dolgozott: Claude
 
 ---
 
@@ -171,11 +171,64 @@ nyers bájtként keresi a fájlokban.)
    „ONPROBA SAPI-hangok: N". A `SuperDL-cli.exe --diagnose` erre VAK (a CLI-ből
    a fordító szándékosan kimarad).
 4. Helyben a TELJES tesztcsomag fut (a SAPI-tesztekkel együtt), ahogy a CI-n.
+5. A kész exéből a fájlküldés élő próbája: `SuperDL.exe --wh send --code N-szo-szo
+   --text x` + `--wh receive N-szo-szo` (4.6.19 óta).
 
 ⚠️ **Két Python 3.14 van a gépen.** A `...\Programs\Python\Python314` a
 build-értelmező; 2026-09-24 óta ebben is van ctranslate2 4.8.1,
 sentencepiece 0.2.2, sacremoses 0.2.0, joblib 1.5.3, subword-nmt 0.3.8
 (a 4.6.12–4.6.17 között ezek hiányoztak → a fordító némán kiesett).
+
+### ✅ 4.6.19 + MODULKÖR KIADVA (2026-09-25) – RÉGI PROCESSZOR, FÁJLKÜLDÉS, FÓKUSZ
+
+Commit `a88c4ca`. `releases/latest = v4.6.19`, 4 URL 200, CI zöld. Modulok:
+konyvek 1.3.5, mediatools 1.4.11, hangalamondas 1.0.7, csevej 1.6.2 – a
+`modules.json` sha256 + méret LETÖLTÖTT fájlon ellenőrizve. Önpróba mindkét
+exéből: numpy rendben, fordító elérhető, SAPI 18. A fájlküldést ÉLŐBEN
+kipróbáltam a kész onedir ÉS onefile exéből (`--wh send` / `--wh receive`).
+Napló: `claude/windows-kiadas-4-6-19.md`.
+
+1. **numpy-őr (`superdl/numpyor.py`)** [Tóth Zoltán, Win10, régi CPU]: a numpy
+   2.4.6 x86-64-v2-t kér (SSE4.2+POPCNT). Régi CPU-n az ELSŐ import tiszta
+   ImportError, a MÁSODIK a félig betöltött DLL-be nyúl → 0xc000001d, a program
+   eltűnik (nála: Súgó → Hibajelentés → fordító-ellenőrzés → ctranslate2 →
+   numpy). Most a `main()` a fő szálon EGYSZER betölti; kudarcnál
+   `sys.modules["numpy"] = None`, onnan mindenki tiszta ImportError-t kap.
+   `offlineford.ct2()` előbb a numpy-őrt kérdezi. A hanglejátszás numpy
+   nélkül is megy (`audioengine.hangero_alkalmaz`, array-alapú). A jelentés
+   új sora: „Számolókönyvtár:". ⚠️ **numpyt közvetlenül a Core-ban NE
+   importálj**, a `numpyor.betolt()`-on át.
+2. **Fájlküldés** [Turai László]: a build-értelmezőből hiányzott a
+   magic-wormhole (a spec `collect_all`-ja `except: pass`-szal NÉMÁN
+   átugrotta). Telepítve (0.24.0), a build-őr KELL-listáján: wormhole,
+   wormhole.cli.cli, twisted, nacl, spake2, cryptography…kdf.hkdf. Az őr a
+   pontozott nevet PONTOSAN nézi (PYZ vagy .py), nem elég a csomagmappa.
+   A telepítő `[InstallDelete]`-tel törli a régi `{app}\_internal`-t: az ott
+   maradt régi wormhole akadt össze az új cryptographyval.
+   ⚠️ `tools\build_installer.ps1` a ROSSZ értelmezőre mutatott – javítva, és
+   az őrt is futtatja.
+3. **Hangoskönyv F5 „kidob"** [Turai]: a `videocompose.media_duration`
+   `CREATE_NO_WINDOW` nélkül indította az ffprobe-ot → konzolablak → fókusz
+   elveszett (Alt+Tab hozta vissza). Az első `_tick` futtatta. Javítva, és a
+   `tests/test_4_6_19.py` MINDEN `subprocess` hívást végignéz (a mail modul
+   kivétel, az Intéző szándékos). Így jött ki a mediatools/hangalamondas/
+   csevej is.
+4. **Hangoskönyv**: sávlista egyetlen `Set`-tel + Freeze/Thaw (20+ mp
+   fagyás); `duration_nem_var()` – a kijelző nem vár az ffprobe-ra;
+   **Ctrl+I: hol tartunk** (leállítva a polcról olvassa a helyet).
+5. **Torrent** [Tóth László]: `VEZERLES_TURES_ELO_MP = 1800` – ha az aria2
+   folyamata ÉL, fél órát várunk a vezérlésre (induló hash-ellenőrzés), halott
+   folyamatnál marad az 5 perc.
+
+**Elengedve – Dávid döntése (2026-09-25):** hangoskönyv-készítés
+időpontos darabolásánál mondathatár-keresés (Tóth László kérése). „60 perc az
+60 perc." Ne tervezd újra.
+
+**Nyitva:** Turai: fel/le nyíl = sávváltás, elalvás-időzítő, ugrás mappára;
+a zene indításakor a `Player.play` Popen-je a fő szálon fut (Turai naplójában
+egyszer 20+ mp) – háttérszálra tenni nagyobb átalakítás, mert az
+`is_active()`-ra sok hívó épít. Tóth Zoltán: „a frissítés nem működik" – a
+naplója szerint 4.6.16 → 4.6.18 SIKERÜLT; megkérdeztem, mit lát pontosan.
 
 ### ✅ 4.6.18 KIADVA (2026-09-24) – A HELYBEN FUTÓ FORDÍTÓ VISSZA
 
