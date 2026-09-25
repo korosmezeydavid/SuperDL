@@ -80,7 +80,7 @@ def ft(osszeg: int) -> str:
 
 def ar_szam(szoveg: str) -> int | None:
     """„1 169 Ft”, „1169 Ft”, „899.-” → 1169 / 899. Nincs szám: None."""
-    s = (szoveg or "").replace(" ", " ").replace("\xa0", " ")
+    s = (szoveg or "").replace(" ", " ").replace("\xa0", " ").replace(" ", " ")
     m = re.search(r"(\d{1,3}(?:[ .]\d{3})+|\d+)", s)
     if not m:
         return None

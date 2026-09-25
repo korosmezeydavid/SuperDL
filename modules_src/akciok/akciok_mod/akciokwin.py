@@ -23,14 +23,28 @@ RENDEZESEK = ("Bolt szerint", "Ár szerint, a legolcsóbb elöl", "Név szerint"
 SUGO = """AKCIÓS ÚJSÁG – SÚGÓ
 
 MIRE VALÓ
-A boltok heti akciós újságjait mutatja meg olvasható, nyilazható listában:
-Penny, Lidl és Aldi. Nem kép és nem találgatás: a boltok saját, nyilvános
-oldalairól és újságjaiból jön a szöveg, ugyanaz, ami a papíron áll.
+A boltok akcióit mutatja meg olvasható, nyilazható listában: Penny, Lidl,
+Aldi, Tesco, Spar és Interspar, Rossmann és dm. Nem kép és nem
+találgatás: a boltok saját, nyilvános oldalairól és újságjaiból jön a
+szöveg, ugyanaz, ami a papíron vagy a bolt honlapján áll.
+
+HONNAN JÖN AZ ADAT
+  Penny, Aldi ........ a bolt honlapjának akciós oldala (Aldinál az újság is)
+  Lidl, Tesco, Spar .. a bolt saját akciós újságja (PDF). A Tescónál és a
+                       Sparnál az árat a kiírt egységárból számoljuk – ez
+                       a nyomtatott ár, sok darabos csomagnál pár forint
+                       eltérés lehet
+  Rossmann ........... a webshop akciós termékei és a Rossmann Plus
+                       kártyás ajánlatai; ami csak online kapható, azt a
+                       megjegyzés kimondja
+  dm ................. a dm-nek nincs heti újsága; a kiárusított termékek
+                       jönnek, a készlet erejéig
+A pultos áruk (felvágott, sajt a pultból) ára kilónként értendő.
 
 BÖNGÉSZÉS
   Bolt ............... Alt+B – egy bolt, vagy minden bolt egyszerre
-  Kategória .......... Alt+K – pl. Italok, Friss húsok (a Pennynél), vagy
-                       az újság neve (Lidl, Aldi)
+  Kategória .......... Alt+K – pl. Italok, Friss húsok (a Pennynél), Haj
+                       (a Rossmannál), vagy az újság neve (Lidl, Tesco…)
   Keresés ............ Alt+E – gépelés közben szűr, ékezet nélkül is jó
                        („rantott” megtalálja a „Rántott”-at)
   Rendezés ........... Alt+R – bolt, ár vagy név szerint
@@ -56,8 +70,11 @@ helyen „megvan”, a másikon is az lesz. Semmit nem töröl.
 FRISSÍTÉS
   F5 ................. az újságok letöltése újra
 Megnyitáskor a legutóbbi letöltött újságok azonnal olvashatók, a friss adat
-a háttérben jön. A Lidl újságja nagy (több tíz megabájt), az első letöltés
-fél percig is eltarthat.
+a háttérben jön. A Lidl, a Tesco és a Spar újságja nagy (több tíz
+megabájt), a Rossmann pedig közel háromezer terméket ad, ezért az első
+letöltés fél percig is eltarthat. A boltokat kíméletesen, szünetekkel
+kérdezzük – ha valamelyik bolt épp lassítást kér, a program vár és újra
+próbálja.
 
 Az árak a boltok saját adatai; a program csak megmutatja őket. Nyomdai és
 átvételi hibákért a program nem felel – vásárlás előtt a boltban nézd meg.

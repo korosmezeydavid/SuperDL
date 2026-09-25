@@ -74,9 +74,10 @@ def szamolt_ar(meret: str, egysegar: str) -> int | None:
         return None
     if alap in ("db", "darab", "tekercs", "pár", "mosás", "m"):
         # „6 darab” + „58,17 Ft/db” → 349; „10 tekercs” + „102,90 Ft/tekercs”
-        m = re.search(r"(\d+)\s*(?:x\s*\d+\s*\w+\s*)?(darab|db|tekercs|pár|"
+        m = re.search(r"(\d+)\s*(?:x\s*(\d+)\s*)?(darab|db|tekercs|pár|"
                       r"mosás|m)\b", meret or "", re.I)
-        darab = int(m.group(1)) if m else 1
+        darab = int(m.group(1)) * (int(m.group(2)) if m and m.group(2) else 1) \
+            if m else 1                     # „4x72 db/cs” = 288 darab
         ar = darab * egys
         return int(round(ar)) if 0 < ar < 1_000_000 else None
     m = _MERET.search(meret or "")

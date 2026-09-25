@@ -16,7 +16,7 @@ def register(core):
     menu = _sub("&Eszközök", "Akciós új&ság") if _sub \
         else core.add_menu("Akciós új&ság")
     item = core.add_menu_item(
-        menu, "Akciós új&ság (Penny, Lidl, Aldi)\tCtrl+Alt+A", opener,
+        menu, "Akciós új&ság (élelmiszer- és drogérialáncok)\tCtrl+Alt+A", opener,
         help="A boltok heti akciói felolvasható listában, bevásárlólistával")
     _state["item"] = item
     core.log.info("akciok modul betöltve")

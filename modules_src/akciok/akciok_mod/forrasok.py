@@ -11,7 +11,7 @@ import json
 import time
 from pathlib import Path
 
-from . import aldi, lidl, penny
+from . import aldi, dm, lidl, penny, rossmann, spar, tesco
 from .termek import Termek
 
 MAPPA = Path.home() / ".superdl" / "akciok"
@@ -24,14 +24,53 @@ BOLTOK = [
     ("penny", "Penny", lambda get, gb, j: penny.letolt(get, j)),
     ("lidl", "Lidl", lambda get, gb, j: lidl.letolt(gb, j)),
     ("aldi", "Aldi", lambda get, gb, j: aldi.letolt(gb, j)),
+    ("tesco", "Tesco", lambda get, gb, j: tesco.letolt(get, gb, j)),
+    ("spar", "Spar és Interspar", lambda get, gb, j: spar.letolt(get, gb, j)),
+    ("rossmann", "Rossmann", lambda get, gb, j: rossmann.letolt(_post_json, j)),
+    ("dm", "dm", lambda get, gb, j: dm.letolt(_get_json, j)),
 ]
 
 
+def _get_json(url: str, fejlec: dict | None = None) -> dict:
+    try:
+        from curl_cffi import requests as cr
+        r = cr.get(url, headers=fejlec or {}, impersonate="chrome", timeout=60)
+    except ImportError:
+        import requests
+        r = requests.get(url, headers={"User-Agent": UA, **(fejlec or {})},
+                         timeout=60)
+    r.raise_for_status()
+    return r.json()
+
+
+def _post_json(url: str, adat: dict, fejlec: dict | None = None) -> dict:
+    """JSON-kérés (GraphQL) böngészőként; ugyanaz a tartalék, mint a get-nél."""
+    fej = {"Content-Type": "application/json", **(fejlec or {})}
+    try:
+        from curl_cffi import requests as cr
+        r = cr.post(url, json=adat, headers=fej, impersonate="chrome", timeout=60)
+    except ImportError:
+        import requests
+        r = requests.post(url, json=adat, headers={"User-Agent": UA, **fej},
+                          timeout=60)
+    r.raise_for_status()
+    return r.json()
+
+
 def _get_bytes(url: str) -> bytes:
+    """Böngészőként kérünk (curl_cffi), mert több bolt oldala a sima
+    Python-kérést elutasítja; ha a curl_cffi nincs meg, a sima requests."""
+    try:
+        from curl_cffi import requests as cr
+        r = cr.get(url, impersonate="chrome", timeout=90)
+        r.raise_for_status()
+        return r.content
+    except ImportError:
+        pass
     import requests                         # a Core-ból
     r = requests.get(url, headers={"User-Agent": UA,
                                    "Accept-Language": "hu-HU,hu;q=0.9"},
-                     timeout=60)
+                     timeout=90)
     r.raise_for_status()
     return r.content
 

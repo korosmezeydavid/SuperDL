@@ -396,3 +396,181 @@ def test_az_ablak_gombjainak_alt_betui_nem_utkoznek():
                  re.findall(r'label="[^"]*?&(\w)|\("[^"]*?&(\w)',
                             inspect.getsource(fv)) for m in m if m]
         assert len(betuk) == len(set(betuk)), (fv.__name__, betuk)
+
+
+# ---- Tesco, Spar, Rossmann, dm (2026-09-25) -------------------------------
+
+from akciok_mod import dm, forrasok, rossmann, spar, tesco  # noqa: E402
+
+TESCO_SZOVEG = """Tesco csont nélküli,
+szeletelt sertéstarja
+400 g, 2 933 Ft/1 kg
+2498 Ft/1 kg
+
+Kinder tejszelet multipack
+5x28 g/cs
+6421 Ft/1 kg
+Clubcarddal: 6064 Ft/1 kg
+"""
+
+
+def test_tesco_ar_az_egysegarbol():
+    tk = tesco.termekek(TESCO_SZOVEG, "Hipermarket újság", "09.25-tól 10.01-ig")
+    tarja = next(t for t in tk if "tarja" in t.nev)
+    assert tarja.ar == 999 and tarja.regi_ar == 1173
+    assert tarja.kiszereles == "400 g"
+    kinder = next(t for t in tk if "Kinder" in t.nev)
+    assert kinder.ar == 899 and kinder.kartyas_ar == 849
+    assert kinder.kartya_nev == "Clubcarddal"
+
+
+def test_tesco_ujsagok_a_next_adatbol():
+    allapot = {"Leaflet:1": {"type": "HM", "leafletUrl": "https://x/hm.pdf",
+                             "validFrom": "2026-09-25T00:00", "validTo": "2026-10-01"}}
+    html = ('<script id="__NEXT_DATA__" type="application/json">%s</script>'
+            % json.dumps({"props": {"pageProps": {"__APOLLO_STATE__": allapot}}}))
+    assert tesco.ujsagok(html) == [("Hipermarket újság", "https://x/hm.pdf",
+                                    "2026-09-25", "2026-10-01")]
+
+
+SPAR_SZOVEG = """Danonino XXL
+eper-banán
+4×95 g
+(2.365,79 Ft/1 kg)
+
+Apenta+
+funkcionális ital
+0,75 l
+(572 Ft/1 l)
+2 db-tól:
+(332 Ft/1 l)
+
+Kockázott pulyka felsőcombfilé
+csomagolt
+500 g
+(2.878 Ft/1 kg)
+1.439 Ft
+MYSPAR ÁR*
+-22%
+1.119
+(2.238 Ft/1 kg)
+
+Ft
+/10 dkg
+S-BUDGET
+disznósajt**
+a kiszolgálópultban
+(2.990 Ft/1 kg)
+
+Jó döntés már 35 éve.Érvényes: 2026. 09. 24. csütörtöktől 2026. 09. 30. szerdáig
+"""
+
+
+def test_spar_termekek():
+    tk = spar.termekek(SPAR_SZOVEG, "Spar szórólap", spar.ervenyesseg(SPAR_SZOVEG))
+    nevek = {t.nev: t for t in tk}
+    d = nevek["Danonino XXL eper-banán"]
+    assert d.ar == 899 and d.kiszereles == "4x95 g"
+    assert d.ervenyes == "09.24-tól 09.30-ig"
+    a = nevek["Apenta+ funkcionális ital"]
+    assert a.ar == 429 and "2 db-tól 249 Ft/db" in a.megjegyzes
+    p = nevek["Kockázott pulyka felsőcombfilé csomagolt"]
+    assert p.ar == 1439 and p.kartyas_ar == 1119 and p.kartya_nev == "MySpar-ral"
+    s = nevek["S-BUDGET disznósajt"]
+    assert s.ar == 2990 and s.kiszereles == "kilónként"
+
+
+def test_spar_csak_az_orszagos_ujsagok_a_legujabbal():
+    html = " ".join('href="/content/dam/sparhuwebsite/_flyers/2026/%s/%s.pdf"' % x
+                    for x in (("0917", "spar-szorolap-0917p"),
+                              ("0924", "spar-szorolap-0924p"),
+                              ("0924", "interspar-szorolap0924p"),
+                              ("0924", "spar-market-cityspar0924")))
+    assert spar.ujsagok(html) == [
+        ("Spar szórólap", spar.ALAP + "/content/dam/sparhuwebsite/_flyers/2026/0924/"
+                                      "spar-szorolap-0924p.pdf"),
+        ("Interspar szórólap", spar.ALAP + "/content/dam/sparhuwebsite/_flyers/2026/"
+                                           "0924/interspar-szorolap0924p.pdf")]
+
+
+ROSS = {"id": 159734, "name": "Kubu gyümölcspüré alma - barack - 100 g",
+        "price": 199, "price_original": 299, "price_unit": 1990, "unit_base": "kg",
+        "price_rplus": None, "price_rossmano": None, "deposit_fee": 0,
+        "category_path_main": [{"name": "Baba"}],
+        "badges_featured": [{"info": "33% KEDVEZMÉNY"}]}
+
+
+def test_rossmann_termek():
+    t = rossmann.termek(ROSS)
+    assert (t.nev, t.kiszereles, t.ar, t.regi_ar) == \
+        ("Kubu gyümölcspüré alma - barack", "100 g", 199, 299)
+    assert t.kedvezmeny == "-33%" and t.egysegar == "1 kg = 1990 Ft"
+    assert t.kategoria == "Baba" and t.megjegyzes == ""
+
+
+def test_rossmann_kartyas_es_arnyalat():
+    p = dict(ROSS, name="NYX ajakfény /Blush Rush - 1 db", price=1949,
+             price_original=None, price_rplus=1559,
+             badges_featured=[{"info": "R+ kártyával 20% kedvezmény"},
+                              {"info": "Csak online elérhető"}])
+    t = rossmann.termek(p)
+    assert t.nev == "NYX ajakfény, Blush Rush"
+    assert t.kartyas_ar == 1559 and t.kartya_nev == "Rossmann Plus kártyával"
+    assert t.kedvezmeny == "-20% kártyával"
+    assert t.megjegyzes == "Csak online elérhető"
+
+
+def test_rossmann_lapoz_es_nem_duplaz(monkeypatch):
+    monkeypatch.setattr(rossmann, "SZUNET_MP", 0)
+    kerdesek = []
+
+    def post(url, adat, fejlec):
+        v = adat["variables"]
+        kerdesek.append((v["f"][0]["field"], v["page"]))
+        adatok = [dict(ROSS, id=v["page"])] if v["f"][0]["field"] == "IS_DISCOUNTED" \
+            else [dict(ROSS, id=1, price_original=None, price_rplus=150)]
+        return {"data": {"listProductsByCategory": {
+            "paginatorInfo": {"lastPage": 2}, "data": adatok}}}
+
+    tk = rossmann.letolt(post)
+    assert kerdesek == [("IS_DISCOUNTED", 1), ("IS_DISCOUNTED", 2),
+                        ("PROMOTION_TYPE", 1), ("PROMOTION_TYPE", 2)]
+    assert sorted(t.kod for t in tk) == ["1", "2"]
+
+
+DM = {"dan": 1626108, "brandName": "babylove",
+      "title": "Szenzitív napozó spray, 150 ml",
+      "tileData": {"brand": {"name": "babylove"},
+                   "price": {"price": {"current": {"value": "1 499 Ft"},
+                                       "previous": {"value": "2 999 Ft"}},
+                             "tileInfos": ["150 ml (9,99 Ft / 1 ml)"]},
+                   "trackingData": {"categories": ["Napozó spray"]}}}
+
+
+def test_dm_termek():
+    t = dm.termek(DM)
+    assert t.nev == "babylove Szenzitív napozó spray"
+    assert (t.ar, t.regi_ar, t.kedvezmeny) == (1499, 2999, "-50%")
+    assert t.kiszereles == "150 ml" and t.egysegar == "1 ml = 9,99 Ft"
+    assert t.kategoria == "Napozó spray" and "Kiárusítás" in t.megjegyzes
+
+
+def test_dm_turelmes_429_eseten(monkeypatch):
+    monkeypatch.setattr(dm, "SZUNET_MP", 0)
+    monkeypatch.setattr(dm, "VARAKOZAS_MP", (0, 0))
+    hivas = []
+
+    def get_json(url, fejlec):
+        hivas.append(url)
+        if len(hivas) == 1:
+            raise RuntimeError("HTTP Error 429: Too many requests")
+        return {"totalPages": 1, "products": [DM]}
+
+    tk = dm.letolt(get_json)
+    assert len(hivas) == 2 and len(tk) == 1
+    assert "popularFacet=Ki%C3%A1rus%C3%ADt%C3%A1s" in hivas[0]
+
+
+def test_minden_uj_bolt_be_van_kotve():
+    azonok = [a for a, _n, _f in forrasok.BOLTOK]
+    assert azonok == ["penny", "lidl", "aldi", "tesco", "spar", "rossmann", "dm"]
