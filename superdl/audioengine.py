@@ -23,6 +23,28 @@ CHANNELS = 2
 RENDSZER_ESZKOZ = ""
 
 
+def hangero_alkalmaz(raw: bytes, v: float, np=None) -> bytes:
+    """16 bites, little-endian hangminták hangerejének állítása.
+
+    numpyval gyors; ha nincs numpy (régi processzor, Tóth Zoltán,
+    2026-09-24), a beépített `array` modullal számolunk. Egy 4096 bájtos
+    darab 2048 minta – ez tiszta Pythonban is bőven belefér a valós időbe."""
+    if np is not None:
+        a = np.frombuffer(raw[:len(raw) & ~1], dtype=np.int16)
+        return (a.astype(np.float32) * v).astype(np.int16).tobytes()
+    import array
+    import sys
+    paros = len(raw) & ~1
+    a = array.array("h")
+    a.frombytes(raw[:paros])
+    if sys.byteorder != "little":
+        a.byteswap()
+    a = array.array("h", [int(x * v) for x in a])
+    if sys.byteorder != "little":
+        a.byteswap()
+    return a.tobytes()
+
+
 def eszkoz_nev(nyers: str) -> str:
     """A hangeszköz nevének FELOLVASHATÓ alakja.
 
@@ -341,7 +363,15 @@ class Player:
         # FONTOS: a szál KIZÁRÓLAG a saját `stop_event`-jét figyeli (nem a közös
         # self._stop-ot), és `gen`-en át küld állapotot – így egy leváltott régi
         # szál nem küld HAMIS állapotot az új lejátszásra. [Herman Tibor AUDIO-03]
-        import numpy as np
+        # ⚠️ A numpy NEM kötelező (Tóth Zoltán, 2026-09-24): régi processzoron
+        # nem tölthető be, és ettől eddig SEMMILYEN hang nem szólt, mert a
+        # szál már az importnál elhasalt. A hangerőt numpy nélkül is tudjuk
+        # állítani (lásd `hangero_alkalmaz`).
+        from . import numpyor
+        try:
+            np = numpyor.betolt()
+        except ImportError:
+            np = None
         import sounddevice as sd
         # ⚠️ Ezt a szál INDULÁSAKOR kell elkapni: egy újabb `play()` közben
         # átírhatja. Azt jelzi, hogy ez a lejátszás TEKERÉSSEL indult.
@@ -403,8 +433,7 @@ class Player:
                 if v >= 0.999:
                     stream.write(raw)
                 else:
-                    a = np.frombuffer(raw, dtype=np.int16).astype(np.float32)
-                    stream.write((a * v).astype(np.int16).tobytes())
+                    stream.write(hangero_alkalmaz(raw, v, np))
         except Exception as exc:
             failed = True
             err_msg = str(exc)

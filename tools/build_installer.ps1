@@ -2,7 +2,9 @@
 # Használat:  powershell -File tools\build_installer.ps1 [-Version 3.26.0]
 param([string]$Version = "")
 $ErrorActionPreference = "Stop"
-$py   = "C:\Users\msn\AppData\Local\Python\pythoncore-3.14-64\python.exe"
+# ⚠️ A BUILD-ÉRTELMEZŐ (2026-09-25): a gépen két Python 3.14 van. Ez a szkript
+# a másikra mutatott – abban nincs pdfminer és nincs magic-wormhole.
+$py   = "C:\Users\msn\AppData\Local\Programs\Python\Python314\python.exe"
 $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 
 if (-not $Version) {
@@ -11,10 +13,15 @@ if (-not $Version) {
 }
 Write-Host "SuperDL telepítő-build – verzió: $Version"
 
+& $py tools\build_ellenor.py --elotte
+if ($LASTEXITCODE -ne 0) { throw "A build-őr hiányt talált – NE építs." }
+
 Write-Host "1/2  PyInstaller onedir build (SuperDL-onedir.spec)…"
 & $py -m PyInstaller SuperDL-onedir.spec --noconfirm --clean
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller hiba (kód $LASTEXITCODE)" }
 if (-not (Test-Path "dist\SuperDL\SuperDL.exe")) { throw "Hiányzik a dist\SuperDL\SuperDL.exe" }
+& $py tools\build_ellenor.py
+if ($LASTEXITCODE -ne 0) { throw "A kész buildből hiányzik valami – NE add ki." }
 
 Write-Host "2/2  Inno Setup telepítő (SuperDL.iss)…"
 & $iscc "/DMyAppVersion=$Version" SuperDL.iss

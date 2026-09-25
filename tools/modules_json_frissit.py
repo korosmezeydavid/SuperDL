@@ -49,11 +49,16 @@ def frissit(mod_id: str) -> str:
     m["latest"] = {
         "version": v,
         "min_core_api": man["min_core_api"],
-        "min_core_version": man["min_core_version"],
+    }
+    # nem minden manifest ad meg Core-verziót (pl. hangalamondas) – ilyenkor
+    # a katalógusba sem írunk ki kitalált értéket
+    if man.get("min_core_version"):
+        m["latest"]["min_core_version"] = man["min_core_version"]
+    m["latest"].update({
         "url": URL.format(id=mod_id, v=v),
         "sha256": hashlib.sha256(adat).hexdigest(),
         "size": len(adat),
-    }
+    })
     kat.write_text(json.dumps(kat_adat, indent=2, ensure_ascii=False) + "\n",
                    encoding="utf-8")
     return f"{mod_id}: {regi} -> {v}  ({len(adat)} byte)"

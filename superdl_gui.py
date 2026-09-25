@@ -3984,6 +3984,18 @@ def main():
         naplo.bekapcsol()
     except Exception:
         pass
+    # NUMPY-ŐR (Tóth Zoltán, 2026-09-24): régi processzoron a numpy második
+    # betöltési kísérlete natívan megöli a programot. Itt, a fő szálon,
+    # bármilyen háttérszál ELŐTT egyszer, ellenőrzötten betöltjük; ha nem
+    # megy, a numpyor lezárja, és onnantól mindenki tiszta ImportError-t kap.
+    try:
+        from superdl import numpyor
+        if not numpyor.elerheto():
+            import logging
+            logging.getLogger("superdl").warning(
+                "numpy nem tölthető be: %s", numpyor.hiba())
+    except Exception:
+        pass
     # ⚠️ KIADÁS ELŐTTI ÖNPRÓBA (4.6.18): `SuperDL.exe --onproba <fájl>`
     # a KÉSZ, fagyasztott programból írja ki a diagnosztikát, GUI nélkül.
     # Azért kell, mert a CLI-ből a fordító szándékosan ki van hagyva, tehát

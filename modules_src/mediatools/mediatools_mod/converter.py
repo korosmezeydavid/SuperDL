@@ -81,7 +81,10 @@ def probe(path: str) -> tuple[str, str, float]:
     def first(args):
         try:
             r = subprocess.run([pb, "-v", "error", *args, path],
-                               capture_output=True, text=True, timeout=30)
+                               capture_output=True, text=True, timeout=30,
+                               # konzolablak nélkül: az elvinné a fókuszt
+                               creationflags=getattr(
+                                   subprocess, "CREATE_NO_WINDOW", 0))
             return r.stdout.strip().splitlines()[0] if r.stdout.strip() else ""
         except (OSError, subprocess.SubprocessError, IndexError):
             return ""

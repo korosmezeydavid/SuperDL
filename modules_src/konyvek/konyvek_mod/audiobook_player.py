@@ -135,6 +135,7 @@ class AudioBookPlayer:
         self.book_root = ""         # a könyv gyökere (a relatív sáv-azonosítóhoz)
         self.idx = 0
         self._dur = {}              # út -> hossz (mp) gyorsítótár
+        self._dur_fut = set()       # utak, amelyek hossza épp most készül
         self._on_track_end = on_track_end
         self._on_error = on_error
 
@@ -186,6 +187,25 @@ class AudioBookPlayer:
             except Exception:
                 self._dur[p] = 0.0
         return self._dur[p]
+
+    def duration_nem_var(self, path=None) -> float:
+        """A sáv hossza, ha már ismert – különben 0, és a lekérdezés
+        HÁTTÉRSZÁLON indul.
+
+        ⚠️ A félmásodperces kijelzőfrissítés a FŐ SZÁLON fut. Az ffprobe
+        elindítása lassú gépen (vírusirtó) másodpercekig tarthat – azt a
+        felület nem várhatja meg (Turai László, 2026-09-24)."""
+        p = path or self.current_path()
+        if not p:
+            return 0.0
+        if p in self._dur:
+            return self._dur[p]
+        if p not in self._dur_fut:
+            self._dur_fut.add(p)
+            import threading
+            threading.Thread(target=self.duration, args=(p,),
+                             daemon=True).start()
+        return 0.0
 
     # ---- vezérlés ----
     def play_track(self, i: int, at: float = 0.0):

@@ -113,7 +113,9 @@ def has_audio(ff: str, src: str) -> bool:
         r = subprocess.run([str(pb), "-v", "error", "-select_streams", "a",
                             "-show_entries", "stream=index", "-of",
                             "csv=p=0", src], capture_output=True, text=True,
-                           timeout=30)
+                           timeout=30,
+                           creationflags=getattr(subprocess,
+                                                 "CREATE_NO_WINDOW", 0))
         return bool(r.stdout.strip())
     except (OSError, subprocess.SubprocessError):
         return False            # bizonytalan → inkább némaként kezeljük
@@ -127,7 +129,9 @@ def media_duration(ff: str, src: str) -> float:
         r = subprocess.run([str(pb), "-v", "error", "-show_entries",
                             "format=duration", "-of",
                             "default=noprint_wrappers=1:nokey=1", src],
-                           capture_output=True, text=True, timeout=30)
+                           capture_output=True, text=True, timeout=30,
+                           creationflags=getattr(subprocess,
+                                                 "CREATE_NO_WINDOW", 0))
         return float(r.stdout.strip() or 0)
     except (OSError, ValueError, subprocess.SubprocessError):
         return 0.0

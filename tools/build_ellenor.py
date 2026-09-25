@@ -33,6 +33,17 @@ KELL = [
     ("sentencepiece", "sentencepiece", "helyben futó fordító – szótagoló"),
     ("sacremoses", "sacremoses", "helyben futó fordító – tokenizáló"),
     ("joblib", "joblib", "a sacremoses függősége"),
+    # ⚠️ P2P fájlküldés (Turai László, 2026-09-24): a build-értelmezőben
+    # NEM volt magic-wormhole, a spec `collect_all`-ja pedig csendben
+    # átugrotta. A régi telepítésből ottmaradt wormhole-mappa a friss,
+    # hiányos cryptographyval elhasalt – ez volt a „fura ablak".
+    ("wormhole", "wormhole", "P2P fájlküldés – magic-wormhole"),
+    ("wormhole.cli.cli", "wormhole", "P2P fájlküldés – parancssori belépő"),
+    ("twisted", "twisted", "P2P fájlküldés – hálózati motor"),
+    ("nacl", "nacl", "P2P fájlküldés – titkosítás"),
+    ("spake2", "spake2", "P2P fájlküldés – kódszavas párosítás"),
+    ("cryptography.hazmat.primitives.kdf.hkdf", "cryptography",
+     "P2P fájlküldés – kulcsszármaztatás"),
 ]
 
 
@@ -76,7 +87,13 @@ def utana(gyoker: str, pyz: str = "") -> int:
     for nev, mappa, miert in KELL:
         ut = os.path.join(gyoker, mappa)
         van = os.path.isdir(ut) and any(os.scandir(ut))
-        if not van and nev != "ctranslate2":
+        if "." in nev:
+            # ⚠️ PONTOS almodul: a csomag mappája létezhet úgy is, hogy épp
+            # ez az almodul hiányzik belőle (Turai László, 2026-09-24:
+            # a cryptography ott volt, a kdf nem).
+            fajl = os.path.join(gyoker, *nev.split(".")) + ".py"
+            van = nev in nevek or os.path.isfile(fajl)
+        elif not van and nev != "ctranslate2":
             van = nev in nevek or any(n.startswith(nev + ".") for n in nevek)
         if nev == "ctranslate2" and van:
             # a motor maga egy natív kiterjesztés – a mappa lehet üres héj is

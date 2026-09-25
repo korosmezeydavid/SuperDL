@@ -22,12 +22,12 @@
       "category": "Kommunikáció",
       "description": "JAVÍTVA ÉS ÚJ (visszajelzésre): HALKAN HALLATSZOTT A MÁSIK – mostantól van hangerő-szabályzás, és a keverő sem veszi vissza. Három oka volt, és egyik sem az, hogy „kevés a hangerő”. (1) A modulban EGYETLEN erősítés-fokozat sem volt: ha valakinek halk a mikrofonja, azt sehol nem lehetett felhozni. (2) A térbeli hang közepén három decibel elveszett, márpedig kettesben mindketten középen „ültök”. (3) És a legalattomosabb: a torzítás elleni védelem MINDENKIT lehalkított, ha bárki – akár egyetlen pattanás – túlcsordult, húsz ezredmásodpercenként újraszámolva. Ez azt jelentette, hogy egy hangosabb ember folyamatosan lenyomta a halkabbat, és minél többen voltatok a szobában, annál halkabb lett mindenki. Mostantól: MIKROFON-ERŐSÍTÉS (Ctrl+M) a saját hangodra, lágy korlátozással, hogy az erősítés ne recsegjen; FŐ HANGERŐ (Ctrl+Shift+H) mindenkire; és a legfontosabb: RÉSZTVEVŐNKÉNTI HANGERŐ (Ctrl+G) – ha CSAK EGY valakit hallasz halkan, ŐT hozod fel, nem az egészet, így a többiek nem lesznek fájdalmasan hangosak. A beállítás névre megjegyződik, tehát legközelebb is annyi lesz. És mivel szintmérőt vakon nem lehet nézni: HALLJAM MAGAM (F8) – visszahallgatod a saját hangodat úgy, ahogy a többiek hallanak (fejhallgató kell hozzá); MILYEN A SZINTEM? (F9) – a program megmondja, jó szinten vagy-e, és azt is, mit tegyél, ha nem. Vak-first, teljesen akadálymentes valós idejű csevegő – gépek között, szoba-kóddal. Nyiss egy szobát (kapsz egy rövid, bemondható kódot, pl. GK7QP), oszd meg a kódot bárkivel, és máris beszélgethettek élőben, írásban. Mindenki látja, ki van a szobában (jelenlét), az érkező üzeneteket a képernyőolvasó azonnal felolvassa, és minden vezérlőnek olvasható neve van. Nem kell hozzá szerver, nem kell semmit beállítani: csak internet. Semmit nem tárolunk sehol – az üzenetek átmennek a szobán és eltűnnek. Ez az alap; hamarosan valós idejű, TÉRBELI (sztereó) hangos konferencia is épül rá, ahol mindenki onnan szól, ahol „ül”. Csak legális, tisztességes használatra.",
       "latest": {
-        "version": "1.6.1",
+        "version": "1.6.2",
         "min_core_api": "1.0",
         "min_core_version": "4.2.7",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-csevej-1.6.1/csevej-1.6.1.zip",
-        "sha256": "09cf57559d3772ed211eb3b50ed4e97091592f4aabf666753d602768bb9246e3",
-        "size": 130445
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-csevej-1.6.2/csevej-1.6.2.zip",
+        "sha256": "bfcd517d8eff43ebab3adcc6f79539a94cc596e3dc1bf48e980aef94345dabce",
+        "size": 130537
       }
     },
     {
@@ -64,11 +64,11 @@
       "category": "AI",
       "description": "AI hangalámondás (audio description) videóhoz: a videó képi tartalmát AI írja le és hanggal mondja el, az eredeti hang alatta halkítva – így a videó vakon is „nézhető”. A leírás részletessége és elhelyezése (párbeszéd-szünet / kiterjesztett) választható; a saját AI-kulcsoddal megy.",
       "latest": {
-        "version": "1.0.6",
+        "version": "1.0.7",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-hangalamondas-1.0.6/hangalamondas-1.0.6.zip",
-        "sha256": "b5e4097d01b241ecd83316814f739cc6351c86a1f7af3996117cb8b73d06af42",
-        "size": 11626
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-hangalamondas-1.0.7/hangalamondas-1.0.7.zip",
+        "sha256": "00c97bd831259614ebd18e5d73b782e93b5c1fe339c182e98b83a4dcb8d657bc",
+        "size": 11669
       }
     },
     {
@@ -118,12 +118,12 @@
       "category": "Könyvek",
       "description": "ÚJ (Turai László jelzésére, 2026-09-23): A HANGOSKÖNYV-LEJÁTSZÓBAN MOSTANTÓL ÁLLÍTHATÓ A HANGERŐ. „A hangoskönyv lejátszóban a hangerőt nem lehet állítani” – igaza volt, és ez nem elromlott: SOHA nem volt benne. A Zenelejátszó megkapta, a Hangoskönyv kimaradt. Mostantól Ctrl+fel és Ctrl+le állítja, a program bemondja a százalékot, és a beállított hangerő MEGMARAD a következő indításra is. ÚJ: UGRÁS EGY MEGADOTT IDŐPONTRA a mostani sávon belül (Ctrl+G). Egy nyolcórás hangoskönyvben a tizenöt másodperces lépegetés nem út, ha tudod, hol tartottál. Az időpontot többféleképpen írhatod – 12:30, 1:02:03, 90 (ennyi másodperc), „5 perc 30”, „2 óra 10 perc” –, mert vakon a gépelés a gyors út, és egyetlen formátumra kényszeríteni kegyetlenség. Ha a sáv rövidebb, a program megmondja, meddig tud ugrani, és nem ugrik vakon a végére. JAVÍTVA (Turai László jelzésére, 2026-09-22): A HANGOSKÖNYV-LEJÁTSZÓBAN A MAPPA MEGNYITÁSA BEFAGYASZTOTTA A PROGRAMOT. Az „Ezt a mappát választom” gomb a mappa teljes bejárását – az összes almappával együtt – a program FŐ SZÁLÁN végezte el, tehát amíg tartott, a SuperDL semmire nem válaszolt. Nagy hangoskönyv-gyűjteménynél vagy hálózati meghajtónál ez húsz másodpercnél is tovább tart: a Windows „nem válaszol”-t ír ki, a felhasználó pedig joggal hiszi, hogy a program összeomlott. Mostantól a bejárás a háttérben megy, a program azonnal bemondja, hogy „Sávok keresése a mappában…”, közben végig használható marad, és az ablak bezárása sem várja meg egy lassú hálózati meghajtó végigolvasását. Ehhez a SuperDL 4.6.13 kell. KORÁBBI: JAVÍTVA: HA A HANGOSKÖNYV-KÉSZÍTÉS ELHASAL, MOSTANTÓL MEGTUDOD, MIÉRT. Eddig két baj volt egyszerre. Egy: a hiba csak a képernyőre került ki, a naplóba nem – így a hibajelentésben nyoma sem maradt, és utólag nem lehetett megfejteni. Kettő: a hangfájlokat összefűző külső program (ffmpeg) el volt némítva, tehát még ő maga sem mondta meg, mi a baja; a felhasználó egy értelmetlen, angol mondatot kapott. Mostantól a hiba bekerül a naplóba – a hanggal, a darabolás módjával és a célmappával együtt –, az ffmpeg pedig megszólal: a saját indoklása (például hogy betelt a lemez, vagy túl hosszú az útvonal) benne van az üzenetben. A szokásos fecsegése marad néma, csak a hiba beszél. [Dr. Kiss István jelzése, 2026-09-16] ÚJ: FEJEZETENKÉNTI DARABOLÁS. A hangoskönyv eddig csak percek szerint volt darabolható; mostantól a szövegben lévő fejezetjelölők mentén is. A jelölőt a Super Edit szövegszerkesztő teszi bele (Ctrl+Shift+J, adhatsz neki címet is), és sima szöveg, tehát a .txt fájlban is megmarad – épp ott, ahol a legtöbb alapanyag van. A program a könyv betöltésekor megmondja, hány fejezetjelölőt talált, és a „Fejezetenként darabolja” választás csak akkor jelenik meg, ha tényleg van mit darabolni. Minden fejezet külön MP3 lesz, a fejezet címével a fájlnévben, és a vágás sosem esik mondat közepére, mert nem időre vágunk. JAVÍTVA: a Könyvolvasó telefon-átküldési felajánlása korábban SOHA nem futott le a kiadott programban (rossz importútvonal, amit egy néma hibakezelő elnyelt) – most működik. KORÁBBI JAVÍTÁS (Dr. Kiss István összeomlás-naplója nyomán): A KÖNYV- ÉS HANGFÁJL-VÁLASZTÁS MOSTANTÓL A SUPERDL SAJÁT VÁLASZTÓJÁVAL MEGY, nem a Windowséval. Egy felhasználónál a program natívan KILÉPETT, miközben épp a könyv kiválasztásánál járt. Ez nem a program hibája volt: a Windows fájlválasztójába idegen bővítmények épülnek be (bélyegkép-készítő, felhő-szinkron, vírusirtó), és ha egyikük elszáll, viszi magával az egész programot – ezt a programból nem lehet elkapni. A SuperDL saját választója SEMMILYEN rendszerbővítményt nem tölt be, és vakon kényelmesebb is: két lista (mappák és fájlok), Enter a mappán belépés, Backspace vissza a szülőmappába, gyorshelyek (Asztal, Dokumentumok, Letöltések, meghajtók), és gépeléssel szűrhető, a program pedig mondja, hány találat maradt. Mind az öt helyen ez jön: könyv kiválasztása, célmappa, hangfájl megnyitása, hangoskönyv-mappa, könyv megnyitása. Ha a saját választó bármi miatt nem érhető el, a program visszalép a rendszerére – inkább a régi viselkedés, mint egy működésképtelen menüpont. Akadálymentes könyv-eszközök egy csomagban: Könyvolvasó (élő felolvasás SAPI/Edge hanggal, könyvjelzővel és folytatással) és Hangoskönyv-készítő (TXT/DOCX/EPUB/PDF → MP3, választható hanggal és sebességgel). ÚJ: a kész hangoskönyv kérésre a KÖNYV MELLÉ kerül (oda, ahonnan betallóztad); darabolásnál mindig külön almappába; a végén hangjelzés (fanfár sikernél, másik jelzés hibánál), és a darab-hossz mező csak akkor jelenik meg, ha a darabolás be van kapcsolva.",
       "latest": {
-        "version": "1.3.4",
+        "version": "1.3.5",
         "min_core_api": "1.0",
         "min_core_version": "4.6.13",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-konyvek-1.3.4/konyvek-1.3.4.zip",
-        "sha256": "267561f9b1953d61c7452b08818d0f9bba8086bdb718f0659e3a01d85dff8d93",
-        "size": 43462
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-konyvek-1.3.5/konyvek-1.3.5.zip",
+        "sha256": "ec964c194b2a93f5d2b2773ac255de2a6e6720b6dbc03f095d27ae44d71d647a",
+        "size": 44472
       }
     },
     {
@@ -146,12 +146,12 @@
       "category": "Média",
       "description": "ÚJ FORMÁTUMOK (Miki jelzésére): a konvertáló és a médiaelemző mostantól látja a ritkább hangformátumokat is – .ape (Monkey's Audio), .wv, .tta, .tak, .mpc, .dsf, .dff, .aiff, .au, .amr, .caf, .spx, .ac3, .dts, .mka, .oga, .w64 –, tehát nem kell az „összes fájl” kerülőút. Ha a Windows fájlválasztója összeomlik a gépeden (idegen bővítmény miatt), a konvertáló a SuperDL beépített, biztonságos fájlválasztóját használja. Médiakészítő és -elemző eszközök egy csomagban: kötegelt médiakonvertáló, beszélő médiaelemző (LUFS/EBU R128), iPhone csengőhang-készítő, videókészítő (kép+zene) és videóvágó-összefűző. ÚJ: a DVD-s VOB (és a többi DVD/AVCHD formátum: m2v, m2ts, mts) mostantól MAPPÁBÓL is bekerül a listába, nem csak fájlonként kiválasztva; és a DVD több VOB-darabját (VTS_01_1, VTS_01_2 …) kérésre EGY filmmé fűzi össze (bájtszintű összefűzéssel, ahogy a DVD-hez való), a menü-fájlt kihagyva – és a végén ELLENŐRZI a kész film hosszát, hogy soha ne kapj néma féleredményt.",
       "latest": {
-        "version": "1.4.10",
+        "version": "1.4.11",
         "min_core_api": "1.0",
         "min_core_version": "4.0.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.10/mediatools-1.4.10.zip",
-        "sha256": "ad5aa377a79f2e80cab5d9750416018b64b9e6e98c002592310b1663264ecbc7",
-        "size": 46168
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.11/mediatools-1.4.11.zip",
+        "sha256": "1670ec8bf99e3b1b61a9ad2d59108f50cfd13fdd65e317150262d7846b5338f2",
+        "size": 46299
       }
     },
     {

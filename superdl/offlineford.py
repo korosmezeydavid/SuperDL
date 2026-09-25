@@ -85,6 +85,17 @@ def ct2():
     importot."""
     import sys
     import types
+    # ⚠️ RÉGI PROCESSZOR (Tóth Zoltán, 2026-09-24): a ctranslate2 behúzza a
+    # numpyt, és ha az egyszer már elbukott, egy újabb próba natívan megöli
+    # az egész programot (0xc000001d) – nála a Súgó → Hibajelentés tette
+    # ezt. Ezért ELŐBB a numpy-őr: ha a numpy nem megy, a ctranslate2-höz
+    # hozzá sem nyúlunk.
+    from . import numpyor
+    try:
+        numpyor.betolt()
+    except ImportError as e:
+        raise ImportError("A helyben futó fordító nem indítható: %s" % e) \
+            from None
     # ⚠️ A SORREND FONTOS: ELŐBB a teljes behozási tánc, és CSAK A VÉGÉN az
     # ellenőrzés. Az első változatomban az ellenőrzés az első ág végén volt,
     # és `ImportError`-t dobott – amit a lenti `except ImportError` elnyelt,

@@ -58,6 +58,14 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
 Name: "assocmedia"; Description: "Zene- és videofajlok tarsitasa a SuperDL-hez (dupla kattintasra a SuperDL nyitja meg)"; GroupDescription: "Fajltarsitasok:"; Flags: unchecked
 
+[InstallDelete]
+; A RÉGI `_internal` TÖRLÉSE telepítés előtt (Turai László, 2026-09-24). Az Inno
+; magától csak felülír, sosem töröl: egy régebbi buildből ottmaradt csomag
+; (nála a wormhole) az új, más összetételű könyvtárakkal összeakadt, és a
+; fájlküldés elhasalt. A `_internal` tisztán build-kimenet – felhasználói adat
+; nincs benne (az a ~/.superdl alatt van).
+Type: filesandordirs; Name: "{app}\_internal"
+
 [Files]
 ; a teljes onedir-tartalom (exe + DLL-ek + adatmappák), almappákkal együtt
 Source: "{#DistDir}\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion

@@ -954,6 +954,21 @@ class TorrentDownloader:
     # visszafordíthatatlan, a hallgatás viszont múlik.
     VEZERLES_TURES_MP = 300.0
 
+    # ⚠️ HA A MOTOR FOLYAMATA ÉL (Tóth László, 2026-09-24): újraindulás után
+    # az aria2 a nagy fájlokat ellenőrzi, és közben öt percnél tovább sem
+    # válaszol. Nála mind az öt seedelő torrent „1 sikertelen próbát" kapott
+    # emiatt, pedig semmi baj nem volt – egy perc múlva mind visszaállt.
+    # Amíg a folyamat él, ennyit várunk; halott folyamatnál marad az 5 perc.
+    VEZERLES_TURES_ELO_MP = 1800.0
+
+    def _vezerles_tures(self) -> float:
+        try:
+            if self.client is not None and self.client.alive():
+                return self.VEZERLES_TURES_ELO_MP
+        except Exception:
+            pass
+        return self.VEZERLES_TURES_MP
+
     # Ennél régebbi állapotot NEM tekintünk érvényesnek. A figyelő
     # másodpercenként kérdez; tíz másodperc után már biztosan baj van vele.
     # ⚠️ Nem azért kell, hogy riasszunk — hanem hogy soha ne mutassunk
@@ -1050,7 +1065,7 @@ class TorrentDownloader:
                 # ettől még fut. Ezt eddig VÉGLEGES hibának könyveltük el, és
                 # egyetlen perc alatt az egész sort tönkretette
                 # (szakember83, 2026-09-10).
-                if time.monotonic() - utolso_valasz < self.VEZERLES_TURES_MP:
+                if time.monotonic() - utolso_valasz < self._vezerles_tures():
                     if not csendben:
                         # Szólunk róla — de FIGYELMEZTETÉSKÉNT, nem hibaként:
                         # a kettő különbsége az, hogy kell-e tenni valamit.

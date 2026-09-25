@@ -34,7 +34,9 @@ class Zenelejatszo:
         self._proc = subprocess.Popen(
             [ff, "-nostdin", "-loglevel", "quiet", "-i", ut,
              "-f", "s16le", "-acodec", "pcm_s16le", "-ac", "1", "-ar", str(FS), "-"],
-            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=10 ** 6)
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=10 ** 6,
+            # konzolablak nélkül: az elvinné a fókuszt a Csevejcenterből
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         self._stop.clear()
         self._thread = threading.Thread(target=self._loop, daemon=True)
         self._thread.start()

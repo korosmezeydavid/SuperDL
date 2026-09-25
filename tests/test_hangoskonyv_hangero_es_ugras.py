@@ -181,4 +181,7 @@ def test_a_nemitas_nem_ment_nullat():
 ])
 def test_a_manifest_verzioja_emelve(ut, verzio):
     d = json.loads((GYOKER / ut).read_text(encoding="utf-8"))
-    assert d["version"] == verzio
+    # legalább ez – a későbbi modulkörök tovább emelik
+    def t(v):
+        return tuple(int(x) for x in v.split("."))
+    assert t(d["version"]) >= t(verzio)

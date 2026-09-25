@@ -80,7 +80,12 @@ def media_duration(path: str) -> float:
         out = subprocess.run(
             [pb, "-v", "error", "-show_entries", "format=duration",
              "-of", "default=noprint_wrappers=1:nokey=1", path],
-            capture_output=True, text=True, timeout=30)
+            capture_output=True, text=True, timeout=30,
+            # ⚠️ ABLAK NÉLKÜL (Turai László, 2026-09-24): enélkül a Windows
+            # egy konzolablakot nyit az ffprobe-nak, ami ELVESZI A FÓKUSZT.
+            # A Hangoskönyvnél ez az első lejátszáskor futott (a sáv hosszát
+            # kéri le), és a felhasználót „kidobta" – Alt+Tabbal jött vissza.
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         return float(out.stdout.strip() or 0)
     except (ValueError, OSError, subprocess.SubprocessError):
         return 0.0

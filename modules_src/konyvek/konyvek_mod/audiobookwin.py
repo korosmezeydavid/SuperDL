@@ -45,6 +45,8 @@ _SUGO = (
     "következő indításra is.\n"
     "• Ctrl+G: ugrás egy megadott időpontra a mostani sávon belül. Írhatod "
     "így: 12:30, 1:02:03, 90 (ennyi másodperc), „5 perc 30”, „2 óra 10 perc”.\n"
+    "• Ctrl+I: hol tartunk – a könyv, a sáv, az időpont és hogy mennyi van "
+    "még hátra a sávból.\n"
     "• Előző/Következő sáv gomb: sávok közt lépés. A sáv vége magától a "
     "következőre lép.\n\n"
     "KÖNYVJELZŐK\n"
@@ -148,6 +150,7 @@ class AudioBookFrame(wx.Frame):
                 ("Hangerő le&jjebb (Ctrl+Le)",
                  lambda e: self._hangero_allit(-HANGERO_LEPES)),
                 ("&Ugrás időpontra… (Ctrl+G)", lambda e: self._ugras_idopontra()),
+                ("H&ol tartunk? (Ctrl+I)", lambda e: self._hol_tartunk()),
                 ("&Előző sáv", lambda e: self._prev_track()),
                 ("&Következő sáv", lambda e: self._next_track()),
                 ("Köny&vjelző (Ctrl+B)", lambda e: self._add_bookmark()),
@@ -197,7 +200,8 @@ class AudioBookFrame(wx.Frame):
 
         ids = {k: wx.NewIdRef() for k in
                ("play", "pause", "stop", "back", "fwd", "bm", "bmlist", "help",
-                "hfel", "hle", "ugras")}
+                "hfel", "hle", "ugras", "hol")}
+        self.Bind(wx.EVT_MENU, lambda e: self._hol_tartunk(), id=ids["hol"])
         self.Bind(wx.EVT_MENU, lambda e: self._hangero_allit(HANGERO_LEPES),
                   id=ids["hfel"])
         self.Bind(wx.EVT_MENU, lambda e: self._hangero_allit(-HANGERO_LEPES),
@@ -220,6 +224,7 @@ class AudioBookFrame(wx.Frame):
             (wx.ACCEL_CTRL, wx.WXK_UP, ids["hfel"]),
             (wx.ACCEL_CTRL, wx.WXK_DOWN, ids["hle"]),
             (wx.ACCEL_CTRL, ord('G'), ids["ugras"]),
+            (wx.ACCEL_CTRL, ord('I'), ids["hol"]),
             (wx.ACCEL_CTRL, ord('B'), ids["bm"]),
             (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('B'), ids["bmlist"]),
             (wx.ACCEL_NORMAL, wx.WXK_F1, ids["help"]),
@@ -310,11 +315,22 @@ class AudioBookFrame(wx.Frame):
         self._mond(uzenet)
 
     def _fill_tracklist(self):
-        self.sav_lista.Clear()
-        for i, ut in enumerate(self.player.tracks):
-            # a relatív út a kötet-almappát is mutatja (pl. „1. kötet/03.mp3")
-            self.sav_lista.Append(f"{i + 1}. {self.player.track_id(ut)}")
-        if self.player.tracks:
+        """A sávlista feltöltése EGY lépésben.
+
+        ⚠️ Turai László (2026-09-23): nagy hangoskönyvnél a program több mint
+        20 másodpercre befagyott itt. Soronkénti `Append` volt: minden sornál
+        újrarajzolás, és a képernyőolvasó minden sorról külön értesítést kap.
+        Most a feliratokat előre összerakjuk, és egyetlen `Set`-tel,
+        befagyasztott rajzolás mellett tesszük be."""
+        # a relatív út a kötet-almappát is mutatja (pl. „1. kötet/03.mp3")
+        feliratok = [f"{i + 1}. {self.player.track_id(ut)}"
+                     for i, ut in enumerate(self.player.tracks)]
+        self.sav_lista.Freeze()
+        try:
+            self.sav_lista.Set(feliratok)
+        finally:
+            self.sav_lista.Thaw()
+        if feliratok:
             self.sav_lista.SetSelection(self.player.idx)
 
     # ---- vezérlés ----
@@ -405,7 +421,8 @@ class AudioBookFrame(wx.Frame):
             return
         if self.player.is_active():
             poz = self.player.position()
-            hossz = self.player.duration()
+            # ⚠️ NEM VÁRHAT: ez a fő szál (Turai László, 2026-09-24)
+            hossz = self.player.duration_nem_var()
             n = self.player.track_count()
             self.poz_lbl.SetLabel(
                 f"{self.player.idx + 1}/{n}. sáv – {ido_str(poz)}"
@@ -575,6 +592,48 @@ class AudioBookFrame(wx.Frame):
             if szunetelt:
                 self.player.pause()
         self._mond("Ugrás ide: %s." % ido_str(cel))
+
+    def _hol_tartunk_szoveg(self) -> str:
+        """Ctrl+I – hol tartunk (Turai László kérése, 2026-09-24, „mint a
+        Zenében"). Egy mondatban: könyv, sáv, időpont, mennyi van hátra."""
+        n = self.player.track_count()
+        if not n:
+            return "Nincs megnyitott hangoskönyv."
+        i = self.player.idx
+        sav = self.player.track_id(self.player.tracks[i]) \
+            if 0 <= i < n else ""
+        if self.player.is_active():
+            poz = self.player.position()
+            allapot = "Szünetel" if self.player.is_paused() else "Szól"
+        else:
+            poz = 0.0
+            allapot = "Leállítva"
+            mentett = self._resume_at
+            if not mentett:
+                # Esc után a hely a polcra mentődik – onnan olvassuk vissza
+                it = self.lib.get(self._bookkey) if self._bookkey else None
+                if it and (it.get("ms") or it.get("track")):
+                    j = self.player.track_index_of(it.get("track", ""))
+                    mentett = (j if j is not None else i,
+                               int(it.get("ms", 0)))
+            if mentett:
+                i, ms = mentett
+                poz = ms / 1000.0
+                allapot = "Leállítva, innen folytatod"
+            sav = self.player.track_id(self.player.tracks[i]) \
+                if 0 <= i < n else ""
+        hossz = self.player.duration_nem_var(
+            self.player.tracks[i] if 0 <= i < n else None)
+        mondat = "%s: %s. %d. sáv a %d-ből: %s. %s" % (
+            allapot, self._title or "hangoskönyv", i + 1, n, sav,
+            ido_str(poz))
+        if hossz > 0:
+            mondat += " / %s, hátra %s" % (ido_str(hossz),
+                                           ido_str(max(0.0, hossz - poz)))
+        return mondat + "."
+
+    def _hol_tartunk(self):
+        self._mond(self._hol_tartunk_szoveg())
 
     # ---- súgó / támogatás / zárás ----
     def _help(self):

@@ -223,6 +223,17 @@ def build_report(settings: dict | None = None,
         pass
     pend = Path.home() / ".superdl" / "update_pending.json"
     lines.append(f"Függő önfrissítés-jelző: {'VAN' if pend.exists() else 'nincs'}")
+    # NUMPY (Tóth Zoltán, 2026-09-24): régi processzoron nem tölthető be –
+    # ilyenkor a retró hang és a helyben fordító nem megy. A jelentésből első ránézésre látsszon.
+    try:
+        from . import numpyor
+        if numpyor.elerheto():
+            lines.append("Számolókönyvtár:  numpy rendben")
+        else:
+            lines.append("Számolókönyvtár:  NEM TÖLTHETŐ BE – "
+                         + (numpyor.hiba() or "ismeretlen ok"))
+    except Exception as e:
+        lines.append(f"Számolókönyvtár:  nem ellenőrizhető ({e})")
     # OFFLINE FORDÍTÁS: hibajelentésnél az első kérdés, hogy a gépen egyáltalán
     # elérhető-e a motor, és melyik nyelvi csomagok vannak letöltve.
     try:
