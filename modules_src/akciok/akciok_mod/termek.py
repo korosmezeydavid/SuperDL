@@ -37,8 +37,8 @@ class Termek:
                                      ft(self.kartyas_ar)))
         if self.kedvezmeny:
             reszek.append(self.kedvezmeny)
-        if self.kiszereles:
-            reszek.append(self.kiszereles)
+        if self.kiszereles and self.kiszereles.lower() not in self.nev.lower():
+            reszek.append(self.kiszereles)       # ha a névben már benne van, ne
         return ", ".join(reszek)
 
     def reszletek(self) -> str:

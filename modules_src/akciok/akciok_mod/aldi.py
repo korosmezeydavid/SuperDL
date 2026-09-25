@@ -100,7 +100,9 @@ def szamolt_ar(meret: str, egysegar: str) -> int | None:
 
 def _szep(s: str) -> str:
     s = re.sub(r"\s+", " ", s.replace("*", "")).strip()
-    return " ".join(w.capitalize() if len(w) >= 2 and w.isupper() else w
+    # „A.D.” és hasonló rövidítések maradnak, csak a sima szavakat alakítjuk
+    return " ".join(w.capitalize() if len(w) >= 2 and w.isupper()
+                    and w.replace("-", "").replace("’", "").isalpha() else w
                     for w in s.split())
 
 
@@ -159,7 +161,164 @@ def _ervenyes(oldalak: list) -> str:
     return ""
 
 
+# ---- aldi.hu ajánlat-oldalak (2026-09-25-től ez az ELSŐDLEGES) --------------
+#
+# Az aldi.hu saját ajánlat-oldalai (/ajanlatok/ÉÉÉÉ-HH-NN) tiszta termék-
+# csempéket adnak: márka, név, kiszerelés, egységár, ár. Az oldal a sima
+# Python-kérésre 403-at ad (böngésző-ujjlenyomatot vár), ezért ehhez a
+# `curl_cffi` kell (a Core-ban, a yt-dlp is használja). Ha nincs meg, a
+# fenti Publitas-szövegréteg a tartalék.
+
+WEB = "https://www.aldi.hu"
+
+
+def web_datumok(fo_html: str, ma: _dt.date | None = None) -> list:
+    """A főoldal ajánlat-napjai közül az elmúlt 10 és a következő 7 nap."""
+    ma = ma or _dt.date.today()
+    ki = []
+    for d in sorted(set(re.findall(r'/ajanlatok/(\d{4}-\d{2}-\d{2})', fo_html))):
+        try:
+            nap = _dt.date.fromisoformat(d)
+        except ValueError:
+            continue
+        if -10 <= (nap - ma).days <= 7:
+            ki.append(nap)
+    return ki
+
+
+def _html_szoveg(s: str) -> str:
+    import html as _h
+    s = re.sub(r"<[^>]+>", " ", s or "")
+    return re.sub(r"\s+", " ", _h.unescape(s).replace("\xa0", " ")).strip()
+
+
+_NAPOK = ("hétfőtől", "keddtől", "szerdától", "csütörtöktől", "péntektől",
+          "szombattól", "vasárnaptól")
+
+
+def web_csempek(oldal: str, nap: _dt.date | None = None) -> list:
+    ki = []
+    for d in oldal.split('data-test="product-tile"')[1:]:
+        link = re.search(r'href="(/termek/[^"]+)"', d)
+        nev = re.search(r'data-test="product-tile__name"[^>]*>(.*?)</div>', d, re.S)
+        if not (link and nev):
+            continue
+        marka = re.search(r'data-test="product-tile__brandname"[^>]*>(.*?)</div>',
+                          d, re.S)
+        meret = re.search(r'data-test="product-tile__unit-of-measurement"[^>]*>(.*?)</div>',
+                          d, re.S)
+        egys = re.search(r'data-test="product-tile__comparison-price"[^>]*>(.*?)</div>',
+                         d, re.S)
+        ar = re.search(r'data-test="product-tile__price"[^>]*>(.*?)</a>', d, re.S)
+        cimke = re.search(r'data-test="product-tile__on-sale-label"[^>]*>(.*?)</div>',
+                          d, re.S)
+        n = _html_szoveg(nev.group(1))
+        m = _html_szoveg(marka.group(1)) if marka else ""
+        # a név végén gyakran a kiszerelés is ott van („…, 100 ml”)
+        t = Termek(bolt=BOLT, nev=_szep(m) + " " + n if m else n,
+                   kod=WEB + link.group(1),
+                   kiszereles=_html_szoveg(meret.group(1)) if meret else "",
+                   egysegar=_html_szoveg(egys.group(1)).strip("()") if egys else "")
+        if ar:
+            nyers = ar.group(1)
+            # ⚠️ a betétdíj („+50 Ft”) külön elem – NEM az ár (a Fantánál
+            # különben „50 forint” lett volna)
+            betet = re.search(r'class="base-price__deposit"[^>]*>(.*?)</(?:span|div)>',
+                              nyers, re.S)
+            if betet:
+                t.megjegyzes = _html_szoveg(betet.group(1))
+                nyers = nyers.replace(betet.group(0), "")
+            szoveg = _html_szoveg(nyers)
+            arak = [ar_szam(x) for x in re.findall(r"\d[\d  ]*\s?Ft", szoveg)]
+            arak = [a for a in arak if a]
+            if arak:
+                t.ar = min(arak)
+                if len(arak) > 1 and max(arak) > t.ar:
+                    t.regi_ar = max(arak)
+            k = re.search(r"-\s?\d+\s?%", szoveg)
+            if k:
+                t.kedvezmeny = k.group(0).replace(" ", "")
+        if nap:
+            t.ervenyes = "%02d.%02d-tól" % (nap.month, nap.day)
+            t.kategoria = "%s %s" % (nap.strftime("%m.%d."),
+                                    _NAPOK[nap.weekday()])
+        if cimke:
+            t.megjegyzes = ", ".join(x for x in (_html_szoveg(cimke.group(1)),
+                                                 t.megjegyzes) if x)
+        if t.ar is not None:
+            ki.append(t)
+    return ki
+
+
+def _curl_get(url: str) -> str:
+    from curl_cffi import requests as cr        # a Core-ból
+    r = cr.get(url, impersonate="chrome", timeout=40)
+    r.raise_for_status()
+    return r.text
+
+
+def web_letolt(jelez=lambda s: None, get=None, ma=None) -> list:
+    get = get or _curl_get
+    fo = get(WEB + "/hu/ajanlatok.html")
+    ki, latott = [], set()
+    for nap in web_datumok(fo, ma):
+        jelez("Aldi: %s…" % nap.strftime("%m.%d."))
+        for t in web_csempek(get(WEB + "/ajanlatok/" + nap.isoformat()), nap):
+            if t.kod not in latott:
+                latott.add(t.kod)
+                ki.append(t)
+    return ki
+
+
 def letolt(get_bytes, jelez=lambda s: None, ma=None) -> list:
+    """Előbb az aldi.hu ajánlat-oldalai; ha azok nem mennek (nincs
+    curl_cffi, vagy a bolt oldala épp nem válaszol), a lapozós újság
+    szövegrétege."""
+    try:
+        web = web_letolt(jelez, ma=ma)
+    except Exception:                           # noqa: BLE001
+        web = []
+    try:
+        ujsag = publitas_letolt(get_bytes, jelez, ma)
+    except Exception:                           # noqa: BLE001
+        ujsag = []
+    return osszefesul(web, ujsag)
+
+
+def _szavak(nev: str) -> set:
+    from .termek import ekezet_nelkul
+    return {w for w in re.findall(r"\w+", ekezet_nelkul(nev)) if len(w) > 2}
+
+
+def _ugyanaz(a: set, b: set) -> bool:
+    """Két név ugyanazt a terméket jelöli-e: legalább két közös szó, és ez
+    a rövidebb név szavainak legalább fele („Vajas rúd • sajtos vagy” =
+    „Snack Fun Vajas rúd, 150 g”)."""
+    kozos = len(a & b)
+    if not a or not b:
+        return False
+    if min(len(a), len(b)) == 1:
+        return kozos == 1
+    return kozos >= 2 and kozos * 2 >= min(len(a), len(b))
+
+
+def osszefesul(web: list, ujsag: list) -> list:
+    """A weboldal csempéi az elsődlegesek; az újságból csak az kerül mellé,
+    ami a weben NINCS (az újság élelmiszereinek egy része csak ott szerepel).
+    Egyezés: lásd `_ugyanaz`."""
+    ki = list(web)
+    webszavak = [_szavak(t.nev) for t in web]
+    for t in ujsag:
+        sz = _szavak(t.nev)
+        if not sz:
+            continue
+        if any(_ugyanaz(sz, w) for w in webszavak):
+            continue
+        ki.append(t)
+    return ki
+
+
+def publitas_letolt(get_bytes, jelez=lambda s: None, ma=None) -> list:
     ki, latott, fajtak = [], set(), set()
     for nev, fajta, het in ujsag_nevek(ma):
         if fajta in fajtak:

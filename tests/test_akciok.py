@@ -179,6 +179,52 @@ def test_aldi_blokk():
     assert t.ar == 549 and t.kiszereles == "150 g"
 
 
+ALDI_CSEMPE = """<div class="product-tile" data-test="product-tile" title="x">
+<a href="/termek/naturland-fekete-nadalyto-krem-100-ml-000000000000320894" class="base-link product-tile__link">
+<div class="base-label base-label--info" data-test="product-tile__on-sale-label"> Amíg a készlet tart</div></div>
+<div class="product-tile__brandname" data-test="product-tile__brandname"><p>NATURLAND A.D. 1989</p></div>
+<div class="product-tile__name" data-test="product-tile__name"><p>Fekete nadálytő krém, 100 ml</p></div>
+<div data-test="product-tile__unit-of-measurement" class="product-tile__unit-of-measurement"><p>0,1 l</p></div>
+<div data-test="product-tile__comparison-price" class="product-tile__comparison-price"><p>(11 690,00 Ft/1 l)</p></div>
+<div class="base-price base-price--product-tile" data-test="product-tile__price"><div class="base-price__discount-tag__wrapper"></div><span class="base-price__regular"><span>1 169 Ft</span></span></div></a>
+</div><div class="product-tile" data-test="product-tile" title="y">
+<a href="/termek/fanta-narancs-05-l-1" class="base-link product-tile__link">
+<div class="product-tile__brandname" data-test="product-tile__brandname"><p>FANTA</p></div>
+<div class="product-tile__name" data-test="product-tile__name"><p>Szénsavas üdítőital, narancs, 0,5 l</p></div>
+<div data-test="product-tile__unit-of-measurement"><p>0,5 l</p></div>
+<div class="base-price" data-test="product-tile__price"><span class="base-price__regular"><span>319 Ft</span></span><span class="base-price__deposit">+ 50 Ft Betétdíj</span></div></a>
+</div>"""
+
+
+def test_aldi_weboldal_csempe_es_betetdij():
+    import datetime as dt
+    tt = aldi.web_csempek(ALDI_CSEMPE, dt.date(2026, 9, 24))
+    assert len(tt) == 2
+    a, b = tt
+    assert a.nev == "Naturland A.D. 1989 Fekete nadálytő krém, 100 ml"
+    assert a.ar == 1169 and a.egysegar == "11 690,00 Ft/1 l"
+    assert a.ervenyes == "09.24-tól" and a.kategoria == "09.24. csütörtöktől"
+    assert "készlet" in a.megjegyzes
+    # ⚠️ a betétdíj NEM ár
+    assert b.ar == 319 and "Betétdíj" in b.megjegyzes
+    assert b.sor() == "Fanta Szénsavas üdítőital, narancs, 0,5 l, 319 forint"
+
+
+def test_aldi_web_es_ujsag_osszefesulese():
+    web = [Termek("Aldi", "Snack Fun Vajas rúd, 150 g", ar=549)]
+    ujsag = [Termek("Aldi", "Vajas Rúd • sajtos vagy", ar=549),
+             Termek("Aldi", "Hummusz", ar=275)]
+    assert [t.nev for t in aldi.osszefesul(web, ujsag)] == \
+        ["Snack Fun Vajas rúd, 150 g", "Hummusz"]
+
+
+def test_lidl_csak_ervenyes_ujsag():
+    import datetime as dt
+    lista = [("A 39", "u1", "2026-09-24", "2026-09-30"),
+             ("A 38", "u2", "2026-09-17", "2026-09-23")]
+    assert [u[0] for u in lidl.aktualis(lista, dt.date(2026, 9, 25))] == ["A 39"]
+
+
 def test_aldi_ujsagnevek_het_szerint():
     import datetime as dt
     nevek = [n for n, _f, _h in aldi.ujsag_nevek(dt.date(2026, 9, 25))]

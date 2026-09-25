@@ -210,12 +210,20 @@ def termekek(szoveg: str, ujsag: str = "") -> list:
     return [t for t in ki if t.ar is not None or t.kartyas_ar is not None]
 
 
-def letolt(get_bytes, jelez=lambda s: None, csak_elso: int = 2) -> list:
+def aktualis(lista: list, ma=None) -> list:
+    """Csak a még érvényes újságok (a vége ma vagy később), legfeljebb 4."""
+    import datetime as _dt
+    ma = (ma or _dt.date.today()).isoformat()
+    ki = [u for u in lista if not u[3] or u[3][:10] >= ma]
+    return ki[:4]
+
+
+def letolt(get_bytes, jelez=lambda s: None, ma=None) -> list:
     """A heti Lidl-újságok termékei. `get_bytes(url) -> bytes`."""
     from pdfminer.high_level import extract_text
     ov = json.loads(get_bytes(OVERVIEW).decode("utf-8"))
     ki, latott = [], set()
-    for cim, url, _k, _v in ujsagok(ov)[:csak_elso]:
+    for cim, url, _k, _v in aktualis(ujsagok(ov), ma):
         jelez("Lidl: %s letöltése…" % cim)
         pdf = get_bytes(url)
         jelez("Lidl: %s olvasása…" % cim)
