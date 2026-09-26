@@ -7,17 +7,20 @@ Ctrl+L-lel a saját bevásárlólistára kerül; a lista (Ctrl+B) a gépen van,
 
 Minden a fő szálon marad, ami a felülethez nyúl; a letöltés háttérszálon.
 """
+import os
 import threading
 import time
 
 import wx
 
 from . import bevasarlo as B
+from . import csoport as CS
 from . import forrasok as F
 from .termek import illik
 
 MIND = "Minden bolt"
 OSSZES_KAT = "Minden kategória"
+MIND_CSOP = "Minden termékcsoport"
 RENDEZESEK = ("Bolt szerint", "Ár szerint, a legolcsóbb elöl", "Név szerint")
 
 SUGO = """AKCIÓS ÚJSÁG – SÚGÓ
@@ -46,13 +49,25 @@ A pultos áruk (felvágott, sajt a pultból) ára kilónként értendő.
 
 BÖNGÉSZÉS
   Bolt ............... Alt+B – egy bolt, vagy minden bolt egyszerre
-  Kategória .......... Alt+K – pl. Italok, Friss húsok (a Pennynél), Haj
+  Termékcsoport ...... Alt+C – KÖZÖS csoportok minden boltban: Tejtermék és
+                       tojás, Hús, hal, felvágott, Pékáru, Zöldség és
+                       gyümölcs, Ital, Édesség és snack, Alapvető élelmiszer,
+                       Fagyasztott, Háztartás, Drogéria, Baba, Állateledel,
+                       Egyéb. Mindegyik mellett ott a darabszám. A csoportot a
+                       program a termék nevéből állapítja meg; ami
+                       bizonytalan, az az „Egyéb”-be kerül, nem rossz helyre.
+  A bolt saját
+  kategóriája ........ Alt+K – pl. Italok, Friss húsok (a Pennynél), Haj
                        (a Rossmannál), vagy az újság neve (Lidl, Tesco…)
   Keresés ............ Alt+E – gépelés közben szűr, ékezet nélkül is jó
                        („rantott” megtalálja a „Rántott”-at)
   Rendezés ........... Alt+R – bolt, ár vagy név szerint
   Termékek ........... Alt+T – a sor elején a név és az ár, utána a
-                       kártyás ár, a kedvezmény és a kiszerelés
+                       kártyás ár, a kedvezmény és a kiszerelés. Ha minden
+                       boltot nézel, a bolt neve rögtön az ár után jön.
+
+HOL A LEGOLCSÓBB? Bolt: Minden bolt, Keresés: pl. joghurt, Rendezés: ár
+szerint – a lista a legolcsóbbtól a legdrágábbig sorolja, bolttal együtt.
 A kijelölt termék minden részlete (egységár, érvényesség, eredeti ár) az
 alatta lévő mezőben olvasható.
 
@@ -65,6 +80,11 @@ A lista a gépen van, net nélkül is megmarad. A listában:
   Delete ............. törlés
   Ctrl+N ............. új tétel kézzel
   Ctrl+T ............. összefésülés a TELEFON bevásárlólistájával
+  Ctrl+E ............. a lista KIKÜLDÉSE: vágólapra (Messengerbe, e-mailbe
+                       beilleszthető), fájlba (Word vagy szöveg), vagy
+                       megnyitás a Super Editben. Ami már megvan, az a
+                       végére kerül külön – a segítődnek csak az marad a
+                       listán, amit még meg kell venni.
 A telefonos összefésüléshez a telefonon kapcsold be a WiFi-portált (ugyanaz,
 mint az Átjárónál), és add meg a telefon által bemondott PIN-t. A két lista
 összeadódik: ami az egyiken van, a másikra is felkerül, és ami az egyik
@@ -137,10 +157,22 @@ class AkciokFrame(wx.Frame):
         self.bolt.Bind(wx.EVT_CHOICE, lambda e: self._bolt_valt())
         felso.Add(self.bolt, 1, wx.EXPAND)
 
-        felso.Add(wx.StaticText(p, label="&Kategória:"), 0,
+        # KÖZÖS termékcsoport minden bolthoz (Petrus József, 2026-09-26):
+        # a „Tejtermék" a Lidlben is ugyanazt jelenti, mint a Pennyben
+        felso.Add(wx.StaticText(p, label="Termék&csoport:"), 0,
+                  wx.ALIGN_CENTER_VERTICAL)
+        self.csop = wx.Choice(p, choices=[MIND_CSOP])
+        self.csop.SetName("Termékcsoport")
+        self.csop.SetSelection(0)
+        self._csop_nevek = [""]
+        self.csop.Bind(wx.EVT_CHOICE, lambda e: self._szur())
+        felso.Add(self.csop, 1, wx.EXPAND)
+
+        felso.Add(wx.StaticText(p, label="A bolt saját &kategóriája:"), 0,
                   wx.ALIGN_CENTER_VERTICAL)
         self.kat = wx.Choice(p, choices=[OSSZES_KAT])
-        self.kat.SetName("Kategória")
+        self.kat.SetName("A bolt saját kategóriája (a PDF-újságos "
+                         "boltoknál az újság neve)")
         self.kat.SetSelection(0)
         self.kat.Bind(wx.EVT_CHOICE, lambda e: self._szur())
         felso.Add(self.kat, 1, wx.EXPAND)
@@ -320,7 +352,26 @@ class AkciokFrame(wx.Frame):
             return list(self._adat.get(b, []))
         return [t for a, _n, _f in F.BOLTOK for t in self._adat.get(a, [])]
 
+    def _csoportok(self):
+        """A termékcsoport-választó, DARABSZÁMMAL („Tejtermék és tojás, 38"):
+        vakon így már a választás előtt hallod, hol van mit keresni."""
+        i = self.csop.GetSelection()
+        regi = self._csop_nevek[i] if 0 <= i < len(self._csop_nevek) else ""
+        db = {}
+        for t in self._forras():
+            c = CS.csoportja(t)
+            db[c] = db.get(c, 0) + 1
+        nevek = [""] + [c for c in CS.CSOPORTOK if db.get(c)]
+        self._csop_nevek = nevek
+        self.csop.Set([MIND_CSOP] + ["%s, %d" % (c, db[c]) for c in nevek[1:]])
+        self.csop.SetSelection(nevek.index(regi) if regi in nevek else 0)
+
+    def _valasztott_csoport(self) -> str:
+        i = self.csop.GetSelection()
+        return self._csop_nevek[i] if 0 < i < len(self._csop_nevek) else ""
+
     def _kategoriak(self):
+        self._csoportok()
         regi = self.kat.GetStringSelection()
         katok = []
         for t in self._forras():
@@ -334,11 +385,13 @@ class AkciokFrame(wx.Frame):
         self._kategoriak()
         self._szur()
 
-    def szurt(self, termekek, kategoria, kereses, rendezes):
+    def szurt(self, termekek, kategoria, kereses, rendezes, csoport=""):
         """A szűrés és rendezés – külön, hogy tesztelhető legyen."""
         ki = [t for t in termekek
               if (not kategoria or kategoria == OSSZES_KAT
-                  or t.kategoria == kategoria) and illik(t, kereses)]
+                  or t.kategoria == kategoria)
+              and (not csoport or CS.csoportja(t) == csoport)
+              and illik(t, kereses)]
         if rendezes == 1:
             ki.sort(key=lambda t: (t.legjobb_ar() is None, t.legjobb_ar() or 0))
         elif rendezes == 2:
@@ -352,10 +405,12 @@ class AkciokFrame(wx.Frame):
         self._lathato = self.szurt(self._forras(),
                                    self.kat.GetStringSelection(),
                                    self.kereso.GetValue(),
-                                   self.rendez.GetSelection())
+                                   self.rendez.GetSelection(),
+                                   self._valasztott_csoport())
         self.lista.Freeze()
         try:
-            self.lista.Set([t.sor() for t in self._lathato])
+            bolttal = self._valasztott_bolt() is None
+            self.lista.Set([t.sor(bolttal) for t in self._lathato])
         finally:
             self.lista.Thaw()
         if self._lathato:
@@ -456,18 +511,21 @@ class ListaDialog(wx.Dialog):
                           ("Ú&j tétel… (Ctrl+N)", self._uj),
                           ("Összefésülés a tele&fonnal… (Ctrl+T)",
                            self._telefon),
+                          ("Lista &kiküldése… (Ctrl+E)", self._kuldes),
                           ("&Bezárás", lambda: self.EndModal(wx.ID_OK))):
             b = wx.Button(self, label=cimke)
             b.Bind(wx.EVT_BUTTON, lambda e, f=fv: f())
             sor.Add(b, 0, wx.RIGHT, 6)
         v.Add(sor, 0, wx.ALL, 8)
         self.SetSizer(v)
-        ids = {k: wx.NewIdRef() for k in ("uj", "tel")}
+        ids = {k: wx.NewIdRef() for k in ("uj", "tel", "kuld")}
         self.Bind(wx.EVT_MENU, lambda e: self._uj(), id=ids["uj"])
         self.Bind(wx.EVT_MENU, lambda e: self._telefon(), id=ids["tel"])
+        self.Bind(wx.EVT_MENU, lambda e: self._kuldes(), id=ids["kuld"])
         self.SetAcceleratorTable(wx.AcceleratorTable([
             (wx.ACCEL_CTRL, ord("N"), ids["uj"]),
             (wx.ACCEL_CTRL, ord("T"), ids["tel"]),
+            (wx.ACCEL_CTRL, ord("E"), ids["kuld"]),
         ]))
         self.SetEscapeId(wx.ID_OK)
         self._frissit()
@@ -541,6 +599,90 @@ class ListaDialog(wx.Dialog):
         self._frissit(len(B.tetelek(self.adat)) - 1)
         self.szulo._mond("Felvéve: %s." % nev if uj
                          else "Ez már rajta van: %s." % nev)
+
+    # ---- kiküldés (Petrus József kérése, 2026-09-26) ---------------------
+
+    def _super_edit_van(self) -> bool:
+        main = getattr(self.szulo, "main", None)
+        host = getattr(main, "_module_host", None)
+        return "superedit_module" in (getattr(host, "_openers", None) or {})
+
+    def _kuldes(self):
+        if not B.tetelek(self.adat):
+            self.szulo._mond("A lista üres, nincs mit kiküldeni.")
+            return
+        valasztek = [("vagolap", "Másolás a vágólapra – utána beillesztheted "
+                                 "Messengerbe, e-mailbe"),
+                     ("fajl", "Mentés fájlba (Word vagy szövegfájl)")]
+        if self._super_edit_van():
+            valasztek.append(("superedit", "Megnyitás a Super Editben – ott "
+                                           "szerkesztheted, mentheted"))
+        d = wx.SingleChoiceDialog(self, "Hogyan küldjem ki a listát?",
+                                  "Lista kiküldése",
+                                  [c for _k, c in valasztek])
+        try:
+            if d.ShowModal() != wx.ID_OK:
+                return
+            mit = valasztek[d.GetSelection()][0]
+        finally:
+            d.Destroy()
+        szoveg = B.szoveges(self.adat)
+        if mit == "vagolap":
+            if wx.TheClipboard.Open():
+                try:
+                    wx.TheClipboard.SetData(wx.TextDataObject(szoveg))
+                finally:
+                    wx.TheClipboard.Close()
+                self.szulo._mond("A lista a vágólapon van – most beillesztheted "
+                                 "(Ctrl+V) bárhová.")
+            else:
+                self.szulo._mond("A vágólap most foglalt, próbáld újra.")
+            return
+        if mit == "fajl":
+            ut = self._fajlt_valaszt()
+            if not ut:
+                return
+        else:
+            ut = os.path.join(self._dokumentumok(), self._alap_nev() + ".txt")
+        try:
+            B.ment_fajlba(szoveg, ut)
+        except Exception as ex:                  # noqa: BLE001
+            self.szulo._mond("A mentés nem sikerült: %s" % ex)
+            return
+        if mit == "fajl":
+            self.szulo._mond("Elmentve: %s, a %s mappába."
+                             % (os.path.basename(ut),
+                                os.path.basename(os.path.dirname(ut))))
+            return
+        nyit = getattr(getattr(self.szulo, "main", None), "open_media_file", None)
+        if nyit is None:
+            self.szulo._mond("Elmentve, de a Super Editet nem tudtam megnyitni: %s."
+                             % ut)
+            return
+        self.EndModal(wx.ID_OK)
+        nyit(ut)
+
+    @staticmethod
+    def _dokumentumok() -> str:
+        d = os.path.join(os.path.expanduser("~"), "Documents")
+        return d if os.path.isdir(d) else os.path.expanduser("~")
+
+    def _alap_nev(self) -> str:
+        return "Bevásárlólista %s" % time.strftime("%Y-%m-%d")
+
+    def _fajlt_valaszt(self) -> str:
+        with wx.FileDialog(
+                self, "A lista mentése", defaultDir=self._dokumentumok(),
+                defaultFile=self._alap_nev() + ".docx",
+                wildcard="Word-dokumentum (*.docx)|*.docx|"
+                         "Szövegfájl (*.txt)|*.txt",
+                style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as d:
+            if d.ShowModal() != wx.ID_OK:
+                return ""
+            ut = d.GetPath()
+            if not os.path.splitext(ut)[1]:
+                ut += (".docx", ".txt")[max(0, d.GetFilterIndex())]
+            return ut
 
     def _telefon(self):
         if self._fut:

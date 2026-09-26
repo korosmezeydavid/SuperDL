@@ -194,6 +194,9 @@ KEYS_TEXT = (
     "  Ctrl+F6  – a kijelölt elem javításának megkísérlése\n"
     "  Ctrl+J   – napi infó (dátum, névnap, időjárás, és a letöltések)\n"
     "  Ctrl+F   – médiakereső (keresés, lejátszás, letöltés)\n"
+    "  Ctrl+Alt+D – Asztal: minden modul és a fő funkciók egy ikonos\n"
+    "               listában, ABC-sorrendben. Betű: ugrás az első ilyen\n"
+    "               kezdetűre, újra lenyomva a következőre; Enter: megnyitás\n"
     "  Ctrl+Shift+R – internetes rádió\n"
     "  Ctrl+U   – frissítések keresése\n"
     "  Ctrl+Alt+I – Internet-teszt (sebesség, késleltetés, IP-cím, és a Wi-Fi\n"
@@ -578,10 +581,26 @@ class MainFrame(wx.Frame):
         except Exception:
             import logging
             logging.getLogger("superdl").exception("modulbetöltés hiba")
+        host = getattr(self, "_module_host", None)
+        elotte = set(getattr(host, "modul_menu_idk", ()))
         # a modulok létrehozták a Média menüt → most tesszük bele a
         # fájltársítás-kapcsolót (zene → Super M, videó → felirat-felolvasó)
         self._add_media_switch()
         self._add_autostart_switch()   # „Indítás a Windows-szal (háttérben)…"
+        # Ezek a Core kapcsolói, nem modulok: az Asztalon nincs helyük.
+        if host is not None:
+            host.modul_menu_idk &= elotte
+        if self.settings.get("asztal_indulaskor", False):
+            wx.CallLater(2500, self._on_asztal)
+
+    def _on_asztal(self, event=None):
+        """Asztal – minden modul egy helyen (Ctrl+Alt+D)."""
+        try:
+            from superdl import asztal
+            asztal.AsztalAblak(self, getattr(self, "_module_host", None))
+        except Exception:
+            import logging
+            logging.getLogger("superdl").exception("Asztal hiba")
 
     def _add_media_switch(self):
         """„Fájltársítások (zene/videó)…" a Média menübe – a rákattintott
@@ -821,6 +840,14 @@ class MainFrame(wx.Frame):
 
         m_tools = wx.Menu()
         # Az AI-asszisztens ELTÁVOLÍTVA (az AI-eszközök az AI menüben maradnak).
+        # ASZTAL (Petrus József ötlete): minden modul és a fő funkciók egy
+        # ikonos, ABC-sorrendű listában, betűre ugrással.
+        mi_asztal = m_tools.Append(
+            wx.ID_ANY, "&Asztal – minden modul egy helyen\tCtrl+Alt+D",
+            "Minden telepített modul és a fő funkciók ABC-sorrendben; "
+            "betűre ugrik, Enter megnyitja")
+        self._asztal_menu_id = mi_asztal.GetId()
+        m_tools.AppendSeparator()
         mi_search = m_tools.Append(
             wx.ID_ANY, "Média&kereső\tCtrl+F",
             "Keresés több forráson, lejátszás és letöltés egy helyen")
@@ -949,6 +976,14 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_search_window, mi_search)
         self.Bind(wx.EVT_MENU, self._on_modmgr_window, mi_modmgr)
         self.Bind(wx.EVT_MENU, self._on_nettest, mi_nettest)
+        self.Bind(wx.EVT_MENU, self._on_asztal, mi_asztal)
+        # A Core fő funkciói, amelyek az Asztalon is megjelennek (a modulok
+        # menüpontjait a modul-host maga jegyzi).
+        self._asztal_core_idk = [
+            m.GetId() for m in (mi_focus, mi_search, mi_nettest, mi_modmgr,
+                                mi_settings, mi_history, mi_status, mi_upd,
+                                mi_mentes, mi_subnew, mi_submng, mi_chan_fresh,
+                                mi_how)]
         self.Bind(wx.EVT_MENU, self._on_ai_image, mi_ai_img)
         self.Bind(wx.EVT_MENU, self._on_ai_clip, mi_ai_clip)
         self.Bind(wx.EVT_MENU, self._on_ai_ocr, mi_ai_ocr)
@@ -1113,6 +1148,7 @@ class MainFrame(wx.Frame):
             "screenreader_only": False,
             "selfvoice_enabled": False, "selfvoice_off": False,
             "hide_url_row": False, "startup_signal": True,
+            "asztal_indulaskor": False,
             "selfvoice_voice": "",
             "selfvoice_rate": 0, "selfvoice_pitch": 0, "selfvoice_volume": 100,
         }

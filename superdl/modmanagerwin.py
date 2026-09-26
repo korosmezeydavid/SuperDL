@@ -183,7 +183,7 @@ class ModuleManagerFrame(wx.Frame):
         out = {}
         for d in self.loader.discover(self.root):
             try:
-                data = json.loads((d / "manifest.json").read_text(encoding="utf-8"))
+                data = json.loads((d / "manifest.json").read_text(encoding="utf-8-sig"))
                 man = modkit.parse_manifest(data)
                 out[man.id] = man.version
             except Exception:

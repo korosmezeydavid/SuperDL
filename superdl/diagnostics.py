@@ -85,7 +85,7 @@ def _modules_lines() -> list[str]:
                 if not mf.is_file():
                     continue
                 try:
-                    m = json.loads(mf.read_text(encoding="utf-8"))
+                    m = json.loads(mf.read_text(encoding="utf-8-sig"))
                     out.append(f"  {m.get('id', d.name)}: "
                                f"{m.get('version', '?')}  ({m.get('name', '')})")
                 except (OSError, ValueError):

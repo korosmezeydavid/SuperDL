@@ -166,7 +166,7 @@ def telepitett_modulok() -> list:
         if not manifest.is_file():
             continue
         try:
-            d = json.loads(manifest.read_text(encoding="utf-8"))
+            d = json.loads(manifest.read_text(encoding="utf-8-sig"))
             ki.append({"id": d.get("id", m.name),
                        "nev": d.get("name", m.name),
                        "verzio": d.get("version", "")})

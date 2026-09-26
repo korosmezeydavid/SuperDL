@@ -112,6 +112,60 @@ def osszeg(lst: list) -> int:
     return sum(int(t.get("priceHuf") or 0) for t in lst)
 
 
+_HONAPOK = ("január", "február", "március", "április", "május", "június",
+            "július", "augusztus", "szeptember", "október", "november",
+            "december")
+
+
+def _ft_szep(n: int) -> str:
+    """5480 → „5 480" (az ezres tagolás a papíron és felolvasva is jobb)."""
+    return "{:,}".format(int(n)).replace(",", " ")
+
+
+def szoveges(adat: dict, ma=None) -> str:
+    """A lista KIKÜLDHETŐ szövege (vágólap, fájl, Super Edit) – Petrus
+    József kérése: „el tudom küldeni messengerben vagy e-mailben… a
+    segítőnek, aki bevásárol nekem".
+
+    Soronként egy tétel a bolttal és az árral; ami már MEGVAN, az külön, a
+    végén – a segítőnek csak az marad a listán, amit még meg kell venni."""
+    import datetime as _dt
+    ma = ma or _dt.date.today()
+    lst = tetelek(adat)
+    kell = [t for t in lst if not t.get("checked")]
+    megvan = [t for t in lst if t.get("checked")]
+    sorok = ["Bevásárlólista – %s (%d. %s %d.)" % (
+        aktiv_nev(adat), ma.year, _HONAPOK[ma.month - 1], ma.day), ""]
+    if not kell:
+        sorok.append("Minden megvan a listáról.")
+    for t in kell:
+        ar = t.get("priceHuf")
+        sorok.append("%s%s" % (t.get("name", ""),
+                               " – %s Ft" % _ft_szep(ar) if ar else ""))
+    if kell and any(t.get("priceHuf") for t in kell):
+        sorok += ["", "Összesen kb. %s Ft" % _ft_szep(osszeg(kell))]
+    if megvan:
+        sorok += ["", "Már megvan: " + ", ".join(t.get("name", "") for t in megvan)]
+    return "\n".join(sorok) + "\n"
+
+
+def ment_fajlba(szoveg: str, ut: str) -> None:
+    """.docx → Word-dokumentum (az első sor címsorként); minden más → UTF-8
+    szövegfájl Windows-sorvégekkel (a Jegyzettömb és a Super Edit is jól
+    olvassa)."""
+    if ut.lower().endswith(".docx"):
+        import docx                       # a Core-ban (python-docx)
+        doc = docx.Document()
+        sorok = szoveg.rstrip("\n").split("\n")
+        doc.add_heading(sorok[0], level=1)
+        for s in sorok[1:]:
+            doc.add_paragraph(s)
+        doc.save(ut)
+        return
+    with open(ut, "w", encoding="utf-8-sig", newline="\r\n") as f:
+        f.write(szoveg)
+
+
 def tetel_sor(t: dict) -> str:
     ar = t.get("priceHuf")
     return "%s%s. %s" % (t.get("name", ""),

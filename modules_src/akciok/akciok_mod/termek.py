@@ -25,13 +25,20 @@ class Termek:
     kategoria: str = ""
     kod: str = ""                # a bolt azonosítója (URL vagy cikkszám)
     megjegyzes: str = ""
+    csoport: str = ""            # közös termékcsoport (csoport.besorol)
 
-    def sor(self) -> str:
+    def sor(self, bolttal: bool = False) -> str:
         """A listasor. ⚠️ A sor ELEJÉN a név és az ár: nyilazáskor ez
-        hangzik el először, a többi csak utána."""
+        hangzik el először, a többi csak utána.
+
+        `bolttal=True` (Minden bolt nézet): a bolt neve közvetlenül az ár
+        után – Petrus József: „a legolcsóbbtól a legdrágábbig, persze
+        feltüntetve az áruház nevét"."""
         reszek = [self.nev]
         if self.ar is not None:
             reszek.append(ft(self.ar))
+        if bolttal and self.bolt:
+            reszek.append(self.bolt)
         if self.kartyas_ar is not None:
             reszek.append("%s %s" % (self.kartya_nev or "kártyával",
                                      ft(self.kartyas_ar)))
@@ -43,6 +50,8 @@ class Termek:
 
     def reszletek(self) -> str:
         sorok = [self.nev, "Bolt: %s" % self.bolt]
+        if self.csoport:
+            sorok.append("Termékcsoport: %s" % self.csoport)
         if self.ar is not None:
             sorok.append("Ár: %s" % ft(self.ar))
         if self.kartyas_ar is not None:

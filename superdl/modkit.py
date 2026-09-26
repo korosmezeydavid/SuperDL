@@ -396,7 +396,7 @@ def install_module_zip(data: bytes, expected_sha256: str | None = None,
         if not mfp.is_file():
             raise InstallError("A modulcsomagban nincs manifest.json.")
         try:
-            man = parse_manifest(json.loads(mfp.read_text(encoding="utf-8")))
+            man = parse_manifest(json.loads(mfp.read_text(encoding="utf-8-sig")))
         except (ValueError, OSError) as e:
             raise InstallError(f"Hibás manifest a csomagban: {e}")
         if not is_compatible(man, core_api):
@@ -468,7 +468,7 @@ class ModuleLoader:
         module_dir = Path(module_dir)
         try:
             data = json.loads((module_dir / "manifest.json")
-                              .read_text(encoding="utf-8"))
+                              .read_text(encoding="utf-8-sig"))
             man = parse_manifest(data)
         except Exception as e:
             self.errors[module_dir.name] = f"manifest: {e}"

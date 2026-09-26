@@ -112,7 +112,7 @@ def modul_frissitesek(root=None, entries=None) -> list:
     telepitett = {}
     for d in sorted(root.glob("*/manifest.json")) if root.is_dir() else []:
         try:
-            man = modkit.parse_manifest(json.loads(d.read_text(encoding="utf-8")))
+            man = modkit.parse_manifest(json.loads(d.read_text(encoding="utf-8-sig")))
             telepitett[man.id] = man.version
         except Exception:
             continue
@@ -368,6 +368,9 @@ class WxHost:
         self.frame = frame
         self._windows: dict = {}
         self._openers: dict = {}        # kulcs → megnyitó (fájltársításhoz)
+        # A modulok által felvett menüpontok azonosítói – az Asztal ebből
+        # tudja, melyik menüpont egy-egy modul belépési pontja.
+        self.modul_menu_idk: set = set()
 
     @property
     def main_frame(self):
@@ -434,9 +437,17 @@ class WxHost:
         text = f"{label}\t{shortcut}" if shortcut else label
         item = menu.Append(wx.ID_ANY, text, help)
         self.frame.Bind(wx.EVT_MENU, lambda e: callback(), item)
+        try:
+            self.modul_menu_idk.add(item.GetId())
+        except Exception:
+            pass
         return item
 
     def remove_menu_item(self, item):
+        try:
+            self.modul_menu_idk.discard(item.GetId())
+        except Exception:
+            pass
         try:
             menu = item.GetMenu()
             if menu:

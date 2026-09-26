@@ -354,6 +354,11 @@ class SettingsDialog(wx.Dialog):
         # frissítési forrás átállítása (repo.txt / SUPERDL_REPO). Kikapcsolva a
         # program KIZÁRÓLAG a hivatalos helyről frissül – egy odacsempészett
         # repo.txt így nem térítheti el (biztonsági audit-javaslat).
+        self.c_asztal = wx.CheckBox(
+            p, label="Induláskor az &Asztal nyíljon meg (minden modul egy "
+                     "helyen, Ctrl+Alt+D)")
+        self.c_asztal.SetValue(bool(self.s.get("asztal_indulaskor", False)))
+        v.Add(self.c_asztal, 0, wx.ALL, 10)
         self.c_devrepo = wx.CheckBox(
             p, label="Fe&jlesztői mód: egyéni frissítési forrás engedélyezése "
                      "(repo.txt) – csak ha tudod, mit csinálsz!")
@@ -639,6 +644,7 @@ class SettingsDialog(wx.Dialog):
             "clipboard": self.c_clip.GetValue(),
             "notify": self.c_notify.GetValue(),
             "dev_custom_repo": self.c_devrepo.GetValue(),
+            "asztal_indulaskor": self.c_asztal.GetValue(),
             "city": self.c_city.GetValue().strip(),
             "voice_mode": VOICE_LABELS[self.c_voice.GetSelection()][1],
             "beep_enabled": self.c_beep.GetValue(),
