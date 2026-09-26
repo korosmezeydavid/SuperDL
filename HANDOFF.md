@@ -179,6 +179,29 @@ build-értelmező; 2026-09-24 óta ebben is van ctranslate2 4.8.1,
 sentencepiece 0.2.2, sacremoses 0.2.0, joblib 1.5.3, subword-nmt 0.3.8
 (a 4.6.12–4.6.17 között ezek hiányoztak → a fordító némán kiesett).
 
+### ✅ 4.6.21 + AKCIÓS ÚJSÁG 0.5.0 (2026-09-26) – PETRUS JÓZSEF ÖTLETEI
+
+Core 4.6.21: **Asztal** (`superdl/asztal.py`; Eszközök → Asztal, Ctrl+Alt+D).
+Minden modul-menüpont és a fő Core-funkciók egy ikonos (`LC_ICON`),
+ABC-sorrendű listában; betű: ugrás az első ilyen kezdetűre, újra: a
+következőre (körbeér, ékezetfüggetlen), Enter: a menüpont eseménye lefut.
+A `WxHost.modul_menu_idk` jegyzi a modulok `add_menu_item`-jeit (a Core saját
+kapcsolóit – fájltársítás, Windows-indítás – `_init_modules` kiveszi); a Core
+funkcióit `MainFrame._asztal_core_idk` sorolja. Azonos nevű pontoknál a
+szülőmenü neve is mögé kerül. Beállítások / Általános: „Induláskor az Asztal
+nyíljon meg" (`asztal_indulaskor`, alapból ki). A modul-manifestet mostantól
+BOM-mal is elfogadja (`utf-8-sig` mind az öt olvasási helyen). Teszt:
+`tests/test_asztal.py`.
+
+Akciós újság 0.5.0: közös **Termékcsoport**-szűrő (`csoport.py`,
+kulcsszavas, bizonytalan → Egyéb), a Minden bolt nézetben a bolt neve az ár
+után, bevásárlólista-kiküldés (Ctrl+E: vágólap / Word vagy szöveg / Super
+Edit, végösszeggel). Teszt: `tests/test_akciok_jozsi.py`.
+⚠️ Ismert, régi gyorsbillentyű-ütközések (az Asztal listája hozta elő):
+Ctrl+Shift+J (Játékok / Mi a helyzet?), Ctrl+Shift+E (Super Edit /
+Videóvágó), Ctrl+Shift+M (Mappa küldése / Super M), Ctrl+Alt+M (Super Mail /
+Teljes mentés), Ctrl+Shift+P (Podcastok / iPhone).
+
 ### ✅ 4.6.20 + ÚJ MODUL: AKCIÓS ÚJSÁG 0.3.0 (2026-09-26)
 
 Az `akciok` modul (Eszközök → Akciós újság, Ctrl+Alt+A): hét lánc akciói
