@@ -573,7 +573,8 @@ def test_dm_turelmes_429_eseten(monkeypatch):
 
 def test_minden_uj_bolt_be_van_kotve():
     azonok = [a for a, _n, _f in forrasok.BOLTOK]
-    assert azonok == ["penny", "lidl", "aldi", "tesco", "spar", "rossmann", "dm"]
+    assert azonok == ["penny", "lidl", "aldi", "tesco", "spar", "auchan",
+                      "rossmann", "dm"]
 
 
 # ---- Barbara (2026-09-26): „a Lidl és a dm mindig nullát mond" ------------
@@ -606,3 +607,41 @@ def test_a_boltok_parhuzamosan_toltodnek():
     src = Path("modules_src/akciok/akciok_mod/akciokwin.py").read_text(encoding="utf-8")
     assert "threading.Semaphore(self.PARHUZAMOS)" in src
     assert 'name="akciok-" + azon' in src
+
+
+# ---- Auchan (2026-09-26): ugyanaz a gyűjtő, mint az Androidon ----------------
+
+from akciok_mod import auchan  # noqa: E402
+
+# az iPaper az ezreseket keskeny szóközzel választja el, az árcímkék a
+# cikkszám („1234_HM") után, a termékleírástól külön állnak
+AUCHAN_OLDAL = ("12 HÁZI TEJFÖL 20%, 330 g, 1\u202f512 Ft/kg "
+                "GYULAI KOLBÁSZ 250 g, 7\u202f196 Ft/kg, 4\u202f796 Ft/kg 1234_HM "
+                "499 Ft 1\u202f799 Ft 1\u202f199 Ft "
+                "RÉGI ÁRAS SAJT 200 g, 9\u202f999 Ft/kg")
+
+
+def test_auchan_csak_igazolt_ar():
+    tk = {p["nev"]: p for p in auchan.oldal(AUCHAN_OLDAL, 12)}
+    assert tk["HÁZI TEJFÖL"]["ar"] == 499            # 0,33 kg × 1512 ≈ 499 – az oldalon áll
+    kolb = tk["GYULAI KOLBÁSZ"]
+    assert kolb["ar"] == 1199 and kolb["regi"] == 1799
+    # a 2000 Ft-os sajt ára sehol nincs az oldalon: kimarad, nem találgatunk
+    assert "RÉGI ÁRAS SAJT" not in tk
+
+
+def test_auchan_katalogus_lista_es_termek():
+    kat = auchan.katalogusok('[{"id": 1598, "title": "Heti Hipermarket ajánlataink",'
+                             ' "flipbookUrl": "https://x", "availabilityFromDate":'
+                             ' "2026-09-24T00:00", "availabilityToDate": "2026-09-30"}]')
+    assert kat == [(1598, "Heti Hipermarket ajánlataink", "https://x",
+                    "2026-09-24", "2026-09-30")]
+    p = auchan.oldal(AUCHAN_OLDAL, 12)[1]
+    t = auchan.termek(p, kat[0][1], kat[0][3], kat[0][4], "auchan:1598:12:2")
+    assert t.nev == "Gyulai kolbász" and t.ar == 1199 and t.regi_ar == 1799
+    assert t.ervenyes == "09.24-tól 09.30-ig" and t.kedvezmeny == "-33%"
+
+
+def test_auchan_page_texts():
+    html = 'var x = {"pageTexts":["egy", null, "három"], "más": 1};'
+    assert auchan.oldal_szovegek(html) == ["egy", "", "három"]

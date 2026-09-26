@@ -11,7 +11,7 @@ import json
 import time
 from pathlib import Path
 
-from . import aldi, dm, lidl, penny, rossmann, spar, tesco
+from . import aldi, auchan, dm, lidl, penny, rossmann, spar, tesco
 from .termek import Termek
 
 MAPPA = Path.home() / ".superdl" / "akciok"
@@ -26,9 +26,24 @@ BOLTOK = [
     ("aldi", "Aldi", lambda get, gb, j: aldi.letolt(gb, j)),
     ("tesco", "Tesco", lambda get, gb, j: tesco.letolt(get, gb, j)),
     ("spar", "Spar és Interspar", lambda get, gb, j: spar.letolt(get, gb, j)),
+    ("auchan", "Auchan", lambda get, gb, j: auchan.letolt(_get_sima, j)),
     ("rossmann", "Rossmann", lambda get, gb, j: rossmann.letolt(_post_json, j)),
     ("dm", "dm", lambda get, gb, j: dm.letolt(_get_json, j)),
 ]
+
+
+def _get_sima(url: str) -> str:
+    """Sima (nem böngésző-ujjlenyomatú) kérés. ⚠️ Az Auchan API-ja a
+    Chrome-ujjlenyomatra 500-at, JSON-kérésre ÜRES listát ad (2026-09-26
+    mérés) – a sima kérésre viszont a rendes katalógus-listát."""
+    import requests                         # a Core-ból
+    r = requests.get(url, headers={"User-Agent": UA,
+                                   "Accept": "application/json, text/html, */*",
+                                   "Accept-Language": "hu-HU,hu;q=0.9"},
+                     timeout=60)
+    r.raise_for_status()
+    r.encoding = r.encoding or "utf-8"
+    return r.text
 
 
 def _get_json(url: str, fejlec: dict | None = None) -> dict:

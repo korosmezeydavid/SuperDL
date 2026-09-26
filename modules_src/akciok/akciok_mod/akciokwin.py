@@ -24,7 +24,7 @@ SUGO = """AKCIÓS ÚJSÁG – SÚGÓ
 
 MIRE VALÓ
 A boltok akcióit mutatja meg olvasható, nyilazható listában: Penny, Lidl,
-Aldi, Tesco, Spar és Interspar, Rossmann és dm. Nem kép és nem
+Aldi, Tesco, Spar és Interspar, Auchan, Rossmann és dm. Nem kép és nem
 találgatás: a boltok saját, nyilvános oldalairól és újságjaiból jön a
 szöveg, ugyanaz, ami a papíron vagy a bolt honlapján áll.
 
@@ -34,6 +34,9 @@ HONNAN JÖN AZ ADAT
                        Sparnál az árat a kiírt egységárból számoljuk – ez
                        a nyomtatott ár, sok darabos csomagnál pár forint
                        eltérés lehet
+  Auchan ............. a heti és a tematikus katalógusok szövege; csak az
+                       a termék marad, amelynek az ára az újságban is
+                       szerepel (inkább kevesebb, mint rossz)
   Rossmann ........... a webshop akciós termékei és a Rossmann Plus
                        kártyás ajánlatai; ami csak online kapható, azt a
                        megjegyzés kimondja

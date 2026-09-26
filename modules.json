@@ -6,14 +6,14 @@
       "id": "akciok",
       "name": "Akciós újság",
       "category": "Mindennapok",
-      "description": "A boltok akciói felolvasható, nyilazható listában – Penny, Lidl, Aldi, Tesco, Spar és Interspar, Rossmann és dm. Nem kép és nem találgatás: a boltok saját, nyilvános oldalairól és újságjaiból jön a szöveg. Keresés ékezet nélkül is, szűrés boltra és kategóriára, rendezés ár szerint. A kiválasztott terméket Ctrl+L-lel felveheted a saját bevásárlólistádra, ami a gépen van, és egy mozdulattal összefésülhető a telefonos SuperDL bevásárlólistájával.",
+      "description": "A boltok akciói felolvasható, nyilazható listában – Penny, Lidl, Aldi, Tesco, Spar és Interspar, Auchan, Rossmann és dm. Nem kép és nem találgatás: a boltok saját, nyilvános oldalairól és újságjaiból jön a szöveg. Keresés ékezet nélkül is, szűrés boltra és kategóriára, rendezés ár szerint. A kiválasztott terméket Ctrl+L-lel felveheted a saját bevásárlólistádra, ami a gépen van, és egy mozdulattal összefésülhető a telefonos SuperDL bevásárlólistájával.",
       "latest": {
-        "version": "0.3.1",
+        "version": "0.4.0",
         "min_core_api": "1.0",
         "min_core_version": "4.6.20",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-akciok-0.3.1/akciok-0.3.1.zip",
-        "sha256": "09b590e07a400cf2cdd4f053227594965ce88f664a599583f982f8c5969e5440",
-        "size": 40829
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-akciok-0.4.0/akciok-0.4.0.zip",
+        "sha256": "01921ad8f62022a82d88a016a8e69020af3c46b6c9311b606c951d7a82460ac0",
+        "size": 45751
       }
     },
     {
