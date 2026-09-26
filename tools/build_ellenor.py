@@ -44,6 +44,9 @@ KELL = [
     ("spake2", "spake2", "P2P fájlküldés – kódszavas párosítás"),
     ("cryptography.hazmat.primitives.kdf.hkdf", "cryptography",
      "P2P fájlküldés – kulcsszármaztatás"),
+    # Akciós újság (4.6.20): böngésző-ujjlenyomatú kérés (Aldi, Rossmann, dm)
+    ("curl_cffi", "curl_cffi", "Akciós újság – böngészőként kérő letöltő"),
+    ("curl_cffi.requests", "curl_cffi", "Akciós újság – a kérés-felület"),
 ]
 
 

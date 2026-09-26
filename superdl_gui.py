@@ -4016,6 +4016,16 @@ def main():
                 len(hangok), ", ".join(h.id for h in hangok[:6]))
         except Exception as e:                       # noqa: BLE001
             szoveg += "\nONPROBA SAPI HIBA: %r\n" % (e,)
+        try:
+            # 4.6.20: az Akciós újság modul böngészőként kér (curl_cffi,
+            # natív könyvtárral) – a KÉSZ programból élő kéréssel nézzük
+            from curl_cffi import requests as _cr
+            r = _cr.get("https://www.aldi.hu/hu/ajanlatok.html",
+                        impersonate="chrome", timeout=30)
+            szoveg += "ONPROBA curl_cffi: HTTP %d, %d bajt\n" % (
+                r.status_code, len(r.content))
+        except Exception as e:                       # noqa: BLE001
+            szoveg += "ONPROBA curl_cffi HIBA: %r\n" % (e,)
         with open(sys.argv[2], "w", encoding="utf-8") as f:
             f.write(szoveg)
         return

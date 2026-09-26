@@ -86,6 +86,10 @@ tmp_ret = collect_all('sounddevice')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('edge_tts')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+# Akciós újság modul (4.6.20): több bolt oldala csak böngésző-ujjlenyomatú
+# kérést enged (Aldi 403, Rossmann, dm) – a curl_cffi natív könyvtárral jön
+tmp_ret = collect_all('curl_cffi')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 # magic-wormhole (P2P fájlküldés) – Twisted-alapú, sok rejtett importtal
 for _pkg in ('wormhole', 'twisted', 'autobahn', 'automat', 'incremental',
              'constantly', 'hyperlink', 'txaio', 'zope', 'nacl', 'spake2',
