@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "platform": "android",
-  "frissitve": "2026-09-10",
+  "frissitve": "2026-09-26",
   "megjegyzes": "A SuperDL mobil (Android) katalógusa. A modulok ADATOK (kérdéssor, szólista, állomáslista, útmutató) — NEM futtatható kód. A motorjuk a SuperDL alkalmazásban van, így új tartalomhoz nem kell új alkalmazás-verzió.",
   "kategoriak": [
     {
@@ -367,6 +367,18 @@
       "fajl": "modulok/jatekok/kviz-gyerek.json",
       "minAlkalmazasVerzio": "1.63.0",
       "kategoria": "jatekok"
+    },
+    {
+      "id": "beszelo-ora-leda",
+      "nev": "Beszélő óra — Leda hangja",
+      "kategoria": "megjelenes",
+      "tipus": "talkingclock",
+      "szerzo": "Kőrösmezey Dávid",
+      "verzio": 1,
+      "leiras": "Az időbemondás élő női hangon, Elena hangján: „Most tizennégy óra harminc perc van.\" Egész órakor és ötpercenként szól; a köztes percekben marad a felolvasó. A Teljes őrség időbemondásával működik.",
+      "meret": 994919,
+      "fajl": "modulok/beszelo-ora-leda.json",
+      "minAlkalmazasVerzio": "1.86.0"
     }
   ]
 }
