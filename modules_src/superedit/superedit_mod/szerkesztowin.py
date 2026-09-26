@@ -1395,16 +1395,73 @@ class SuperEditFrame(wx.Frame):
                         "megmaradtak – Word-dokumentumként mentve megőrződnek.")
         return ""
 
+    # ha a mentés ennél tovább tart, kimondjuk, hogy dolgozunk (ne higgye a
+    # felhasználó, hogy a program lefagyott)
+    MENTES_JELZES_MP = 1.5
+
+    def _hatter_ment(self, ut, bek, piszkos_torol=True):
+        """A fájlírás KÜLÖN SZÁLON, az ablak közben válaszol.
+
+        ⚠️ Farkas István hibajelentése (2026-09-25): egy nagy dokumentum
+        Word-mentése ~40 másodpercre megakasztotta az egész programot (a
+        megakadás-figyelő jelentette). A mentés most a háttérben fut; a fő
+        szál addig is feldolgozza az eseményeket, így a program nem akad
+        meg, a képernyőolvasó sem néma.
+
+        A hívóknak (bezáráskor „mented?") továbbra is TUDNIUK kell, sikerült-e,
+        ezért a függvény megvárja a végét – de várakozás közben nem áll.
+        Visszaad: None, ha sikerült; a kivételt, ha nem."""
+        import threading
+        import time
+        if getattr(self, "_mentes_fut", False):
+            return RuntimeError("már folyik egy mentés, várd meg a végét")
+        eredmeny = {}
+
+        def munka():
+            try:
+                FM.ment(ut, bek)
+            except Exception as ex:                      # noqa: BLE001
+                eredmeny["hiba"] = ex
+
+        # ami a mentés ALATT változik, az utána is „mentetlen" marad: ezért
+        # a jelzőt most töröljük, és a szerkesztés közben újra felkapcsolja
+        # (PDF-exportnál nem nyúlunk hozzá: az nem a dokumentum mentése)
+        volt_piszkos = self._piszkos
+        if piszkos_torol:
+            self._piszkos = False
+        self._mentes_fut = True
+        szal = threading.Thread(target=munka, daemon=True,
+                                name="superedit-mentes")
+        szal.start()
+        kezdet = time.monotonic()
+        szolt = False
+        try:
+            while szal.is_alive():
+                szal.join(0.05)
+                if not szolt and time.monotonic() - kezdet > \
+                        self.MENTES_JELZES_MP:
+                    szolt = True
+                    self._allapot("Mentés folyamatban, nagy dokumentum…")
+                app = wx.GetApp()
+                if app is not None:
+                    app.Yield(True)
+        finally:
+            self._mentes_fut = False
+        hiba = eredmeny.get("hiba")
+        if hiba is not None and piszkos_torol:
+            # nem sikerült: ami eddig mentetlen volt, az is marad
+            self._piszkos = self._piszkos or volt_piszkos
+        return hiba
+
     def _ment(self) -> bool:
         if not self._ut or self._csak_olvas:
             return self._ment_maskent()
         bek = self._bekezdesek()
-        try:
-            FM.ment(self._ut, bek)
-        except Exception as ex:
-            self._allapot(f"A mentés nem sikerült: {ex}")
+        hiba = self._hatter_ment(self._ut, bek)
+        if hiba is not None:
+            self._cim_frissit()
+            self._allapot(f"A mentés nem sikerült: {hiba}")
             return False
-        self._piszkos = False
         self._cim_frissit()
         self._allapot(f"Mentve: {os.path.basename(self._ut)}."
                       + self._veszteseg(self._ut, bek))
@@ -1420,14 +1477,13 @@ class SuperEditFrame(wx.Frame):
         if not os.path.splitext(ut)[1]:
             ut += ".docx"
         bek = self._bekezdesek()
-        try:
-            FM.ment(ut, bek)
-        except Exception as ex:
-            self._allapot(f"A mentés nem sikerült: {ex}")
+        hiba = self._hatter_ment(ut, bek)
+        if hiba is not None:
+            self._cim_frissit()
+            self._allapot(f"A mentés nem sikerült: {hiba}")
             return False
         self._ut = ut
         self._csak_olvas = False
-        self._piszkos = False
         self._cim_frissit()
         self._allapot(f"Mentve: {os.path.basename(ut)}."
                       + self._veszteseg(ut, bek))
@@ -1442,10 +1498,9 @@ class SuperEditFrame(wx.Frame):
             ut = d.GetPath()
         if not ut.lower().endswith(".pdf"):
             ut += ".pdf"
-        try:
-            FM.ment(ut, self._bekezdesek())
-        except Exception as ex:
-            self._allapot(f"A PDF-export nem sikerült: {ex}")
+        hiba = self._hatter_ment(ut, self._bekezdesek(), piszkos_torol=False)
+        if hiba is not None:
+            self._allapot(f"A PDF-export nem sikerült: {hiba}")
             return
         self._allapot(f"PDF elkészült: {os.path.basename(ut)}. "
                       "A PDF-et visszaolvasni tudjuk, szerkeszteni nem.")
@@ -1579,6 +1634,11 @@ class SuperEditFrame(wx.Frame):
         d.Destroy()
 
     def _on_close(self, e):
+        if getattr(self, "_mentes_fut", False) and e.CanVeto():
+            # mentés közben bezárni = félkész fájl; előbb végezzen
+            e.Veto()
+            self._allapot("Most ment a program. Ha végzett, bezárhatod.")
+            return
         if e.CanVeto() and not self._kerdez_mentest():
             e.Veto()
             return

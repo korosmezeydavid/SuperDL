@@ -13,6 +13,7 @@ felhasználó csak hetekkel később jön rá, amikor már késő.
 """
 
 import os
+import re
 
 IRHATO = (".docx", ".txt", ".html", ".htm", ".md", ".markdown", ".log")
 CSAK_OLVASHATO = (".pdf", ".epub")
@@ -100,19 +101,83 @@ def _szoveg_olvas(ut: str) -> Dokumentum:
     return d
 
 
+_HAMIS = ("0", "false", "off")
+
+
+def _kapcsolo(rpr, nev, qn) -> bool:
+    """Egy rPr-kapcsoló (w:b, w:i) értéke: jelen van és nem „0/false/off"."""
+    if rpr is None:
+        return False
+    e = rpr.find(qn(nev))
+    return e is not None and (e.get(qn("w:val")) or "true").lower() not in _HAMIS
+
+
 def _docx_olvas(ut: str) -> Dokumentum:
+    """Word-dokumentum beolvasása KÖZVETLENÜL az XML-fából.
+
+    ⚠️ A python-docx `p.style` / `p.runs` / `r.text` útja bekezdésenként
+    több keresést fut: egy 40 000 bekezdéses dokumentum megnyitása ~90 mp
+    volt (mérés, 2026-09-26). Itt egyetlen bejárás – ugyanazt adja vissza,
+    amit a régi út (szöveg, stílus, futamok), a hivatkozások szövegével."""
     import docx
+    from docx.oxml.ns import qn
     d = Dokumentum()
     doc = docx.Document(ut)
-    for p in doc.paragraphs:
+    # stílus-azonosító → név, EGYSZER
+    nevek = {}
+    for s in doc.styles:
+        try:
+            nevek[s.style_id] = s.name or ""
+        except Exception:
+            continue
+    W_P, W_R, W_HL = qn("w:p"), qn("w:r"), qn("w:hyperlink")
+    W_PPR, W_PSTYLE, W_RPR, W_VAL = (qn("w:pPr"), qn("w:pStyle"),
+                                    qn("w:rPr"), qn("w:val"))
+    W_T, W_TAB, W_PTAB = qn("w:t"), qn("w:tab"), qn("w:ptab")
+    W_BR, W_CR, W_NBH = qn("w:br"), qn("w:cr"), qn("w:noBreakHyphen")
+    W_U = qn("w:u")
+    for p in doc.element.body.iterchildren(W_P):
         stilus = "Normál"
-        nev = (p.style.name or "") if p.style is not None else ""
+        ppr = p.find(W_PPR)
+        ps = ppr.find(W_PSTYLE) if ppr is not None else None
+        nev = nevek.get(ps.get(W_VAL), "") if ps is not None else ""
         for szint in (1, 2, 3):
             if nev.lower() in (f"heading {szint}", f"címsor {szint}"):
                 stilus = f"Címsor {szint}"
-        futamok = [(r.text, bool(r.bold), bool(r.italic), bool(r.underline))
-                   for r in p.runs if r.text]
-        d.bekezdesek.append((p.text, stilus, futamok))
+        futamok, reszek = [], []
+        for elem in p:
+            if elem.tag == W_R:
+                runok = (elem,)
+            elif elem.tag == W_HL:
+                runok = tuple(elem.iterchildren(W_R))
+            else:
+                continue
+            for r in runok:
+                sz = []
+                for c in r:
+                    if c.tag == W_T:
+                        sz.append(c.text or "")
+                    elif c.tag in (W_TAB, W_PTAB):
+                        sz.append("\t")
+                    elif c.tag == W_CR or (c.tag == W_BR and (
+                            c.get(qn("w:type")) or "textWrapping")
+                            == "textWrapping"):
+                        # az oldal- és hasábtörés nem szöveg (a python-docx
+                        # is üresnek veszi)
+                        sz.append("\n")
+                    elif c.tag == W_NBH:
+                        sz.append("-")
+                szoveg = "".join(sz)
+                if not szoveg:
+                    continue
+                reszek.append(szoveg)
+                rpr = r.find(W_RPR)
+                u = rpr.find(W_U) if rpr is not None else None
+                alahuzott = u is not None and \
+                    (u.get(W_VAL) or "single").lower() not in ("none",) + _HAMIS
+                futamok.append((szoveg, _kapcsolo(rpr, "w:b", qn),
+                                _kapcsolo(rpr, "w:i", qn), alahuzott))
+        d.bekezdesek.append(("".join(reszek), stilus, futamok))
     # ⚠️ amit NEM tudunk visszaírni – ezt ki kell mondani, nem elhallgatni
     veszit = []
     if doc.tables:
@@ -184,23 +249,92 @@ def _szoveg_ment(ut: str, bekezdesek) -> None:
         f.write("\n".join(b[0] for b in bekezdesek))
 
 
+# az XML-ben tiltott vezérlőkarakterek (a lxml elutasítaná őket, és akkor a
+# mentés elszállna – pl. PDF-ből kinyert szövegben előfordulnak)
+_TILTOTT = dict.fromkeys(c for c in range(32) if c not in (9, 10, 13))
+_TAGOLO = re.compile(r"([\t\n])")
+
+
 def _docx_ment(ut: str, bekezdesek) -> None:
+    """Word-mentés KÖZVETLENÜL az XML-fába.
+
+    ⚠️ Farkas István hibajelentése (2026-09-25): egy nagy dokumentum
+    mentése ~40 másodpercre megakasztotta a programot. A python-docx
+    `add_run()` + `run.text =` futamonként XPath-keresést fut (a
+    `clear_content`), ez ezer bekezdésenként ~1 mp. Itt ugyanazt az XML-t
+    mi rakjuk össze, keresés nélkül – ugyanaz a Word-fájl, töredék idő alatt.
+    """
     import docx
+    from docx.oxml.ns import qn
+    from lxml import etree
+
     doc = docx.Document()
+    torzs = doc.element.body
+    sectpr = torzs.find(qn("w:sectPr"))
+    W_P, W_PPR, W_PSTYLE = qn("w:p"), qn("w:pPr"), qn("w:pStyle")
+    W_R, W_RPR, W_T = qn("w:r"), qn("w:rPr"), qn("w:t")
+    W_B, W_I, W_U, W_VAL = qn("w:b"), qn("w:i"), qn("w:u"), qn("w:val")
+    W_TAB, W_BR = qn("w:tab"), qn("w:br")
+    XML_SPACE = "{http://www.w3.org/XML/1998/namespace}space"
+    # a „Címsor N" stílus azonosítója a sablonban (ugyanaz, amit az
+    # add_heading() használna)
+    stilus_id = {}
+    for szint in (1, 2, 3):
+        try:
+            stilus_id[szint] = doc.styles["Heading %d" % szint].style_id
+        except KeyError:
+            stilus_id[szint] = "Heading%d" % szint
+
+    uj_p = []
     for bek in bekezdesek:
         szoveg, stilus, futamok = szet(bek)
         szint = {"Címsor 1": 1, "Címsor 2": 2, "Címsor 3": 3}.get(stilus)
-        p = doc.add_heading("", level=szint) if szint else doc.add_paragraph()
-        if not futamok:
-            continue
+        p = etree.Element(W_P)
+        if szint:
+            ppr = etree.SubElement(p, W_PPR)
+            etree.SubElement(ppr, W_PSTYLE).set(W_VAL, stilus_id[szint])
         for reszszoveg, felkover, dolt, alahuzott in futamok:
-            r = p.add_run(reszszoveg)
-            # a címsor magától félkövér; ott csak akkor írjuk felül, ha kell
-            if felkover or not szint:
-                r.bold = bool(felkover)
-            r.italic = bool(dolt)
-            r.underline = bool(alahuzott)
-    doc.save(ut)
+            if not reszszoveg:
+                continue
+            r = etree.SubElement(p, W_R)
+            if felkover or dolt or alahuzott:
+                rpr = etree.SubElement(r, W_RPR)
+                if felkover:
+                    etree.SubElement(rpr, W_B)
+                if dolt:
+                    etree.SubElement(rpr, W_I)
+                if alahuzott:
+                    etree.SubElement(rpr, W_U).set(W_VAL, "single")
+            # a tabulátor és a sortörés a Wordben külön elem (a python-docx
+            # `run.text` is így írta)
+            tiszta = reszszoveg.translate(_TILTOTT).replace("\r", "")
+            for darab in _TAGOLO.split(tiszta):
+                if darab == "\t":
+                    etree.SubElement(r, W_TAB)
+                elif darab == "\n":
+                    etree.SubElement(r, W_BR)
+                elif darab:
+                    t = etree.SubElement(r, W_T)
+                    t.text = darab
+                    t.set(XML_SPACE, "preserve")
+        uj_p.append(p)
+    if sectpr is not None:
+        hely = list(torzs).index(sectpr)
+        torzs[hely:hely] = uj_p
+    else:
+        torzs.extend(uj_p)
+    # félkész fájl helyett: ideiglenes névre, aztán csere (egy megszakított
+    # mentés ne tegye tönkre a meglévő dokumentumot)
+    tmp = ut + ".mentes.tmp"
+    try:
+        doc.save(tmp)
+        os.replace(tmp, ut)
+    finally:
+        if os.path.exists(tmp):
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
 
 
 def _html_ment(ut: str, bekezdesek) -> None:
