@@ -574,3 +574,35 @@ def test_dm_turelmes_429_eseten(monkeypatch):
 def test_minden_uj_bolt_be_van_kotve():
     azonok = [a for a, _n, _f in forrasok.BOLTOK]
     assert azonok == ["penny", "lidl", "aldi", "tesco", "spar", "rossmann", "dm"]
+
+
+# ---- Barbara (2026-09-26): „a Lidl és a dm mindig nullát mond" ------------
+
+def _csonk(valasztott, folyamatban, adat, lathato=0):
+    pytest.importorskip("wx")
+    from akciok_mod import akciokwin as W
+
+    class Cs:
+        _darab_szoveg = W.AkciokFrame._darab_szoveg
+
+        def _valasztott_bolt(self):
+            return valasztott
+    c = Cs()
+    c._folyamatban, c._adat, c._lathato = set(folyamatban), adat, [0] * lathato
+    return c._darab_szoveg()
+
+
+def test_toltodo_bolt_nem_nullat_mond():
+    s = _csonk("lidl", {"lidl"}, {})
+    assert "még töltődnek" in s and "0 termék" not in s
+    # ha van korábbi adat, azt mutatjuk – annak a száma igaz
+    assert _csonk("lidl", {"lidl"}, {"lidl": [1]}, 5) == "5 termék."
+    assert _csonk(None, {"dm"}, {"penny": [1]}, 3) == "3 termék. Még töltődik: dm."
+    assert _csonk("penny", set(), {"penny": [1]}, 3) == "3 termék."
+
+
+def test_a_boltok_parhuzamosan_toltodnek():
+    from pathlib import Path
+    src = Path("modules_src/akciok/akciok_mod/akciokwin.py").read_text(encoding="utf-8")
+    assert "threading.Semaphore(self.PARHUZAMOS)" in src
+    assert 'name="akciok-" + azon' in src

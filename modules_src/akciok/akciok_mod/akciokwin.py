@@ -100,6 +100,9 @@ def _mondd(main, szoveg):
 
 
 class AkciokFrame(wx.Frame):
+    # ennyi bolt töltődik egyszerre (a PDF-es boltok gépet is dolgoztatnak)
+    PARHUZAMOS = 3
+
     def __init__(self, parent, core=None):
         super().__init__(parent, title="SuperDL – Akciós újság",
                          size=(900, 640))
@@ -110,6 +113,7 @@ class AkciokFrame(wx.Frame):
         self._ido = {}               # bolt_id -> letöltés ideje
         self._lathato = []           # a listában épp látszó termékek
         self._tolt = False
+        self._folyamatban = set()    # a most töltődő boltok
         self._build()
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self.CreateStatusBar()
@@ -239,24 +243,45 @@ class AkciokFrame(wx.Frame):
         def jelez(s):
             wx.CallAfter(self._mond, s, False)
 
-        def munka():
-            eredmeny = []
-            for azon in kellenek:
-                if self._closing:
-                    return
-                try:
-                    t = F.letolt(azon, jelez)
-                    wx.CallAfter(self._megjott, azon, t, None)
-                    eredmeny.append("%s %d" % (F.bolt_nev(azon), len(t)))
-                except Exception as ex:           # noqa: BLE001
-                    wx.CallAfter(self._megjott, azon, None, ex)
-            wx.CallAfter(self._kesz, eredmeny)
+        # ⚠️ Stolmár Barbara (2026-09-26): „a Lidl és a dm mindig nullát
+        # mond". Az ok: a boltok EGYMÁS UTÁN jöttek, a Lidl négy nagy PDF-je
+        # egy-másfél percig tartott, és ami mögötte állt (Aldi … dm), addig
+        # üres volt – a lista „0 termék"-et mondott, mintha nem lenne akció.
+        # Most a boltok PÁRHUZAMOSAN töltődnek (egyszerre legfeljebb
+        # PARHUZAMOS), és amíg egy bolt töltődik, azt mondjuk, nem a nullát.
+        self._folyamatban = set(kellenek)
+        eredmeny = []
+        zar = threading.Lock()
+        maradt = [len(kellenek)]
+        kapu = threading.Semaphore(self.PARHUZAMOS)
 
-        threading.Thread(target=munka, daemon=True).start()
+        def egy(azon):
+            with kapu:
+                if self._closing:
+                    t, hiba = None, None
+                else:
+                    try:
+                        t, hiba = F.letolt(azon, jelez), None
+                    except Exception as ex:       # noqa: BLE001
+                        t, hiba = None, ex
+            if not self._closing:
+                wx.CallAfter(self._megjott, azon, t, hiba)
+            with zar:
+                if t:
+                    eredmeny.append("%s %d" % (F.bolt_nev(azon), len(t)))
+                maradt[0] -= 1
+                utolso = maradt[0] == 0
+            if utolso and not self._closing:
+                wx.CallAfter(self._kesz, eredmeny)
+
+        for azon in kellenek:
+            threading.Thread(target=egy, args=(azon,), daemon=True,
+                             name="akciok-" + azon).start()
 
     def _megjott(self, azon, termekek, hiba):
         if self._closing:
             return
+        self._folyamatban.discard(azon)
         if hiba is not None or not termekek:
             ok = str(hiba) if hiba else "nem adott egyetlen terméket sem"
             van = " A legutóbb letöltött adatot mutatom." \
@@ -264,12 +289,21 @@ class AkciokFrame(wx.Frame):
             self._mond("%s: most nem sikerült letölteni (%s).%s"
                        % (F.bolt_nev(azon), ok, van))
             return
+        varta = not self._adat.get(azon)
         self._adat[azon], self._ido[azon] = termekek, time.time()
+        valasztott = self._valasztott_bolt()
+        if valasztott not in (None, azon):
+            return            # más boltot nézel: a listádhoz nem nyúlunk
         self._kategoriak()
-        self._szur(mondja=False)
+        self._szur(mondja=False, megtart=True)
+        if valasztott == azon and varta:
+            # erre vártál – szólunk, hogy megjött
+            self._mond("Megjött: %s, %d termék." % (F.bolt_nev(azon),
+                                                    len(self._lathato)))
 
     def _kesz(self, eredmeny):
         self._tolt = False
+        self._folyamatban = set()
         if eredmeny and not self._closing:
             self._mond("Frissítve: %s akciós termék." % ", ".join(eredmeny))
 
@@ -308,7 +342,10 @@ class AkciokFrame(wx.Frame):
             ki.sort(key=lambda t: t.nev.lower())
         return ki
 
-    def _szur(self, mondja=True):
+    def _szur(self, mondja=True, megtart=False):
+        # háttérből érkező frissítésnél a kijelölt termék maradjon kijelölve
+        # (ne ugorjon a lista elejére, miközben valaki épp olvassa)
+        elotte = self._kijelolt() if megtart else None
         self._lathato = self.szurt(self._forras(),
                                    self.kat.GetStringSelection(),
                                    self.kereso.GetValue(),
@@ -319,12 +356,33 @@ class AkciokFrame(wx.Frame):
         finally:
             self.lista.Thaw()
         if self._lathato:
-            self.lista.SetSelection(0)
+            hely = 0
+            if elotte is not None:
+                hely = next((i for i, t in enumerate(self._lathato)
+                             if t.bolt == elotte.bolt and t.nev == elotte.nev
+                             and t.ar == elotte.ar), 0)
+            self.lista.SetSelection(hely)
         self._reszlet()
+        szoveg = self._darab_szoveg()
         if mondja:
-            self._mond("%d termék." % len(self._lathato))
+            self._mond(szoveg)
         else:
-            self.SetStatusText("%d termék." % len(self._lathato))
+            self.SetStatusText(szoveg)
+
+    def _darab_szoveg(self) -> str:
+        """„12 termék." – de ha a választott bolt még töltődik, azt mondjuk,
+        nem a nullát (Barbara: „a Lidl mindig nullát mond")."""
+        n = len(self._lathato)
+        b = self._valasztott_bolt()
+        tolt = [a for a, _n, _f in F.BOLTOK
+                if a in self._folyamatban and not self._adat.get(a)]
+        if b is not None and b in tolt:
+            return ("%s: az ajánlatok még töltődnek, ez egy-két perc is "
+                    "lehet. Szólok, ha megjöttek." % F.bolt_nev(b))
+        if b is None and tolt:
+            return "%d termék. Még töltődik: %s." % (
+                n, ", ".join(F.bolt_nev(a) for a in tolt))
+        return "%d termék." % n
 
     def _kijelolt(self):
         i = self.lista.GetSelection()

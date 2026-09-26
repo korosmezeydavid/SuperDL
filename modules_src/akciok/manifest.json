@@ -1,7 +1,7 @@
 {
   "id": "akciok",
   "name": "Akciós újság",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "entry": "akciok_mod",
   "category": "Mindennapok",
   "description": "A boltok akciói felolvasható, nyilazható listában – Penny, Lidl, Aldi, Tesco, Spar és Interspar, Rossmann és dm. Nem kép és nem találgatás: a boltok saját, nyilvános oldalairól és újságjaiból jön a szöveg. Keresés ékezet nélkül is, szűrés boltra és kategóriára, rendezés ár szerint. A kiválasztott terméket Ctrl+L-lel felveheted a saját bevásárlólistádra, ami a gépen van, és egy mozdulattal összefésülhető a telefonos SuperDL bevásárlólistájával.",
