@@ -158,7 +158,7 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-09-25 · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-26 · dolgozott: Claude
 
 ---
 
@@ -178,6 +178,27 @@ nyers bájtként keresi a fájlokban.)
 build-értelmező; 2026-09-24 óta ebben is van ctranslate2 4.8.1,
 sentencepiece 0.2.2, sacremoses 0.2.0, joblib 1.5.3, subword-nmt 0.3.8
 (a 4.6.12–4.6.17 között ezek hiányoztak → a fordító némán kiesett).
+
+### ✅ 4.6.20 + ÚJ MODUL: AKCIÓS ÚJSÁG 0.3.0 (2026-09-26)
+
+Az `akciok` modul (Eszközök → Akciós újság, Ctrl+Alt+A): hét lánc akciói
+felolvasható listában – Penny (HTML), Lidl (Schwarz leaflets API + PDF),
+Aldi (aldi.hu csempék + Publitas), Tesco (`__NEXT_DATA__` → PDF), Spar és
+Interspar (spar.hu PDF), Rossmann (api.rossmann.hu GraphQL, IS_DISCOUNTED +
+rossmann_plus), dm (dmtech product-search, Kiárusítás, 429-nél türelmes).
+Saját bevásárlólista (`~/.superdl/bevasarlolista.json`), Ctrl+T-vel
+összefésülhető a telefon WiFi-portáljának `/shopping` oldalával (csak
+összead, nem töröl). Gyorsítótár: `~/.superdl/akciok/<bolt>.json`, 6 óra,
+üres eredmény nem ír felül jót. Teszt: `tests/test_akciok.py` (38).
+
+Core 4.6.20: **`curl_cffi`** mindkét specben és a build-őrben (több bolt
+csak böngésző-ujjlenyomatú kérést enged). Az `--onproba` mostantól élő
+curl_cffi-kérést is tesz (aldi.hu) – „ONPROBA curl_cffi: HTTP 200".
+⚠️ A `modules_src/akciok/manifest.json` `min_core_version` = 4.6.20.
+
+A beszélő óra Leda-hangja (az androidos klipek) félkész, MÁSIK beszélgetésben
+finomítjuk – a munka a követetlen `_leda_munka/` mappában (patch + klipek +
+teszt), a kiadásba NEM került.
 
 ### ✅ 4.6.19 + MODULKÖR KIADVA (2026-09-25) – RÉGI PROCESSZOR, FÁJLKÜLDÉS, FÓKUSZ
 
