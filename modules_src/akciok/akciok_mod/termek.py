@@ -122,6 +122,9 @@ def illik(termek: Termek, kereses: str) -> bool:
     szavak = ekezet_nelkul(kereses).split()
     if not szavak:
         return True
+    # a megjegyzésben is keresünk: ott áll pl. az Illatoriumnál, melyik
+    # parfüm ihlette („versace"), a Pepcónál a termék leírása
     mibol = ekezet_nelkul(" ".join((termek.nev, termek.kategoria,
-                                    termek.bolt, termek.kiszereles)))
+                                    termek.bolt, termek.kiszereles,
+                                    termek.megjegyzes)))
     return all(sz in mibol for sz in szavak)

@@ -11,8 +11,8 @@ import json
 import time
 from pathlib import Path
 
-from . import (aldi, auchan, dm, libri, lidl, mueller, penny, pepco,
-               rossmann, spar, tesco)
+from . import (aldi, auchan, dm, illatorium, libri, lidl, mueller, penny,
+               pepco, rossmann, spar, tesco)
 from .termek import Termek
 
 MAPPA = Path.home() / ".superdl" / "akciok"
@@ -33,6 +33,9 @@ BOLTOK = [
     ("mueller", "Müller", lambda get, gb, j: mueller.letolt(get, gb, j)),
     ("pepco", "Pepco", lambda get, gb, j: pepco.letolt(get, j)),
     ("libri", "Libri", lambda get, gb, j: libri.letolt(gb, j)),
+    # Dávid saját parfümboltja: a TELJES kínálat, nem akció (2026-09-27)
+    ("illatorium", "Illatorium – saját parfümbolt",
+     lambda get, gb, j: illatorium.letolt(get, j)),
 ]
 
 # A boltok FAJTÁJA (a Bolt-választó csoportjaihoz) és HONLAPJA. A `webshop`
@@ -53,6 +56,7 @@ BOLT_INFO = {
     "mueller": ("drogeria", "https://www.mueller.co.hu/prospektusok/", False),
     "pepco": ("vegyes", "https://pepco.hu/gyujtemeny/ujsagaink/", False),
     "libri": ("konyv", "https://www.libri.hu/konyvutca", True),
+    "illatorium": ("drogeria", "https://illatorium.hu/illatinspiraciok", True),
 }
 
 

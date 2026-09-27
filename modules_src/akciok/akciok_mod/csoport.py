@@ -31,12 +31,17 @@ _SZABALYOK = [
     ("Állateledel", "macska kutya allateledel eledel alom =whiskas "
                     "pedigree prevital felix =perfect friskies kitekat "
                     "jutalomfalat ragocsont"),
+    # a parfüm KÜLÖN csoport (2026-09-27: az Illatorium saját kínálata és a
+    # drogériák parfümjei egy helyen). Csak teljes szóra: a „parfümös
+    # tusfürdő" maradjon drogéria.
+    ("Parfüm és illat", "=parfum =parfumje =eau =edp =edt =edc =kolni "
+                        "parfumviz illatpermet =testpermet"),
     ("Drogéria és szépségápolás",
      "sampon hajbalzsam =balzsam hajpakolas hajmaszk hajfest hajlakk hajhab "
      "hajzsele hajolaj tusfurd tusolo habfurd dezodor deo =izzadsag "
      "fogkrem fogkefe fogselyem fogkoz mosdato szajviz szajvi arckrem kezkrem labkrem "
      "testapol testvaj testolaj arcszerum szerum arctisztit arclemos "
-     "sminklemos micellas napozo naptej fenyvedo parfum eau kolni rúzs "
+     "sminklemos micellas napozo naptej fenyvedo parfum kolni rúzs "
      "ruzs ajak szempilla szemhej szemceruza szemfest alapozo puder "
      "pirosito korom =smink highlighter borotv borotva intim tampon "
      "egeszsegugyi =betet tisztasagi vatta fultiszt szappan kezmos "
@@ -143,7 +148,7 @@ _SZABALYOK += [
 ]
 
 _NEM_ELELMISZER = ("Ruházat és cipő", "Otthon és dekoráció", "Játék",
-                   "Könyv", "Drogéria és szépségápolás",
+                   "Könyv", "Parfüm és illat", "Drogéria és szépségápolás",
                    "Háztartás és tisztítószer")
 _CSAK_NEM_ELELMISZER = {"Pepco"}
 
@@ -228,7 +233,8 @@ def besorol(nev: str, kategoria: str = "", bolt: str = "") -> str:
         if k:
             return _elso(_NEV_MINTAK, nev) or k
         nevbol = _elso(_NEV_MINTAK, nev)
-        drog = ("Drogéria és szépségápolás", "Háztartás és tisztítószer",
+        drog = ("Parfüm és illat", "Drogéria és szépségápolás",
+                "Háztartás és tisztítószer",
                 "Baba", "Állateledel")
         return nevbol if nevbol in drog else _BOLT_ALAP[bolt]
     return (_elso(_NEV_MINTAK, nev) or _elso(_KAT_MINTAK, kategoria)

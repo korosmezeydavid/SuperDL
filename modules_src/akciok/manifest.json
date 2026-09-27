@@ -1,10 +1,10 @@
 {
   "id": "akciok",
   "name": "Akciós újság",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "entry": "akciok_mod",
   "category": "Mindennapok",
-  "description": "A boltok akciói felolvasható, nyilazható listában – élelmiszer: Penny, Lidl, Aldi, Tesco, Spar és Interspar, Auchan; drogéria és kozmetika: Rossmann, dm, Müller; vegyes áru: Pepco; könyv: Libri. Nem kép és nem találgatás: a boltok saját, nyilvános oldalairól és újságjaiból jön a szöveg. Szűrés boltra vagy boltfajtára, közös termékcsoportra és a bolt saját kategóriájára, keresés ékezet nélkül is, rendezés ár szerint. Ctrl+O: a termék oldala a bolt honlapján, Ctrl+Shift+C: a cím a vágólapra. Saját bevásárlólista (Ctrl+L), ami összefésülhető a telefonos SuperDL-lel, és Ctrl+E-vel kiküldhető.",
+  "description": "A boltok akciói felolvasható, nyilazható listában – élelmiszer: Penny, Lidl, Aldi, Tesco, Spar és Interspar, Auchan; drogéria és kozmetika: Rossmann, dm, Müller, valamint az Illatorium (a program készítőjének saját parfümboltja, teljes kínálattal); vegyes áru: Pepco; könyv: Libri. Nem kép és nem találgatás: a boltok saját, nyilvános oldalairól és újságjaiból jön a szöveg. Szűrés boltra vagy boltfajtára, közös termékcsoportra és a bolt saját kategóriájára, keresés ékezet nélkül is, rendezés ár szerint. Ctrl+O: a termék oldala a bolt honlapján, Ctrl+Shift+C: a cím a vágólapra. Saját bevásárlólista (Ctrl+L), ami összefésülhető a telefonos SuperDL-lel, és Ctrl+E-vel kiküldhető.",
   "min_core_api": "1.0",
   "min_core_version": "4.6.20",
   "requires_tools": [],

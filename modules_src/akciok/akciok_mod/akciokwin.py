@@ -28,7 +28,9 @@ SUGO = """AKCIÓS ÚJSÁG – SÚGÓ
 MIRE VALÓ
 A boltok akcióit mutatja meg olvasható, nyilazható listában.
   Élelmiszer ......... Penny, Lidl, Aldi, Tesco, Spar és Interspar, Auchan
-  Drogéria, kozmetika  Rossmann, dm, Müller (a parfümériával együtt)
+  Drogéria, kozmetika  Rossmann, dm, Müller (a parfümériával együtt), és az
+                       Illatorium – a program készítőjének saját
+                       parfümboltja (lásd lent)
   Vegyes áru ......... Pepco
   Könyv .............. Libri (a Könyvutca akciós könyvei)
 Nem kép és nem
@@ -54,6 +56,13 @@ HONNAN JÖN AZ ADAT
                        nem olvasható ki pontosan
   Pepco .............. a heti újság a pepco.hu-n (csütörtökönként új)
   Libri .............. a Könyvutca akciós könyvei, szerzővel, borító árral
+  Illatorium ......... Kőrösmezey Dávid, a SuperDL készítőjének saját
+                       parfümboltja (illatorium.hu). Ez NEM akció, hanem a
+                       bolt teljes kínálata, kb. 2400 illat árral és
+                       kiszereléssel. A részleteknél ott áll, melyik ismert
+                       parfüm ihlette, és ebben is kereshetsz: a „versace"
+                       szóra kijönnek a Versace ihlette illatok. Ha a bolt
+                       kínálata változik, a program magától követi.
 A pultos áruk (felvágott, sajt a pultból) ára kilónként értendő.
 
 BÖNGÉSZÉS
@@ -123,6 +132,11 @@ próbálja.
 Az árak a boltok saját adatai; a program csak megmutatja őket. Nyomdai és
 átvételi hibákért a program nem felel – vásárlás előtt a boltban nézd meg.
 """
+
+
+def _nevelo(nev: str) -> str:
+    """„a Penny", de „az Illatorium", „az Aldi"."""
+    return ("az " if nev[:1].lower() in "aáeéiíoóöőuúüű" else "a ") + nev
 
 
 def _mondd(main, szoveg):
@@ -517,12 +531,12 @@ class AkciokFrame(wx.Frame):
         t = self._kijelolt()
         if t is None:
             b = self._valasztott_bolt()
-            return (F.bolt_oldal(b), "a %s oldala" % F.bolt_nev(b)) \
+            return (F.bolt_oldal(b), "%s oldala" % _nevelo(F.bolt_nev(b))) \
                 if b else ("", "")
         if t.hivatkozas():
             return t.hivatkozas(), "a termék oldala (%s)" % t.bolt
         azon = F.bolt_id_nevbol(t.bolt)
-        return F.bolt_oldal(azon), "a %s oldala" % t.bolt
+        return F.bolt_oldal(azon), "%s oldala" % _nevelo(t.bolt)
 
     def _megnyit(self):
         url, mi = self._cim()

@@ -180,7 +180,8 @@ def test_boltfajtak():
     c = Cs()
     c._bolt_ertekek = [None, ("fajta", "drogeria"), ("bolt", "libri")]
     c.bolt.i = 1
-    assert c._valasztott_boltok() == ["rossmann", "dm", "mueller"]
+    assert c._valasztott_boltok() == ["rossmann", "dm", "mueller",
+                                      "illatorium"]
     assert c._valasztott_bolt() is None
     c.bolt.i = 2
     assert c._valasztott_boltok() == ["libri"] and c._valasztott_bolt() == "libri"
