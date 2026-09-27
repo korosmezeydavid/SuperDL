@@ -139,7 +139,8 @@ def uj_osszeomlas() -> bool:
     ki, egy olyan befagyás után, amiből a program KIJÖTT, azt állítanánk a
     felhasználónak, hogy összeomlott. Az pedig pont az a fajta hazugság, ami
     ellen az egész napló készült."""
-    return _osszeomlas_nyom(_megakadas_nelkul(_uj_resz))
+    return _osszeomlas_nyom(
+        _megakadas_nelkul(_tulelt_nelkul(_uj_resz)))
 
 
 def uj_megakadas() -> bool:
@@ -446,3 +447,143 @@ def sziv_inditasa(ablak, lepes_ms: int = 2000):
     sziv_dobban()
     ido.Start(int(lepes_ms))
     return ido
+
+
+# ---------------------------------------------------------------------
+# RENDES KILÉPÉS ÉS A JELENTÉS NYOMAI (szakember83, 2026-09-26)
+# ---------------------------------------------------------------------
+#
+# KÉT HIBA EGY JELENTÉSBEN. (1) A 4.6.20 futásakor a program megakadt, és a
+# nyomát rendben feljegyeztük – a hibajelentés viszont csak a LEGUTOLSÓ nyomot
+# csatolta, az pedig egy későbbi, ártalmatlan COM-jelzés (0x8001010d) volt a
+# 4.6.21 indulásakor. A felhasználónak azt mondtuk, „feljegyeztük, hol tartott
+# – küldd el", ő elküldte, és pont az nem volt benne. (2) Azt a COM-jelzést a
+# jelentés „összeomlásnak" nevezte, pedig a program futott tovább – abból
+# küldte a jelentést. A `faulthandler` Windowson minden natív kivételt kiír,
+# azt is, amit a Windows maga kezel le.
+#
+# A megoldás: rendes kilépéskor jelet írunk. Ha egy futás rendben ért véget
+# (vagy épp most is fut), a benne lévő natív jelzés NEM összeomlás.
+
+RENDBEN_JEL = "=== SuperDL rendben kilépett"
+
+
+def rendben_kilep() -> None:
+    """Rendes kilépéskor hívjuk (a fő hurok után)."""
+    if _fajl is None:
+        return
+    try:
+        _fajl.write("%s: %s ===\n" % (RENDBEN_JEL,
+                                       time.strftime("%Y-%m-%d %H:%M:%S")))
+        _fajl.flush()
+    except Exception:
+        pass
+
+
+def _szakaszok(sorok):
+    """[(kezdő index, záró index kizárólag)] – egy-egy futás a naplóban."""
+    kezdetek = [i for i, s in enumerate(sorok) if _INDULT.search(s)]
+    if not kezdetek or kezdetek[0] != 0:
+        kezdetek = [0] + kezdetek
+    return [(k, kezdetek[j + 1] if j + 1 < len(kezdetek) else len(sorok))
+            for j, k in enumerate(kezdetek)]
+
+
+def _tulelt_nelkul(szoveg: str) -> str:
+    """A rendben véget ért futások kivágása: az azokban lévő natív jelzés nem
+    összeomlás."""
+    sorok = (szoveg or "").splitlines(True)
+    ki = []
+    for a, b in _szakaszok(sorok):
+        resz = sorok[a:b]
+        if not any(RENDBEN_JEL in s for s in resz):
+            ki.extend(resz)
+    return "".join(ki)
+
+
+_VEGZETES = ("Windows fatal exception", "Fatal Python error")
+
+
+def jelentes_blokkok(max_sorok: int = 300, fut_most: bool = True) -> list:
+    """A hibajelentés nyomai: a LEGUTÓBBI natív jelzés ÉS a LEGUTÓBBI
+    megakadás – mindkettő, ha van (időrendben).
+
+    Egy elem: {"fajta": "osszeomlas" | "tulelt" | "megakadas", "sorok": [...],
+    "ido", "verzio", "ota", "most"}. A „tulelt" natív jelzés olyan futásban
+    történt, amelyik rendben véget ért – vagy amelyik éppen most is fut
+    (`fut_most`: a jelentést maga a futó program készíti)."""
+    try:
+        with open(NAPLO, encoding="utf-8", errors="replace") as f:
+            sorok = f.read().splitlines()
+    except OSError:
+        return []
+    szak = _szakaszok(sorok)
+
+    def szakasza(i):
+        for n, (a, b) in enumerate(szak):
+            if a <= i < b:
+                return n
+        return len(szak) - 1
+
+    # a megakadás-blokkok sorai (ezeket a natív jelzés keresésekor kihagyjuk)
+    megak, benne, kezd = [], False, 0
+    for i, s in enumerate(sorok):
+        if MEGAKADAS_FEJLEC in s:
+            benne, kezd = True, i
+        elif benne and MEGAKADAS_VEGE in s:
+            megak.append((kezd, i + 1))
+            benne = False
+    if benne:
+        megak.append((kezd, len(sorok)))
+    megak_sor = set()
+    for a, b in megak:
+        megak_sor.update(range(a, b))
+
+    natv = None
+    for i in range(len(sorok) - 1, -1, -1):
+        if i not in megak_sor and any(v in sorok[i] for v in _VEGZETES):
+            natv = i
+            break
+
+    def blokk(fajta, a, b):
+        n = szakasza(a)
+        sa, sb = szak[n]
+        fej = sorok[sa] if _INDULT.search(sorok[sa]) else ""
+        t = _INDULT.search(fej) if fej else None
+        resz = sorok[a:b]
+        if len(resz) > max_sorok:
+            resz = resz[:max_sorok] + [
+                "… (a nyom hosszabb; a jelentés az ELEJÉT tartotta meg, "
+                "mert az ok ott van)"]
+        ota = sum(1 for (x, _) in szak[n + 1:] if _INDULT.search(sorok[x]))
+        most = ""
+        for (x, _) in szak[n + 1:]:
+            m = _INDULT.search(sorok[x])
+            if m:
+                most = m.group("verzio")
+        return {"fajta": fajta, "sorok": ([fej] if fej else []) + resz,
+                "ido": t.group("ido") if t else "",
+                "verzio": t.group("verzio") if t else "",
+                "ota": ota, "most": most or (t.group("verzio") if t else ""),
+                "_hol": a}
+
+    ki = []
+    if natv is not None:
+        n = szakasza(natv)
+        sa, sb = szak[n]
+        # a nyom vége: a szakasz vége vagy a következő megakadás-blokk
+        veg = sb
+        for a, _ in megak:
+            if natv < a < veg:
+                veg = a
+        rendben = any(RENDBEN_JEL in s for s in sorok[sa:sb])
+        jelenlegi = fut_most and n == len(szak) - 1 and _fajl is not None
+        ki.append(blokk("tulelt" if (rendben or jelenlegi) else "osszeomlas",
+                        natv, veg))
+    if megak:
+        a, b = megak[-1]
+        ki.append(blokk("megakadas", a, b))
+    ki.sort(key=lambda e: e["_hol"])
+    for e in ki:
+        e.pop("_hol", None)
+    return ki

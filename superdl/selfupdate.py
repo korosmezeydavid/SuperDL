@@ -26,6 +26,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 import urllib.request
 from pathlib import Path
 
@@ -185,6 +186,20 @@ def _download_to_file(url: str, dest: Path, progress=None) -> str:
     import hashlib
     h = hashlib.sha256()
     req = urllib.request.Request(url, headers=UA)
+    # ⚠️ A folyamatjelzőt CSAK egész százalék-váltáskor hívjuk. Egy 150 MB-os
+    # telepítő 64 KB-os darabokban ~2300 hívás; mindegyik egy `CallAfter` a
+    # fő szálra, és a képernyőolvasó minden folyamatjelző-változást feldolgoz.
+    # szakember83 4.6.20→4.6.21 frissítésekor a program pont ekkor „megakadt".
+    utolso = [-1]
+
+    def _jelez(arany):
+        if not progress:
+            return
+        szazalek = int(arany * 100)
+        if szazalek != utolso[0]:
+            utolso[0] = szazalek
+            progress(szazalek / 100.0)
+
     with urllib.request.urlopen(req, timeout=60) as r, open(dest, "wb") as f:
         total = int(r.headers.get("Content-Length", 0) or 0)
         done = 0
@@ -195,9 +210,74 @@ def _download_to_file(url: str, dest: Path, progress=None) -> str:
             f.write(chunk)
             h.update(chunk)
             done += len(chunk)
-            if progress and total:
-                progress(done / total)
+            if total:
+                _jelez(done / total)
+    # A félbeszakadt letöltés NEM „manipulált" fájl – külön, érthető hiba.
+    if total and done != total:
+        raise FelbeszakadtLetoltes(
+            f"a letöltés félbeszakadt ({done // 1048576} / "
+            f"{total // 1048576} MB érkezett meg)")
     return h.hexdigest().lower()
+
+
+class FelbeszakadtLetoltes(OSError):
+    """A kapcsolat a letöltés közben megszakadt (hiányos fájl)."""
+
+
+class EllenorzoOsszegHiba(RuntimeError):
+    """A letöltött fájl SHA-256-ja nem egyezik a hivatalossal."""
+
+
+def _naploz(sor: str) -> None:
+    try:
+        with open(update_log(), "a", encoding="utf-8") as lf:
+            lf.write(time.strftime("[%Y-%m-%d %H:%M:%S] ") + sor + "\n")
+    except OSError:
+        pass
+
+
+def _letolt_ellenorizve(url: str, dest: Path, want: str | None,
+                        progress=None, probak: int = 3,
+                        varakozas: float = 3.0) -> str:
+    """Letöltés + SHA-256 ellenőrzés, HÁLÓZATI HIBÁNÁL ÚJRAPRÓBÁLVA.
+
+    Egy 150 MB-os letöltésnél egy pillanatnyi wifi-kiesés is elég, hogy az
+    egész frissítés elbukjon, és a felhasználó kézzel töltse le a kiadási
+    oldalról (szakember83, 2026-09-26). Ezért legfeljebb `probak`-szor
+    próbáljuk, és minden próbát naplózunk az update.log-ba, hogy egy
+    hibajelentésből kiderüljön, MI szakította meg."""
+    utolso_hiba = None
+    for proba in range(1, probak + 1):
+        try:
+            got = _download_to_file(url, dest, progress)
+            if want and got != want:
+                raise EllenorzoOsszegHiba(
+                    "az ellenőrző összeg nem egyezik a hivatalossal")
+            if proba > 1:
+                _naploz(f"[LETOLTES] {dest.name}: sikerult a(z) {proba}. "
+                        "probara")
+            return got
+        except Exception as e:          # hálózat, időtúllépés, csonka fájl
+            utolso_hiba = e
+            _naploz(f"[LETOLTES] {dest.name}: {proba}. proba sikertelen: "
+                    f"{type(e).__name__}: {e}")
+            try:
+                dest.unlink(missing_ok=True)
+            except OSError:
+                pass
+            if proba < probak:
+                time.sleep(varakozas * proba)
+    if isinstance(utolso_hiba, EllenorzoOsszegHiba):
+        raise RuntimeError(
+            f"A letöltött {dest.name} ellenőrző összege {probak} próbálkozás "
+            "után sem egyezik a hivatalossal – sérült vagy manipulált "
+            "letöltés. A frissítést megszakítottam, a jelenlegi verzió "
+            "érintetlen.")
+    raise RuntimeError(
+        f"A letöltés {probak} próbálkozásra sem sikerült ({utolso_hiba}). "
+        "Valószínűleg akadozott az internetkapcsolat. A jelenlegi verzió "
+        "érintetlen; próbáld újra pár perc múlva, vagy töltsd le kézzel a "
+        "kiadási oldalról.")
 
 
 def cleanup_old() -> None:
@@ -513,13 +593,7 @@ def apply_installer(assets: dict, name: str, progress=None,
     if not url:
         raise RuntimeError(f"A kiadásban nincs telepítő ({name}).")
     dest = Path(tempfile.gettempdir()) / name
-    got = _download_to_file(url, dest, progress)
-    want = (digests or {}).get(name)
-    if want and got != want:
-        dest.unlink(missing_ok=True)
-        raise RuntimeError(
-            "A letöltött telepítő ellenőrző összege nem egyezik a hivatalossal "
-            "– sérült vagy manipulált, a frissítést megszakítottam.")
+    _letolt_ellenorizve(url, dest, (digests or {}).get(name), progress)
     # INDÍTÓ kötegfájl: megvárja a SuperDL kilépését, AZUTÁN futtatja a telepítőt
     # (így nem ütközik a kilépő/modális appal – ez volt a „letölt, de nem cserél").
     pid = os.getpid()
@@ -594,14 +668,7 @@ def apply(assets: dict, progress=None, restart: bool = True,
         if not url:
             continue
         newf = folder / (name + ".new")
-        got = _download_to_file(url, newf, progress)   # lemezre + sha256
-        want = (digests or {}).get(name)
-        if want and got != want:
-            newf.unlink(missing_ok=True)
-            raise RuntimeError(
-                f"A letöltött {name} ellenőrző összege nem egyezik a "
-                "hivatalossal – sérült vagy manipulált letöltés. A frissítést "
-                "megszakítottam, a jelenlegi verzió érintetlen.")
+        _letolt_ellenorizve(url, newf, (digests or {}).get(name), progress)
         pairs.append((newf, folder / name))
 
     if not pairs:

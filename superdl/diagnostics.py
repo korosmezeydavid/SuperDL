@@ -306,7 +306,18 @@ def build_report(settings: dict | None = None,
     # amit senki nem hív.
     try:
         from . import osszeomlas
-        if osszeomlas.volt_osszeomlas():
+        blokkok = osszeomlas.jelentes_blokkok()
+        if blokkok:
+            # A LEGUTÓBBI natív jelzés ÉS a LEGUTÓBBI megakadás – mindkettő.
+            # szakember83 jelentésében (2026-09-26) a megakadás nyoma, amire
+            # a program maga kérte, hogy küldje el, KIMARADT: csak a legutolsó
+            # blokk került be, az pedig egy túlélt COM-jelzés volt, amit a
+            # jelentés ráadásul „összeomlásnak" nevezett.
+            for b in blokkok:
+                lines += ["", _BLOKK_CIM[b["fajta"]]]
+                lines += ["  " + s for s in _kor_sorok(b)]
+                lines += ["  " + ln for ln in b["sorok"]]
+        elif osszeomlas.volt_osszeomlas():
             # A TELJES utolsó nyomot csatoljuk, a fejlécével együtt – abban
             # van a hiba KÓDJA. A korábbi 80 soros sorfark a nyom közepét
             # vágta ki, és pont az ok maradt le róla.
@@ -334,6 +345,34 @@ def build_report(settings: dict | None = None,
     lines += ["", "(A jelentés nem tartalmaz API-kulcsot, jelszót vagy "
                   "süti-tartalmat; a felhasználói mappa ~ jellel szerepel.)"]
     return _mask_secrets("\n".join(lines))
+
+
+_BLOKK_CIM = {
+    "osszeomlas": "⚠️ ÖSSZEOMLÁS-NAPLÓ (natív hiba nyoma):",
+    "megakadas": "⚠️ MEGAKADÁS-NAPLÓ (a program nem válaszolt; "
+                 "minden szál verme):",
+    "tulelt": "ℹ️ TÚLÉLT NATÍV JELZÉS (a program futott tovább – NEM "
+              "összeomlás; a Windows lekezelte):",
+}
+
+
+def _kor_sorok(b: dict) -> list:
+    """MIKOR / AZÓTA egy jelentés-blokkhoz (a `_nyom_kora_sorok` mintájára)."""
+    ki = []
+    if b.get("ido"):
+        ki.append("MIKOR: %s, a(z) %s verzióban."
+                  % (b["ido"], b.get("verzio") or "ismeretlen"))
+    ota = int(b.get("ota") or 0)
+    if ota:
+        ki.append("AZÓTA: %d indulás." % ota)
+    else:
+        ki.append("AZÓTA: ez volt a LEGUTÓBBI indulás – a nyom friss.")
+    regi, most = b.get("verzio"), b.get("most")
+    if ota and regi and most and regi != most:
+        ki.append("FIGYELEM: a nyom egy KORÁBBI verzióból való (%s), "
+                  "a program azóta %s. Lehet, hogy a hibát már javítottuk."
+                  % (regi, most))
+    return ki
 
 
 def _nyom_kora_sorok(osszeomlas) -> list:

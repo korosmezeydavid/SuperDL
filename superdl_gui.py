@@ -3810,8 +3810,15 @@ class UpdateDialog(wx.Dialog):
         app_digests = self.app.get("digests", {}) if self.app else {}
         self.info.SetValue("Frissítések letöltése és telepítése...")
 
+        utolso = [-1]
+
         def prog(f):
-            wx.CallAfter(self.gauge.SetValue, int(f * 100))
+            # Csak egész százalék-váltáskor: egy 150 MB-os letöltés különben
+            # több ezer CallAfter-rel árasztja el a fő szálat (megakadás).
+            v = int(f * 100)
+            if v != utolso[0]:
+                utolso[0] = v
+                wx.CallAfter(self.gauge.SetValue, v)
 
         def work():
             results = []
@@ -4161,6 +4168,13 @@ def main():
         wx.CallLater(8000,
                      lambda: wx.CallAfter(frame._osszeomlas_utan_szol))
     app.MainLoop()
+    # Rendes kilépés jele: az ebben a futásban esetleg kiírt, de a Windows
+    # által lekezelt natív jelzés (pl. 0x8001010d) így NEM számít összeomlásnak.
+    try:
+        from superdl import osszeomlas as _oo
+        _oo.rendben_kilep()
+    except Exception:
+        pass
 
 
 if __name__ == "__main__":

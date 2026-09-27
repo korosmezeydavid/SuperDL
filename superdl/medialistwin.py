@@ -116,6 +116,8 @@ class MediaListDialog(wx.Dialog):
         threading.Thread(target=work, daemon=True).start()
 
     def _on_state(self, text):
+        if not self:          # az ablakot közben bezárták
+            return
         if text == "lejátszás" and self._cur:
             self._announce(f"Most szól: {self._cur}  "
                            f"(hangerő {round(self.player.volume * 100)}%)")

@@ -614,6 +614,12 @@ class MediaSearchFrame(wx.Frame):
         return f"Nem lejátszható: {msg[:120]}. Próbálj egy másikat."
 
     def _on_player_state(self, text):
+        # A lejátszó a leállításkor („vége") még CallAfter-rel visszaszól –
+        # ha közben bezárták az ablakot, az már törölt wx-objektum.
+        # (szakember83 naplója, 4.6.20: „wrapped C/C++ object of type
+        # MediaSearchFrame has been deleted".)
+        if not self:
+            return
         if text == "lejátszás":
             self._player_mode = True
             if self._tekert:
@@ -726,6 +732,10 @@ class MediaSearchFrame(wx.Frame):
             "Médiakereső súgó", wx.OK | wx.ICON_INFORMATION, self)
 
     def _on_close(self, e):
+        try:
+            self.player.on_state = None     # bezárás után ne szóljon ide
+        except Exception:
+            pass
         try:
             self.player.stop()
         except Exception:

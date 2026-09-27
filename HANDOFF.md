@@ -179,6 +179,24 @@ build-értelmező; 2026-09-24 óta ebben is van ctranslate2 4.8.1,
 sentencepiece 0.2.2, sacremoses 0.2.0, joblib 1.5.3, subword-nmt 0.3.8
 (a 4.6.12–4.6.17 között ezek hiányoztak → a fordító némán kiesett).
 
+### ✅ 4.6.22 (2026-09-27) – szakember83: FRISSÍTÉS, ELREJTETT NYOM
+
+Jelentés: a 4.6.20→4.6.21 önfrissítés hibával megszakadt, a program
+„megakadt", a hibajelentésből pedig pont a megakadás nyoma hiányzott.
+- `selfupdate._download_to_file`: a folyamatjelzőt csak egész százalék-
+  váltáskor hívja (150 MB ≈ 2300 → 101 hívás; élőben mérve), a csonka
+  letöltést `FelbeszakadtLetoltes`-ként ismeri fel. Új `_letolt_ellenorizve`:
+  3 próba, minden próba az update.log-ba; hálózati hibánál érthető üzenet (nem
+  a „sérült vagy manipulált"). A GUI `prog` is csak változáskor hív CallAfter-t.
+- `osszeomlas`: `rendben_kilep()` a `MainLoop` után („=== SuperDL rendben
+  kilépett"); a rendben véget ért futás natív jelzése (pl. 0x8001010d) nem
+  összeomlás (`uj_osszeomlas`). Új `jelentes_blokkok()`: a LEGUTÓBBI natív
+  jelzés ÉS a LEGUTÓBBI megakadás is a jelentésbe kerül; a futó programban
+  vagy rendben lezárt futásban lévő jelzés címe „TÚLÉLT NATÍV JELZÉS".
+- `searchwin` / `freshvideoswin` / `medialistwin`: a lejátszó a bezárt
+  ablakhoz nem szól vissza (`RuntimeError: wrapped C/C++ object … deleted`).
+Teszt: `tests/test_szakember83_frissites.py`.
+
 ### ✅ 4.6.21 + AKCIÓS ÚJSÁG 0.5.0 (2026-09-26) – PETRUS JÓZSEF ÖTLETEI
 
 Core 4.6.21: **Asztal** (`superdl/asztal.py`; Eszközök → Asztal, Ctrl+Alt+D).
