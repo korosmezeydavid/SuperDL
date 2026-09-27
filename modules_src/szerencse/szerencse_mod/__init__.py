@@ -133,8 +133,7 @@ def _utes(_e=None):
     s = _state.get("suti")
     if s is None:
         return
-    if s.a.csomagok and time.time() - _state.get("csomag_ido", 0) \
-            > CSOMAG_FRISSITES_MP:
+    if time.time() - _state.get("csomag_ido", 0) > CSOMAG_FRISSITES_MP:
         _csomag_letolt()
     uj = s.lepes(time.time(), _dt.datetime.now())
     if uj:
@@ -188,11 +187,8 @@ def beallitasok():
         return
     d = BeallitasDialog(main, s.a)
     if d.ShowModal() == d.GetAffirmativeId():
-        volt = s.a.csomagok
         d.alkalmaz(s.a)
         _ment()
-        if s.a.csomagok and not volt:
-            _csomag_letolt()
         _mondd("Szerencsesüti beállítások elmentve.")
     d.Destroy()
 

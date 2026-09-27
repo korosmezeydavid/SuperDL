@@ -229,12 +229,12 @@
       "category": "Szórakozás",
       "description": "Napközben 15 percenként érkezik egy szerencsesüti: Ctrl+Alt+S-sel kibontod, és a felolvasó elmondja, mi van benne – bölcsesség, vicc, huncut beszólás, nevetéssel és hanghatásokkal. Néha büntetés jár (1, 2, 10 vagy akár 24 óra sütiszünet), néha bónusz (még egy süti). Legfeljebb 3 süti gyűlik össze; éjszakai csend alatt nem jön süti. Beállítás: be/ki, éjszakai csend, érkezés szóban. Saját üzeneteket is írhatsz hozzá.",
       "latest": {
-        "version": "1.0.0",
+        "version": "1.0.1",
         "min_core_api": "1.0",
         "min_core_version": "4.6.12",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szerencse-1.0.0/szerencse-1.0.0.zip",
-        "sha256": "c964d272fad59e36b6c9fffcf9bd921f3ec90a4f796574bc6a55f4a41d94647c",
-        "size": 509952
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szerencse-1.0.1/szerencse-1.0.1.zip",
+        "sha256": "8ea45fea882c02da805aaa8ecd53eb08ad6a14ec696bde6e22f6ede6d83e8bb4",
+        "size": 509974
       }
     },
     {

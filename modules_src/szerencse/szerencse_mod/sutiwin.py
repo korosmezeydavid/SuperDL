@@ -17,10 +17,6 @@ class BeallitasDialog(wx.Dialog):
                                            "szóljon (nem csak a hang)")
         self.szo.SetValue(bool(allapot.erkezes_szoval))
         v.Add(self.szo, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
-        self.cs = wx.CheckBox(self, label="Ünnepi &süticsomagok a netről "
-                                          "(karácsony, húsvét és a többi)")
-        self.cs.SetValue(bool(allapot.csomagok))
-        v.Add(self.cs, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
         g = wx.FlexGridSizer(cols=2, vgap=6, hgap=8)
         g.Add(wx.StaticText(self, label="Éjszakai csend &kezdete (óó:pp):"),
               0, wx.ALIGN_CENTER_VERTICAL)
@@ -56,6 +52,5 @@ class BeallitasDialog(wx.Dialog):
     def alkalmaz(self, a):
         a.bekapcsolva = self.be.GetValue()
         a.erkezes_szoval = self.szo.GetValue()
-        a.csomagok = self.cs.GetValue()
         a.csend_tol = self.tol.GetValue().strip()
         a.csend_ig = self.ig.GetValue().strip()

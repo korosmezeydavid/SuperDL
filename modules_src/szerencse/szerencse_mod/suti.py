@@ -169,8 +169,8 @@ class Suti:
         return self.a.varo - elotte
 
     def aktiv_csomag(self):
-        if not self.a.csomagok:
-            return None
+        # Dávid döntése: a csomagot ő kapcsolja be, a felhasználó nem
+        # választhat – ha van csomag, az megy.
         return aktiv_csomag(self.csomagok, self.ma or _dt.date.today())
 
     def csomag_hir(self) -> str:
@@ -218,7 +218,13 @@ class Suti:
             return None
         self.a.varo -= 1
         self.a.bontva += 1
-        fajta = self.rnd.choices(list(SULYOK), weights=list(SULYOK.values()))[0]
+        sulyok = SULYOK
+        c = self.aktiv_csomag()
+        if c is not None and c.csere:
+            # csere-csomag: csak a csomagban szereplő fajták jöhetnek
+            sulyok = {k: v for k, v in SULYOK.items()
+                      if c.uzenetek.get(k)} or SULYOK
+        fajta = self.rnd.choices(list(sulyok), weights=list(sulyok.values()))[0]
         u = self._huz(fajta)
         if u.fajta == "buntetes":
             self.a.buntetes_ig = most + u.orak * 3600

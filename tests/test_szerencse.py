@@ -97,24 +97,30 @@ def test_hangfajl_ures_mappa_nem_hiba(tmp_path):
 
 
 # --- süticsomagok a netről ---------------------------------------------------
-TAROLO_CSOMAG = Path(__file__).resolve().parents[1] / "szerencse" \
-    / "csomagok.txt"
+TAROLO = Path(__file__).resolve().parents[1] / "szerencse"
 
 
-def test_tarolo_csomagfajl_ervenyes_es_naptar():
-    cs = S.csomagok_betolt(TAROLO_CSOMAG.read_text(encoding="utf-8"))
-    assert len(cs) >= 4
-    for c in cs:
+def test_tarolo_csomagfajlok():
+    # a futó csomag csak Dávid szólására kerül be
+    futo = S.csomagok_betolt((TAROLO / "csomagok.txt").read_text(
+        encoding="utf-8"))
+    assert len(futo) <= 1
+    tar = S.csomagok_betolt((TAROLO / "csomag_tar.txt").read_text(
+        encoding="utf-8"))
+    assert len(tar) >= 4
+    for c in tar:
+        assert c.csere and not c.tol and not c.ig
+        assert S.csomag_ervenyes(c, dt.date(2026, 9, 27))
         for v in c.uzenetek.values():
             for x in v:
                 assert x.hang in ("",) + S.HANGOK
-    nev = lambda d: (S.aktiv_csomag(cs, d) or S.Csomag("-", {})).nev  # noqa
-    assert "adventi" in nev(dt.date(2026, 12, 5))
-    assert "karácsonyi" in nev(dt.date(2027, 12, 25))
-    assert "szilveszteri" in nev(dt.date(2026, 12, 31))
-    assert "szilveszteri" in nev(dt.date(2027, 1, 1))
-    assert "húsvéti" in nev(dt.date(2027, 3, 29))
-    assert nev(dt.date(2026, 9, 27)) == "-"
+
+
+def test_naptaras_csomag_evfordulon_at():
+    c = S.Csomag("x", {}, tol="12-31", ig="01-01")
+    assert S.csomag_ervenyes(c, dt.date(2026, 12, 31))
+    assert S.csomag_ervenyes(c, dt.date(2027, 1, 1))
+    assert not S.csomag_ervenyes(c, dt.date(2027, 1, 2))
 
 
 def test_csomag_keveres_csere_es_bejelentes():
@@ -129,11 +135,9 @@ def test_csomag_keveres_csere_es_bejelentes():
     s.rnd.choices = lambda pop, weights=None: ["vicc"]
     assert s.kibont(T0).szoveg == "CSOMAGVICC"
     assert s.csomag_hir() == "Hahó!" and s.csomag_hir() == ""
-    # a nem szereplő fajta a rendes sütikből jön
-    s.rnd.choices = lambda pop, weights=None: ["bolcsesseg"]
-    assert s.kibont(T0).szoveg != "CSOMAGVICC"
-    # kikapcsolva: nincs csomag
+    # csere-csomagnál csak a csomagban lévő fajták közül sorsol
+    s.rnd.choices = lambda pop, weights=None: [list(pop)[0]]
+    assert s.kibont(T0).szoveg == "CSOMAGVICC"
+    # a beállítás nem kapcsolja ki (Dávid döntése)
     s.a.csomagok = False
-    s.rnd.choices = lambda pop, weights=None: ["vicc"]
-    assert s.kibont(T0).szoveg != "CSOMAGVICC"
-    assert s.csomag_hir() == ""
+    assert s.kibont(T0).szoveg == "CSOMAGVICC"

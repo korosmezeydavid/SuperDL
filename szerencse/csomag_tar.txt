@@ -1,0 +1,103 @@
+# Kész süticsomagok – NEM töltődnek le. Bekapcsolás: a kívánt csomagot
+# (a @nev: sortól a következő @nev: sorig) át kell másolni a
+# csomagok.txt-be, és feltölteni.
+
+@nev: adventi süticsomag
+@mod: csere
+@udvozles: Megérkezett az adventi süticsomag! Mostantól minden sütiben egy kis adventi kalendárium lakik.
+
+[bolcsesseg]
+Az advent arról szól, hogy várni is lehet szépen. A sütire is.
+Egy gyertya kevés fényt ad. De ha valaki mellé gyújt még egyet, már kettő.
+Nem az ajándék számít, hanem az, hogy valaki gondolt rád. Ma én gondoltam rád.
+Ebben az időszakban a türelem nem erény, hanem túlélési stratégia.
+Ha ma valakinek írsz egy kedves üzenetet, az ő adventi kalendáriumában kinyílik egy ablak.
+
+[vicc]
+Az adventi kalendárium az egyetlen naptár, amit az emberek előre kiolvasnak. |kuncogas
+Hány rénszarvas kell egy villanykörte cseréjéhez? Egy sem, Rudolf világít. |kuncogas
+A Mikulás azért nem használ GPS-t, mert Rudolf orra jobb, mint bármelyik térkép. |nagy_nevetes
+
+[beszolas]
+Ez a süti adventi különkiadás. Pont olyan, mint a rendes, csak ünnepélyesebben nézel rá. |huncut
+Britt kutatók megállapították, hogy december elsején minden évben ugyanannyi idő van még karácsonyig. |punch
+Az ajándékokat még nem vetted meg? Nyugi, a boltok is csak december huszonharmadikán kezdenek pánikolni. |huncut
+Ne kiabálj, vegyél lufit! Karácsonyfára is akaszthatod. |kuncogas
+
+[buntetes]
+1: A krampusz járt erre, és elvitte a sütidet.
+2: Virgácsot kaptál sütiben. Két óra elmélkedés.
+
+[bonusz]
+Kinyílt még egy ablak az adventi kalendáriumon!
+
+@nev: karácsonyi süticsomag
+@mod: csere
+@udvozles: Boldog karácsonyt! Megérkezett a karácsonyi süticsomag. Dávid és a SuperDL szeretettel gondol rád.
+
+[bolcsesseg]
+A legszebb ajándék az, amit nem lehet becsomagolni: az idő, amit valakivel töltesz.
+Karácsonykor nem a fa a legfényesebb a szobában, hanem az, aki mellette ül.
+Ma nem kell tökéletesnek lenned. Elég, ha ott vagy.
+A bejgli is csak liszt, dió és türelem. Te is ilyen vagy, csak dió helyett szívvel.
+Ha ma egyedül vagy, tudd: ezt a sütit valaki neked sütötte. Nem vagy egyedül.
+
+[vicc]
+Mit mond a karácsonyfa a díszeknek? Ne lógjatok itt egész nap! |kuncogas
+A töltött káposzta harmadnapra a legjobb. A rokonok nem feltétlenül. |nagy_nevetes
+A Jézuska idén is késik. Ő legalább előre szólt, hogy csak este jön. |kuncogas
+
+[beszolas]
+Britt kutatók megállapították, hogy a harmadik szelet bejgli után már nem te eszed a bejglit, hanem a bejgli téged. |punch
+Ez a süti karácsonyi. Semmit nem kell érte csinálnod, csak örülni. Menni fog? |huncut
+Ha a nagynénéd megkérdezi, mikor nősülsz, mondd azt, hogy a szerencsesüti szerint még nem most. |huncut
+
+[buntetes]
+1: A rénszarvasok sztrájkolnak. Egy óra szánkószünet.
+
+[bonusz]
+Ajándék! Még egy süti a fa alatt.
+Csengettek! Még egy süti érkezett.
+
+@nev: szilveszteri és újévi süticsomag
+@mod: csere
+@udvozles: Megjött a szilveszteri süticsomag! Boldog új évet, és köszönjük, hogy idén is velünk voltál!
+
+[bolcsesseg]
+Az új év nem attól lesz új, hogy megváltozik a dátum, hanem attól, hogy te mersz valami újat.
+Ne fogadj meg száz dolgot. Egyet fogadj meg, és azt tartsd be.
+Az idei év minden napja, a rosszak is, elvezettek ide. És itt jó lenni.
+
+[vicc]
+Idei újévi fogadalmam: leszokom a fogadalmakról. Tavaly is ez volt. |kuncogas
+Az újév az a nap, amikor mindenki egészségesen akar élni, és mindenki fejfájással ébred. |nagy_nevetes
+
+[beszolas]
+Britt kutatók megállapították, hogy az újévi fogadalmak átlagos élettartama tizenegy nap és négy óra. |punch
+Ez a süti már jövő évi. Csak még nem tudja. |huncut
+
+[bonusz]
+Pezsgőbontás! Még egy süti a koccintáshoz.
+
+@nev: húsvéti süticsomag
+@mod: csere
+@udvozles: Kellemes húsvéti ünnepeket! Megérkezett a húsvéti süticsomag, a nyuszi külön neked hozta.
+
+[bolcsesseg]
+A tavasz mindig eljön. Még akkor is, ha a tél úgy tesz, mintha örökre maradna.
+A tojásból is akkor lesz élet, ha nem kívülről törik fel, hanem belülről.
+Ma egy kicsit újrakezdheted. Ezért van a húsvét.
+
+[vicc]
+Miért nem jár a húsvéti nyuszi iskolába? Mert ő már mindent tud a tojásokról. |kuncogas
+A locsolkodás az egyetlen hagyomány, ahol leöntenek kölnivel, és még meg is köszönöd. |nagy_nevetes
+
+[beszolas]
+Britt kutatók megállapították, hogy a csokinyuszit mindenki a fülénél kezdi. A kutatáshoz negyven csokinyuszi kellett. |punch
+Ez a süti húsvéti. Nem tojás, de mindent megtesz. |huncut
+
+[buntetes]
+2: A nyuszi elbújtatta a sütidet. Két óra keresgélés.
+
+[bonusz]
+Találtál egy piros tojást! Még egy süti jár érte.
