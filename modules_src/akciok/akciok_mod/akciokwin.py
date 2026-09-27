@@ -634,7 +634,8 @@ class AkciokFrame(wx.Frame):
         self.lista.Freeze()
         try:
             bolttal = self._valasztott_bolt() is None
-            self.lista.Set([t.sor(bolttal) for t in self._lathato])
+            arrend = self.rendez.GetSelection() == 1
+            self.lista.Set([t.sor(bolttal, arrend) for t in self._lathato])
         finally:
             self.lista.Thaw()
         if self._lathato:

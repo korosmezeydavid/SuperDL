@@ -29,13 +29,34 @@ class Termek:
     csoport: str = ""            # közös termékcsoport (csoport.besorol)
     url: str = ""                # a termék oldala a bolt honlapján, ha van
 
-    def sor(self, bolttal: bool = False) -> str:
+    def sor(self, bolttal: bool = False, legjobb_elol: bool = False) -> str:
         """A listasor. ⚠️ A sor ELEJÉN a név és az ár: nyilazáskor ez
         hangzik el először, a többi csak utána.
 
         `bolttal=True` (Minden bolt nézet): a bolt neve közvetlenül az ár
         után – Petrus József: „a legolcsóbbtól a legdrágábbig, persze
-        feltüntetve az áruház nevét"."""
+        feltüntetve az áruház nevét".
+
+        `legjobb_elol=True` (Ár szerint rendezve): ELSŐNEK az az ár hangzik
+        el, ami szerint a lista rendezve van (`legjobb_ar`). Ha a kártyás ár
+        az olcsóbb, az kerül előre, a kártya nélküli ár hátra. Különben
+        nyilazáskor a kártya nélküli árat hallod, a sorrend viszont a
+        kártyás szerint megy – ez „összekutyulódott" (Petrus József,
+        2026-09-27)."""
+        if (legjobb_elol and self.kartyas_ar is not None
+                and (self.ar is None or self.kartyas_ar < self.ar)):
+            reszek = [self.nev, "%s %s" % (self.kartya_nev or "kártyával",
+                                           ft(self.kartyas_ar))]
+            if bolttal and self.bolt:
+                reszek.append(self.bolt)
+            if self.ar is not None:
+                reszek.append("kártya nélkül %s" % ft(self.ar))
+            if self.kedvezmeny:
+                reszek.append(self.kedvezmeny)
+            if (self.kiszereles
+                    and self.kiszereles.lower() not in self.nev.lower()):
+                reszek.append(self.kiszereles)
+            return ", ".join(reszek)
         reszek = [self.nev]
         if self.ar is not None:
             reszek.append(ft(self.ar))
