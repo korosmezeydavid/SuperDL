@@ -8,12 +8,12 @@
       "category": "Mindennapok",
       "description": "A boltok akciói felolvasható, nyilazható listában – élelmiszer: Penny, Lidl, Aldi, Tesco, Spar és Interspar, Auchan; drogéria és kozmetika: Rossmann, dm, Müller, valamint az Illatorium (a program készítőjének saját parfümboltja, teljes kínálattal); vegyes áru: Pepco; könyv: Libri. Nem kép és nem találgatás: a boltok saját, nyilvános oldalairól és újságjaiból jön a szöveg. Szűrés boltra vagy boltfajtára, közös termékcsoportra és a bolt saját kategóriájára, keresés ékezet nélkül is, rendezés ár szerint. Ctrl+O: a termék oldala a bolt honlapján, Ctrl+Shift+C: a cím a vágólapra. Saját bevásárlólista (Ctrl+L), ami összefésülhető a telefonos SuperDL-lel, és Ctrl+E-vel kiküldhető.",
       "latest": {
-        "version": "0.7.0",
+        "version": "0.7.1",
         "min_core_api": "1.0",
         "min_core_version": "4.6.20",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-akciok-0.7.0/akciok-0.7.0.zip",
-        "sha256": "0565386607b5addade43212c561654d7de088f7e034b775aec53228edef3f185",
-        "size": 66342
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-akciok-0.7.1/akciok-0.7.1.zip",
+        "sha256": "4df2c7ec188430724ed0e42cf8b247d251e204b13759bb9b32050af4b4eb99b6",
+        "size": 67153
       }
     },
     {

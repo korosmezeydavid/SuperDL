@@ -134,6 +134,71 @@ Az árak a boltok saját adatai; a program csak megmutatja őket. Nyomdai és
 """
 
 
+class TermekLista(wx.ListCtrl):
+    """VIRTUÁLIS terméklista – a ListBox helyett (szakember83, 2026-09-27).
+
+    ⚠️ A 0.7.0-ban a „Minden bolt" nézet már kb. 12 000 terméket mutat
+    (Rossmann, Libri, Illatorium…). A ListBox minden sort egyenként kap meg,
+    és a képernyőolvasó minden sorról értesítést kér: nála a lista feltöltése
+    több mint 20 másodpercre megakasztotta a programot – ráadásul minden
+    beérkező boltnál újra. A virtuális lista a sorokat csak akkor kéri el,
+    amikor megjelennek (vagy a képernyőolvasó rájuk lép), így a feltöltés
+    azonnali, akármekkora a lista.
+
+    A ListBox-nál megszokott hívásokat (Set, GetSelection, SetSelection,
+    GetString, GetCount) ugyanúgy tudja, a kijelölés pedig EVT_LISTBOX-ot
+    küld – a hívó kódnak nem kell tudnia a cseréről."""
+
+    def __init__(self, szulo):
+        super().__init__(szulo, style=wx.LC_REPORT | wx.LC_VIRTUAL
+                         | wx.LC_SINGLE_SEL | wx.LC_NO_HEADER)
+        self.InsertColumn(0, "Termék")
+        self._sorok = []
+        self.Bind(wx.EVT_SIZE, self._meret)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self._kijelolve)
+
+    def _meret(self, e):
+        try:
+            self.SetColumnWidth(0, max(200, self.GetClientSize().width - 4))
+        except Exception:
+            pass
+        e.Skip()
+
+    def _kijelolve(self, e):
+        ev = wx.CommandEvent(wx.wxEVT_LISTBOX, self.GetId())
+        ev.SetEventObject(self)
+        ev.SetInt(e.GetIndex())
+        self.GetEventHandler().ProcessEvent(ev)
+        e.Skip()
+
+    def OnGetItemText(self, item, col):
+        return self._sorok[item] if 0 <= item < len(self._sorok) else ""
+
+    def Set(self, sorok):
+        self._sorok = list(sorok)
+        self.SetItemCount(len(self._sorok))
+        self.Refresh()
+
+    def GetCount(self):
+        return len(self._sorok)
+
+    def GetString(self, i):
+        return self._sorok[i]
+
+    def GetSelection(self):
+        return self.GetFirstSelected()
+
+    def SetSelection(self, i):
+        if not (0 <= i < len(self._sorok)):
+            return
+        allapot = wx.LIST_STATE_SELECTED | wx.LIST_STATE_FOCUSED
+        regi = self.GetFirstSelected()
+        if regi not in (-1, i):
+            self.SetItemState(regi, 0, allapot)
+        self.SetItemState(i, allapot, allapot)
+        self.EnsureVisible(i)
+
+
 def _nevelo(nev: str) -> str:
     """„a Penny", de „az Illatorium", „az Aldi"."""
     return ("az " if nev[:1].lower() in "aáeéiíoóöőuúüű" else "a ") + nev
@@ -241,7 +306,7 @@ class AkciokFrame(wx.Frame):
 
         v.Add(wx.StaticText(p, label="&Termékek (Ctrl+L: fel a bevásárló"
                                      "listára):"), 0, wx.LEFT, 8)
-        self.lista = wx.ListBox(p, style=wx.LB_SINGLE)
+        self.lista = TermekLista(p)
         self.lista.SetName("Akciós termékek")
         self.lista.Bind(wx.EVT_LISTBOX, lambda e: self._reszlet())
         v.Add(self.lista, 1, wx.EXPAND | wx.ALL, 8)
