@@ -26,6 +26,7 @@ class Termek:
     kod: str = ""                # a bolt azonosítója (URL vagy cikkszám)
     megjegyzes: str = ""
     csoport: str = ""            # közös termékcsoport (csoport.besorol)
+    url: str = ""                # a termék oldala a bolt honlapján, ha van
 
     def sor(self, bolttal: bool = False) -> str:
         """A listasor. ⚠️ A sor ELEJÉN a név és az ár: nyilazáskor ez
@@ -67,7 +68,18 @@ class Termek:
                            ("Megjegyzés", self.megjegyzes)):
             if ertek:
                 sorok.append("%s: %s" % (cim, ertek))
+        if self.hivatkozas():
+            sorok.append("Weboldal: %s" % self.hivatkozas())
         return "\n".join(sorok)
+
+    def hivatkozas(self) -> str:
+        """A termék saját oldala a bolt honlapján – ha a bolt ad ilyet (a
+        régebbi forrásoknál a `kod` maga a cím)."""
+        if self.url:
+            return self.url
+        if (self.kod or "").startswith("http"):
+            return self.kod
+        return ""
 
     def legjobb_ar(self) -> int | None:
         arak = [a for a in (self.ar, self.kartyas_ar) if a is not None]

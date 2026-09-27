@@ -574,7 +574,10 @@ def test_dm_turelmes_429_eseten(monkeypatch):
 def test_minden_uj_bolt_be_van_kotve():
     azonok = [a for a, _n, _f in forrasok.BOLTOK]
     assert azonok == ["penny", "lidl", "aldi", "tesco", "spar", "auchan",
-                      "rossmann", "dm"]
+                      "rossmann", "dm", "mueller", "pepco", "libri"]
+    # minden boltnak van fajtája és honlapja
+    for a in azonok:
+        assert forrasok.bolt_fajta(a) and forrasok.bolt_oldal(a).startswith("https://")
 
 
 # ---- Barbara (2026-09-26): „a Lidl és a dm mindig nullát mond" ------------
@@ -588,6 +591,10 @@ def _csonk(valasztott, folyamatban, adat, lathato=0):
 
         def _valasztott_bolt(self):
             return valasztott
+
+        def _valasztott_boltok(self):
+            return [valasztott] if valasztott else \
+                [a for a, _n, _f in forrasok.BOLTOK]
     c = Cs()
     c._folyamatban, c._adat, c._lathato = set(folyamatban), adat, [0] * lathato
     return c._darab_szoveg()

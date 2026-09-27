@@ -11,7 +11,8 @@ import json
 import time
 from pathlib import Path
 
-from . import aldi, auchan, dm, lidl, penny, rossmann, spar, tesco
+from . import (aldi, auchan, dm, libri, lidl, mueller, penny, pepco,
+               rossmann, spar, tesco)
 from .termek import Termek
 
 MAPPA = Path.home() / ".superdl" / "akciok"
@@ -29,7 +30,50 @@ BOLTOK = [
     ("auchan", "Auchan", lambda get, gb, j: auchan.letolt(_get_sima, j)),
     ("rossmann", "Rossmann", lambda get, gb, j: rossmann.letolt(_post_json, j)),
     ("dm", "dm", lambda get, gb, j: dm.letolt(_get_json, j)),
+    ("mueller", "Müller", lambda get, gb, j: mueller.letolt(get, gb, j)),
+    ("pepco", "Pepco", lambda get, gb, j: pepco.letolt(get, j)),
+    ("libri", "Libri", lambda get, gb, j: libri.letolt(gb, j)),
 ]
+
+# A boltok FAJTÁJA (a Bolt-választó csoportjaihoz) és HONLAPJA. A `webshop`
+# csak ott igaz, ahol a bolt honlapján tényleg lehet rendelni.
+FAJTAK = [("elelmiszer", "Minden élelmiszerlánc"),
+          ("drogeria", "Minden drogéria és kozmetika"),
+          ("vegyes", "Minden vegyes áru"),
+          ("konyv", "Minden könyvesbolt")]
+BOLT_INFO = {
+    "penny": ("elelmiszer", "https://www.penny.hu/ajanlatok", False),
+    "lidl": ("elelmiszer", "https://www.lidl.hu", False),
+    "aldi": ("elelmiszer", "https://www.aldi.hu", False),
+    "tesco": ("elelmiszer", "https://tesco.hu/akciok/akcios-termekek/", True),
+    "spar": ("elelmiszer", "https://www.spar.hu/ajanlatok", False),
+    "auchan": ("elelmiszer", "https://auchan.hu", True),
+    "rossmann": ("drogeria", "https://shop.rossmann.hu", True),
+    "dm": ("drogeria", "https://www.dm.hu", True),
+    "mueller": ("drogeria", "https://www.mueller.co.hu/prospektusok/", False),
+    "pepco": ("vegyes", "https://pepco.hu/gyujtemeny/ujsagaink/", False),
+    "libri": ("konyv", "https://www.libri.hu/konyvutca", True),
+}
+
+
+def bolt_fajta(bolt_id: str) -> str:
+    return BOLT_INFO.get(bolt_id, ("", "", False))[0]
+
+
+def bolt_oldal(bolt_id: str) -> str:
+    return BOLT_INFO.get(bolt_id, ("", "", False))[1]
+
+
+def webshop(bolt_id: str) -> bool:
+    return BOLT_INFO.get(bolt_id, ("", "", False))[2]
+
+
+def bolt_id_nevbol(nev: str) -> str:
+    """„Spar" → "spar" (a termék a bolt NEVÉT hordozza)."""
+    for a, n, _f in BOLTOK:
+        if nev == n or n.startswith(nev + " ") or nev.lower() == a:
+            return a
+    return ""
 
 
 def _get_sima(url: str) -> str:

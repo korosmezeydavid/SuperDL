@@ -65,6 +65,9 @@ def termek(p: dict) -> Termek | None:
         t.regi_ar = int(regi)
         t.kedvezmeny = "-%d%%" % round((1 - ar / regi) * 100)
     t.kod = str(p.get("dan") or p.get("gtin") or "")
+    onlap = td.get("self") or ""
+    if onlap.startswith("/"):
+        t.url = "https://www.dm.hu" + onlap
     return t
 
 

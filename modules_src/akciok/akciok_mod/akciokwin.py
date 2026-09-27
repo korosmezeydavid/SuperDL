@@ -26,8 +26,12 @@ RENDEZESEK = ("Bolt szerint", "Ár szerint, a legolcsóbb elöl", "Név szerint"
 SUGO = """AKCIÓS ÚJSÁG – SÚGÓ
 
 MIRE VALÓ
-A boltok akcióit mutatja meg olvasható, nyilazható listában: Penny, Lidl,
-Aldi, Tesco, Spar és Interspar, Auchan, Rossmann és dm. Nem kép és nem
+A boltok akcióit mutatja meg olvasható, nyilazható listában.
+  Élelmiszer ......... Penny, Lidl, Aldi, Tesco, Spar és Interspar, Auchan
+  Drogéria, kozmetika  Rossmann, dm, Müller (a parfümériával együtt)
+  Vegyes áru ......... Pepco
+  Könyv .............. Libri (a Könyvutca akciós könyvei)
+Nem kép és nem
 találgatás: a boltok saját, nyilvános oldalairól és újságjaiból jön a
 szöveg, ugyanaz, ami a papíron vagy a bolt honlapján áll.
 
@@ -45,10 +49,18 @@ HONNAN JÖN AZ ADAT
                        megjegyzés kimondja
   dm ................. a dm-nek nincs heti újsága; a kiárusított termékek
                        jönnek, a készlet erejéig
+  Müller ............. a drogéria- és a parfüméria-prospektus (PDF). Az
+                       egységárat itt nem mondjuk be, mert a prospektusból
+                       nem olvasható ki pontosan
+  Pepco .............. a heti újság a pepco.hu-n (csütörtökönként új)
+  Libri .............. a Könyvutca akciós könyvei, szerzővel, borító árral
 A pultos áruk (felvágott, sajt a pultból) ára kilónként értendő.
 
 BÖNGÉSZÉS
-  Bolt ............... Alt+B – egy bolt, vagy minden bolt egyszerre
+  Bolt ............... Alt+B – minden bolt, egy boltfajta egyszerre
+                       („Minden élelmiszerlánc", „Minden drogéria és
+                       kozmetika", „Minden vegyes áru", „Minden
+                       könyvesbolt"), vagy egyetlen bolt
   Termékcsoport ...... Alt+C – KÖZÖS csoportok minden boltban: Tejtermék és
                        tojás, Hús, hal, felvágott, Pékáru, Zöldség és
                        gyümölcs, Ital, Édesség és snack, Alapvető élelmiszer,
@@ -70,6 +82,15 @@ HOL A LEGOLCSÓBB? Bolt: Minden bolt, Keresés: pl. joghurt, Rendezés: ár
 szerint – a lista a legolcsóbbtól a legdrágábbig sorolja, bolttal együtt.
 A kijelölt termék minden részlete (egységár, érvényesség, eredeti ár) az
 alatta lévő mezőben olvasható.
+
+A BOLT OLDALA
+  Ctrl+O ............. a kijelölt termék oldala a bolt honlapján (ha a bolt
+                       ad ilyet), különben a bolt akciós oldala – a
+                       böngésződben. Ahol a honlapon online is lehet
+                       rendelni (Tesco, Auchan, Rossmann, dm, Libri), azt a
+                       program kimondja, és a termék adatai közt is ott áll.
+  Ctrl+Shift+C ....... ugyanez a cím a vágólapra – beillesztheted egy
+                       levélbe vagy üzenetbe a segítődnek.
 
 BEVÁSÁRLÓLISTA
   Ctrl+L ............. a kijelölt termék felkerül a listádra (a bolt nevével,
@@ -151,7 +172,18 @@ class AkciokFrame(wx.Frame):
         felso = wx.FlexGridSizer(cols=2, vgap=6, hgap=8)
         felso.AddGrowableCol(1)
         felso.Add(wx.StaticText(p, label="&Bolt:"), 0, wx.ALIGN_CENTER_VERTICAL)
-        self.bolt = wx.Choice(p, choices=[MIND] + [n for _a, n, _f in F.BOLTOK])
+        # MIND, a bolt-FAJTÁK (élelmiszer, drogéria, vegyes áru, könyv), majd
+        # egyenként a boltok – Dávid ötlete (2026-09-27)
+        self._bolt_ertekek = [None]
+        cimkek = [MIND]
+        for kulcs, cim in F.FAJTAK:
+            if any(F.bolt_fajta(a) == kulcs for a, _n, _f in F.BOLTOK):
+                self._bolt_ertekek.append(("fajta", kulcs))
+                cimkek.append(cim)
+        for a, n, _f in F.BOLTOK:
+            self._bolt_ertekek.append(("bolt", a))
+            cimkek.append(n)
+        self.bolt = wx.Choice(p, choices=cimkek)
         self.bolt.SetName("Bolt")
         self.bolt.SetSelection(0)
         self.bolt.Bind(wx.EVT_CHOICE, lambda e: self._bolt_valt())
@@ -212,6 +244,10 @@ class AkciokFrame(wx.Frame):
         for cimke, fv in (("&Felvétel a bevásárlólistára (Ctrl+L)",
                            self._felvesz),
                           ("Bevásárló&lista… (Ctrl+B)", self._lista_ablak),
+                          ("&Megnyitás a bolt oldalán (Ctrl+O)",
+                           self._megnyit),
+                          ("&Hivatkozás másolása (Ctrl+Shift+C)",
+                           self._masol),
                           ("Fri&ssítés (F5)", lambda: self._letolt(True)),
                           ("Sú&gó (F1)", self._sugo),
                           ("Be&zárás", self.Close)):
@@ -221,7 +257,10 @@ class AkciokFrame(wx.Frame):
         v.Add(sor, 0, wx.ALL, 8)
         p.SetSizer(v)
 
-        ids = {k: wx.NewIdRef() for k in ("fel", "lista", "friss", "sugo")}
+        ids = {k: wx.NewIdRef() for k in ("fel", "lista", "friss", "sugo",
+                                          "nyit", "masol")}
+        self.Bind(wx.EVT_MENU, lambda e: self._megnyit(), id=ids["nyit"])
+        self.Bind(wx.EVT_MENU, lambda e: self._masol(), id=ids["masol"])
         self.Bind(wx.EVT_MENU, lambda e: self._felvesz(), id=ids["fel"])
         self.Bind(wx.EVT_MENU, lambda e: self._lista_ablak(), id=ids["lista"])
         self.Bind(wx.EVT_MENU, lambda e: self._letolt(True), id=ids["friss"])
@@ -231,6 +270,8 @@ class AkciokFrame(wx.Frame):
             (wx.ACCEL_CTRL, ord("B"), ids["lista"]),
             (wx.ACCEL_NORMAL, wx.WXK_F5, ids["friss"]),
             (wx.ACCEL_NORMAL, wx.WXK_F1, ids["sugo"]),
+            (wx.ACCEL_CTRL, ord("O"), ids["nyit"]),
+            (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord("C"), ids["masol"]),
         ]))
         self.lista.SetFocus()
 
@@ -327,7 +368,7 @@ class AkciokFrame(wx.Frame):
         varta = not self._adat.get(azon)
         self._adat[azon], self._ido[azon] = termekek, time.time()
         valasztott = self._valasztott_bolt()
-        if valasztott not in (None, azon):
+        if azon not in self._valasztott_boltok():
             return            # más boltot nézel: a listádhoz nem nyúlunk
         self._kategoriak()
         self._szur(mondja=False, megtart=True)
@@ -343,14 +384,24 @@ class AkciokFrame(wx.Frame):
             self._mond("Frissítve: %s akciós termék." % ", ".join(eredmeny))
 
     def _valasztott_bolt(self):
+        """Az EGY kiválasztott bolt azonosítója – csoportnál és Mindennél
+        None."""
         i = self.bolt.GetSelection()
-        return None if i <= 0 else F.BOLTOK[i - 1][0]
+        e = self._bolt_ertekek[i] if 0 <= i < len(self._bolt_ertekek) else None
+        return e[1] if e and e[0] == "bolt" else None
+
+    def _valasztott_boltok(self) -> list:
+        i = self.bolt.GetSelection()
+        e = self._bolt_ertekek[i] if 0 <= i < len(self._bolt_ertekek) else None
+        if e is None:
+            return [a for a, _n, _f in F.BOLTOK]
+        if e[0] == "fajta":
+            return [a for a, _n, _f in F.BOLTOK if F.bolt_fajta(a) == e[1]]
+        return [e[1]]
 
     def _forras(self):
-        b = self._valasztott_bolt()
-        if b:
-            return list(self._adat.get(b, []))
-        return [t for a, _n, _f in F.BOLTOK for t in self._adat.get(a, [])]
+        return [t for a in self._valasztott_boltok()
+                for t in self._adat.get(a, [])]
 
     def _csoportok(self):
         """A termékcsoport-választó, DARABSZÁMMAL („Tejtermék és tojás, 38"):
@@ -437,6 +488,7 @@ class AkciokFrame(wx.Frame):
         if b is not None and b in tolt:
             return ("%s: az ajánlatok még töltődnek, ez egy-két perc is "
                     "lehet. Szólok, ha megjöttek." % F.bolt_nev(b))
+        tolt = [a for a in tolt if a in self._valasztott_boltok()]
         if b is None and tolt:
             return "%d termék. Még töltődik: %s." % (
                 n, ", ".join(F.bolt_nev(a) for a in tolt))
@@ -448,7 +500,60 @@ class AkciokFrame(wx.Frame):
 
     def _reszlet(self):
         t = self._kijelolt()
-        self.reszlet.SetValue(t.reszletek() if t else "")
+        if not t:
+            self.reszlet.SetValue("")
+            return
+        sorok = [t.reszletek()]
+        azon = F.bolt_id_nevbol(t.bolt)
+        if not t.hivatkozas() and F.bolt_oldal(azon):
+            sorok.append("A bolt oldala: %s" % F.bolt_oldal(azon))
+        if F.webshop(azon):
+            sorok.append("A bolt honlapján online is rendelhetsz "
+                         "(Ctrl+O: megnyitás).")
+        self.reszlet.SetValue("\n".join(sorok))
+
+    def _cim(self):
+        """(cím, leírás) – a termék oldala, ha van, különben a bolt oldala."""
+        t = self._kijelolt()
+        if t is None:
+            b = self._valasztott_bolt()
+            return (F.bolt_oldal(b), "a %s oldala" % F.bolt_nev(b)) \
+                if b else ("", "")
+        if t.hivatkozas():
+            return t.hivatkozas(), "a termék oldala (%s)" % t.bolt
+        azon = F.bolt_id_nevbol(t.bolt)
+        return F.bolt_oldal(azon), "a %s oldala" % t.bolt
+
+    def _megnyit(self):
+        url, mi = self._cim()
+        if not url:
+            self._mond("Előbb válassz egy terméket vagy egy boltot.")
+            return
+        import webbrowser
+        try:
+            webbrowser.open(url)
+        except Exception as ex:           # noqa: BLE001
+            self._mond("Nem sikerült megnyitni a böngészőt: %s" % ex)
+            return
+        t = self._kijelolt()
+        rendel = t is not None and F.webshop(F.bolt_id_nevbol(t.bolt))
+        self._mond("Megnyitom a böngészőben: %s.%s" % (
+            mi, " Itt online is rendelhetsz." if rendel else ""))
+
+    def _masol(self):
+        url, mi = self._cim()
+        if not url:
+            self._mond("Előbb válassz egy terméket vagy egy boltot.")
+            return
+        if wx.TheClipboard.Open():
+            try:
+                wx.TheClipboard.SetData(wx.TextDataObject(url))
+                wx.TheClipboard.Flush()     # a program bezárása után is maradjon
+            finally:
+                wx.TheClipboard.Close()
+            self._mond("Kimásoltam a vágólapra: %s." % mi)
+        else:
+            self._mond("A vágólap most foglalt, próbáld újra.")
 
     # ---- bevásárlólista ---------------------------------------------------
     def _felvesz(self):
@@ -631,6 +736,7 @@ class ListaDialog(wx.Dialog):
             if wx.TheClipboard.Open():
                 try:
                     wx.TheClipboard.SetData(wx.TextDataObject(szoveg))
+                    wx.TheClipboard.Flush()
                 finally:
                     wx.TheClipboard.Close()
                 self.szulo._mond("A lista a vágólapon van – most beillesztheted "

@@ -27,14 +27,14 @@ EGYEB = "Egyéb"
 _SZABALYOK = [
     ("Baba", "~pelenka babakozmetik bebietel bebiital babaetel babafurdet "
              "popsi cumi cumisuveg babatorl babahinto babaolaj =baby kubu hipp gerber "
-             "babydream babylove pampers huggies bebivita"),
+             "babydream babylove pampers huggies bebivita tejpep babaapol"),
     ("Állateledel", "macska kutya allateledel eledel alom =whiskas "
                     "pedigree prevital felix =perfect friskies kitekat "
                     "jutalomfalat ragocsont"),
     ("Drogéria és szépségápolás",
      "sampon hajbalzsam =balzsam hajpakolas hajmaszk hajfest hajlakk hajhab "
      "hajzsele hajolaj tusfurd tusolo habfurd dezodor deo =izzadsag "
-     "fogkrem fogkefe fogselyem szajviz szajvi arckrem kezkrem labkrem "
+     "fogkrem fogkefe fogselyem fogkoz mosdato szajviz szajvi arckrem kezkrem labkrem "
      "testapol testvaj testolaj arcszerum szerum arctisztit arclemos "
      "sminklemos micellas napozo naptej fenyvedo parfum eau kolni rúzs "
      "ruzs ajak szempilla szemhej szemceruza szemfest alapozo puder "
@@ -59,9 +59,10 @@ _SZABALYOK = [
              "whisky vodka likor rum =gin konyak brandy energiaital "
              "=ital itala jegestea =tea teafilter =kave kaveszemes "
              "kavekapszula kavespecial =cappuccino "
-             "latte shot fuzetea sorpack ~buzasor =pils ~bier ~weiss prosecco ~likor sportital ~aperitif ~szorp ~kave gyumolcsital ~italpor kaveital ~szirup gyogyviz =icetea nestea =smoothie =kombucha =nektar"),
+             "latte shot fuzetea sorpack ~buzasor =pils ~bier weissbier =jagermeister prosecco ~likor sportital ~aperitif ~szorp ~kave gyumolcsital ~italpor kaveital ~szirup gyogyviz =icetea nestea =smoothie =kombucha =nektar"),
     ("Édesség és snack", "tejszelet =rudi csoki csokolade "
-                         "=cukorka cukorka nyaloka bonbon desszert keksz "
+                         "=cukorka cukorka kemenycukor nyaloka bonbon desszert keksz "
+                         "puszedli fondant ~csokolad "
                          "ostya napolyi piskota gumicukor zselecukor "
                          "=szelet muzliszelet proteinszelet chips =ropi "
                          "perec popcorn =mogyoro pattogatott "
@@ -118,9 +119,39 @@ _SZABALYOK = [
                             "=petrezselyem =zeller =kapor karalabe =sosk =cekla"),
 ]
 
+# NEM ÉLELMISZER (0.6.0: Pepco, Müller-játékok, Libri). A lista VÉGÉN állnak,
+# hogy az élelmiszer- és drogériaszabályok előbb döntsenek; a vegyes áru
+# boltjainál (_CSAK_NEM_ELELMISZER) viszont CSAK ezek jöhetnek szóba – egy
+# „macskamintás ruha" ott ne legyen állateledel.
+_SZABALYOK += [
+    ("Ruházat és cipő", "=polo polot =ruha =ruhat szoknya leggings pizsama "
+                        "zokni harisnya pulover pulcsi kardigan kabat dzseki "
+                        "nadrag farmer =ing =inget bluz =cipo cipot csizma "
+                        "papucs sapka kesztyu sal =sal melltarto bugyi "
+                        "alsonadrag boxer overal jelmez tunika "
+                        "melegito =mez fehernemu"),
+    ("Otthon és dekoráció", "parna parnahuzat takaro pled agynemu lepedo "
+                            "torolkozo furdolepedo fuggony szonyeg labtorlo "
+                            "dekor dekoracio bogre tanyer =pohar poharak "
+                            "evoeszkoz =tal =talka kosar =doboz tarolo lampa "
+                            "koszoru =vaza gyertyatarto kepkeret =ora faliora "
+                            "=serpenyo =labas edeny"),
+    ("Játék", "jatek jatekfigura pluss plussfigura =lego kirako puzzle "
+              "tarsasjatek =baba babak jatekauto =auto kisauto labda "
+              "szinezo gyurma =kocka"),
+    ("Könyv", "=konyv konyvek regeny"),
+]
+
+_NEM_ELELMISZER = ("Ruházat és cipő", "Otthon és dekoráció", "Játék",
+                   "Könyv", "Drogéria és szépségápolás",
+                   "Háztartás és tisztítószer")
+_CSAK_NEM_ELELMISZER = {"Pepco"}
+
 # a bolt SAJÁT kategóriájának szavai (Rossmann, dm, Penny) – ha a névből
 # nem derül ki
 _KATEGORIA_JEL = [
+    ("Játék", "jatek jatekok"),
+    ("Könyv", "=konyv konyvek"),
     ("Baba", "=baba pelenka"),
     ("Állateledel", "=allat allateledel =kisallat"),
     ("Háztartás és tisztítószer", "haztartas tisztit mosas"),
@@ -141,6 +172,9 @@ _KATEGORIA_JEL = [
 # ha semmi nem illik: a bolt jellege
 _BOLT_ALAP = {"Rossmann": "Drogéria és szépségápolás",
               "dm": "Drogéria és szépségápolás"}
+# vegyes kínálatú drogéria (édességet, kávét, italt is árul): a NÉV dönt, és
+# csak ha semmi nem illik, akkor drogéria
+_ALAP_HA_SEMMI = {"Müller": "Drogéria és szépségápolás"}
 
 CSOPORTOK = [c for c, _k in _SZABALYOK] + [EGYEB]
 
@@ -180,6 +214,11 @@ def csoportja(t) -> str:
 def besorol(nev: str, kategoria: str = "", bolt: str = "") -> str:
     """A termék közös csoportja: név → bolti kategória → bolt jellege →
     „Egyéb"."""
+    if bolt in _CSAK_NEM_ELELMISZER:
+        for c, m in _NEV_MINTAK:
+            if c in _NEM_ELELMISZER and m.search(ekezet_nelkul(nev or "")):
+                return c
+        return EGYEB
     if bolt in _BOLT_ALAP:
         # drogérialánc: a SAJÁT kategóriája megbízhatóbb, mint a név (egy
         # „citromos tusfürdő" ne legyen gyümölcs); élelmiszernél a név dönt
@@ -193,4 +232,4 @@ def besorol(nev: str, kategoria: str = "", bolt: str = "") -> str:
                 "Baba", "Állateledel")
         return nevbol if nevbol in drog else _BOLT_ALAP[bolt]
     return (_elso(_NEV_MINTAK, nev) or _elso(_KAT_MINTAK, kategoria)
-            or EGYEB)
+            or _ALAP_HA_SEMMI.get(bolt) or EGYEB)

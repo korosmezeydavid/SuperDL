@@ -92,6 +92,8 @@ def termek(p: dict) -> Termek | None:
             jegyzet.append(info.strip().capitalize())
     t.megjegyzes = ", ".join(dict.fromkeys(jegyzet))
     t.kod = str(p.get("id") or "")
+    if p.get("slug"):
+        t.url = "https://shop.rossmann.hu/termek/%s" % p["slug"]
     return t
 
 
