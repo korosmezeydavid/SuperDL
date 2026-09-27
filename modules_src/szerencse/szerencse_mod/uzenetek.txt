@@ -1,0 +1,249 @@
+# Szerencsesüti – üzenetek
+# Forma: [fajta] fejléc alatt soronként egy üzenet.
+# Fajták: bolcsesseg, vicc, beszolas, buntetes, bonusz
+# A [buntetes] alatt a sor elején az órák száma: 1:, 2:, 10: vagy 24:
+# A sor végén „|hang" felülírhatja a reakcióhangot:
+#   |nagy_nevetes |kuncogas |huncut |punch |bonusz |buntetes
+# Saját üzeneteidet a felhasználói mappád .superdl\szerencse_sajat.txt
+# fájljába írd, ugyanebben a formában – frissítéskor nem vesznek el.
+
+[bolcsesseg]
+Aki korán kel, az korán álmos. Ezt senki nem mondja, de igaz.
+A legjobb pillanat egy fát ültetni húsz éve volt. A második legjobb most. A harmadik holnap, de azt már ne mondd senkinek.
+Nem az a gazdag, akinek sok van, hanem akinek elég. Meg akinek sok van. Az is.
+Ha nem tudod, merre mész, minden út odavisz. Csak nem biztos, hogy tetszeni fog.
+A türelem rózsát terem. Meg tüskét. Rózsát tüskével.
+Ma valaki rád gondol. Lehet, hogy csak azért, mert tartozol neki, de akkor is.
+A kávé nem old meg semmit. De a kávé nélküli világ sem.
+Ne halogasd holnaputánra, amit holnap is ráérsz megcsinálni.
+Minden nagy út egyetlen lépéssel kezdődik. Meg egy kényelmes cipővel.
+A mosoly ingyen van, és mégis a legjobb befektetés.
+Aki keres, talál. Aki nem keres, az is talál, csak mást.
+Ma olyasmit fogsz megtanulni, amit tegnap még nem tudtál. Például ezt a mondatot.
+A csend is válasz. Főleg, ha a kérdés az volt, ki ette meg a csokit.
+Nem kell mindent tudni. Elég, ha tudod, kit kell megkérdezni.
+A hiba nem kudarc. A kudarc az, ha kétszer ugyanazt rontod el ugyanúgy.
+Egy jó barát olyan, mint a jó wifi: nem látod, de érzed, ha nincs.
+Ma légy kedves valakivel, aki nem számít rá. Meglátod, milyen arcot vág. Na jó, nem látod. De hallani fogod.
+A boldogság nem cél, hanem mellékhatás.
+Ha az élet citromot ad, kérj mellé tequilát is.
+Aki másnak vermet ás, annak nagyon jó a kondíciója.
+A legnagyobb kaland az, amire nem készültél fel.
+Az idő pénz. Ezért van mindenkinek kevés mindkettőből.
+Ne a széllel szemben köpj. Ez nem bölcsesség, ez fizika.
+Ma egy régi ismerős eszedbe fog jutni. Hívd fel, mielőtt ő hív téged kölcsönért.
+Nem a cél a fontos, hanem az út. Kivéve, ha vécére mész.
+A holnap a ma legjobb kifogása.
+Minden rosszban van valami jó. A rossz vicceknek például itt van ez a süti.
+A szerencse a felkészült embert keresi. Úgyhogy tegyél úgy, mintha felkészült lennél.
+Amit ma megtehetsz, azt ma tedd meg. Holnapra marad úgyis elég más.
+Nem vagy késésben. Csak másképp érsz oda.
+A legjobb dolgok az életben ingyen vannak. A második legjobbak drágák.
+Egy kis őrültség nélkül az élet csak egy hosszú várakozás.
+Ma egy jó hír vár rád. Lehet, hogy pont ez volt az.
+Aki mer, az nyer. Aki nem mer, az legalább nem veszít. Te döntöd el.
+Az okos ember tanul a hibájából. A bölcs a másokéból. A többiek süteményt esznek.
+A szíved tudja az utat. A lábad néha nem.
+Ne feledd: te is valakinek a kedvenc embere vagy.
+A nevetés a legjobb orvosság. Kivéve, ha lábtörésed van. Akkor a gipsz.
+Az élet túl rövid ahhoz, hogy rossz kávét igyál.
+Ma kicsit bátrabb leszel, mint tegnap. Elég egy kicsi is.
+A legnehezebb ajtó az, amit nem nyitottál ki.
+Minden reggel új esély. Minden este új kifogás.
+Aki sokat kérdez, sokat tud meg. Meg sokakat idegesít.
+A jó döntések tapasztalatból jönnek. A tapasztalat rossz döntésekből.
+Ma ne hasonlítsd magad senkihez. Te vagy az egyetlen változat magadból, és a gyári beállítás is egész jó.
+Az álmok nem járnak le. Csak porosodnak.
+Ha fáradt vagy, pihenj. Ne add fel, csak tarts szünetet.
+Egy ölelés többet mond ezer szónál. És kevesebbe kerül, mint egy telefonszámla.
+A szerencse forgandó. Ma pont feléd fordult, különben nem kaptad volna ezt a sütit.
+Tanulj úgy, mintha örökké élnél. Egyél sütit úgy, mintha holnap diéta jönne.
+A világ nem fog megváltozni attól, hogy aggódsz. Attól viszont igen, ha csinálsz valamit.
+Ma valaki hálás lesz neked. Lehet, hogy nem mondja. Ezért mondom én.
+Nem kell tökéletesnek lenned. Elég, ha megjelensz.
+Az igazi barát akkor is veled van, amikor lemerült a telefonod.
+A sötétben is lehet táncolni. Csak vigyázz a dohányzóasztalra.
+Aki másokat nevettet, sosem marad egyedül.
+Ma egy apró csoda történik veled. Figyelj, mert könnyű elsiklani fölötte.
+A legszebb hangok a nevetés és a kávéfőző bugyogása.
+Nem minden vihar jön azért, hogy felforgassa az életed. Van, amelyik csak kitisztítja az utat.
+Légy olyan, mint a jó süti: kívül ropogós, belül édes.
+
+[vicc]
+A pék azért lett pék, mert neki mindig lisztes volt a helyzete.
+Tudod, mi a különbség a hűtő és a párom között? A hűtő nem kérdezi meg, miért vagyok benne éjjel kettőkor.
+Mondtam a feleségemnek, hogy kevesebbet fogok enni. Most már csak a hűtő ajtajában eszem, ott gyorsabb.
+A csiga elment a rendőrségre, mert kirabolta két teknős. Megkérdezték, hogy nézett ki a tettes. Azt mondta: nem tudom, olyan gyorsan történt minden!
+Két hal úszik egy tartályban. Az egyik megkérdezi: tudod te ezt vezetni?
+Mit mond a nulla a nyolcasnak? Klassz öv!
+Vettem egy kaméleont. Azóta nem láttam.
+Mi az: sárga és nem tud úszni? Egy markológép.
+A diétám jól megy. Tegnap elhagytam két kilót. Sajnos a boltban, a szatyorban.
+Az orvos azt mondta, hogy többet kellene mozognom. Úgyhogy most két szobából nézem a tévét.
+Mit csinál a szellem a cukrászdában? Kísértést okoz.
+Azt mondják, a pénz nem boldogít. Szeretném magam meggyőződni róla.
+Miért nem kártyáznak az állatok a dzsungelben? Mert túl sok a gepárd.
+Pistike megkérdezi: apa, milyen érzés gyereknek lenni? Az apja: nem tudom, fiam, én rögtön felnőttként kezdtem a számlákkal.
+A tésztának miért nincs soha pénze? Mert mindig le van vajazva.
+Két kismalac beszélget. Az egyik: röf. A másik: ezt én is akartam mondani!
+Mit mond a fal a másik falnak? Találkozzunk a sarkon!
+Az informatikus felesége azt mondja: menj le a boltba, hozz egy kenyeret, és ha van tojás, hozz tízet. Hazajön tíz kenyérrel.
+Vettem egy könyvet a gravitáció ellen. Nem tudtam letenni.
+Miért visz a matematikus létrát a kocsmába? Mert hallotta, hogy ott magasak az árak.
+A horgász azt mondja: akkora halat fogtam, hogy a fényképe két kiló volt.
+Mit mond a kávé a cukornak? Nélküled keserű az életem.
+Elmentem a jógára, hogy rugalmasabb legyek. Most már gond nélkül ki tudok bújni a feladatok alól.
+A szomszéd dobol éjjel kettőkor. Nem baj, én meg furulyázom hajnali ötkor.
+Tudod, mi a legjobb abban, ha idősebb leszel? A kor. Meg a nyugdíj. Ja, az nem.
+A papagájom mindent utánoz, amit mondok. Tegnap azt mondtam neki: ne ismételgess! Erre ő: ne ismételgess!
+Hogy hívják a kutyát, aki bűvészkedik? Labrakadabrador.
+Miért nem jár a csontváz buliba? Mert nincs, aki elkísérje, csak csont nélkül.
+Az étteremben: pincér, légy van a levesemben! Ne kiabáljon, uram, még a többiek is kérnek.
+Azt mondták, legyek önmagam. Rossz tanács volt.
+Mi a közös a tévé távirányítójában és a zokniban? Mindkettő eltűnik, amikor a legjobban kellene.
+A nagymamám azt mondta, egyek meg mindent a tányéromon. Most tányérfogam van.
+Miért fél a tojás a vicctől? Mert a végén mindig feltörik.
+A villanykörte a rendőrségen: engem csak becsavartak!
+Mondom az órásnak: megállt az órám. Azt mondja: akkor végre pihenhet.
+A szendvics bemegy a kocsmába. A csapos azt mondja: bocs, ételt nem szolgálunk ki.
+Az anyósom mondta, hogy a lelkem mélyén jó ember vagyok. Azóta búvárkodni tanulok, hogy megtaláljam.
+Mit csinál a hóember nyáron? Elolvad a munkától.
+Megkérdezték a lustát, mi a kedvenc sportja. Azt mondta: a sakk, mert ott csak a figurák mozognak.
+Azt olvastam, hogy a nevetés öt percig tartó edzésnek felel meg. Úgyhogy ma már sportoltam.
+Tegnap feltaláltam egy tollat, ami radírozni is tud. Most már kitalálni is kéne, minek.
+Mit mond az egyik oroszlán a másiknak evés közben? Ez a bohóc olyan vicces íze van.
+A navigáció azt mondta, forduljak vissza, amint lehetséges. Azóta a szakításom óta nem hallottam ezt ilyen kedvesen.
+Miért olyan nyugodt a kaktusz? Mert tudja, hogy mindenki tartja tőle a távolságot.
+Azt kérdezi a gyerek: apa, hol vannak az Alpok? Az apa: kérdezd anyádat, ő pakolt el mindent.
+Vettem egy papucsot, ami világít. Most már nem csak éjjel, hanem fényesen is belerúgok a szekrénybe.
+A matektanár azt mondta: képzeljétek el, hogy van öt almátok. Pistike: tanár úr, ez túl sok képzelet ahhoz a fizetéshez.
+Az órám hat percet siet. De nem zavar, mert én hét percet késem.
+Hogy hívják a hóembert, aki mérges? Fagyos.
+Két antenna összeházasodott. Az esküvő nem volt nagy szám, de a vétel kiváló volt.
+
+[beszolas]
+Na, ezt a gombot is jól megnyomtad. Ügyes vagy, valakinek sikerült valami ma. |punch
+Ez a süti kalóriamentes. Azt nem mondom, hogy a hazugság is az. |huncut
+Olyan gyorsan bontottad ki, mintha fizetésemelés lett volna benne. |punch
+Kiderült, hogy te vagy az, aki a hűtőből mindig a legjobb falatot eszi meg. Nem árulom el senkinek. Talán. |huncut
+Ma olyan jól nézel ki, hogy a tükör kérte, hogy maradj még egy kicsit. |huncut
+Az a mosoly a hangodon. Na, ne tagadd! |kuncogas
+Ez a süti titkos üzenetet tartalmaz. Olyan titkosat, hogy még én sem tudom. |punch
+Ha a lustaság olimpiai szám lenne, te már ott se lennél, mert lusta lennél elmenni. |punch
+Tudom, mit csináltál tegnap este. Na jó, nem tudom. De most elgondolkodtál. |huncut
+Egy süti nem süti. Két süti már életmód. |kuncogas
+Figyelmeztetés: ez a süti pajzán gondolatokat ébreszthet. Ha már ébren vannak, nem a süti tehet róla. |huncut
+Ma valaki kacsintani fog rád. Csak nem biztos, hogy szándékosan. |huncut
+Azt mondják, a szerelem vak. Szerencsére a szerencsesüti nem, pontosan tudja, kinek adja magát. |huncut
+Ez a süti nem hízlal. A hat előtte igen. |punch
+Olyan édes vagy, hogy a fogorvosod már névnapi ajándékot küld. |huncut
+Figyelem! A sütit egy profi bontotta ki. Ne próbáld ki otthon! Na jó, otthon vagy. |punch
+Még egy ilyen bontás, és a pék is beléd szeret. |huncut
+Pajzán tipp: ma este kapcsold le a villanyt. Ja, neked mindegy. Akkor gyújts gyertyát, az legalább illatos. |huncut
+Tudod, mi a különbség közted és egy szerencsesüti között? A süti csak tizenöt percenként ad bölcsességet, te folyamatosan. Na jó, néha. |punch
+Ma szerencsés napod van. Legalábbis a sütinek szerencséje van, hogy te bontottad ki. |kuncogas
+Nem mondom, hogy kíváncsi vagy, de ennyi idő alatt egy mókus is elfelejtette volna, hol a dió. |punch
+Na tessék, már megint te. Kezdem azt hinni, hogy tetszem neked. |huncut
+Titkos üzenet: aki ezt olvassa, annak ma este valaki megmelegíti a lábát. Vagy egy termofor. |huncut
+Olyan elszántan nyomod ezt a gombot, mintha a lottószámok lennének benne. Nincsenek. Ötös, tizenkettő. Na jó, vicceltem. |punch
+Ez a süti tizennyolc éven felülieknek szól. Ha fiatalabb vagy, felejtsd el, amit nem mondtam. |huncut
+Mondják, a nők a fülükkel szeretnek. Akkor ez a süti most flörtöl veled. |huncut
+Mondják, a férfiak a gyomrukkal szeretnek. Ez a süti tehát most komoly szándékkal jött. |huncut
+Hívhatnálak szerencsésnek, de te már tudod magadról. |kuncogas
+A süti jelenti: a gazdi ma különösen szexi a hangja alapján. Ezt a süti mondta, nem én. |huncut
+Ha a kanapé beszélni tudna, most azt mondaná: kelj fel végre! |punch
+Na, most megint kibontottál egy sütit a munka helyett. Nem árullak be. Ma. |huncut
+A süti szerint ma valaki gondolatban megcsókolt. A süti nem mondja meg, ki. A süti huncut. |huncut
+Hé, ez nem a hűtőajtó! Bár a mozdulat ugyanaz. |punch
+Titokban mindenki ilyen sütiket bontogat. Csak te vagy olyan bátor, hogy be is vallod. |kuncogas
+Ez a süti fogadást kötött, hogy mosolyogni fogsz. Nyert. |kuncogas
+Az előző süti azt üzeni, hogy hiányzol neki. Megetted. Szívtelen. |punch
+Ha ma valaki megkérdezi, miért vagy ilyen vidám, mondd, hogy egy süti tehet róla. Ne részletezd. |huncut
+Kinyitottad. Most már felelősséggel tartozol érte. |punch
+A süti szerint ma jó napod lesz. Ha mégsem, reklamálj a péknél. |kuncogas
+Ez a süti diétás. Csak a nevetés hizlal benne. |kuncogas
+Bontogatsz, bontogatsz, aztán majd csodálkozol, hogy morzsás a billentyűzet. |punch
+Pajzán jóslat: a mai estéd forró lesz. Legalábbis a teád. |huncut
+Ma egy titkos hódoló figyel rád. Az is lehet, hogy csak a macska. |huncut
+Olyan vagy, mint a jó bor: évről évre jobb, és este veszélyesebb. |huncut
+Mielőtt megkérdeznéd: igen, ez a süti is ingyen van. Mint minden jó dolog ebben a programban. |kuncogas
+Figyelem! Ez a süti forró. Mint te. Na jó, ez már túl sok volt, bocs. |huncut
+Valaki ma azt fogja mondani, hogy igazad volt. Jegyezd fel, ritka pillanat. |punch
+Ezt a sütit csak különleges embereknek adjuk. Meg mindenkinek, aki megnyomja a gombot. |punch
+Tudom, hogy csak a hangokért bontod ki. Nem baj, én is szeretem a nevetést. |kuncogas
+A süti azt suttogja: ma este lazíts. Holnap úgyis te leszel a főnök. Na jó, holnapután. |huncut
+Ha a sütik tudnának beszélni, ez most azt mondaná: végre egy értelmes ember! Na, most beszél. |kuncogas
+Ez a süti nem akart kijönni a dobozból, mert szégyenlős. Vigyázz vele, még pirul. |huncut
+Az életben két dolog biztos: a halál és a szerencsesüti tizenöt percenként. Az egyik vidámabb. |punch
+Most kibontottál egy sütit. Ez a legtöbb, amit ma produktívan csináltál? Csak kérdezem. |punch
+A süti szerint a legjobb flört egy jól időzített poén. Most próbáld ki a legközelebbi emberen. |huncut
+Valaki ma meg fog lepni. Remélem, kellemesen. Ha nem, akkor legalább meglepetés volt. |punch
+Ma annyira jó a formád, hogy a szerencsesüti is tőled kérne tanácsot. |kuncogas
+Ez a süti annyira csípős, hogy a paprika is elpirult tőle. |huncut
+Olyan kitartóan nyomogatod ezt, mint egy szerelmes kamasz a csengőt. |huncut
+A mai jóslat: valaki rád fog kacsintani a buszon. Sajnos te nem fogod látni. Szerencsére a kacsintó sem tudja. |kuncogas
+
+# --- fárasztó klasszikusok (Dávid kérésére) ---
+Britt kutatók megállapították, hogy aki ezt a sütit kibontotta, az kibontotta ezt a sütit. |kuncogas
+Britt kutatók megállapították, hogy a hétfő átlagosan pontosan egy héttel az előző hétfő után érkezik. |kuncogas
+Britt kutatók megállapították, hogy a lépcső felfelé is lépcső, csak fárasztóbb. |punch
+Britt kutatók megállapították, hogy a britt kutatók többsége britt. |huncut
+Britt kutatók megállapították, hogy aki sokat alszik, az kevesebbet van ébren. A kutatást három évig finanszírozták. |punch
+A tej rákkeltő: ha egy tejre rákot öntesz, felébred. |kuncogas
+Ha az internet is sütikkel kínál, és te mindent elfogadsz, csoda, hogy még nem pukkadtál ki. |huncut
+Hogy hívják a bűvész kutyáját? Labrakadabra. |kuncogas
+Mit mond a nulla a nyolcasnak? Jó kis öved van! |kuncogas
+Két hal úszik a tengerben. Az egyik azt mondja: blubb. Mire a másik: pont ezt akartam mondani. |punch
+Tudod, mi a legnyugodtabb állat? A csiga. A háza sincs kifizetve, mégsem idegeskedik. |huncut
+Mit csinál a hóember nyáron? Hát, rövid ideig mindenfélét. |punch
+# --- lufis ---
+Stressz elleni óriáslufi! Mire felfújod, lenyugszol. |kuncogas
+Ne kiabálj, vegyél lufit! A gondod nem oldódik meg, de lesz egy lufid. |huncut
+# --- SuperDL-es ---
+Ez egy hibajelentés. Ott lenne az eseménynaplóban, ha valódi lenne. |huncut
+A szerencséd frissült a legújabb verzióra. Változások: hibajavítások és teljesítménynövelés. Mint mindig. |punch
+Ez előfizetéses funkció! Ja, olyan nincs is. De a támogatást azért köszönjük, részletek a súgóban. |huncut
+A SuperDL ingyenes. A fejlesztő kávéja sajnos nem. Csak mondom. |kuncogas
+
+[buntetes]
+1: Mohó vagy! Aki sokat eszik, keveset kap.
+1: A pék észrevette, hogy lopkodod a sütit a hátsó ajtón.
+1: Túl sok süti, túl kevés munka. Egy kis szünet jót tesz.
+1: A süti sztrájkol. Munkakörülmények javítását követeli.
+1: A dobozt elvitte a macska. Keresd meg, addig türelem.
+1: Morzsás lett a billentyűzet. Takarítás, aztán jöhet a következő.
+1: Az utolsó süti megharapott. Meg kell nyugodnia.
+1: A pék elment ebédelni. Te is menj!
+1: A sütiszámláló túlmelegedett. Hűl.
+1: Ez a süti elveszett a postán. A következőt ajánlott levélben küldjük.
+2: A sütiellenőr ellenőrzést tart. Addig minden süti zárolva.
+2: A konyhában tűz ütött ki. Nem nagy, csak a pék haja.
+2: Szigorú diéta! Az orvosod üzeni.
+2: A sütik szakszervezeti gyűlést tartanak. Rólad is szó esik.
+2: A sütőt átvitték karbantartásra. Az is fáradt, mint te.
+2: Kiderült, hogy csaltál. Azt nem tudom, mivel, de a pék biztos benne.
+10: Nagy a baj! A pék megsértődött, és elment horgászni.
+10: A sütik kivándoroltak egy másik számítógépre. Remélhetőleg visszajönnek.
+10: A pék szabadságra ment. Megérdemli, te is pihenj.
+10: A süti lelkiismeret-furdalást kapott és megtért. Tíz óra lelkigyakorlat.
+10: Túl sok volt a nevetés. A hasizmaidnak pihenő kell.
+24: Egy teljes napos sütiszünet! A pék elköltözött a nagymamájához vidékre. Holnap visszajön. Talán.
+24: Katasztrófa! Valaki megette az összes sütit. Az a valaki te voltál.
+24: A sütiminisztérium rendelete: holnapig böjt. Lehet fellebbezni, de nem érdemes.
+
+[bonusz]
+Gratulálok! Hatost dobtál a kockával!
+Telitalálat! Ma te vagy a sütikirály!
+Ding-ding-ding! Jackpot! A gép két sütit dobott ki!
+A pék jó kedvében van, és ad még egyet.
+Te vagy a mai szerencsés! Kihúztak a sütisorsoláson!
+Megtaláltad a titkos sütit a doboz alján!
+Bónusz! Ez a süti ikertestvérrel érkezett.
+A szerencse ma veled van. És még egy süti is.
+Kétszer is hat! A kocka ma a barátod.
+A süti postás elkeverte a címeket, és neked két süti jutott.
+Ajándék a háznak! Ma minden második süti ingyen van. Na jó, mind az.
+Szerencsekerék megpörgetve: még egy süti!
+Nyertél! A nyeremény: még egy lehetőség, hogy nyerj.
+A pék azt mondja, olyan szépen kérted, hogy megérdemelsz még egyet.
+Plusz egy süti, mert ma különösen jó ember voltál. Vagy legalábbis nem buktál le.

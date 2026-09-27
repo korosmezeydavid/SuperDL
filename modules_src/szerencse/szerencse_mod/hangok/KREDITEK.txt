@@ -1,0 +1,13 @@
+Szerencsesüti – hangok forrása
+Minden hang szabad licencű (CC0 / közkincs). WAV-ra alakítva, vágva, hangerőben kiegyenlítve.
+
+nyitas       – BigSoundBank #0648 (pezsgősdugó) – Joseph SARDIN, BigSoundBank.com
+erkezes      – OpenGameArt: completetask_0.mp3 (CC0)
+nagy_nevetes – BigSoundBank #0490 – Joseph SARDIN, BigSoundBank.com
+kuncogas     – BigSoundBank #1419 – Joseph SARDIN, BigSoundBank.com
+huncut       – OpenGameArt: laugh-evil-1.ogg (CC0)
+punch        – BigSoundBank #2409 – Joseph SARDIN, BigSoundBank.com
+bonusz       – OpenGameArt: winfretless.ogg (CC0)
+buntetes     – OpenGameArt: losetrumpet.mp3 (CC0)
+
+Saját hangot bármelyik mappába tehetsz (.wav), ilyenkor véletlenszerűen választ közülük.
