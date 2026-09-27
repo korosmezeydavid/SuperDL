@@ -554,7 +554,12 @@ class MainFrame(wx.Frame):
         if self.settings.get("startup_signal", True):
             wx.CallLater(250, sounds.play_startup)
         # ha volt függő frissítés: jelezzük, sikerült-e (néma csere-hiba ellen)
-        wx.CallLater(900, self._check_update_result)
+        # ⚠️ 900 → 150 ms, a modulok betöltése ELÉ (szakember83, 2026-09-27):
+        # frissítés után a gépén a modulok 20 másodpercig töltődtek, és addig
+        # a program néma volt – azt hitte, el sem indult, és kézzel indította.
+        # (CallAfter-rel: hibánál modális ablakot nyit, az pedig időzítő-
+        # visszahívásból tilos – 0x8001010d)
+        wx.CallLater(150, lambda: wx.CallAfter(self._check_update_result))
         # induló, automatikus hangos üdvözlés (dátum, névnap, időjárás)
         wx.CallLater(1200, self._startup_greeting)
         # BIZTONSÁG: nem hivatalos frissítési forrás → hangos figyelmeztetés
@@ -569,7 +574,11 @@ class MainFrame(wx.Frame):
         # így egy kezdő felhasználót nem „dob be" rögtön a letöltésekbe.
         self.welcome.SetInsertionPoint(0)
         self.welcome.SetFocus()
-        wx.CallAfter(self._init_modules)
+        # A modulok betöltése a fő szálon fut, és lassú gépen (vagy frissítés
+        # után, amikor a víruskereső minden új fájlt átnéz) húsz másodpercig
+        # is eltart. ELŐTTE szóljon az induló szignál és a frissítés eredménye
+        # – ezért nem CallAfter, hanem 300 ms-os késleltetés.
+        wx.CallLater(300, self._init_modules)
 
     def _init_modules(self):
         """A telepített, OPCIONÁLIS modulok hibatűrő betöltése (moduláris
@@ -2558,7 +2567,8 @@ class MainFrame(wx.Frame):
         if not res:
             return
         if res["status"] == "ok":
-            self._announce(f"A frissítés sikerült: a(z) {res['target']} verzió fut.",
+            self._announce(f"A frissítés sikerült: a(z) {res['target']} verzió "
+                           "fut. A modulok betöltése folyik, egy pillanat.",
                            toast=True, sound="done")
             return
         link = ("https://github.com/korosmezeydavid/SuperDL/releases/latest/"

@@ -103,6 +103,9 @@ class AudioBookFrame(wx.Frame):
         self._bookkey = ""         # a polc-kulcs (az AudioLibrary-hez)
         self._title = ""
         self._resume_at = None     # (sáv-index, ms) a mentett folytatáshoz
+        # a könyv VÉGÉRE értünk: a folytatás ne a végéről, hanem az elejéről
+        # induljon (Turai László, 2026-09-27)
+        self._vegere_ert = False
         # a mappa-bejárás HÁTTÉRSZÁLON megy (ld. `_open_any`)
         self._bejaras_fut = False
         self._bejaras_megall = threading.Event()
@@ -318,6 +321,7 @@ class AudioBookFrame(wx.Frame):
         self._bookkey = konyv_kulcs(path, is_dir)
         self.player.load(savok, book_root=(path if is_dir else ""))
         self._resume_at = None
+        self._vegere_ert = False
         self._fill_tracklist()
         self.cim_lbl.SetLabel(f"Hangoskönyv: {self._title}  ({len(savok)} sáv)")
         # felkerül a POLCRA (teljes úttal); a meglévő folytatást megtartja
@@ -359,6 +363,7 @@ class AudioBookFrame(wx.Frame):
 
     # ---- vezérlés ----
     def _play(self):
+        self._vegere_ert = False
         if not self.player.tracks:
             self._mond("Előbb nyiss meg egy hangfájlt vagy mappát.")
             return
@@ -421,6 +426,7 @@ class AudioBookFrame(wx.Frame):
     def _play_selected(self):
         i = self.sav_lista.GetSelection()
         if 0 <= i < self.player.track_count():
+            self._vegere_ert = False
             self.player.play_track(i, 0.0)
             self.SetStatusText(f"{i + 1}. sáv lejátszása.")
 
@@ -444,7 +450,18 @@ class AudioBookFrame(wx.Frame):
             self.sav_lista.SetSelection(self.player.idx)
             self.SetStatusText(f"{self.player.idx + 1}. sáv.")
         else:
-            self.SetStatusText("A hangoskönyv végére értem.")
+            # ⚠️ Turai László (2026-09-27): a végighallgatott könyvet később
+            # újranyitva a program a legutóbbi megállítás helyéről folytatta.
+            # Aki végigért, az legközelebb az ELEJÉT akarja – a folytatási
+            # pontot tehát az elejére tesszük, és ezt ki is mondjuk.
+            self._vegere_ert = True
+            self._save_resume()
+            self._resume_at = None
+            self.player.idx = 0
+            if self.player.track_count():
+                self.sav_lista.SetSelection(0)
+            self._mond("A hangoskönyv végére értem. Legközelebb az elejéről "
+                       "indul – F5-tel akár most is.")
 
     def _tick(self, e):
         if self._closing:
@@ -499,6 +516,7 @@ class AudioBookFrame(wx.Frame):
         i = self.player.track_index_of(bm.track) if bm.track else None
         if i is None:
             i = self.player.idx
+        self._vegere_ert = False
         self.player.play_track(i, max(0, int(bm.pos_ms)) / 1000.0)
         self.sav_lista.SetSelection(i)
         self._mond(f"Ugrás ide: {bm.preview or (str(i + 1) + '. sáv')}.")
@@ -506,6 +524,13 @@ class AudioBookFrame(wx.Frame):
     # ---- polc + folytatás (a polc a teljes utat és a folytatást is tárolja) ----
     def _save_resume(self):
         if not self._bookkey:
+            return
+        if self._vegere_ert:
+            try:
+                self.lib.set_resume(self._bookkey, "", 0)   # az elejére
+                self._refresh_shelf()
+            except Exception:
+                pass
             return
         try:
             self.lib.set_resume(
