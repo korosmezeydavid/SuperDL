@@ -6,6 +6,7 @@ csinál, és SEMMIT nem továbbít sehová. Az első indításkor hozzájárulá
 és világosan közöljük: a megadott adatok kizárólag a te gépeden, titkosítva
 élnek, és egyetlen céljuk, hogy az e-mail működjön.
 """
+import logging
 import os
 import re
 import threading
@@ -367,6 +368,22 @@ def _mondd(main, szoveg):
             sv.speak(szoveg, force=True)
         except Exception:
             pass
+
+
+
+def _html_hiba_mondat(ok):
+    """Őszinte mondat arról, MIÉRT nincs HTML nézet (Schibik Miklós)."""
+    if ok == "csomag":
+        return ("A HTML nézet ebben a SuperDL-változatban nem indul el, mert "
+                "a programból hiányzik a hozzá való rész. Ez nem a gépeden "
+                "múlik: frissítsd a SuperDL-t (Súgó, Frissítések keresése). "
+                "Addig marad az egyszerűsített nézet.")
+    if ok == "webview2":
+        return ("A HTML nézethez az Edge WebView2 kell, ami ezen a gépen nem "
+                "érhető el. Marad az egyszerűsített nézet.")
+    return ("A HTML nézet nem indult el. A pontos hiba a program naplójába "
+            "került, a Súgó, Hibajelentés vágólapra ezt is tartalmazza. "
+            "Marad az egyszerűsített nézet.")
 
 
 class HelyesirasDialog(wx.Dialog):
@@ -2104,9 +2121,26 @@ class LevelOlvasoFrame(wx.Frame):
         # megtisztított HTML-t kapja, és semmit nem tölt le a netről.
         self._html = None
         self._html_nezet = False
+        # MIÉRT nincs HTML nézet (Schibik Miklós, 2026-09-28): a 4.6.25-ben a
+        # `wx.html2` kimaradt a csomagból, és a program azt állította, hogy a
+        # GÉPEN nincs WebView2 – pedig ott volt. Most megkülönböztetjük, és a
+        # pontos hiba a naplóba kerül.
+        self._html_hiba = ""
         try:
             import wx.html2 as _h2
-            if _h2.WebView.IsBackendAvailable(_h2.WebViewBackendEdge):
+        except Exception:
+            _h2 = None
+            self._html_hiba = "csomag"
+            logging.getLogger("superdl.mail").exception(
+                "HTML nézet: a wx.html2 nem tölthető be")
+        try:
+            if _h2 is None:
+                pass
+            elif not _h2.WebView.IsBackendAvailable(_h2.WebViewBackendEdge):
+                self._html_hiba = "webview2"
+                logging.getLogger("superdl.mail").warning(
+                    "HTML nézet: az Edge WebView2 háttér nem érhető el")
+            else:
                 self._html = _h2.WebView.New(p, backend=_h2.WebViewBackendEdge)
                 self._html.SetName("Levél HTML nézetben")
                 self._html.EnableContextMenu(False)
@@ -2120,6 +2154,9 @@ class LevelOlvasoFrame(wx.Frame):
                 v.Add(self._html, 1, wx.EXPAND | wx.ALL, 8)
         except Exception:
             self._html = None
+            self._html_hiba = self._html_hiba or "inditas"
+            logging.getLogger("superdl.mail").exception(
+                "HTML nézet: a megjelenítő nem indult el")
 
         # a hivatkozások ÉS az e-mail címek (Enter egy címen: új levél neki)
         self._linkek = MC.hivatkozasok_szovegbol(torzs)
@@ -2231,9 +2268,8 @@ class LevelOlvasoFrame(wx.Frame):
         """Ctrl+H: egyszerűsített ↔ HTML nézet ebben az ablakban."""
         if self._html is None:
             if mondja:
-                _mondd(self.main, "A HTML nézethez az Edge WebView2 kell, ami "
-                                  "ezen a gépen nem érhető el. Marad az "
-                                  "egyszerűsített nézet.")
+                _mondd(self.main, _html_hiba_mondat(
+                    getattr(self, "_html_hiba", "")))
             return
         html = (not self._html_nezet) if html is None else bool(html)
         if html and not getattr(self, "_html_betoltve", False):
