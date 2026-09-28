@@ -575,7 +575,7 @@ def test_minden_uj_bolt_be_van_kotve():
     azonok = [a for a, _n, _f in forrasok.BOLTOK]
     assert azonok == ["penny", "lidl", "aldi", "tesco", "spar", "auchan",
                       "rossmann", "dm", "mueller", "pepco", "libri",
-                      "illatorium"]
+                      "euronics", "praktiker", "illatorium"]
     # minden boltnak van fajtája és honlapja
     for a in azonok:
         assert forrasok.bolt_fajta(a) and forrasok.bolt_oldal(a).startswith("https://")

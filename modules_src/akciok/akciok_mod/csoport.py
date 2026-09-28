@@ -145,12 +145,35 @@ _SZABALYOK += [
               "tarsasjatek =baba babak jatekauto =auto kisauto labda "
               "szinezo gyurma =kocka"),
     ("Könyv", "=konyv konyvek regeny"),
+    # műszaki és barkács (Euronics, Praktiker – 2026-09-28)
+    ("Műszaki cikk", "=tv televizio okostelefon telefon mobiltelefon laptop "
+                     "notebook =tablet monitor nyomtato fulhallgato "
+                     "hangszoro soundbar kavefozo kavegep mosogep "
+                     "mosogatogep szaritogep hutoszekreny =huto "
+                     "hutogep fagyaszto =suto mikrohullamu "
+                     "porszivo robotporszivo =vasalo turmix botmixer "
+                     "konyhagep robotgep =fozolap fozolap =tuzhely "
+                     "legkondicionalo klima hajszarito borotva "
+                     "=konzol jatekkonzol okosora =kamera "
+                     "=smart =led =qned =oled"),
+    ("Barkács és kert", "=kert kerti =tarolo =furo furogep csavar "
+                        "csavarhuzo szerszam szerszamkeszlet =kalapacs "
+                        "=festek falfestek =csempe burkolat laminalt parketta "
+                        "zuhanykabin =mosdo =csaptelep =wc =ajto =ablak "
+                        "=letra fuvago funyiro gereblye lapat =ontozo "
+                        "tomlo =grill pavilon sorpad napernyo "
+                        "=fenyforras izzo =lampa hosszabbito kabel "
+                        "=polc =szekreny =tuzifa =cserep =viragfold"),
 ]
 
 _NEM_ELELMISZER = ("Ruházat és cipő", "Otthon és dekoráció", "Játék",
                    "Könyv", "Parfüm és illat", "Drogéria és szépségápolás",
-                   "Háztartás és tisztítószer")
-_CSAK_NEM_ELELMISZER = {"Pepco"}
+                   "Háztartás és tisztítószer", "Műszaki cikk",
+                   "Barkács és kert")
+_CSAK_NEM_ELELMISZER = {"Pepco", "Euronics", "Praktiker"}
+# a nem-élelmiszer boltok alapcsoportja, ha a névből semmi nem derül ki
+_NEM_ELELMISZER_ALAP = {"Euronics": "Műszaki cikk",
+                        "Praktiker": "Barkács és kert"}
 
 # a bolt SAJÁT kategóriájának szavai (Rossmann, dm, Penny) – ha a névből
 # nem derül ki
@@ -220,10 +243,16 @@ def besorol(nev: str, kategoria: str = "", bolt: str = "") -> str:
     """A termék közös csoportja: név → bolti kategória → bolt jellege →
     „Egyéb"."""
     if bolt in _CSAK_NEM_ELELMISZER:
+        # a bolt SAJÁT profilja elől: a Praktiker „kerti tárolója" barkács
+        # és kert, ne otthon és dekoráció
+        alap = _NEM_ELELMISZER_ALAP.get(bolt)
+        for c, m in _NEV_MINTAK:
+            if c == alap and m.search(ekezet_nelkul(nev or "")):
+                return c
         for c, m in _NEV_MINTAK:
             if c in _NEM_ELELMISZER and m.search(ekezet_nelkul(nev or "")):
                 return c
-        return EGYEB
+        return _NEM_ELELMISZER_ALAP.get(bolt, EGYEB)
     if bolt in _BOLT_ALAP:
         # drogérialánc: a SAJÁT kategóriája megbízhatóbb, mint a név (egy
         # „citromos tusfürdő" ne legyen gyümölcs); élelmiszernél a név dönt

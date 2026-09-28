@@ -35,6 +35,7 @@ A boltok akcióit mutatja meg olvasható, nyilazható listában.
                        parfümboltja (lásd lent)
   Vegyes áru ......... Pepco
   Könyv .............. Libri (a Könyvutca akciós könyvei)
+  Műszaki, barkács ... Euronics, Praktiker
 Nem kép és nem
 találgatás: a boltok saját, nyilvános oldalairól és újságjaiból jön a
 szöveg, ugyanaz, ami a papíron vagy a bolt honlapján áll.
@@ -58,6 +59,15 @@ HONNAN JÖN AZ ADAT
                        nem olvasható ki pontosan
   Pepco .............. a heti újság a pepco.hu-n (csütörtökönként új)
   Libri .............. a Könyvutca akciós könyvei, szerzővel, borító árral
+  Euronics ........... a heti ajánlatok és az éppen futó kampányok (pl.
+                       „Jó árak jó helyen") az euronics.hu-n, eredeti
+                       árral és érvényességgel
+  Praktiker .......... az „Árzuhanás" oldal és a törzsvásárlói ajánlatok a
+                       praktiker.hu-n; a törzsvásárlói árat kártyás árként
+                       mondja, mellette a kártya nélküli árat
+  MediaMarkt, OBI .... egyelőre nincsenek benne: az oldaluk az árakat csak
+                       a böngészőben futó programmal rakja ki, szövegként
+                       nem kapjuk meg
   Illatorium ......... Kőrösmezey Dávid, a SuperDL készítőjének saját
                        parfümboltja (illatorium.hu). Ez NEM akció, hanem a
                        bolt teljes kínálata, kb. 2400 illat árral és
@@ -71,7 +81,8 @@ BÖNGÉSZÉS
   Bolt ............... Alt+B – minden bolt, a SAJÁT boltjaid, egy boltfajta
                        egyszerre („Minden élelmiszerlánc", „Minden drogéria
                        és kozmetika", „Minden vegyes áru", „Minden
-                       könyvesbolt"), vagy egyetlen bolt
+                       könyvesbolt", „Minden műszaki és barkácsbolt"),
+                       vagy egyetlen bolt
   Saját boltjaim ..... Ctrl+Shift+B – pipáld ki, melyik boltok vannak a
                        településeden (pl. Spar, Lidl, Aldi). Utána a Bolt
                        választóban a „Saját boltjaim" csak ezekben keres,
@@ -87,7 +98,8 @@ BÖNGÉSZÉS
                        tojás, Hús, hal, felvágott, Pékáru, Zöldség és
                        gyümölcs, Ital, Édesség és snack, Alapvető élelmiszer,
                        Fagyasztott, Háztartás, Drogéria, Baba, Állateledel,
-                       Egyéb. Mindegyik mellett ott a darabszám. A csoportot a
+                       Műszaki cikk, Barkács és kert, Egyéb. Mindegyik
+                       mellett ott a darabszám. A csoportot a
                        program a termék nevéből állapítja meg; ami
                        bizonytalan, az az „Egyéb”-be kerül, nem rossz helyre.
   A bolt saját
@@ -109,7 +121,8 @@ A BOLT OLDALA
   Ctrl+O ............. a kijelölt termék oldala a bolt honlapján (ha a bolt
                        ad ilyet), különben a bolt akciós oldala – a
                        böngésződben. Ahol a honlapon online is lehet
-                       rendelni (Tesco, Auchan, Rossmann, dm, Libri), azt a
+                       rendelni (Tesco, Auchan, Rossmann, dm, Libri,
+                       Euronics, Praktiker), azt a
                        program kimondja, és a termék adatai közt is ott áll.
   Ctrl+Shift+C ....... ugyanez a cím a vágólapra – beillesztheted egy
                        levélbe vagy üzenetbe a segítődnek.
