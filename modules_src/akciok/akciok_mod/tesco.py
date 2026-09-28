@@ -71,8 +71,99 @@ def _szam(s: str) -> float | None:
         return None
 
 
-def termekek(szoveg: str, ujsag: str = "", ervenyes: str = "") -> list:
+_PULT = re.compile(r"^(?:csont nélkül,\s*)?(hús|csemege)pultban kapható\s*$", re.I)
+_KILOS_AR = re.compile(r"^(\d[\d  ]*)\s*Ft/kg\s*$", re.I)
+_CSAK_SZAM = re.compile(r"^(\d[\d  ]*)\s*$")
+_EGYSEG_BLOKK = re.compile(r"^Ft(?:/kg|/10 dkg)?\s*$", re.I)
+_SZAZALEK = re.compile(r"^[–-]\s*(\d+)\s*%\s*$")
+_REGI_AR = re.compile(r"^(\d[\d  ]*)\s*Ft(?:/kg|/10 dkg)?\s*$", re.I)
+
+
+def _blokkok(szoveg: str) -> list:
+    return [[s.strip() for s in b.split("\n") if s.strip()]
+            for b in re.split(r"\n\s*\n", _ligatura(szoveg or ""))]
+
+
+def _ar_elotte(blokkok: list, i: int):
+    """A HÚSPULTOS termék ára a PDF-ben sokszor a neve ELŐTT áll, külön
+    blokkokban: „1599 Ft/kg" · „– 28 %" · „1145" · „Ft/kg" · a név.
+    Visszafelé olvassuk: (új ár, régi ár) vagy (None, None)."""
+    j = i - 1
+    if j < 0 or len(blokkok[j]) != 1 or not _EGYSEG_BLOKK.match(blokkok[j][0]):
+        return None, None
+    j -= 1
+    if j < 0 or len(blokkok[j]) != 1 or not _CSAK_SZAM.match(blokkok[j][0]):
+        return None, None
+    uj = int(re.sub(r"[  ]", "", blokkok[j][0]))
+    j -= 1
+    if j >= 0 and len(blokkok[j]) == 1 and _SZAZALEK.match(blokkok[j][0]):
+        j -= 1
+    regi = None
+    if j >= 0 and len(blokkok[j]) == 1:
+        m = _REGI_AR.match(blokkok[j][0])
+        if m:
+            regi = int(re.sub(r"[  ]", "", m.group(1)))
+    return uj, (regi if regi and regi > uj else None)
+
+
+def pultos_termekek(szoveg: str, ujsag: str = "", ervenyes: str = "") -> list:
+    """A húspultos (kilós) áru. Schibik Miklós (2026-09-28): „a Tescónál a
+    húspultos dolgok nincsenek benne". Ezeknél a PDF nem „Ft/1 kg"-ot ír,
+    hanem „Ft/kg"-ot, és az ár vagy a név UTÁN áll a blokkban (870 Ft/kg,
+    699 Ft/kg), vagy a név ELŐTT külön blokkokban (`_ar_elotte`). Ha a
+    blokkban a pultos mellett a csomagolt párja is ott van („csomagolt,
+    különböző kiszerelésben kapható"), a blokk végi kilós árak a csomagolté."""
     ki = []
+    blokkok = _blokkok(szoveg)
+    for i, sorok in enumerate(blokkok):
+        jelek = [k for k, s in enumerate(sorok) if _PULT.match(s)]
+        if not jelek or any(_EGYS_SOR.match(s) for s in sorok):
+            continue            # „Ft/1 kg"-os blokk: a rendes elemző dolga
+        csomagolt = next((k for k, s in enumerate(sorok)
+                          if s.lower().startswith("csomagolt, különböző")), None)
+        kilos = [(k, int(re.sub(r"[  ]", "", _KILOS_AR.match(s).group(1))))
+                 for k, s in enumerate(sorok) if _KILOS_AR.match(s)]
+        utana = [a for k, a in kilos if k > jelek[-1]
+                 and (csomagolt is None or k < csomagolt)]
+        eleje = 0
+        for k in jelek:
+            nev = " ".join(sorok[eleje:k]).strip(" ,")
+            eleje = k + 1
+            if not nev or re.search(r"\bFt\b", nev):
+                continue
+            if utana:
+                uj, regi = utana[-1], (utana[0] if len(utana) > 1 else None)
+            else:
+                uj, regi = _ar_elotte(blokkok, i)
+            if uj is None:
+                continue
+            pult = "húspult" if "hús" in sorok[k].lower() else "csemegepult"
+            t = Termek(bolt=BOLT, nev=nev, ar=uj, kiszereles="kilónként",
+                       egysegar="1 kg = %d Ft" % uj, ervenyes=ervenyes,
+                       kategoria=ujsag, megjegyzes="%sban kapható" % pult)
+            if regi and regi > uj:
+                t.regi_ar = regi
+                t.kedvezmeny = "-%d%%" % round((1 - uj / regi) * 100)
+            ki.append(t)
+        # a csomagolt párja (vákuumcsomagolt): a blokk végi kilós árak
+        if csomagolt is not None:
+            nev = " ".join(sorok[jelek[-1] + 1:csomagolt]).strip(" ,")
+            arak = [a for k, a in kilos if k > csomagolt]
+            if nev and arak and not re.search(r"\bFt\b", nev):
+                uj, regi = arak[-1], (arak[0] if len(arak) > 1 else None)
+                t = Termek(bolt=BOLT, nev=nev, ar=uj, kiszereles="kilónként",
+                           egysegar="1 kg = %d Ft" % uj, ervenyes=ervenyes,
+                           kategoria=ujsag,
+                           megjegyzes="csomagolt, különböző kiszerelésben")
+                if regi and regi > uj:
+                    t.regi_ar = regi
+                    t.kedvezmeny = "-%d%%" % round((1 - uj / regi) * 100)
+                ki.append(t)
+    return ki
+
+
+def termekek(szoveg: str, ujsag: str = "", ervenyes: str = "") -> list:
+    ki = pultos_termekek(szoveg, ujsag, ervenyes)
     for b in re.split(r"\n\s*\n", _ligatura(szoveg or "")):
         sorok = [s.strip() for s in b.split("\n") if s.strip()]
         if not any(_EGYS.search(s) for s in sorok):

@@ -1811,11 +1811,36 @@ class MainFrame(wx.Frame):
 
         threading.Thread(target=work, daemon=True).start()
 
+    def aktiv_ablak(self):
+        """A felhasználó ÉPP HASZNÁLT felső szintű ablaka (modulablak is
+        lehet), vagy a főablak. Egy időzítőből felugró kérdés szülője EZ
+        legyen: ha a főablakhoz kötjük, a kérdés a Játékok (vagy más modul)
+        ablaka MÖGÉ kerül, a program pedig várja a választ – a felhasználó
+        azt látja, hogy „lefagyott", és Alt+Tab-bal kell megkeresnie a
+        dobozt. [Schibik Miklós, 2026-09-28]"""
+        try:
+            w = wx.GetActiveWindow()
+            if w is None:
+                f = wx.Window.FindFocus()
+                w = wx.GetTopLevelParent(f) if f is not None else None
+            if w is not None and w.IsShown():
+                return w
+        except Exception:
+            pass
+        return self
+
     def _after_auto_check(self, names, today, modulok=None):
         self.settings["update_last_check"] = today
         self._save_settings()
         modulok = modulok or []
         if not names and not modulok:
+            return
+        # Frissítés-kérdés: HALASZTVA, ha épp egy másik doboz nyitva van
+        # (ne legyen két modális egymáson), és MINDIG az aktív ablakhoz kötve.
+        app = wx.GetApp()
+        if app is not None and getattr(app, "IsModalDialogShowing",
+                                       lambda: False)():
+            wx.CallLater(15000, self._after_auto_check, names, today, modulok)
             return
         if names:
             joined = ", ".join(names)
@@ -1824,7 +1849,7 @@ class MainFrame(wx.Frame):
                     f"Új verzió érhető el ehhez: {joined}.\n\n"
                     "Megnyitod a frissítéskezelőt?",
                     "SuperDL – frissítés", wx.YES_NO | wx.ICON_INFORMATION,
-                    self) == wx.YES:
+                    self.aktiv_ablak()) == wx.YES:
                 self._on_check_updates()
         if modulok:
             szoveg = "%d modulhoz van frissítés: %s." % (len(modulok),
@@ -1834,7 +1859,8 @@ class MainFrame(wx.Frame):
                     szoveg + "\n\nMegnyitod a Modulkezelőt? Ott az „Összes "
                     "frissítése” gombbal egyben is elintézhető.",
                     "SuperDL – modul-frissítés",
-                    wx.YES_NO | wx.ICON_INFORMATION, self) == wx.YES:
+                    wx.YES_NO | wx.ICON_INFORMATION,
+                    self.aktiv_ablak()) == wx.YES:
                 self._on_modmgr_window()
 
     # ---- folytatás induláskor -----------------------------------------

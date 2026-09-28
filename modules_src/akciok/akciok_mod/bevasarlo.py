@@ -108,8 +108,44 @@ def megvan_valt(adat: dict, tetel_id: int, lista: str | None = None):
     return None
 
 
+def darab(t: dict) -> int:
+    """A tétel darabszáma (Petrus József, 2026-09-28). Alap: 1. A telefon
+    nem ismeri – ott a tétel egyszer szerepel, a darabszám a gépen marad."""
+    try:
+        return max(1, int(t.get("qty") or 1))
+    except (TypeError, ValueError):
+        return 1
+
+
+def darab_allit(adat: dict, tetel_id: int, db: int,
+                lista: str | None = None):
+    for t in tetelek(adat, lista):
+        if t.get("id") == tetel_id:
+            db = max(1, min(999, int(db)))
+            if db == 1:
+                t.pop("qty", None)
+            else:
+                t["qty"] = db
+            return t
+    return None
+
+
 def osszeg(lst: list) -> int:
-    return sum(int(t.get("priceHuf") or 0) for t in lst)
+    """A végösszeg: ár × darabszám."""
+    return sum(int(t.get("priceHuf") or 0) * darab(t) for t in lst)
+
+
+def kiurit(adat: dict, csak_megvan: bool = False,
+           lista: str | None = None) -> int:
+    """A lista kiürítése (Petrus József: „lista törlése gomb, ami törli a
+    már nem használt listát"). `csak_megvan`: csak a kipipált tételek mennek.
+    Visszaadja, hány tétel ment ki."""
+    nev = lista or aktiv_nev(adat)
+    lst = adat.setdefault("listak", {}).setdefault(nev, [])
+    marad = [t for t in lst if csak_megvan and not t.get("checked")]
+    ki = len(lst) - len(marad)
+    adat["listak"][nev] = marad
+    return ki
 
 
 _HONAPOK = ("január", "február", "március", "április", "május", "június",
@@ -140,8 +176,14 @@ def szoveges(adat: dict, ma=None) -> str:
         sorok.append("Minden megvan a listáról.")
     for t in kell:
         ar = t.get("priceHuf")
-        sorok.append("%s%s" % (t.get("name", ""),
-                               " – %s Ft" % _ft_szep(ar) if ar else ""))
+        db = darab(t)
+        eleje = "%d × " % db if db > 1 else ""
+        ar_sz = ""
+        if ar:
+            ar_sz = " – %s Ft" % _ft_szep(ar * db)
+            if db > 1:
+                ar_sz += " (%s Ft darabja)" % _ft_szep(ar)
+        sorok.append("%s%s%s" % (eleje, t.get("name", ""), ar_sz))
     if kell and any(t.get("priceHuf") for t in kell):
         sorok += ["", "Összesen kb. %s Ft" % _ft_szep(osszeg(kell))]
     if megvan:
@@ -168,9 +210,15 @@ def ment_fajlba(szoveg: str, ut: str) -> None:
 
 def tetel_sor(t: dict) -> str:
     ar = t.get("priceHuf")
-    return "%s%s. %s" % (t.get("name", ""),
-                         ", %d forint" % ar if ar is not None else "",
-                         "Megvan" if t.get("checked") else "Még nincs meg")
+    db = darab(t)
+    reszek = [t.get("name", "")]
+    if db > 1:
+        reszek.append("%d darab" % db)
+    if ar is not None:
+        reszek.append("%d forint" % (ar * db) + (
+            " (%d darabja)" % ar if db > 1 else ""))
+    return "%s. %s" % (", ".join(reszek),
+                       "Megvan" if t.get("checked") else "Még nincs meg")
 
 
 # ---- telefon (Átjáró-portál) ---------------------------------------------

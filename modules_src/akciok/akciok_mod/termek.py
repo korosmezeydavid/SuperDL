@@ -6,6 +6,7 @@ weboldaláról, a Lidl PDF-jéből vagy az Aldi lapozós újságjából jött, a
 `forrasok` dolga. Így egy új bolt (dm, Rossmann, Tesco…) csak egy új
 forrás-függvény, a felülethez nem kell nyúlni."""
 from dataclasses import dataclass, asdict
+import datetime as _dt
 import re
 import unicodedata
 
@@ -92,6 +93,44 @@ class Termek:
     def szotarbol(cls, d: dict) -> "Termek":
         mezok = cls.__dataclass_fields__
         return cls(**{k: v for k, v in (d or {}).items() if k in mezok})
+
+
+_HONAP_NAP = re.compile(r"(?<!\d)(\d{1,2})\.\s*(\d{1,2})(?!\d)")
+
+
+def _datum(honap: int, nap: int, ma: _dt.date):
+    """Hónap.nap → dátum a MAI naphoz legközelebbi évvel (az évfordulón át
+    is jó: decemberben a „01.05" jövő január)."""
+    for ev in (ma.year, ma.year + 1, ma.year - 1):
+        try:
+            d = _dt.date(ev, honap, nap)
+        except ValueError:
+            return None
+        if abs((d - ma).days) <= 183:
+            return d
+    return None
+
+
+def lejart(ervenyes: str, ma: _dt.date | None = None) -> bool:
+    """Lejárt-e az akció? Schibik Miklós (2026-09-28): „az előző heti
+    akciók is benne vannak" – a Lidl két hét újságját adja, és a hét eleji
+    (09.24–09.27) tételek a hét végén még a listában voltak.
+
+    „09.24-tól 09.30-ig", „2026. 09. 02–09. 29.", „09.28–10.04." → az
+    UTOLSÓ hónap.nap a vég. Csak kezdet („09.21-tól", Aldi): két hét után
+    tekintjük lejártnak. Üres vagy érthetetlen: nem lejárt (nem dobunk el
+    olyat, amiről nem tudjuk)."""
+    ma = ma or _dt.date.today()
+    parok = _HONAP_NAP.findall(ervenyes or "")
+    if not parok:
+        return False
+    h, n = (int(x) for x in parok[-1])
+    veg = _datum(h, n, ma)
+    if veg is None:
+        return False
+    if len(parok) == 1 and "-ig" not in (ervenyes or ""):
+        return (ma - veg).days > 13         # csak kezdet ismert
+    return veg < ma
 
 
 def ft(osszeg: int) -> str:

@@ -13,12 +13,14 @@ import time
 
 import wx
 
+from . import beallitas as BE
 from . import bevasarlo as B
 from . import csoport as CS
 from . import forrasok as F
-from .termek import illik
+from .termek import illik, lejart
 
 MIND = "Minden bolt"
+SAJAT = "Saját boltjaim"
 OSSZES_KAT = "Minden kategória"
 MIND_CSOP = "Minden termékcsoport"
 RENDEZESEK = ("Bolt szerint", "Ár szerint, a legolcsóbb elöl", "Név szerint")
@@ -66,10 +68,21 @@ HONNAN JÖN AZ ADAT
 A pultos áruk (felvágott, sajt a pultból) ára kilónként értendő.
 
 BÖNGÉSZÉS
-  Bolt ............... Alt+B – minden bolt, egy boltfajta egyszerre
-                       („Minden élelmiszerlánc", „Minden drogéria és
-                       kozmetika", „Minden vegyes áru", „Minden
+  Bolt ............... Alt+B – minden bolt, a SAJÁT boltjaid, egy boltfajta
+                       egyszerre („Minden élelmiszerlánc", „Minden drogéria
+                       és kozmetika", „Minden vegyes áru", „Minden
                        könyvesbolt"), vagy egyetlen bolt
+  Saját boltjaim ..... Ctrl+Shift+B – pipáld ki, melyik boltok vannak a
+                       településeden (pl. Spar, Lidl, Aldi). Utána a Bolt
+                       választóban a „Saját boltjaim" csak ezekben keres,
+                       és ez marad az alap, amíg mást nem választasz.
+  Kedvencek .......... Ctrl+K – írd be, amit rendszeresen veszel („Mizse
+                       ásványvíz", „Félix macskaeledel"). Minden frissítés
+                       után a program szól, ha valamelyik akciós, és a
+                       Kedvencek ablakban látod, hol mennyiért. Enter egy
+                       kedvencen: a lista rögtön arra szűr.
+  Lejárt akciók ...... az előző heti, már lejárt tételek nem jelennek meg
+                       (a jövő hetiek igen, az érvényességnél látszik).
   Termékcsoport ...... Alt+C – KÖZÖS csoportok minden boltban: Tejtermék és
                        tojás, Hús, hal, felvágott, Pékáru, Zöldség és
                        gyümölcs, Ital, Édesség és snack, Alapvető élelmiszer,
@@ -108,6 +121,10 @@ BEVÁSÁRLÓLISTA
 A lista a gépen van, net nélkül is megmarad. A listában:
   Szóköz ............. megvan / még nincs meg
   Delete ............. törlés
+  + és - ............. darabszám (Ctrl+D: beírva) – a végösszeg ár ×
+                       darab
+  Ctrl+Delete ........ a lista kiürítése (csak a megvan tételek, vagy az
+                       egész)
   Ctrl+N ............. új tétel kézzel
   Ctrl+T ............. összefésülés a TELEFON bevásárlólistájával
   Ctrl+E ............. a lista KIKÜLDÉSE: vágólapra (Messengerbe, e-mailbe
@@ -255,6 +272,9 @@ class AkciokFrame(wx.Frame):
         # egyenként a boltok – Dávid ötlete (2026-09-27)
         self._bolt_ertekek = [None]
         cimkek = [MIND]
+        self._be = BE.betolt()
+        self._bolt_ertekek.append(("sajat", None))
+        cimkek.append(SAJAT)
         for kulcs, cim in F.FAJTAK:
             if any(F.bolt_fajta(a) == kulcs for a, _n, _f in F.BOLTOK):
                 self._bolt_ertekek.append(("fajta", kulcs))
@@ -264,7 +284,7 @@ class AkciokFrame(wx.Frame):
             cimkek.append(n)
         self.bolt = wx.Choice(p, choices=cimkek)
         self.bolt.SetName("Bolt")
-        self.bolt.SetSelection(0)
+        self.bolt.SetSelection(1 if self._sajat_boltok() else 0)
         self.bolt.Bind(wx.EVT_CHOICE, lambda e: self._bolt_valt())
         felso.Add(self.bolt, 1, wx.EXPAND)
 
@@ -328,6 +348,8 @@ class AkciokFrame(wx.Frame):
                           ("&Hivatkozás másolása (Ctrl+Shift+C)",
                            self._masol),
                           ("Fri&ssítés (F5)", lambda: self._letolt(True)),
+                          ("Saját bolt&jaim… (Ctrl+Shift+B)", self._boltjaim),
+                          ("Ked&vencek… (Ctrl+K)", self._kedvencek),
                           ("Sú&gó (F1)", self._sugo),
                           ("Be&zárás", self.Close)):
             b = wx.Button(p, label=cimke)
@@ -337,7 +359,9 @@ class AkciokFrame(wx.Frame):
         p.SetSizer(v)
 
         ids = {k: wx.NewIdRef() for k in ("fel", "lista", "friss", "sugo",
-                                          "nyit", "masol")}
+                                          "nyit", "masol", "boltjaim", "kedv")}
+        self.Bind(wx.EVT_MENU, lambda e: self._boltjaim(), id=ids["boltjaim"])
+        self.Bind(wx.EVT_MENU, lambda e: self._kedvencek(), id=ids["kedv"])
         self.Bind(wx.EVT_MENU, lambda e: self._megnyit(), id=ids["nyit"])
         self.Bind(wx.EVT_MENU, lambda e: self._masol(), id=ids["masol"])
         self.Bind(wx.EVT_MENU, lambda e: self._felvesz(), id=ids["fel"])
@@ -351,8 +375,73 @@ class AkciokFrame(wx.Frame):
             (wx.ACCEL_NORMAL, wx.WXK_F1, ids["sugo"]),
             (wx.ACCEL_CTRL, ord("O"), ids["nyit"]),
             (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord("C"), ids["masol"]),
+            (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord("B"), ids["boltjaim"]),
+            (wx.ACCEL_CTRL, ord("K"), ids["kedv"]),
         ]))
         self.lista.SetFocus()
+
+    # ---- saját boltjaim, kedvencek (Petrus József, 2026-09-28) ----------
+    def _sajat_boltok(self) -> list:
+        ismert = [a for a, _n, _f in F.BOLTOK]
+        return [a for a in self._be.get("boltjaim", []) if a in ismert]
+
+    def _boltjaim(self):
+        nevek = [n for _a, n, _f in F.BOLTOK]
+        azonok = [a for a, _n, _f in F.BOLTOK]
+        d = wx.MultiChoiceDialog(
+            self, "Pipáld ki, melyik boltok vannak a településeden. A „Saját "
+                  "boltjaim” nézet csak ezekben keres.", "Saját boltjaim", nevek)
+        d.SetSelections([i for i, a in enumerate(azonok)
+                         if a in self._sajat_boltok()])
+        try:
+            if d.ShowModal() != wx.ID_OK:
+                return
+            valasztott = [azonok[i] for i in d.GetSelections()]
+        finally:
+            d.Destroy()
+        self._be["boltjaim"] = valasztott
+        BE.ment(self._be)
+        if valasztott:
+            self.bolt.SetSelection(1)
+            self._bolt_valt()
+            self._mond("Saját boltjaim: %s. A lista most ezekben keres, %d termék."
+                       % (", ".join(F.bolt_nev(a) for a in valasztott),
+                          len(self._lathato)))
+        else:
+            if self.bolt.GetSelection() == 1:
+                self.bolt.SetSelection(0)
+                self._bolt_valt()
+            self._mond("Nincs kijelölt saját bolt, minden boltban keresek.")
+
+    def _minden_ervenyes(self) -> list:
+        return [t for a, _n, _f in F.BOLTOK
+                for t in self._adat.get(a, []) if not lejart(t.ervenyes)]
+
+    def _kedvenc_talalatok(self) -> list:
+        return BE.kedvenc_talalatok(self._be.get("kedvencek", []),
+                                    self._minden_ervenyes())
+
+    def _kedvencek_szol(self):
+        """Frissítés után: melyik kedvenc akciós most."""
+        if not self._be.get("kedvencek"):
+            return
+        szoveg = BE.kedvenc_osszefoglalo(self._kedvenc_talalatok())
+        if szoveg:
+            wx.CallLater(1500, self._mond, szoveg)
+
+    def _kedvencek(self):
+        d = KedvencekDialog(self)
+        try:
+            if d.ShowModal() == wx.ID_OK and d.valasztott:
+                self.bolt.SetSelection(0)
+                self._kategoriak()
+                self.kereso.ChangeValue(d.valasztott)
+                self.csop.SetSelection(0)
+                self.kat.SetSelection(0)
+                self._szur()
+                self.lista.SetFocus()
+        finally:
+            d.Destroy()
 
     def _mond(self, szoveg, mondja=True):
         if self._closing:
@@ -378,6 +467,7 @@ class AkciokFrame(wx.Frame):
             self._mond("Akciós újság. A legutóbb letöltött ajánlatok: %s "
                        "termék. Frissítés a háttérben. Súgó: F1."
                        % ", ".join(regi))
+            self._kedvencek_szol()
         else:
             self._mond("Akciós újság. Az újságok letöltése folyik, egy kis "
                        "türelmet – a Lidl újságja nagy. Súgó: F1.")
@@ -461,6 +551,7 @@ class AkciokFrame(wx.Frame):
         self._folyamatban = set()
         if eredmeny and not self._closing:
             self._mond("Frissítve: %s akciós termék." % ", ".join(eredmeny))
+            self._kedvencek_szol()
 
     def _valasztott_bolt(self):
         """Az EGY kiválasztott bolt azonosítója – csoportnál és Mindennél
@@ -474,13 +565,16 @@ class AkciokFrame(wx.Frame):
         e = self._bolt_ertekek[i] if 0 <= i < len(self._bolt_ertekek) else None
         if e is None:
             return [a for a, _n, _f in F.BOLTOK]
+        if e[0] == "sajat":
+            return self._sajat_boltok() or [a for a, _n, _f in F.BOLTOK]
         if e[0] == "fajta":
             return [a for a, _n, _f in F.BOLTOK if F.bolt_fajta(a) == e[1]]
         return [e[1]]
 
     def _forras(self):
+        # a lejárt (előző heti) akciók nem kerülnek a listába
         return [t for a in self._valasztott_boltok()
-                for t in self._adat.get(a, [])]
+                for t in self._adat.get(a, []) if not lejart(t.ervenyes)]
 
     def _csoportok(self):
         """A termékcsoport-választó, DARABSZÁMMAL („Tejtermék és tojás, 38"):
@@ -672,6 +766,121 @@ class AkciokFrame(wx.Frame):
         e.Skip()
 
 
+class KedvencekDialog(wx.Dialog):
+    """Kedvencek: amit rendszeresen veszel – a program szól, ha akciós.
+    Enter egy kedvencen: a főablak listája arra szűr (`valasztott`)."""
+
+    def __init__(self, szulo):
+        super().__init__(szulo, title="Kedvencek", size=(640, 480))
+        self.szulo = szulo
+        self.valasztott = ""
+        v = wx.BoxSizer(wx.VERTICAL)
+        v.Add(wx.StaticText(self, label="&Kedvenceid és hogy most hol "
+                                        "akciósak (Enter: mutasd a listában; "
+                                        "Delete: törlés):"), 0, wx.ALL, 8)
+        self.lista = wx.ListBox(self, style=wx.LB_SINGLE)
+        self.lista.SetName("Kedvencek")
+        self.lista.Bind(wx.EVT_KEY_DOWN, self._billentyu)
+        self.lista.Bind(wx.EVT_LISTBOX_DCLICK, lambda e: self._mutat())
+        v.Add(self.lista, 1, wx.EXPAND | wx.ALL, 8)
+        sor = wx.BoxSizer(wx.HORIZONTAL)
+        for cimke, fv in (("Ú&j kedvenc… (Ctrl+N)", self._uj),
+                          ("&Mutasd a listában (Enter)", self._mutat),
+                          ("T&örlés (Delete)", self._torol),
+                          ("&Bezárás", lambda: self.EndModal(wx.ID_CANCEL))):
+            b = wx.Button(self, label=cimke)
+            b.Bind(wx.EVT_BUTTON, lambda e, f=fv: f())
+            sor.Add(b, 0, wx.RIGHT, 6)
+        v.Add(sor, 0, wx.ALL, 8)
+        self.SetSizer(v)
+        uj_id = wx.NewIdRef()
+        self.Bind(wx.EVT_MENU, lambda e: self._uj(), id=uj_id)
+        self.SetAcceleratorTable(wx.AcceleratorTable([
+            (wx.ACCEL_CTRL, ord("N"), uj_id)]))
+        self.SetEscapeId(wx.ID_CANCEL)
+        self._frissit()
+        self.lista.SetFocus()
+        n = len(self._talalatok)
+        akcios = sum(1 for _k, l in self._talalatok if l)
+        wx.CallAfter(self.szulo._mond,
+                     "Kedvencek: %d, ebből most %d akciós." % (n, akcios) if n
+                     else "Még nincs kedvenced. Ctrl+N-nel írd be, amit "
+                          "rendszeresen veszel, például: Mizse ásványvíz.")
+
+    def _frissit(self, marad=None):
+        self._talalatok = self.szulo._kedvenc_talalatok()
+        sorok = []
+        for k, lista in self._talalatok:
+            if not lista:
+                sorok.append("%s – most nem akciós" % k)
+                continue
+            boltok, latott = [], set()
+            for t in lista:
+                if t.bolt in latott:
+                    continue
+                latott.add(t.bolt)
+                ar = t.legjobb_ar()
+                boltok.append("%s %d forint" % (t.bolt, ar) if ar is not None
+                              else t.bolt)
+            sorok.append("%s – %d akció: %s" % (k, len(lista), ", ".join(boltok)))
+        self.lista.Set(sorok)
+        if sorok:
+            i = marad if marad is not None else 0
+            self.lista.SetSelection(max(0, min(i, len(sorok) - 1)))
+
+    def _kijelolt(self):
+        i = self.lista.GetSelection()
+        return (i, self._talalatok[i][0]) if 0 <= i < len(self._talalatok) \
+            else (i, None)
+
+    def _billentyu(self, e):
+        k = e.GetKeyCode()
+        if k in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER):
+            self._mutat()
+        elif k in (wx.WXK_DELETE, wx.WXK_NUMPAD_DELETE):
+            self._torol()
+        else:
+            e.Skip()
+
+    def _uj(self):
+        d = wx.TextEntryDialog(self, "Mit veszel rendszeresen? (Egy-két szó, "
+                                     "ahogy a boltban hívják, például: Mizse "
+                                     "ásványvíz)", "Új kedvenc")
+        try:
+            if d.ShowModal() != wx.ID_OK:
+                return
+            szo = d.GetValue().strip()
+        finally:
+            d.Destroy()
+        if not szo:
+            return
+        if not BE.kedvenc_hozzaad(self.szulo._be, szo):
+            self.szulo._mond("Ez már a kedvenceid közt van: %s." % szo)
+            return
+        BE.ment(self.szulo._be)
+        self._frissit(len(self.szulo._be["kedvencek"]) - 1)
+        _k, lista = self._talalatok[-1]
+        self.szulo._mond("Felvéve a kedvencek közé: %s. %s" % (
+            szo, "Most %d akciós ajánlat van rá." % len(lista) if lista
+            else "Most nem akciós; szólok, ha az lesz."))
+
+    def _torol(self):
+        i, k = self._kijelolt()
+        if not k:
+            return
+        BE.kedvenc_torol(self.szulo._be, k)
+        BE.ment(self.szulo._be)
+        self._frissit(i)
+        self.szulo._mond("Törölve a kedvencek közül: %s." % k)
+
+    def _mutat(self):
+        _i, k = self._kijelolt()
+        if not k:
+            return
+        self.valasztott = k
+        self.EndModal(wx.ID_OK)
+
+
 class ListaDialog(wx.Dialog):
     """A saját bevásárlólista: pipálás, törlés, kézi tétel, telefon."""
 
@@ -684,7 +893,8 @@ class ListaDialog(wx.Dialog):
         self.cim = wx.StaticText(self, label="")
         v.Add(self.cim, 0, wx.ALL, 8)
         v.Add(wx.StaticText(self, label="&Tételek (Szóköz: megvan / még "
-                                        "nincs; Delete: törlés):"), 0, wx.LEFT, 8)
+                                        "nincs; Delete: törlés; + és -: "
+                                        "darabszám):"), 0, wx.LEFT, 8)
         self.lista = wx.ListBox(self, style=wx.LB_SINGLE)
         self.lista.SetName("Bevásárlólista tételei")
         self.lista.Bind(wx.EVT_KEY_DOWN, self._billentyu)
@@ -692,7 +902,9 @@ class ListaDialog(wx.Dialog):
         sor = wx.BoxSizer(wx.HORIZONTAL)
         for cimke, fv in (("&Megvan / még nincs (Szóköz)", self._pipa),
                           ("T&örlés (Delete)", self._torol),
+                          ("&Darabszám… (Ctrl+D)", self._darab),
                           ("Ú&j tétel… (Ctrl+N)", self._uj),
+                          ("Lista kiü&rítése… (Ctrl+Delete)", self._kiurit),
                           ("Összefésülés a tele&fonnal… (Ctrl+T)",
                            self._telefon),
                           ("Lista &kiküldése… (Ctrl+E)", self._kuldes),
@@ -702,14 +914,18 @@ class ListaDialog(wx.Dialog):
             sor.Add(b, 0, wx.RIGHT, 6)
         v.Add(sor, 0, wx.ALL, 8)
         self.SetSizer(v)
-        ids = {k: wx.NewIdRef() for k in ("uj", "tel", "kuld")}
+        ids = {k: wx.NewIdRef() for k in ("uj", "tel", "kuld", "db", "urit")}
         self.Bind(wx.EVT_MENU, lambda e: self._uj(), id=ids["uj"])
+        self.Bind(wx.EVT_MENU, lambda e: self._darab(), id=ids["db"])
+        self.Bind(wx.EVT_MENU, lambda e: self._kiurit(), id=ids["urit"])
         self.Bind(wx.EVT_MENU, lambda e: self._telefon(), id=ids["tel"])
         self.Bind(wx.EVT_MENU, lambda e: self._kuldes(), id=ids["kuld"])
         self.SetAcceleratorTable(wx.AcceleratorTable([
             (wx.ACCEL_CTRL, ord("N"), ids["uj"]),
             (wx.ACCEL_CTRL, ord("T"), ids["tel"]),
             (wx.ACCEL_CTRL, ord("E"), ids["kuld"]),
+            (wx.ACCEL_CTRL, ord("D"), ids["db"]),
+            (wx.ACCEL_CTRL, wx.WXK_DELETE, ids["urit"]),
         ]))
         self.SetEscapeId(wx.ID_OK)
         self._frissit()
@@ -741,9 +957,83 @@ class ListaDialog(wx.Dialog):
         if k == wx.WXK_SPACE:
             self._pipa()
         elif k in (wx.WXK_DELETE, wx.WXK_NUMPAD_DELETE):
-            self._torol()
+            if e.ControlDown():
+                self._kiurit()
+            else:
+                self._torol()
+        elif k in (wx.WXK_ADD, wx.WXK_NUMPAD_ADD) or e.GetUnicodeKey() == ord("+"):
+            self._darab_lep(1)
+        elif k in (wx.WXK_SUBTRACT, wx.WXK_NUMPAD_SUBTRACT) \
+                or e.GetUnicodeKey() == ord("-"):
+            self._darab_lep(-1)
         else:
             e.Skip()
+
+    def _darab_lep(self, mennyi):
+        i, t = self._kijelolt()
+        if not t:
+            return
+        uj = B.darab(t) + mennyi
+        if uj < 1:
+            self.szulo._mond("Egynél kevesebb nem lehet. Törölni a Delete-tel tudod.")
+            return
+        B.darab_allit(self.adat, t["id"], uj)
+        B.ment(self.adat)
+        self._frissit(i)
+        self.szulo._mond("%d darab: %s." % (uj, t.get("name", "")))
+
+    def _darab(self):
+        i, t = self._kijelolt()
+        if not t:
+            return
+        d = wx.TextEntryDialog(self, "Hány darab kell ebből? (%s)"
+                               % t.get("name", ""), "Darabszám",
+                               str(B.darab(t)))
+        try:
+            if d.ShowModal() != wx.ID_OK:
+                return
+            ertek = d.GetValue().strip()
+        finally:
+            d.Destroy()
+        try:
+            db = int(ertek)
+            if db < 1:
+                raise ValueError
+        except ValueError:
+            self.szulo._mond("Egész számot írj, legalább egyet.")
+            return
+        B.darab_allit(self.adat, t["id"], db)
+        B.ment(self.adat)
+        self._frissit(i)
+        self.szulo._mond("%d darab: %s." % (db, t.get("name", "")))
+
+    def _kiurit(self):
+        lst = B.tetelek(self.adat)
+        if not lst:
+            self.szulo._mond("A lista már üres.")
+            return
+        megvan = sum(1 for t in lst if t.get("checked"))
+        valasztek = ["Az egész lista törlése (%d tétel)" % len(lst)]
+        if megvan:
+            valasztek.insert(0, "Csak a már megvan tételek törlése (%d)" % megvan)
+        d = wx.SingleChoiceDialog(self, "Mit töröljek a bevásárlólistáról?",
+                                  "Lista kiürítése", valasztek)
+        try:
+            if d.ShowModal() != wx.ID_OK:
+                return
+            csak_megvan = megvan and d.GetSelection() == 0
+        finally:
+            d.Destroy()
+        if not csak_megvan and wx.MessageBox(
+                "Biztosan törlöd az egész listát? Ezt nem lehet visszavonni.",
+                "Lista kiürítése", wx.YES_NO | wx.ICON_QUESTION, self) != wx.YES:
+            return
+        n = B.kiurit(self.adat, csak_megvan=bool(csak_megvan))
+        B.ment(self.adat)
+        self._frissit()
+        self.szulo._mond("%d tétel törölve. %s" % (
+            n, "A listán %d tétel maradt." % len(B.tetelek(self.adat))
+            if B.tetelek(self.adat) else "A lista üres."))
 
     def _pipa(self):
         i, t = self._kijelolt()
