@@ -158,7 +158,7 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-09-26 · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-28 · dolgozott: Claude
 
 ---
 
@@ -178,6 +178,22 @@ nyers bájtként keresi a fájlokban.)
 build-értelmező; 2026-09-24 óta ebben is van ctranslate2 4.8.1,
 sentencepiece 0.2.2, sacremoses 0.2.0, joblib 1.5.3, subword-nmt 0.3.8
 (a 4.6.12–4.6.17 között ezek hiányoztak → a fordító némán kiesett).
+
+### ✅ Akciós újság 0.9.0 + Super Mail 1.6.1 (2026-09-28) – modul-kiadás, Core nem változott
+
+- **Akciós újság 0.9.0** (Petrus József): új boltok `euronics.py` (heti ajánlatok +
+  a most futó kampányok, HTML-kártyák) és `praktiker.py` (az „Árzuhanás" /kiarusitas/bfd
+  és a törzsvásárlói /torzsvasarloi-ajanlatok/ilp, a lapba ágyazott JSON-ból,
+  `json.JSONDecoder.raw_decode`); új fajta `muszaki`, új csoportok „Műszaki cikk",
+  „Barkács és kert" (`_NEM_ELELMISZER_ALAP`). Benne a 0.8.1-es ár-sorrend javítás is
+  (`ea980a7`). MediaMarkt, OBI: NINCS – az áraik csak böngészőben futó JS-sel jönnek.
+  Teszt: `tests/test_akciok_muszaki_boltok.py`.
+- **Super Mail 1.6.1** (Dávid): OKOS SZŰRŐ (`okos_szuro`, alap: be) – a hírlevél
+  (List-Unsubscribe, List-Post nélkül) és a ≥3 hivatkozásos HTML-levél magától HTML
+  nézetben nyílik; fókusz-javítás HTML nézetnél. ⚠️ A mail FORRÁSA továbbra sincs a
+  tárolóban (csak zip + modules.json); teszt: `tests/test_mail_okos_szuro.py` (CI-n kimarad).
+- Commit `f1038b2`; release `mod-akciok-0.9.0`, `mod-mail-1.6.1` (`--latest=false`),
+  `releases/latest` maradt `v4.6.25`; modules.json élesben, SHA egyezik.
 
 ### ✅ 4.6.22 (2026-09-27) – szakember83: FRISSÍTÉS, ELREJTETT NYOM
 
