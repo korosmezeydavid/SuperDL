@@ -3442,6 +3442,13 @@ class MainFrame(wx.Frame):
         self._save_settings()
         self.timer.Stop()
         self.feed_timer.Stop()
+        # Rendes kilépés jele MÁR ITT: ha egy rejtett modulablak miatt a fő
+        # hurok nem tér vissza, a jel akkor is kint van.
+        try:
+            from superdl import osszeomlas as _oo
+            _oo.rendben_kilep()
+        except Exception:
+            pass
         event.Skip()
 
 
@@ -3891,7 +3898,11 @@ class UpdateDialog(wx.Dialog):
                 "SuperDL frissítés", wx.YES_NO | wx.ICON_QUESTION,
                 self) == wx.YES:
             self.EndModal(wx.ID_CLOSE)
-            wx.CallAfter(parent.Close)
+            # ⚠️ `_quit_app`, NEM `Close`: háttérmódban (tálca) a Close csak
+            # elrejti az ablakot – a program nem lépett ki, a telepítő 90 mp
+            # múlva erővel zárta be, és a következő induláskor „váratlanul
+            # bezárult" üzenet fogadott. [Dávid, 2026-09-28]
+            wx.CallAfter(getattr(parent, "_quit_app", parent.Close))
 
 
 def url_is_new(mgr, url: str) -> bool:

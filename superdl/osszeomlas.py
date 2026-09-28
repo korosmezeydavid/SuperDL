@@ -33,6 +33,18 @@ NAPLO = Path.home() / ".superdl" / "osszeomlas.log"
 _OLVASVA = Path.home() / ".superdl" / "osszeomlas_olvasva.txt"
 _fajl = None
 _uj_resz = ""          # ami a legutóbbi indulásunk ÓTA került a naplóba
+# ÉLETJEL A LEMEZEN (Dávid, 2026-09-28: „minden indításkor bedobja"). A
+# faulthandler Windowson a LEKEZELT natív kivételt is kiírja (0x8001010d,
+# 0x80010108 – COM-jelzések, a program fut tovább). Ha a futás ezután nem
+# „rendben" ért véget – a gép leállt, a telepítő zárta be, tálcán futott –,
+# a következő induláskor összeomlásnak látszott. Ezért a fő szál fél percenként
+# felírja, meddig ért a napló. Ami az utolsó életjel ELŐTT került a naplóba,
+# azt a program BIZONYOSAN túlélte (utána még élt); összeomlás csak az utolsó
+# életjel UTÁNI részben lehet.
+_uj_farok = None       # az új rész az utolsó életjel után (None: nincs életjel)
+_ELETJEL_MP = 30.0
+_eletjel_ido = 0.0
+_rendben_irva = False
 
 # --- MEGAKADÁS (befagyás) ---------------------------------------------
 # Tóth László jelzése (2026-09-14): „a fájlválasztóba belefagyott […]
@@ -66,6 +78,13 @@ def bekapcsol() -> bool:
         # „a" mód: a korábbi összeomlások is megmaradnak, hogy össze lehessen
         # hasonlítani őket
         _fajl = open(NAPLO, "a", encoding="utf-8", errors="replace")
+        if elozo_tulelte():
+            # Az előző futás nem jelzett rendes kilépést, de az utolsó
+            # életjelig minden jelzést túlélt: ezt a naplóba is beírjuk, hogy
+            # a hibajelentés se nevezze összeomlásnak.
+            _fajl.write("%s – pontosabban: nem jelzett kilépést, de a "
+                        "natív jelzéseket az életjel szerint túlélte ===\n"
+                        % RENDBEN_JEL)
         _fajl.write("\n=== SuperDL indult: %s (verzió: %s) ===\n"
                     % (time.strftime("%Y-%m-%d %H:%M:%S"), _verzio()))
         _fajl.flush()
@@ -82,7 +101,8 @@ def _olvasatlan_beolvas() -> None:
     A jelölőt MÉG A FEJLÉC KIÍRÁSA ELŐTT toljuk a fájl végére: a saját
     „SuperDL indult" sorunk nem újdonság, és ha benne maradna az új részben,
     a következő induláskor is „történt valami" látszatát keltené."""
-    global _uj_resz
+    global _uj_resz, _uj_farok
+    _uj_farok = None
     try:
         meret = NAPLO.stat().st_size
     except OSError:
@@ -110,12 +130,49 @@ def _olvasatlan_beolvas() -> None:
         _jelolo_ir(meret)
         return
     try:
-        with open(NAPLO, encoding="utf-8", errors="replace") as f:
+        with open(NAPLO, "rb") as f:
             f.seek(eddig)
-            _uj_resz = f.read()
+            nyers = f.read()
     except OSError:
-        _uj_resz = ""
+        nyers = b""
+    _uj_resz = nyers.decode("utf-8", errors="replace")
+    el = _eletjel_olvas()
+    if el is not None and eddig <= el <= meret:
+        _uj_farok = nyers[el - eddig:].decode("utf-8", errors="replace")
     _jelolo_ir(meret)
+
+
+def elozo_tulelte() -> bool:
+    """Az előző futásban volt natív jelzés, rendes kilépés nem, de az
+    életjel szerint mindet túlélte (összeomlás-nyom csak az utolsó életjel
+    előtt van)."""
+    if _uj_farok is None or RENDBEN_JEL in _uj_resz:
+        return False
+    return (_osszeomlas_nyom(_megakadas_nelkul(_uj_resz))
+            and not _osszeomlas_nyom(_megakadas_nelkul(_uj_farok)))
+
+
+def _eletjel_ut() -> Path:
+    return NAPLO.with_name("osszeomlas_eletjel.txt")
+
+
+def _eletjel_olvas():
+    try:
+        return int(_eletjel_ut().read_text(encoding="utf-8").strip())
+    except (OSError, ValueError):
+        return None
+
+
+def eletjel_ir() -> None:
+    """A napló jelenlegi hossza az életjel-fájlba: eddig biztosan élünk."""
+    if _fajl is None:
+        return
+    try:
+        _fajl.flush()
+        meret = os.fstat(_fajl.fileno()).st_size
+        _eletjel_ut().write_text(str(int(meret)), encoding="utf-8")
+    except Exception:
+        pass
 
 
 def _jelolo_ir(hol: int) -> None:
@@ -139,8 +196,9 @@ def uj_osszeomlas() -> bool:
     ki, egy olyan befagyás után, amiből a program KIJÖTT, azt állítanánk a
     felhasználónak, hogy összeomlott. Az pedig pont az a fajta hazugság, ami
     ellen az egész napló készült."""
+    resz = _uj_resz if _uj_farok is None else _uj_farok
     return _osszeomlas_nyom(
-        _megakadas_nelkul(_tulelt_nelkul(_uj_resz)))
+        _megakadas_nelkul(_tulelt_nelkul(resz)))
 
 
 def uj_megakadas() -> bool:
@@ -370,8 +428,11 @@ def volt_osszeomlas() -> bool:
 
 def sziv_dobban() -> None:
     """A fő szál életjele. Időzítőből hívjuk – NEM csinál semmi láthatót."""
-    global _sziv, _megakadva
+    global _sziv, _megakadva, _eletjel_ido
     _sziv = time.monotonic()
+    if _sziv - _eletjel_ido >= _ELETJEL_MP:
+        _eletjel_ido = _sziv
+        eletjel_ir()
     if _megakadva:
         _megakadva = False
         jegyzet("A program újra válaszol – a megakadás elmúlt.")
@@ -469,9 +530,11 @@ RENDBEN_JEL = "=== SuperDL rendben kilépett"
 
 
 def rendben_kilep() -> None:
-    """Rendes kilépéskor hívjuk (a fő hurok után)."""
-    if _fajl is None:
+    """Rendes kilépéskor hívjuk (a bezáráskor és a fő hurok után)."""
+    global _rendben_irva
+    if _fajl is None or _rendben_irva:
         return
+    _rendben_irva = True
     try:
         _fajl.write("%s: %s ===\n" % (RENDBEN_JEL,
                                        time.strftime("%Y-%m-%d %H:%M:%S")))

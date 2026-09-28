@@ -464,7 +464,7 @@ class ModuleLoader:
         return [d for d in sorted(root.iterdir())
                 if (d / "manifest.json").is_file()]
 
-    def load_dir(self, module_dir) -> LoadedModule | None:
+    def load_dir(self, module_dir) -> LoadedModule | None:  # noqa: C901
         module_dir = Path(module_dir)
         try:
             data = json.loads((module_dir / "manifest.json")
@@ -509,7 +509,7 @@ class ModuleLoader:
             mod = importlib.import_module(man.entry)
             core = self._make_core(man)
             if hasattr(mod, "register"):
-                mod.register(core)
+                fo_szalon(mod.register, core)
             lm = LoadedModule(man, mod, core)
             self.loaded[man.id] = lm
             self.errors.pop(man.id, None)
@@ -531,7 +531,41 @@ class ModuleLoader:
             return False
         try:
             if hasattr(lm.module, "unregister"):
-                lm.module.unregister(lm.core)
+                fo_szalon(lm.module.unregister, lm.core)
         except Exception:
             self._log.exception("Modul unregister hibája: %s", module_id)
         return True
+
+def fo_szalon(fn, *args, varakozas: float = 120.0):
+    """`fn(*args)` a wx FŐ SZÁLÁN, és megvárja az eredményt.
+
+    A Modulkezelő háttérszálon telepít és tölt be modult. A modulok
+    `register`-e menüt épít és időzítőt indít – ezt a wx csak a fő szálon
+    engedi (a Szerencsesüti így nem töltődött be: „timer can only be started
+    from the main thread", Dávid naplója, 2026-09-27). Ha már a fő szálon
+    vagyunk, vagy nincs futó wx-alkalmazás (tesztek), egyszerűen meghívjuk."""
+    try:
+        import wx
+        kell = wx.GetApp() is not None and not wx.IsMainThread()
+    except Exception:
+        kell = False
+    if not kell:
+        return fn(*args)
+    import threading
+    kesz = threading.Event()
+    eredmeny = {}
+
+    def futtat():
+        try:
+            eredmeny["ertek"] = fn(*args)
+        except BaseException as e:          # a hívó szálon dobjuk tovább
+            eredmeny["hiba"] = e
+        finally:
+            kesz.set()
+    wx.CallAfter(futtat)
+    if not kesz.wait(varakozas):
+        raise TimeoutError("a modul nem töltődött be %d mp alatt a fő szálon"
+                           % varakozas)
+    if "hiba" in eredmeny:
+        raise eredmeny["hiba"]
+    return eredmeny.get("ertek")
