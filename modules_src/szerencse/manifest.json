@@ -1,7 +1,7 @@
 {
   "id": "szerencse",
   "name": "Szerencsesüti",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "entry": "szerencse_mod",
   "category": "Szórakozás",
   "description": "Napközben 15 percenként érkezik egy szerencsesüti: Ctrl+Alt+S-sel kibontod, és a felolvasó elmondja, mi van benne – bölcsesség, vicc, huncut beszólás, nevetéssel és hanghatásokkal. Néha büntetés jár (1, 2, 10 vagy akár 24 óra sütiszünet), néha bónusz (még egy süti). Legfeljebb 3 süti gyűlik össze; éjszakai csend alatt nem jön süti. Beállítás: be/ki, éjszakai csend, érkezés szóban. Saját üzeneteket is írhatsz hozzá.",

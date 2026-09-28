@@ -213,13 +213,26 @@ def register(core):
         core.add_menu_item(menu, "Szerencsesüti &beállításai…", beallitasok,
                            help="Be- és kikapcsolás, éjszakai csend"),
     ]
+    # ⚠️ Időzítőt csak a fő szál indíthat. A Modulkezelő telepítéskor
+    # háttérszálon tölti be a modult – ott a wx.Timer.Start kivételt dob, és
+    # a modul be sem töltődött (Dávid naplója, 2026-09-27).
+    if wx.IsMainThread():
+        _idozitok_inditasa()
+    else:
+        wx.CallAfter(_idozitok_inditasa)
+    core.log.info("szerencse modul betöltve")
+
+
+def _idozitok_inditasa():
+    import wx
+    if _state.get("suti") is None or _state.get("timer") is not None:
+        return                      # közben leszerelték, vagy már fut
     t = wx.Timer()
     t.Bind(wx.EVT_TIMER, _utes)
     t.Start(30 * 1000)
     _state["timer"] = t
     # az első ütés ne az indulás zajába essen
     _state["elso"] = wx.CallLater(20 * 1000, _utes)
-    core.log.info("szerencse modul betöltve")
 
 
 def unregister(core):
