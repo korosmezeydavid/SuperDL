@@ -49,6 +49,19 @@ hiddenimports += collect_submodules('bs4')
 # az a lista ide kerül.
 hiddenimports += ['plistlib']                     # iphone modul (afc.py)
 hiddenimports += collect_submodules('comtypes')   # mail helyesírás, távsegítség
+
+# A Super Mail HTML NÉZETE (Schibik Miklós, 2026-09-28) a `wx.html2`-t (Edge
+# WebView2) használja. A Core nem importálja, ezért a PyInstaller kihagyta a
+# `_html2` bővítményt, a `wxmsw32u_webview` DLL-t és a WebView2Loader.dll-t:
+# a kiadott programban a HTML nézet MINDENKINÉL azt mondta, hogy „nincs
+# WebView2 ezen a gépen" – akkor is, ha a gépen telepítve volt.
+# ⚠️ A `tools/modul_importok.py` ezt NEM látta: csak a legfelső nevet (`wx`)
+# nézi, a `wx` pedig bent van. A `tests/test_spec_wx_almodulok.py` őrzi.
+hiddenimports += ['wx.html2']
+import os as _os
+import wx as _wx
+binaries += [(_os.path.join(_os.path.dirname(_wx.__file__),
+                            'WebView2Loader.dll'), 'wx')]
 # A TELJES superdl csomag (a megosztott runtime: videocompose, audioengine,
 # booktext, ocr, extratools…) – a kiemelt MODULOK `from superdl import …`-zal
 # hívják, ezért akkor is bundle-ölni kell, ha a built-in gui már nem importálja.
