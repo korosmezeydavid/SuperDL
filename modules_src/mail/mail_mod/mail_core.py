@@ -284,6 +284,169 @@ def hivatkozasok_szovegbol(szoveg):
     return ki
 
 
+_EMAIL_RE = re.compile(r"(?<![\w.+-])([\w.+-]+@[\w-]+(?:\.[\w-]+)+)(?![\w-])")
+
+
+def emailcimek_szovegbol(szoveg):
+    """A szövegben álló e-mail címek, sorrendben, duplikátum nélkül
+    (Schibik Miklós, 2026-09-28: „az e-mail cím is nyithatna egy új levelet
+    a címzettnek")."""
+    ki, latott = [], set()
+    for c in _EMAIL_RE.findall(szoveg or ""):
+        c = c.rstrip(".")
+        k = c.lower()
+        if k not in latott:
+            latott.add(k)
+            ki.append(c)
+    return ki
+
+
+# ---- HTML NÉZET (Schibik Miklós kérése, 2026-09-28) ----------------------
+#
+# „A levél megtekintő nem lehetne HTML formátumú? Ha sok hivatkozás van,
+# elég nehéz megtalálni, amit meg kéne nyitni." A HTML nézetben a
+# hivatkozás OTT van a szövegben, ahol a levél írója tette – a képernyőolvasó
+# linkről linkre lépked benne, mint a böngészőben. A levél HTML-jét viszont
+# NEM engedjük szabadon: nincs szkript, nincs űrlap, nincs beágyazott keret,
+# és NEM tölt le semmit a netről (kép, követő pixel, stílus) – a CSP-fejléc
+# ezt a megjelenítőben is tiltja, nem csak a mi szűrőnk.
+
+# Az e-mail címek NEM „mailto:" hivatkozásként mennek a megjelenítőbe – azt
+# az Edge a rendszer levelezőjének (Outlook) adná át, nem nekünk. Helyette
+# egy csak nálunk értelmes címre mutatnak, amit az ablak elkap, és a Super
+# Mailben nyit új levelet.
+MAILTO_ELOTAG = "https://mailto.superdl.local/"
+
+
+def mailto_cim(url: str) -> str:
+    """A megjelenítőből jövő cím → e-mail cím, ha a mi mailto-alakunk (vagy
+    valódi mailto:), különben üres."""
+    from urllib.parse import unquote
+    u = url or ""
+    if u.startswith(MAILTO_ELOTAG):
+        return unquote(u[len(MAILTO_ELOTAG):].split("?")[0]).strip()
+    if u.lower().startswith("mailto:"):
+        return unquote(u[7:].split("?")[0]).strip()
+    return ""
+
+
+_CSP = ('<meta http-equiv="Content-Security-Policy" content="default-src '
+        "'none'; style-src 'unsafe-inline'; img-src data:\">")
+_STILUS = ("<style>body{font-family:Segoe UI,Arial,sans-serif;font-size:16px;"
+           "line-height:1.5;margin:12px;max-width:100%;word-wrap:break-word}"
+           "a{color:#0645ad}pre{white-space:pre-wrap;font-family:inherit}"
+           "img{max-width:100%}</style>")
+
+
+def _linkesit(szoveg):
+    """Sima szöveg → HTML: a webcímek és az e-mail címek kattinthatók."""
+    import html as _h
+    darabok, poz = [], 0
+    minta = re.compile(r"(%s)|(%s)" % (_URL_RE.pattern, _EMAIL_RE.pattern),
+                       re.IGNORECASE)
+    for m in minta.finditer(szoveg or ""):
+        darabok.append(_h.escape(szoveg[poz:m.start()]))
+        if m.group(1):
+            u = m.group(1)
+            vege = len(u) - len(u.rstrip(".,;:!?)"))
+            u, farok = u[:len(u) - vege], u[len(u) - vege:]
+            darabok.append('<a href="%s">%s</a>%s'
+                           % (_h.escape(u, quote=True), _h.escape(u),
+                              _h.escape(farok)))
+        else:
+            c = m.group(2)
+            darabok.append('<a href="%s%s">%s</a>'
+                           % (MAILTO_ELOTAG, _h.escape(c, quote=True),
+                              _h.escape(c)))
+        poz = m.end()
+    darabok.append(_h.escape((szoveg or "")[poz:]))
+    return "<pre>%s</pre>" % "".join(darabok)
+
+
+_TILTOTT_ELEM = re.compile(
+    r"<\s*(script|style|iframe|frame|frameset|object|embed|applet|form|input|"
+    r"button|select|textarea|link|base|meta|svg|math|video|audio|source|"
+    r"template|noscript)\b[^>]*>.*?<\s*/\s*\1\s*>|"
+    r"<\s*(script|style|iframe|frame|object|embed|applet|form|input|button|"
+    r"link|base|meta|source|img)\b[^>]*/?>", re.I | re.S)
+_ON_ATTR = re.compile(r"""\s+on\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)""", re.I)
+_ROSSZ_HREF = re.compile(r"""(href|src|action|formaction|background|poster)\s*=\s*("|')?\s*(javascript|vbscript|data|file):""", re.I)
+_STYLE_URL = re.compile(r"""(style\s*=\s*("[^"]*"|'[^']*'))""", re.I)
+_IMG = re.compile(r"<\s*img\b([^>]*)>", re.I)
+
+
+def _kep_szovegge(m):
+    alt = re.search(r"""\balt\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))""",
+                    m.group(1), re.I)
+    szoveg = (alt.group(2) or alt.group(3) or alt.group(4) or "").strip() \
+        if alt else ""
+    return " [kép: %s] " % szoveg if szoveg else ""
+
+
+def html_megjeleniteshez(html_nyers):
+    """A levél HTML-je a beépített megjelenítőhöz, MEGTISZTÍTVA: nincs
+    szkript, űrlap, keret, esemény-attribútum, javascript:-hivatkozás; a
+    képek helyén a leírásuk áll (nem tölt le semmit). Amit a szűrő
+    esetleg átengedne, azt a CSP-fejléc a megjelenítőben tiltja."""
+    h = html_nyers or ""
+    h = re.sub(r"<!--.*?-->", "", h, flags=re.S)
+    h = _IMG.sub(_kep_szovegge, h)
+    h = _TILTOTT_ELEM.sub("", h)
+    h = _ON_ATTR.sub("", h)
+    h = _ROSSZ_HREF.sub(r"\1=\2#", h)
+    h = re.sub(r"(href\s*=\s*[\"']?)mailto:", r"\1" + MAILTO_ELOTAG, h, flags=re.I)
+    h = _STYLE_URL.sub(lambda m: re.sub(r"url\s*\(", "no-url(", m.group(1),
+                                        flags=re.I), h)
+    # csak a törzs kell (a fej-részt mi adjuk)
+    m = re.search(r"<body\b[^>]*>(.*?)</body>", h, re.I | re.S)
+    if m:
+        h = m.group(1)
+    return ("<!doctype html><html><head><meta charset=\"utf-8\">%s%s</head>"
+            "<body>%s</body></html>" % (_CSP, _STILUS, h))
+
+
+# ---- OKOS SZŰRŐ (Dávid, 2026-09-28) ----------------------------------------
+#
+# „Ismerje föl a levelet, hogy vannak-e benne hivatkozások, pl. hírlevelek,
+# és azt HTML-ben mutassa. De kikapcsolható legyen." A hétköznapi levél
+# (baráti levél, levelezőlista-hozzászólás) marad a megszokott egyszerű
+# nézetben; a hírlevél és a hivatkozásokkal teli levél magától HTML-ben nyílik,
+# ahol a hivatkozás ott van a szövegben, ahová az írója tette.
+
+OKOS_LINK_KUSZOB = 3    # ennyi hivatkozástól számít „hivatkozásokkal telinek"
+
+
+def hirlevel_e(msg) -> bool:
+    """Hírlevél: van leiratkozási fejléce, de NEM levelezőlista (a lista
+    hozzászólásain van `List-Post`, a hírleveleken nincs)."""
+    try:
+        return bool(msg.get("List-Unsubscribe")) and not msg.get("List-Post")
+    except Exception:
+        return False
+
+
+def okos_html_kell(msg, linkek_szama: int) -> bool:
+    """Az okos szűrő döntése: HTML nézetben nyíljon-e a levél.
+
+    Csak akkor, ha a levélnek VAN HTML része (a sima szöveges levél marad
+    szöveg), és hírlevél legalább egy hivatkozással, vagy legalább
+    `OKOS_LINK_KUSZOB` hivatkozás van benne."""
+    try:
+        if not level_html_torzs(msg):
+            return False
+    except Exception:
+        return False
+    n = int(linkek_szama or 0)
+    return n >= OKOS_LINK_KUSZOB or (n >= 1 and hirlevel_e(msg))
+
+
+def szoveg_megjeleniteshez(szoveg):
+    """Sima szövegű levél a beépített megjelenítőhöz, kattintható
+    hivatkozásokkal és e-mail címekkel."""
+    return ("<!doctype html><html><head><meta charset=\"utf-8\">%s%s</head>"
+            "<body>%s</body></html>" % (_CSP, _STILUS, _linkesit(szoveg)))
+
+
 def _imap_utf7_decode(s):
     """IMAP modified UTF-7 (RFC 3501) → Unicode, hogy a magyar ékezetes
     mappanevek (pl. Elküldött, Összes levél) helyesen jelenjenek meg."""
@@ -762,6 +925,54 @@ def cimjegyzek_felvesz_szovegbol(szoveg):
     return uj
 
 
+def cimjegyzek_atir(regi_email, uj_email, nev=None, becenev=None):
+    """Egy címjegyzék-bejegyzés ÁTÍRÁSA – az e-mail címet is beleértve.
+
+    Miért kell külön függvény: az e-mail cím a bejegyzés AZONOSÍTÓJA, ezért a
+    megváltoztatása nem egyszerű mezőírás. A `cimjegyzek_felvesz` a címet
+    KULCSKÉNT kezeli, tehát új címmel hívva egy MÁSODIK bejegyzés keletkezne,
+    a régi meg ott maradna – a felhasználó pedig két Tóth Lászlót találna,
+    az egyiket rossz címmel. [Szabó Zsolt Jenő jelzésére, 2026-09-12]
+
+    Ha az új cím MÁR szerepel a címjegyzékben, a két bejegyzést ÖSSZEVONJUK:
+    a gyakoriság-számlálók összeadódnak, a név és a becenév a most megadott
+    lesz. Így a „régi cím" sem marad ott kísértetnek.
+
+    Visszaad: üres szöveg, ha sikerült; különben a hiba felolvasható mondata."""
+    import time
+    regi = (regi_email or "").strip().lower()
+    uj = (uj_email or "").strip().lower()
+    if "@" not in uj or "." not in uj.rsplit("@", 1)[-1]:
+        return "Ez nem érvényes e-mail cím: %s" % (uj_email or "(üres)")
+    lista = cimjegyzek_betolt()
+    sajat = None
+    masik = None
+    for c in lista:
+        cim = (c.get("email") or "").strip().lower()
+        if cim == regi:
+            sajat = c
+        elif cim == uj:
+            masik = c
+    if sajat is None:
+        return "Ezt a címet már nem találom a címjegyzékben: %s" % regi_email
+    if masik is not None and regi != uj:
+        # ÖSSZEVONÁS: a másik bejegyzés beolvad ebbe, aztán kikerül a listából
+        sajat["db"] = int(sajat.get("db", 0)) + int(masik.get("db", 0))
+        if not (nev or "").strip() and (masik.get("nev") or "").strip():
+            nev = masik.get("nev")
+        if becenev is None and (masik.get("becenev") or "").strip():
+            becenev = masik.get("becenev")
+        lista = [c for c in lista if c is not masik]
+    sajat["email"] = uj
+    if nev is not None:
+        sajat["nev"] = (nev or "").strip()
+    if becenev is not None:
+        sajat["becenev"] = (becenev or "").strip()
+    sajat["utoljara"] = time.time()
+    cimjegyzek_ment(lista)
+    return ""
+
+
 def cimek_kinyerese_uzenetbol(msg):
     """Egy üzenet From/To/Cc címei [(nev, email), …] – a passzív tanuláshoz."""
     ki = []
@@ -951,7 +1162,10 @@ _ALTALANOS_ALAP = {"auto_ellenoriz": True, "ellenoriz_perc": 3,
                    # ALAPÉRTELMEZETT FORDÍTÓ (F9). "kerdez" = minden
                    # fordításnál kérdezzen; "offline" = helyben, a gépen;
                    # "mymemory" = ingyenes online; "ai" = saját AI-kulccsal
-                   "forditas_motor": "kerdez"}
+                   "forditas_motor": "kerdez",
+                   # OKOS SZŰRŐ: a hírlevél és a hivatkozásokkal teli levél
+                   # magától HTML nézetben nyílik (egyszerűsített nézetnél)
+                   "okos_szuro": True}
 
 
 def altalanos_betolt():

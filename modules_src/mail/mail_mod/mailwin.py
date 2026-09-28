@@ -254,7 +254,20 @@ _SUGO = (
     "• Enter (vagy dupla kattintás) a levélen: KÜLÖN ABLAKBAN nyílik meg. Ott "
     "külön van a fejléc és a szöveg, és LENT a Hivatkozások lista: rállsz egy "
     "linkre, Enter, és megnyílik a böngészőben (a levélben lévő linkek így "
-    "kattinthatók).\n"
+    "kattinthatók). A listában az e-mail címek is ott vannak: Enter egy címen, "
+    "és új levél nyílik neki.\n"
+    "• HTML NÉZET (Ctrl+H az olvasó-ablakban, vagy alapnak a Beállításokban): "
+    "a levél úgy jelenik meg, mint a böngészőben – a hivatkozások OTT vannak a "
+    "szövegben, ahová a levél írója tette, és a képernyőolvasó linkről linkre "
+    "lépked (Tab, vagy a képernyőolvasó linklistája). Enter egy hivatkozáson: "
+    "megnyílik a böngészőben; e-mail címen: új levél a címzettnek. A HTML "
+    "nézet SEM tölt le semmit a netről (kép, követő pixel), és nem futtat "
+    "semmit a levélből.\n"
+    "• OKOS SZŰRŐ (alapból bekapcsolva, a Beállítások Általános lapján "
+    "kikapcsolható): ha egyszerűsített nézetet használsz, a hírlevél és a "
+    "hivatkozásokkal teli levél (legalább 3 hivatkozás) magától HTML "
+    "nézetben nyílik, és ezt a program meg is mondja. A hétköznapi levél és a "
+    "levelezőlista hozzászólása marad egyszerű. A Ctrl+H bármikor átvált.\n"
     "• Az olvasó-ablaknak SAJÁT menüsávja van (Levél, Hivatkozások, Segítség): "
     "válasz, továbbítás, csatolmány mentése, AI-összefoglaló, törlés, bezárás "
     "(Esc). A HTML-levelek távoli képeit adatvédelmi okból nem töltjük be.\n\n"
@@ -2035,6 +2048,12 @@ class ErtesitoDialog(wx.Dialog):
         self.EndModal(wx.ID_OK)
 
 
+def _cim_resz(felado: str) -> str:
+    """„Név <cím>" → cím (kisbetűsen hasonlítjuk)."""
+    import email.utils
+    return email.utils.parseaddr(felado or "")[1] or ""
+
+
 class LevelOlvasoFrame(wx.Frame):
     """Egy levél KÜLÖN ablakban: fejléc + szöveg + KATTINTHATÓ hivatkozás-lista,
     saját menüsávval (válasz, továbbítás, csatolmány, AI, törlés). A műveletek a
@@ -2078,16 +2097,65 @@ class LevelOlvasoFrame(wx.Frame):
         self.olvaso.SetName("Levél szövege")
         self.olvaso.SetInsertionPoint(0)
         v.Add(self.olvaso, 1, wx.EXPAND | wx.ALL, 8)
+        self._szoveg_cimke = v.GetItem(v.GetItemCount() - 2).GetWindow()
 
+        # HTML NÉZET (Schibik Miklós, 2026-09-28): a hivatkozások a szövegben,
+        # mint a böngészőben. A beépített megjelenítő (Edge WebView) csak a
+        # megtisztított HTML-t kapja, és semmit nem tölt le a netről.
+        self._html = None
+        self._html_nezet = False
+        try:
+            import wx.html2 as _h2
+            if _h2.WebView.IsBackendAvailable(_h2.WebViewBackendEdge):
+                self._html = _h2.WebView.New(p, backend=_h2.WebViewBackendEdge)
+                self._html.SetName("Levél HTML nézetben")
+                self._html.EnableContextMenu(False)
+                try:
+                    self._html.EnableAccessToDevTools(False)
+                except Exception:
+                    pass
+                self._html.Bind(_h2.EVT_WEBVIEW_NAVIGATING, self._html_navigal)
+                self._html.Bind(_h2.EVT_WEBVIEW_NEWWINDOW, self._html_navigal)
+                self._html.Hide()
+                v.Add(self._html, 1, wx.EXPAND | wx.ALL, 8)
+        except Exception:
+            self._html = None
+
+        # a hivatkozások ÉS az e-mail címek (Enter egy címen: új levél neki)
         self._linkek = MC.hivatkozasok_szovegbol(torzs)
-        v.Add(wx.StaticText(p, label="&Hivatkozások a levélben (Enter: megnyitás "
-              "a böngészőben):"), 0, wx.LEFT, 8)
+        self._emailek = [c for c in MC.emailcimek_szovegbol(torzs)
+                         if c.lower() != _cim_resz(fej.get("felado", "")).lower()]
+        self._link_sorok = list(self._linkek) + ["E-mail: %s" % c
+                                                  for c in self._emailek]
+        self._link_cimke = wx.StaticText(
+            p, label="&Hivatkozások és e-mail címek a levélben (Enter: "
+                     "megnyitás, e-mail címnél új levél):")
+        v.Add(self._link_cimke, 0, wx.LEFT, 8)
         self.link_lista = wx.ListBox(
-            p, choices=self._linkek or ["(ebben a levélben nincs hivatkozás)"])
-        self.link_lista.SetName("Hivatkozások")
+            p, choices=self._link_sorok
+            or ["(ebben a levélben nincs hivatkozás)"])
+        self.link_lista.SetName("Hivatkozások és e-mail címek")
         self.link_lista.Bind(wx.EVT_LISTBOX_DCLICK, lambda e: self._link_nyit())
         v.Add(self.link_lista, 0, wx.EXPAND | wx.ALL, 8)
         p.SetSizer(v)
+        self._p = p
+        _alt = MC.altalanos_betolt()
+        # OKOS SZŰRŐ (Dávid, 2026-09-28): egyszerűsített nézetnél a hírlevél
+        # és a hivatkozásokkal teli levél magától HTML-ben nyílik.
+        self._okos_html = False
+        self._html_indul = False        # HTML nézetben nyílik-e (bemondáshoz)
+        if self._html is not None:
+            if _alt.get("levelnezet", "egyszeru") == "html":
+                self._html_indul = True
+                wx.CallAfter(self._nezet_valt, True, mondja=False)
+            elif _alt.get("okos_szuro", True):
+                try:
+                    self._okos_html = MC.okos_html_kell(msg, len(self._linkek))
+                except Exception:
+                    self._okos_html = False
+                if self._okos_html:
+                    self._html_indul = True
+                    wx.CallAfter(self._nezet_valt, True, mondja=False)
 
         self.Bind(wx.EVT_CHAR_HOOK, self._on_key)
         self.Bind(wx.EVT_CLOSE, self._on_close)
@@ -2095,8 +2163,13 @@ class LevelOlvasoFrame(wx.Frame):
         # a fókusz rögtön a LEVÉL SZÖVEGÉRE kerül (a tesztelő kérése): így a
         # képernyőolvasóval azonnal olvasható a tartalom, nem kell a fejlécen
         # átlépkedni – a fejléc külön mezőben ott marad (Shift+Tab).
-        wx.CallAfter(self.olvaso.SetFocus)
+        # ⚠️ HTML nézetben a HTML-re: az egyszerű mező ilyenkor rejtett, és a
+        # rejtett vezérlőre tett fókusz a semmibe vész.
+        wx.CallAfter(lambda: (self._html if self._html_nezet
+                              and self._html is not None
+                              else self.olvaso).SetFocus())
         n = len(self._linkek)
+        ne = len(self._emailek)
         lista = MC.lista_neve(msg) if MC.listas_level(msg) else ""
         # BIZTONSÁGI FIGYELMEZTETÉS a levél ELEJÉN hangzik el – utólag, a
         # szöveg meghallgatása után már késő volna.
@@ -2122,11 +2195,22 @@ class LevelOlvasoFrame(wx.Frame):
                      ("FIGYELEM! " + " ".join(self._figyelmeztetesek) + " "
                       if self._figyelmeztetesek else "")
                      + prio
-                     + f"{fej['felado']}. Tárgy: {fej['targy']}. A szöveg a Levél "
-                     "szövege mezőben. "
+                     + f"{fej['felado']}. Tárgy: {fej['targy']}. "
+                     + ("" if self._html_indul
+                        else "A szöveg a Levél szövege mezőben. ")
                      + (BESZ.bevezeto(torzs) + " " if BESZ.bevezeto(torzs) else "")
-                     + (f"{n} hivatkozás a levélben, lent a listában. "
+                     + ((f"{n} hivatkozás a levélben. " if self._html_indul
+                         else f"{n} hivatkozás a levélben, lent a listában. ")
                         if n else "Nincs hivatkozás a levélben. ")
+                     + (f"{ne} e-mail cím a levélben. " if ne else "")
+                     + ("Okos szűrő: hivatkozásokkal teli levél, ezért HTML "
+                        "nézetben mutatom – a hivatkozások a szövegben "
+                        "vannak. Ctrl+H: egyszerűsített nézet. "
+                        if self._okos_html else
+                        "HTML nézet. Ctrl+H: egyszerűsített nézet. "
+                        if self._html_indul else
+                        "Ctrl+H: HTML nézet. " if self._html is not None
+                        and n else "")
                      + (f"Ez a levél a(z) {lista} listáról jött – válasz a "
                         "listára: L betű. " if lista else "")
                      + ("Erről a hírlevélről a Ctrl+U-val leiratkozhatsz."
@@ -2140,6 +2224,74 @@ class LevelOlvasoFrame(wx.Frame):
                 _mondd, self.main,
                 "Ez a levél időpontot említ: %s. A Ctrl+D-vel felveszem a "
                 "naptáradba." % mikor.strftime("%Y. %m. %d. %H:%M"))
+
+    # ---- HTML nézet és e-mail cím (Schibik Miklós, 2026-09-28) ----------
+
+    def _nezet_valt(self, html=None, mondja=True):
+        """Ctrl+H: egyszerűsített ↔ HTML nézet ebben az ablakban."""
+        if self._html is None:
+            if mondja:
+                _mondd(self.main, "A HTML nézethez az Edge WebView2 kell, ami "
+                                  "ezen a gépen nem érhető el. Marad az "
+                                  "egyszerűsített nézet.")
+            return
+        html = (not self._html_nezet) if html is None else bool(html)
+        if html and not getattr(self, "_html_betoltve", False):
+            nyers = MC.level_html_torzs(self._msg)
+            lap = (MC.html_megjeleniteshez(nyers) if nyers
+                   else MC.szoveg_megjeleniteshez(self._teljes_torzs))
+            self._html.SetPage(lap, "")
+            self._html_betoltve = True
+        self._html_nezet = html
+        self.olvaso.Show(not html)
+        self._html.Show(html)
+        self._link_cimke.Show(not html)
+        self.link_lista.Show(not html)
+        self._szoveg_cimke.SetLabel(
+            "Levél &szövege – HTML nézet (Ctrl+H: egyszerűsített):" if html
+            else ("Levél &szövege – csak az ÚJ rész (Ctrl+I: teljes szöveg):"
+                  if self._csak_uj else "Levél &szövege (Ctrl+H: HTML nézet):"))
+        self._p.Layout()
+        (self._html if html else self.olvaso).SetFocus()
+        if mondja:
+            _mondd(self.main, "HTML nézet: a hivatkozásokra a szövegben Tabbal "
+                              "vagy a képernyőolvasó linklistájával léphetsz; "
+                              "Enter megnyitja." if html
+                   else "Egyszerűsített nézet: a hivatkozások lent, a listában.")
+
+    def _html_navigal(self, e):
+        """A HTML nézetben minden hivatkozás KIFELÉ megy: webcím a
+        böngészőbe, e-mail cím új levélbe – a megjelenítő maga soha nem
+        navigál el a levélről, és nem tölt le semmit."""
+        url = e.GetURL() or ""
+        if url in ("", "about:blank") or url.startswith("data:"):
+            return
+        e.Veto()
+        cim = MC.mailto_cim(url)
+        if cim:
+            self._uj_level_cimre(cim)
+            return
+        if url.startswith(("http://", "https://")):
+            import webbrowser
+            try:
+                webbrowser.open(url)
+                _mondd(self.main, "Megnyitottam a hivatkozást a böngészőben.")
+            except Exception:
+                _mondd(self.main, "Nem sikerült megnyitni a hivatkozást.")
+
+    def _uj_level_cimre(self, cim):
+        """Új levél a levélben talált címre."""
+        if not cim:
+            return
+        if not self._fiok:
+            _mondd(self.main, "Nincs fiók, amelyikből írhatnék.")
+            return
+        _mondd(self.main, "Új levél ide: %s." % cim)
+        d = LevelIroDialog(self._mf, self.main, self._fiok, cim)
+        try:
+            d.ShowModal()
+        finally:
+            d.Destroy()
 
     def _idezet_valt(self):
         """Váltás az ÚJ rész és a TELJES szöveg között (Ctrl+I)."""
@@ -2330,6 +2482,7 @@ class LevelOlvasoFrame(wx.Frame):
            lambda e: self._csat_felolvas())
         mi(m, "&Idézett előzmény mutatása/elrejtése  (Ctrl+I)",
            lambda e: self._idezet_valt())
+        mi(m, "&HTML nézet be/ki  (Ctrl+H)", lambda e: self._nezet_valt())
         mi(m, "Válasz min&denkinek  (Shift+R)", lambda e: self._valaszol(
             msg=self._msg, fiok=self._fiok, mind=True))
         mi(m, "&Továbbítás  (F vagy Ctrl+F)", lambda e: self._mf._tovabbit(
@@ -2346,7 +2499,7 @@ class LevelOlvasoFrame(wx.Frame):
         mb.Append(m, "&Levél")
 
         mh = wx.Menu()
-        mi(mh, "A kijelölt hivatkozás &megnyitása a böngészőben",
+        mi(mh, "A kijelölt hivatkozás &megnyitása (e-mail címnél új levél)",
            lambda e: self._link_nyit())
         mb.Append(mh, "&Hivatkozások")
 
@@ -2356,12 +2509,15 @@ class LevelOlvasoFrame(wx.Frame):
         return mb
 
     def _link_nyit(self):
-        if not self._linkek:
+        if not self._link_sorok:
             _mondd(self.main, "Ebben a levélben nincs hivatkozás.")
             return
         i = self.link_lista.GetSelection()
-        if not (0 <= i < len(self._linkek)):
+        if not (0 <= i < len(self._link_sorok)):
             i = 0
+        if i >= len(self._linkek):              # e-mail cím: új levél neki
+            self._uj_level_cimre(self._emailek[i - len(self._linkek)])
+            return
         import webbrowser
         try:
             webbrowser.open(self._linkek[i])
@@ -2425,6 +2581,8 @@ class LevelOlvasoFrame(wx.Frame):
             self._link_nyit()
         elif ctrl and ch == "i":                   # Ctrl+I: idézet ki/be
             self._idezet_valt()
+        elif ctrl and ch == "h":                   # Ctrl+H: HTML nézet ki/be
+            self._nezet_valt()
         elif ctrl and e.ShiftDown() and ch == "l":  # Ctrl+Shift+L: csatolmány
             self._csat_felolvas()
         elif ctrl and ch == "d":                   # Ctrl+D: naptárba a dátumot
@@ -2635,6 +2793,70 @@ class ForditasDialog(wx.Dialog):
 
     def nyelv(self):
         return FORD.NYELVEK[self._nyelv.GetSelection()][0]
+
+
+class CimjegyzekTetelDialog(wx.Dialog):
+    """Egy címjegyzék-bejegyzés: NÉV, E-MAIL CÍM és BECENÉV – mindhárom
+    szerkeszthető.
+
+    Eddig két egymás utáni kérdő-ablak volt, és a szerkesztés csak a nevet
+    kérdezte meg. Egy ablak, három mező: így egy Tab-bal végigmész rajta, és
+    látod (hallod), mi mit jelent. [Szabó Zsolt Jenő jelzésére, 2026-09-12]"""
+
+    def __init__(self, parent, main, kontakt=None):
+        uj = not kontakt
+        super().__init__(parent,
+                         title="Új cím" if uj else "Cím szerkesztése",
+                         size=(560, -1))
+        self.main = main
+        k = kontakt or {}
+        v = wx.BoxSizer(wx.VERTICAL)
+
+        def mezo(cimke, ertek, nev_a_felolvasonak):
+            v.Add(wx.StaticText(self, label=cimke), 0, wx.LEFT | wx.TOP, 8)
+            t = wx.TextCtrl(self, value=str(ertek or ""))
+            t.SetName(nev_a_felolvasonak)
+            v.Add(t, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+            return t
+
+        self.nev = mezo("&Név:", k.get("nev", ""),
+                        "A partner neve, ahogy a címjegyzékben látod")
+        self.email = mezo(
+            "&E-mail cím:", k.get("email", ""),
+            "A partner e-mail címe. Ha megváltozott, itt írhatod át – a "
+            "becenév és az eddigi levelezés megmarad hozzá.")
+        self.becenev = mezo(
+            "&Becenév (nem kötelező):", k.get("becenev", ""),
+            "Rövid becenév, amivel a levélírásnál előhívhatod ezt a címet – "
+            "például anyu, doki, lista")
+
+        if not uj:
+            sug = wx.StaticText(self, label=(
+                "Az e-mail címet is átírhatod. Ha az új cím már szerepel a "
+                "címjegyzékben, a két bejegyzést összevonom."))
+            sug.Wrap(500)
+            sug.SetName(sug.GetLabel())
+            v.Add(sug, 0, wx.ALL, 8)
+
+        gs = wx.BoxSizer(wx.HORIZONTAL)
+        ok = wx.Button(self, wx.ID_OK, "&Mentés")
+        ok.SetDefault()
+        gs.Add(ok, 0, wx.RIGHT, 8)
+        gs.Add(wx.Button(self, wx.ID_CANCEL, "Még&sem"), 0)
+        v.Add(gs, 0, wx.ALL | wx.ALIGN_CENTER, 10)
+
+        self.SetSizerAndFit(v)
+        self.CentreOnParent()
+        (self.email if uj else self.nev).SetFocus()
+        wx.CallAfter(_mondd, main,
+                     "Új cím. Add meg az e-mail címet és a nevet." if uj
+                     else "Cím szerkesztése. Három mező: név, e-mail cím és "
+                          "becenév – mindhárom átírható.")
+
+    def eredmeny(self):
+        return (self.nev.GetValue().strip(),
+                self.email.GetValue().strip(),
+                self.becenev.GetValue().strip())
 
 
 class BeallitasokDialog(wx.Dialog):
@@ -2893,22 +3115,45 @@ class BeallitasokDialog(wx.Dialog):
                        or ["(a címjegyzék üres – ahogy levelezel, feltöltődik)"])
 
     def _cj_uj(self, e):
-        em = wx.GetTextFromUser("E-mail cím:", "Új cím", "", self).strip()
-        if "@" not in em:
-            return
-        nev = wx.GetTextFromUser("Név (nem kötelező):", "Új cím", "", self).strip()
-        MC.cimjegyzek_frissit(em, nev)
-        self._cj_frissit()
+        d = CimjegyzekTetelDialog(self, self.main)
+        if d.ShowModal() == wx.ID_OK:
+            nev, em, becenev = d.eredmeny()
+            if "@" in em:
+                MC.cimjegyzek_frissit(em, nev)
+                if becenev:
+                    MC.cimjegyzek_becenev(em, becenev)
+                self._cj_frissit()
+                _mondd(self.main, "Felvéve a címjegyzékbe: %s" % (nev or em))
+        d.Destroy()
 
     def _cj_edit(self, e):
+        """A bejegyzés MINDEN mezőjének szerkesztése – az e-mail címet is.
+
+        Eddig csak a nevet lehetett átírni, mert a cím a bejegyzés kulcsa.
+        Csakhogy címet cserélni is szoktak: ilyenkor a felhasználónak törölnie
+        kellett és újra felvennie a partnerét, közben elveszett a becenév és a
+        gyakoriság. [Szabó Zsolt Jenő jelzésére, 2026-09-12]"""
         i = self.cj_lb.GetSelection()
         if not (0 <= i < len(self._cj_talalatok)):
+            _mondd(self.main, "Előbb válassz egy nevet a listából.")
             return
         c = self._cj_talalatok[i]
-        nev = wx.GetTextFromUser(f"Név a(z) {c['email']} címhez:", "Szerkesztés",
-                                 c.get("nev", ""), self)
-        MC.cimjegyzek_frissit(c["email"], nev.strip())
-        self._cj_frissit()
+        d = CimjegyzekTetelDialog(self, self.main, c)
+        if d.ShowModal() == wx.ID_OK:
+            nev, em, becenev = d.eredmeny()
+            baj = MC.cimjegyzek_atir(c["email"], em, nev, becenev)
+            if baj:
+                _mondd(self.main, baj)
+                wx.MessageBox(baj, "Címjegyzék", wx.OK | wx.ICON_ERROR, self)
+            else:
+                self._cj_frissit()
+                regi = (c.get("email") or "").strip().lower()
+                if regi != em.strip().lower():
+                    _mondd(self.main, "Módosítva. %s új címe: %s"
+                           % (nev or em, em))
+                else:
+                    _mondd(self.main, "Módosítva: %s" % (nev or em))
+        d.Destroy()
 
     def _cj_del(self, e):
         i = self.cj_lb.GetSelection()
@@ -3016,6 +3261,35 @@ class BeallitasokDialog(wx.Dialog):
             "Ctrl+Z-vel visszavonhatod. Nulla esetén azonnal elmegy.")
         hs5.Add(self.alt_visszavonas, 0)
         v.Add(hs5, 0, wx.ALL, 8)
+
+        # --- LEVÉLNÉZET (Schibik Miklós, 2026-09-28) ---
+        hsn = wx.BoxSizer(wx.HORIZONTAL)
+        hsn.Add(wx.StaticText(p, label="A levél meg&jelenítése:"), 0,
+                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.alt_nezet = wx.Choice(p, choices=[
+            "Egyszerűsített – szöveg, alatta a hivatkozások listája",
+            "HTML – mint a böngészőben, a hivatkozások a szövegben"])
+        self.alt_nezet.SetSelection(
+            1 if cfg.get("levelnezet", "egyszeru") == "html" else 0)
+        self.alt_nezet.SetName(
+            "Egyszerűsített: a levél tiszta szövegként, a hivatkozások külön "
+            "listában. HTML: a levél úgy, mint a böngészőben, a hivatkozásokra "
+            "a szövegben lépkedsz. Az olvasó-ablakban a Ctrl+H bármikor átvált.")
+        hsn.Add(self.alt_nezet, 0)
+        v.Add(hsn, 0, wx.ALL, 8)
+        # OKOS SZŰRŐ (Dávid, 2026-09-28) – a nézet-választó UTÁN jön létre,
+        # hogy a képernyőolvasó a jó címkével párosítsa
+        self.alt_okos = wx.CheckBox(
+            p, label="Okos s&zűrő: a hírlevelet és a hivatkozásokkal teli "
+                     "levelet magától HTML-ben mutassa")
+        self.alt_okos.SetValue(bool(cfg.get("okos_szuro", True)))
+        self.alt_okos.SetName(
+            "Egyszerűsített nézetnél is: ha a levél hírlevél, vagy legalább "
+            "%d hivatkozás van benne, HTML nézetben nyílik, ahol a "
+            "hivatkozások a szövegben vannak. A hétköznapi levél marad "
+            "egyszerű. Az olvasó-ablakban a Ctrl+H bármikor átvált."
+            % MC.OKOS_LINK_KUSZOB)
+        v.Add(self.alt_okos, 0, wx.ALL, 8)
 
         # --- FONTOSSÁG (prioritás) ---
         self.alt_prio = wx.CheckBox(
@@ -3193,6 +3467,9 @@ class BeallitasokDialog(wx.Dialog):
                 "valasz_zarja_eredetit": bool(
                     self.alt_valasz_zar.GetValue()),
                 "prioritas_jelzes": bool(self.alt_prio.GetValue()),
+                "levelnezet": "html" if self.alt_nezet.GetSelection() == 1
+                else "egyszeru",
+                "okos_szuro": bool(self.alt_okos.GetValue()),
                 "legujabb_alul": bool(self.alt_sorrend.GetSelection() == 1),
                 "autovalasz_be": bool(self.alt_autovalasz.GetValue()),
                 "forditas_motor": [k for k, _n in self._ford_motorok][
