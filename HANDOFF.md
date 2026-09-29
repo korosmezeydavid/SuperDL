@@ -158,7 +158,7 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
-**Utolsó frissítés:** 2026-09-28 · dolgozott: Claude
+**Utolsó frissítés:** 2026-09-29 · dolgozott: Claude
 
 ---
 
@@ -178,6 +178,41 @@ nyers bájtként keresi a fájlokban.)
 build-értelmező; 2026-09-24 óta ebben is van ctranslate2 4.8.1,
 sentencepiece 0.2.2, sacremoses 0.2.0, joblib 1.5.3, subword-nmt 0.3.8
 (a 4.6.12–4.6.17 között ezek hiányoztak → a fordító némán kiesett).
+
+### ✅ 4.6.27 + Super Mail 1.6.2 + Játékok 1.17.1 + Dokumentum-konverter 1.3.5 (2026-09-29)
+
+Dávid: „adjuk ki … hiszek a közösség erejében” (NVDA-val élőben NEM próbálta senki).
+- **Core 4.6.27** (a 4.6.26 külön sosem ment ki; benne van):
+  - 4.6.26-os rész (`dd27552`): `wx.html2` + `WebView2Loader.dll` a csomagban
+    (`SuperDL.spec`, `SuperDL-onedir.spec`) – a Super Mail HTML nézete eddig a
+    kiadott programban mindenkinél „nincs WebView2”-t mondott. Build után
+    ellenőrizve: `dist\SuperDL\_internal\wx\` alatt `_html2…pyd`,
+    `wxmsw32u_webview_vc140_x64.dll`, `WebView2Loader.dll`.
+  - NVDA-s kritika (`727e98a`, `claude/windows-kritika-elemzes-2026-09-29.md`):
+    modulkezelő – futó olvasó mellett a kijelölt sort nem mondja a saját hang,
+    a többi bemondás előbb `screenreader.speak`; `coremod.VoiceAdapter` is;
+    `SelfVoice` generáció-őr (nem torlódik); `screenreader.running()`, JAWS csak ha
+    fut (`FindWindowW("JFWUI2")`); `VoiceSpeaker` valódi „off” (→ olvasó);
+    `MainFrame._apply_voice_settings()` induláskor ÉS mentéskor; beállítások:
+    `cimke_ele_zsorrend()` – a címke natívan a SpinCtrl szerkesztő-mezője elé
+    (javítás nélkül a Tempó „Bejelentő hang”-nak hallatszott); Általános az első
+    lap, `valassz_lapot("AI")` (a régi `page=3` az Általánost nyitotta);
+    Escape zár: AI-ablak (Alt+T némít), Előzmények, Feliratkozások, Frissítések.
+    Teszt: `tests/test_beszed_nvda_mellett.py` (2 élő wx-es Z-sorrend teszt).
+- **Super Mail 1.6.2** (`bc4bb3c`): a HTML nézet a valódi okot mondja. A mail
+  forrása mostantól a repóban van (1.6.1 → `5db356c`).
+- **Játékok 1.17.1** (`e38b960`): Ctrl+Alt+J (a Ctrl+Shift+J a „Mi a helyzet?”).
+- **Dokumentum-konverter 1.3.5** (`6a86307`): az összegzés első szava mondja
+  meg, sikerült-e (NEM SIKERÜLT / RÉSZBEN KÉSZ / LEÁLLÍTVA / Kész).
+- Ellenőrzés: teljes pytest KILEPES=0; BUILD=OK (build-őr); `--onproba` mindkét
+  exén (4.6.27, fordító elérhető, 18 SAPI-hang); `--wh` élő küldés/fogadás OK;
+  keyscan 178 fájl TISZTA.
+- Ismert, régi gyorsbillentyű-ütközések (maradtak): Ctrl+Shift+E (Super Edit /
+  Videóvágó), Ctrl+Shift+M (Mappa küldése / Super M), Ctrl+Alt+M (Super Mail /
+  Teljes mentés), Ctrl+Shift+P (Podcastok / iPhone), Ctrl+Shift+L (főablak /
+  Felirat-felolvasó), Ctrl+Shift+V (főablak / Videókészítő).
+- Nyitott döntés (Dávid): futó képernyőolvasó mellett alapból hallgasson-e a
+  saját hang (induló köszöntés is).
 
 ### ✅ Akciós újság 0.9.0 + Super Mail 1.6.1 (2026-09-28) – modul-kiadás, Core nem változott
 
