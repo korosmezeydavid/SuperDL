@@ -18,8 +18,11 @@ def register(core):
 
     opener = core.register_window("jatekok_module", JatekokFrame)
     menu = core.add_menu("&Játékok")
+    # Ctrl+ALT+J, nem Ctrl+Shift+J: a Ctrl+Shift+J a főablak „Mi a helyzet?”
+    # parancsa (letöltések állapota), és az nyert – a Játékok nem nyílt meg,
+    # a program azt mondta: „Nincs aktív letöltés.” (Turai László, 2026-09-29)
     item = core.add_menu_item(
-        menu, "&Játékok…\tCtrl+Shift+J", opener,
+        menu, "&Játékok…\tCtrl+Alt+J", opener,
         help="Retró játékok korhű beszédhanggal és a SuperDL saját játékai")
     _state["item"] = item
     core.log.info("jatekok modul betöltve")
