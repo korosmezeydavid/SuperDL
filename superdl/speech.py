@@ -134,7 +134,11 @@ class VoiceSpeaker:
         return True       # Edge vagy SAPI mindig elérhető
 
     def set_mode(self, mode: str) -> None:
-        if mode in ("auto", "edge", "system"):
+        # "off" = KÉPERNYŐOLVASÓ-MÓD: a szöveget a futó NVDA/JAWS mondja, a
+        # program saját hangja hallgat. Korábban az "off"-ot csendben
+        # eldobta, így a „Csak a képernyőolvasó beszéljen" mellett is az
+        # Edge-hang köszönt induláskor.
+        if mode in ("auto", "edge", "system", "off"):
             self.mode = mode
 
     def _get_player(self):
@@ -148,6 +152,13 @@ class VoiceSpeaker:
         if not text:
             return
         self.stop()
+        if self.mode == "off":
+            try:
+                from . import screenreader
+                screenreader.speak(text, interrupt=True)
+            except Exception:
+                pass
+            return
         if self.mode == "system":
             self._sapi.speak(text)
             return

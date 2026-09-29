@@ -306,6 +306,16 @@ class VoiceAdapter:
         self._sv = getattr(main, "selfvoice", None)
 
     def speak(self, text):
+        """ELŐBB a futó képernyőolvasó (NVDA/JAWS), és csak ha nincs, a
+        program saját hangja – különben NVDA mellett kettőzött a beszéd."""
+        if not (text or "").strip():
+            return
+        try:
+            from . import screenreader
+            if screenreader.speak(text):
+                return
+        except Exception:
+            pass
         if self._sv:
             try:
                 self._sv.speak(text, force=True)

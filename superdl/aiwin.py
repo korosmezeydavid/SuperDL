@@ -45,10 +45,14 @@ class AIResultFrame(wx.Frame):
                   "AI EREDMÉNY\n\nItt jelenik meg az AI válasza, amint "
                   "elkészül.\n• A szövegmezőben fel/le nyíllal olvasható a "
                   "teljes válasz.\n• Ctrl+C: a kijelölt szöveg másolása.\n"
+                  "• Alt+T: a felolvasás némítása.\n"
                   "• Escape: az ablak bezárása.")
 
+        # Escape = BEZÁRÁS (ahogy a súgó is ígéri); a bezárás a felolvasást
+        # is leállítja. Csak némítani: Alt+T (Némítás gomb). Korábban az
+        # Escape csak némított, és az ablak csak a Bezárás gombbal zárult.
         sid = wx.NewIdRef()
-        self.Bind(wx.EVT_MENU, lambda e: self._stop(), id=sid)
+        self.Bind(wx.EVT_MENU, lambda e: self.Close(), id=sid)
         self.SetAcceleratorTable(wx.AcceleratorTable([
             (wx.ACCEL_NORMAL, wx.WXK_ESCAPE, sid)]))
         self.Bind(wx.EVT_CLOSE, self._on_close)
@@ -73,7 +77,7 @@ class AIResultFrame(wx.Frame):
             t = self.text.GetValue().strip()
             if t:
                 self.speaker.speak(t)
-                self.status.SetLabel("Felolvasás… (némítás: Escape)")
+                self.status.SetLabel("Felolvasás… (némítás: Alt+T, bezárás: Escape)")
 
     def _stop(self):
         if self.speaker:

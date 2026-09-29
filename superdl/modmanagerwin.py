@@ -170,10 +170,27 @@ class ModuleManagerFrame(wx.Frame):
 
     # ---- segédek ------------------------------------------------------
 
-    def _announce(self, text):
+    def _announce(self, text, lista_sor=False):
+        """Állapotsor + bemondás. ELŐBB a képernyőolvasó (mint a
+        Médiakeresőben), és csak ha nincs futó NVDA/JAWS, a saját hang.
+
+        `lista_sor`: a kijelölt listasor bemondása. Ezt futó képernyőolvasó
+        mellett NEM mondjuk – a fókuszban lévő sort az olvasó magától
+        felolvassa, a program saját hangja csak megkettőzné (NVDA-s
+        felhasználó jelzése, 2026-09-29: „a SAPI és az NVDA is mondja")."""
         self.SetStatusText(text)
+        if not (text or "").strip():
+            return
+        try:
+            from . import screenreader
+            if lista_sor and screenreader.running():
+                return
+            if not lista_sor and screenreader.speak(text):
+                return
+        except Exception:
+            pass
         sv = getattr(self.main, "selfvoice", None)
-        if sv:
+        if sv is not None and not getattr(sv, "muted", False):
             try:
                 sv.speak(text, force=True)
             except Exception:
@@ -200,7 +217,8 @@ class ModuleManagerFrame(wx.Frame):
             self.install_btn.Enable(bool(r["installable"]) and not self._busy)
             self.remove_btn.Enable(bool(r["removable"]) and not self._busy)
             self._announce(f"{r['name']} – {r['status']}"
-                           + (f", verzió {r['version']}" if r['version'] else ""))
+                           + (f", verzió {r['version']}" if r['version'] else ""),
+                           lista_sor=True)
 
     def _on_key(self, e):
         if e.GetKeyCode() == wx.WXK_DELETE:

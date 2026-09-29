@@ -78,6 +78,11 @@ class SelfVoice:
         self.volume = 100           # 0..100
         self._voice = None
         self._lock = threading.Lock()
+        # Bemondás-generáció: minden új speak() eggyel növeli. A sorban álló
+        # (a zárra váró) régi bemondás a zár megszerzése után megnézi, és ha
+        # közben újabb jött, KIMARAD. Enélkül egy gyors nyilazás minden sora
+        # sorba állt, és a program percekig mesélt (NVDA-s felhasználó, 2026-09-29).
+        self._gen = 0
         self._espeak_proc = None
         # A magyar SAPI-hang leírása, EGYSZER feloldva – lásd a lenti ⚠️-t.
         # None = még nem néztük meg; "" = megnéztük, nincs magyar hang.
@@ -205,6 +210,8 @@ class SelfVoice:
         # a hang leírását a HÍVÓ (fő) szálon oldjuk fel (ott él a fő COM-objektum)
         desc = self._effective_voice_desc()
         rate, vol = self.rate, self.volume
+        self._gen += 1
+        gen = self._gen
 
         def work():
             # FONTOS: a SAPI COM-ot használó HÁTTÉRSZÁLNAK saját CoInitialize kell,
@@ -225,6 +232,8 @@ class SelfVoice:
                 pass
             try:
                 with self._lock:
+                    if gen != self._gen:     # közben újabb bemondás jött
+                        return
                     v = win32com.client.Dispatch("SAPI.SpVoice")
                     v.Rate = rate
                     v.Volume = vol

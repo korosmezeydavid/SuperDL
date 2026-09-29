@@ -112,7 +112,30 @@ def _ensure_jaws():
     return _jaws
 
 
+def _jaws_running() -> bool:
+    """Tényleg FUT-e a JAWS? A COM-objektum egy TELEPÍTETT, de le nem futó
+    JAWS-nál is létrehozható, ezért önmagában nem bizonyíték – a JAWS
+    főablaka (osztálya: JFWUI2) viszont csak futás közben létezik. Ugyanezt
+    nézi a Tolk is."""
+    if os.name != "nt":
+        return False
+    try:
+        return bool(ctypes.windll.user32.FindWindowW("JFWUI2", None))
+    except Exception:
+        return False
+
+
+def running() -> bool:
+    """Fut-e most NVDA vagy JAWS? (Olcsó; bárhonnan hívható.)"""
+    n = _ensure_nvda()
+    if n and _nvda_running(n):
+        return True
+    return _jaws_running()
+
+
 def _jaws_speak(text: str, interrupt: bool) -> bool:
+    if not _jaws_running():
+        return False
     j = _ensure_jaws()
     if not j:
         return False
@@ -127,14 +150,14 @@ def available() -> bool:
     n = _ensure_nvda()
     if n and _nvda_running(n):
         return True
-    return bool(_ensure_jaws())
+    return _jaws_running() and bool(_ensure_jaws())
 
 
 def screen_reader_name() -> str:
     n = _ensure_nvda()
     if n and _nvda_running(n):
         return "NVDA"
-    if _ensure_jaws():
+    if _jaws_running() and _ensure_jaws():
         return "JAWS"
     return ""
 
