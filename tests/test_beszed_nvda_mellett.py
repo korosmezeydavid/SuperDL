@@ -99,6 +99,7 @@ def test_jaws_csak_ha_fut(monkeypatch):
     monkeypatch.setattr(screenreader, "_ensure_nvda", lambda: False)
     monkeypatch.setattr(screenreader, "_ensure_jaws", lambda: object())
     monkeypatch.setattr(screenreader, "_jaws_running", lambda: False)
+    monkeypatch.setattr(screenreader, "_running_cache", [0.0, False])
     assert screenreader.available() is False
     assert screenreader.running() is False
     assert screenreader.screen_reader_name() == ""

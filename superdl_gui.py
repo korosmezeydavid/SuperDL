@@ -1156,6 +1156,8 @@ class MainFrame(wx.Frame):
             "audio_samplerate": "",
             "beep_enabled": True, "beep_volume": 30,
             "screenreader_only": False,
+            # futó NVDA/JAWS mellett a saját hang magától hallgat (alapból BE)
+            "sr_auto_csend": True,
             "selfvoice_enabled": False, "selfvoice_off": False,
             "hide_url_row": False, "startup_signal": True,
             "asztal_indulaskor": False,
@@ -1195,6 +1197,12 @@ class MainFrame(wx.Frame):
         is ez fut – korábban csak induláskor, ezért a „Csak a képernyőolvasó
         beszéljen" és a saját hang kikapcsolása csak újraindítás után hatott."""
         s = self.settings
+        # Ha fut képernyőolvasó, a saját hang magától hallgat, és az olvasó
+        # mondja a szöveget – ezt MINDEN bemondásnál újra megnézzük, tehát az
+        # is jó, ha az NVDA-t a SuperDL után indítják el.
+        _auto = bool(s.get("sr_auto_csend", True))
+        self.selfvoice.auto_sr = _auto
+        self.speaker.auto_sr = _auto
         # Képernyőolvasó-mód: minden EGYÉB program-beszéd némuljon, csak a
         # képernyőolvasó (NVDA/JAWS) beszéljen – a felhasználó kifejezett kérése.
         sr_only = bool(s.get("screenreader_only", False))

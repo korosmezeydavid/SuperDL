@@ -125,12 +125,23 @@ def _jaws_running() -> bool:
         return False
 
 
+_running_cache = [0.0, False]     # [mikor néztük (monotonic), eredmény]
+
+
 def running() -> bool:
-    """Fut-e most NVDA vagy JAWS? (Olcsó; bárhonnan hívható.)"""
+    """Fut-e most NVDA vagy JAWS? Bárhonnan hívható. Az eredményt két
+    másodpercig megjegyzi: egy gyors nyilazásnál sok bemondás jön sorban,
+    és nem kell mindegyiknél újra megkérdezni az olvasót – ha viszont
+    közben elindítják vagy leállítják az NVDA-t, két másodpercen belül
+    észreveszi."""
+    import time
+    most = time.monotonic()
+    if most - _running_cache[0] < 2.0:
+        return _running_cache[1]
     n = _ensure_nvda()
-    if n and _nvda_running(n):
-        return True
-    return _jaws_running()
+    fut = bool(n and _nvda_running(n)) or _jaws_running()
+    _running_cache[0], _running_cache[1] = most, fut
+    return fut
 
 
 def _jaws_speak(text: str, interrupt: bool) -> bool:

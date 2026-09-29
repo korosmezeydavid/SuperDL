@@ -72,6 +72,10 @@ class SelfVoice:
     def __init__(self):
         self.enabled = False
         self.muted = False          # TELJES némítás: a force=True-t is felülírja
+        # Ha fut képernyőolvasó (NVDA/JAWS), a saját hang hallgat, és a
+        # szöveget az olvasó mondja (Dávid döntése, 2026-09-29: „alapból
+        # legyen kikapcsolva a saját beszédhang, ha érzékeli az olvasót").
+        self.auto_sr = False
         self.voice_desc = ""        # a kívánt hang leírásának részlete
         self.rate = 0               # -10..10 (tempó)
         self.pitch = 0              # -10..10 (hangmagasság)
@@ -200,6 +204,14 @@ class SelfVoice:
             return
         if not self.enabled and not force:
             return
+        if self.auto_sr:
+            try:
+                from . import screenreader
+                if screenreader.running():
+                    screenreader.speak(text)
+                    return
+            except Exception:
+                pass
         if self._use_espeak:
             self._speak_espeak(text)
             return

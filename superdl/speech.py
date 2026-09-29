@@ -98,6 +98,9 @@ class VoiceSpeaker:
         # a FŐ SZÁLON kérdeznénk le, minden indítás öt másodperccel lassulna
         # — és a hangra csak akkor van szükség, ha az Edge nem elérhető.
         self._sapi_voice_cache = None
+        # Futó képernyőolvasó mellett a szöveget az olvasó mondja, nem az
+        # Edge-/SAPI-hang (lásd SelfVoice.auto_sr).
+        self.auto_sr = False
         self._player = None
         self._seq = 0
         self._lock = threading.Lock()
@@ -152,6 +155,14 @@ class VoiceSpeaker:
         if not text:
             return
         self.stop()
+        if self.mode != "off" and self.auto_sr:
+            try:
+                from . import screenreader
+                if screenreader.running():
+                    screenreader.speak(text, interrupt=True)
+                    return
+            except Exception:
+                pass
         if self.mode == "off":
             try:
                 from . import screenreader

@@ -469,6 +469,13 @@ class SettingsDialog(wx.Dialog):
                               "visszajelzéseket a képernyőolvasó mondja")
         self.c_sronly.SetValue(bool(self.s.get("screenreader_only", False)))
         v.Add(self.c_sronly, 0, wx.ALL, 8)
+        self.c_srauto = wx.CheckBox(
+            p, label="Ha fut képernyőolvasó (NVDA, JAWS), a program saját hangja "
+                     "hallgasson, és az &olvasó mondja helyette")
+        self.c_srauto.SetName("Ha fut képernyőolvasó, a program saját hangja "
+                              "hallgasson, és a képernyőolvasó mondja helyette")
+        self.c_srauto.SetValue(bool(self.s.get("sr_auto_csend", True)))
+        v.Add(self.c_srauto, 0, wx.ALL, 8)
         v.Add(wx.StaticLine(p), 0, wx.EXPAND | wx.ALL, 8)
 
         v.Add(wx.StaticText(p, label="SZÁZALÉK-PITTYEGÉS – hosszú "
@@ -729,6 +736,7 @@ class SettingsDialog(wx.Dialog):
             "beep_enabled": self.c_beep.GetValue(),
             "beep_volume": self.c_beepvol.GetValue(),
             "screenreader_only": self.c_sronly.GetValue(),
+            "sr_auto_csend": self.c_srauto.GetValue(),
             "selfvoice_enabled": self.c_sv.GetValue(),
             "selfvoice_off": self.c_sv_off.GetValue(),
             "hide_url_row": self.c_hide_url.GetValue(),
