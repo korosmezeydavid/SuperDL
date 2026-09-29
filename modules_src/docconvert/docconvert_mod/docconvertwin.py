@@ -490,17 +490,11 @@ class DocConvertFrame(wx.Frame):
                 errors.append((os.path.basename(src), str(e)))
                 wx.CallAfter(self._set_status, i, "hiba")
             wx.CallAfter(self.gauge.SetValue, int((i + 1) / total * 100))
-        if megszakitva:
-            msg = (f"LEÁLLÍTVA. Eddig {ok}/{total} fájl készült el ide: "
-                   f"{out_dir} ({out_fmt.upper()}). A többihez nem nyúltam.")
-        else:
-            msg = (f"Kész: {ok}/{total} fájl konvertálva ide: {out_dir}"
-                   f" ({out_fmt.upper()}).")
-        if errors:
-            msg += "\n\nHibás fájlok:\n" + "\n".join(
-                f"• {n}: {err.splitlines()[0]}" for n, err in errors[:8])
-            if len(errors) > 8:
-                msg += f"\n… és további {len(errors) - 8}."
+        # Az ELSŐ SZÓ mondja meg, sikerült-e: NEM SIKERÜLT / RÉSZBEN KÉSZ /
+        # LEÁLLÍTVA / Kész. Eddig 0/1-nél is „Kész"-szel kezdődött, és a
+        # képernyőolvasó ezt mondta ki először. (Turai László, 2026-09-29)
+        msg = DC.osszegzo_uzenet(ok, total, errors, out_dir, out_fmt,
+                                 megszakitva=megszakitva)
         wx.CallAfter(self._done, msg)
 
     def _run_merge(self, files, dst, out_fmt, in_enc, out_enc, engine):
@@ -515,13 +509,8 @@ class DocConvertFrame(wx.Frame):
             ok, errors = DC.merge_documents(
                 files, dst, out_fmt, in_enc, out_enc, ocr_engine=engine,
                 on_file=on_file, progress=prog)
-            msg = (f"Összefűzve: {ok}/{len(files)} fájl szövege ide: "
-                   f"{os.path.basename(dst)} ({out_fmt.upper()}).")
-            if errors:
-                msg += "\n\nKihagyott fájlok:\n" + "\n".join(
-                    f"• {n}: {err.splitlines()[0]}" for n, err in errors[:8])
-                if len(errors) > 8:
-                    msg += f"\n… és további {len(errors) - 8}."
+            msg = DC.osszegzo_uzenet(ok, len(files), errors, dst, out_fmt,
+                                     osszefuzve=True)
         except Exception as e:
             msg = f"Az összefűzés nem sikerült: {e}"
         wx.CallAfter(self._done, msg)
