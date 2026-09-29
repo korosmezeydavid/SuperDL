@@ -226,9 +226,9 @@ class SettingsDialog(wx.Dialog):
         self.c_asr.SetSelection(
             next((i for i, (_, val) in enumerate(SAMPLERATES) if val == cur_sr),
                  0))
-        self._row(p, v, "&Mintavétel (kHz):", self.c_asr)
+        self._row(p, v, "Mi&ntavétel (kHz):", self.c_asr)
         self.c_seedfor = wx.CheckBox(
-            p, label="A kész torrent &kézi leállításig ossza meg "
+            p, label="A kész torrent kézi leállításig &ossza meg "
                      "(ilyenkor a seed-arány nem számít)")
         self.c_seedfor.SetValue(bool(self.s.get("seed_forever", True)))
         v.Add(self.c_seedfor, 0, wx.ALL, 10)
@@ -236,7 +236,7 @@ class SettingsDialog(wx.Dialog):
         self._row(p, v, "Seed-&arány (torrent):", self.c_seed,
                   name="Torrent megosztási arány")
         self.c_uplimit = wx.TextCtrl(p, value=str(self.s.get("upload_limit", "")))
-        self._row(p, v, "&Feltöltési sávkorlát (pl. 500K, 2M; üres = nincs):",
+        self._row(p, v, "Feltöl&tési sávkorlát (pl. 500K, 2M; üres = nincs):",
                   self.c_uplimit, name="Feltöltési sávkorlát")
         self.c_hely = wx.CheckBox(
             p, label="Szabad &hely ellenőrzése a letöltés indítása előtt")
@@ -258,7 +258,7 @@ class SettingsDialog(wx.Dialog):
             "Üresen hagyva nincs időzítés, csak a fenti állandó korlát.")
         # MK10
         self.c_dup = wx.CheckBox(
-            p, label="&Kérdezzen rá, ha ezt már letöltöttem egyszer")
+            p, label="Kér&dezzen rá, ha ezt már letöltöttem egyszer")
         self.c_dup.SetValue(bool(self.s.get("duplikatum_kerdes", True)))
         self.c_dup.SetToolTip(
             "A mappában nem látszik, hogy a fájl már ott van, a névütközés "
@@ -330,7 +330,7 @@ class SettingsDialog(wx.Dialog):
         cur_sr = str(rr.get("sample_rate", "") or "")
         self.c_rrsr.SetSelection(next(
             (i for i, (_, val) in enumerate(SAMPLERATES) if val == cur_sr), 0))
-        self._row(p, v, "&Mintavétel:", self.c_rrsr)
+        self._row(p, v, "Mi&ntavétel:", self.c_rrsr)
 
         self.c_rrsplit = wx.RadioBox(
             p, label="Felvétel módja",
@@ -423,7 +423,7 @@ class SettingsDialog(wx.Dialog):
         v.Add(self.c_notify, 0, wx.ALL, 10)
         self.c_city = wx.TextCtrl(p, value=str(self.s.get("city", "Budapest")))
         self.c_city.SetHint("pl. Budapest")
-        self._row(p, v, "Vá&ros (napi időjárás):", self.c_city)
+        self._row(p, v, "Vár&os (napi időjárás):", self.c_city)
         self.c_voice = wx.Choice(p, choices=[t for t, _ in VOICE_LABELS])
         mode = self.s.get("voice_mode", "auto")
         self.c_voice.SetSelection(
@@ -557,17 +557,17 @@ class SettingsDialog(wx.Dialog):
         self.c_svrate = wx.SpinCtrl(p, min=-10, max=10,
                                     initial=int(self.s.get("selfvoice_rate", 0)))
         self.c_svrate.SetName("Beszédtempó")
-        self._row(p, v, "&Tempó (-10–10):", self.c_svrate)
+        self._row(p, v, "T&empó (-10–10):", self.c_svrate)
         self.c_svpitch = wx.SpinCtrl(
             p, min=-10, max=10, initial=int(self.s.get("selfvoice_pitch", 0)))
         self.c_svpitch.SetName("Hangmagasság")
-        self._row(p, v, "Hang&magasság (-10–10):", self.c_svpitch)
+        self._row(p, v, "Hangmagas&ság (-10–10):", self.c_svpitch)
         self.c_svvol = wx.SpinCtrl(
             p, min=0, max=100, initial=int(self.s.get("selfvoice_volume", 100)))
         self.c_svvol.SetName("Beszéd hangereje")
-        self._row(p, v, "Beszéd hangere&je (0–100):", self.c_svvol)
+        self._row(p, v, "&Beszéd hangereje (0–100):", self.c_svvol)
 
-        b_test = wx.Button(p, label="Hang ki&próbálása")
+        b_test = wx.Button(p, label="Hang &kipróbálása")
         b_test.Bind(wx.EVT_BUTTON, lambda e: self._test_voice())
         v.Add(b_test, 0, wx.ALL, 8)
         p.SetSizer(v)
@@ -610,7 +610,7 @@ class SettingsDialog(wx.Dialog):
         self._row(p, v, "&OpenAI (GPT) kulcs:", self.ai_openai)
         self.ai_gemini = wx.TextCtrl(p, value=self.ai.get("gemini_key", ""),
                                      style=wx.TE_PASSWORD)
-        self._row(p, v, "Google &Gemini kulcs:", self.ai_gemini)
+        self._row(p, v, "Google G&emini kulcs:", self.ai_gemini)
         self.ai_anthropic = wx.TextCtrl(p, value=self.ai.get("anthropic_key", ""),
                                         style=wx.TE_PASSWORD)
         self._row(p, v, "&Anthropic (Claude) kulcs:", self.ai_anthropic)
@@ -630,7 +630,7 @@ class SettingsDialog(wx.Dialog):
         self.ai = aiclient.migralt_modellek(self.ai)
         self.ai_models = {}
         for cimke, kulcs, pelda in (
-                ("OpenAI-&modell (opcionális):", "openai", "gpt-4o-mini"),
+                ("OpenA&I-modell (opcionális):", "openai", "gpt-4o-mini"),
                 ("Gemini-mo&dell (opcionális):", "gemini", "gemini-2.5-flash"),
                 ("Claude-mode&ll (opcionális):", "anthropic",
                  "claude-sonnet-4-6"),
