@@ -14,7 +14,8 @@ import wx
 
 from .audiobook_player import (AudioBookPlayer, AudioLibrary, konyv_kulcs,
                                mappa_savok, audio_fajl, ido_str,
-                               ido_ertelmez, hangero_betolt, hangero_ment)
+                               ido_ertelmez, hangero_betolt, hangero_ment,
+                               media_duration)  # Ctrl+T mappa-hossz (1.3.9)
 from . import valaszto                         # beépített fájlválasztó
 
 HANGERO_LEPES = 0.05        # ugyanaz a lépés, mint a Zenelejátszóban

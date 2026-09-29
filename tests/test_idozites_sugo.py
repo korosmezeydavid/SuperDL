@@ -53,14 +53,18 @@ def test_ora_perc_ma_ha_meg_nem_mult_el():
                                                                  microsecond=0)
     t = parse_when("%d:%02d" % (kesobb.hour, kesobb.minute))
     assert t is not None
-    assert dt.datetime.fromtimestamp(t).date() == dt.date.today()
+    # 22 óra után a +2 óra már holnapra esik - ezért a várt nap a `kesobb`
+    # napja (korábban este 10 után ez a teszt magától elbukott)
+    assert dt.datetime.fromtimestamp(t).date() == kesobb.date()
 
 
 def test_ora_perc_holnap_ha_mar_elmult():
     korabban = dt.datetime.now() - dt.timedelta(hours=2)
     t = parse_when("%d:%02d" % (korabban.hour, korabban.minute))
     assert t is not None
-    holnap = dt.date.today() + dt.timedelta(days=1)
+    # hajnali 2 előtt a -2 óra még tegnapi - a következő ilyen időpont
+    # tehát a `korabban` napja + 1 (ez 2 óra előtt a mai nap)
+    holnap = korabban.date() + dt.timedelta(days=1)
     assert dt.datetime.fromtimestamp(t).date() == holnap
 
 
