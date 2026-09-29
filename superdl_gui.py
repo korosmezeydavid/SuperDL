@@ -201,7 +201,8 @@ KEYS_TEXT = (
     "  Ctrl+U   – frissítések keresése\n"
     "  Ctrl+Alt+I – Internet-teszt (sebesség, késleltetés, IP-cím, és a Wi-Fi\n"
     "               jelerőssége dBm-ben – mesh-hálózat építéséhez is)\n"
-    "  Ctrl+Alt+M – Teljes mentés és visszaállítás (költözés új gépre)\n"
+    "  Ctrl+Alt+B – Teljes mentés és visszaállítás (költözés új gépre)\n"
+            "  Ctrl+Alt+K – Modulkezelő (modulok telepítése, frissítése)\n"
     "  Delete   – futó letöltés leállítása; befejezett/hibás elem törlése\n"
     "  Shift+Delete – a kijelölt elem eltávolítása a listából\n"
     "  Ctrl+Shift+S – minden letöltés leállítása\n"
@@ -248,7 +249,7 @@ PRIVACY_TEXT = (
     "TITKOK – az AI-/TTS-kulcsok és más bizalmas adatok a gépeden, Windows "
     "DPAPI-val TITKOSÍTVA tárolódnak; ha a titkosítás nem érhető el, a program "
     "inkább nem menti el, mint hogy nyíltan tárolja.\n\n"
-    "TELJES MENTÉS (Súgó menü, Ctrl+Alt+M) – egyetlen fájlba menti az egész "
+    "TELJES MENTÉS (Súgó menü, Ctrl+Alt+B) – egyetlen fájlba menti az egész "
     "SuperDL-t: beállítások, feliratkozások, könyvjelzők, naptár, címjegyzék, "
     "a levelező szabályai, ÉS a bizalmas adatok (e-mail jelszavak, "
     "AI-kulcsok) is. Ez a fájl SEHOVA nem megy: oda mented, ahova te akarod. "
@@ -881,13 +882,13 @@ class MainFrame(wx.Frame):
             "Sebesség, késleltetés, wifi, IP-cím és a szolgáltatások "
             "elérhetősége – egy gombnyomásra, felolvasva")
         mi_modmgr = m_tools.Append(
-            wx.ID_ANY, "&Modulkezelő…",
+            wx.ID_ANY, "&Modulkezelő…\tCtrl+Alt+K",
             "Opcionális SuperDL-modulok telepítése, frissítése és eltávolítása")
         mb.Append(m_tools, "&Eszközök")
 
         m_ai = wx.Menu()
         mi_ai_img = m_ai.Append(
-            wx.ID_ANY, "&Kép leírása fájlból…\tCtrl+Shift+L",
+            wx.ID_ANY, "&Kép leírása fájlból…\tCtrl+Alt+L",
             "Mi van a képen? – részletes leírás, felolvasással")
         mi_ai_clip = m_ai.Append(
             wx.ID_ANY, "Kép leírása a &vágólapról",
@@ -928,7 +929,7 @@ class MainFrame(wx.Frame):
             "Hol és hogyan szerezhetsz API-kulcsot a 4 szolgáltatóhoz")
         m_help.AppendSeparator()
         mi_mentes = m_help.Append(
-            wx.ID_ANY, "&Teljes mentés és visszaállítás…\tCtrl+Alt+M",
+            wx.ID_ANY, "&Teljes mentés és visszaállítás…\tCtrl+Alt+B",
             "MINDEN egy fájlba: beállítások, feliratkozások, könyvjelzők, "
             "naptár, e-mail jelszavak, AI-kulcsok – új gépre költözéshez")
         m_help.AppendSeparator()
@@ -2775,7 +2776,7 @@ class MainFrame(wx.Frame):
         dlg.Destroy()
 
     def _on_mentes(self, event=None):
-        """Teljes mentés és visszaállítás (Súgó menü, Ctrl+Alt+M).
+        """Teljes mentés és visszaállítás (Súgó menü, Ctrl+Alt+B).
 
         Egy fájlban MINDEN: beállítások, feliratkozások, könyvjelzők, naptár,
         címjegyzék, a levelező szabályai – és a bizalmas adatok (e-mail
