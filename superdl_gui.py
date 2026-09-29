@@ -353,6 +353,7 @@ class HistoryDialog(wx.Dialog):
         self.b_ujra.Bind(wx.EVT_BUTTON, self._on_ujra)
         self.b_mappa.Bind(wx.EVT_BUTTON, self._on_mappa)
         b_zar.Bind(wx.EVT_BUTTON, lambda e: self.EndModal(wx.ID_CLOSE))
+        self.SetEscapeId(wx.ID_CLOSE)    # Escape = Bezárás
         self._tetelek: list = []
         self._frissit()
         self.kereso.SetFocus()
@@ -1003,7 +1004,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, lambda e: self._on_ai_transcribe(srt=True),
                   mi_ai_srt)
         self.Bind(wx.EVT_MENU, self._on_ai_video, mi_ai_vid)
-        self.Bind(wx.EVT_MENU, lambda e: self._on_settings(page=3), mi_ai_set)
+        self.Bind(wx.EVT_MENU, lambda e: self._on_settings(page="AI"), mi_ai_set)
         self.Bind(wx.EVT_MENU, self._on_support, mi_support)
         self.Bind(wx.EVT_MENU, self._on_credits, mi_credits)
         self.Bind(wx.EVT_MENU, lambda e: self._show_info(0), mi_about)
@@ -1186,6 +1187,14 @@ class MainFrame(wx.Frame):
         # „Csak hang" ALAPBÓL: induláskor a mentett állapotot állítjuk vissza,
         # így nem kell minden indításkor újra bepipálni (Maxi jelezte)
         self.audio_chk.SetValue(bool(s.get("audio_only", False)))
+        self._apply_voice_settings()
+
+    def _apply_voice_settings(self):
+        """A beszéd-beállítások (képernyőolvasó-mód, gépi felolvasás, saját
+        hang, pittyegés) érvényesítése. Induláskor ÉS a Beállítások mentésekor
+        is ez fut – korábban csak induláskor, ezért a „Csak a képernyőolvasó
+        beszéljen" és a saját hang kikapcsolása csak újraindítás után hatott."""
+        s = self.settings
         # Képernyőolvasó-mód: minden EGYÉB program-beszéd némuljon, csak a
         # képernyőolvasó (NVDA/JAWS) beszéljen – a felhasználó kifejezett kérése.
         sr_only = bool(s.get("screenreader_only", False))
@@ -1311,7 +1320,7 @@ class MainFrame(wx.Frame):
     def _on_settings(self, event=None, page=0):
         dlg = SettingsDialog(self, self.settings, self.ai_config)
         if page:
-            dlg.nb.SetSelection(page)
+            dlg.valassz_lapot(page)
         if dlg.ShowModal() == wx.ID_OK and dlg.result_settings is not None:
             self.settings.update(dlg.result_settings)
             self.ai_config = dlg.result_ai
@@ -1328,7 +1337,7 @@ class MainFrame(wx.Frame):
 
     def _apply_runtime_settings(self):
         """A megváltozott beállítások érvényesítése a futó részekre."""
-        self.speaker.set_mode(str(self.settings.get("voice_mode", "auto")))
+        self._apply_voice_settings()
         if self.mgr:
             self.mgr.connections = self.settings.get("connections", 8)
             self.mgr.limiter.bps = parse_limit(
@@ -3631,6 +3640,7 @@ class SubsDialog(wx.Dialog):
         btn_browse.Bind(wx.EVT_BUTTON, lambda e: self._browse())
         btn_del.Bind(wx.EVT_BUTTON, self._on_delete)
         btn_close.Bind(wx.EVT_BUTTON, lambda e: self.EndModal(wx.ID_CLOSE))
+        self.SetEscapeId(wx.ID_CLOSE)    # Escape = Bezárás
         self.Bind(wx.EVT_CHAR_HOOK, self._on_key)
         self._refresh()
         self.listbox.SetFocus()
@@ -3773,6 +3783,7 @@ class UpdateDialog(wx.Dialog):
         self.btn_check.Bind(wx.EVT_BUTTON, lambda e: self._check())
         self.btn_inst.Bind(wx.EVT_BUTTON, lambda e: self._install())
         btn_close.Bind(wx.EVT_BUTTON, lambda e: self.EndModal(wx.ID_CLOSE))
+        self.SetEscapeId(wx.ID_CLOSE)    # Escape = Bezárás
         self._check()
 
     def _check(self):

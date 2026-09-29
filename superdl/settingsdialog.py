@@ -5,6 +5,8 @@ A főablakból a „Beállítások…” gomb (Ctrl+,) nyitja meg. Csak a célma
 hogy ne legyen zsúfolt és könnyű legyen képernyőolvasóval bejárni.
 """
 
+import os
+
 import wx
 
 from . import aiclient
@@ -43,6 +45,63 @@ class _NamedAccessible(wx.Accessible):
         return (wx.ACC_OK, self._name)
 
 
+def _vezerlo_hwndjei(ctrl) -> list:
+    """A vezérlő natív ablakai: maga, és ha léptető (SpinCtrl), a szerkesztő-társa."""
+    import ctypes
+    from ctypes import wintypes
+    u = ctypes.windll.user32
+    h = int(ctrl.GetHandle())
+    out = [h]
+    buf = ctypes.create_unicode_buffer(64)
+    u.GetClassNameW(wintypes.HWND(h), buf, 64)
+    if buf.value.lower() == "msctls_updown32":
+        u.SendMessageW.restype = ctypes.c_ssize_t
+        u.SendMessageW.argtypes = [wintypes.HWND, wintypes.UINT,
+                                   wintypes.WPARAM, wintypes.LPARAM]
+        buddy = u.SendMessageW(h, 0x046A, 0, 0)       # UDM_GETBUDDY
+        if buddy:
+            out.append(int(buddy))
+    return out
+
+
+def cimke_ele_zsorrend(lbl, ctrl) -> None:
+    """A címkét natívan KÖZVETLENÜL a vezérlő (SpinCtrl-nél a szerkesztő-
+    mezője) elé teszi a Z-sorrendben: a képernyőolvasók innen veszik a
+    mező nevét. Nem Windowson, vagy ha bármi hiba van, nem csinál semmit."""
+    if os.name != "nt":
+        return
+    try:
+        import ctypes
+        from ctypes import wintypes
+        u = ctypes.windll.user32
+        u.GetWindow.restype = wintypes.HWND
+        u.GetWindow.argtypes = [wintypes.HWND, wintypes.UINT]
+        u.SetWindowPos.argtypes = [wintypes.HWND, wintypes.HWND, ctypes.c_int,
+                                   ctypes.c_int, ctypes.c_int, ctypes.c_int,
+                                   wintypes.UINT]
+        hl = int(lbl.GetHandle())
+        sajat = set(_vezerlo_hwndjei(ctrl))
+        # a vezérlő Z-sorrendben ELSŐ ablaka
+        h = u.GetWindow(wintypes.HWND(hl), 0)             # GW_HWNDFIRST
+        elso = None
+        while h:
+            if int(h) in sajat:
+                elso = int(h)
+                break
+            h = u.GetWindow(h, 2)                          # GW_HWNDNEXT
+        if elso is None:
+            return
+        elotte = u.GetWindow(wintypes.HWND(elso), 3)       # GW_HWNDPREV
+        if elotte and int(elotte) == hl:
+            return
+        # SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOOWNERZORDER
+        u.SetWindowPos(wintypes.HWND(hl),
+                       wintypes.HWND(int(elotte)) if elotte else wintypes.HWND(0),
+                       0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010 | 0x0200)
+    except Exception:
+        pass
+
+
 class SettingsDialog(wx.Dialog):
     def __init__(self, parent, settings: dict, ai_config: dict):
         super().__init__(parent, title="SuperDL – Beállítások", size=(620, 560))
@@ -55,10 +114,10 @@ class SettingsDialog(wx.Dialog):
 
         outer = wx.BoxSizer(wx.VERTICAL)
         self.nb = wx.Notebook(self)
+        self.nb.AddPage(self._page_general(), "Általános")
         self.nb.AddPage(self._page_download(), "Letöltés")
         self.nb.AddPage(self._page_radiorec(), "Rádió felvétel")
         self.nb.AddPage(self._page_cookies(), "Fiók / Sütik")
-        self.nb.AddPage(self._page_general(), "Általános")
         self.nb.AddPage(self._page_sound(), "Hangjelzések / Beszéd")
         self.nb.AddPage(self._page_ai(), "AI")
         outer.Add(self.nb, 1, wx.EXPAND | wx.ALL, 8)
@@ -82,6 +141,19 @@ class SettingsDialog(wx.Dialog):
                   "A saját hang (SelfVoice) itt kapcsolható be azoknak, akik "
                   "nem futtatnak képernyőolvasót.")
         self.Bind(wx.EVT_BUTTON, self._on_ok, id=wx.ID_OK)
+
+    def valassz_lapot(self, lap):
+        """Lap kiválasztása NÉV (pl. "AI") vagy sorszám szerint. Név szerint
+        biztonságos: a lapok sorrendje változhat (2026-09-29: az Általános
+        került előre, és a régi „page=3" már rossz lapot nyitott volna)."""
+        if isinstance(lap, str):
+            for i in range(self.nb.GetPageCount()):
+                if self.nb.GetPageText(i) == lap:
+                    self.nb.SetSelection(i)
+                    return
+            return
+        if 0 <= int(lap) < self.nb.GetPageCount():
+            self.nb.SetSelection(int(lap))
 
     # ---- segéd: címke + vezérlő egy sorban ----------------------------
 
@@ -107,6 +179,13 @@ class SettingsDialog(wx.Dialog):
                 lbl.MoveBeforeInTabOrder(ctrl)
             except Exception:
                 pass
+            # ⚠️ A SpinCtrl (szám-mező) KÉT natív ablak: léptető + szerkesztő.
+            # A fenti két megoldás csak a léptetőre hat, az NVDA viszont a
+            # SZERKESZTŐ-mezőn áll, és annak nevét a Z-sorrendben előtte álló
+            # szövegből veszi – ezért mondta a „Tempó" mezőre, hogy „Bejelentő
+            # hang", a „Hangmagasság"-ra, hogy „Tempó" (NVDA-s jelzés,
+            # 2026-09-29). Itt a címkét natívan a vezérlő MINDKÉT ablaka elé tesszük.
+            cimke_ele_zsorrend(lbl, ctrl)
         r = wx.BoxSizer(wx.HORIZONTAL)
         r.Add(lbl, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
         r.Add(ctrl, 1, wx.ALIGN_CENTER_VERTICAL)
