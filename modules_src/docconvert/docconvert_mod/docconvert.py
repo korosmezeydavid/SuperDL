@@ -464,6 +464,57 @@ def _convert_inner(src, dst, out_format, in_encoding=None, out_encoding="utf-8",
     return uzenet
 
 
+# ---- az eredmény ELSŐ SZAVA mondja meg, sikerült-e ----------------------
+
+def osszegzo_uzenet(ok, total, errors, hova, out_fmt, megszakitva=False,
+                    osszefuzve=False) -> str:
+    """A köteg végén felolvasott összegzés.
+
+    ⚠️ Eddig az összegzés MINDIG „Kész: 0/1 fájl konvertálva…"-val kezdődött,
+    a hiba oka pedig csak két sorral lejjebb, a „Hibás fájlok" alatt állt.
+    A képernyőolvasó az ELSŐ szót mondja ki – a felhasználó azt hallotta,
+    hogy „kész", pedig egyetlen fájl sem készült el (Turai László,
+    2026-09-29: DOC-bemenet Calibre nélkül). A „kész" szó ilyenkor hazugság,
+    ugyanúgy, mint a szétesett PDF-nél volt. Mostantól:
+      • semmi nem sikerült → „NEM SIKERÜLT: <fájl> – <ok>" (egy fájlnál az
+        ok rögtön az első sorban), több fájlnál a lista utána;
+      • részben → „RÉSZBEN KÉSZ: n/m …", és a lista;
+      • leállítva → „LEÁLLÍTVA. …" (a DOC-P0-03 szerint);
+      • minden sikerült → „Kész: …" / „Összefűzve: …" – a „kész" csak akkor
+        hangzik el, ha igaz."""
+    fmt = (out_fmt or "").upper()
+    errors = list(errors or [])
+    hova_nev = Path(hova).name if osszefuzve else str(hova)
+    mit = "fájl szövege" if osszefuzve else "fájl konvertálva"
+
+    def _ok_sor(err):
+        return (err or "").strip().splitlines()[0] if (err or "").strip() \
+            else "ismeretlen ok"
+
+    if megszakitva:
+        msg = (f"LEÁLLÍTVA. Eddig {ok}/{total} fájl készült el ide: {hova} "
+               f"({fmt}). A többihez nem nyúltam.")
+    elif ok == 0:
+        if len(errors) == 1:
+            n, err = errors[0]
+            return f"NEM SIKERÜLT: {n} – {_ok_sor(err)}"
+        msg = (f"NEM SIKERÜLT: egyik fájl sem lett konvertálva "
+               f"({total} fájl, {fmt}).")
+    elif errors:
+        msg = (f"RÉSZBEN KÉSZ: {ok}/{total} {mit} ide: {hova_nev} ({fmt}); "
+               f"{len(errors)} fájl nem sikerült.")
+    else:
+        elso = "Összefűzve" if osszefuzve else "Kész"
+        msg = f"{elso}: {ok}/{total} {mit} ide: {hova_nev} ({fmt})."
+    if errors:
+        cim = "Kihagyott fájlok" if osszefuzve else "Hibás fájlok"
+        msg += f"\n\n{cim}:\n" + "\n".join(
+            f"• {n}: {_ok_sor(err)}" for n, err in errors[:8])
+        if len(errors) > 8:
+            msg += f"\n… és további {len(errors) - 8}."
+    return msg
+
+
 # ---- KÖTEGELT mód: szöveg-kinyerés + több fájl EGY kimenetbe -----------
 
 def extract_book(src, in_encoding=None, ocr_engine="ai") -> booktext.Book:
