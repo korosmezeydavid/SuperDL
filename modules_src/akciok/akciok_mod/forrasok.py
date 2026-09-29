@@ -175,14 +175,42 @@ def friss_e(ido: float) -> bool:
     return ido > 0 and time.time() - ido < FRISS_ORA * 3600
 
 
+def megtartva(regi: list, uj: list, ma=None) -> list:
+    """Az új letöltés + a régiből az, ami MÉG ÉRVÉNYES és az újban nincs.
+
+    Petrus József (2026-09-29): a bolt már csütörtökön kicseréli az újságot
+    a jövő hetire, pedig a mostani még vasárnapig érvényes – és a régi
+    akciók eltűntek a listából, mielőtt lejártak volna. Csak olyan régi
+    tétel marad, aminek ISMERT a vége (különben örökre itt ragadna), és az
+    a vég még nem múlt el. Azonosság: név + ár + érvényesség."""
+    from .termek import lejart, _HONAP_NAP
+
+    def kulcs(t):
+        return ((t.nev or "").strip().lower(), t.ar, t.kartyas_ar,
+                (t.ervenyes or "").strip())
+
+    megvan = {kulcs(t) for t in uj}
+    plusz = []
+    for t in regi:
+        if kulcs(t) in megvan or not _HONAP_NAP.findall(t.ervenyes or ""):
+            continue
+        if lejart(t.ervenyes, ma):
+            continue
+        megvan.add(kulcs(t))
+        plusz.append(t)
+    return list(uj) + plusz
+
+
 def letolt(bolt_id: str, jelez=lambda s: None, get=None, get_bytes=None) -> list:
     """Letölti és elmenti. ⚠️ Üres eredmény NEM írja felül a korábbi jó
     adatot (a TV-műsor 2026-09-21-i tanulsága: egy hiányos forrás egyszer
-    már felülírta a jót)."""
+    már felülírta a jót). A még érvényes régi tételek megmaradnak
+    (`megtartva`)."""
     for azon, _nev, fv in BOLTOK:
         if azon == bolt_id:
             termekek = fv(get or _get, get_bytes or _get_bytes, jelez)
             if termekek:
+                termekek = megtartva(mentett(bolt_id)[0], termekek)
                 _ment(bolt_id, termekek)
             return termekek
     raise KeyError(bolt_id)

@@ -35,11 +35,11 @@ def register(core):
          "iPhone &csengőhang-készítő\tCtrl+Shift+G",
          "Csengőhang (.m4r) vagy MP3 készítése egy zene részletéből")
     _add(core, menu, "video_module", VideoComposeFrame,
-         "&Videókészítő (kép + zene)\tCtrl+Shift+V",
+         "&Videókészítő (kép + zene)\tCtrl+Alt+E",
          "Videó készítése állóképből és zenéből, idővonalra helyezett "
          "szöveg- és kép-overlay-ekkel")
     _add(core, menu, "videoedit_module", VideoEditFrame,
-         "Videóvá&gó és összefűző\tCtrl+Shift+E",
+         "Videóvá&gó és összefűző\tCtrl+Alt+V",
          "Videó vágása füllel (markerek), magyarázó szöveg ráégetése, "
          "videók összefűzése")
     core.log.info("mediatools modul betöltve")

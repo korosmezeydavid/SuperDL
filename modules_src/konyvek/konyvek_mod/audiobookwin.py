@@ -69,10 +69,29 @@ _SUGO = (
     "következőre lép.\n\n"
     "KÖNYVJELZŐK\n"
     "• Ctrl+B: könyvjelző az aktuális helyre (sáv + időpont).\n"
-    "• Ctrl+Shift+B: a könyv könyvjelzőinek listája (ugrás / törlés).\n\n"
+    "• Ctrl+Shift+B: a könyv könyvjelzőinek listája (ugrás / törlés).\n"
+    "• Ctrl+T: egy mappa TELJES hossza – hány óra hanganyag van benne (az "
+    "almappákkal együtt). A polcon kijelölt mappát vagy a nyitott könyv "
+    "mappáját nézi, különben megkérdezi. A számolás a háttérben megy, közben "
+    "szól, hol tart.\n\n"
     "Csak a saját, jogtisztán birtokolt hanganyagodhoz. F1: ez a súgó. "
     "Escape: leállítás."
 )
+
+
+def _ora_perc(mp: float) -> str:
+    """3725 → „1 óra 2 perc"; 90 → „1 perc 30 másodperc"."""
+    mp = int(round(mp or 0))
+    ora, maradek = divmod(mp, 3600)
+    perc, masodperc = divmod(maradek, 60)
+    if ora >= 24:
+        nap, ora = divmod(ora, 24)
+        return "%d nap %d óra %d perc" % (nap, ora, perc)
+    if ora:
+        return "%d óra %d perc" % (ora, perc)
+    if perc:
+        return "%d perc %d másodperc" % (perc, masodperc)
+    return "%d másodperc" % masodperc
 
 
 def _mondd(main, szoveg):
@@ -179,7 +198,9 @@ class AudioBookFrame(wx.Frame):
                 ("Köny&vjelző (Ctrl+B)", lambda e: self._add_bookmark()),
                 # Alt+E ütközött az Előző sáv gombbal – most Alt+A
                 ("Könyvjelzők listáj&a… (Ctrl+Shift+B)",
-                 lambda e: self._show_bookmarks())):
+                 lambda e: self._show_bookmarks()),
+                ("Mappa &teljes hossza… (Ctrl+T)",
+                 lambda e: self._mappa_hossza())):
             b = wx.Button(p, label=label)
             b.Bind(wx.EVT_BUTTON, fn)
             ctl.Add(b, 0, wx.RIGHT, 4)
@@ -224,7 +245,8 @@ class AudioBookFrame(wx.Frame):
 
         ids = {k: wx.NewIdRef() for k in
                ("play", "pause", "stop", "back", "fwd", "bm", "bmlist", "help",
-                "hfel", "hle", "ugras", "hol", "alvas")}
+                "hfel", "hle", "ugras", "hol", "alvas", "hossz")}
+        self.Bind(wx.EVT_MENU, lambda e: self._mappa_hossza(), id=ids["hossz"])
         self.Bind(wx.EVT_MENU, lambda e: self._hol_tartunk(), id=ids["hol"])
         self.Bind(wx.EVT_MENU, lambda e: self._alvas_parbeszed(),
                   id=ids["alvas"])
@@ -254,8 +276,77 @@ class AudioBookFrame(wx.Frame):
             (wx.ACCEL_CTRL, ord('S'), ids["alvas"]),
             (wx.ACCEL_CTRL, ord('B'), ids["bm"]),
             (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('B'), ids["bmlist"]),
+            (wx.ACCEL_CTRL, ord('T'), ids["hossz"]),
             (wx.ACCEL_NORMAL, wx.WXK_F1, ids["help"]),
         ]))
+
+    # ---- mappa teljes hossza (Turai László kérése, 2026-09-29) --------------
+    def _mappa_hossza(self):
+        """Ctrl+T: hány óra hanganyag van egy mappában (az almappákkal).
+        Laci: „kíváncsi lennék a rádiójátékos archívumom hosszára … az mp3
+        méretéből nem derül ki a különböző bitráták miatt". Alap a polcon
+        kijelölt mappa, vagy a nyitott könyv mappája; különben mappaválasztó.
+        A számolás HÁTTÉRBEN megy, közben szól, hol tart."""
+        if getattr(self, "_hossz_fut", False):
+            self._mond("Még számolom az előző mappát.")
+            return
+        ut = ""
+        items = getattr(self, "_shelf_items", [])
+        i = self.polc.GetSelection()
+        if self.FindFocus() is self.polc and 0 <= i < len(items) \
+                and items[i].get("is_dir"):
+            ut = items[i].get("path", "")
+        if not ut and self._bookkey and os.path.isdir(
+                getattr(self.player, "book_root", "") or ""):
+            ut = self.player.book_root
+        if not ut or not os.path.isdir(ut):
+            ut = valaszto.egy_mappa(self, "Melyik mappa teljes hosszát számoljam?")
+        if not ut:
+            return
+        self._hossz_fut = True
+        nev = os.path.basename(ut.rstrip("/\\")) or ut
+        self._mond("Számolom: %s. Ez a fájlok számától függően eltarthat." % nev)
+
+        def munka():
+            try:
+                savok = mappa_savok(ut)
+                ossz, kesz, hibas = 0.0, 0, 0
+                for f in savok:
+                    if self._closing:
+                        return
+                    h = media_duration(f)
+                    if h and h > 0:
+                        ossz += h
+                    else:
+                        hibas += 1
+                    kesz += 1
+                    if kesz % 50 == 0:
+                        wx.CallAfter(self._mond, "%d fájl kész, eddig %s…"
+                                     % (kesz, _ora_perc(ossz)))
+                wx.CallAfter(self._mappa_hossza_kesz, nev, len(savok), ossz, hibas)
+            except Exception as ex:                        # noqa: BLE001
+                wx.CallAfter(self._mappa_hossza_kesz, nev, 0, 0.0, 0, str(ex))
+
+        threading.Thread(target=munka, daemon=True).start()
+
+    def _mappa_hossza_kesz(self, nev, db, ossz, hibas, hiba=""):
+        self._hossz_fut = False
+        if self._closing:
+            return
+        if hiba:
+            self._mond("A számolás nem sikerült: %s" % hiba)
+            return
+        if not db:
+            self._mond("Ebben a mappában nincs hangfájl: %s." % nev)
+            return
+        szoveg = "%s: %d hangfájl, összesen %s." % (nev, db, _ora_perc(ossz))
+        if hibas:
+            szoveg += " %d fájl hosszát nem tudtam megállapítani." % hibas
+        self._mond(szoveg)
+        try:
+            self.cim_lbl.SetLabel(szoveg)
+        except Exception:
+            pass
 
     # ---- megnyitás ----
     def _open_file(self):

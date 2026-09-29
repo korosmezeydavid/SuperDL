@@ -36,7 +36,7 @@ def register(core):
         mappa_kuldes_inditasa()
 
     _state["mappa"] = core.add_menu_item(
-        menu, "&Mappa küldése és megosztás…\tCtrl+Shift+M", mappa_menu,
+        menu, "&Mappa küldése és megosztás…\tCtrl+Alt+F", mappa_menu,
         help="Egy egész mappa becsomagolása és elküldése – gépről gépre vagy "
              "ideiglenes tárhelyre")
     core.log.info("p2p modul betöltve")

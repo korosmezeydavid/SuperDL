@@ -18,7 +18,7 @@ def register(core):
     _sub = getattr(core, "add_submenu", None)
     menu = _sub("&Eszközök", "&iPhone") if _sub else core.add_menu("&iPhone")
     item = core.add_menu_item(
-        menu, "&iPhone (zene, fotó, videó)\tCtrl+Shift+P", opener,
+        menu, "&iPhone (zene, fotó, videó)\tCtrl+Alt+P", opener,
         help="Zene, fotó, videó és hangfelvétel mentése iPhone-ról a gépre, "
              "illetve törlése a telefonról")
     _state["item"] = item

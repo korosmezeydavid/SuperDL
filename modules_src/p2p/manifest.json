@@ -1,10 +1,10 @@
 {
   "id": "p2p",
   "name": "Fájl- és mappaküldés, megosztás",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "entry": "p2p_mod",
   "category": "Eszközök",
-  "description": "Fájl VAGY egész mappa eljuttatása valaki máshoz. Gépről gépre, felhő nélkül, bemondható kóddal és végpontok közötti titkosítással (magic-wormhole) – vagy ha a másik fél nincs a gépénél, feltöltés ideiglenes tárhelyre, lejáratot számon tartó megosztási előzményekkel.",
+  "description": "ÚJ BILLENTYŰ: a Mappa küldése és megosztás mostantól Ctrl+Alt+F a főmenüben (eddig Ctrl+Shift+M volt, ami ütközött egy másik menüponttal). Fájl VAGY egész mappa eljuttatása valaki máshoz. Gépről gépre, felhő nélkül, bemondható kóddal és végpontok közötti titkosítással (magic-wormhole) – vagy ha a másik fél nincs a gépénél, feltöltés ideiglenes tárhelyre, lejáratot számon tartó megosztási előzményekkel.",
   "min_core_api": "1.0",
   "requires_tools": [],
   "author": "Kőrösmezey Dávid"
