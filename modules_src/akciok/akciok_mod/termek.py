@@ -56,6 +56,7 @@ class Termek:
             if (self.kiszereles
                     and self.kiszereles.lower() not in self.nev.lower()):
                 reszek.append(self.kiszereles)
+            reszek.extend(self._mennyisegi())
             return ", ".join(reszek)
         reszek = [self.nev]
         if self.ar is not None:
@@ -69,7 +70,15 @@ class Termek:
             reszek.append(self.kedvezmeny)
         if self.kiszereles and self.kiszereles.lower() not in self.nev.lower():
             reszek.append(self.kiszereles)       # ha a névben már benne van, ne
+        reszek.extend(self._mennyisegi())
         return ", ".join(reszek)
+
+    def _mennyisegi(self) -> list:
+        """A mennyiségi akció („6 db-tól 119 Ft/db”) a listasorban is hallható
+        legyen, ne csak a részleteknél – különben a SPAR Verde ásványvíznél
+        csak a 179 Ft hangzott el, az akciós ár nem (Petrus József, 2026-09-30)."""
+        m = self.megjegyzes or ""
+        return [m] if "db-tól" in m and m not in (self.kedvezmeny or "") else []
 
     def reszletek(self) -> str:
         sorok = [self.nev, "Bolt: %s" % self.bolt]
