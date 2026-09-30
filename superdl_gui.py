@@ -2637,18 +2637,12 @@ class MainFrame(wx.Frame):
             return
         # indításkor automatikus, hangos üdvözlés (beep nélkül, hogy ne
         # ütközzön a beszéddel)
+        # A letöltések állapota (Zsolt kérése) MÁR BENNE VAN a köszöntésben
+        # (_compose_dayinfo → _download_status_phrase). A régi, 2,6 mp-cel
+        # később külön elmondott „Jelenleg nincs aktív letöltés." képernyőolvasó
+        # mellett (4.6.28 óta a szöveg a JAWS/NVDA-n megy) FÉLBEVÁGTA a
+        # köszöntést a dátumnál (Schibik Miklós, JAWS, 2026-09-30) – kivéve.
         self._speak_dayinfo(toast=False, beep=False)
-        # …majd az aktív letöltések állapota is (amit Zsolt kért)
-        active = 0
-        if self.mgr:
-            active = sum(1 for j in self.mgr.jobs
-                         if j.progress.status in (
-                             "letöltés", "seedelés", "várakozik", "ütemezve",
-                             DownloadManager.HALOZATRA_VAR))
-        msg = (f"{active} aktív vagy várakozó letöltés van."
-               if active else "Jelenleg nincs aktív letöltés.")
-        wx.CallLater(2600, lambda: self.speaker.speak(msg)
-                     if self.speaker and self.speaker.available else None)
 
     # ---- AI: kép leírása / OCR ----------------------------------------
 

@@ -2316,16 +2316,27 @@ class LevelOlvasoFrame(wx.Frame):
         if self._html is None:
             return
         self._html.SetFocus()
+        # ⚠️ Betöltés ELŐTT a RunScript nem futhat: a wx ilyenkor „Error
+        # running JavaScript" figyelmeztetést naplóz, ami a felhasználónak
+        # OK-gombos ablakként ugrott fel, és a fókusz a fejlécen ragadt
+        # (Schibik Miklós, mail 1.6.3, 2026-09-30). A betöltés után az
+        # EVT_WEBVIEW_LOADED úgyis újra ide hív.
+        if not getattr(self, "_html_kesz", False):
+            return
+        _csend = wx.LogNull()
         try:
             self._html.RunScript(MC.HTML_FOKUSZ_JS)
         except Exception:
             pass
+        finally:
+            del _csend
 
     def _html_betoltodott(self, e):
         """A WebView2 KÉSŐBB tölt be, mint ahogy a fókuszt adtuk – ezért
         esett a fejlécre (Schibik Miklós, 2026-09-29). Betöltés után újra a
         levélre."""
         e.Skip()
+        self._html_kesz = True
         if self._html_nezet and self._html is not None:
             self._html_fokusz()
 
