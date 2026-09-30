@@ -34,7 +34,11 @@ def register(core):
          "Super &Recorder – felvevő…",
          "Akadálymentes hangfelvevő: felvétel mikrofonból, kimondott "
          "szintmérővel, mentés WAV/MP3-ba normalizálással")
-    _add(core, menu, "superedit_module", SuperEditorFrame,
+    # SAJÁT kulcs! Régen „superedit_module” volt – ugyanaz, mint a Super Edit
+    # szövegszerkesztőé, így a később betöltött hangszerkesztő elfoglalta a
+    # helyét: a szövegfájlok, a Ctrl+Shift+E és az Akciós újság „Megnyitás a
+    # Super Editben” is ezt nyitotta (Petrus József, 2026-09-30).
+    _add(core, menu, "superhangszerk_module", SuperEditorFrame,
          "Super Recorder – fülre-sz&erkesztő…",
          "Akadálymentes hangszerkesztő: markeres navigáció, szakasz "
          "törlése/némítása/trim, csend-beszúrás, undo/redo – mind kimondva")

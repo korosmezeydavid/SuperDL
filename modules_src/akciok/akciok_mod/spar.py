@@ -96,10 +96,32 @@ def ervenyesseg(szoveg: str) -> str:
         if m else ""
 
 
+# a PDF gyakran egy sorba ragasztja a nagy árat és az egységárat:
+# „999(3.330 Ft/1 kg)” – ilyenkor a kártyás/kuponos ár elveszett (Petrus József,
+# 2026-09-30: „Regnum hot-dog kolbásznál nincs ott az akciós ár”)
+_RAGADT = re.compile(r"^(\d[\d.]*)\s*(\(\d[\d.]*(?:,\d+)?\s*Ft/1\s*\w+\))$")
+# nyomdai szemét az Interspar-lapon („1001_ISP_10-11.indd 10”, „2026. 09. 24. 12:33”):
+# a termék nevébe keveredett
+_SZEMET = re.compile(r"(\.indd\s+\d+$|^\d{4}\.\s*\d{2}\.\s*\d{2}\.\s*\d{1,2}:\d{2}$)", re.I)
+
+
+def _sorok(szoveg: str) -> list:
+    ki = []
+    for s in (szoveg or "").split("\n"):
+        s = re.sub(r"\s+", " ", s).strip()
+        if not s or _SZEMET.search(s):
+            continue
+        m = _RAGADT.match(s)
+        if m:
+            ki.extend((m.group(1), m.group(2)))
+        else:
+            ki.append(s)
+    return ki
+
+
 def termekek(szoveg: str, ujsag: str = "", ervenyes: str = "") -> list:
     from .termek import Termek
-    L = [re.sub(r"\s+", " ", s).strip() for s in (szoveg or "").split("\n")]
-    L = [s for s in L if s]
+    L = _sorok(szoveg)
     ki, utolso, hatar = [], None, -1        # utolso = (Termek, meret, sorindex)
     for i, s in enumerate(L):
         e = _EGYS.match(s)
@@ -148,8 +170,10 @@ def termekek(szoveg: str, ujsag: str = "", ervenyes: str = "") -> list:
             k = int(round(egys)) if t.kiszereles == "kilónként" else \
                 _darab(re.sub(r";\s*ár:.*$", "", meret), egys, alap)
             if k and k < t.ar:
-                t.kartyas_ar, t.kartya_nev = k, "MySpar-ral"
-                t.kedvezmeny = "-%d%% MySpar-ral" % round((1 - k / t.ar) * 100)
+                kupon = any("KUPON" in x.upper() for x in L[max(0, i - 4):i])
+                kartya = "MySpar-kuponnal" if kupon else "MySpar-ral"
+                t.kartyas_ar, t.kartya_nev = k, kartya
+                t.kedvezmeny = "-%d%% %s" % (round((1 - k / t.ar) * 100), kartya)
             hatar = i
             continue
         # pultos áru: név, esetleg „a kiszolgálópultban”, aztán az egységár
