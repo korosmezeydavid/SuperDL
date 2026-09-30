@@ -2150,6 +2150,18 @@ class LevelOlvasoFrame(wx.Frame):
                     pass
                 self._html.Bind(_h2.EVT_WEBVIEW_NAVIGATING, self._html_navigal)
                 self._html.Bind(_h2.EVT_WEBVIEW_NEWWINDOW, self._html_navigal)
+                # BILLENTYŰ-HÍD + FÓKUSZ (Schibik Miklós, 2026-09-29): a
+                # WebView2 külön folyamat, az Esc/Ctrl+H benne ragadt, és a
+                # fókusz a betöltés ELŐTT állt be (a fejlécre esett vissza).
+                self._html.Bind(_h2.EVT_WEBVIEW_LOADED, self._html_betoltodott)
+                try:
+                    self._html.AddScriptMessageHandler(MC.HTML_HID_NEV)
+                    self._html.AddUserScript(MC.HTML_BILLENTYU_JS)
+                    self._html.Bind(_h2.EVT_WEBVIEW_SCRIPT_MESSAGE_RECEIVED,
+                                    self._html_uzenet)
+                except Exception:
+                    logging.getLogger("superdl.mail").exception(
+                        "HTML nézet: a billentyű-híd nem épült ki")
                 self._html.Hide()
                 v.Add(self._html, 1, wx.EXPAND | wx.ALL, 8)
         except Exception:
@@ -2202,9 +2214,9 @@ class LevelOlvasoFrame(wx.Frame):
         # átlépkedni – a fejléc külön mezőben ott marad (Shift+Tab).
         # ⚠️ HTML nézetben a HTML-re: az egyszerű mező ilyenkor rejtett, és a
         # rejtett vezérlőre tett fókusz a semmibe vész.
-        wx.CallAfter(lambda: (self._html if self._html_nezet
+        wx.CallAfter(lambda: (self._html_fokusz() if self._html_nezet
                               and self._html is not None
-                              else self.olvaso).SetFocus())
+                              else self.olvaso.SetFocus()))
         n = len(self._linkek)
         ne = len(self._emailek)
         lista = MC.lista_neve(msg) if MC.listas_level(msg) else ""
@@ -2288,12 +2300,46 @@ class LevelOlvasoFrame(wx.Frame):
             else ("Levél &szövege – csak az ÚJ rész (Ctrl+I: teljes szöveg):"
                   if self._csak_uj else "Levél &szövege (Ctrl+H: HTML nézet):"))
         self._p.Layout()
-        (self._html if html else self.olvaso).SetFocus()
+        if html:
+            self._html_fokusz()
+        else:
+            self.olvaso.SetFocus()
         if mondja:
             _mondd(self.main, "HTML nézet: a hivatkozásokra a szövegben Tabbal "
                               "vagy a képernyőolvasó linklistájával léphetsz; "
                               "Enter megnyitja." if html
                    else "Egyszerűsített nézet: a hivatkozások lent, a listában.")
+
+    def _html_fokusz(self):
+        """Fókusz a HTML nézetre – a vezérlőre ÉS a lap törzsére. A puszta
+        SetFocus az Edge külső keretére tette, a törzsbe nem jutott be."""
+        if self._html is None:
+            return
+        self._html.SetFocus()
+        try:
+            self._html.RunScript(MC.HTML_FOKUSZ_JS)
+        except Exception:
+            pass
+
+    def _html_betoltodott(self, e):
+        """A WebView2 KÉSŐBB tölt be, mint ahogy a fókuszt adtuk – ezért
+        esett a fejlécre (Schibik Miklós, 2026-09-29). Betöltés után újra a
+        levélre."""
+        e.Skip()
+        if self._html_nezet and self._html is not None:
+            self._html_fokusz()
+
+    def _html_uzenet(self, e):
+        """A lapba tett figyelő visszaküldte a nekünk szóló billentyűt."""
+        bill = MC.html_billentyu_ertelmez(e.GetString())
+        if bill is None:
+            return
+        nev, ctrl, shift = bill
+        k = {"Escape": wx.WXK_ESCAPE, "F1": wx.WXK_F1,
+             "F9": wx.WXK_F9}.get(nev, ord(nev.upper()) if len(nev) == 1
+                                  else 0)
+        ch = nev if len(nev) == 1 else ""
+        self._billentyu(k, ctrl, shift, ch)
 
     def _html_navigal(self, e):
         """A HTML nézetben minden hivatkozás KIFELÉ megy: webcím a
@@ -2607,7 +2653,12 @@ class LevelOlvasoFrame(wx.Frame):
         Ctrl+F is megy (mint máshol a „reply" és „forward")."""
         k = e.GetKeyCode()
         ch = chr(k).lower() if 32 < k < 256 else ""
-        ctrl = e.ControlDown()
+        if not self._billentyu(k, e.ControlDown(), e.ShiftDown(), ch):
+            e.Skip()
+
+    def _billentyu(self, k, ctrl, shift, ch):
+        """Egy billentyű kezelése – a wx eseményből ÉS a HTML nézet hídjából
+        ugyanide fut. True, ha a miénk volt."""
         if k == wx.WXK_ESCAPE:
             self.Close()
         elif k == wx.WXK_F1:
@@ -2619,11 +2670,11 @@ class LevelOlvasoFrame(wx.Frame):
             self._idezet_valt()
         elif ctrl and ch == "h":                   # Ctrl+H: HTML nézet ki/be
             self._nezet_valt()
-        elif ctrl and e.ShiftDown() and ch == "l":  # Ctrl+Shift+L: csatolmány
+        elif ctrl and shift and ch == "l":         # Ctrl+Shift+L: csatolmány
             self._csat_felolvas()
         elif ctrl and ch == "d":                   # Ctrl+D: naptárba a dátumot
             self._naptarba()
-        elif ch == "r" and e.ShiftDown():          # válasz MINDENKINEK
+        elif ch == "r" and shift:                  # válasz MINDENKINEK
             self._valaszol(msg=self._msg, fiok=self._fiok, mind=True)
         elif ch == "r":                            # R vagy Ctrl+R: válasz
             self._valaszol(msg=self._msg, fiok=self._fiok)
@@ -2636,7 +2687,8 @@ class LevelOlvasoFrame(wx.Frame):
         elif ch == "l":                            # L: válasz a LISTÁRA
             self._valasz_listara()
         else:
-            e.Skip()
+            return False
+        return True
 
     # ---- fordítás ------------------------------------------------------
 

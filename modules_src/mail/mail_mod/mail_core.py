@@ -1934,3 +1934,66 @@ def lista_neve(msg) -> str:
 
 def listas_level(msg) -> bool:
     return bool(lista_cim(msg))
+
+
+# ---- HTML nézet: billentyű-híd és fókusz (Schibik Miklós, 2026-09-29) ----
+# A HTML-t az Edge WebView2 KÜLÖN folyamatban rajzolja. Amíg a fókusz benne
+# van, a billentyűk (Esc, Ctrl+H, F1…) oda mennek, és a wx ablak nem látja
+# őket – ezért „csak Alt+F4-re zárult". A lapba tett kis figyelő visszaküldi
+# a nekünk szóló billentyűket; a többit (Tab, nyilak, Ctrl+C) a lapnál
+# hagyja. A szkript a WebView „felhasználói szkriptje" (nem a levél része),
+# ezért a levél CSP-je nem tiltja, és a levél HTML-je nem tud hozzányúlni.
+HTML_HID_NEV = "superdl"
+HTML_BILLENTYU_JS = r"""
+(function () {
+  if (window.__superdlHid) { return; }
+  window.__superdlHid = true;
+  function kuld(e) {
+    var c = e.target;
+    var t = (c && c.tagName ? c.tagName : "").toLowerCase();
+    var mezoben = (t === "input" || t === "textarea" || t === "select" ||
+                   (c && c.isContentEditable));
+    var k = e.key || "";
+    var betu = /^[A-Za-z]$/.test(k);
+    var erdekes = (k === "Escape" || k === "F1" || k === "F9" ||
+                   (e.ctrlKey && betu) ||
+                   (!mezoben && !e.altKey && !e.ctrlKey && /^[rRfFlL]$/.test(k)));
+    if (!erdekes) { return; }
+    if (e.ctrlKey && /^[aAcC]$/.test(k)) { return; }   /* másolás, kijelölés a lapé */
+    e.preventDefault(); e.stopPropagation();
+    var uzenet = JSON.stringify({key: k, ctrl: !!e.ctrlKey, shift: !!e.shiftKey});
+    try { window.superdl.postMessage(uzenet); return; } catch (x) {}
+    try { window.chrome.webview.postMessage(uzenet); } catch (x) {}
+  }
+  window.addEventListener("keydown", kuld, true);
+  window.addEventListener("load", function () {
+    try { document.body.tabIndex = -1; document.body.focus(); } catch (x) {}
+  });
+})();
+"""
+HTML_FOKUSZ_JS = ("(function(){try{document.body.tabIndex=-1;"
+                  "document.body.focus();}catch(x){}})();")
+
+
+def html_billentyu_ertelmez(uzenet):
+    """A lapból jött üzenet → ('Escape'|'F1'|'F9'|egy kisbetű, ctrl, shift),
+    vagy None, ha nem nekünk szóló / hibás. Csak ezeket engedjük át – a levél
+    HTML-je nem tud ide üzenni, de ha mégis, legfeljebb egy billentyűt
+    „nyom le", amit a felhasználó is lenyomhatna."""
+    import json as _json
+    try:
+        d = _json.loads(uzenet or "")
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(d, dict):
+        return None
+    k = d.get("key")
+    if not isinstance(k, str):
+        return None
+    if k in ("Escape", "F1", "F9"):
+        nev = k
+    elif len(k) == 1 and k.isascii() and k.isalpha():
+        nev = k.lower()
+    else:
+        return None
+    return nev, bool(d.get("ctrl")), bool(d.get("shift"))

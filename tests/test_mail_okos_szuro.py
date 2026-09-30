@@ -75,4 +75,5 @@ def test_az_olvaso_ablak_hasznalja_es_menti():
     assert "MC.okos_html_kell(msg, len(self._linkek))" in src
     assert '"okos_szuro": bool(self.alt_okos.GetValue())' in src
     # HTML nézetben a fókusz nem a rejtett szövegmezőre megy
-    assert "self._html if self._html_nezet" in src
+    assert ("self._html if self._html_nezet" in src
+            or "self._html_fokusz() if self._html_nezet" in src)
