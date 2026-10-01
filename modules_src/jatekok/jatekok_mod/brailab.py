@@ -25,6 +25,7 @@ from __future__ import annotations
 import os
 import subprocess
 import threading
+import time
 
 MAPPA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "brailab")
 HOST = os.path.join(MAPPA, "brailab_host.exe")
@@ -52,6 +53,40 @@ HOSSZ_TABLA = {
 MAGASSAGOK = (-1, 0, 1)
 TEMPOK = (0, 1, 2, 3, 4, 5)
 HANGEROK = (-1, 0, 1)
+
+# A TTS_StartSay legfeljebb 511 karaktert fogad el egyszerre; hosszabb
+# szövegre „-10” hibakódot ad, és NÉMA marad (élőben megmérve, 2026-10-01:
+# a Kő-papír-olló, a Szerencsekerék és az Ország-Város leírása emiatt nem
+# szólalt meg F8-ra). A hosszabb szöveget ezért mondathatáron darabolva,
+# egymás után mondatjuk el. Kis tartalékkal maradunk a határ alatt.
+MAX_KARAKTER = 480
+
+
+def darabol(szoveg: str, legfeljebb: int = MAX_KARAKTER) -> list:
+    """A szöveg feldarabolása legfeljebb `legfeljebb` karakteres részekre:
+    elsősorban mondathatáron, ha az sem elég, vesszőnél / szóköznél, végső
+    esetben keményen. Üres szövegre üres lista."""
+    szoveg = " ".join((szoveg or "").split())
+    if not szoveg:
+        return []
+    darabok = []
+    while len(szoveg) > legfeljebb:
+        ablak = szoveg[:legfeljebb + 1]
+        vag = -1
+        for jelek in ((". ", "! ", "? ", "… "), ("; ", ": ", ", ", " – "), (" ",)):
+            for j in jelek:
+                i = ablak.rfind(j)
+                if i > 0:
+                    vag = max(vag, i + len(j.rstrip()))
+            if vag > 0:
+                break
+        if vag <= 0:
+            vag = legfeljebb
+        darabok.append(szoveg[:vag].strip())
+        szoveg = szoveg[vag:].strip()
+    if szoveg:
+        darabok.append(szoveg)
+    return [d for d in darabok if d]
 
 
 def elerheto() -> bool:
@@ -89,6 +124,7 @@ class BrailabMotor:
         self.tempo = 4
         self.hangero = 0
         self.hiba = ""
+        self._generacio = 0          # minden új mondás / leállítás növeli
 
     # ---- életciklus ---------------------------------------------------
     def _fut(self) -> bool:
@@ -149,6 +185,7 @@ class BrailabMotor:
     def leallit(self):
         """Elnémítás + a host lezárása (a játék bezárásakor)."""
         with self._zar:
+            self._generacio += 1
             if self._fut():
                 self._parancs("STOP")
             self._zarj()
@@ -170,28 +207,56 @@ class BrailabMotor:
         """Kimondja a szöveget. `intonacio=False` esetén mondatdallam NÉLKÜL
         (monotonabb, még retróbb). Visszaad: a BECSÜLT hossz másodpercben
         (0.0, ha nem sikerült megszólalni)."""
-        szoveg = (szoveg or "").strip()
-        if not szoveg:
+        # a sor-alapú protokoll miatt az újsorokat szóközre váltjuk; a motor
+        # 511 karakternél hosszabbat nem fogad el, ezért darabolunk
+        darabok = darabol(szoveg)
+        if not darabok:
             return 0.0
-        # a sor-alapú protokoll miatt az újsorokat szóközre váltjuk
-        egysoros = " ".join(szoveg.split())
-        parancs = ("SPEAK " if intonacio else "SPEAKFLAT ") + egysoros
+        elotag = "SPEAK " if intonacio else "SPEAKFLAT "
         with self._zar:
+            self._generacio += 1            # a korábbi, még hátralévő darabok elmaradnak
+            gen = self._generacio
             if not self._indit_zarban():
                 return 0.0
+            parancs = elotag + darabok[0]
             valasz = self._parancs(parancs)
             if valasz != "OK":
                 # egyszeri újraindítás: a host közben elszállhatott
                 self._zarj()
                 if not self._indit_zarban():
                     return 0.0
-                if self._parancs(parancs) != "OK":
+                valasz = self._parancs(parancs)
+                if valasz != "OK":
+                    self.hiba = "a motor nem fogadta el a szöveget (%s)" % (
+                        valasz or "nincs válasz")
                     return 0.0
-        return becsult_hossz(egysoros, self.tempo)
+            tempo = self.tempo
+        hosszak = [becsult_hossz(d, tempo) for d in darabok]
+        if len(darabok) > 1:
+            threading.Thread(target=self._folytat,
+                             args=(gen, elotag, darabok[1:], hosszak[:-1]),
+                             daemon=True, name="brailab-folytatas").start()
+        return sum(hosszak)
+
+    def _folytat(self, gen, elotag, darabok, varakozasok):
+        """A hosszú szöveg további darabjai: mindegyik az előző BECSÜLT végén
+        indul. Ha közben új mondat jött vagy leállították, abbahagyja."""
+        for darab, var in zip(darabok, varakozasok):
+            veg = time.monotonic() + var
+            while time.monotonic() < veg:
+                if self._generacio != gen:
+                    return
+                time.sleep(0.05)
+            with self._zar:
+                if self._generacio != gen:
+                    return
+                if self._parancs(elotag + darab) != "OK":
+                    return
 
     def stop(self):
         """Az éppen folyó beszéd azonnali megszakítása."""
         with self._zar:
+            self._generacio += 1            # a hátralévő darabok se szóljanak
             if self._fut():
                 self._parancs("STOP")
 
