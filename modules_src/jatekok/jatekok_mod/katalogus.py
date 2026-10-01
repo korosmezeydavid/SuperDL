@@ -374,6 +374,16 @@ SAJAT: tuple[Jatek, ...] = (
           "közönségszavazás) és több mint ezer kérdéssel. Saját, jogtiszta "
           "változat – a műsor zenéje és hangja nélkül.",
           retro=False),
+    Jatek("kpo", "Kő, papír, olló – és Répa, nyuszi, pisztoly",
+          "A klasszikus kő-papír-olló, és a mókás változata: a nyuszi megeszi a "
+          "répát, a pisztollyal le lehet lőni a nyuszit, a répával viszont be "
+          "lehet dugni a pisztoly csövét! Játssz a gép ellen (a szerencsés gép "
+          "vakon választ, a RAVASZ kiismeri a szokásaidat), 1, 3, 5 vagy 7 körös "
+          "meccsen – vagy ONLINE egy barátod ellen, akár telefonos SuperDL-lel "
+          "is. Csalni nem lehet. Választás az 1, 2, 3 billentyűvel; hangok és "
+          "beszólások. A hangok a Kenney.nl szabadon felhasználható (CC0) "
+          "csomagjaiból és saját szintézisből.",
+          retro=False),
     Jatek("uno", "UNO",
           "A klasszikus UNO két vagy négy fővel: modern, felolvasott felület – "
           "fel/le nyíllal lépkedsz a lapjaidon, a rakhatók jelölve. "

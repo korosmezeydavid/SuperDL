@@ -1,0 +1,107 @@
+{
+  "_leiras": "Kő-papír-olló és Répa-nyuszi-pisztoly: szabályok, mondatok, beszólások. A Windows- és az Android-SuperDL UGYANEZT a fájlt olvassa. A három elem sorrendje számít: az i-edik elem az (i-1)-ediket üti (körbe): 1 üti 0-t, 2 üti 1-et, 0 üti 2-t.",
+  "valtozatok": {
+    "kpo": {
+      "nev": "Kő, papír, olló",
+      "elemek": ["ko", "papir", "ollo"],
+      "nevek": {"ko": "kő", "papir": "papír", "ollo": "olló"},
+      "visszaszamlalas": "Kő… papír… olló!",
+      "szabaly": "A kő kicsorbítja az ollót, az olló elvágja a papírt, a papír becsomagolja a követ.",
+      "utes": {
+        "papir>ko": "A papír becsomagolja a követ.",
+        "ollo>papir": "Az olló elvágja a papírt.",
+        "ko>ollo": "A kő kicsorbítja az ollót."
+      },
+      "hang": {
+        "papir>ko": "kpo_papir_utes",
+        "ollo>papir": "kpo_ollo_utes",
+        "ko>ollo": "kpo_ko_utes"
+      },
+      "dontetlen": {
+        "ko": ["Két kő: kőkemény döntetlen!", "Kő a kő ellen – ebből csak kavics lesz. Döntetlen!"],
+        "papir": ["Két papír: papírforma döntetlen.", "Papír papírra – ez már irodalom. Döntetlen!"],
+        "ollo": ["Két olló: kardpárbaj, de senki nem nyer.", "Csatt-csatt! Két olló, döntetlen."]
+      }
+    },
+    "rnp": {
+      "nev": "Répa, nyuszi, pisztoly",
+      "elemek": ["repa", "nyuszi", "pisztoly"],
+      "nevek": {"repa": "répa", "nyuszi": "nyuszi", "pisztoly": "pisztoly"},
+      "visszaszamlalas": "Répa… nyuszi… pisztoly!",
+      "szabaly": "A nyuszi megeszi a répát, a pisztollyal le lehet lőni a nyuszit, a répával viszont be lehet dugni a pisztoly csövét.",
+      "utes": {
+        "nyuszi>repa": "A nyuszi megeszi a répát. Ropp-ropp, nyam-nyam!",
+        "pisztoly>nyuszi": "Piú! A pisztoly lelövi a nyuszit… aki látványosan hanyatt dobja magát, aztán felpattan és meghajol.",
+        "repa>pisztoly": "A répa bedugja a pisztoly csövét. Pfff… csak egy kis füst jön ki belőle!"
+      },
+      "hang": {
+        "nyuszi>repa": "rnp_nyuszi_utes",
+        "pisztoly>nyuszi": "rnp_pisztoly_utes",
+        "repa>pisztoly": "rnp_repa_utes"
+      },
+      "dontetlen": {
+        "repa": ["Két répa: egyik sem nyer, de legalább lesz belőlük főzelék.", "Répa a répa ellen – narancssárga döntetlen!"],
+        "nyuszi": ["Két nyuszi: összeszimatolnak, és barátok lesznek. Döntetlen!", "Két tapsifüles – ebből csak nyuszi-buli lesz. Döntetlen!"],
+        "pisztoly": ["Két pisztoly: farkasszemet néztek, mint egy westernben. Döntetlen!", "Pisztoly a pisztoly ellen – senki nem mer elsőnek lőni. Döntetlen!"]
+      }
+    }
+  },
+  "beszolasok": {
+    "nyersz": [
+      "{gep}: Na tessék, ezt nem láttam jönni!",
+      "{gep}: Szerencse volt… legközelebb kiismerlek!",
+      "{gep}: Hűha, ez fájt.",
+      "{gep}: Jó, jó, ez a kör a tiéd.",
+      "{gep}: Mintha belelátnál a processzoromba!",
+      "{gep}: Kérek egy visszajátszást… ja, nincs."
+    ],
+    "vesztesz": [
+      "{gep}: Hehe, ezt megnyertem!",
+      "{gep}: Látod? Mondtam, hogy gondolatolvasó vagyok.",
+      "{gep}: Bocsi, nem bocsi!",
+      "{gep}: Ez neked nem jött össze, barátom.",
+      "{gep}: Még egy ilyen, és kiírják a nevemet a falra!",
+      "{gep}: Pont erre számítottam!"
+    ],
+    "dontetlen": [
+      "{gep}: Ugyanazt gondoltuk – ijesztő!",
+      "{gep}: Két nagy elme, egy gondolat.",
+      "{gep}: Nem ér, ezt én akartam mondani!"
+    ],
+    "meccs_nyersz": [
+      "Gratulálok, megnyerted a meccset! {gep} elismerően bólint, és már a visszavágót tervezi.",
+      "Győztél! {gep} morog egy kicsit, aztán gratulál. Jár a taps!"
+    ],
+    "meccs_vesztesz": [
+      "{gep} nyerte a meccset. Ne búsulj, a visszavágó a tiéd lehet!",
+      "Ezt most {gep} vitte. Kérsz visszavágót? A gép ugyanis már nagyon nagyképű."
+    ],
+    "online_nyersz": [
+      "{ellenfel} ezt nem látta jönni!",
+      "Ez a kör a tiéd – {ellenfel} most vakarja a fejét.",
+      "Telitalálat! {ellenfel} ennyiből is tanulhat."
+    ],
+    "online_vesztesz": [
+      "Ezt most {ellenfel} vitte. Ne add fel!",
+      "{ellenfel} kiismert… vagy csak szerencséje volt.",
+      "Hoppá, {ellenfel} pontot szerzett."
+    ],
+    "online_dontetlen": [
+      "Ugyanazt választottátok – gondolatolvasók vagytok?",
+      "Egyforma! Ti ketten túl jól ismeritek egymást."
+    ],
+    "online_meccs_nyersz": [
+      "Megnyerted a meccset {ellenfel} ellen! Jár a taps!",
+      "Győzelem! {ellenfel} visszavágót fog kérni, az biztos."
+    ],
+    "online_meccs_vesztesz": [
+      "{ellenfel} nyerte a meccset. Visszavágó?",
+      "Ezt most {ellenfel} vitte el. Legközelebb a tiéd lesz!"
+    ]
+  },
+  "gep_stilus": {
+    "szerencse": "Szerencsés gép – teljesen véletlenül választ.",
+    "ravasz": "Ravasz gép – figyeli a szokásaidat, és megpróbál kiismerni."
+  },
+  "meccs_hossz": [1, 3, 5, 7]
+}

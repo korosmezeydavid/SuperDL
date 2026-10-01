@@ -1,0 +1,9 @@
+Kő-papír-olló / Répa-nyuszi-pisztoly – a hangok forrása
+
+1) Kenney.nl hangcsomagok (Impact Sounds, RPG Audio, Music Jingles, Interface Sounds,
+   Digital Audio) – Creative Commons CC0 1.0 (közkincs, szabadon felhasználható,
+   forrásmegjelölés sem kötelező). https://kenney.nl
+   https://creativecommons.org/publicdomain/zero/1.0/
+2) Saját szintézis (numpy), a SuperDL saját anyaga: kpo_dontetlen (boing),
+   kpo_kor_veszit, kpo_meccs_veszit (szomorú trombita).
+   A visszaszámlálás és a többi hang Kenney-mintákból kevert.

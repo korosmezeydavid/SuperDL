@@ -59,11 +59,15 @@ class NetSzoba:
     """Egy online játék-szoba (egy Ably-csatorna). Nem tud a játékról semmit,
     csak üzeneteket küld/fogad a szobában."""
 
-    def __init__(self, kod: str, nev: str, kulcs: str = ""):
+    def __init__(self, kod: str, nev: str, kulcs: str = "",
+                 elotag: str = "szerencsekerek"):
         self.kod = (kod or "").strip().upper()
         self.nev = nev
         self._kulcs = kulcs or ably_kulcs()
-        self._chan = f"szerencsekerek:{self.kod}"
+        # Az előtag választja szét a játékokat. A régi játékok a
+        # „szerencsekerek:" előtagon maradnak (visszafelé kompatibilis); a
+        # Kő-papír-olló „kpo:" előtagot használ – ugyanazt, mint a telefon.
+        self._chan = f"{elotag}:{self.kod}"
         self._last = 0                 # utolsó látott üzenet ideje (ms)
         self._seen: set = set()        # látott üzenet-id-k (dedup)
         self._stop = threading.Event()

@@ -790,7 +790,8 @@ class _KonzolCtx:
 # ---- a felület által hívott indítók -------------------------------------
 
 # a saját, lapfüles ABLAKOS játékok – ezek külön wx-ablakot nyitnak
-_ABLAK_JATEKOK = {"orszagvaros", "szerencsekerek", "uno", "blackjack21", "poker"}
+_ABLAK_JATEKOK = {"orszagvaros", "szerencsekerek", "uno", "blackjack21", "poker",
+                  "kpo"}
 
 
 def indithato(kulcs: str) -> bool:
@@ -815,6 +816,9 @@ def _ablak_osztaly(kulcs):
     if kulcs == "poker":
         from .pokerwin import PokerAblak
         return PokerAblak
+    if kulcs == "kpo":
+        from .kpowin import KpoAblak
+        return KpoAblak
     return None
 
 
