@@ -4242,7 +4242,8 @@ class MailFrame(wx.Frame):
             if uj:
                 # ÚJ LEVÉL a háttér-körben: egyetlen jelzés az egészre, nem
                 # levelenként (öt levélre ne tilinkózzon ötször).
-                self._ertesit_osszes(uj, csat)
+                self._ertesit_osszes(uj, csat,
+                                     getattr(self, "_osszes_uj_fiokok", None))
 
         def hiba(ex):
             self._osszes_fut = False
@@ -4260,9 +4261,13 @@ class MailFrame(wx.Frame):
                       str(it.get("uid", ""))))
         elozo = getattr(self, "_osszes_latott", None)
         self._osszes_latott = most
+        self._osszes_uj_fiokok = []
         if elozo is None:
             return 0                      # az első betöltés a kiindulási alap
-        return len(most - elozo)
+        ujak = most - elozo
+        # melyik fiókba jöttek az újak (a fiókonkénti értesítő-beállításhoz)
+        self._osszes_uj_fiokok = [k[0] for k in sorted(ujak)]
+        return len(ujak)
 
     def _mappa_kijelol(self, raw_nev: str) -> None:
         """A mappalistában kijelöli a megadott (nyers nevű) mappát, ha ott van –
@@ -5474,13 +5479,45 @@ class MailFrame(wx.Frame):
         from . import hangok
         return hangok.uj_level(str(cfg.get("ertesito_hang_fajl", "") or ""))
 
-    def _ertesit_osszes(self, darab: int, csatolmanyos: int = 0) -> None:
-        """Az egyesített nézet háttér-köre után: EGY jelzés az egészre."""
+    def _ertesit_osszes(self, darab: int, csatolmanyos: int = 0,
+                        uj_fiokok=None) -> None:
+        """Az egyesített nézet háttér-köre után: EGY jelzés az egészre.
+
+        JAVÍTVA (Schibik Miklós, 2026-10-01): az egyesített nézet eddig a
+        fiókonként beállított értesítőt (saját szöveg, hang, „nincs”) teljesen
+        figyelmen kívül hagyta, és mindig az alapmondatot mondta. Mostantól a
+        fiókok saját beállítása érvényes (lásd MC.osszesitett_ertesites)."""
         self._jelzo_hang()
         csat = self._csat_szoveg(csatolmanyos)
-        self._mond(("%d új levél érkezett." % darab if darab > 1
-                    else "Új leveled érkezett.")
-                   + ((" " + csat) if csat else ""))
+        if not uj_fiokok:
+            self._mond(("%d új levél érkezett." % darab if darab > 1
+                        else "Új leveled érkezett.")
+                       + ((" " + csat) if csat else ""))
+            return
+        darabok = {}
+        for em in uj_fiokok:
+            darabok[em] = darabok.get(em, 0) + 1
+        try:
+            reszek, alap_db, hangok = MC.osszesitett_ertesites(
+                list(darabok.items()))
+        except Exception:
+            reszek, alap_db, hangok = [], darab, []
+        if hangok:
+            szolt = False
+            try:
+                szolt, _uz = ertesito_hang(hangok[0][0])
+            except Exception:
+                szolt = False
+            if not szolt:                    # a hang nem szólt: mondjuk ki
+                alap_db += sum(db for _h, db in hangok)
+        if alap_db:
+            reszek.append("%d új levél érkezett." % alap_db if alap_db > 1
+                          else "Új leveled érkezett.")
+        if not reszek and not hangok:
+            return                           # minden érintett fióknál „nincs”
+        mondat = " ".join(reszek + ([csat] if csat else []))
+        if mondat:
+            self._mond(mondat)
 
     @staticmethod
     def _surgos_szoveg(darab: int) -> str:
