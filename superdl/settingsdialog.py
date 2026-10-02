@@ -539,6 +539,19 @@ class SettingsDialog(wx.Dialog):
         self.c_startsig.SetValue(bool(self.s.get("startup_signal", True)))
         v.Add(self.c_startsig, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
 
+        # A SUPERDL-LOGÓ KÖSZÖNTÉSE (Dávid, 2026-10-02): női vagy férfi hang.
+        self._logo_hangok = [("Női hang", "noi"), ("Férfi hang", "ferfi")]
+        self.c_logo = wx.Choice(p, choices=[lab for lab, _ in self._logo_hangok])
+        cur_logo = self.s.get("startup_hang", "noi") or "noi"
+        self.c_logo.SetSelection(next(
+            (i for i, (_l, k) in enumerate(self._logo_hangok) if k == cur_logo), 0))
+        self.c_logo.SetName("A SuperDL-logó köszöntése: női vagy férfi hang")
+        self._row(p, v, "A SuperDL-&logó köszöntése:", self.c_logo)
+        b_logo = wx.Button(p, label="Logó meghallg&atása")
+        b_logo.SetName("A kiválasztott logó-köszöntés meghallgatása")
+        b_logo.Bind(wx.EVT_BUTTON, lambda e: self._logo_proba())
+        v.Add(b_logo, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+
         pairs = [("(alapértelmezett rendszerhang)", "")]
         try:
             for d in SelfVoice().list_voices():
@@ -572,6 +585,14 @@ class SettingsDialog(wx.Dialog):
         v.Add(b_test, 0, wx.ALL, 8)
         p.SetSizer(v)
         return p
+
+    def _logo_proba(self):
+        """A kiválasztott logó-köszöntés lejátszása (a mentés előtt is)."""
+        try:
+            from . import sounds
+            sounds.play_startup(self._logo_hangok[max(0, self.c_logo.GetSelection())][1])
+        except Exception:
+            pass
 
     def _test_voice(self):
         from .selfvoice import SelfVoice
@@ -741,6 +762,7 @@ class SettingsDialog(wx.Dialog):
             "selfvoice_off": self.c_sv_off.GetValue(),
             "hide_url_row": self.c_hide_url.GetValue(),
             "startup_signal": self.c_startsig.GetValue(),
+            "startup_hang": self._logo_hangok[max(0, self.c_logo.GetSelection())][1],
             "beepitett_fajlvalaszto": self.c_sajatfv.GetValue(),
             "selfvoice_voice":
                 self._sv_voice_pairs[self.c_svvoice.GetSelection()][1],

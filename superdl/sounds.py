@@ -235,16 +235,26 @@ def play(name: str) -> None:
         pass
 
 
-def play_startup() -> None:
+LOGO_HANGOK = ("noi", "ferfi")
+
+
+def logo_fajl(hang: str = "noi"):
+    """A beépített logó-köszöntés fájlja: startup_noi.wav vagy startup_ferfi.wav
+    (Dávid, 2026-10-02 – a beállításokban választható). Ismeretlen értéknél női."""
+    hang = hang if hang in LOGO_HANGOK else "noi"
+    return Path(__file__).resolve().parent / f"startup_{hang}.wav"
+
+
+def play_startup(hang: str = "noi") -> None:
     """Az INDULÓ SZIGNÁL lejátszása (aszinkron). Sorrend: a felhasználó saját
-    fájlja (~/.superdl/sounds/startup.wav), különben a BEÉPÍTETT szignál
-    (superdl/startup.wav), végül egy kellemes szintetizált akkord. FÜGGETLEN a
+    fájlja (~/.superdl/sounds/startup.wav), különben a BEÉPÍTETT logó-köszöntés
+    (superdl/startup_noi.wav vagy startup_ferfi.wav – a `hang` szerint), végül egy kellemes szintetizált akkord. FÜGGETLEN a
     teljes némítástól – ez HANG, nem beszéd (Farkas kérése: némítva is legyen jel)."""
     if winsound is None:
         return
     try:
         user = SOUND_DIR / "startup.wav"                 # a felhasználó felülírhatja
-        bundled = Path(__file__).resolve().parent / "startup.wav"
+        bundled = logo_fajl(hang)                        # női vagy férfi köszöntés
         f = None
         if user.is_file():
             f = user

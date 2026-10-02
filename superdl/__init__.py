@@ -1,6 +1,6 @@
 """SuperDL - többfunkciós, több szálú letöltő."""
 
-__version__ = "4.6.29"
+__version__ = "4.6.30"
 
 # --- HTTPS-tanúsítvány: megbízható CA-csomag mindenhol ----------------
 # Egyes Windows-gépeken a rendszer CA-tára hiányos/elavult, és a urllib SSL-

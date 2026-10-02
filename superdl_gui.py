@@ -554,7 +554,8 @@ class MainFrame(wx.Frame):
         # induló szignál (kellemes hangjelzés) – a TELJES NÉMÍTÁStól függetlenül,
         # mert ez hang, nem beszéd (Farkas: némítva is legyen jel az indulásról)
         if self.settings.get("startup_signal", True):
-            wx.CallLater(250, sounds.play_startup)
+            wx.CallLater(250, sounds.play_startup,
+                         self.settings.get("startup_hang", "noi"))
         # ha volt függő frissítés: jelezzük, sikerült-e (néma csere-hiba ellen)
         # ⚠️ 900 → 150 ms, a modulok betöltése ELÉ (szakember83, 2026-09-27):
         # frissítés után a gépén a modulok 20 másodpercig töltődtek, és addig
@@ -1161,6 +1162,7 @@ class MainFrame(wx.Frame):
             "sr_auto_csend": True,
             "selfvoice_enabled": False, "selfvoice_off": False,
             "hide_url_row": False, "startup_signal": True,
+            "startup_hang": "noi",
             "asztal_indulaskor": False,
             "selfvoice_voice": "",
             "selfvoice_rate": 0, "selfvoice_pitch": 0, "selfvoice_volume": 100,

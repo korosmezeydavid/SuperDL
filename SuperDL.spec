@@ -16,7 +16,8 @@ binaries = [('bin\\aria2c.exe', '.'),
             ('bin\\bass_fx.dll', '.')]
 # eSpeak-NG hangadatok (magyar hang a self-voice-hoz) – a teljes mappa
 datas += [('bin\\espeak-ng-data', 'espeak-ng-data')]
-datas += [('superdl\\startup.wav', 'superdl')]     # induló szignál (Farkas kérése)
+datas += [('superdl\\startup_noi.wav', 'superdl'),     # induló szignál (Farkas kérése)
+          ('superdl\\startup_ferfi.wav', 'superdl')]   # női / férfi logó-köszöntés (Dávid, 2026-10-02)
 datas += [('superdl\\tolk\\nvdaControllerClient64.dll', 'superdl\\tolk')]  # képernyőolvasó-kimenet (NVDA)
 hiddenimports = ['win32com.client', 'pythoncom', 'pywintypes', 'win32crypt']
 # A Super Mail modul e-mail-protokolljai. A Core sehol nem importálja ezeket,
