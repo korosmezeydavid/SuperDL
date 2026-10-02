@@ -1041,6 +1041,43 @@ def ertesito_fiok(email_cim):
             "hang": d.get("hang", "")}
 
 
+ALAP_ERTESITO_SZOVEG = "Új leveled érkezett."
+
+
+def osszesitett_ertesites(fiok_darabok, ertesito=None):
+    """Az egyesített („Összes bejövő”) nézet új-levél jelzése a FIÓKONKÉNTI
+    értesítő-beállítások szerint (Schibik Miklós jelzése, 2026-10-01: a saját
+    szöveg az egyesített nézetben eddig sosem hangzott el).
+
+    `fiok_darabok`: [(e-mail cím, új levelek száma), ...].
+    Visszaad: (saját szövegek listája ismétlés nélkül, az ALAP szövegű fiókok
+    új leveleinek száma, [(hangfájl, darab), ...] a hangos fiókokra).
+    A „nincs” típusú fiók kimarad."""
+    ertesito = ertesito or ertesito_fiok
+    reszek, alap_db, hangok = [], 0, []
+    for em, db in fiok_darabok:
+        try:
+            db = int(db or 0)
+        except (TypeError, ValueError):
+            db = 0
+        if db <= 0:
+            continue
+        cfg = ertesito(em) or {}
+        tipus = cfg.get("tipus", "szoveg")
+        if tipus == "nincs":
+            continue
+        if tipus == "hang" and cfg.get("hang"):
+            hangok.append((cfg["hang"], db))
+            continue
+        sajat = (cfg.get("szoveg") or "").strip()
+        if sajat and sajat != ALAP_ERTESITO_SZOVEG:
+            if sajat not in reszek:
+                reszek.append(sajat)
+        else:
+            alap_db += db
+    return reszek, alap_db, hangok
+
+
 def ertesito_fiok_ment(email_cim, tipus, szoveg="", hang=""):
     """Értesítő mentése: tipus = 'nincs' | 'szoveg' | 'hang'."""
     d = ertesito_betolt()
