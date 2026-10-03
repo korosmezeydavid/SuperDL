@@ -158,6 +158,35 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
+**Távsegítség 1.0.2 kiadásra előkészítve: 2026-10-03 · Codex.** A felhasználó
+engedélyezte a GitHub-publikálást és a levelezőlistás tájékoztatót. A modul
+verziója 1.0.2; a partnercím-szűrés és HELLO-visszhang javítása a helyi
+forrásban van. Az AUD-001 kriptográfiai része továbbra is nyitott. A tényleges
+feltöltést és levélküldést ezek megtörténte után külön jelöld ebben a szakaszban.
+
+**Gmail hibafeldolgozás: 2026-10-03 · Codex.** A felhasználó külön kérte a
+hibák ellenőrzését, szükség esetén javítását és a bejelentők megválaszolását.
+A 4.6.30-as audit AUD-001/AUD-003 tétele alapján helyi módosítás készült:
+`p2phalozat.py` partnerjelölt/peer-címszűrés és HELLO-visszhang megszüntetése.
+A címszűrés NEM kriptográfiai hitelesítés: AUD-001 teljes rendezése nyitott.
+Hat új regressziós teszt sikeres (öt a HEAD-kódon hibát reprodukál), teljes
+pytest futás exit 0; két valódi localhost UDP-végpont kézfogása és kétirányú
+adata sikeres. Kétgépes/NAT-próba még nincs. Forrásjavítás, NEM kiadott modul;
+verzió/katalógus/ZIP nem változott, build/push/publikálás nem történt.
+Magánlevelezési állapot és további nyitott ügyek a repón kívül:
+`C:\Users\msn\.codex\superdl-monitor\state.json`. Három egyéni válasz elküldve.
+Az alábbi „nem történt alkalmazáskód-módosítás” a korábbi felmérésre vonatkozik.
+
+**Átvételi felmérés: 2026-10-03 · Codex.** A helyi Windows-forrás már **4.6.30**
+(`dacb535`), a katalógus **21 modult** tartalmaz. Mind a 21 manifestverzió és
+helyi ZIP SHA-256 egyezik a katalógussal. A build-őr előtte/utána ellenőrzése
+sikeres, a `tests/test_modkit.py` 16 tesztje sikeres. Ellenőrzött interpreter:
+`C:\Users\msn\AppData\Local\Programs\Python\Python314\python.exe`.
+Nem történt alkalmazáskód-módosítás, új build vagy publikálás; teljes regresszió,
+élő akadálymentességi próba és távoli kiadásellenőrzés sem. Részletes felmérés:
+`ATVETEL_CODEX_2026-10-03.md`. Az alábbi Claude-bejegyzések történeti állapotot
+rögzítenek; a régi interpreter-útvonalak és modulszámok nem mind aktuálisak.
+
 **Utolsó frissítés:** 2026-09-29 · dolgozott: Claude
 
 ---

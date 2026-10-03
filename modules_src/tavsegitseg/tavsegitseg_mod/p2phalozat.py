@@ -34,12 +34,21 @@ class P2PHalozat:
         self._lock = threading.Lock()
 
     def _peer_rogzit(self, addr):
-        """A peer első rögzítése – jelez a felső rétegnek (a lyukfúrás kész)."""
+        """Jelölt rögzítése; csak az elfogadott társra ad True értéket.
+
+        Ez címszűrés, nem kriptográfiai partnerhitelesítés.
+        """
         elso = False
         with self._lock:
+            if self._closing or not self._fut:
+                return False
             if self._peer is None:
+                if addr not in self._jeloltek:
+                    return False
                 self._peer = addr
                 elso = True
+            elif addr != self._peer:
+                return False
             if elso and not self._kesz_jelezve:
                 self._kesz_jelezve = True
         if elso and self.on_kesz:
@@ -47,6 +56,7 @@ class P2PHalozat:
                 self.on_kesz()
             except Exception:
                 pass
+        return True
 
     # ------------------------------------------------------------ indítás
     def indit(self, stun_lekeres=True):
@@ -117,9 +127,11 @@ class P2PHalozat:
             tip = data[0]
             if tip == _TIP_HELLO:
                 self._peer_rogzit(addr)               # rögzítjük az élő utat + jelez
-                self._raw(_TIP_HELLO, b"", addr)      # hello-ra hello
+                # Mindkét fél időzítve küld HELLO-t a punch loopban.
+                # A beérkező HELLO-ra válaszolva végtelen visszhang keletkezne.
             elif tip == _TIP_ADAT:
-                self._peer_rogzit(addr)
+                if not self._peer_rogzit(addr):
+                    continue
                 if self.on_adat:
                     try:
                         self.on_adat(data[1:])
