@@ -163,9 +163,9 @@ a GitHub-publikálást és a levelezőlistás tájékoztatót. A `6f3748a` commi
 GitHub `main` ágon van; a `mod-tavsegitseg-1.0.2` release ZIP-je 26629 bájt,
 SHA-256: `a877edd76b2d2177bd646450e06653ef7fc98aeabb1cc0d3649bd4e70f906b16`.
 A távoli csomag digestje egyezik a katalógussal. Teljes helyi pytest exit 0;
-GitHub CI a kiadás utáni ellenőrzéskor még futott. A partnercím-szűrés és a
-HELLO-visszhang javítva; az AUD-001 kriptográfiai része továbbra is nyitott.
-A listalevél elküldését a GitHub CI végeredménye után jegyezd ide.
+a `37135022965` GitHub CI futás sikeres. A partnercím-szűrés és a HELLO-visszhang
+javítva; az AUD-001 kriptográfiai része továbbra is nyitott. A felhasználó nevében
+a `superdl@lev-lista.hu` listára tájékoztató elküldve (Gmail `1a1027ddfce62d39`).
 
 **Gmail hibafeldolgozás: 2026-10-03 · Codex.** A felhasználó külön kérte a
 hibák ellenőrzését, szükség esetén javítását és a bejelentők megválaszolását.
