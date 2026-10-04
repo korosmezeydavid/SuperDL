@@ -172,8 +172,12 @@ keresőmezőre (felhasználói próba, 2026-10-04); a fókuszváltás Tabbal tö
 A 17 új teszt és a 16 modulrendszer-teszt sikeres; élő API- és
 cikkpróba, illetve programozott ablak/fókuszpróba sikeres. Helyben telepítve a felhasználó
 `~/.superdl/modules/supersurf` mappájába, külön próbaablak megnyitva.
-NVDA/JAWS-fókusz és gesztuspróba a felhasználónál vár. Nincs GitHub-push,
-modulkatalógus-változás vagy éles kiadás. Részletek a modul README-jében.
+Az éles kiadás előtti NVDA-próbát a felhasználó elvégezte, és a javított
+felületet publikálhatónak ítélte. A forráskód `0552d29` commitban a GitHub
+`main` ágon van. A `mod-supersurf-0.1.0` release ZIP-je 12561 bájt,
+SHA-256: `e03c4f77f7fccdbd2332c5dc352dcd8415f0150953ecb70fa2e92e67ffd144d1`;
+a távoli asset letöltött digestje egyezik. A modul katalógusba kerülése és
+a levelezőlistás bemutató levél a kiadás befejező lépése. Részletek a modul README-jében.
 
 **Távsegítség 1.0.2 kiadva: 2026-10-03 · Codex.** A felhasználó engedélyezte
 a GitHub-publikálást és a levelezőlistás tájékoztatót. A `6f3748a` commit a

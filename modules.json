@@ -224,6 +224,20 @@
       }
     },
     {
+      "id": "supersurf",
+      "name": "Super Surf – Kutatás és olvasás",
+      "category": "Eszközök",
+      "description": "ÚJ, közösen formálható kutató és cikkolvasó modul: Wikipédia-összefoglaló, nyilvános cikkek reklámzaj nélküli olvasása, aktuális időjárás, napi tájékoztató árfolyam és angol szótár. Natív, képernyőolvasóval bejárható fejezetlista és szövegmező; fel/le nyíl, Enter az olvasáshoz, Escape vissza, másolás és mentés. A JAWS Kutatás szolgáltatásának esetleges változásától független alternatíva; a további forrásokat felhasználói visszajelzések alapján bővítjük.",
+      "latest": {
+        "version": "0.1.0",
+        "min_core_api": "1.0",
+        "min_core_version": "4.6.30",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supersurf-0.1.0/supersurf-0.1.0.zip",
+        "sha256": "e03c4f77f7fccdbd2332c5dc352dcd8415f0150953ecb70fa2e92e67ffd144d1",
+        "size": 12561
+      }
+    },
+    {
       "id": "szerencse",
       "name": "Szerencsesüti",
       "category": "Szórakozás",

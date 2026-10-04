@@ -1,7 +1,8 @@
-# Super Surf 0.1.0 – helyi akadálymentességi próba
+# Super Surf 0.1.0 – kutatás és cikkolvasás
 
-Állapot: 2026-10-04, helyben telepített próbamodul. Nincs a GitHubra feltöltve,
-és nincs éles kiadás.
+Állapot: 2026-10-04, első nyilvános Windows-modulkiadás.
+Telepítés a SuperDL 4.6.30 vagy újabb verziójának Modulkezelőjéből.
+Kiadás: https://github.com/korosmezeydavid/SuperDL/releases/tag/mod-supersurf-0.1.0 .
 
 ## Használat
 
@@ -28,9 +29,9 @@ nem feltétlenül nyerhetők ki.
 4. Hibás URL, hiányzó találat és lassú hálózat esetén legyen érthető állapot.
 5. Megszakítás után egy későn befutó válasz ne írja felül az új állapotot.
 
-Képernyőolvasós élő próbát a felhasználó végzi; a programozott UI-próba nem
-helyettesíti ezt. Az esetleges fókuszhibát a pontos képernyőolvasóval és
-lépésekkel kell visszajelezni, mielőtt a modul éles kiadást kap.
+A kiadás előtti képernyőolvasós próbát a fejlesztő végezte; a forrásválasztó
+fókuszhibáját jelzése alapján javítottuk. További fókuszhibánál a pontos
+képernyőolvasót és lépéseket kérjük visszajelzésként.
 
 ## Ellenőrzés és források
 
