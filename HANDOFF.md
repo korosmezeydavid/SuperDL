@@ -158,6 +158,23 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
+**Super Surf 1. mérföldkő: 2026-10-04 · Codex.** A kutató és cikkolvasó modul
+architektúra- és adatmodell-tervezete a `SUPER_SURF_MILESTONE_1.md` fájlban van.
+Első célplatform a Windows külön telepíthető modulja; az Android külön
+megvalósításként szerepel. A felhasználó később engedélyezte a teljes modul
+folytatását és az éles kiadás előtti akadálymentességi próbát. Ennek nyomán
+`modules_src/supersurf/` alatt a 0.1.0 próbamodul elkészült: Wikipédia,
+nyilvános cikkolvasó, Open-Meteo időjárás, Frankfurter árfolyam, angol szótár,
+natív fejezetlista és olvasómező, másolás és mentés. A felhasználó a kezdeti
+WebView2 nézetet elvetette; az Akciós újság és az RSS-olvasó mintája alapján
+átalakítva. A forrásválasztó fel/le lépése többé nem ugratja a fókuszt a
+keresőmezőre (felhasználói próba, 2026-10-04); a fókuszváltás Tabbal történik.
+A 17 új teszt és a 16 modulrendszer-teszt sikeres; élő API- és
+cikkpróba, illetve programozott ablak/fókuszpróba sikeres. Helyben telepítve a felhasználó
+`~/.superdl/modules/supersurf` mappájába, külön próbaablak megnyitva.
+NVDA/JAWS-fókusz és gesztuspróba a felhasználónál vár. Nincs GitHub-push,
+modulkatalógus-változás vagy éles kiadás. Részletek a modul README-jében.
+
 **Távsegítség 1.0.2 kiadva: 2026-10-03 · Codex.** A felhasználó engedélyezte
 a GitHub-publikálást és a levelezőlistás tájékoztatót. A `6f3748a` commit a
 GitHub `main` ágon van; a `mod-tavsegitseg-1.0.2` release ZIP-je 26629 bájt,
