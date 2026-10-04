@@ -176,8 +176,12 @@ Az éles kiadás előtti NVDA-próbát a felhasználó elvégezte, és a javíto
 felületet publikálhatónak ítélte. A forráskód `0552d29` commitban a GitHub
 `main` ágon van. A `mod-supersurf-0.1.0` release ZIP-je 12561 bájt,
 SHA-256: `e03c4f77f7fccdbd2332c5dc352dcd8415f0150953ecb70fa2e92e67ffd144d1`;
-a távoli asset letöltött digestje egyezik. A modul katalógusba kerülése és
-a levelezőlistás bemutató levél a kiadás befejező lépése. Részletek a modul README-jében.
+a távoli asset letöltött digestje egyezik. A `modules.json` katalógus a
+`aed13e1` commitban GitHub `main` ágra került, a távoli és helyi változat
+egyezik; a GitHub CI `37206353261` sikeres. A bemutatkozó levelet a
+`superdl@lev-lista.hu` listára 2026-10-04-én elküldtük a felhasználó nevében
+(Gmail `1a107270c06fba60`, `SENT` címkével ellenőrizve). Részletek a modul
+README-jében.
 
 **Távsegítség 1.0.2 kiadva: 2026-10-03 · Codex.** A felhasználó engedélyezte
 a GitHub-publikálást és a levelezőlistás tájékoztatót. A `6f3748a` commit a
