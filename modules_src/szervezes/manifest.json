@@ -1,10 +1,10 @@
 {
   "id": "szervezes",
   "name": "Szervezés",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "entry": "szervezes_mod",
   "category": "Szervezés",
-  "description": "ÚJ: BESZÉLŐ ÓRA és IDŐZÍTŐ-PROFILOK. Az óra beállítható időnként (5/10/15/20/30/60 perc) bemondja a pontos időt – mindig kerek pontokon (:00, :20, :40), rövid jingle-lel és SAJÁT, átírható bevezető szöveggel („A pontos idő”, „az idő”, vagy semmi). Három bemondási stílus, éjfélen átnyúló csendes sáv, és 22 választható eSpeak-hang, mindegyik meghallgatható a választás előtt. Az időzítők ELMENTHETŐ PROFILOK: egyszerre több is futhat, mindegyik saját hanggal és saját figyelmeztetési ritmussal – így a HANGBÓL tudod, melyik szól hozzád. Az utolsó percben sűrűbben szól, kilépéskor figyelmeztet a futó időzítőkre, és alvás után sem zúdítja rád az elmaradt bemondásokat. Ctrl+Shift+X: mennyi az idő. Ctrl+Alt+X: mennyi van hátra. Emellett változatlanul: akadálymentes Hírolvasó (RSS), Podcast-felfedező, Naptár/teendők/jegyzetek (emlékeztetővel, ICS-szinkronnal) rezsi/költség-kalkulátor füllel, és Napi infó (időjárás, névnap).",
+  "description": "Programok és szórakozás: akadálymentes, dátumos színház-, koncert- és moziműsor Budapest és Nyíregyháza kiválasztott helyszíneiről, város-, időszak- és műfajszűrővel. Mozi: ARTMozi, Cinema City Arena és Cinema City Nyíregyháza. A Szervezés modul továbbra is tartalmazza a Hírolvasót, Podcast-felfedezőt, Naptárat, Napi infót, Beszélő órát és időzítőket.",
   "min_core_api": "1.0",
   "min_core_version": "4.6.12",
   "requires_tools": [],

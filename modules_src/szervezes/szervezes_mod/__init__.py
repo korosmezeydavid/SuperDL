@@ -139,6 +139,7 @@ def _kilepes_or():
 
 def register(core):
     from .newswin import NewsFrame
+    from .programwin import ProgramFrame
     from .podcastwin import PodcastFrame
     from .organizerwin import OrganizerFrame
     from .dayinfowin import DayInfoDialog
@@ -150,6 +151,9 @@ def register(core):
     _add(core, menu, "news_module", NewsFrame,
          "&Hírolvasó\tCtrl+Shift+F",
          "Reklámmentes RSS hírgyűjtő és letisztított cikkolvasó")
+    _add(core, menu, "programok_module", ProgramFrame,
+         "&Programok és szórakozás...",
+         "Színházi, koncert- és kulturális események város és idő szerint")
     _add(core, menu, "podcast_module", PodcastFrame,
          "&Podcastok felfedezése...\tCtrl+Shift+P",
          "Podcast-keresés és ország-toplista, feliratkozással")
