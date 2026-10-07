@@ -9,6 +9,7 @@ from supersurf_mod.models import ContentBlock, ReaderContent, ResearchQuery  # n
 from supersurf_mod.network import FetchError, public_url  # noqa: E402
 from supersurf_mod.reader import extract_article  # noqa: E402
 from supersurf_mod.service import ResearchService  # noqa: E402
+from supersurf_mod.wikipedia import extract_wikipedia  # noqa: E402
 
 
 ARTICLE = """<html><head><title>Cikk címe | Portál</title></head><body>
@@ -33,6 +34,37 @@ def test_reader_no_content_is_explicit():
     with pytest.raises(FetchError) as error:
         extract_article("<html><body><nav>menü</nav></body></html>", "https://example.com")
     assert error.value.code == "no_content"
+
+
+def test_reader_keeps_rich_article_content_and_short_text():
+    page = """<html><head><title>Új cikk | Hírportál</title>
+    <meta property='article:published_time' content='2026-10-05'></head><body>
+    <header><p>Oldalfejléc</p></header><nav><p>Menü</p></nav>
+    <main><article><h1>Új cikk</h1><p>Rövid hír.</p><h2>Részletek</h2>
+    <p>Az érdemi tartalom itt olvasható.</p>
+    <table><caption>Összehasonlítás</caption><tr><th>Év</th><th>Érték</th></tr>
+    <tr><td>2026</td><td>42</td></tr></table>
+    <figure><img alt='Ábra'><figcaption>Az eredmény ábrája</figcaption></figure>
+    <div class='image-caption'>Második képaláírás</div><img alt='Önálló diagram'>
+    <dl><dt>Fogalom</dt><dd>Magyarázat</dd></dl>
+    <div class='related'><p>Másik cikk ajánlója</p></div>
+    </article></main><footer><p>Lábléc</p></footer></body></html>"""
+    content = extract_article(page, "https://example.com/news")
+    result = content.plain_text()
+    assert content.published_at == "2026-10-05"
+    assert "Rövid hír." in result
+    assert "Év: Érték" in result and "2026: 42" in result
+    assert "Az eredmény ábrája" in result
+    assert "Második képaláírás" in result and "Önálló diagram" in result
+    assert "Fogalom" in result and "Magyarázat" in result
+    assert "Menü" not in result and "ajánlója" not in result and "Lábléc" not in result
+
+
+def test_reader_keeps_short_semantic_article_without_page_chrome():
+    page = "<html><body><div>Nem cikk.</div><article><h1>Cím</h1><p>Egy mondat.</p></article></body></html>"
+    content = extract_article(page, "https://example.com/brief")
+    assert "Egy mondat." in content.plain_text()
+    assert "Nem cikk." not in content.plain_text()
 
 
 def test_blocks_are_escaped_in_semantic_html():
@@ -93,9 +125,14 @@ class FakeHttp:
     def json(self, url):
         if "/search/page?" in url:
             return {"pages": [{"title": "Budapest"}, {"title": "Budapest története"}]}, url
-        if "/page/summary/" in url:
-            return {"title": "Budapest", "extract": "Magyarország fővárosa.",
-                    "content_urls": {"desktop": {"page": "https://hu.wikipedia.org/wiki/Budapest"}}}, url
+        if "/w/api.php?" in url:
+            return {"parse": {"title": "Budapest", "text": """<div class='mw-parser-output'>
+                <p>Magyarország fővárosa.</p><h2>Története</h2><p>Régi történet.</p>
+                <table><caption>Adatok</caption><tr><th>Lakosság</th><td>1 600 000</td></tr></table>
+                <figure><img alt='Duna-part'><figcaption>A Duna-part látképe</figcaption></figure>
+                <div class='thumb'><div class='thumbcaption'>Második fénykép</div></div>
+                <h2>Források</h2><ol><li>Első forrás</li></ol>
+                </div>"""}}, url
         if "geocoding" in url:
             return {"results": [{"name": "Budapest", "country": "Magyarország",
                                  "latitude": 47.5, "longitude": 19.0}]}, url
@@ -123,7 +160,57 @@ def test_all_modes_return_source_and_readable_content(kind, value):
     assert result.content and result.content.plain_text()
 
 
+def test_wikipedia_returns_full_article_not_just_summary():
+    result = ResearchService(FakeHttp()).run(ResearchQuery("wikipedia_search", "Budapest"))
+    assert result.status == "success"
+    assert [block.text for block in result.content.blocks if block.kind == "heading"] == [
+        "Története", "Adatok", "Források"]
+    assert "1 600 000" in result.content.plain_text()
+    assert "A Duna-part látképe" in result.content.plain_text()
+    assert "Második fénykép" in result.content.plain_text()
+    assert "Első forrás" in result.content.plain_text()
+    assert "rövid összefoglaló" not in " ".join(result.warnings)
+
+
+def test_wikipedia_removes_edit_controls_but_keeps_short_paragraphs():
+    content = extract_wikipedia("<div class='mw-parser-output'><p>Rövid.</p>"
+        "<span class='mw-editsection'>[szerkesztés]</span><h2>Fejezet</h2>"
+        "<p>Teljes szöveg.</p></div>", "Cikk", "https://hu.wikipedia.org/wiki/Cikk")
+    assert "Rövid." in content.plain_text()
+    assert "szerkesztés" not in content.plain_text()
+
+
 def test_invalid_rate_and_cancellation():
     service = ResearchService(FakeHttp())
     assert service.run(ResearchQuery("exchange_rate", "EURO HUF")).error.code == "invalid_input"
     assert service.run(ResearchQuery("weather", "Budapest"), cancelled=lambda: True).status == "cancelled"
+
+
+def test_dictionary_timeout_uses_exact_fallback_definition():
+    class SlowDictionary(FakeHttp):
+        def json(self, url):
+            if "dictionaryapi.dev" in url:
+                raise FetchError("timeout", "A lekérdezés túllépte az időkorlátot.", True)
+            if "api.datamuse.com" in url:
+                return [{"word": "computer", "defs": ["n\tA programmable electronic device."]}], url
+            return super().json(url)
+
+    result = ResearchService(SlowDictionary()).run(ResearchQuery("dictionary", "computer"))
+    assert result.status == "success"
+    assert result.source_name == "Datamuse"
+    assert "A programmable electronic device." in result.content.plain_text()
+    assert "tartalék forrásból" in result.warnings[0]
+
+
+def test_dictionary_fallback_rejects_approximate_word():
+    class ApproximateDictionary(FakeHttp):
+        def json(self, url):
+            if "dictionaryapi.dev" in url:
+                raise FetchError("timeout", "Időtúllépés.", True)
+            if "api.datamuse.com" in url:
+                return [{"word": "computerized", "defs": ["adj\tRelated to computers."]}], url
+            return super().json(url)
+
+    result = ResearchService(ApproximateDictionary()).run(ResearchQuery("dictionary", "computer"))
+    assert result.status == "empty"
+    assert result.error.code == "no_content"

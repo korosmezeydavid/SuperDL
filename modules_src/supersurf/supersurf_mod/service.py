@@ -8,6 +8,7 @@ from urllib.parse import quote, urlencode
 from .models import ContentBlock, ReaderContent, ResearchError, ResearchProgress, ResearchQuery, ResearchResult
 from .network import FetchError, HttpClient
 from .reader import extract_article
+from .wikipedia import extract_wikipedia
 
 
 class ResearchService:
@@ -64,16 +65,20 @@ class ResearchService:
         title = pages[0].get("title")
         if not isinstance(title, str) or not title:
             raise FetchError("invalid_response", "A Wikipédia hibás találati adatot küldött.")
-        emit("extracting", "Wikipédia-összefoglaló feldolgozása…")
-        summary_url = base + "/api/rest_v1/page/summary/" + quote(title.replace(" ", "_"), safe="")
-        summary, _ = self.http.json(summary_url)
-        if not isinstance(summary, dict) or not isinstance(summary.get("extract"), str) or not summary["extract"].strip():
-            raise FetchError("no_content", "Ehhez a Wikipédia-találathoz nincs olvasható összefoglaló.")
-        canonical = summary.get("content_urls", {}).get("desktop", {}).get("page") or base + "/wiki/" + quote(title.replace(" ", "_"))
-        text = summary["extract"].strip()
-        content = ReaderContent(summary.get("title") or title,
-                                (ContentBlock("paragraph", text),), canonical_url=canonical)
-        warnings = ("A legelső találat összefoglalója; ellenőrizd a címet.",) if len(pages) > 1 else ()
+        emit("extracting", "Teljes Wikipédia-cikk feldolgozása…")
+        article_api = base + "/w/api.php?" + urlencode({
+            "action": "parse", "page": title, "prop": "text", "redirects": 1,
+            "format": "json", "formatversion": 2})
+        article, _ = self.http.json(article_api)
+        parsed = article.get("parse", {}) if isinstance(article, dict) else {}
+        if not isinstance(parsed, dict) or not isinstance(parsed.get("text"), str):
+            raise FetchError("no_content", "Ehhez a Wikipédia-találathoz nincs olvasható cikk.")
+        actual_title = parsed.get("title") or title
+        canonical = base + "/wiki/" + quote(actual_title.replace(" ", "_"), safe="():")
+        content = extract_wikipedia(parsed["text"], actual_title, canonical)
+        warnings = ()
+        if len(pages) > 1:
+            warnings += ("A legelső találatot választottuk; ellenőrizd a címet.",)
         return content, "Wikipédia", canonical, warnings
 
     def _article(self, value, query, emit):
@@ -139,7 +144,13 @@ class ResearchService:
         if len(value) > 80 or any(c in value for c in "/?#"):
             raise FetchError("invalid_input", "Egy angol szót adj meg.")
         url = "https://api.dictionaryapi.dev/api/v2/entries/en/" + quote(value)
-        data, _ = self.http.json(url)
+        try:
+            data, _ = self.http.json(url)
+        except FetchError as error:
+            if not error.retryable:
+                raise
+            emit("fetching", "Az első szótár nem válaszol; tartalék forrás lekérdezése…")
+            return self._dictionary_fallback(value)
         if not isinstance(data, list) or not data:
             raise FetchError("no_content", "Nem található angol szótári címszó.")
         entry = data[0]
@@ -160,3 +171,33 @@ class ResearchService:
             raise FetchError("no_content", "Ehhez a szóhoz nincs meghatározás.")
         content = ReaderContent(title, tuple(blocks), canonical_url=url)
         return content, "Free Dictionary API", url, ("A szótár jelenleg angol nyelvű.",)
+
+    def _dictionary_fallback(self, value):
+        # A Datamuse strukturált definíciókat ad; csak a pontos címszót fogadjuk el.
+        url = "https://api.datamuse.com/words?" + urlencode({"sp": value, "md": "d", "max": 10})
+        data, _ = self.http.json(url)
+        if not isinstance(data, list):
+            raise FetchError("no_content", "A tartalék szótárban sincs ilyen címszó.")
+        entry = next((item for item in data if isinstance(item, dict) and
+                      str(item.get("word", "")).casefold() == value.casefold()), None)
+        if entry is None:
+            raise FetchError("no_content", "A tartalék szótárban sincs pontos találat.")
+        blocks = []
+        parts = {"n": "Főnév", "v": "Ige", "adj": "Melléknév", "adv": "Határozószó"}
+        previous_part = None
+        for raw in entry.get("defs", [])[:12]:
+            if not isinstance(raw, str) or not raw.strip():
+                continue
+            part, separator, definition = raw.partition("\t")
+            if not separator:
+                definition, part = part, ""
+            if part in parts and part != previous_part:
+                blocks.append(ContentBlock("heading", parts[part], level=2))
+                previous_part = part
+            if definition.strip():
+                blocks.append(ContentBlock("paragraph", definition.strip()))
+        if not blocks:
+            raise FetchError("no_content", "A tartalék szótár nem adott meghatározást.")
+        content = ReaderContent(value, tuple(blocks), canonical_url=url)
+        return content, "Datamuse", url, ("Az első szótár nem válaszolt; tartalék forrásból olvasol.",
+                                               "A szótár jelenleg angol nyelvű.")

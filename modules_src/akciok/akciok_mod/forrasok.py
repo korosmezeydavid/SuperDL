@@ -11,8 +11,9 @@ import json
 import time
 from pathlib import Path
 
-from . import (aldi, auchan, dm, euronics, illatorium, libri, lidl, mueller,
-               penny, pepco, praktiker, rossmann, spar, tesco)
+from . import (aldi, auchan, benu, dm, euronics, illatorium, libri, lidl,
+               mueller, patikaplus, penny, pepco, praktiker, rossmann, spar,
+               tesco)
 from .termek import Termek
 
 MAPPA = Path.home() / ".superdl" / "akciok"
@@ -39,6 +40,8 @@ BOLTOK = [
     # Dávid saját parfümboltja: a TELJES kínálat, nem akció (2026-09-27)
     ("illatorium", "Illatorium – saját parfümbolt",
      lambda get, gb, j: illatorium.letolt(get, j)),
+    ("benu", "BENU Gyógyszertár", lambda get, gb, j: benu.letolt(get, j)),
+    ("patikaplus", "PatikaPlus", lambda get, gb, j: patikaplus.letolt(get, j)),
 ]
 
 # A boltok FAJTÁJA (a Bolt-választó csoportjaihoz) és HONLAPJA. A `webshop`
@@ -47,7 +50,8 @@ FAJTAK = [("elelmiszer", "Minden élelmiszerlánc"),
           ("drogeria", "Minden drogéria és kozmetika"),
           ("vegyes", "Minden vegyes áru"),
           ("konyv", "Minden könyvesbolt"),
-          ("muszaki", "Minden műszaki és barkácsbolt")]
+          ("muszaki", "Minden műszaki és barkácsbolt"),
+          ("gyogyszertar", "Minden gyógyszertár")]
 BOLT_INFO = {
     "penny": ("elelmiszer", "https://www.penny.hu/ajanlatok", False),
     "lidl": ("elelmiszer", "https://www.lidl.hu", False),
@@ -63,6 +67,8 @@ BOLT_INFO = {
     "euronics": ("muszaki", "https://euronics.hu/heti-ajanlatok", True),
     "praktiker": ("muszaki", "https://www.praktiker.hu/kiarusitas/bfd", True),
     "illatorium": ("drogeria", "https://illatorium.hu/illatinspiraciok", True),
+    "benu": ("gyogyszertar", "https://benu.hu/collections/akcios-ujsag", True),
+    "patikaplus": ("gyogyszertar", "https://patikaplus.hu/patika", False),
 }
 
 

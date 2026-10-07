@@ -11,7 +11,7 @@ from .models import ResearchQuery
 from .service import ResearchService
 
 MODES = (
-    ("Wikipédia", "wikipedia_search", "Keresőszó, például Budapest"),
+    ("Wikipédia – teljes cikk", "wikipedia_search", "Keresőszó, például Budapest"),
     ("Cikk webcímről", "article_url", "Cikk webcíme: https://…"),
     ("Időjárás", "weather", "Település, például Budapest"),
     ("Árfolyam", "exchange_rate", "Pénznempár, például EUR HUF"),
@@ -26,12 +26,16 @@ HELP = (
     "F5: új lekérdezés. Ctrl+F: keresőmező. F1: ez a súgó. "
     "A teljes eredmény másolható vagy menthető.\n\n"
     "Az angol szótár csak angol szavakat ismer. Az árfolyam nem valós idejű banki adat."
+    " A Wikipédia keresés a találat teljes olvasható cikkét fejezetekre bontva mutatja."
 )
 
 
 def sections_from_content(content) -> list[tuple[str, str]]:
     """A H2/H3 címekből nyíllal járható fejezetlista készül."""
-    sections, label, lines = [], "Összefoglaló", []
+    lines = ([content.byline] if content.byline else [])
+    if content.published_at:
+        lines.append("Megjelenés: " + content.published_at)
+    sections, label = [], "Összefoglaló"
 
     def flush():
         if lines:

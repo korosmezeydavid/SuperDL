@@ -3657,6 +3657,7 @@ class MailFrame(wx.Frame):
         self._pop3_elmondva = set()    # melyik POP3-fióknál mondtuk már el,
         #                                hogy ott nincs több mappa
         self._lista = []               # a jelenlegi levéllista info-dictjei
+        self._torles_folyamatban = False  # egyszerre csak egy törlés indulhat
         #                                (MINDIG a MEGJELENÍTÉSI sorrendben!)
         # A legújabb levél alul legyen-e. Az alapot a beállítás adja, de a
         # Ctrl+Shift+E menet közben, CSAK erre az alkalomra megfordítja.
@@ -6027,6 +6028,9 @@ class MailFrame(wx.Frame):
         return None
 
     def _torol(self, e, vegleges_kenyszer=False):
+        if self._torles_folyamatban:
+            self._mond("Az előző törlés még folyamatban van. Várj, amíg befejeződik.")
+            return
         infok = self._kivalasztottak()
         if not infok:
             egy = self._kivalasztott()
@@ -6040,18 +6044,26 @@ class MailFrame(wx.Frame):
         kuka = self._kuka_mappa()
         # KUKÁBA helyezés = visszaállítható → NEM kérdezünk. VÉGLEGES törlésnél
         # (nincs Kuka, a Kukából törlünk, vagy Shift+Del) MINDIG kérdezünk.
-        vegleges = vegleges_kenyszer or (not kuka) or (self._mappa == kuka)
+        # Az egyesített nézet mappalistája nem tartalmaz fiókonkénti Kukát.
+        # A hiányzó Kukát ezért soha nem értelmezhetjük végleges törlésként.
+        vegleges = (vegleges_kenyszer or
+                    (self._mappa == kuka and bool(kuka)) or
+                    any(((it.get("_fiok") or self._aktiv) or {}).get("protokoll") == "pop"
+                        for it in infok))
         if vegleges:
             kerdes = (f"VÉGLEGESEN törlöd a kijelölt {n} levelet? Ez NEM vonható "
                       "vissza!" if n > 1
-                      else "VÉGLEGESEN törlöd ezt a levelet? Ez NEM vonható "
-                      "vissza!")
+                      else ("VÉGLEGESEN törlöd ezt a levelet?\n"
+                            f"Feladó: {infok[0].get('felado') or 'ismeretlen'}\n"
+                            f"Tárgy: {infok[0].get('targy') or 'nincs tárgy'}\n"
+                            "Ez NEM vonható vissza!"))
             if wx.MessageBox(kerdes, "Végleges törlés",
                              wx.YES_NO | wx.ICON_WARNING, self) != wx.YES:
                 return
 
         torlendo = list(infok)
         torlendo_id = {id(x) for x in torlendo}
+        self._torles_folyamatban = True
 
         def munka():
             from collections import defaultdict
@@ -6072,19 +6084,29 @@ class MailFrame(wx.Frame):
                     # VÉGLEGES kényszernél sosem tesszük Kukába; különben a fiók
                     # Kukájába helyezzük (visszaállítható), ha van és nem onnan
                     # törlünk
-                    kuka_f = (None if vegleges_kenyszer
-                              else (self._kuka_mappa() if f is self._aktiv
-                                    else None))
-                    if kuka_f and m != kuka_f:
-                        if not k.athelyez(uidok, kuka_f, m):
-                            k.torol(uidok, m)
-                    else:
+                    if vegleges_kenyszer or m == kuka:
                         k.torol(uidok, m)
+                    else:
+                        # Mindig a levél SAJÁT fiókjának Kukáját keressük. Az
+                        # egyesített beérkezőben az aktuális mappalista csak
+                        # a virtuális nézetet tartalmazza.
+                        mappak = k.mappak()
+                        kuka_f = next((nev for nev in mappak
+                                       if any(s in nev.lower() for s in
+                                              ("trash", "kuka", "deleted", "törölt"))),
+                                      None)
+                        if not kuka_f:
+                            raise RuntimeError("Nem található a fiók Kukája; "
+                                               "a levél nem lett törölve.")
+                        if not k.athelyez(uidok, kuka_f, m):
+                            raise RuntimeError("A Kukába helyezés nem sikerült; "
+                                               "a levél nem lett törölve.")
                 k.bezar()
                 total += len(tetelek)
             return total
 
         def kesz(r):
+            self._torles_folyamatban = False
             if self._closing:
                 return
             self._mond(f"{r} levél " + ("véglegesen törölve."
@@ -6100,7 +6122,15 @@ class MailFrame(wx.Frame):
                 self._mond(self._sor_szoveg(self._lista[uj]))
             else:
                 self._mond("Nincs több levél ebben a mappában.")
-        _hatterben(munka, kesz, self._halo_hiba)
+        def hiba(ex):
+            self._torles_folyamatban = False
+            self._halo_hiba(ex)
+
+        try:
+            _hatterben(munka, kesz, hiba)
+        except Exception:
+            self._torles_folyamatban = False
+            raise
 
     # ---- vágólap: kivágás/másolás (Ctrl+X/C) → beillesztés (Ctrl+V) ----
     def _masol_vagolapra(self, cut):

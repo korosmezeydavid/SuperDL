@@ -1,10 +1,10 @@
 {
   "id": "supersurf",
   "name": "Super Surf – Kutatás és olvasás",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "entry": "supersurf_mod",
   "category": "Eszközök",
-  "description": "Akadálymentes Wikipédia-keresés, cikkolvasó, időjárás, árfolyam és angol szótár.",
+  "description": "Teljes, tagolt Wikipédia-cikkek és részletesebb webcímes cikkolvasás; időjárás, árfolyam és angol szótár tartalék forrással.",
   "min_core_api": "1.0",
   "min_core_version": "4.6.30",
   "requires_tools": [],

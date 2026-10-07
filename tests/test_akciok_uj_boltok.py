@@ -163,7 +163,8 @@ def test_hivatkozas_es_bolt_oldal():
 
 def test_boltfajtak():
     fajtak = {F.bolt_fajta(a) for a, _n, _f in F.BOLTOK}
-    assert fajtak == {"elelmiszer", "drogeria", "vegyes", "konyv", "muszaki"}
+    assert fajtak == {"elelmiszer", "drogeria", "vegyes", "konyv", "muszaki",
+                      "gyogyszertar"}
     pytest.importorskip("wx")
     from akciok_mod import akciokwin as W
 

@@ -36,6 +36,7 @@ A boltok akcióit mutatja meg olvasható, nyilazható listában.
   Vegyes áru ......... Pepco
   Könyv .............. Libri (a Könyvutca akciós könyvei)
   Műszaki, barkács ... Euronics, Praktiker
+  Gyógyszertárak ...... BENU Gyógyszertár, PatikaPlus
 Nem kép és nem
 találgatás: a boltok saját, nyilvános oldalairól és újságjaiból jön a
 szöveg, ugyanaz, ami a papíron vagy a bolt honlapján áll.
@@ -65,6 +66,10 @@ HONNAN JÖN AZ ADAT
   Praktiker .......... az „Árzuhanás" oldal és a törzsvásárlói ajánlatok a
                        praktiker.hu-n; a törzsvásárlói árat kártyás árként
                        mondja, mellette a kártya nélküli árat
+  BENU ............... a nyilvános akciós újság árkedvezményes termékei;
+                       az ár az egyes gyógyszertárakban eltérhet
+  PatikaPlus .......... a havi, patikában megvásárolható akciós termékek;
+                       ár és készlet patikánként eltérhet
   MediaMarkt, OBI .... egyelőre nincsenek benne: az oldaluk az árakat csak
                        a böngészőben futó programmal rakja ki, szövegként
                        nem kapjuk meg

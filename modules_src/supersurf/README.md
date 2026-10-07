@@ -13,7 +13,7 @@ mentés és forrás megnyitása külön gomb. A feldolgozott tartalomban a H2/H3
 struktúra megmarad; a kezelőfelületen ezek fejezetlistaként jelennek meg.
 Beágyazott böngésző már nincs az olvasóban.
 
-Módok: magyar/angol Wikipédia-összefoglaló; nyilvános cikk-URL tisztítása;
+Módok: magyar/angol Wikipédia-cikk teljes olvasható tartalma; nyilvános cikk-URL tisztítása;
 aktuális időjárás település szerint; napi tájékoztató árfolyam (például
 `EUR HUF`); angol szótár, opcionális etimológiával. A szótár még nem magyar
 szótár. A dinamikusan betöltött, bejelentkezést vagy előfizetést kérő cikkek
@@ -40,6 +40,20 @@ a HTML escape-et, a helyi URL tiltását és a megszakítást vizsgálja. Élő
 Wikipédia-, Open-Meteo-, Frankfurter-, Free Dictionary API- és cikkoldal-próba
 is sikerült 2026-10-04-én. Az API-k adatai és elérhetősége változhat.
 
-Adatforrások: https://www.mediawiki.org/wiki/API:REST_API/Reference ;
+Fejlesztési állapot (2026-10-05, még nem kiadott): ha az első angol szótár
+időtúllépést jelez, a modul a Datamuse API pontos címszóhoz tartozó
+definícióit kéri le. A Wikipédia mód a MediaWiki Parse API teljes cikkét
+dolgozza fel: fejezetek, bekezdések, listák, táblázatsorok, képaláírások
+és hivatkozásjegyzék. A képek maguk továbbra sem jelennek meg a szöveges
+olvasóban. A Datamuse adatforrás
+elismerése: https://www.datamuse.com/api/ .
+
+A webcímes cikkolvasó helyi változata rövid bekezdéseket, táblázatsorokat,
+képaláírásokat, önálló képek leírását, fogalomlistákat és kódblokkokat is
+megtart. A menük, hirdetések és rejtett elemek továbbra sem kerülnek az
+olvasóba. A bejelentkezéshez kötött, kizárólag JavaScripttel betöltött vagy
+az olvasási méretkorlátot túllépő oldalak tartalma nem mindig érhető el.
+
+Adatforrások: https://www.mediawiki.org/wiki/API:Parsing_wikitext ;
 https://open-meteo.com/en/docs ; https://frankfurter.dev/ ;
 https://dictionaryapi.dev/ .

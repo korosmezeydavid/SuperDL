@@ -42,6 +42,8 @@ class ReaderContent:
         parts = [self.title]
         if self.byline:
             parts.append(self.byline)
+        if self.published_at:
+            parts.append("Megjelenés: " + self.published_at)
         for block in self.blocks:
             if block.kind == "list":
                 parts.append("\n".join(
