@@ -158,6 +158,19 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
+**Akciós újság – gyógyszertárak (2026-10-04, helyi munka, még nem kiadva):**
+Új „Minden gyógyszertár” boltfajta, BENU Gyógyszertár és PatikaPlus forrás
+a `modules_src/akciok` modulban, a `manifest.json` helyi verziója 0.9.3.
+A BENU nyilvános akciós újságának lapozható termékkártyáiból az akciós és
+eredeti ár, a PatikaPlus havi patikai oldaláról az üzleti ajánlatok jönnek.
+A termékoldal megnyitható; a részletek jelzik, hogy az ár/készlet helyben
+eltérhet. Élő próba: BENU 80, PatikaPlus 123 tétel; a BENU egy későbbi
+lapjának időtúllépése után a már lekért tételek megmaradnak. A célzott
+akciósújság-tesztek és a teljes pytest sikeresek. A 0.9.3 ZIP helyben
+felépült, kulcsszken tiszta, a felhasználó `~/.superdl/modules/akciok`
+mappájába telepítve; a régi 0.9.2 az `akciok.bak` mappában megmaradt.
+GitHubra és modulkatalógusba nem került, nincs éles kiadás.
+
 **Super Surf 1. mérföldkő: 2026-10-04 · Codex.** A kutató és cikkolvasó modul
 architektúra- és adatmodell-tervezete a `SUPER_SURF_MILESTONE_1.md` fájlban van.
 Első célplatform a Windows külön telepíthető modulja; az Android külön
@@ -2399,3 +2412,65 @@ kategóriákkal, tiszta belépés-előtti képernyővel. Frissítés: a program 
 - Ha bizonytalan az állapotban, előbb **nézze meg a lemezt** (mi épült/van kiadva),
   és kérdezzen, mielőtt kiadna vagy törölne bármit.
 - Build mindig a **pythoncore-3.14-64** interpreterrel; a telepítőt **PowerShellből**.
+
+**2026-10-05, Super Surf helyi javítás, még nem kiadva:** Barbara visszajelzésére a Free Dictionary API időtúllépése reprodukálható volt a `computer` és `accessibility` szónál. Időtúllépéskor pontos címszavas Datamuse-tartalék forrásra váltunk; a Wikipédia választó most egyértelműen rövid összefoglalót jelez, a teljes cikkhez a cikk-URL módot ajánlja. 19 célzott teszt sikeres, élő `computer` lekérdezés Datamuse-ról sikeres. Válasz elküldve a bejelentőnek. GitHubra és nyilvános kiadásba nem került.
+
+**2026-10-05, Super Surf Wikipédia teljes cikk (helyben telepítve, még nem kiadva):** Felhasználói kérésre a keresés első találatánál már nem a rövid summary API-t hívja, hanem a MediaWiki Parse API teljes cikkét. A natív fejezetlistában a címsorok, bekezdések, felsorolások, táblázatsorok, képaláírások és hivatkozások szövege olvasható. A képfájlokat nem jeleníti meg. A `tests/test_supersurf.py` 21 tesztje sikeres; élő Budapest-cikk 496 tartalmi blokkal betöltődött. A helyi `~/.superdl/modules/supersurf` fájlokat frissítettük; a régi service/window másolata `C:\Users\msn\.codex\superdl-monitor\supersurf-backup-20261005-full-wikipedia` mappában van. GitHubra nem került, nincs új release. Képernyőolvasós felhasználói próba még szükséges.
+
+**2026-10-05, Super Surf webcímes cikkolvasó gazdagítása (helyben telepítve, még nem kiadva):** A korábbi kinyerő a 20 karakternél rövidebb bekezdéseket és a táblázatokat eldobta. Most a szemantikus cikk rövid szövegét is megtartja, külön sorokként olvassa a táblázatokat, kezeli a képaláírásokat és önálló kép-altszövegeket, a fogalomlistákat, idézeteket és kódblokkokat. A menü-, hirdetés- és rejtett elemek kiszűrése megmaradt. 23 célzott Super Surf teszt sikeres; élő MediaWiki weboldal-próba 137 bekezdést, 17 címsort és 6 listát adott. A helyi `~/.superdl/modules/supersurf` reader/models/window fájljai frissítve; korábbi változatuk `C:\Users\msn\.codex\superdl-monitor\supersurf-backup-20261005-rich-web` alatt. Nincs GitHub push vagy nyilvános kiadás. A futó SuperDL újraindítása után képernyőolvasós próba szükséges.
+
+**2026-10-06, Super Mail törlésbiztonság (helyi, még nem kiadva):** Schibik Miklós szerint gyors egymás utáni törléskor más levél is törlődhet. A levéltörlés aszinkron munkái korábban párhuzamosan indulhattak; most egy törlés lezárásáig újabb nem indul. Végleges törlés előtt a megerősítés feladót és tárgyat is mutat. A célzott törlési regressziós tesztek és a teljes mail tesztcsoport (367 teszt) sikeres. A bejelentőnek válasz ment. Kiadás/push nem történt; pontos mappa/billentyű útvonal visszajelzése még várható.
+
+**2026-10-06, Programok és szórakozás – 1. mérföldkő (helyi prototípus):** A modules_src/szervezes/szervezes_mod/programok.py a Jegy.hu két ellenőrzött helyszínoldalának nyilvános Schema.org/Event adataiból dátumos eseményeket olvas Budapest (Müpa) és Nyíregyháza (Móricz Zsigmond Színház) számára. Múltbeli, törölt, idegen városú, dátum nélküli és nem megbízható URL-ű tételeket kizár. Az első Magyar Színház-oldal strukturált listájában oda nem tartozó eseményeket találtunk, ezért az nem került a források közé. Hat célzott teszt, a kapcsolódó URL-biztonsági tesztekkel együtt 49 teszt sikeres; élő próba: Budapest 30, Nyíregyháza 18 jövőbeli esemény. Felület, mobilos átvétel, más szolgáltató, publikálás még nincs; ezek következő mérföldkövek.
+
+**2026-10-06, Programok és szórakozás – 2. mérföldkő (helyi prototípus):** A Jegy.hu mellett a Budapest Park nyilvános naptáradatai is feldolgozhatók, így a három forrás két szolgáltatót és két várost fed le. Dátum-, város- és műfajszűrés került a magba, és egy hibás forrás nem rejti el a többi eseményt: külön hibalistát ad. Az események címe, pontos helyi időpontja és helyszíne képernyőolvasóhoz kész szövegben elérhető. 55 kapcsolódó teszt sikeres; élő próba 52 közelgő eseményt adott (Budapest 34, Nyíregyháza 18), forráshiba nélkül. A Budapest Park jelenleg csak néhány, távolabbi koncertet sorol; ez nem teljes városi programnaptár. Felület, telefonos átvétel, kiadás még nincs.
+# Programok és szórakozás – Windows felület (2026-10-06)
+
+**Kiadás 2026-10-06:** a Szervezés modul 1.5.0 kiadva
+(`mod-szervezes-1.5.0`, forráscommit `089596b`, katalóguscommit `b8a1935`).
+A publikus ZIP 51 562 bájt, SHA-256:
+`de190efa48a028fc8cfb3b2a6ed4f6b884bddebe2b5d9cc21769a972a7d0df87`;
+a GitHub-asset és a publikus `modules.json` egyezik. A kulcsszken tiszta,
+135 kapcsolódó teszt sikeres. Listás tájékoztató elküldve
+`superdl@lev-lista.hu` címre, Gmail-ID `1a112d56575c885b`. A főprogram
+4.6.30 maradt. A felhasználói képernyőolvasós visszajelzéseket figyelni kell.
+
+Multiplex bővítés: a Cinema City saját, nyilvános quickbook JSON-végpontja
+konkrét vetítési időpontokat ad. A Cinema City Arena (Budapest) és Nyíregyháza
+forrás hozzáadva, filmcím/dátum/idő/mozi/terem és ellenőrzött eredeti
+Cinema City hivatkozás jelenik meg. Az élő lekérés rendre 900 és 211
+jövőbeli vetítést adott; a források csak a ténylegesen közzétett napokat
+mutatják. Összesen 59 célzott teszt sikeres. A Windows-próbaablak újra
+megnyitva; nincs push vagy kiadás.
+
+Utólagos mozipótlás: a felhasználó jelezte, hogy a mozi teljesen kimaradt.
+Az ARTMozi nyilvános heti JSON-műsorából dátumhoz, időhöz és mozihoz kötött
+vetítések kerülnek be „Mozi” műfajjal; a következő 30 nap heti adatait kérjük le.
+A foglalási link csak ellenőrzött `bpfilm.hu` aldomainről kerülhet találatba.
+Élő próba: 461 jövőbeli budapesti vetítés, 58 célzott teszt sikeres. Az
+ablakot újra megnyitottuk kézi akadálymentességi próbához. Ez továbbra is
+helyi fejlesztés, nincs publikálva.
+
+A Szervezés menüben új „Programok és szórakozás” ablak nyílik (`programwin.py`).
+Natív wx vezérlők: város, időszak, műfaj, helyi cím/helyszín-keresés,
+eredménylista és csak olvasható részletek. A szűrés nem mozgatja a fókuszt;
+Enter a listáról a részletekre, Escape onnan vissza, F5 új lekérés, F1 súgó.
+A hálózati lekérés háttérszálon fut, a forráshibák nem rejtik el a többi
+programot. Az adatkör jelenleg Müpa, Móricz Zsigmond Színház és Budapest Park;
+ez nem országos műsorjegyzék. A programablak próbára megnyitva. Célzott
+ellenőrzés: 11 programteszt, valamint korábban az URL- és bezárási tesztekkel
+együtt 55 teszt sikeres. Képernyőolvasós kézi visszajelzés még szükséges.
+Nem történt publikálás vagy push.
+
+### 2026-10-07 Super Mail törlés (helyi, még nem kiadott)
+Schibik Miklós pontosította: a sima Del az Összes bejövő (minden fiók) és a Spam nézetben okozott téves törlést. A forrásban az egyesített nézet virtuális mappalistája miatt a Kuka nem volt megtalálható, és a sima Del végleges IMAP-törlésre eshetett vissza. A helyi javítás a levél saját fiókjának mappalistájából keresi a Kukát; ha nincs vagy az áthelyezés sikertelen, hibával megáll, nem végez végleges törlést. A korábbi párhuzamos törlést tiltó javítás megmaradt. Ellenőrzés: python -m unittest discover -s tests -p test_mail_combined_delete.py -v: 1 sikeres; python -m py_compile modules_src/mail/mail_mod/mailwin.py: sikeres. Teljes regressziós készlet itt nem futott (pytest nincs ebben a Python-környezetben); kiadás nincs. A bejelentőnek az új pontosításra még nincs válasz.
+
+### 2026-10-07 Windows modulkiadás
+Felhasználói utasításra a helyi változtatásokat ellenőriztük és három modult adtunk ki. A forráscommit `c4f2500` a `main` ágon van. A teljes `pytest tests` sikeres (egy kihagyott teszttel); az érintett tesztek a végső patikai URL-ellenőrzés után is sikeresek. Élő Super Surf próba: a Budapest Wikipédia-keresés 498, a webcímes olvasás 528 tartalmi blokkot adott. A BENU 151, a PatikaPlus 123 aktuális akciós tételt adott az élő próbában. A patikai termékhivatkozások csak a saját szolgáltatójuk domainjére vezethetnek. A 135 forrás-/csomagfájlra végzett kulcsszken tiszta (két helyben tárolt kulcs, nulla találat).
+
+Kiadott modulok és ZIP SHA-256 értékek:
+- `mod-supersurf-0.1.1`: `a09fda58d5d3d864f81ffc91c5c132cab7e6bdadb460970df4daada067b50aa7`
+- `mod-akciok-0.9.3`: `133d3b16f553ccf15b5cc63d8c9d691fc527f54900e121e4d59f9e5b415cbc35`
+- `mod-mail-1.6.6`: `b48fcab27d365fe79a6db53224c7e7c2318d677eb5018232c1991e63faaed594`
+
+A GitHub release-assetek SHA-256 digestje és mérete egyezik a helyi ZIP-ekkel; mindhárom kiadás `--latest=false` kapcsolóval készült. A `modules.json` katalógus frissítve. A Szervezés 1.5.0 már korábban kiadott ZIP-je a Cinema City és ARTMozi forrásokat is tartalmazza; a korábbi „helyi, nincs kiadva” bejegyzések történeti állapotot rögzítenek. A főprogram továbbra is 4.6.30. Képernyőolvasós kézi próba és további felhasználói visszajelzés szükséges a három modul valós használatának megítéléséhez.
