@@ -1,7 +1,7 @@
 {
   "megjegyzes": "A SuperDL mobil legfrissebb verziója. A telefon naponta kétszer ránéz erre a fájlra, és szól, ha újabb van. Kiadáskor EZT a fájlt kell frissíteni.",
-  "verzio": "1.87.0",
+  "verzio": "1.88.0",
   "letoltes": "https://github.com/korosmezeydavid/SuperDL-Android/releases/latest/download/SuperDL.apk",
-  "kiadva": "2026-10-05",
-  "ujdonsagok": "Új Internet-teszt: kapcsolat- és sebességmérés, felolvasható eredmény és előzmények. A hívásszűrő a feketelistás hívásokat a SuperDL hívásnaplójából is eltünteti. Új Szám azonosítása: a hívásnaplóban az ismeretlen számhoz nyilvános OpenStreetMap-adatok alapján lehetséges név és település kérhető; az adat téves vagy elavult lehet, nem bizonyítja a hívó személyét. Az Akciós újság érthetőbben jelzi, ha egy bolt elutasítja a lekérést. A Beszélő óra és az akcióletöltés hibatűrése javult. Hibát a Súgó menüből küldhető hibajelentéssel jelezzetek."
+  "kiadva": "2026-10-09",
+  "ujdonsagok": "Javult az SMS értesítőhangja és az automatikus beszélő óra hangútvonala; a rendszer értesítési hangjai és a Notifications mappa hangjai is választhatók. Az e-mail alkalmazásjelszó vágólapról vagy szövegfájlból is átvehető. Az Információ alatt a Super Surf az eddigi keresés mellett Wikipédia-, Wikiszótár- és árfolyamlekérdezést kínál. Javult a podcast HTTPS-átirányítása és a Szövegolvasó stabilitása. A készülékek eltérő hangkezelése miatt a headsetes működés visszajelzését várjuk."
 }
