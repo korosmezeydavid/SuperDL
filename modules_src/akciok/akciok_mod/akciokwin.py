@@ -404,17 +404,11 @@ class AkciokFrame(wx.Frame):
         return [a for a in self._be.get("boltjaim", []) if a in ismert]
 
     def _boltjaim(self):
-        nevek = [n for _a, n, _f in F.BOLTOK]
-        azonok = [a for a, _n, _f in F.BOLTOK]
-        d = wx.MultiChoiceDialog(
-            self, "Pipáld ki, melyik boltok vannak a településeden. A „Saját "
-                  "boltjaim” nézet csak ezekben keres.", "Saját boltjaim", nevek)
-        d.SetSelections([i for i, a in enumerate(azonok)
-                         if a in self._sajat_boltok()])
+        d = SajatBoltjaimDialog(self, self._sajat_boltok())
         try:
             if d.ShowModal() != wx.ID_OK:
                 return
-            valasztott = [azonok[i] for i in d.GetSelections()]
+            valasztott = d.valasztott
         finally:
             d.Destroy()
         self._be["boltjaim"] = valasztott
@@ -783,6 +777,67 @@ class AkciokFrame(wx.Frame):
     def _on_close(self, e):
         self._closing = True
         e.Skip()
+
+
+class SajatBoltjaimDialog(wx.Dialog):
+    """A kijelölés állapotát minden sor neve kimondhatóan tartalmazza."""
+
+    def __init__(self, parent, valasztott):
+        super().__init__(parent, title="Saját boltjaim", size=(510, 520))
+        self._boltok = [(a, n) for a, n, _f in F.BOLTOK]
+        self._valasztott = set(valasztott)
+        panel = wx.Panel(self)
+        elrendezes = wx.BoxSizer(wx.VERTICAL)
+        elrendezes.Add(wx.StaticText(
+            panel, label="Fel és le nyíllal válassz boltot; szóközzel jelöld ki "
+                         "vagy töröld a kijelölést. Tab: Mentés vagy Mégse."),
+            0, wx.ALL | wx.EXPAND, 10)
+        self.lista = wx.ListBox(panel, choices=[self._sor(i)
+                                                for i in range(len(self._boltok))])
+        self.lista.SetName("Saját boltjaim, szóköz: kijelölés váltása")
+        self.lista.Bind(wx.EVT_KEY_DOWN, self._billentyu)
+        elrendezes.Add(self.lista, 1, wx.LEFT | wx.RIGHT | wx.EXPAND, 10)
+        gombok = wx.StdDialogButtonSizer()
+        mentes = wx.Button(panel, wx.ID_OK, "Mentés")
+        megse = wx.Button(panel, wx.ID_CANCEL, "Mégse")
+        gombok.AddButton(mentes)
+        gombok.AddButton(megse)
+        gombok.Realize()
+        elrendezes.Add(gombok, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
+        panel.SetSizer(elrendezes)
+        keret = wx.BoxSizer(wx.VERTICAL)
+        keret.Add(panel, 1, wx.EXPAND)
+        self.SetSizer(keret)
+        self.lista.SetSelection(0)
+        self.lista.SetFocus()
+
+    def _sor(self, index):
+        azonosito, nev = self._boltok[index]
+        return f"{nev}, {'kijelölve' if azonosito in self._valasztott else 'nincs kijelölve'}"
+
+    def _billentyu(self, event):
+        if event.GetKeyCode() != wx.WXK_SPACE:
+            event.Skip()
+            return
+        self._valt()
+
+    def _valt(self):
+        index = self.lista.GetSelection()
+        if index == wx.NOT_FOUND:
+            return
+        azonosito, _nev = self._boltok[index]
+        if azonosito in self._valasztott:
+            self._valasztott.remove(azonosito)
+        else:
+            self._valasztott.add(azonosito)
+        self.lista.SetString(index, self._sor(index))
+        self.lista.SetSelection(index)
+        self.lista.SetFocus()
+        _mondd(self, self._sor(index))
+
+    @property
+    def valasztott(self):
+        return [a for a, _n in self._boltok if a in self._valasztott]
 
 
 class KedvencekDialog(wx.Dialog):

@@ -39,3 +39,26 @@ def test_virtualis_lista_gyors_es_listbox_szeru(app):
     lista.Set([])
     assert lista.GetCount() == 0 and lista.OnGetItemText(0, 0) == ""
     f.Destroy()
+
+
+def test_sajat_boltjaim_kijeloles_allapota_felolvashato(app, monkeypatch):
+    import wx
+    from akciok_mod import akciokwin
+
+    monkeypatch.setattr(akciokwin, "_mondd", lambda *_args: None)
+    f = wx.Frame(None)
+    d = akciokwin.SajatBoltjaimDialog(f, [])
+    try:
+        assert "nincs kijelölve" in d.lista.GetString(0)
+        elso = d._boltok[0][0]
+        d._valt()
+        assert d.lista.GetSelection() == 0
+        assert d.lista.GetString(0).endswith("kijelölve")
+        assert "nincs kijelölve" not in d.lista.GetString(0)
+        assert elso in d.valasztott
+        d._valt()
+        assert "nincs kijelölve" in d.lista.GetString(0)
+        assert elso not in d.valasztott
+    finally:
+        d.Destroy()
+        f.Destroy()
