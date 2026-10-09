@@ -2474,3 +2474,10 @@ Kiadott modulok és ZIP SHA-256 értékek:
 - `mod-mail-1.6.6`: `b48fcab27d365fe79a6db53224c7e7c2318d677eb5018232c1991e63faaed594`
 
 A GitHub release-assetek SHA-256 digestje és mérete egyezik a helyi ZIP-ekkel; mindhárom kiadás `--latest=false` kapcsolóval készült. A `modules.json` katalógus frissítve. A Szervezés 1.5.0 már korábban kiadott ZIP-je a Cinema City és ARTMozi forrásokat is tartalmazza; a korábbi „helyi, nincs kiadva” bejegyzések történeti állapotot rögzítenek. A főprogram továbbra is 4.6.30. Képernyőolvasós kézi próba és további felhasználói visszajelzés szükséges a három modul valós használatának megítéléséhez.
+
+### 2026-10-08 Akciós újság: Saját boltjaim kijelölés (helyi, nincs kiadva)
+Erika jelezte, hogy képernyőolvasóval nem különböztethető meg a kijelölt bolt. A wx.MultiChoiceDialog helyére egy egyszerű listás párbeszédablak került: minden sor felolvashatóan tartalmazza a kijelölési állapotot, szóközzel váltható; a fókusz a soron marad, Tab után Mentés/Mégse. Célzott wx-teszt: 2 sikeres (Python 3.14), git diff --check tiszta. Valódi NVDA-próba még szükséges. Nem változott a kiadott 0.9.3-as modul. Erika a 1a10fac573f6f483 szálban választ kapott, hogy a javítás még nincs kiadva; a videószerkesztőben bal/jobb nyíl és a gombok 2 mp-es léptetést adnak.
+
+### 2026-10-09 Akciós újság 0.9.4 kiadás
+A Saját boltjaim kijelölési állapotának felolvasható javítása kiadva: mod-akciok-0.9.4. Forráscommit 673ebc1. Teljes Windows pytest tesztkészlet és 2 célzott wx teszt sikeres; kézi NVDA/JAWS próba még szükséges. A ZIP 82 825 bájt, SHA-256: d73e6b8fa5ca8dae1db4d1e2c37fa192ec5b8513db4bd74f51ffc5211ab17ab6. A GitHub release-asset digestje egyezik. A főprogram változatlanul 4.6.30.
+
