@@ -138,35 +138,24 @@ def _ikonlista(felsok):
     return il, idx
 
 
-def AsztalAblak(frame, host):
-    """Létrehozza (vagy előhozza) az Asztal ablakot. Egy példány."""
+def AsztalNezet(frame, host, on_compact):
+    """Az Asztal a főablak egyik nézete; nem nyit második ablakot."""
     import wx
 
-    regi = getattr(frame, "_asztal_win", None)
-    if regi:
-        try:
-            regi.Raise()
-            regi.lista.SetFocus()
-            return regi
-        except Exception:
-            frame._asztal_win = None
-
-    class _Asztal(wx.Frame):
+    class _Asztal(wx.Panel):
         def __init__(self):
-            super().__init__(frame, title="SuperDL – Asztal",
-                             size=(760, 520))
+            super().__init__(frame)
             self.SetName("Asztal – minden modul egy helyen")
-            p = wx.Panel(self)
             v = wx.BoxSizer(wx.VERTICAL)
             felirat = wx.StaticText(
-                p, label="&Modulok és funkciók (betű: ugrás, Enter: megnyitás, "
-                         "Escape: bezárás):")
+                self, label="&Modulok és funkciók (betű: ugrás, Enter: megnyitás, "
+                            "Escape: kompakt nézet):")
             v.Add(felirat, 0, wx.ALL, 8)
             self.lista = wx.ListCtrl(
-                p, style=wx.LC_ICON | wx.LC_SINGLE_SEL | wx.LC_AUTOARRANGE)
+                self, style=wx.LC_ICON | wx.LC_SINGLE_SEL | wx.LC_AUTOARRANGE)
             self.lista.SetName("Asztal")
             v.Add(self.lista, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
-            p.SetSizer(v)
+            self.SetSizer(v)
             self._elemek = elemek(frame, getattr(host, "modul_menu_idk", ()),
                                   getattr(frame, "_asztal_core_idk", ()))
             self._il, idx = _ikonlista([e[3] for e in self._elemek])
@@ -178,8 +167,6 @@ def AsztalAblak(frame, host):
             self.lista.Bind(wx.EVT_LIST_ITEM_ACTIVATED,
                             lambda e: self._nyit(e.GetIndex()))
             self.Bind(wx.EVT_CHAR_HOOK, self._on_key)
-            self.Bind(wx.EVT_CLOSE, self._on_close)
-            self.CentreOnParent()
 
         def _nevek(self):
             return [e[0] for e in self._elemek]
@@ -192,7 +179,7 @@ def AsztalAblak(frame, host):
         def _on_key(self, e):
             k = e.GetKeyCode()
             if k == wx.WXK_ESCAPE:
-                self.Close()
+                on_compact()
                 return
             if k in (wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER):
                 i = self.lista.GetFirstSelected()
@@ -219,7 +206,6 @@ def AsztalAblak(frame, host):
             if not (0 <= i < len(self._elemek)):
                 return
             iid = self._elemek[i][2]
-            self.Close()
 
             def _kuld():
                 ev = wx.CommandEvent(wx.wxEVT_MENU, iid)
@@ -227,13 +213,4 @@ def AsztalAblak(frame, host):
                 frame.GetEventHandler().ProcessEvent(ev)
             wx.CallAfter(_kuld)
 
-        def _on_close(self, e):
-            frame._asztal_win = None
-            e.Skip()
-
-    w = _Asztal()
-    frame._asztal_win = w
-    w.Show()
-    w.Raise()
-    w.lista.SetFocus()
-    return w
+    return _Asztal()

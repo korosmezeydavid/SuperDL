@@ -194,9 +194,9 @@ KEYS_TEXT = (
     "  Ctrl+F6  – a kijelölt elem javításának megkísérlése\n"
     "  Ctrl+J   – napi infó (dátum, névnap, időjárás, és a letöltések)\n"
     "  Ctrl+F   – médiakereső (keresés, lejátszás, letöltés)\n"
-    "  Ctrl+Alt+D – Asztal: minden modul és a fő funkciók egy ikonos\n"
-    "               listában, ABC-sorrendben. Betű: ugrás az első ilyen\n"
-    "               kezdetűre, újra lenyomva a következőre; Enter: megnyitás\n"
+    "  Ctrl+Alt+D – Kompakt/Asztal nézet váltása ugyanabban az ablakban.\n"
+    "               Az Asztalon betű: ugrás a következő ilyen kezdetűre;\n"
+    "               Enter: megnyitás; Escape: vissza a kompakt nézetre\n"
     "  Ctrl+Shift+R – internetes rádió\n"
     "  Ctrl+U   – frissítések keresése\n"
     "  Ctrl+Alt+I – Internet-teszt (sebesség, késleltetés, IP-cím, és a Wi-Fi\n"
@@ -602,17 +602,55 @@ class MainFrame(wx.Frame):
         # Ezek a Core kapcsolói, nem modulok: az Asztalon nincs helyük.
         if host is not None:
             host.modul_menu_idk &= elotte
-        if self.settings.get("asztal_indulaskor", False):
-            wx.CallLater(2500, self._on_asztal)
+        if self._indulo_nezet() == "asztal" or (
+                self._asztal_view is not None and self._asztal_view.IsShown()):
+            wx.CallAfter(self._show_asztal_view, True)
 
-    def _on_asztal(self, event=None):
-        """Asztal – minden modul egy helyen (Ctrl+Alt+D)."""
+    def _indulo_nezet(self):
+        nezet = self.settings.get("indulo_nezet")
+        if nezet in ("kompakt", "asztal"):
+            return nezet
+        return "asztal" if self.settings.get("asztal_indulaskor") else "kompakt"
+
+    def _show_asztal_view(self, force_refresh=False):
         try:
-            from superdl import asztal
-            asztal.AsztalAblak(self, getattr(self, "_module_host", None))
-        except Exception:
+            # Újranyitáskor az időközben telepített/eltávolított modulok
+            # menüpontjaiból épüljön a lista, ne egy régi pillanatképből.
+            if self._asztal_view is not None and (
+                    force_refresh or not self._asztal_view.IsShown()):
+                self._view_sizer.Detach(self._asztal_view)
+                self._asztal_view.Destroy()
+                self._asztal_view = None
+            if self._asztal_view is None:
+                from superdl import asztal
+                self._asztal_view = asztal.AsztalNezet(
+                    self, getattr(self, "_module_host", None),
+                    self._show_compact_view)
+                self._view_sizer.Add(self._asztal_view, 1, wx.EXPAND)
+            self._main_panel.Hide()
+            self._asztal_view.Show()
+            self._view_sizer.Layout()
+            self._asztal_view.lista.SetFocus()
+        except Exception as exc:
             import logging
             logging.getLogger("superdl").exception("Asztal hiba")
+            self._show_compact_view()
+            wx.MessageBox("Az Asztal nézetet nem sikerült megnyitni: %s" % exc,
+                          "Asztal hiba", wx.OK | wx.ICON_ERROR, self)
+
+    def _show_compact_view(self):
+        if self._asztal_view is not None:
+            self._asztal_view.Hide()
+        self._main_panel.Show()
+        self._view_sizer.Layout()
+        self.welcome.SetFocus()
+
+    def _on_asztal(self, event=None):
+        """Váltás a két főnézet között (Ctrl+Alt+D)."""
+        if self._asztal_view is not None and self._asztal_view.IsShown():
+            self._show_compact_view()
+        else:
+            self._show_asztal_view()
 
     def _add_media_switch(self):
         """„Fájltársítások (zene/videó)…" a Média menübe – a rákattintott
@@ -855,9 +893,9 @@ class MainFrame(wx.Frame):
         # ASZTAL (Petrus József ötlete): minden modul és a fő funkciók egy
         # ikonos, ABC-sorrendű listában, betűre ugrással.
         mi_asztal = m_tools.Append(
-            wx.ID_ANY, "&Asztal – minden modul egy helyen\tCtrl+Alt+D",
-            "Minden telepített modul és a fő funkciók ABC-sorrendben; "
-            "betűre ugrik, Enter megnyitja")
+            wx.ID_ANY, "&Asztal / kompakt nézet váltása\tCtrl+Alt+D",
+            "Váltás a két főnézet között; az Asztal listájában betűre "
+            "ugorhatsz, Enterrel megnyithatod a funkciót")
         self._asztal_menu_id = mi_asztal.GetId()
         m_tools.AppendSeparator()
         mi_search = m_tools.Append(
@@ -1133,6 +1171,10 @@ class MainFrame(wx.Frame):
         vbox.Add(self.log, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
 
         panel.SetSizer(vbox)
+        self._view_sizer = wx.BoxSizer(wx.VERTICAL)
+        self._view_sizer.Add(panel, 1, wx.EXPAND)
+        self.SetSizer(self._view_sizer)
+        self._asztal_view = None
 
         self.CreateStatusBar()
         self.SetStatusText("Üdvözöl a SuperDL! Illessz be egy URL-t, majd "
@@ -1163,7 +1205,8 @@ class MainFrame(wx.Frame):
             "selfvoice_enabled": False, "selfvoice_off": False,
             "hide_url_row": False, "startup_signal": True,
             "startup_hang": "noi",
-            "asztal_indulaskor": False,
+            "asztal_indulaskor": False,  # régi beállítások olvasásához
+            "indulo_nezet": None,
             "selfvoice_voice": "",
             "selfvoice_rate": 0, "selfvoice_pitch": 0, "selfvoice_volume": 100,
         }
@@ -1343,6 +1386,10 @@ class MainFrame(wx.Frame):
             self._save_settings()
             self._apply_runtime_settings()
             self._apply_startup_view()      # az URL-sor el/megjelenítése azonnal
+            if self._indulo_nezet() == "asztal":
+                self._show_asztal_view()
+            else:
+                self._show_compact_view()
             self._announce("A beállítások elmentve.")
         dlg.Destroy()
 

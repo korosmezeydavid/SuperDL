@@ -74,14 +74,45 @@ def test_elemek_es_megnyitas(app):
                         "Internet-teszt (Ctrl+Alt+I)", "Zene"]
     assert kihagy.GetId() not in [e[2] for e in el]
 
-    w = A.AsztalAblak(f, host)
-    assert A.AsztalAblak(f, host) is w          # egy példány
+    w = A.AsztalNezet(f, host, lambda: None)
+    assert isinstance(w, wx.Panel)
+    assert w.GetParent() is f                    # nincs második főablak
     w._nyit(0)
     for _ in range(5):
         wx.Yield()
     assert hivas == [1]
-    assert getattr(f, "_asztal_win", None) is None
+    assert not w.IsBeingDeleted()                # modul után megmarad az Asztal
 
     host.remove_menu_item(it)
     assert it.GetId() not in host.modul_menu_idk
+    f.Destroy()
+
+
+def test_kompakt_es_asztal_ugyanabban_a_foablakban(app):
+    import types
+    import wx
+    from superdl.coremod import WxHost
+    from superdl_gui import MainFrame
+
+    f = wx.Frame(None)
+    f._module_host = WxHost(f)
+    f._asztal_core_idk = ()
+    f._asztal_view = None
+    f._main_panel = wx.Panel(f)
+    f.welcome = wx.TextCtrl(f._main_panel)
+    f._view_sizer = wx.BoxSizer(wx.VERTICAL)
+    f._view_sizer.Add(f._main_panel, 1, wx.EXPAND)
+    f.SetSizer(f._view_sizer)
+    f._show_asztal_view = types.MethodType(MainFrame._show_asztal_view, f)
+    f._show_compact_view = types.MethodType(MainFrame._show_compact_view, f)
+
+    f._show_asztal_view()
+    elso = f._asztal_view
+    assert elso.GetTopLevelParent() is f
+    assert elso.IsShown() and not f._main_panel.IsShown()
+    f._show_compact_view()
+    assert f._main_panel.IsShown() and not elso.IsShown()
+    f._show_asztal_view()
+    assert f._asztal_view is not elso
+    assert f._asztal_view.IsShown() and not f._main_panel.IsShown()
     f.Destroy()

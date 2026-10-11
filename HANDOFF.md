@@ -158,6 +158,10 @@ nyers bájtként keresi a fájlokban.)
 
 ## 6. JELENLEGI ÁLLAPOT  ⟵ EZT FRISSÍTSD MINDEN VÁLTÁSKOR
 
+**2026-10-11, Windows 4.6.31:** Az Asztal és a Kompakt nézet ugyanabban a főablakban váltható (Ctrl+Alt+D); az Általános beállításban megadható az induló nézet. A korábbi `asztal_indulaskor` beállítás értéke megmarad. A kiadás kizárólag a Core-t érinti, a modulok változatlanok. Ellenőrzés: teljes `pytest tests -q` kilépési kód 0 (egy kihagyás); build-őr előtte/utána sikeres; onedir, CLI, onefile és Inno Setup fordítás sikeres; mindkét GUI `--onproba` 4.6.31-et, elérhető helyi fordítót és 18 SAPI-hangot jelzett; CLI `--diagnose` sikeres. A onefile exe élő magic-wormhole küldés/fogadás próbája sikeres (az első, foglalt kódú próba után egyedi kóddal). A forrás és a négy kiadási fájl kulcsszkenje 4230 fájlon tiszta. Az éles release az ellenőrzés után készül.
+
+**Hangoskönyv, Dr. Kiss István:** A 4.6.30 / Könyvek 1.3.9 jelentésében a harmadik darabnál Edge TTS WebSocket 403 szerepelt. A helyi 7.2.8-as `edge-tts` csomaggal az első hosszabb magyar darab elkészült, a második kérés 403-ra futott; egy későbbi rövid próba is 403 lett. Ez külső szolgáltatás általi elutasítás, nem igazolt helyi javítás. A felhasználó a Könyvek modulban a helyi SAPI motorral készíthet hangoskönyvet, ha van megfelelő telepített hang. Az Edge-hiba okához szolgáltatói visszajelzés / további reprodukció kell; a 4.6.31 nem ígér megoldást rá.
+
 **Akciós újság – gyógyszertárak (2026-10-04, helyi munka, még nem kiadva):**
 Új „Minden gyógyszertár” boltfajta, BENU Gyógyszertár és PatikaPlus forrás
 a `modules_src/akciok` modulban, a `manifest.json` helyi verziója 0.9.3.
