@@ -1,8 +1,8 @@
 """A Windowsos TDLib JSON C felületének betöltése és ellenőrzése.
 
 Nem töltünk DLL-t a munkakönyvtárból: csak explicit beállított abszolút
-útvonalról vagy a felhasználói SuperDL-adatkönyvtárból. A kulcsok más fájlba
-kerülnek; ezt a modult és a nyilvános repót soha nem érintik.
+útvonalról, a felhasználói SuperDL-adatkönyvtárból vagy a csomagolt motorból.
+A helyi bejelentkezési adatok nem kerülnek a modulcsomagba.
 """
 
 import ctypes
