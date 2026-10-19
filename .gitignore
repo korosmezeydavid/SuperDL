@@ -31,6 +31,11 @@ modules_src/csevej/csevej_mod/ably_kulcs_beepitett.txt
 # Super Mail – valódi OAuth kliens-ID-k (a ZIP-be kerülnek, de nem a repóba)
 modules_src/mail/mail_mod/oauth_kliens.json
 
+# Supergram – a nyilvános kiadásba épített alkalmazásazonosító és natív futásidő
+# csak a generált ZIP-be kerül, a forrásrepóba nem.
+modules_src/supergram/supergram_mod/telegram.public.properties
+modules_src/supergram/supergram_mod/tdlib/
+
 # BraiLab-készlet – 2026-09-26 óta újra a modul-ZIP-ben van (lásd
 # jatekok_mod/brailab/FORRAS.txt), de a repóba továbbra sem tesszük
 modules_src/jatekok/jatekok_mod/brailab/

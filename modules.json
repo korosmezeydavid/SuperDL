@@ -306,6 +306,20 @@
         "sha256": "f79caa58c0f32ba82fe3999f7ccdad55d09e0c0d74a7cac95ceb722f52d610ca",
         "size": 28807
       }
+    },
+    {
+      "id": "supergram",
+      "name": "Supergram",
+      "category": "Kommunikáció",
+      "description": "Akadálymentes Telegram-kliens beszélgetésekkel, mappákkal, üzenetekkel, fájlokkal, hangüzenetekkel és értesítésekkel.",
+      "latest": {
+        "version": "0.3.12",
+        "min_core_api": "1.0",
+        "min_core_version": "4.6.30",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supergram-0.3.12/supergram-0.3.12.zip",
+        "sha256": "8f8849f7cca961ed9db55d8f65a64e8533c0a4c752bddf9a24763f8ebb9b0cde",
+        "size": 18825896
+      }
     }
   ]
 }

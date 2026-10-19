@@ -1,0 +1,12 @@
+{
+  "id": "supergram",
+  "name": "Supergram",
+  "version": "0.3.12",
+  "entry": "supergram_mod",
+  "category": "Kommunikáció",
+  "description": "Akadálymentes Telegram-kliens beszélgetésekkel, mappákkal, üzenetekkel, fájlokkal, hangüzenetekkel és értesítésekkel.",
+  "min_core_api": "1.0",
+  "min_core_version": "4.6.30",
+  "requires_tools": [],
+  "author": "Kőrösmezey Dávid"
+}
