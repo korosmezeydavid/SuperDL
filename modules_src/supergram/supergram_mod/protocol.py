@@ -116,8 +116,9 @@ def voice_message(chat_id: int, path: Path, duration: int) -> dict:
     return {"@type": "sendMessage", "chat_id": chat_id, "topic_id": None,
             "reply_to": None, "options": None, "reply_markup": None,
             "input_message_content": {"@type": "inputMessageVoiceNote",
-                "voice_note": {"@type": "inputFileLocal", "path": str(path.resolve())},
-                "duration": duration, "waveform": "", "caption": None,
+                "voice_note": {"@type": "inputVoiceNote",
+                    "voice_note": {"@type": "inputFileLocal", "path": str(path.resolve())},
+                    "duration": duration, "waveform": ""}, "caption": None,
                 "self_destruct_type": None}}
 
 

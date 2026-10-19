@@ -317,8 +317,8 @@
         "min_core_api": "1.0",
         "min_core_version": "4.6.30",
         "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supergram-0.3.12/supergram-0.3.12.zip",
-        "sha256": "8f8849f7cca961ed9db55d8f65a64e8533c0a4c752bddf9a24763f8ebb9b0cde",
-        "size": 18825896
+        "sha256": "0d7cf5f129f95591da6de876b8477e8500bdb872a297c9f9a7ac1f5a6061fa82",
+        "size": 18232701
       }
     }
   ]

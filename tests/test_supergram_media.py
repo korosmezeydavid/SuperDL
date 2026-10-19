@@ -138,6 +138,29 @@ class SupergramMediaTests(unittest.TestCase):
         finally:
             frame.Destroy()
 
+    def test_failed_voice_send_reports_telegram_error_and_keeps_recording(self):
+        app = wx.App.Get() or wx.App(False)
+        with patch.object(SupergramFrame, "_diagnose", return_value=False):
+            frame = SupergramFrame(None, None)
+        try:
+            with TemporaryDirectory(dir=Path(__file__).parent) as directory:
+                recording = Path(directory) / "voice.ogg"
+                recording.write_bytes(b"OggS")
+                messages = []
+                frame._status = messages.append
+                frame.sending = True
+                frame.sending_kind = "voice"
+                frame.pending_message_id = 42
+                frame.recorded_voice = (recording, 1)
+                frame._event({"@type": "updateMessageSendFailed",
+                              "old_message_id": 42,
+                              "error": {"@type": "error", "code": 400,
+                                        "message": "Input voice note is not specified"}})
+                self.assertIn("Input voice note is not specified", messages[-1])
+                self.assertTrue(recording.exists())
+        finally:
+            frame.Destroy()
+
 
 if __name__ == "__main__":
     unittest.main()

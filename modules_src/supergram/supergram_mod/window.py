@@ -368,12 +368,14 @@ class SupergramFrame(wx.Frame):
         elif kind == "updateMessageSendFailed":
             old_id = int(event.get("old_message_id") or 0)
             if self.sending and old_id:
+                error = event.get("error") or {}
+                detail = error.get("message") or f"hibakód {error.get('code', '?')}"
                 if old_id == self.pending_message_id:
-                    self._complete_send(False)
+                    self._complete_send(False, detail)
                 else:
-                    self.terminal_sends[old_id] = False
+                    self.terminal_sends[old_id] = (False, detail)
 
-    def _complete_send(self, success):
+    def _complete_send(self, success, detail=""):
         self.sending = False
         self.pending_message_id = 0
         self.terminal_sends.clear()
@@ -396,11 +398,12 @@ class SupergramFrame(wx.Frame):
                          "A fájl elküldve." if self.sending_kind == "file" else
                          "Az üzenet elküldve.")
         else:
-            self._status("A hangüzenet küldése sikertelen. A felvétel újrapróbálható." if
+            message = ("A hangüzenet küldése sikertelen. A felvétel újrapróbálható." if
                          self.sending_kind == "voice" else
                          "A fájlküldés sikertelen. A helyi fájl megmaradt." if
                          self.sending_kind == "file" else
                          "A küldés sikertelen. A szöveg megmaradt újrapróbáláshoz.")
+            self._status(message + (" Telegram: " + str(detail) if detail else ""))
         self.sending_kind = ""
         self.sending_chat_id = 0
         self.sending_text = ""
@@ -559,7 +562,10 @@ class SupergramFrame(wx.Frame):
                 if outcome is None:
                     self._status("A Telegram feldolgozza az üzenetet; küldési visszajelzésre várunk.")
                 else:
-                    self._complete_send(outcome)
+                    if isinstance(outcome, tuple):
+                        self._complete_send(*outcome)
+                    else:
+                        self._complete_send(outcome)
         elif isinstance(context, tuple) and context[0] == "download":
             self._download_progress(event)
         elif isinstance(context, tuple) and context[0] == "play_download":

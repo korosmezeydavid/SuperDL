@@ -42,8 +42,9 @@ def test_voice_note_uses_local_ogg_and_rejects_missing_recording(tmp_path):
     assert request["chat_id"] == 7
     assert content["@type"] == "inputMessageVoiceNote"
     assert content["voice_note"] == {
-        "@type": "inputFileLocal", "path": str(recording.resolve())}
-    assert content["duration"] == 2
+        "@type": "inputVoiceNote", "voice_note": {
+            "@type": "inputFileLocal", "path": str(recording.resolve())},
+        "duration": 2, "waveform": ""}
 
 
 def test_local_credentials_are_read_without_exposure(tmp_path):
