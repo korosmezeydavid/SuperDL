@@ -2485,3 +2485,7 @@ Erika jelezte, hogy képernyőolvasóval nem különböztethető meg a kijelölt
 ### 2026-10-09 Akciós újság 0.9.4 kiadás
 A Saját boltjaim kijelölési állapotának felolvasható javítása kiadva: mod-akciok-0.9.4. Forráscommit 673ebc1. Teljes Windows pytest tesztkészlet és 2 célzott wx teszt sikeres; kézi NVDA/JAWS próba még szükséges. A ZIP 82 825 bájt, SHA-256: d73e6b8fa5ca8dae1db4d1e2c37fa192ec5b8513db4bd74f51ffc5211ab17ab6. A GitHub release-asset digestje egyezik. A főprogram változatlanul 4.6.30.
 
+
+### 2026-10-19 Supergram CI-ellenőrzés (helyi javítás)
+A kiadott 2df8f2b commit GitHub CI-futásában (39281216209) 3010 teszt sikerült, egy elbukott: a modules_src/supergram/supergram_mod/recording.py FFmpeg-hívásából hiányzott a Windows konzolablakot tiltó creationflags. A SuperDL-supergram-release munkapéldányban célzottan hozzáadva a CREATE_NO_WINDOW kapcsoló (más platformon 0). A konzolablak-ellenőrzés és a Supergram célzott tesztjei: 44 sikeres. A teljes helyi tesztfutás környezeti eltérések mellett 16%-nál elakadt, ezért nem ad megbízható eredményt. A Super Media párhuzamos, befejezetlen változtatásaihoz nem nyúltunk. A teljes GitHub CI-t új commit után ismét ellenőrizni kell.
+

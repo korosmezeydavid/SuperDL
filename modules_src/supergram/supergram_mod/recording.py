@@ -57,7 +57,8 @@ class VoiceRecorder:
             result = subprocess.run([ffmpeg_path, "-nostdin", "-y", "-loglevel", "error",
                 "-i", str(self.wav_path), "-ac", "1", "-ar", "48000", "-c:a",
                 "libopus", "-b:a", "32k", str(ogg_path)], capture_output=True,
-                timeout=90, check=False)
+                timeout=90, check=False,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
             if result.returncode or not ogg_path.is_file() or ogg_path.stat().st_size == 0:
                 raise RuntimeError("Az OGG/Opus átalakítás sikertelen.")
             return ogg_path, max(1, round(self.duration))
