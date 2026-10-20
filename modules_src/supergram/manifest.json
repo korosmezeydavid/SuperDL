@@ -1,7 +1,7 @@
 {
   "id": "supergram",
   "name": "Supergram",
-  "version": "0.3.12",
+  "version": "0.3.13",
   "entry": "supergram_mod",
   "category": "Kommunikáció",
   "description": "Akadálymentes Telegram-kliens beszélgetésekkel, mappákkal, üzenetekkel, fájlokkal, hangüzenetekkel és értesítésekkel.",
