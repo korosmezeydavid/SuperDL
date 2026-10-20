@@ -313,12 +313,12 @@
       "category": "Kommunikáció",
       "description": "Akadálymentes Telegram-kliens beszélgetésekkel, mappákkal, üzenetekkel, fájlokkal, hangüzenetekkel és értesítésekkel.",
       "latest": {
-        "version": "0.3.12",
+        "version": "0.3.13",
         "min_core_api": "1.0",
         "min_core_version": "4.6.30",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supergram-0.3.12/supergram-0.3.12.zip",
-        "sha256": "6cbeb5b2b2a19c9912799ca57bd5c6603089c5c59dfdf8570bb6014f80e06f56",
-        "size": 18232684
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-supergram-0.3.13/supergram-0.3.13.zip",
+        "sha256": "572f3d143d4651cf2780041aa06d6e5cf256b64c6d2e8a7ee018bf84d7c26a29",
+        "size": 18232726
       }
     }
   ]
