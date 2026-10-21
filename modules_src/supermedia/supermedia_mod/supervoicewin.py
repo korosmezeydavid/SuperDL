@@ -13,17 +13,24 @@ from . import supervoicechanger as VC
 HELP = """VALÓS IDEJŰ VOICE CHANGER
 
 MIRE VALÓ
-Élő mikrofon-átalakítás valós időben: hangmagasság-váltás és DX8-effektek, a
-fejhallgatóba monitorozva.
+Élő mikrofon-átalakítás valós időben: hangmagasság, beszédtempó,
+hangkarakterek és DX8-effektek, a fejhallgatóba monitorozva.
 
 LÉPÉSRŐL LÉPÉSRE (vakon is)
 1. TEGYÉL FEL FEJHALLGATÓT (különben visszhang/gerjedés lesz).
 2. Válaszd ki a mikrofont az „Eszköz” listából (a kezdő fókusz itt van).
 3. „Indítás” – ettől kezdve a mikrofonod átalakítva szól a fejhallgatóban.
-4. „Hangmagasság” csúszka: mélyebb/magasabb hang.
-5. Az effekteknél (visszhang, echo, torzítás, kórus…) pipáld be, amit szeretnél,
+4. A „Hangkarakter” listában választhatsz kész kombinációt, például mély,
+   rajzfilm, robot, űrhang vagy nagyterem. A „Tiszta hang” minden effektet levesz.
+5. „Hangmagasság”: mélyebb/magasabb hang. „Beszédtempó”: lassabb/gyorsabb
+   beszéd a hangmagasság megváltoztatása nélkül.
+   Ha a természetes hangmagasság-motor telepítve van, külön bekapcsolható;
+   csak a következő indítástól érvényes, és kis késést ad a monitorhanghoz.
+6. Az effekteknél (visszhang, echo, torzítás, kórus…) pipáld be, amit szeretnél,
    és a mellette lévő ERŐSSÉG-csúszkával állítsd az intenzitást.
-6. „Leállítás” – kikapcsolja az átalakítást.
+   A „Vocoder” a beszéd ritmusával vezérelt szintetikus hang; a vivő hangmagassága
+   és a száraz/effektes hang aránya külön állítható. Bekapcsolni indítás előtt lehet.
+7. „Leállítás” – kikapcsolja az átalakítást.
 
 GYORSBILLENTYŰK
 F1 – súgó.  A vezérlők (Indítás/Leállítás, csúszkák, pipák) Tab-bal elérhetők,
@@ -37,7 +44,7 @@ fejhallgató-kimenet van kiválasztva."""
 class VoiceChangerFrame(wx.Frame):
     def __init__(self, main):
         super().__init__(main, title="SuperDL – Valós idejű voice changer",
-                         size=(640, 520))
+                         size=(790, 700))
         self.main = main
         self._closing = False        # zárás alatt a háttér-callbackek kilépnek
         self.vc: VC.VoiceChanger | None = None
@@ -74,6 +81,16 @@ class VoiceChangerFrame(wx.Frame):
         d.AddGrowableCol(1, 1)
         v.Add(d, 0, wx.EXPAND | wx.ALL, 10)
 
+        presets = wx.BoxSizer(wx.HORIZONTAL)
+        presets.Add(wx.StaticText(p, label="Hang&karakter:"), 0,
+                    wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
+        self.preset = wx.Choice(p, choices=list(VC.PRESETS))
+        self.preset.SetSelection(0)
+        self.preset.SetName("Előre beállított hangkarakter")
+        self.preset.Bind(wx.EVT_CHOICE, lambda e: self._on_preset())
+        presets.Add(self.preset, 1, wx.EXPAND)
+        v.Add(presets, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
+
         # indítás
         self.btn = wx.Button(p, label="&Indítás")
         self.btn.Bind(wx.EVT_BUTTON, lambda e: self._toggle())
@@ -93,12 +110,64 @@ class VoiceChangerFrame(wx.Frame):
         ph.Add(self.pitch_val, 0, wx.ALIGN_CENTER_VERTICAL)
         v.Add(ph, 0, wx.LEFT | wx.BOTTOM, 10)
 
+        self.natural_pitch = wx.CheckBox(
+            p, label="Természetesebb hangmagasság, formánsmegőrzéssel")
+        self.natural_pitch.SetName(
+            "Természetesebb hangmagasság motor be vagy ki; indítás előtt állítható")
+        self.natural_pitch.Enable(VC.STRETCH.available())
+        v.Add(self.natural_pitch, 0, wx.LEFT | wx.BOTTOM, 10)
+
+        self.vocoder = wx.CheckBox(p, label="&Vocoder, szintetikus beszédhang")
+        self.vocoder.SetName("Vocoder szintetikus beszédhang be vagy ki; indítás előtt")
+        self.vocoder.Enable(VC.STRETCH.available())
+        self.vocoder.Bind(wx.EVT_CHECKBOX, lambda e: self._enable_vocoder_controls())
+        v.Add(self.vocoder, 0, wx.LEFT | wx.BOTTOM, 10)
+
+        carrier_row = wx.BoxSizer(wx.HORIZONTAL)
+        carrier_row.Add(wx.StaticText(p, label="Vocoder &vivőfrekvencia:"), 0,
+                        wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
+        self.carrier = wx.Slider(p, minValue=70, maxValue=400, value=120,
+                                 size=(200, -1))
+        self.carrier.SetName("Vocoder vivőfrekvencia hertzben, 70 és 400 között")
+        self.carrier.Bind(wx.EVT_SLIDER, lambda e: self._on_vocoder())
+        carrier_row.Add(self.carrier, 0, wx.RIGHT, 6)
+        self.carrier_val = wx.StaticText(p, label="120 hertz", size=(90, -1))
+        carrier_row.Add(self.carrier_val, 0, wx.ALIGN_CENTER_VERTICAL)
+        v.Add(carrier_row, 0, wx.LEFT | wx.BOTTOM, 10)
+
+        mix_row = wx.BoxSizer(wx.HORIZONTAL)
+        mix_row.Add(wx.StaticText(p, label="Vocoder &keverés:"), 0,
+                    wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
+        self.vocoder_mix = wx.Slider(p, minValue=0, maxValue=100, value=100,
+                                     size=(200, -1))
+        self.vocoder_mix.SetName("Vocoder keverés százalékban, nulla és száz között")
+        self.vocoder_mix.Bind(wx.EVT_SLIDER, lambda e: self._on_vocoder())
+        mix_row.Add(self.vocoder_mix, 0, wx.RIGHT, 6)
+        self.vocoder_mix_val = wx.StaticText(p, label="100 százalék", size=(110, -1))
+        mix_row.Add(self.vocoder_mix_val, 0, wx.ALIGN_CENTER_VERTICAL)
+        v.Add(mix_row, 0, wx.LEFT | wx.BOTTOM, 10)
+
+        th = wx.BoxSizer(wx.HORIZONTAL)
+        th.Add(wx.StaticText(p, label="Beszéd&tempó (százalék, −30…+30):"), 0,
+               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
+        self.tempo = wx.Slider(p, minValue=-30, maxValue=30, value=0,
+                               size=(200, -1))
+        self.tempo.SetName("Beszédtempó százalékban, mínusz harminctól plusz harmincig")
+        self.tempo.Bind(wx.EVT_SLIDER, lambda e: self._on_tempo())
+        th.Add(self.tempo, 0, wx.RIGHT, 6)
+        self.tempo_val = wx.StaticText(p, label="0 százalék", size=(90, -1))
+        th.Add(self.tempo_val, 0, wx.ALIGN_CENTER_VERTICAL)
+        v.Add(th, 0, wx.LEFT | wx.BOTTOM, 10)
+
         # effektek (DX8) – pipa + intenzitás-csúszka soronként
-        box = wx.StaticBoxSizer(wx.VERTICAL, p, "Élő effektek (pipa + erősség)")
+        scroll = wx.ScrolledWindow(p, style=wx.VSCROLL | wx.TAB_TRAVERSAL)
+        scroll.SetScrollRate(0, 14)
+        box = wx.StaticBoxSizer(wx.VERTICAL, scroll, "Élő effektek (pipa + erősség)")
         sb = box.GetStaticBox()
         self.fx_chk = {}
         self.fx_slider = {}
-        grid = wx.FlexGridSizer(len(VC.EFFECTS), 3, 4, 8)
+        self.fx_parameters = {}
+        grid = wx.FlexGridSizer(len(VC.EFFECTS), 4, 4, 8)
         for name, dx8 in VC.EFFECTS:
             c = wx.CheckBox(sb, label=name)
             c.SetName(f"{name} effekt be/ki")
@@ -112,9 +181,15 @@ class VoiceChangerFrame(wx.Frame):
             grid.Add(sl, 0, wx.ALIGN_CENTER_VERTICAL)
             grid.Add(wx.StaticText(sb, label="erősség %"), 0,
                      wx.ALIGN_CENTER_VERTICAL)
+            details = wx.Button(sb, label="Részletek…" if dx8 in VC.FX.PARAMETERS else "Nincs részlet")
+            details.SetName(f"{name} részletes hangolása")
+            details.Enable(dx8 in VC.FX.PARAMETERS)
+            details.Bind(wx.EVT_BUTTON, lambda e, t=dx8: self._show_fx_details(t))
+            grid.Add(details, 0, wx.ALIGN_CENTER_VERTICAL)
         grid.AddGrowableCol(1, 1)
         box.Add(grid, 0, wx.EXPAND | wx.ALL, 4)
-        v.Add(box, 0, wx.EXPAND | wx.ALL, 10)
+        scroll.SetSizer(box)
+        v.Add(scroll, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
 
         p.SetSizer(v)
         self.CreateStatusBar()
@@ -188,10 +263,19 @@ class VoiceChangerFrame(wx.Frame):
 
     def _enable_fx(self, on):
         self.pitch.Enable(on)
+        self.tempo.Enable(on)
+        self.natural_pitch.Enable(not on and VC.STRETCH.available())
+        self.vocoder.Enable(not on and VC.STRETCH.available())
+        self._enable_vocoder_controls()
         for c in self.fx_chk.values():
             c.Enable(on)
         for s in self.fx_slider.values():
             s.Enable(on)
+
+    def _enable_vocoder_controls(self):
+        enabled = self.vocoder.GetValue() and VC.STRETCH.available()
+        self.carrier.Enable(enabled)
+        self.vocoder_mix.Enable(enabled)
 
     def _fx_name(self, dx8):
         for name, t in VC.EFFECTS:
@@ -205,6 +289,37 @@ class VoiceChangerFrame(wx.Frame):
             self.vc.set_effect_intensity(dx8, val)
         self._announce(f"{self._fx_name(dx8)} erőssége: {val} százalék.")
 
+    def _show_fx_details(self, dx8):
+        definitions = VC.FX.PARAMETERS.get(dx8, {})
+        if not definitions:
+            return
+        with wx.Dialog(self, title=f"{self._fx_name(dx8)} – részletes hangolás") as dialog:
+            layout = wx.BoxSizer(wx.VERTICAL)
+            controls = {}
+            for key, (label, low, high, default, _fields, _scale) in definitions.items():
+                current = int(self.fx_parameters.get(dx8, {}).get(key, default))
+                text = wx.StaticText(dialog, label=f"{label}: {current}")
+                slider = wx.Slider(dialog, minValue=low, maxValue=high,
+                                   value=current, size=(330, -1))
+                slider.SetName(label)
+                slider.Bind(wx.EVT_SLIDER,
+                            lambda e, t=text, s=slider, name=label: t.SetLabel(
+                                f"{name}: {s.GetValue()}"))
+                controls[key] = slider
+                layout.Add(text, 0, wx.LEFT | wx.TOP, 8)
+                layout.Add(slider, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+            buttons = dialog.CreateButtonSizer(wx.OK | wx.CANCEL)
+            layout.Add(buttons, 0, wx.EXPAND | wx.ALL, 8)
+            dialog.SetSizerAndFit(layout)
+            if dialog.ShowModal() != wx.ID_OK:
+                return
+            values = {key: slider.GetValue() for key, slider in controls.items()}
+        self.fx_parameters[dx8] = values
+        if self.vc and self.vc.running:
+            for key, value in values.items():
+                self.vc.set_effect_parameter(dx8, key, value)
+        self._announce(f"{self._fx_name(dx8)} részletes beállításai elmentve.")
+
     # ---- vezérlés ----------------------------------------------------
 
     def _toggle(self):
@@ -217,10 +332,18 @@ class VoiceChangerFrame(wx.Frame):
             self._announce("Voice changer leállítva.")
             return
         try:
-            self.vc = VC.VoiceChanger(self._in_dev(), self._out_dev())
+            self.vc = VC.VoiceChanger(
+                self._in_dev(), self._out_dev(),
+                natural_pitch=self.natural_pitch.GetValue(),
+                vocoder=self.vocoder.GetValue())
             self.vc.set_pitch(self.pitch.GetValue())
+            self.vc.set_tempo(self.tempo.GetValue())
+            self.vc.set_vocoder(self.carrier.GetValue(),
+                                self.vocoder_mix.GetValue() / 100)
             self.vc.start()
         except Exception as ex:
+            if self.vc:
+                self.vc.stop()
             self._announce(f"Nem indult: {ex}")
             wx.MessageBox(f"A voice changer nem indult el:\n\n{ex}",
                           "Voice changer", wx.OK | wx.ICON_ERROR, self)
@@ -233,6 +356,9 @@ class VoiceChangerFrame(wx.Frame):
         # a csúszkák aktuális intenzitása → majd a bekapcsolt effekt-pipák
         for dx8, sl in self.fx_slider.items():
             self.vc.set_effect_intensity(dx8, sl.GetValue())
+        for dx8, values in self.fx_parameters.items():
+            for key, value in values.items():
+                self.vc.set_effect_parameter(dx8, key, value)
         for dx8, c in self.fx_chk.items():
             if c.GetValue():
                 self.vc.set_effect(dx8, True)
@@ -244,6 +370,44 @@ class VoiceChangerFrame(wx.Frame):
         if self.vc and self.vc.running:
             self.vc.set_pitch(val)
         self._announce(f"Hangmagasság: {val:+d} félhang.")
+
+    def _on_tempo(self):
+        val = self.tempo.GetValue()
+        self.tempo_val.SetLabel(f"{val:+d} százalék")
+        if self.vc and self.vc.running:
+            self.vc.set_tempo(val)
+        self._announce(f"Beszédtempó: {val:+d} százalék.")
+
+    def _on_vocoder(self):
+        hz = self.carrier.GetValue()
+        mix = self.vocoder_mix.GetValue()
+        self.carrier_val.SetLabel(f"{hz} hertz")
+        self.vocoder_mix_val.SetLabel(f"{mix} százalék")
+        if self.vc and self.vc.running:
+            self.vc.set_vocoder(hz, mix / 100)
+        self._announce(f"Vocoder: vivő {hz} hertz, keverés {mix} százalék.")
+
+    def _on_preset(self):
+        name = self.preset.GetStringSelection()
+        pitch, tempo, effects = VC.PRESETS[name]
+        self.pitch.SetValue(pitch)
+        self.pitch_val.SetLabel(f"{pitch:+d} félhang")
+        self.tempo.SetValue(tempo)
+        self.tempo_val.SetLabel(f"{tempo:+d} százalék")
+        if self.vc and self.vc.running:
+            self.vc.set_pitch(pitch)
+            self.vc.set_tempo(tempo)
+        for dx8, check in self.fx_chk.items():
+            want = dx8 in effects
+            check.SetValue(want)
+            if self.vc and self.vc.running:
+                self.vc.set_effect(dx8, want)
+        for dx8, amount in effects.items():
+            self.fx_slider[dx8].SetValue(amount)
+            if self.vc and self.vc.running:
+                self.vc.set_effect_intensity(dx8, amount)
+        self._announce(f"Hangkarakter: {name}. Hangmagasság {pitch:+d} félhang, "
+                       f"tempó {tempo:+d} százalék.")
 
     def _on_fx(self, dx8):
         if not (self.vc and self.vc.running):

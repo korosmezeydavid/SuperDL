@@ -20,7 +20,15 @@ DX8_DISTORTION = 2
 DX8_ECHO = 3
 DX8_FLANGER = 4
 DX8_GARGLE = 5
+DX8_PARAMEQ = 7
 DX8_REVERB = 8
+
+# Saját EQ-karakterek: egyenként külön DX8 PARAMEQ-példányt használnak.
+EQ_BASS = 1001
+EQ_PRESENCE = 1002
+EQ_NASAL = 1003
+EQ_DARK = 1004
+_EQ_CENTERS = {EQ_BASS: 180, EQ_PRESENCE: 2600, EQ_NASAL: 1100, EQ_DARK: 6500}
 
 # (megjelenített név, DX8-típus) – a rack-UI ebből épül
 EFFECTS = [
@@ -31,7 +39,61 @@ EFFECTS = [
     ("Flanger", DX8_FLANGER),
     ("Kompresszor", DX8_COMPRESSOR),
     ("Gargle (pörgő)", DX8_GARGLE),
+    ("Mélykiemelés", EQ_BASS),
+    ("Beszédérthetőség", EQ_PRESENCE),
+    ("Orrhang", EQ_NASAL),
+    ("Tompa hang", EQ_DARK),
 ]
+
+# név -> (felolvasott címke, alsó, felső, alap, struktúramezők, szorzó)
+PARAMETERS = {
+    DX8_ECHO: {
+        "delay": ("Ismétlések közti idő, ezredmásodperc", 20, 1200, 350,
+                  ("fLeftDelay", "fRightDelay"), 1.0),
+        "feedback": ("Ismétlések sűrűsége, százalék", 0, 85, 35,
+                     ("fFeedback",), 1.0),
+    },
+    DX8_REVERB: {
+        "decay": ("Térhang lecsengése, ezredmásodperc", 100, 3000, 1000,
+                  ("fReverbTime",), 1.0),
+    },
+    DX8_CHORUS: {
+        "depth": ("Kórus mélysége, százalék", 0, 100, 25, ("fDepth",), 1.0),
+        "rate": ("Kórus hullámzása, tized hertz", 1, 50, 11,
+                 ("fFrequency",), 0.1),
+    },
+    DX8_FLANGER: {
+        "depth": ("Flanger mélysége, százalék", 0, 100, 50, ("fDepth",), 1.0),
+        "rate": ("Flanger hullámzása, tized hertz", 1, 50, 3,
+                 ("fFrequency",), 0.1),
+        "feedback": ("Flanger visszacsatolása, százalék", -90, 90, -50,
+                     ("fFeedback",), 1.0),
+    },
+    DX8_DISTORTION: {
+        "edge": ("Torzítás élessége, százalék", 0, 100, 15,
+                 ("fEdge",), 1.0),
+        "color": ("Torzítás hangszíne, hertz", 100, 8000, 2400,
+                  ("fPostEQCenterFrequency",), 1.0),
+        "lowpass": ("Torzítás magasvágása, hertz", 100, 8000, 8000,
+                    ("fPreLowpassCutoff",), 1.0),
+    },
+    DX8_COMPRESSOR: {
+        "threshold": ("Kompresszor küszöbe, decibel", -60, 0, -20,
+                      ("fThreshold",), 1.0),
+        "ratio": ("Kompresszor aránya", 1, 20, 3,
+                  ("fRatio",), 1.0),
+        "attack": ("Kompresszor indulása, ezredmásodperc", 1, 200, 10,
+                   ("fAttack",), 1.0),
+        "release": ("Kompresszor lecsengése, ezredmásodperc", 50, 1000, 200,
+                    ("fRelease",), 1.0),
+    },
+    **{kind: {
+        "center": ("Hangszín középfrekvenciája, hertz", 80, 10000, center,
+                   ("fCenter",), 1.0),
+        "bandwidth": ("Hangszín sávszélessége, félhang", 1, 36, 12,
+                      ("fBandwidth",), 1.0),
+    } for kind, center in _EQ_CENTERS.items()},
+}
 
 
 def _bass():
@@ -84,6 +146,11 @@ class _DX8_GARGLE(Structure):
     _fields_ = [("dwRateHz", c_uint), ("dwWaveShape", c_uint)]
 
 
+class _DX8_PARAMEQ(Structure):
+    _fields_ = [("fCenter", c_float), ("fBandwidth", c_float),
+                ("fGain", c_float)]
+
+
 def _lerp(lo, hi, amount):
     return lo + (hi - lo) * max(0.0, min(100.0, amount)) / 100.0
 
@@ -108,10 +175,21 @@ _PARAMS = {
     DX8_GARGLE: (_DX8_GARGLE,
                  lambda s, a: setattr(s, "dwRateHz",
                                       max(1, int(_lerp(1, 100, a))))),
+    EQ_BASS: (_DX8_PARAMEQ, lambda s, a: _set_eq(s, 180, _lerp(0, 12, a))),
+    EQ_PRESENCE: (_DX8_PARAMEQ, lambda s, a: _set_eq(s, 2600, _lerp(0, 12, a))),
+    EQ_NASAL: (_DX8_PARAMEQ, lambda s, a: _set_eq(s, 1100, _lerp(0, 12, a))),
+    EQ_DARK: (_DX8_PARAMEQ, lambda s, a: _set_eq(s, 6500, _lerp(0, -15, a))),
 }
 
 
-def set_effect_params(fx_handle: int, dx8_type: int, amount: float) -> bool:
+def _set_eq(params, center, gain):
+    params.fCenter = center
+    params.fBandwidth = 12
+    params.fGain = gain
+
+
+def set_effect_params(fx_handle: int, dx8_type: int, amount: float,
+                      overrides: dict | None = None) -> bool:
     """Egy aktív DX8 effekt intenzitásának állítása 0–100%-ról. BIZTONSÁGOS:
     előbb LEKÉRJÜK a BASS alapértelmezett paramétereit (a teljes struct feltöltve),
     csak a fő mező(ke)t hangoljuk, majd visszaírjuk – így a struct mindig ép."""
@@ -122,8 +200,17 @@ def set_effect_params(fx_handle: int, dx8_type: int, amount: float) -> bool:
     st = cls()
     b = _bass()
     try:
-        b.BASS_FXGetParameters(fx_handle, byref(st))
+        if not b.BASS_FXGetParameters(fx_handle, byref(st)):
+            return False
         apply(st, amount)
+        for key, value in (overrides or {}).items():
+            definition = PARAMETERS.get(dx8_type, {}).get(key)
+            if definition is None:
+                continue
+            _, minimum, maximum, _, fields, scale = definition
+            converted = max(minimum, min(maximum, float(value))) * scale
+            for field in fields:
+                setattr(st, field, converted)
         return bool(b.BASS_FXSetParameters(fx_handle, byref(st)))
     except Exception:
         return False
@@ -133,7 +220,8 @@ def apply_effect(channel: int, dx8_type: int, priority: int = 0) -> int:
     """Effekt rátétele egy élő csatornára. Visszaad: FX-handle (0 = hiba)."""
     if not channel:
         return 0
-    return int(_bass().BASS_ChannelSetFX(channel, dx8_type, priority))
+    bass_type = DX8_PARAMEQ if dx8_type in _EQ_CENTERS else dx8_type
+    return int(_bass().BASS_ChannelSetFX(channel, bass_type, priority))
 
 
 def remove_effect(channel: int, fx_handle: int) -> bool:
@@ -152,6 +240,7 @@ class EffectRack:
         self.channel = int(channel or 0)
         self._on: dict[int, int] = {}      # dx8_type -> FX-handle
         self._intensity: dict[int, float] = {}   # dx8_type -> 0..100%
+        self._parameters: dict[int, dict[str, float]] = {}
 
     def is_on(self, dx8_type: int) -> bool:
         return dx8_type in self._on
@@ -165,8 +254,9 @@ class EffectRack:
             if h:
                 self._on[dx8_type] = h
                 amt = self._intensity.get(dx8_type)
-                if amt is not None:            # a beállított intenzitás alkalmazása
-                    set_effect_params(h, dx8_type, amt)
+                if amt is not None or dx8_type in _EQ_CENTERS or dx8_type in self._parameters:
+                    set_effect_params(h, dx8_type, amt if amt is not None else 50,
+                                      self._parameters.get(dx8_type))
                 return True
             return False
         if dx8_type in self._on:
@@ -178,7 +268,17 @@ class EffectRack:
         csatornaváltáskor is érvényesül), és ha épp aktív, azonnal alkalmazzuk."""
         self._intensity[dx8_type] = amount
         h = self._on.get(dx8_type)
-        return set_effect_params(h, dx8_type, amount) if h else True
+        return set_effect_params(h, dx8_type, amount,
+                                 self._parameters.get(dx8_type)) if h else True
+
+    def set_parameter(self, dx8_type: int, key: str, value: float) -> bool:
+        if key not in PARAMETERS.get(dx8_type, {}):
+            return False
+        self._parameters.setdefault(dx8_type, {})[key] = value
+        handle = self._on.get(dx8_type)
+        return set_effect_params(handle, dx8_type,
+                                 self._intensity.get(dx8_type, 50),
+                                 self._parameters[dx8_type]) if handle else True
 
     def active_types(self) -> list[int]:
         return list(self._on)
