@@ -1,7 +1,7 @@
 {
   "megjegyzes": "A SuperDL mobil legfrissebb verziója. A telefon naponta kétszer ránéz erre a fájlra, és szól, ha újabb van. Kiadáskor EZT a fájlt kell frissíteni.",
-  "verzio": "1.88.0",
+  "verzio": "1.89.0",
   "letoltes": "https://github.com/korosmezeydavid/SuperDL-Android/releases/latest/download/SuperDL.apk",
-  "kiadva": "2026-10-09",
-  "ujdonsagok": "Javult az SMS értesítőhangja és az automatikus beszélő óra hangútvonala; a rendszer értesítési hangjai és a Notifications mappa hangjai is választhatók. Az e-mail alkalmazásjelszó vágólapról vagy szövegfájlból is átvehető. Az Információ alatt a Super Surf az eddigi keresés mellett Wikipédia-, Wikiszótár- és árfolyamlekérdezést kínál. Javult a podcast HTTPS-átirányítása és a Szövegolvasó stabilitása. A készülékek eltérő hangkezelése miatt a headsetes működés visszajelzését várjuk."
+  "kiadva": "2026-10-22",
+  "ujdonsagok": "Az SMS-diktálás jobbra söpréssel lezárható, és a sablon a már beírt szöveghez fűzhető. A mentett GPS-útvonalak és bejegyzéseik szerkeszthetők. A beszélő órában Lilly és Martin is választható egész órára, a köztes időpontokat továbbra is Elena mondja. A GPS-kitekintő a friss sebességet is bemondja; a közeli megállók alatt elérhető megállófigyelő első betöltése lassabb lehet. Android Telegram még nincs a nyilvános APK-ban. Első telepítésre tartalék készülék ajánlott; a mindennapi telefonra telepítés saját felelősségre történik."
 }
