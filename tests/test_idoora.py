@@ -11,6 +11,28 @@ import pytest
 from superdl import idoora as I
 
 
+def test_azonnali_oraproba_az_ideiglenes_beallitast_hasznalja_mentes_nelkul():
+    class Beszelo:
+        def __init__(self):
+            self.hivasok = []
+
+        def mond(self, *args, **kwargs):
+            self.hivasok.append((args, kwargs))
+
+    beszelo = Beszelo()
+    motor = I.OraMotor(beszelo, dict(I.ALAP))
+    eredeti = dict(motor.utemezo.beall)
+    proba = {**eredeti, "ora_hang": "lilly", "valtozat": "f2",
+             "jingle": False, "prefix_szoveg": "Próba"}
+    motor.mennyi_az_ido(most=dt.datetime(2026, 10, 26, 11, 0), beall=proba)
+    args, kwargs = beszelo.hivasok[-1]
+    assert args[1] == "f2"
+    assert kwargs["felvett"] == "lilly"
+    assert kwargs["ora_ido"] == (11, 0)
+    assert kwargs["jingle"] is False
+    assert motor.utemezo.beall == eredeti
+
+
 # ───────────────────── 1. szabály: órához igazítás ──────────────────
 
 @pytest.mark.parametrize("perc,var", [

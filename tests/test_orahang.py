@@ -12,6 +12,113 @@ import pytest
 from superdl import orahang as H
 
 
+def test_felvett_ora_hangok_teljesek_es_ejfel_24es_klip():
+    import wave
+    for voice in ("lilly", "martin"):
+        for hour in range(24):
+            path = H.felvett_fajl(voice, (hour, 0))
+            assert path is not None
+            assert path.name == ("24.wav" if hour == 0 else f"{hour:02d}.wav")
+            with wave.open(str(path)) as clip:
+                assert clip.getnframes() > 0 and clip.getnchannels() == 1
+    for hour in range(24):
+        for minute in range(0, 60, 5):
+            path = H.felvett_fajl("leda", (hour, minute))
+            assert path is not None
+            with wave.open(str(path)) as clip:
+                assert clip.getnframes() > 0 and clip.getnchannels() == 1
+    assert H.felvett_fajl("martin", (14, 30)).parts[-2:] == ("leda", "14-30.wav")
+    assert H.felvett_fajl("lilly", (14, 7)) is None
+    assert H.felvett_fajl("leda", (24, 0)) is None
+
+
+def test_minden_felvett_ora_klipnek_van_ertelmezheto_hangos_tartalma():
+    """A pusztán létező vagy néma WAV ne számítson kész órahangnak."""
+    from array import array
+    import wave
+
+    for voice, count in (("lilly", 24), ("martin", 24), ("leda", 288)):
+        paths = sorted((H.Path(__file__).resolve().parents[1] / "superdl" / "clock" / voice).glob("*.wav"))
+        assert len(paths) == count
+        for path in paths:
+            with wave.open(str(path), "rb") as clip:
+                assert clip.getnchannels() == 1, path
+                assert clip.getsampwidth() == 2, path
+                assert clip.getframerate() in (24000, 44100), path
+                assert 0.8 <= clip.getnframes() / clip.getframerate() <= 10, path
+                samples = array("h", clip.readframes(clip.getnframes()))
+                assert samples and max(abs(sample) for sample in samples) > 1000, path
+
+
+def test_felvett_bemondas_es_hianyzo_klip_visszaesese(monkeypatch):
+    import threading
+    b = object.__new__(H.Beszelo)
+    b.kepernyoolvaso = False
+    b._megszakit = threading.Event()
+    b._stop = threading.Event()
+    played, spoken = [], []
+    monkeypatch.setattr(b, "_felvett", lambda path: played.append(path.name) or True)
+    monkeypatch.setattr(b, "_espeak", lambda item: spoken.append(item.szoveg))
+    b._egy(H.Bemondas("Most tizennégy óra van.", ora_ido=(14, 0), felvett="lilly"))
+    assert played == ["14.wav"] and spoken == []
+    b._egy(H.Bemondas("A pontos idő tizennégy óra hét perc.",
+                       ora_ido=(14, 7), felvett="lilly"))
+    assert spoken == ["A pontos idő tizennégy óra hét perc."]
+
+
+def test_felvett_hang_a_hangkimenet_vegeig_fogja_a_bemondasi_sort(monkeypatch):
+    import threading
+    from superdl import audioengine
+
+    class KesleltetettKimenet:
+        on_state = None
+        def set_volume(self, value):
+            pass
+        def play(self, path, title):
+            threading.Timer(0.12, lambda: self.on_state("vége")).start()
+        def stop(self):
+            raise AssertionError("sikeres lejátszás nem állítható le idő előtt")
+
+    monkeypatch.setattr(audioengine, "Player", KesleltetettKimenet)
+    b = object.__new__(H.Beszelo)
+    b._lejatszo = None
+    b.volume = 70
+    b._megszakit = threading.Event()
+    b._stop = threading.Event()
+    start = __import__("time").monotonic()
+    assert b._felvett(H.felvett_fajl("leda", (11, 0)))
+    assert __import__("time").monotonic() - start >= 0.10
+
+
+@pytest.mark.parametrize("result,expected", [("vége", True), ("hiba: kimenet", False)])
+def test_edge_hang_a_tenyleges_kimeneti_allapotot_varja(monkeypatch, tmp_path, result, expected):
+    import threading
+    from superdl import audioengine, tts
+
+    class KesleltetettKimenet:
+        on_state = None
+        def set_volume(self, value):
+            pass
+        def play(self, path, title):
+            threading.Timer(0.12, lambda: self.on_state(result)).start()
+        def stop(self):
+            raise AssertionError("lezárt lejátszás nem állítható le")
+
+    monkeypatch.setattr(audioengine, "Player", KesleltetettKimenet)
+    monkeypatch.setattr(tts.ENGINES["edge"], "synth", lambda *a, **kw: str(tmp_path / "ora.mp3"))
+    monkeypatch.setattr(H.Path, "home", lambda: tmp_path)
+    b = object.__new__(H.Beszelo)
+    b._lejatszo = None
+    b._edge_sorszam = 0
+    b.volume = 70
+    b.pitch = b.rate = 0
+    b._megszakit = threading.Event()
+    b._stop = threading.Event()
+    start = time.monotonic()
+    assert b._edge(H.Bemondas("Most tizenegy óra van.", "edge:hu-HU-TamasNeural")) is expected
+    assert time.monotonic() - start >= 0.10
+
+
 # ───────────────── változat-ellenőrzés (néma visszaesés ellen) ──────
 
 DAVID_KESZLETE = ["robert", "rob", "max", "Michael", "Denis", "Diogo",

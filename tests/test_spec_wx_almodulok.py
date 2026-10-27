@@ -52,6 +52,12 @@ def test_html2_a_ket_specben():
         assert "WebView2Loader.dll" in szoveg, nev
 
 
+def test_beszelo_ora_gorgetheto_panelje_a_ket_specben():
+    for nev in SPECEK:
+        szoveg = io.open(os.path.join(GYOKER, nev), encoding="utf-8").read()
+        assert "'wx.lib.scrolledpanel'" in szoveg, nev
+
+
 def test_minden_modul_wx_almodul_bent_van():
     hasznalt = _wx_almodulok(os.path.join(GYOKER, "modules_src"))
     kell = sorted(hasznalt - CORE_LATJA)

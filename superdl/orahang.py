@@ -65,6 +65,33 @@ EDGE_HANGOK: list[tuple[str, str]] = [
      "Noémi – női köszöntő hang (internet kell hozzá)"),
 ]
 
+# Felvett, offline órahangok. Lilly és Martin egész órakor szól; köztes
+# ötperces időpontban mindkettőnél Leda kész mondata használható.
+FELVETT_HANGOK = [
+    ("", "A kiválasztott beszédhang"),
+    ("leda", "Leda – felvett női órahang"),
+    ("lilly", "Lilly – egész órakor; köztes időben Leda"),
+    ("martin", "Martin – egész órakor; köztes időben Leda"),
+]
+
+
+def felvett_fajl(hang: str, ido: tuple[int, int] | None) -> Path | None:
+    """Csak a pontos időponthoz tartozó helyi klip. Más percnél TTS jön."""
+    if hang not in {"leda", "lilly", "martin"} or ido is None:
+        return None
+    try:
+        ora, perc = map(int, ido)
+    except (TypeError, ValueError):
+        return None
+    if not 0 <= ora <= 23 or not 0 <= perc <= 59 or perc % 5:
+        return None
+    root = Path(__file__).resolve().parent / "clock"
+    if perc == 0 and hang in {"lilly", "martin"}:
+        path = root / hang / f"{ora or 24:02d}.wav"
+    else:
+        path = root / "leda" / f"{ora:02d}-{perc:02d}.wav"
+    return path if path.is_file() else None
+
 
 def edge_e(valtozat: str) -> bool:
     return (valtozat or "").startswith(EDGE_ELOTAG)
@@ -145,13 +172,16 @@ def cimke(valtozat: str) -> str:
 class Bemondas:
     """Egy sorba állított bemondás."""
 
-    __slots__ = ("szoveg", "valtozat", "jingle", "surgos")
+    __slots__ = ("szoveg", "valtozat", "jingle", "surgos", "ora_ido", "felvett")
 
-    def __init__(self, szoveg, valtozat="", jingle=False, surgos=False):
+    def __init__(self, szoveg, valtozat="", jingle=False, surgos=False,
+                 ora_ido=None, felvett=""):
         self.szoveg = szoveg
         self.valtozat = valtozat or ""
         self.jingle = bool(jingle)
         self.surgos = bool(surgos)
+        self.ora_ido = ora_ido
+        self.felvett = felvett or ""
 
 
 class Beszelo:
@@ -196,7 +226,7 @@ class Beszelo:
         return self._sor.qsize()
 
     def mond(self, szoveg: str, valtozat: str = "", *, jingle: bool = False,
-             surgos: bool = False) -> bool:
+             surgos: bool = False, ora_ido=None, felvett: str = "") -> bool:
         """Bemondás a sor VÉGÉRE. `surgos=True` (időzítő lejárt) akkor is
         bekerül, ha a sor tele van – a periodikus időbemondás nem.
         Visszaad: bekerült-e."""
@@ -206,7 +236,8 @@ class Beszelo:
             _log.info("a bemondás sora tele (%d), kihagyva: %r",
                       self._sor.qsize(), szoveg[:40])
             return False
-        self._sor.put(Bemondas(szoveg, valtozat, jingle, surgos))
+        self._sor.put(Bemondas(szoveg, valtozat, jingle, surgos,
+                              ora_ido, felvett))
         return True
 
     def leallit(self) -> None:
@@ -267,6 +298,15 @@ class Beszelo:
             if screenreader.speak(b.szoveg, False):
                 return
             # ha nincs képernyőolvasó, essünk vissza az eSpeakre
+        if b.felvett:
+            path = felvett_fajl(b.felvett, b.ora_ido)
+            if path is not None and self._felvett(path):
+                return
+            if self._megszakit.is_set() or self._stop.is_set():
+                return
+            # Hiányzó/sérült klip vagy nem ötperces időpont: ne legyen néma óra.
+            _log.info("felvett órahang nem használható: %s, %s; beszédhang jön",
+                      b.felvett, b.ora_ido)
         if edge_e(b.valtozat):
             if self._edge(b):
                 return
@@ -274,6 +314,37 @@ class Beszelo:
             # eSpeak alaphangja mondja be. A néma óra rosszabb a gépiesnél.
             b = Bemondas(b.szoveg, "", False, b.surgos)
         self._espeak(b)
+
+    def _felvett(self, path: Path) -> bool:
+        """Egyetlen klip lejátszása a beszéd sorában, leállítható módon."""
+        try:
+            from .audioengine import Player
+            if self._lejatszo is None:
+                self._lejatszo = Player()
+            lj = self._lejatszo
+            vege = threading.Event()
+            allapot = []
+
+            def allapotvaltas(state):
+                if state == "vége" or state.startswith("hiba"):
+                    allapot.append(state)
+                    vege.set()
+
+            lj.on_state = allapotvaltas
+            lj.set_volume(max(0.0, min(1.0, self.volume / 100.0)))
+            self._megszakit.clear()
+            lj.play(str(path), "")
+            limit = time.monotonic() + 20.0
+            while (not vege.wait(0.05) and time.monotonic() < limit
+                   and not self._megszakit.is_set() and not self._stop.is_set()):
+                pass
+            if not vege.is_set() or self._megszakit.is_set() or self._stop.is_set():
+                lj.stop()
+                return False
+            return bool(allapot) and allapot[-1] == "vége"
+        except Exception:
+            _log.exception("a felvett órahang lejátszása nem sikerült")
+            return False
 
     # Egy bemondás felső határa: ennyi után akkor is továbblépünk, ha a
     # lejátszó valamiért nem jelezne véget (ne akadjon el a sor).
@@ -300,23 +371,29 @@ class Beszelo:
             if self._lejatszo is None:
                 self._lejatszo = Player()
             lj = self._lejatszo
+            vege = threading.Event()
+            allapot = []
+
+            def allapotvaltas(state):
+                if state == "vége" or state.startswith("hiba"):
+                    allapot.append(state)
+                    vege.set()
+
+            lj.on_state = allapotvaltas
             lj.set_volume(max(0.0, min(1.0, self.volume / 100.0)))
             self._megszakit.clear()
             lj.play(ut, "")
         except Exception:
             _log.exception("a köszöntő hang lejátszása nem sikerült")
             return False
-        kezdet = time.monotonic()
-        time.sleep(0.3)              # a lejátszó elindulása
-        while (time.monotonic() - kezdet < self.EDGE_MAX_MP
+        limit = time.monotonic() + self.EDGE_MAX_MP
+        while (not vege.wait(0.05) and time.monotonic() < limit
                and not self._megszakit.is_set() and not self._stop.is_set()):
-            try:
-                if not lj.is_active():
-                    break
-            except Exception:
-                break
-            time.sleep(0.1)
-        return True
+            pass
+        if not vege.is_set() or self._megszakit.is_set() or self._stop.is_set():
+            lj.stop()
+            return False
+        return bool(allapot) and allapot[-1] == "vége"
 
     def _jingle(self) -> None:
         """Rövid, kétszótagú jel a bemondás ELŐTT. NEM óraütés: nem számol,

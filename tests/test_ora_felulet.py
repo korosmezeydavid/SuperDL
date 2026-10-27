@@ -153,6 +153,7 @@ def test_az_ora_lap_visszaadja_a_beirt_ertekeket(ablak):
     o.prefix_be.SetValue(True)
     o.prefix.SetValue("az idő")
     o.jingle.SetValue(False)
+    o.ora_hang.SetSelection(o._ora_hang_kulcsok.index("martin"))
     o.csend_tol.SetValue("23:30")
     o.csend_ig.SetValue("06:15")
     e = ablak.ertekek()
@@ -160,7 +161,56 @@ def test_az_ora_lap_visszaadja_a_beirt_ertekeket(ablak):
     assert e["periodus_perc"] == 30
     assert e["prefix_szoveg"] == "az idő"
     assert e["jingle"] is False
+    assert e["ora_hang"] == "martin"
     assert (e["csend_tol"], e["csend_ig"]) == ("23:30", "06:15")
+
+
+def test_felvett_hang_probagombja_kimondja_a_kivalasztott_hangot(ablak):
+    panel = ablak.ora
+    panel.ora_hang.SetSelection(panel._ora_hang_kulcsok.index("lilly"))
+    panel._felvett_valasztas(None)
+    assert panel.felvett_proba.IsEnabled()
+    assert "Lilly" in panel.felvett_proba.GetName()
+    assert "tizenegy órára" in panel.felvett_proba.GetName()
+    panel.ora_hang.SetSelection(0)
+    panel._felvett_valasztas(None)
+    assert not panel.felvett_proba.IsEnabled()
+    assert "előbb válassz" in panel.felvett_proba.GetName()
+
+
+def test_felvett_hang_proba_a_kijelolt_hangot_hasznalja(ablak, monkeypatch):
+    hiv = []
+    monkeypatch.setattr(ablak.ora._beszelo, "mond",
+                        lambda *args, **kw: hiv.append((args, kw)))
+    ablak.ora.ora_hang.SetSelection(ablak.ora._ora_hang_kulcsok.index("lilly"))
+    ablak.ora._felvett_proba(None)
+    assert len(hiv) == 1
+    assert hiv[0][1]["felvett"] == "lilly"
+    assert hiv[0][1]["ora_ido"] == (11, 0)
+
+
+def test_most_proba_nem_modositja_a_futo_ora_beallitasait(ablak, monkeypatch):
+    beall = dict(ablak.ora._motor.utemezo.beall)
+    latott = []
+    monkeypatch.setattr(ablak.ora._motor, "mennyi_az_ido",
+                        lambda **kw: latott.append(kw))
+    ablak.ora.ora_hang.SetSelection(ablak.ora._ora_hang_kulcsok.index("leda"))
+    ablak.ora.prefix.SetValue("Csak próba")
+    ablak.ora._most()
+    assert latott[0]["beall"]["ora_hang"] == "leda"
+    assert latott[0]["beall"]["prefix_szoveg"] == "Csak próba"
+    assert ablak.ora._motor.utemezo.beall == beall
+
+
+def test_ora_sugo_ismeri_a_felvett_hangokat(modul):
+    for hang in ("Leda", "Lilly", "Martin"):
+        assert hang in modul.HELP_ORA
+    assert "Képernyőolvasó" in modul.HELP_ORA
+
+
+def test_ora_beallitasok_gorgethetok(ablak):
+    assert isinstance(ablak.ora, wx.ScrolledWindow)
+    assert ablak.ora.GetScrollPixelsPerUnit()[1] > 0
 
 
 def test_csak_a_hatvan_osztoi_valaszthatoak(ablak):

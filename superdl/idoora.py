@@ -51,6 +51,7 @@ ALAP = {
     "csend_ig": "07:00",
     "ules_emlekezteto_perc": 0,
     "valtozat": "f1",
+    "ora_hang": "",           # üres = a meglévő szöveges beszédhang
     "minden_hang": False,
 }
 
@@ -461,16 +462,20 @@ class OraMotor:
 
     # ---- bemondások -------------------------------------------------
 
-    def mennyi_az_ido(self, *, most=None, reszletes: bool = False) -> str:
+    def mennyi_az_ido(self, *, most=None, reszletes: bool = False,
+                     beall: dict | None = None) -> str:
         """Az azonnali „mennyi az idő?" bemondása. Ez FELHASZNÁLÓI kérés,
         tehát sürgős: a sor tele állapota se nyelje el."""
         most = most or _dt.datetime.now()
-        szov = bemondas_szoveg(most, self.utemezo.beall)
+        beall = self.utemezo.beall if beall is None else beall
+        szov = bemondas_szoveg(most, beall)
         if reszletes:
             szov += " " + self._datum_szoveg(most)
-        self.beszelo.mond(szov, self.utemezo.beall.get("valtozat", ""),
-                          jingle=bool(self.utemezo.beall.get("jingle")),
-                          surgos=True)
+        self.beszelo.mond(szov, beall.get("valtozat", ""),
+                          jingle=bool(beall.get("jingle")),
+                          surgos=True,
+                          ora_ido=None if reszletes else (most.hour, most.minute),
+                          felvett=beall.get("ora_hang", ""))
         return szov
 
     @staticmethod
@@ -547,7 +552,9 @@ class OraMotor:
         if pont is not None:
             self.beszelo.mond(self.utemezo.szoveg(pont),
                               beall.get("valtozat", ""),
-                              jingle=bool(beall.get("jingle")))
+                              jingle=bool(beall.get("jingle")),
+                              ora_ido=(pont.hour, pont.minute),
+                              felvett=beall.get("ora_hang", ""))
         # 3) ülés-emlékeztető (alapból ki)
         self._ules(beall)
 

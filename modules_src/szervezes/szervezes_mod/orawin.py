@@ -18,6 +18,7 @@ AKADÁLYMENTESSÉG – AMI ITT NEM ELHAGYHATÓ
 """
 
 import wx
+from wx.lib.scrolledpanel import ScrolledPanel
 
 from superdl import idoora as I
 from superdl import orahang as H
@@ -39,8 +40,14 @@ szövegeddel. Nem harangoz – röviden szól. Az ablaknak két lapfüle van:
    vagy a pipát kiveheted, és akkor csak az időt mondja.
 5. „Stílus” – háromféleképpen tudja mondani ugyanazt az időpontot.
 6. „Csendes sáv” – például 22:00-tól 07:00-ig néma. Átnyúlhat éjfélen.
-7. „Hang” – 22 eSpeak-hangból választhatsz. A „Meghallgatom” gombbal
-   ki is próbálhatod, mielőtt eldöntöd.
+7. „Hang” – a gépi beszédhangot választhatod ki, és a „Meghallgatom”
+   gombbal előre kipróbálhatod.
+8. „Felvett órahang” – Leda minden ötperces időpontot bemond; Lilly és
+   Martin egész órakor a saját felvételükkel, a köztes ötperces pontokon
+   Leda hangjával szól. A külön próbagomb 11 órát játszik le. Más
+   percnél és részletes dátumnál a fenti gépi beszédhang marad.
+   A felvett mondatnál a bevezető szöveg és a stílus nem érvényesül.
+   Képernyőolvasó mellett annak beszéde élvez elsőbbséget.
 
 IDŐZÍTŐK LAPFÜL
 Elmentett időzítő-profilok, amikből EGYSZERRE TÖBB is futhat, mindegyik
@@ -154,12 +161,13 @@ class HangValaszto(wx.BoxSizer):
         self._beszelo.mond(self._minta, self.valtozat(), surgos=True)
 
 
-class OraPanel(wx.Panel):
+class OraPanel(ScrolledPanel):
     """Az „Óra" lapfül: a periodikus időbemondás beállításai."""
 
     def __init__(self, szulo, motor, beszelo):
         super().__init__(szulo)
         self._motor = motor
+        self._beszelo = beszelo
         b = dict(motor.utemezo.beall)
         v = wx.BoxSizer(wx.VERTICAL)
 
@@ -247,6 +255,33 @@ class OraPanel(wx.Panel):
         v.Add(self.hang, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
 
         sor = wx.BoxSizer(wx.HORIZONTAL)
+        sor.Add(wx.StaticText(self, label="&Felvett órahang:"), 0,
+                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
+        self.ora_hang = wx.Choice(self, choices=[label for _, label in H.FELVETT_HANGOK])
+        self.ora_hang.SetName("Felvett órahang")
+        self.ora_hang.SetToolTip(
+            "Lilly és Martin egész órakor, a köztes ötperces időpontokban Leda "
+            "szól. A felvett mondat saját szövegű; más időpontoknál a fent "
+            "kiválasztott beszédhang szól. Képernyőolvasó esetén annak "
+            "felolvasása élvez elsőbbséget.")
+        self._ora_hang_kulcsok = [key for key, _ in H.FELVETT_HANGOK]
+        try:
+            self.ora_hang.SetSelection(self._ora_hang_kulcsok.index(b.get("ora_hang", "")))
+        except ValueError:
+            self.ora_hang.SetSelection(0)
+        sor.Add(self.ora_hang, 1, wx.ALIGN_CENTER_VERTICAL)
+        v.Add(sor, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+        self.felvett_proba = wx.Button(self, label="Felvett hang meghallgatása")
+        self._felvett_valasztas(None)
+        self.ora_hang.Bind(wx.EVT_CHOICE, self._felvett_valasztas)
+        self.felvett_proba.Bind(wx.EVT_BUTTON, self._felvett_proba)
+        v.Add(self.felvett_proba, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+        v.Add(wx.StaticText(self, label=(
+            "Felvett hangnál a kész mondat szól; a fenti stílus és bevezető "
+            "csak a gépi beszédnél érvényes.")), 0,
+            wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+
+        sor = wx.BoxSizer(wx.HORIZONTAL)
         sor.Add(wx.StaticText(self, label="&Ülés-emlékeztető:"), 0,
                 wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         self.ules = wx.SpinCtrl(self, min=0, max=600,
@@ -263,12 +298,26 @@ class OraPanel(wx.Panel):
         b_most.Bind(wx.EVT_BUTTON, lambda e: self._most())
         v.Add(b_most, 0, wx.ALL, 8)
         self.SetSizer(v)
+        self.SetupScrolling(scroll_x=False, scroll_y=True)
 
     def _most(self):
-        """A próba az ÉPP BEÁLLÍTOTT (még nem mentett) értékekkel szóljon –
-        különben a stílust és a prefixet csak mentés után lehetne kipróbálni."""
-        self._motor.beallit(self.ertekek())
-        self._motor.mennyi_az_ido()
+        """Az űrlap értékeivel próbál, a futó óra mentett rendjét nem írja át."""
+        self._motor.mennyi_az_ido(beall=self.ertekek())
+
+    def _felvett_valasztas(self, event):
+        index = self.ora_hang.GetSelection()
+        self.felvett_proba.Enable(index > 0)
+        if index > 0:
+            self.felvett_proba.SetName(
+                f"{self.ora_hang.GetString(index)} – felvett órahang meghallgatása tizenegy órára")
+        else:
+            self.felvett_proba.SetName("Felvett órahang meghallgatása; előbb válassz felvett hangot")
+
+    def _felvett_proba(self, event):
+        self._beszelo.mond("Most tizenegy óra van.", self.hang.valtozat(),
+                           surgos=True, ora_ido=(11, 0),
+                           felvett=self._ora_hang_kulcsok[
+                               max(0, self.ora_hang.GetSelection())])
 
     def ertekek(self) -> dict:
         return {
@@ -281,6 +330,7 @@ class OraPanel(wx.Panel):
             "csend_tol": self.csend_tol.GetValue().strip(),
             "csend_ig": self.csend_ig.GetValue().strip(),
             "valtozat": self.hang.valtozat(),
+            "ora_hang": self._ora_hang_kulcsok[max(0, self.ora_hang.GetSelection())],
             "minden_hang": self.hang.mind.GetValue(),
             "ules_emlekezteto_perc": int(self.ules.GetValue()),
         }

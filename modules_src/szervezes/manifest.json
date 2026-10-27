@@ -1,12 +1,12 @@
 {
   "id": "szervezes",
   "name": "Szervezés",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "entry": "szervezes_mod",
   "category": "Szervezés",
   "description": "Programok és szórakozás: akadálymentes, dátumos színház-, koncert- és moziműsor Budapest és Nyíregyháza kiválasztott helyszíneiről, város-, időszak- és műfajszűrővel. Mozi: ARTMozi, Cinema City Arena és Cinema City Nyíregyháza. A Szervezés modul továbbra is tartalmazza a Hírolvasót, Podcast-felfedezőt, Naptárat, Napi infót, Beszélő órát és időzítőket.",
   "min_core_api": "1.0",
-  "min_core_version": "4.6.12",
+  "min_core_version": "4.6.32",
   "requires_tools": [],
   "author": "Kőrösmezey Dávid"
 }

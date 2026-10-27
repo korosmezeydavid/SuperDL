@@ -257,12 +257,12 @@
       "category": "Szervezés",
       "description": "Programok és szórakozás: akadálymentes, dátumos színház-, koncert- és moziműsor Budapest és Nyíregyháza kiválasztott helyszíneiről, város-, időszak- és műfajszűrővel. Mozi: ARTMozi, Cinema City Arena és Cinema City Nyíregyháza. A Szervezés modul továbbra is tartalmazza a Hírolvasót, Podcast-felfedezőt, Naptárat, Napi infót, Beszélő órát és időzítőket.",
       "latest": {
-        "version": "1.5.0",
+        "version": "1.5.1",
         "min_core_api": "1.0",
-        "min_core_version": "4.6.12",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.5.0/szervezes-1.5.0.zip",
-        "sha256": "de190efa48a028fc8cfb3b2a6ed4f6b884bddebe2b5d9cc21769a972a7d0df87",
-        "size": 51562
+        "min_core_version": "4.6.32",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-szervezes-1.5.1/szervezes-1.5.1.zip",
+        "sha256": "312277dbe11827619fc8364368da02a0a01b6e220142435b365b903fc04983cd",
+        "size": 52464
       }
     },
     {

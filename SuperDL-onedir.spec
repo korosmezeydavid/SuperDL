@@ -19,6 +19,7 @@ binaries = [('bin\\aria2c.exe', '.'),
             ('bin\\bass_fx.dll', '.')]
 # eSpeak-NG hangadatok (magyar hang a self-voice-hoz) – a teljes mappa
 datas += [('bin\\espeak-ng-data', 'espeak-ng-data')]
+datas += [('superdl\\clock', 'superdl\\clock')]
 datas += [('superdl\\startup_noi.wav', 'superdl'),     # induló szignál (Farkas kérése)
           ('superdl\\startup_ferfi.wav', 'superdl')]   # női / férfi logó-köszöntés (Dávid, 2026-10-02)
 datas += [('superdl\\tolk\\nvdaControllerClient64.dll', 'superdl\\tolk')]  # képernyőolvasó-kimenet (NVDA)
@@ -58,7 +59,7 @@ hiddenimports += collect_submodules('comtypes')   # mail helyesírás, távsegí
 # WebView2 ezen a gépen" – akkor is, ha a gépen telepítve volt.
 # ⚠️ A `tools/modul_importok.py` ezt NEM látta: csak a legfelső nevet (`wx`)
 # nézi, a `wx` pedig bent van. A `tests/test_spec_wx_almodulok.py` őrzi.
-hiddenimports += ['wx.html2']
+hiddenimports += ['wx.html2', 'wx.lib.scrolledpanel']
 import os as _os
 import wx as _wx
 binaries += [(_os.path.join(_os.path.dirname(_wx.__file__),
