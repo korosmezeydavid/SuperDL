@@ -5,12 +5,16 @@ vagy MAGYARÁZÓ SZÖVEG tehető (a szöveg a kimenetre ráég). Két marker kö
 SZAKASZ menthető, vagy a teljes (akár több videóból összefűzött) anyag.
 """
 
+import math
 import os
+import subprocess
+import tempfile
 import threading
 from pathlib import Path
 
 import wx
 
+from .videowin import AUDIO_WILDCARD, IMAGE_WILDCARD
 from . import videoedit as VE               # a vágó-motor a MODULBAN
 from superdl.audioengine import Player       # megosztott lejátszó a Core-ból
 
@@ -38,7 +42,15 @@ LÉPÉSRŐL LÉPÉSRE (vakon is)
    • „Szakasz mentése" – csak a két marker KÖZTI részt menti.
 5. ÖSSZEFŰZÉS: „Videó hozzáfűzése" gombbal további videó(ka)t tehetsz a végére,
    majd „Teljes videó mentése".
-6. Mentéskor a program kér formátumot és helyet, a végén bemondja, hova mentette.
+6. KÉP: állj meg a kívánt ponton, válaszd a „Kép hozzáadása itt” gombot, és add
+   meg, hány másodpercig látszódjon. A kép mérete és helye automatikus.
+7. HANG: állj meg a kívánt ponton, válaszd a „Hang hozzáadása itt” gombot,
+   majd egy hangfájlt. A hang az eredeti sávval együtt szól. A „Hangkeverés
+   meghallgatása” legfeljebb 15 másodpercet játszik le a kijelölt hang
+   elejétől vagy a lejátszás helyétől. Ugyanez a gomb állítja le.
+8. A „Képek és hangok” listában a beszúrás időzítése módosítható, Delete-tel
+   a kijelölt beszúrás eltávolítható.
+9. Mentéskor a program kér formátumot és helyet, a végén bemondja, hova mentette.
 
 GYORSBILLENTYŰK
 F1 – súgó.  Szóköz – lejátszás/megállás.  Bal/jobb nyíl – −/+ 2 mp.  A markerek
@@ -58,6 +70,9 @@ class VideoEditFrame(wx.Frame):
         self.main = main
         self.editor = VE.VideoEditor()
         self.player = Player()
+        self.preview_player = Player()
+        self.preview_player.on_state = lambda state: wx.CallAfter(self._preview_state, state)
+        self._preview_dir = None
         self.player.on_state = lambda s: wx.CallAfter(self._player_state, s)
         self._rendering = False
         self._closing = False        # zárás alatt a háttér-callbackek kilépnek
@@ -65,7 +80,7 @@ class VideoEditFrame(wx.Frame):
         self._build()
         self.CreateStatusBar()
         self._announce("Tölts be egy videót. A Szóköz lejátssza/megállítja a "
-                       "hangját; megállva tehetsz markert vagy szöveget.")
+                       "hangját; megállva markert, szöveget, képet vagy hangot adhatsz hozzá.")
         self.Bind(wx.EVT_CHAR_HOOK, self._on_char_hook)
         self.Bind(wx.EVT_CLOSE, self._on_close)
 
@@ -84,7 +99,7 @@ class VideoEditFrame(wx.Frame):
         v.Add(top, 0, wx.EXPAND | wx.ALL, 8)
 
         v.Add(wx.StaticText(p, label="SZÓKÖZ: lejátszás/megállás. Megállva: "
-              "marker vagy magyarázó szöveg. Finomhangolás: bal/jobb nyíl."),
+              "marker, szöveg, kép vagy hang. Finomhangolás: bal/jobb nyíl."),
               0, wx.ALL, 8)
 
         c1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -109,6 +124,17 @@ class VideoEditFrame(wx.Frame):
             c2.Add(b, 0, wx.RIGHT, 5)
         v.Add(c2, 0, wx.ALL, 6)
 
+        inserts = wx.BoxSizer(wx.HORIZONTAL)
+        for label, callback in (
+                ("Ké&p hozzáadása itt…", lambda: self._add_layer("image")),
+                ("H&ang hozzáadása itt…", lambda: self._add_layer("audio")),
+                ("Hangkeverés meghall&gatása", self._preview_audio),
+                ("Beszúrás idő&zítése…", self._edit_layer)):
+            button = wx.Button(p, label=label)
+            button.Bind(wx.EVT_BUTTON, lambda event, fn=callback: fn())
+            inserts.Add(button, 0, wx.RIGHT, 5)
+        v.Add(inserts, 0, wx.ALL, 6)
+
         lists = wx.BoxSizer(wx.HORIZONTAL)
         lv = wx.BoxSizer(wx.VERTICAL)
         lv.Add(wx.StaticText(p, label="Mar&kerek (Delete: törlés). A „Szakasz "
@@ -132,6 +158,10 @@ class VideoEditFrame(wx.Frame):
         nv.Add(self.nt_list, 1, wx.EXPAND | wx.ALL, 4)
         lists.Add(nv, 1, wx.EXPAND)
         v.Add(lists, 1, wx.EXPAND | wx.ALL, 6)
+        v.Add(wx.StaticText(p, label="Képek és hangok (Delete: törlés):"), 0, wx.LEFT, 8)
+        self.layer_list = wx.ListBox(p, name="Beszúrt képek és hangok")
+        self.layer_list.Bind(wx.EVT_KEY_DOWN, self._on_layer_key)
+        v.Add(self.layer_list, 1, wx.EXPAND | wx.ALL, 6)
 
         s = wx.BoxSizer(wx.HORIZONTAL)
         b_sec = wx.Button(p, label="S&zakasz mentése…")
@@ -159,11 +189,20 @@ class VideoEditFrame(wx.Frame):
         return path
 
     def _load_video(self):
+        if self._rendering:
+            return
         path = self._pick_video("Videó betöltése")
         if not path:
             return
         self.player.stop()
+        self.preview_player.stop()
+        self.editor.cleanup()
         self.editor = VE.VideoEditor()
+        self._rendering = True
+        self.title_lbl.SetLabel("Videó vizsgálata…")
+        self._refresh_markers()
+        self._refresh_notes()
+        self._refresh_layers()
         self._announce("Videó vizsgálata…")
 
         def work():
@@ -173,7 +212,12 @@ class VideoEditFrame(wx.Frame):
         threading.Thread(target=work, daemon=True).start()
 
     def _loaded(self, clip, path):
+        self._rendering = False
+        if self._closing:
+            self._cleanup()
+            return
         if not clip:
+            self.title_lbl.SetLabel("Nincs betöltött videó.")
             self._announce("Ezt a videót nem sikerült beolvasni.")
             return
         self.title_lbl.SetLabel(f"Videó: {Path(path).name} "
@@ -184,6 +228,8 @@ class VideoEditFrame(wx.Frame):
                        "Szóköz: a hang lejátszása.")
 
     def _append_video(self):
+        if self._rendering:
+            return
         if not self.editor.clips:
             self._cannot("Előbb tölts be egy videót, utána fűzhetsz hozzá "
                          "továbbiakat a végére.")
@@ -191,6 +237,8 @@ class VideoEditFrame(wx.Frame):
         path = self._pick_video("Videó hozzáfűzése a végéhez")
         if not path:
             return
+        self._rendering = True
+        self.preview_player.stop()
 
         def work():
             clip = self.editor.add_clip(path)
@@ -199,9 +247,14 @@ class VideoEditFrame(wx.Frame):
         threading.Thread(target=work, daemon=True).start()
 
     def _appended(self, clip):
+        self._rendering = False
+        if self._closing:
+            self._cleanup()
+            return
         if not clip:
             self._announce("Ezt a videót nem sikerült hozzáfűzni.")
             return
+        self._refresh_layers(self._selected_layer())
         self._announce(f"Hozzáfűzve: {Path(clip.path).name}. Teljes hossz most "
                        f"{VE.human_time(self.editor.total_duration())}. Az "
                        "összefűzött videót a „Teljes videó mentése” gombbal "
@@ -211,6 +264,9 @@ class VideoEditFrame(wx.Frame):
         return self.editor.clips[0].path if self.editor.clips else ""
 
     def _toggle(self):
+        if self._rendering:
+            return
+        self.preview_player.stop()
         if not self.editor.clips:
             self._announce("Előbb tölts be egy videót.")
             return
@@ -222,6 +278,9 @@ class VideoEditFrame(wx.Frame):
             self.player.play(self._main_clip(), title="videó")
 
     def _restart(self):
+        if self._rendering:
+            return
+        self.preview_player.stop()
         if self.editor.clips:
             self.player.play(self._main_clip(), title="videó")
             self._announce("Lejátszás az elejéről.")
@@ -239,6 +298,9 @@ class VideoEditFrame(wx.Frame):
             self._announce("A lejátszás áll. Szóköz: lejátszás.")
 
     def _fine(self, delta):
+        if self._rendering:
+            return
+        self.preview_player.stop()
         if not self.player.is_active():
             self._announce("Előbb játszd le és állítsd meg a hangot.")
             return
@@ -257,6 +319,8 @@ class VideoEditFrame(wx.Frame):
     # ---- markerek / szövegek ------------------------------------------
 
     def _add_marker(self):
+        if self._rendering:
+            return
         if not self.editor.clips:
             self._cannot("Előbb tölts be egy videót, hogy markert tehess.")
             return
@@ -272,6 +336,8 @@ class VideoEditFrame(wx.Frame):
         self._announce(msg)
 
     def _add_note(self):
+        if self._rendering:
+            return
         if not self.editor.clips:
             return
         at = self._position()
@@ -305,6 +371,8 @@ class VideoEditFrame(wx.Frame):
             self.nt_list.SetItem(i, 1, n.text)
 
     def _on_mk_key(self, e):
+        if self._rendering:
+            return
         if e.GetKeyCode() == wx.WXK_DELETE:
             i = self.mk_list.GetFirstSelected()
             if i >= 0:
@@ -315,6 +383,8 @@ class VideoEditFrame(wx.Frame):
             e.Skip()
 
     def _on_nt_key(self, e):
+        if self._rendering:
+            return
         if e.GetKeyCode() == wx.WXK_DELETE:
             i = self.nt_list.GetFirstSelected()
             if i >= 0:
@@ -323,6 +393,176 @@ class VideoEditFrame(wx.Frame):
                 self._announce("Szöveg törölve.")
         else:
             e.Skip()
+
+
+    def _ask_seconds(self, title, label, default, *, minimum):
+        while True:
+            with wx.TextEntryDialog(self, label, title, f"{default:g}") as dialog:
+                if dialog.ShowModal() != wx.ID_OK:
+                    return None
+                try:
+                    value = float(dialog.GetValue().strip().replace(",", "."))
+                except ValueError:
+                    value = -1
+            if math.isfinite(value) and value >= minimum:
+                return value
+            self._cannot(f"Adj meg legalább {minimum:g} másodpercet számmal.")
+
+    def _add_layer(self, kind):
+        if self._rendering:
+            return
+        if not self.editor.clips:
+            self._cannot("Előbb tölts be egy videót.")
+            return
+        if self.player.is_active():
+            self.player.pause()
+        self.preview_player.stop()
+        at = self._position()
+        title = "Kép hozzáadása" if kind == "image" else "Hang hozzáadása"
+        wildcard = IMAGE_WILDCARD if kind == "image" else AUDIO_WILDCARD
+        with wx.FileDialog(self, title, wildcard=wildcard,
+                           style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as dialog:
+            if dialog.ShowModal() != wx.ID_OK:
+                return
+            path = dialog.GetPath()
+        duration = None
+        if kind == "image":
+            duration = self._ask_seconds(
+                title, "Hány másodpercig látszódjon a kép?", 4, minimum=0.1)
+            if duration is None:
+                return
+        self._rendering = True
+        self._announce("A beszúrandó fájl ellenőrzése…")
+
+        def work():
+            try:
+                layer = self.editor.add_layer(kind, path, at, duration)
+                wx.CallAfter(self._layer_added, layer, "")
+            except (OSError, ValueError, subprocess.SubprocessError) as error:
+                wx.CallAfter(self._layer_added, None, str(error))
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _layer_added(self, layer, error):
+        self._rendering = False
+        if self._closing:
+            self.editor.cleanup()
+            return
+        if layer is None:
+            self._cannot(error)
+            return
+        self._refresh_layers(layer)
+        self._announce("Hozzáadva. " + self._layer_label(layer))
+
+    def _layer_label(self, layer):
+        kind = "Kép" if layer.kind == "image" else "Hang"
+        end = min(self.editor.total_duration(), layer.at + layer.duration)
+        return (f"{kind}: {Path(layer.path).name}. Kezdete {layer.at:.2f} mp, "
+                f"vége {end:.2f} mp.")
+
+    def _refresh_layers(self, selected=None):
+        self.layer_list.Set([self._layer_label(layer) for layer in self.editor.layers])
+        if selected is not None:
+            index = next(i for i, layer in enumerate(self.editor.layers) if layer is selected)
+            self.layer_list.SetSelection(index)
+            self.layer_list.SetFocus()
+
+    def _selected_layer(self):
+        index = self.layer_list.GetSelection()
+        return self.editor.layers[index] if 0 <= index < len(self.editor.layers) else None
+
+    def _edit_layer(self):
+        if self._rendering:
+            return
+        layer = self._selected_layer()
+        if layer is None:
+            self._cannot("Válassz egy képet vagy hangot a beszúrások listájából.")
+            return
+        at = self._ask_seconds("Beszúrás időzítése", "Kezdőpont másodpercben:", layer.at,
+                               minimum=0)
+        if at is None:
+            return
+        if at >= self.editor.total_duration():
+            self._cannot("A kezdőpontnak a videón belül kell lennie.")
+            return
+        duration = layer.duration
+        if layer.kind == "image":
+            duration = self._ask_seconds(
+                "Kép időtartama", "Hány másodpercig látszódjon a kép?",
+                duration, minimum=0.1)
+            if duration is None:
+                return
+        self.preview_player.stop()
+        layer.at, layer.duration = at, duration
+        self.editor.layers.sort(key=lambda item: item.at)
+        self._refresh_layers(layer)
+        self._announce("Időzítés módosítva. " + self._layer_label(layer))
+
+    def _on_layer_key(self, event):
+        if event.GetKeyCode() != wx.WXK_DELETE:
+            event.Skip()
+            return
+        index = self.layer_list.GetSelection()
+        if not self._rendering and index != wx.NOT_FOUND:
+            self.preview_player.stop()
+            del self.editor.layers[index]
+            self._refresh_layers()
+            if self.editor.layers:
+                self.layer_list.SetSelection(min(index, len(self.editor.layers) - 1))
+            self._announce("A beszúrás törölve.")
+
+    def _preview_audio(self):
+        if self._rendering:
+            return
+        if self.preview_player.is_active():
+            self.preview_player.stop()
+            self._announce("Hangkeverés előnézete leállítva.")
+            return
+        if not self.editor.clips:
+            self._cannot("Előbb tölts be egy videót.")
+            return
+        layer = self._selected_layer()
+        at = layer.at if layer is not None and layer.kind == "audio" else self._position()
+        if self.player.is_active():
+            self.player.pause()
+        try:
+            if self._preview_dir is None:
+                self._preview_dir = tempfile.TemporaryDirectory(prefix="superdl_mix_")
+        except OSError as error:
+            self._cannot(str(error))
+            return
+        path = str(Path(self._preview_dir.name) / "preview.wav")
+        self._rendering = True
+        self._announce(f"Hangkeverés előnézete készül, kezdőpont {at:.2f} mp.")
+
+        def work():
+            ok = self.editor.preview_audio(at, path)
+            wx.CallAfter(self._preview_done, ok, path)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _preview_done(self, ok, path):
+        self._rendering = False
+        if self._closing:
+            self._cleanup()
+            return
+        if ok:
+            self._announce("Hangkeverés előnézete. Ugyanezzel a gombbal leállíthatod.")
+            self.preview_player.play(path, title="Hangkeverés előnézete")
+        else:
+            self._cannot(self.editor.error or "A hangelőnézet nem sikerült.")
+
+    def _preview_state(self, state):
+        if state.startswith("hiba"):
+            self._announce(f"A hangelőnézet lejátszása sikertelen: {state}.")
+        elif state == "vége":
+            self._announce("A hangkeverés előnézete véget ért.")
+
+    def _cleanup(self):
+        self.editor.cleanup()
+        if self._preview_dir is not None:
+            self._preview_dir.cleanup()
+            self._preview_dir = None
 
     # ---- mentés -------------------------------------------------------
 
@@ -416,6 +656,7 @@ class VideoEditFrame(wx.Frame):
     def _start_export(self, start, end, out, msg, cut=False):
         self._rendering = True
         self.player.stop()
+        self.preview_player.stop()
         self._sv("video", "start")
         self.gauge.SetValue(0)
         self._last_pct = -10
@@ -431,6 +672,8 @@ class VideoEditFrame(wx.Frame):
         threading.Thread(target=work, daemon=True).start()
 
     def _export_progress(self, p):
+        if self._closing:
+            return
         pct = int(p * 100)
         self.gauge.SetValue(min(100, pct))
         if pct >= self._last_pct + 10:
@@ -439,6 +682,9 @@ class VideoEditFrame(wx.Frame):
 
     def _export_done(self, ok, out):
         self._rendering = False
+        if self._closing:
+            self._cleanup()
+            return
         self.gauge.SetValue(100 if ok else 0)
         self._sv("video", "done" if ok else "error")
         if ok:
@@ -527,8 +773,10 @@ class VideoEditFrame(wx.Frame):
         self._closing = True
         try:
             self.player.stop()
+            self.preview_player.stop()
             self.editor.stop()
-            self.editor.cleanup()
+            if not self._rendering:
+                self._cleanup()
         except Exception:
             pass
         if getattr(self.main, "_videoedit_win", None) is self:

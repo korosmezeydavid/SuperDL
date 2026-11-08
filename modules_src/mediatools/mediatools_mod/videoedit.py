@@ -12,6 +12,7 @@ skálázva fűz össze (normalizált alap). A path-escape gondok ellen a render 
 ideiglenes munkamappában fut, a szöveg-/betűfájlok puszta néven.
 """
 
+import math
 import os
 import shutil
 import subprocess
@@ -22,9 +23,11 @@ from pathlib import Path
 
 from superdl import ffmpeg as ffmpeg_mod    # megosztott Core-modulok
 from superdl import proc as procutil        # alfolyamat-életciklus (MK4)
-from superdl.videocompose import _find_font, human_time, wrap_caption
+from superdl.videocompose import _find_font, human_time, media_duration, wrap_caption
 
 OUT_FORMATS = (("MP4 – ajánlott", "mp4"), ("MKV", "mkv"), ("AVI", "avi"))
+EFFECT_GAIN = 0.35
+PREVIEW_SECONDS = 15.0
 NOTE_DEFAULT_DUR = 4.0          # egy magyarázó szöveg alap megjelenési ideje (mp)
 
 
@@ -32,7 +35,7 @@ def _ffprobe() -> str | None:
     ff = ffmpeg_mod.find_ffmpeg()
     if not ff:
         return None
-    p = Path(ff).with_name("ffprobe.exe")
+    p = Path(ff).with_name("ffprobe.exe" if os.name == "nt" else "ffprobe")
     return str(p) if p.is_file() else None
 
 
@@ -66,6 +69,49 @@ def probe(path: str) -> tuple[float, int, int]:
         except ValueError:
             w = h = 0
     return d, w, h
+
+
+@dataclass
+class TimelineLayer:
+    kind: str
+    path: str
+    at: float
+    duration: float
+
+
+def _has_audio(path: str) -> bool:
+    probe_path = _ffprobe()
+    if not probe_path:
+        raise OSError("Az ffprobe nem érhető el.")
+    result = subprocess.run(
+        [probe_path, "-v", "error", "-select_streams", "a:0",
+         "-show_entries", "stream=index", "-of", "csv=p=0", path],
+        capture_output=True, text=True, check=True, timeout=30,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    return bool(result.stdout.strip())
+
+
+def _audio_chain(duration):
+    return (f"aresample=48000,aformat=channel_layouts=stereo,"
+            f"apad,atrim=duration={duration:.6f},asetpts=PTS-STARTPTS")
+
+
+def _caption_filters(captions, work, width, height):
+    font = _find_font()
+    if not captions or not font:
+        return []
+    shutil.copyfile(font, work / "font.ttf")
+    size = max(18, int(height / 22))
+    margin = max(12, int(height / 18))
+    filters = []
+    for i, (note, at) in enumerate(captions):
+        (work / f"note{i}.txt").write_text(wrap_caption(note.text, width, size), encoding="utf-8")
+        filters.append(
+            f"drawtext=textfile=note{i}.txt:fontfile=font.ttf:fontsize={size}:"
+            f"fontcolor=white:borderw=4:bordercolor=black:line_spacing=8:"
+            f"x=(w-text_w)/2:y=h-text_h-{margin}:expansion=none:"
+            f"enable='between(t,{at:.3f},{at + note.dur:.3f})'")
+    return filters
 
 
 @dataclass
@@ -103,6 +149,7 @@ class VideoEditor:
     def __init__(self):
         self.clips: list[Clip] = []
         self.notes: list[TextNote] = []
+        self.layers: list[TimelineLayer] = []
         self.markers: list[Marker] = []
         self._base = None          # normalizált alap-videó (cache, ha >1 klip)
         self._base_dir = None      # az alap-videó tartós ideiglenes mappája
@@ -151,6 +198,160 @@ class VideoEditor:
                 return c.width, c.height
         return 1280, 720
 
+
+    def add_layer(self, kind, path, at, duration=None):
+        path = str(Path(path).resolve())
+        if not math.isfinite(at) or not 0 <= at < self.total_duration():
+            raise ValueError("Válassz a videón belüli kezdőpontot.")
+        if kind == "image":
+            _, width, height = probe(path)
+            if not width or not height:
+                raise ValueError("A képet nem sikerült beolvasni.")
+        elif kind == "audio":
+            duration = media_duration(path)
+            if not _has_audio(path):
+                raise ValueError("A fájlban nincs lejátszható hang.")
+        else:
+            raise ValueError("Ismeretlen beszúrástípus.")
+        if duration is None or not math.isfinite(duration) or duration <= 0:
+            raise ValueError("Adj meg pozitív, érvényes időtartamot.")
+        layer = TimelineLayer(kind, path, at, duration)
+        self.layers.append(layer)
+        self.layers.sort(key=lambda item: item.at)
+        return layer
+
+    def _layer_inputs(self, cmd, base, ranges, *, video=True):
+        """Apply the layers on the project timeline before trimming any ranges."""
+        total = self.total_duration()
+        graph = []
+        video_stream = "0:v:0"
+        if video:
+            graph.append("[0:v:0]setpts=PTS-STARTPTS[vbase]")
+            video_stream = "vbase"
+        audio_stream = ""
+        if _has_audio(base):
+            graph.append(f"[0:a:0]{_audio_chain(total)}[abase]")
+            audio_stream = "abase"
+
+        width, height = self.target_res()
+        effects = []
+        source = 0
+        for layer in self.layers:
+            if not video and layer.kind == "image":
+                continue
+            end = min(total, layer.at + layer.duration)
+            if not any(layer.at < right and end > left for left, right in ranges):
+                continue
+            cmd.extend(["-i", layer.path])
+            source += 1
+            if layer.kind == "image":
+                graph.append(
+                    f"[{source}:v:0]trim=end_frame=1,setpts=PTS-STARTPTS,"
+                    f"scale={max(1, int(width * .4))}:{max(1, int(height * .4))}:"
+                    f"force_original_aspect_ratio=decrease,setsar=1[image{source}]")
+                graph.append(
+                    f"[{video_stream}][image{source}]overlay="
+                    f"x=main_w-overlay_w-main_w*0.04:y=main_h*0.04:"
+                    f"enable='gte(t,{layer.at:.6f})*lt(t,{end:.6f})'[layer{source}]")
+                video_stream = f"layer{source}"
+            else:
+                graph.append(
+                    f"[{source}:a:0]aresample=48000,aformat=channel_layouts=stereo,"
+                    f"atrim=duration={end - layer.at:.6f},asetpts=PTS-STARTPTS,"
+                    f"volume={EFFECT_GAIN},adelay={round(layer.at * 48000)}S:all=1[effect{source}]")
+                effects.append(f"[effect{source}]")
+        if effects:
+            if not audio_stream:
+                graph.append(f"anullsrc=r=48000:cl=stereo,atrim=duration={total:.6f}[abase]")
+            graph.append(f"[abase]{''.join(effects)}amix=inputs={len(effects) + 1}:"
+                         "duration=first:normalize=0,alimiter=limit=0.95:level=0:latency=1[mixed]")
+            audio_stream = "mixed"
+        return graph, video_stream, audio_stream
+
+    def _render_layers(self, ff, ranges, out, work, progress):
+        base = self._ensure_base(ff)
+        if not base:
+            return False
+        cmd = [ff, "-hide_banner", "-loglevel", "error", "-y",
+               "-filter_complex_threads", "1", "-i", base]
+        graph, video, audio = self._layer_inputs(cmd, base, ranges)
+        if len(ranges) > 1:
+            graph.append(f"[{video}]split={len(ranges)}" + "".join(f"[vs{i}]" for i in range(len(ranges))))
+            if audio:
+                graph.append(f"[{audio}]asplit={len(ranges)}" + "".join(f"[as{i}]" for i in range(len(ranges))))
+        segments = []
+        for i, (left, right) in enumerate(ranges):
+            vsource = f"vs{i}" if len(ranges) > 1 else video
+            graph.append(f"[{vsource}]trim=start={left:.6f}:end={right:.6f},setpts=PTS-STARTPTS[v{i}]")
+            segments.append(f"[v{i}]")
+            if audio:
+                asource = f"as{i}" if len(ranges) > 1 else audio
+                graph.append(f"[{asource}]atrim=start={left:.6f}:end={right:.6f},asetpts=PTS-STARTPTS[a{i}]")
+                segments.append(f"[a{i}]")
+        if len(ranges) > 1:
+            graph.append(f"{''.join(segments)}concat=n={len(ranges)}:v=1:a={int(bool(audio))}"
+                         + ("[video][audio]" if audio else "[video]"))
+            video, audio = "video", "audio" if audio else ""
+        else:
+            video, audio = "v0", "a0" if audio else ""
+
+        width, height = self.target_res()
+        offset = 0.0
+        captions = []
+        for left, right in ranges:
+            captions.extend((note, offset + note.at - left)
+                            for note in self.notes if left <= note.at < right)
+            offset += right - left
+        filters = _caption_filters(captions, work, width, height)
+        if filters:
+            graph.append(f"[{video}]{','.join(filters)}[captioned]")
+            video = "captioned"
+
+        graph.append(f"[{video}]pad=ceil(iw/2)*2:ceil(ih/2)*2[output_video]")
+        cmd += ["-filter_complex", ";".join(graph), "-map", "[output_video]"]
+        if audio:
+            cmd += ["-map", f"[{audio}]"]
+        cmd += ["-t", f"{offset:.6f}", "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+                "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k",
+                "-progress", "pipe:1", "-nostats"]
+        destination = Path(out).resolve()
+        inputs = [Path(clip.path).resolve() for clip in self.clips]
+        inputs.extend(Path(layer.path) for layer in self.layers)
+        if destination in inputs:
+            self.error = "A mentéshez válassz a forrásfájloktól eltérő nevet."
+            return False
+        with tempfile.TemporaryDirectory(prefix="superdl_output_", dir=destination.parent) as staging:
+            temporary = Path(staging) / destination.name
+            if not self._run_progress(cmd + [str(temporary)], str(work), offset, progress):
+                return False
+            os.replace(temporary, destination)
+        return True
+
+    def preview_audio(self, start, out):
+        """Render a short excerpt using the same mix as the saved video."""
+        self._stop.clear()
+        self.error = ""
+        try:
+            end = min(self.total_duration(), start + PREVIEW_SECONDS)
+            if end - start < 0.1:
+                self.error = "Az előnézethez válassz korábbi időpontot."
+                return False
+            ff = self._ff()
+            base = self._ensure_base(ff) if ff else None
+            if not base:
+                self.error = self.error or "A videó hangja nem érhető el."
+                return False
+            cmd = [ff, "-hide_banner", "-loglevel", "error", "-y", "-i", base]
+            graph, _, audio = self._layer_inputs(cmd, base, [(start, end)], video=False)
+            if not audio:
+                self.error = "Ezen a szakaszon nincs lejátszható hang."
+                return False
+            graph.append(f"[{audio}]atrim=start={start:.6f}:end={end:.6f},asetpts=PTS-STARTPTS[preview]")
+            return self._run(cmd + ["-filter_complex", ";".join(graph), "-map", "[preview]", out])
+        except (OSError, subprocess.SubprocessError, ValueError) as error:
+            self.error = str(error)
+            return False
+
     # ---- vezérlés -----------------------------------------------------
 
     def stop(self):
@@ -171,6 +372,9 @@ class VideoEditor:
                 cmd, cwd=cwd, stdin=subprocess.DEVNULL,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.PIPE, text=True, creationflags=flags)
+            if self._stop.is_set():
+                procutil.stop_proc(self._proc)
+                return False
             _out, err = self._proc.communicate()
             if self._proc.returncode != 0:
                 self.error = (err or "").strip().splitlines()[-1] \
@@ -193,7 +397,7 @@ class VideoEditor:
             self._base_dir = tempfile.mkdtemp(prefix="superdl_editbase_")
         w, h = self.target_res()
         base = Path(self._base_dir) / "base.mp4"
-        cmd = [ff, "-y"]
+        cmd = [ff, "-y", "-filter_complex_threads", "1"]
         for c in self.clips:
             cmd += ["-i", c.path]
         parts = []
@@ -201,7 +405,10 @@ class VideoEditor:
             parts.append(
                 f"[{i}:v]scale={w}:{h}:force_original_aspect_ratio=decrease,"
                 f"pad={w}:{h}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=25[v{i}]")
-        streams = "".join(f"[v{i}][{i}:a]" for i in range(len(self.clips)))
+        for i, clip in enumerate(self.clips):
+            source = f"[{i}:a:0]" if _has_audio(clip.path) else "anullsrc=r=48000:cl=stereo,"
+            parts.append(f"{source}{_audio_chain(clip.duration)}[a{i}]")
+        streams = "".join(f"[v{i}][a{i}]" for i in range(len(self.clips)))
         graph = ";".join(parts) + ";" + streams + \
             f"concat=n={len(self.clips)}:v=1:a=1[cv][ca]"
         cmd += ["-filter_complex", graph, "-map", "[cv]", "-map", "[ca]",
@@ -235,6 +442,8 @@ class VideoEditor:
 
         work = Path(tempfile.mkdtemp(prefix="superdl_edit_"))
         try:
+            if self.layers:
+                return self._render_layers(ff, [(start, end)], out, work, progress)
             base = self._ensure_base(ff)
             if not base:
                 self.error = self.error or "az összefűzés nem sikerült"
@@ -279,6 +488,9 @@ class VideoEditor:
                     "-progress", "pipe:1", "-nostats", out]
             # a progress-hez külön kezeljük a stdout-ot
             return self._run_progress(cmd, str(work), dur, progress)
+        except (OSError, subprocess.SubprocessError, ValueError) as error:
+            self.error = str(error)
+            return False
         finally:
             shutil.rmtree(work, ignore_errors=True)
 
@@ -314,6 +526,9 @@ class VideoEditor:
         out_dur = total - gap
         work = Path(tempfile.mkdtemp(prefix="superdl_cut_"))
         try:
+            if self.layers:
+                ranges = ([(0.0, cut_start)] if head else []) + ([(cut_end, total)] if tail else [])
+                return self._render_layers(ff, ranges, out, work, progress)
             base = self._ensure_base(ff)
             if not base:
                 self.error = self.error or "az összefűzés nem sikerült"
@@ -380,6 +595,9 @@ class VideoEditor:
                    "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k",
                    "-progress", "pipe:1", "-nostats", out]
             return self._run_progress(cmd, str(work), out_dur, progress)
+        except (OSError, subprocess.SubprocessError, ValueError) as error:
+            self.error = str(error)
+            return False
         finally:
             shutil.rmtree(work, ignore_errors=True)
 
@@ -399,6 +617,11 @@ class VideoEditor:
         except OSError as e:
             self.error = str(e)
             return False
+        if self._stop.is_set():
+            procutil.stop_proc(self._proc)
+            self.error = "a mentést megszakították"
+            return False
+        last_error = ""
         for line in self._proc.stdout:
             if self._stop.is_set():
                 break
@@ -409,13 +632,15 @@ class VideoEditor:
                     progress(min(1.0, (ms / 1_000_000) / dur))
                 except (ValueError, ZeroDivisionError):
                     pass
+            elif line and "=" not in line:
+                last_error = line
         rc = self._proc.wait()
         procutil.close_pipes(self._proc)      # a stdout bezárása (MK4)
         if self._stop.is_set():
             self.error = "a mentést megszakították"
             return False
         if rc != 0:
-            self.error = f"ffmpeg hibakód {rc}"
+            self.error = last_error or f"ffmpeg hibakód {rc}"
             return False
         if progress:
             progress(1.0)
