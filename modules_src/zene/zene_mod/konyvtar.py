@@ -251,3 +251,37 @@ def ido_szoveg(mp: float) -> str:
     if perc:
         return f"{perc} perc"
     return f"{masodperc} másodperc"
+
+
+def listak_betolt() -> dict[str, list[str]]:
+    """A névvel mentett válogatások, a fájlok eredeti sorrendjében."""
+    path = BEALLITAS.with_name("zene_listak.json")
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {}
+    if not isinstance(data, dict) or any(
+            not isinstance(paths, list)
+            or any(not isinstance(ut, str) or not Path(ut).is_absolute()
+                   or not zenei_fajl(ut) for ut in paths)
+            for paths in data.values()):
+        raise ValueError("A mentett lejátszási listák fájlja nem olvasható.")
+    return data
+
+
+def listak_ment(listak: dict[str, list[str]]) -> None:
+    """Atomi csere, így félbeszakadt mentésnél megmarad az előző változat."""
+    import tempfile
+
+    path = BEALLITAS.with_name("zene_listak.json")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent,
+                                         prefix=".zene_listak_", delete=False) as file:
+            temporary = Path(file.name)
+            json.dump(listak, file, ensure_ascii=False, indent=2)
+        temporary.replace(path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)

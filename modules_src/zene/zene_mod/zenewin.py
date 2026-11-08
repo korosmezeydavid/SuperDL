@@ -18,6 +18,7 @@ import random
 import subprocess
 import threading
 import time
+from collections import deque
 
 import wx
 
@@ -32,8 +33,8 @@ HANGERO_LEPES = 0.1
 SUGO = """ZENE – EGYSZERŰ LEJÁTSZÓ
 
 MIRE VALÓ
-Zenét játszik. Kedvenceket lehet benne jelölni, és keverve is tud játszani –
-ezen túl nem tud mást, és nem is akar.
+Zenét játszik. Kijelölheted a kedvenceidet, keverve hallgathatsz, vagy saját
+sorrendet állíthatsz össze a következő számokból.
 
 INDULÁS
 A „Zenemappa kiválasztása” gombbal (Ctrl+O) adj meg EGY mappát. Ami alatta
@@ -59,6 +60,16 @@ LEJÁTSZÁS
   Ctrl+S ............. elalvás időzítő (5-től 60 percig)
   Ctrl+H ............. hangkimenet (fejhallgató, hangszóró) kiválasztása
   Ctrl+Shift+H ....... hangszín (basszus, magas, beszéd, meleg…)
+
+KÖVETKEZŐ SZÁMOK
+  Ctrl+L ............. a zenemappa böngészése lejátszásváltás nélkül
+  Ctrl+Shift+L ....... egy névvel mentett válogatás megnyitása
+A válogatóban a Szóköz hozzáadja vagy kiveszi a számot. A második listában
+a bejelölés sorrendje látható, ott a Delete leveszi a kijelölt számot.
+A „Lista mentése névvel” későbbre elteszi a válogatást. A „Lejátszási sor
+alkalmazása” után az aktuális szám végén indul a sor, üres lejátszónál
+azonnal. A sor végén a lejátszás megáll. A sor saját sorrendben játszik.
+A keverés és ismétlés beállítása a zenemappa lejátszásához megmarad.
 
 KEDVENCEK
   Ctrl+D ............. az éppen kijelölt szám kedvenc lesz, vagy már nem az
@@ -154,6 +165,98 @@ class _NevAccessible(wx.Accessible):
         return (wx.ACC_OK, self._name)
 
 
+
+class SorDialog(wx.Dialog):
+    """Kijelölés a lejátszó vezérlése nélkül."""
+
+    def __init__(self, parent, szamok, sorban):
+        super().__init__(parent, title="Következő számok kiválasztása", size=(800, 520))
+        self._parent = parent
+        self._szamok = list(szamok)
+        self._sor = {os.path.normcase(s.ut): s for s in sorban}
+        self._poziciok = {os.path.normcase(s.ut): i for i, s in enumerate(self._szamok)}
+        panel = wx.Panel(self)
+        layout = wx.BoxSizer(wx.VERTICAL)
+        layout.Add(wx.StaticText(panel, label=(
+            "Nyilak: böngészés. Szóköz: hozzáadás vagy levétel. "
+            "A számok a bejelölés sorrendjében következnek.")), 0, wx.ALL, 8)
+        lists = wx.BoxSizer(wx.HORIZONTAL)
+        library, queue = wx.BoxSizer(wx.VERTICAL), wx.BoxSizer(wx.VERTICAL)
+        library.Add(wx.StaticText(panel, label="&Számok a zenemappában:"), 0, wx.ALL, 5)
+        self.lista = wx.ListBox(panel, name="Választható számok")
+        library.Add(self.lista, 1, wx.EXPAND | wx.ALL, 5)
+        queue.Add(wx.StaticText(panel, label="&Lejátszási sorrend (Delete: levétel):"),
+                  0, wx.ALL, 5)
+        self.sorlista = wx.ListBox(panel, name="Következő számok lejátszási sorrendben")
+        queue.Add(self.sorlista, 1, wx.EXPAND | wx.ALL, 5)
+        lists.Add(library, 1, wx.EXPAND)
+        lists.Add(queue, 1, wx.EXPAND)
+        layout.Add(lists, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
+
+        buttons = wx.BoxSizer(wx.HORIZONTAL)
+        self.apply = wx.Button(panel, wx.ID_OK, "Lejátszási sor &alkalmazása")
+        self.apply.Bind(wx.EVT_BUTTON, lambda event: self.EndModal(wx.ID_OK))
+        self.save = wx.Button(panel, label="Lista &mentése névvel…")
+        self.save.Bind(wx.EVT_BUTTON, lambda event: parent._sor_ment(self.szamai(), self))
+        cancel = wx.Button(panel, wx.ID_CANCEL, "Még&se")
+        cancel.Bind(wx.EVT_BUTTON, lambda event: self.EndModal(wx.ID_CANCEL))
+        for button in (self.apply, self.save, cancel):
+            buttons.Add(button, 0, wx.RIGHT, 6)
+        layout.Add(buttons, 0, wx.ALL, 8)
+        panel.SetSizer(layout)
+        self.Bind(wx.EVT_CHAR_HOOK, self._billentyu)
+        self.lista.Set([self._sor_felirat(s) for s in self._szamok])
+        if self._szamok:
+            self.lista.SetSelection(0)
+        self._frissit()
+        (self.lista if self._szamok else self.sorlista).SetFocus()
+
+    def _sor_felirat(self, szam):
+        return ("bejelölve, " if os.path.normcase(szam.ut) in self._sor else "") + szam.felirat()
+
+    def _frissit(self):
+        index = self.sorlista.GetSelection()
+        self.sorlista.Set([f"{i}. {s.felirat()}" for i, s in enumerate(self._sor.values(), 1)])
+        if self._sor:
+            self.sorlista.SetSelection(max(0, min(index, len(self._sor) - 1)))
+        self.apply.Enable(bool(self._sor))
+        self.save.Enable(bool(self._sor))
+
+    def _valt(self, szam):
+        key = os.path.normcase(szam.ut)
+        if key in self._sor:
+            del self._sor[key]
+            action = "Levetted a sorból"
+        else:
+            self._sor[key] = szam
+            action = f"Hozzáadva, {len(self._sor)}. a sorban"
+        i = self._poziciok.get(key)
+        if i is not None:
+            selected = self.lista.GetSelection()
+            self.lista.SetString(i, self._sor_felirat(szam))
+            if selected != wx.NOT_FOUND:
+                self.lista.SetSelection(selected)
+        self._frissit()
+        _mondd(self._parent.main, f"{action}: {szam.felirat()}.")
+
+    def _billentyu(self, event):
+        focus = wx.Window.FindFocus()
+        key = event.GetKeyCode()
+        if focus is self.lista and key == wx.WXK_SPACE:
+            i = self.lista.GetSelection()
+            if i != wx.NOT_FOUND:
+                self._valt(self._szamok[i])
+        elif focus is self.sorlista and key == wx.WXK_DELETE:
+            i = self.sorlista.GetSelection()
+            if i != wx.NOT_FOUND:
+                self._valt(self.szamai()[i])
+        else:
+            event.Skip()
+
+    def szamai(self):
+        return list(self._sor.values())
+
+
 class ZeneFrame(wx.Frame):
 
     def __init__(self, main):
@@ -163,6 +266,11 @@ class ZeneFrame(wx.Frame):
         self._osszes = []            # a zenemappa minden száma
         self._szamok = []            # AMI A LISTÁBAN LÁTSZIK (nézet szerint)
         self._index = -1
+        self._szolo_szam = None
+        self._lejatszas_folyamatban = False
+        self._sorban = None
+        self._sor_szerkesztes = False
+        self._sor_varakozo_vege = False
         self._ismetles = False
         self._tovabb = True          # a szám végén menjen a következőre
         self._alvas_vege = 0.0       # időbélyeg; 0 = nincs elalvás
@@ -221,6 +329,12 @@ class ZeneFrame(wx.Frame):
         b = wx.Button(p, label="Zene&mappa kiválasztása…  (Ctrl+O)")
         b.Bind(wx.EVT_BUTTON, lambda e: self._mappat_valaszt())
         sor.Add(b, 0, wx.RIGHT, 6)
+        queue = wx.Button(p, label="K&övetkező számok kiválasztása…")
+        queue.Bind(wx.EVT_BUTTON, lambda e: self._sor_kivalaszt())
+        sor.Add(queue, 0, wx.RIGHT, 6)
+        saved = wx.Button(p, label="Me&ntett listák…")
+        saved.Bind(wx.EVT_BUTTON, lambda e: self._sor_megnyit())
+        sor.Add(saved, 0, wx.RIGHT, 6)
         bm = wx.Button(p, label="Mű&veletek…  (Shift+F10)")
         bm.Bind(wx.EVT_BUTTON, lambda e: self._helyi_menu(None))
         sor.Add(bm, 0, wx.RIGHT, 6)
@@ -286,6 +400,10 @@ class ZeneFrame(wx.Frame):
               self._szunet)
         tetel("Előző szám\tFel nyíl", lambda: self._lep(-1))
         tetel("Következő szám\tLe nyíl", lambda: self._lep(1))
+        tetel("Következő számok kiválasztása…\tCtrl+L", self._sor_kivalaszt)
+        tetel("Mentett lejátszási listák…\tCtrl+Shift+L", self._sor_megnyit)
+        if self._sorban is not None:
+            tetel("Lejátszási sor törlése", self._sor_torol)
         m.AppendSeparator()
         tetel("Vissza 5 másodpercet\tBal nyíl", lambda: self._teker(-TEKERES_MP))
         tetel("Előre 5 másodpercet\tJobb nyíl", lambda: self._teker(TEKERES_MP))
@@ -406,8 +524,9 @@ class ZeneFrame(wx.Frame):
         A ÉPPEN SZÓLÓ számot megkeressük az új listában, és ha benne van, a
         kijelölés meg a belső index rá áll – nézetváltáskor ne kezdjen el
         más számra hivatkozni a „Hol tartunk?" meg a továbblépés."""
-        szolo = (self._szamok[self._index].ut
-                 if 0 <= self._index < len(self._szamok) else "")
+        szolo = (self._szolo_szam.ut if self._szolo_szam is not None else
+                 self._szamok[self._index].ut if 0 <= self._index < len(self._szamok)
+                 else "")
         if self._kedvenc_nezet:
             terkep = {s.ut.lower(): s for s in self._osszes}
             self._szamok = [terkep.get(u.lower()) or KT.szam_utbol(u)
@@ -515,15 +634,102 @@ class ZeneFrame(wx.Frame):
             random.shuffle(self._zsak)
         return self._zsak.pop()
 
+
+    def _sor_kivalaszt(self):
+        szamok = self._osszes or self._szamok
+        if not szamok and not self._sorban:
+            self._allapot("Előbb válassz zenemappát, vagy nyiss meg egy mentett listát.")
+            return
+        self._sor_szerkesztes = True
+        self._sor_varakozo_vege = False
+        try:
+            with SorDialog(self, szamok, self._sorban or ()) as dialog:
+                uj_sor = dialog.szamai() if dialog.ShowModal() == wx.ID_OK else None
+        finally:
+            self._sor_szerkesztes = False
+        if uj_sor is not None:
+            self._sor_alkalmaz(uj_sor)
+        elif self._sor_varakozo_vege:
+            self._szam_vege()
+
+    def _sor_ment(self, szamok, parent):
+        try:
+            listak = KT.listak_betolt()
+            with wx.TextEntryDialog(parent, "A válogatás neve:", "Lejátszási lista mentése") as dialog:
+                if dialog.ShowModal() != wx.ID_OK:
+                    return
+                nev = dialog.GetValue().strip()
+            if not nev:
+                wx.MessageBox("Adj nevet a listának.", "Lejátszási lista",
+                              wx.OK | wx.ICON_INFORMATION, parent)
+                return
+            regi = next((key for key in listak if key.casefold() == nev.casefold()), None)
+            if regi is not None and wx.MessageBox(
+                    f"Lecseréled a mentett listát? {regi}", "Lejátszási lista mentése",
+                    wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION, parent) != wx.YES:
+                return
+            listak[regi or nev] = [os.path.abspath(s.ut) for s in szamok]
+            KT.listak_ment(listak)
+        except (OSError, ValueError) as error:
+            wx.MessageBox(f"A lista mentése nem sikerült. {error}", "Lejátszási lista",
+                          wx.OK | wx.ICON_ERROR, parent)
+            return
+        self._allapot(f"Lista mentve: {regi or nev}, {len(szamok)} szám.")
+
+    def _sor_megnyit(self):
+        try:
+            listak = KT.listak_betolt()
+        except (OSError, ValueError) as error:
+            wx.MessageBox(f"A mentett listák nem olvashatók. {error}", "Mentett listák",
+                          wx.OK | wx.ICON_ERROR, self)
+            return
+        if not listak:
+            self._allapot("Még nincs mentett lejátszási lista.")
+            return
+        nevek = sorted(listak, key=str.casefold)
+        with wx.SingleChoiceDialog(self, "Melyik válogatás kerüljön a lejátszási sorba?",
+                                   "Mentett listák megnyitása", nevek) as dialog:
+            if dialog.ShowModal() != wx.ID_OK:
+                return
+            nev = dialog.GetStringSelection()
+        self._sor_alkalmaz([KT.szam_utbol(ut) for ut in listak[nev]])
+
+    def _sor_alkalmaz(self, szamok):
+        self._sorban = deque(szamok)
+        if self._lejatszas_folyamatban:
+            self._allapot(f"Lejátszási sor beállítva. {len(self._sorban)} szám várakozik.")
+        else:
+            self._sor_leptet()
+
+    def _sor_torol(self):
+        self._sorban = None
+        self._allapot("A lejátszási sor törölve. Visszatérés a zenemappa lejátszásához.")
+
+    def _sor_leptet(self):
+        kihagyott = 0
+        while self._sorban:
+            szam = self._sorban.popleft()
+            if not os.path.isfile(szam.ut):
+                kihagyott += 1
+                continue
+            index = next((i for i, s in enumerate(self._szamok)
+                          if os.path.normcase(s.ut) == os.path.normcase(szam.ut)), -1)
+            elo = f"{kihagyott} hiányzó fájl kihagyva. " if kihagyott else ""
+            self._lejatszik(szam, index, False, elo)
+            return
+        self._sorban = None
+        elo = f"{kihagyott} hiányzó fájl kihagyva. " if kihagyott else ""
+        self._allapot(elo + "A lejátszási sor véget ért.")
+
     # ---- lejátszás ------------------------------------------------------
 
     def _motor(self):
         if self._lejatszo is None:
             from .keverolejatszo import KeveroLejatszo
             self._lejatszo = KeveroLejatszo(
-                on_vege=lambda: wx.CallAfter(self._szam_vege),
-                on_attunes_ido=lambda: wx.CallAfter(self._attunes_ideje),
-                on_hiba=lambda s: wx.CallAfter(self._hiba, s),
+                on_vege=lambda: self._lejatszo_kesobb(self._szam_vege),
+                on_attunes_ido=lambda: self._lejatszo_kesobb(self._attunes_ideje),
+                on_hiba=lambda s: self._lejatszo_kesobb(self._hiba, s),
                 on_kimenet=lambda r, u: wx.CallAfter(self._kimenet_valtott,
                                                      r, u))
             self._lejatszo.fo_hangero = self._hangero
@@ -537,6 +743,18 @@ class ZeneFrame(wx.Frame):
                 self._lejatszo.hangszin_allit(
                     HSZ.szuro(self._hangszin, self._hangszin_eros))
         return self._lejatszo
+
+    def _lejatszo_kesobb(self, callback, *args):
+        motor = self._lejatszo
+        if motor is None:
+            return
+        generation = motor.nemzedek
+
+        def run():
+            if self._lejatszo is motor and motor.nemzedek == generation:
+                callback(*args)
+
+        wx.CallAfter(run)
 
     # ---- hangszín --------------------------------------------------------
 
@@ -639,17 +857,21 @@ class ZeneFrame(wx.Frame):
     def _indit(self, i, attunessel=False):
         if not (0 <= i < len(self._szamok)):
             return
-        self._index = i
-        szam = self._szamok[i]
-        if self.lista.GetSelection() != i:
-            self.lista.SetSelection(i)
+        self._lejatszik(self._szamok[i], i, attunessel)
+
+    def _lejatszik(self, szam, index, attunessel, elo=""):
+        self._index = index
+        self._szolo_szam = szam
+        self._lejatszas_folyamatban = True
+        if index >= 0 and self.lista.GetSelection() != index:
+            self.lista.SetSelection(index)
         h = KT.hossz(szam.ut)
         m = self._motor()
         if attunessel:
             m.attunes_ra(szam.ut, h)
         else:
             m.jatszik(szam.ut, h)
-        self._allapot(self._sor(szam))
+        self._allapot(elo + self._sor(szam))
 
     def _lep(self, irany):
         if not self._szamok:
@@ -671,7 +893,8 @@ class ZeneFrame(wx.Frame):
 
     def _attunes_ideje(self):
         """Három másodperccel a vége előtt: jöhet a következő."""
-        if self._closing or self._ismetles or not self._tovabb:
+        if (self._closing or self._sor_szerkesztes or self._sorban is not None
+                or self._ismetles or not self._tovabb):
             return
         k = self._kovetkezo_index()
         if k >= 0:
@@ -680,6 +903,13 @@ class ZeneFrame(wx.Frame):
     def _szam_vege(self):
         """A szám a végére ért ÁTTŰNÉS NÉLKÜL (nincs hossz, vagy nem ment)."""
         if self._closing:
+            return
+        self._lejatszas_folyamatban = False
+        if self._sor_szerkesztes:
+            self._sor_varakozo_vege = True
+            return
+        if self._sorban is not None:
+            self._sor_leptet()
             return
         if self._ismetles:
             self._indit(self._index)
@@ -694,12 +924,23 @@ class ZeneFrame(wx.Frame):
     def _hiba(self, szoveg):
         if self._closing:
             return
-        self._allapot(f"Ez a szám nem játszható le. {szoveg}")
+        self._lejatszas_folyamatban = False
+        folytatas = " A sor a Szóközzel folytatható." if self._sorban else ""
+        self._allapot(f"Ez a szám nem játszható le. {szoveg}{folytatas}")
 
     # ---- billentyűk ------------------------------------------------------
 
     def _on_key(self, e):
+        if self._sor_szerkesztes:
+            e.Skip()
+            return
         kod, ctrl, shift = e.GetKeyCode(), e.ControlDown(), e.ShiftDown()
+        if ctrl and kod in (ord("L"), ord("l")):
+            if shift:
+                self._sor_megnyit()
+            else:
+                self._sor_kivalaszt()
+            return
         if kod == wx.WXK_ESCAPE:
             self.Close()
             return
@@ -766,7 +1007,7 @@ class ZeneFrame(wx.Frame):
         if ctrl and kod in (ord("C"), ord("c")):
             self._vagolapra()
             return
-        if kod == wx.WXK_SPACE:
+        if kod == wx.WXK_SPACE and not isinstance(wx.Window.FindFocus(), wx.Button):
             self._szunet()
             return
         if kod == wx.WXK_LEFT:
@@ -781,6 +1022,9 @@ class ZeneFrame(wx.Frame):
 
     def _szunet(self):
         if self._lejatszo is None or not self._lejatszo.szol():
+            if self._sorban:
+                self._sor_leptet()
+                return
             i = self.lista.GetSelection()
             if 0 <= i < len(self._szamok):
                 self._indit(i)
@@ -885,11 +1129,11 @@ class ZeneFrame(wx.Frame):
         self.lista.SetFocus()
 
     def _vagolapra(self):
-        i = self._index if self._index >= 0 else self.lista.GetSelection()
-        if not (0 <= i < len(self._szamok)):
+        i = self.lista.GetSelection()
+        s = self._szolo_szam or (self._szamok[i] if 0 <= i < len(self._szamok) else None)
+        if s is None:
             self._allapot("Nincs kiválasztott szám.")
             return
-        s = self._szamok[i]
         if wx.TheClipboard.Open():
             try:
                 wx.TheClipboard.SetData(wx.TextDataObject(
@@ -901,11 +1145,12 @@ class ZeneFrame(wx.Frame):
             self._allapot("A vágólap most nem érhető el.")
 
     def _intezoben(self):
-        i = self._index if self._index >= 0 else self.lista.GetSelection()
-        if not (0 <= i < len(self._szamok)):
+        i = self.lista.GetSelection()
+        s = self._szolo_szam or (self._szamok[i] if 0 <= i < len(self._szamok) else None)
+        if s is None:
             self._allapot("Nincs kiválasztott szám.")
             return
-        ut = self._szamok[i].ut
+        ut = s.ut
         try:
             subprocess.Popen(["explorer", "/select,", os.path.normpath(ut)])
             self._allapot("A mappa megnyílt az Intézőben.")
@@ -913,7 +1158,7 @@ class ZeneFrame(wx.Frame):
             self._allapot(f"A mappát nem sikerült megnyitni. {ex}")
 
     def _hol_tartunk(self):
-        if not self._szamok:
+        if not self._szamok and self._szolo_szam is None:
             self._allapot("Nincs betöltve zene.")
             return
         reszek = []
@@ -921,6 +1166,10 @@ class ZeneFrame(wx.Frame):
             s = self._szamok[self._index]
             reszek.append(f"{self._index + 1}. a {len(self._szamok)}-ból: "
                           f"{s.felirat()}")
+        elif self._szolo_szam is not None:
+            reszek.append(self._szolo_szam.felirat())
+        if self._sorban is not None:
+            reszek.append(f"{len(self._sorban)} szám vár a lejátszási sorban")
         if self._lejatszo is not None and self._lejatszo.szol():
             h = self._lejatszo.hossz()
             p = KT.ido_szoveg(self._lejatszo.pozicio())
@@ -991,6 +1240,7 @@ class ZeneFrame(wx.Frame):
         hatra = self._alvas_vege - time.time()
         if hatra <= 0:
             self._alvas_vege = 0.0
+            self._lejatszas_folyamatban = False
             if self._lejatszo is not None:
                 self._lejatszo.leallit()
                 self._lejatszo.hangero(1.0)

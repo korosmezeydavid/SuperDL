@@ -174,6 +174,10 @@ class KeveroLejatszo:
     def hossz(self) -> float:
         return self._hossz
 
+    @property
+    def nemzedek(self) -> int:
+        return self._nemzedek
+
     def szol(self) -> bool:
         return self._aktiv.is_active()
 

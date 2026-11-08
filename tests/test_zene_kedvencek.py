@@ -342,3 +342,106 @@ def test_a_sugo_mind_a_harom_ujdonsagot_leirja():
     for kulcs in ("Ctrl+D", "Ctrl+B", "Ctrl+K", "Ctrl+H",
                   "KEDVENCEK", "KEVERÉS", "HANGKIMENET"):
         assert kulcs in zenewin.SUGO, kulcs
+
+
+def test_queue_picker_space_marks_in_order_without_playback(ablak, monkeypatch):
+    from types import SimpleNamespace
+    from zene_mod import zenewin
+
+    sounded = []
+    monkeypatch.setattr(ablak, "_indit", lambda i: sounded.append(i))
+    dialog = zenewin.SorDialog(ablak, ablak._osszes, [])
+    try:
+        focus = [dialog.lista]
+        monkeypatch.setattr(wx.Window, "FindFocus", lambda: focus[-1])
+        space = SimpleNamespace(GetKeyCode=lambda: wx.WXK_SPACE)
+        dialog.lista.SetSelection(2)
+        dialog._billentyu(space)
+        dialog.lista.SetSelection(0)
+        dialog._billentyu(space)
+        assert [s.ut for s in dialog.szamai()] == [ablak._osszes[i].ut for i in (2, 0)]
+        assert dialog.lista.GetString(0).startswith("bejelölve, ")
+        assert dialog.lista.GetSelection() == 0
+        focus.append(dialog.sorlista)
+        dialog.sorlista.SetSelection(0)
+        dialog._billentyu(SimpleNamespace(GetKeyCode=lambda: wx.WXK_DELETE))
+        assert [s.ut for s in dialog.szamai()] == [ablak._osszes[0].ut]
+        assert not sounded
+    finally:
+        dialog.Destroy()
+
+
+def test_queue_waits_then_plays_ordered_and_stops(ablak, tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    played = []
+    external = _szamok(tmp_path, ["Other/external.mp3"])[0]
+    missing = KT.szam_utbol(str(tmp_path / "missing.mp3"))
+    monkeypatch.setattr(KT, "hossz", lambda path: 4)
+    monkeypatch.setattr(ablak, "_motor", lambda: SimpleNamespace(
+        jatszik=lambda path, duration: played.append(path),
+        attunes_ra=lambda *args: pytest.fail("The queue must wait for the actual end"),
+    ))
+    ablak._indit(0)
+    ablak._keveres = ablak._ismetles = True
+    ablak._sor_alkalmaz([missing, external, ablak._szamok[1]])
+    ablak._attunes_ideje()
+    assert played == [ablak._szamok[0].ut]
+    ablak._szam_vege()
+    assert ablak._index == -1 and ablak._szolo_szam is external
+    ablak._szam_vege()
+    assert ablak._index == 1
+    ablak._szam_vege()
+    assert played == [ablak._szamok[0].ut, external.ut, ablak._szamok[1].ut]
+    assert not ablak._lejatszas_folyamatban and ablak._sorban is None
+    ablak._lep(1)
+    assert played[-1] == ablak._szamok[2].ut
+
+
+def test_named_lists_keep_order_and_do_not_replace_settings(beallitas, tmp_path):
+    tracks = _szamok(tmp_path, ["Alma.mp3", "Barack.mp3"])
+    KT.gyoker_ment(str(tmp_path))
+    saved = {"Esti válogatás": [tracks[1].ut, tracks[0].ut]}
+    KT.listak_ment(saved)
+    assert KT.listak_betolt() == saved
+    assert KT.gyoker_betolt() == str(tmp_path)
+    saved["Második"] = [tracks[0].ut]
+    KT.listak_ment(saved)
+    assert KT.listak_betolt() == saved
+
+
+def test_picker_cancel_does_not_replace_pending_queue(ablak, monkeypatch):
+    from zene_mod import zenewin
+    from collections import deque
+
+    class CancelDialog:
+        def __init__(self, parent, tracks, queue):
+            assert list(queue) == [ablak._szamok[2]]
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+        def ShowModal(self):
+            return wx.ID_CANCEL
+
+    ablak._sorban = deque([ablak._szamok[2]])
+    monkeypatch.setattr(zenewin, "SorDialog", CancelDialog)
+    ablak._sor_kivalaszt()
+    assert list(ablak._sorban) == [ablak._szamok[2]]
+
+
+def test_stale_end_callback_cannot_advance_the_new_track(ablak, monkeypatch):
+    from types import SimpleNamespace
+
+    waiting, called = [], []
+    monkeypatch.setattr(wx, "CallAfter", waiting.append)
+    motor = SimpleNamespace(nemzedek=1)
+    ablak._lejatszo = motor
+    ablak._lejatszo_kesobb(called.append, "old")
+    motor.nemzedek = 2
+    ablak._lejatszo_kesobb(called.append, "new")
+    for callback in waiting:
+        callback()
+    assert called == ["new"]
