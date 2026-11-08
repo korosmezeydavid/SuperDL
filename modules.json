@@ -158,14 +158,14 @@
       "id": "mediatools",
       "name": "Média-eszközök",
       "category": "Média",
-      "description": "ÚJ BILLENTYŰK: a Videókészítő mostantól Ctrl+Alt+E, a Videóvágó Ctrl+Alt+V a főmenüben (eddig Ctrl+Shift+V és Ctrl+Shift+E volt, amit más menüpont is használt, ezért hol az egyik, hol a másik nyílt). ÚJ FORMÁTUMOK (Miki jelzésére): a konvertáló és a médiaelemző mostantól látja a ritkább hangformátumokat is – .ape (Monkey's Audio), .wv, .tta, .tak, .mpc, .dsf, .dff, .aiff, .au, .amr, .caf, .spx, .ac3, .dts, .mka, .oga, .w64 –, tehát nem kell az „összes fájl” kerülőút. Ha a Windows fájlválasztója összeomlik a gépeden (idegen bővítmény miatt), a konvertáló a SuperDL beépített, biztonságos fájlválasztóját használja. Médiakészítő és -elemző eszközök egy csomagban: kötegelt médiakonvertáló, beszélő médiaelemző (LUFS/EBU R128), iPhone csengőhang-készítő, videókészítő (kép+zene) és videóvágó-összefűző. ÚJ: a DVD-s VOB (és a többi DVD/AVCHD formátum: m2v, m2ts, mts) mostantól MAPPÁBÓL is bekerül a listába, nem csak fájlonként kiválasztva; és a DVD több VOB-darabját (VTS_01_1, VTS_01_2 …) kérésre EGY filmmé fűzi össze (bájtszintű összefűzéssel, ahogy a DVD-hez való), a menü-fájlt kihagyva – és a végén ELLENŐRZI a kész film hosszát, hogy soha ne kapj néma féleredményt.",
+      "description": "ÚJ a Videóvágóban (Ctrl+Alt+V): időzített képek automatikus elhelyezéssel, hangfájlok keverése az eredeti hangsávhoz, hangelőnézet és billentyűzettel kezelhető beszúráslista. ÚJ BILLENTYŰK: a Videókészítő mostantól Ctrl+Alt+E, a Videóvágó Ctrl+Alt+V a főmenüben (eddig Ctrl+Shift+V és Ctrl+Shift+E volt, amit más menüpont is használt, ezért hol az egyik, hol a másik nyílt). ÚJ FORMÁTUMOK (Miki jelzésére): a konvertáló és a médiaelemző mostantól látja a ritkább hangformátumokat is – .ape (Monkey's Audio), .wv, .tta, .tak, .mpc, .dsf, .dff, .aiff, .au, .amr, .caf, .spx, .ac3, .dts, .mka, .oga, .w64 –, tehát nem kell az „összes fájl” kerülőút. Ha a Windows fájlválasztója összeomlik a gépeden (idegen bővítmény miatt), a konvertáló a SuperDL beépített, biztonságos fájlválasztóját használja. Médiakészítő és -elemző eszközök egy csomagban: kötegelt médiakonvertáló, beszélő médiaelemző (LUFS/EBU R128), iPhone csengőhang-készítő, videókészítő (kép+zene) és videóvágó-összefűző. ÚJ: a DVD-s VOB (és a többi DVD/AVCHD formátum: m2v, m2ts, mts) mostantól MAPPÁBÓL is bekerül a listába, nem csak fájlonként kiválasztva; és a DVD több VOB-darabját (VTS_01_1, VTS_01_2 …) kérésre EGY filmmé fűzi össze (bájtszintű összefűzéssel, ahogy a DVD-hez való), a menü-fájlt kihagyva – és a végén ELLENŐRZI a kész film hosszát, hogy soha ne kapj néma féleredményt.",
       "latest": {
-        "version": "1.4.12",
+        "version": "1.4.13",
         "min_core_api": "1.0",
         "min_core_version": "4.0.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.12/mediatools-1.4.12.zip",
-        "sha256": "a1742a3bf7b8bd9fe139cd0527083f9a7f8686d06f2e2f7a491b9a0f8e6b7d5a",
-        "size": 46067
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-mediatools-1.4.13/mediatools-1.4.13.zip",
+        "sha256": "14682a3e843189c963ccf50fedc864084ed57bec8e33f033858a36193643d66e",
+        "size": 50799
       }
     },
     {
