@@ -409,6 +409,79 @@ def test_named_lists_keep_order_and_do_not_replace_settings(beallitas, tmp_path)
     assert KT.listak_betolt() == saved
 
 
+def test_open_saved_list_restricts_visible_tracks_and_native_list_navigation(
+        ablak, tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    folder = list(ablak._osszes)
+    outside = _szamok(tmp_path, ["Other/outside.mp3"])[0]
+    missing = KT.szam_utbol(str(tmp_path / "missing.mp3"))
+    wanted = [folder[3], outside, missing, folder[0]]
+    KT.listak_ment({"Esti & reggeli": [s.ut for s in wanted]})
+
+    class ChoiceDialog:
+        def __init__(self, parent, message, title, choices):
+            assert choices == ["Esti & reggeli"]
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+        def ShowModal(self):
+            return wx.ID_OK
+
+        def GetStringSelection(self):
+            return "Esti & reggeli"
+
+    played = []
+    monkeypatch.setattr(wx, "SingleChoiceDialog", ChoiceDialog)
+    monkeypatch.setattr(KT, "hossz", lambda path: 4)
+    monkeypatch.setattr(ablak, "_motor", lambda: SimpleNamespace(
+        jatszik=lambda path, duration: played.append(path),
+        attunes_ra=lambda *args: pytest.fail("The saved list must stay in order"),
+    ))
+    ablak._indit(1)
+    ablak._sor_megnyit()
+    assert [s.ut for s in ablak._szamok] == [s.ut for s in wanted]
+    assert ablak.lista.GetCount() == len(wanted)
+    assert ablak.lista.GetName() == "Mentett lista: Esti & reggeli. 4 szám."
+    assert "hiányzik" in ablak.lista.GetString(2)
+    assert played == [folder[1].ut, folder[3].ut]
+
+    def select(index):
+        ablak.lista.SetSelection(index)
+        event = wx.CommandEvent(wx.EVT_LISTBOX.typeId, ablak.lista.GetId())
+        ablak.lista.GetEventHandler().ProcessEvent(event)
+
+    select(1)
+    select(0)
+    select(1)
+    select(2)
+    assert played == [folder[1].ut, folder[3].ut, outside.ut, folder[3].ut, outside.ut]
+    ablak._betoltve(folder, 2)
+    assert ablak.lista.GetSelection() == 2
+    ablak._ujraolvas()
+    assert [s.ut for s in ablak._szamok] == [s.ut for s in wanted]
+
+    ablak._keveres = ablak._ismetles = True
+    ablak._attunes_ideje()
+    ablak._szam_vege()
+    assert played[-1] == folder[0].ut
+    ablak._szam_vege()
+    assert played[-2:] == [outside.ut, folder[0].ut]
+    assert not ablak._lejatszas_folyamatban
+    assert ablak.lista.GetCount() == len(wanted)
+
+    ablak._on_key(SimpleNamespace(GetKeyCode=lambda: ord("B"),
+                                 ControlDown=lambda: True, ShiftDown=lambda: False))
+    assert ablak._szamok == folder
+    assert ablak._mentett_lista is None
+    ablak._lep(1)
+    assert played[-1] == folder[1].ut
+
+
 def test_picker_cancel_does_not_replace_pending_queue(ablak, monkeypatch):
     from zene_mod import zenewin
     from collections import deque

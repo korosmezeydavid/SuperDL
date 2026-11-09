@@ -70,6 +70,10 @@ A „Lista mentése névvel” későbbre elteszi a válogatást. A „Lejátsz�
 alkalmazása” után az aktuális szám végén indul a sor, üres lejátszónál
 azonnal. A sor végén a lejátszás megáll. A sor saját sorrendben játszik.
 A keverés és ismétlés beállítása a zenemappa lejátszásához megmarad.
+Mentett lista megnyitásakor a fő listában csak a válogatás számai látszanak.
+A fel-le nyíl ezek között lép, a válogatás a mentett sorrendben halad és a
+végén megáll. A „Kilépés a mentett listából” művelet (Ctrl+B) visszahozza
+az előző nézetet. Új zenemappa választásával is visszatérhetsz a mappanézetbe.
 
 KEDVENCEK
   Ctrl+D ............. az éppen kijelölt szám kedvenc lesz, vagy már nem az
@@ -269,6 +273,7 @@ class ZeneFrame(wx.Frame):
         self._szolo_szam = None
         self._lejatszas_folyamatban = False
         self._sorban = None
+        self._mentett_lista = None
         self._sor_szerkesztes = False
         self._sor_varakozo_vege = False
         self._ismetles = False
@@ -320,7 +325,7 @@ class ZeneFrame(wx.Frame):
         v.Add(self.cimke, 0, wx.LEFT | wx.TOP, 8)
 
         self.lista = wx.ListBox(p, style=wx.LB_SINGLE)
-        self._nev(self.lista, "Számok listája")
+        self._lista_accessible = self._nev(self.lista, "Számok listája")
         self.lista.Bind(wx.EVT_LISTBOX, lambda e: self._kijelolt_indul())
         self.lista.Bind(wx.EVT_CONTEXT_MENU, self._helyi_menu)
         v.Add(self.lista, 1, wx.EXPAND | wx.ALL, 8)
@@ -353,8 +358,9 @@ class ZeneFrame(wx.Frame):
             acc = _NevAccessible(nev)
             ctrl.SetAccessible(acc)
             self._accessibles.append(acc)
+            return acc
         except Exception:
-            pass
+            return None
 
     def _allapot(self, szoveg, mondja=True):
         if self._closing:
@@ -402,6 +408,8 @@ class ZeneFrame(wx.Frame):
         tetel("Következő szám\tLe nyíl", lambda: self._lep(1))
         tetel("Következő számok kiválasztása…\tCtrl+L", self._sor_kivalaszt)
         tetel("Mentett lejátszási listák…\tCtrl+Shift+L", self._sor_megnyit)
+        if self._mentett_lista is not None:
+            tetel("Kilépés a mentett listából\tCtrl+B", self._mentett_lista_bezar)
         if self._sorban is not None:
             tetel("Lejátszási sor törlése", self._sor_torol)
         m.AppendSeparator()
@@ -427,9 +435,10 @@ class ZeneFrame(wx.Frame):
                      and self._kedvenc_e(self._szamok[i]))
         tetel("Levétel a ke&dvencek közül\tCtrl+D" if kedvenc_e
               else "Felvétel a ke&dvencek közé\tCtrl+D", self._kedvenc_valt)
-        tetel("A teljes lista\tCtrl+B" if self._kedvenc_nezet
-              else "Csak a kedvencek (%d szám)\tCtrl+B" % len(self._kedvencek),
-              self._kedvenc_nezet_valt)
+        if self._mentett_lista is None:
+            tetel("A teljes lista\tCtrl+B" if self._kedvenc_nezet
+                  else "Csak a kedvencek (%d szám)\tCtrl+B" % len(self._kedvencek),
+                  self._kedvenc_nezet_valt)
         m.AppendSeparator()
         tetel("&Hangkimenet…\tCtrl+H", self._kimenet_valaszt)
         tetel("Hangs&zín… (most: %s)\tCtrl+Shift+H"
@@ -465,10 +474,16 @@ class ZeneFrame(wx.Frame):
             with wx.DirDialog(self, "Zenemappa kiválasztása") as d:
                 mappa = d.GetPath() if d.ShowModal() == wx.ID_OK else ""
         if mappa:
+            if self._mentett_lista is not None:
+                self._kedvenc_nezet = False
+                self._mentett_lista_bezar()
             KT.gyoker_ment(mappa)
             self._beolvas(mappa)
 
     def _ujraolvas(self):
+        if self._mentett_lista is not None:
+            self._nezet_frissit()
+            return
         gyoker = KT.gyoker_betolt()
         if gyoker:
             self._beolvas(gyoker)
@@ -490,6 +505,8 @@ class ZeneFrame(wx.Frame):
         if self._closing:
             return
         self._osszes = szamok
+        if self._mentett_lista is not None:
+            return
         self._nezet_frissit(mondja=False)
         if self._kedvenc_nezet:
             self._allapot(f"{mappak} mappa, {len(szamok)} szám beolvasva. "
@@ -527,15 +544,26 @@ class ZeneFrame(wx.Frame):
         szolo = (self._szolo_szam.ut if self._szolo_szam is not None else
                  self._szamok[self._index].ut if 0 <= self._index < len(self._szamok)
                  else "")
-        if self._kedvenc_nezet:
+        if self._mentett_lista is not None:
+            nev, szamok = self._mentett_lista
+            self._szamok = list(szamok)
+            listanev = f"Mentett lista: {nev}. {len(szamok)} szám."
+        elif self._kedvenc_nezet:
             terkep = {s.ut.lower(): s for s in self._osszes}
             self._szamok = [terkep.get(u.lower()) or KT.szam_utbol(u)
                             for u in self._kedvencek]
+            listanev = "Kedvenc számok listája"
         else:
             self._szamok = list(self._osszes)
+            listanev = "Számok listája"
+        self.lista.SetName(listanev)
+        if self._lista_accessible is not None:
+            self._lista_accessible._name = listanev
         self.lista.Set([self._sor(s) for s in self._szamok])
         try:
             self.cimke.SetLabel(
+                f"&Mentett lista: {nev.replace('&', '&&')} (Ctrl+B: kilépés):"
+                if self._mentett_lista is not None else
                 "&Kedvencek (Ctrl+B: vissza a teljes listára; "
                 "helyi menü: Shift+F10):" if self._kedvenc_nezet
                 else "&Számok (fel-le nyíl: váltás és lejátszás; "
@@ -551,7 +579,9 @@ class ZeneFrame(wx.Frame):
         if self._szamok:
             self.lista.SetSelection(max(0, self._index))
         if mondja:
-            if not self._szamok:
+            if self._mentett_lista is not None:
+                self._allapot(listanev)
+            elif not self._szamok:
                 self._allapot("A kedvencek listája üres. Jelölj ki számokat "
                               "a Ctrl+D-vel." if self._kedvenc_nezet
                               else "Nincs betöltve zene.")
@@ -588,7 +618,7 @@ class ZeneFrame(wx.Frame):
             self._kedvencek.append(szam.ut)
             uzenet = f"Kedvenc: {szam.felirat()}."
         KT.kedvencek_ment(self._kedvencek)
-        if self._kedvenc_nezet:
+        if self._kedvenc_nezet and self._mentett_lista is None:
             # a levett szám kiesik a listából – a kijelölés maradjon a helyén
             self._nezet_frissit(mondja=False)
             self.lista.SetSelection(min(i, len(self._szamok) - 1)
@@ -687,14 +717,46 @@ class ZeneFrame(wx.Frame):
             self._allapot("Még nincs mentett lejátszási lista.")
             return
         nevek = sorted(listak, key=str.casefold)
-        with wx.SingleChoiceDialog(self, "Melyik válogatás kerüljön a lejátszási sorba?",
+        with wx.SingleChoiceDialog(self, "Melyik mentett lejátszási listát nyissuk meg?",
                                    "Mentett listák megnyitása", nevek) as dialog:
             if dialog.ShowModal() != wx.ID_OK:
                 return
             nev = dialog.GetStringSelection()
-        self._sor_alkalmaz([KT.szam_utbol(ut) for ut in listak[nev]])
+        self._sorban = None
+        self._mentett_lista = (nev, [KT.szam_utbol(ut) for ut in listak[nev]])
+        self._nezet_frissit(mondja=False)
+        self._index = -1
+        self.lista.SetFocus()
+        self._mentett_lista_tovabb(elo=f"Mentett lista: {nev}. ", indulas=True)
+
+    def _mentett_lista_bezar(self):
+        self._mentett_lista = None
+        self._nezet_frissit()
+        self.lista.SetFocus()
+
+    def _mentett_lista_tovabb(self, elo="", *, indulas=False):
+        kezdet = self._index + 1
+        for i in range(kezdet, len(self._szamok)):
+            szam = self._szamok[i]
+            if os.path.isfile(szam.ut):
+                if i > kezdet:
+                    elo += f"{i - kezdet} hiányzó fájl kihagyva. "
+                self._lejatszik(szam, i, False, elo)
+                return
+        if indulas:
+            if self._lejatszo is not None:
+                self._lejatszo.leallit()
+            self._lejatszas_folyamatban = False
+            self._szolo_szam = None
+            self._allapot(elo + "A listában nincs elérhető zenefájl.")
+        else:
+            if kezdet < len(self._szamok):
+                elo += f"{len(self._szamok) - kezdet} hiányzó fájl kihagyva. "
+            self._allapot(elo + "A mentett lista véget ért.")
 
     def _sor_alkalmaz(self, szamok):
+        if self._mentett_lista is not None:
+            self._mentett_lista_bezar()
         self._sorban = deque(szamok)
         if self._lejatszas_folyamatban:
             self._allapot(f"Lejátszási sor beállítva. {len(self._sorban)} szám várakozik.")
@@ -857,7 +919,11 @@ class ZeneFrame(wx.Frame):
     def _indit(self, i, attunessel=False):
         if not (0 <= i < len(self._szamok)):
             return
-        self._lejatszik(self._szamok[i], i, attunessel)
+        szam = self._szamok[i]
+        if self._mentett_lista is not None and not os.path.isfile(szam.ut):
+            self._allapot("Hiányzik a fájl: " + szam.felirat())
+            return
+        self._lejatszik(szam, i, attunessel)
 
     def _lejatszik(self, szam, index, attunessel, elo=""):
         self._index = index
@@ -877,6 +943,9 @@ class ZeneFrame(wx.Frame):
         if not self._szamok:
             self._allapot("Nincs betöltve zene.")
             return
+        if self._mentett_lista is not None:
+            self._indit(self.lista.GetSelection() + irany)
+            return
         alap = self._index if self._index >= 0 else self.lista.GetSelection()
         self._indit((max(0, alap) + irany) % len(self._szamok))
 
@@ -894,6 +963,7 @@ class ZeneFrame(wx.Frame):
     def _attunes_ideje(self):
         """Három másodperccel a vége előtt: jöhet a következő."""
         if (self._closing or self._sor_szerkesztes or self._sorban is not None
+                or self._mentett_lista is not None
                 or self._ismetles or not self._tovabb):
             return
         k = self._kovetkezo_index()
@@ -910,6 +980,9 @@ class ZeneFrame(wx.Frame):
             return
         if self._sorban is not None:
             self._sor_leptet()
+            return
+        if self._mentett_lista is not None:
+            self._mentett_lista_tovabb()
             return
         if self._ismetles:
             self._indit(self._index)
@@ -975,7 +1048,10 @@ class ZeneFrame(wx.Frame):
             self._kedvenc_valt()
             return
         if ctrl and kod in (ord("B"), ord("b")):
-            self._kedvenc_nezet_valt()
+            if self._mentett_lista is not None:
+                self._mentett_lista_bezar()
+            else:
+                self._kedvenc_nezet_valt()
             return
         if ctrl and kod in (ord("K"), ord("k")):
             self._keveres_valt()
@@ -1177,12 +1253,15 @@ class ZeneFrame(wx.Frame):
             if self._lejatszo.szunetel():
                 reszek.append("szünetel")
         reszek.append("hangerő %d százalék" % round(self._hangero * 100))
-        reszek.append("ismétlés be" if self._ismetles else "ismétlés ki")
-        reszek.append("keverés be" if self._keveres else "keverés ki")
-        reszek.append("a végén tovább" if self._tovabb else "a végén megáll")
-        reszek.append("a kedvencek listája" if self._kedvenc_nezet
-                      else "a teljes lista, %d kedvenccel"
-                           % len(self._kedvencek))
+        if self._mentett_lista is not None:
+            reszek.append(f"Mentett lista: {self._mentett_lista[0]}, mentett sorrendben, "
+                          "az utolsó szám után megáll")
+        else:
+            reszek.append("ismétlés be" if self._ismetles else "ismétlés ki")
+            reszek.append("keverés be" if self._keveres else "keverés ki")
+            reszek.append("a végén tovább" if self._tovabb else "a végén megáll")
+            reszek.append("a kedvencek listája" if self._kedvenc_nezet
+                          else "a teljes lista, %d kedvenccel" % len(self._kedvencek))
         if self._kimenet:
             try:
                 from superdl.audioengine import eszkoz_nev
