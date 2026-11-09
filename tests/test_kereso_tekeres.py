@@ -13,10 +13,39 @@ volt meg.
 """
 
 import pytest
+from types import SimpleNamespace
 
 wx = pytest.importorskip("wx")
 
 from superdl import searchwin as SW       # noqa: E402
+
+
+def test_online_playback_passes_resolved_duration(monkeypatch):
+    from superdl import freshvideoswin, medialistwin
+
+    calls = []
+    url = "https://example.org/video"
+    resolved = ("https://example.org/stream", "title", 144)
+    result = SimpleNamespace(title="title", url=url)
+    player = SimpleNamespace(play=lambda *args, **kwargs: calls.append((args, kwargs)))
+    announce = lambda text: None
+    monkeypatch.setattr(SW.S, "resolve_stream", lambda *args, **kwargs: resolved)
+    monkeypatch.setattr(SW.threading, "Thread",
+                        lambda *, target, daemon: SimpleNamespace(start=target))
+    monkeypatch.setattr(wx, "CallAfter", lambda callback, *args, **kwargs:
+                        callback(*args, **kwargs))
+
+    SW.MediaSearchFrame._play_selected(SimpleNamespace(
+        _selected_result=lambda: result, _announce=announce,
+        main=SimpleNamespace(), _audio_only_play=True, player=player))
+    freshvideoswin.FreshVideosDialog._stream(SimpleNamespace(
+        _selected=lambda: result, _announce=announce, _resolve=lambda url: resolved,
+        player=player))
+    medialistwin.MediaListDialog._stream(SimpleNamespace(
+        _selected=lambda: ("title", "", url), _announce=announce,
+        _resolve=lambda url: resolved, player=player))
+
+    assert calls == [(("https://example.org/stream", "title"), {"duration": 144})] * 3
 
 
 # ---- az időszöveg (felolvasásra) ---------------------------------------

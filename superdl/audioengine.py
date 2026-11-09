@@ -156,6 +156,8 @@ class Player:
         self._played = 0           # eddig megszólaltatott PCM-bájtok száma
         self._url = ""             # az aktuális forrás (a seek-hez)
         self._start_offset = 0.0   # a lejátszás kezdő-időpontja (seek után)
+        self._expected_duration = 0.0
+        self._audio_track = None
         # HANGSZÍN: az ffmpeg `-af` szűrőlánca, üres = eredeti hang. A szűrés a
         # DEKÓDOLÁSKOR történik, tehát nem terheli a Pythont, és minden
         # forrásra hat (fájl, élő stream). ⚠️ Menet közbeni váltáshoz a
@@ -287,7 +289,8 @@ class Player:
     def seek(self, pos: float) -> None:
         """Ugrás a megadott időpontra (a forrást a `-ss`-szel újraindítja)."""
         if self._url:
-            self.play(self._url, self.title, start=max(0.0, pos))
+            self.play(self._url, self.title, start=max(0.0, pos),
+                      audio_track=self._audio_track, duration=self._expected_duration)
 
     def relative_seek(self, delta: float) -> None:
         """Léptetés az aktuális pozícióhoz képest (finomhangoláshoz)."""
@@ -304,13 +307,17 @@ class Player:
             procutil.stop_proc(p)
 
     def play(self, url: str, title: str = "", progress=None,
-             start: float = 0.0, audio_track: int | None = None) -> None:
+             start: float = 0.0, audio_track: int | None = None, *,
+             duration: float = 0.0) -> None:
         """A megadott forrás lejátszása (az előzőt leállítja). `start`>0 esetén
         onnan kezd (seek, az ffmpeg `-ss`-ével). `audio_track` megadva a több
-        hangsávos adásból azt a sávot játssza (pl. hangalámondás)."""
+        hangsávos adásból azt a sávot játssza (pl. hangalámondás).
+        A megadott teljes időtartam segít felismerni a korán lezárt streamet."""
         self.stop()
         self.title = title or url
         self._url = url
+        self._audio_track = audio_track
+        self._expected_duration = max(0.0, float(duration or 0))
         ff = _ffmpeg_exe(progress)
         if not ff:
             self._emit("hiba: az ffmpeg nem érhető el")
@@ -323,6 +330,10 @@ class Player:
         self._start_offset = max(0.0, float(start))
         flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
         cmd = [ff, "-nostdin"]
+        if self._expected_duration and url.lower().startswith(("http://", "https://")):
+            # Csak a kereshető HTTP-forrás megszakadt letöltését folytassuk.
+            # Normál EOF-nál és élő adásnál nincs automatikus újraindítás.
+            cmd += ["-reconnect", "1", "-reconnect_delay_max", "3"]
         if self._start_offset > 0:
             cmd += ["-ss", f"{self._start_offset:.3f}"]
         cmd += ["-i", url]
@@ -341,7 +352,9 @@ class Player:
         with self._lock:
             self._proc = proc
         self._thread = threading.Thread(
-            target=self._feed, args=(proc, self._stop, gen), daemon=True)
+            target=self._feed,
+            args=(proc, self._stop, gen, self._start_offset, self._expected_duration),
+            daemon=True)
         self._thread.start()
 
     # ---- belső --------------------------------------------------------
@@ -359,7 +372,7 @@ class Player:
             except Exception:
                 pass
 
-    def _feed(self, proc, stop_event, gen) -> None:
+    def _feed(self, proc, stop_event, gen, kezdo_pozicio=0.0, duration=0.0) -> None:
         # FONTOS: a szál KIZÁRÓLAG a saját `stop_event`-jét figyeli (nem a közös
         # self._stop-ot), és `gen`-en át küld állapotot – így egy leváltott régi
         # szál nem küld HAMIS állapotot az új lejátszásra. [Herman Tibor AUDIO-03]
@@ -373,9 +386,6 @@ class Player:
         except ImportError:
             np = None
         import sounddevice as sd
-        # ⚠️ Ezt a szál INDULÁSAKOR kell elkapni: egy újabb `play()` közben
-        # átírhatja. Azt jelzi, hogy ez a lejátszás TEKERÉSSEL indult.
-        kezdo_pozicio = self._start_offset
         try:
             stream, _visszaesett = self._stream_nyit(sd)
         except Exception as e:
@@ -383,6 +393,7 @@ class Player:
             return
         self._emit_gen(gen, "lejátszás")
         started = False
+        played = 0
         failed = False
         err_msg = ""
         kov_eszkoz_nezes = time.monotonic() + 2.0
@@ -427,13 +438,14 @@ class Player:
                 if not raw:
                     break
                 started = True
-                if gen == self._generation:      # a pozíciót csak az AKTUÁLIS
-                    self._played += len(raw)      # lejátszás számolja
                 v = self._volume
                 if v >= 0.999:
                     stream.write(raw)
                 else:
                     stream.write(hangero_alkalmaz(raw, v, np))
+                played += len(raw)
+                if gen == self._generation:
+                    self._played = played
         except Exception as exc:
             failed = True
             err_msg = str(exc)
@@ -447,6 +459,11 @@ class Player:
             # hogy a normál („vége") lefutáskor se maradjon nyitott leíró (MK4)
             procutil.reap(proc)
         if not stop_event.is_set():
+            if not failed and proc.returncode:
+                failed, err_msg = True, "az adatfolyam dekódolása hibával leállt"
+            # A videó néhány másodperccel hosszabb lehet a hangsávjánál.
+            if not failed and duration - (kezdo_pozicio + played / (RATE * CHANNELS * 2)) > 5:
+                failed, err_msg = True, "az adatfolyam a várható vége előtt megszakadt"
             if failed and started:
                 self._emit_gen(gen, f"hiba: lejátszás megszakadt – {err_msg}")
             elif failed:

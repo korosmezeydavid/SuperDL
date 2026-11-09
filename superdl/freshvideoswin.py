@@ -113,7 +113,7 @@ class FreshVideosDialog(wx.Dialog):
 
         def work():
             try:
-                stream_url, title, _ = self._resolve(vd.url)
+                stream_url, _, duration = self._resolve(vd.url)
             except Exception as e:
                 wx.CallAfter(self._announce,
                              f"Nem játszható le: {vd.title} – {e}")
@@ -122,7 +122,7 @@ class FreshVideosDialog(wx.Dialog):
                 wx.CallAfter(self._announce,
                              f"Nem elérhető: {vd.title} (törölt vagy zárt).")
                 return
-            wx.CallAfter(self.player.play, stream_url, vd.title)
+            wx.CallAfter(self.player.play, stream_url, vd.title, duration=duration)
         threading.Thread(target=work, daemon=True).start()
 
     def _on_state(self, text):

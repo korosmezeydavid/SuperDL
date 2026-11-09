@@ -140,10 +140,19 @@ def test_a_tekeres_utani_ures_lejatszas_VEGE_es_nem_hiba():
     assert '"vége"' in src[i:i + 700]
 
 
-def test_a_kezdo_poziciot_a_szal_indulasakor_kapjuk_el():
-    """Egy újabb `play()` átírhatná a `_start_offset`-et menet közben."""
-    src = inspect.getsource(AE.Player._feed)
-    assert src.index("kezdo_pozicio = self._start_offset") < src.index("while")
+def test_a_kezdo_pozicio_a_lejatszas_sajat_szalargumentuma(monkeypatch):
+    """A késve induló szál a saját pozícióját kapja, akkor is, ha már újra tekertünk."""
+    from types import SimpleNamespace
+
+    pending = []
+    monkeypatch.setattr(AE, "_ffmpeg_exe", lambda progress: "ffmpeg.exe")
+    monkeypatch.setattr(AE.subprocess, "Popen", lambda *args, **kwargs: None)
+    monkeypatch.setattr(AE.threading, "Thread", lambda *, target, args, daemon:
+                        SimpleNamespace(start=lambda: pending.append(args)))
+    player = AE.Player()
+    player.play("sample.mp3", start=15)
+    player.seek(42)
+    assert [args[3] for args in pending] == [15, 42]
 
 
 def test_a_valodi_hiba_tovabbra_is_hiba():

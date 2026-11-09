@@ -104,14 +104,14 @@ class MediaListDialog(wx.Dialog):
 
         def work():
             try:
-                stream_url, _t, _d = self._resolve(url)
+                stream_url, _, duration = self._resolve(url)
             except Exception as e:
                 wx.CallAfter(self._announce, f"Nem játszható le: {title} – {e}")
                 return
             if not stream_url:
                 wx.CallAfter(self._announce, f"Nem elérhető: {title}.")
                 return
-            wx.CallAfter(self.player.play, stream_url, title)
+            wx.CallAfter(self.player.play, stream_url, title, duration=duration)
 
         threading.Thread(target=work, daemon=True).start()
 

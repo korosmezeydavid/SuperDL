@@ -589,11 +589,11 @@ class MediaSearchFrame(wx.Frame):
             last = None
             for b, f in attempts:
                 try:
-                    stream_url, _, _ = S.resolve_stream(
+                    stream_url, _, duration = S.resolve_stream(
                         x.url, audio_only=audio, cookies_browser=b,
                         cookies_file=f)
                     if stream_url:
-                        wx.CallAfter(self.player.play, stream_url, x.title)
+                        wx.CallAfter(self.player.play, stream_url, x.title, duration=duration)
                         return
                     last = "üres találat"
                 except Exception as ex:
@@ -634,7 +634,8 @@ class MediaSearchFrame(wx.Frame):
                            "Escape: leállítás.")
         elif text.startswith("hiba"):
             self._player_mode = False
-            self._announce(f"Nem lejátszható – {text}. Próbálj másikat.")
+            self._tekert = False
+            self._announce(f"Lejátszási hiba: {text.removeprefix('hiba: ')}.")
         elif text == "vége":
             self._player_mode = False
             self._announce("A lejátszás véget ért. Enter egy találaton: új "

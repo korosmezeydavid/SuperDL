@@ -46,7 +46,11 @@ def test_prefers_single_video(url, want):
     ("[Errno 13] Permission denied: 'D:/x.mp4'", "NEM LEHET ÍRNI"),
     ("Unsupported URL: https://example.com/x", "NEM TÁMOGATJA"),
 ])
-def test_friendly_error_kategoriak(msg, kulcsszo):
+def test_friendly_error_kategoriak(msg, kulcsszo, monkeypatch):
+    from superdl import netcheck
+
+    # A hálózati ág általános szövegét teszteljük, a gép állapotától függetlenül.
+    monkeypatch.setattr(netcheck, "offline_reason", lambda: ("", ""))
     assert kulcsszo.lower() in media.friendly_error(msg).lower()
 
 
