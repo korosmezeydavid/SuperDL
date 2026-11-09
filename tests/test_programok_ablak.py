@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 import wx
 
-from modules_src.szervezes.szervezes_mod import programok
+from modules_src.szervezes.szervezes_mod import programok, programwin
 from modules_src.szervezes.szervezes_mod.programwin import ProgramFrame, idoszak_hatarok
 
 
@@ -14,7 +14,13 @@ def test_weekend_limits_include_current_sunday_only():
 
 
 def test_choice_filter_preserves_focus_and_tab_to_results(monkeypatch):
+    class FixedDateTime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls(2026, 11, 1, 12, tzinfo=tz)
+
     app = wx.App.Get() or wx.App(False)
+    monkeypatch.setattr(programwin, "datetime", FixedDateTime)
     monkeypatch.setattr(programok, "osszegyujt", lambda: programok.ProgramGyujtemeny((), ()))
     frame = ProgramFrame(None)
     frame.Show()
