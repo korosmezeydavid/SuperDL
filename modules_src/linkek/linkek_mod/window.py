@@ -39,6 +39,9 @@ class LinkFrame(wx.Frame):
         self.caption = field('&Felirat a QR-kód alatt (elhagyható):', 'QR-kód alatti felirat')
         qr = wx.Button(panel, label='QR-kód &mentése PNG-ként…')
         qr.Bind(wx.EVT_BUTTON, self.on_qr); box.Add(qr, 0, wx.ALL, 5)
+        labels = wx.Button(panel, label='&Tárgycímkék…')
+        labels.SetName('Tárgycímkék készítése és kezelése')
+        labels.Bind(wx.EVT_BUTTON, self.on_labels); box.Add(labels, 0, wx.ALL, 5)
         self.status = wx.StaticText(panel, label='Kész.'); self.status.SetName('Művelet állapota')
         box.Add(self.status, 0, wx.ALL, 5)
         close = wx.Button(panel, wx.ID_CLOSE, '&Bezárás'); close.Bind(wx.EVT_BUTTON, lambda e: self.Close())
@@ -114,6 +117,11 @@ class LinkFrame(wx.Frame):
         except Exception as exc: wx.MessageBox(str(exc), 'Mentési hiba', wx.OK | wx.ICON_ERROR, self); return
         self.items = updated; self.refresh(); self.status.SetLabel('Eltávolítva a helyi listából.')
 
+    def on_labels(self, event):
+        dialog = LabelDialog(self)
+        try: dialog.ShowModal()
+        finally: dialog.Destroy()
+
     def on_qr(self, event):
         try: C.normalize_url(self.qrurl.GetValue())
         except ValueError as exc: wx.MessageBox(str(exc), 'Hibás cím', wx.OK | wx.ICON_WARNING, self); return
@@ -128,3 +136,107 @@ class LinkFrame(wx.Frame):
         except Exception as exc: wx.MessageBox('A QR-kód mentése nem sikerült: ' + str(exc), 'Hiba', wx.OK | wx.ICON_ERROR, self)
         finally: dialog.Destroy()
 
+
+
+class LabelDialog(wx.Dialog):
+    """Offline tárgycímkék: a QR a szöveget tartalmazza."""
+
+    def __init__(self, parent):
+        super().__init__(parent, title='Tárgycímkék', size=(600, 500))
+        try:
+            self.items = C.load_labels()
+        except (OSError, ValueError) as exc:
+            self.items = None
+            wx.MessageBox('A tárgycímkék nem olvashatók, ezért nem írjuk felül őket: ' + str(exc), 'Hiba', wx.OK | wx.ICON_ERROR, self)
+        panel = wx.Panel(self)
+        layout = wx.BoxSizer(wx.VERTICAL)
+        layout.Add(wx.StaticText(panel, label='A QR-kódba a tárgy szövege kerül; internet nem szükséges.'), 0, wx.ALL, 8)
+        layout.Add(wx.StaticText(panel, label='&Tárgy neve vagy címke szövege:'), 0, wx.ALL, 8)
+        self.text = wx.TextCtrl(panel)
+        self.text.SetName('Tárgy neve vagy címke szövege')
+        layout.Add(self.text, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
+        layout.Add(wx.StaticText(panel, label='&Mentett tárgycímkék:'), 0, wx.ALL, 8)
+        self.list = wx.ListBox(panel)
+        self.list.SetName('Mentett tárgycímkék listája')
+        self.list.Bind(wx.EVT_LISTBOX, self.on_select)
+        layout.Add(self.list, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
+        for label, handler in (('Új címke &mentése', self.on_add), ('Kijelölt címke &módosítása', self.on_update), ('Kijelölt címke &törlése', self.on_delete), ('QR-kód &mentése PNG-ként…', self.on_export)):
+            button = wx.Button(panel, label=label)
+            button.Bind(wx.EVT_BUTTON, handler)
+            layout.Add(button, 0, wx.ALL, 5)
+        close = wx.Button(panel, wx.ID_CLOSE, '&Bezárás')
+        close.Bind(wx.EVT_BUTTON, lambda e: self.EndModal(wx.ID_CLOSE))
+        layout.Add(close, 0, wx.ALL | wx.ALIGN_RIGHT, 8)
+        panel.SetSizer(layout)
+        self.refresh()
+        wx.CallAfter(self.text.SetFocus)
+
+    def refresh(self, index=-1):
+        self.list.Set(self.items or [])
+        if 0 <= index < len(self.items or []):
+            self.list.SetSelection(index)
+
+    def on_select(self, event):
+        i = self.list.GetSelection()
+        if self.items is not None and 0 <= i < len(self.items):
+            self.text.SetValue(self.items[i])
+
+    def _write(self, updated):
+        try:
+            C.save_labels(updated)
+        except (OSError, ValueError) as exc:
+            wx.MessageBox('A címkék mentése nem sikerült: ' + str(exc), 'Hiba', wx.OK | wx.ICON_ERROR, self)
+            return False
+        self.items = updated
+        return True
+
+    def on_add(self, event):
+        if self.items is None: return
+        value = self.text.GetValue().strip()
+        if not value:
+            wx.MessageBox('Add meg a címke szövegét.', 'Tárgycímke', wx.OK | wx.ICON_WARNING, self)
+            return
+        updated = self.items + [value]
+        if self._write(updated):
+            self.refresh(len(updated) - 1)
+            wx.MessageBox('A tárgycímkét elmentettük.', 'Tárgycímke', wx.OK | wx.ICON_INFORMATION, self)
+
+    def on_update(self, event):
+        if self.items is None: return
+        i = self.list.GetSelection()
+        value = self.text.GetValue().strip()
+        if not (0 <= i < len(self.items)) or not value:
+            wx.MessageBox('Válassz címkét, és add meg a szövegét.', 'Tárgycímke', wx.OK | wx.ICON_WARNING, self)
+            return
+        updated = list(self.items); updated[i] = value
+        if self._write(updated):
+            self.refresh(i)
+            wx.MessageBox('A tárgycímkét módosítottuk.', 'Tárgycímke', wx.OK | wx.ICON_INFORMATION, self)
+
+    def on_delete(self, event):
+        if self.items is None: return
+        i = self.list.GetSelection()
+        if not (0 <= i < len(self.items)): return
+        if wx.MessageBox('Törlöd ezt a mentett tárgycímkét: ' + self.items[i] + '?', 'Tárgycímke törlése', wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION, self) != wx.YES: return
+        updated = list(self.items); updated.pop(i)
+        if self._write(updated):
+            self.refresh()
+            self.text.Clear()
+            wx.MessageBox('A tárgycímkét töröltük.', 'Tárgycímke', wx.OK | wx.ICON_INFORMATION, self)
+
+    def on_export(self, event):
+        value = self.text.GetValue().strip()
+        if not value:
+            wx.MessageBox('Add meg a címke szövegét.', 'Tárgycímke', wx.OK | wx.ICON_WARNING, self)
+            return
+        dialog = wx.FileDialog(self, 'Tárgycímke mentése', wildcard='PNG kép (*.png)|*.png', style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+        try:
+            if dialog.ShowModal() != wx.ID_OK: return
+            path = dialog.GetPath()
+            if not path.lower().endswith('.png'): path += '.png'
+            C.make_label(value, path)
+            wx.MessageBox('A tárgycímkét elmentettük: ' + path, 'Tárgycímke', wx.OK | wx.ICON_INFORMATION, self)
+        except Exception as exc:
+            wx.MessageBox('A címke készítése nem sikerült: ' + str(exc), 'Hiba', wx.OK | wx.ICON_ERROR, self)
+        finally:
+            dialog.Destroy()

@@ -51,13 +51,21 @@ def save(items):
     store.save_json(DATA, items)
 
 def make_qr(url, caption, destination):
+    return _make_qr_payload(normalize_url(url), caption, destination)
+
+def make_label(text, destination):
+    text = text.strip()
+    if not text:
+        raise ValueError('Add meg a tárgy nevét vagy a címke szövegét.')
+    return _make_qr_payload(text, text, destination)
+
+def _make_qr_payload(payload, caption, destination):
     import sys
     vendor = str(Path(__file__).parent / 'vendor')
     if vendor not in sys.path: sys.path.insert(0, vendor)
     import qrcode
     from PIL import Image, ImageDraw, ImageFont
-    url = normalize_url(url)
-    image = qrcode.make(url).convert('RGB')
+    image = qrcode.make(payload).convert('RGB')
     if caption.strip():
         fontpath = Path('C:/Windows/Fonts/arial.ttf')
         font = ImageFont.truetype(str(fontpath), 20) if fontpath.exists() else ImageFont.load_default()
@@ -77,3 +85,21 @@ def make_qr(url, caption, destination):
             draw.text((12, image.height + 8 + i*height), line, fill='black', font=font)
         image = out
     image.save(destination, format='PNG')
+
+
+LABELS_DATA = store.CONFIG_DIR / 'targycimkek.json'
+
+def load_labels():
+    try:
+        with LABELS_DATA.open(encoding='utf-8') as stream:
+            data = json.load(stream)
+    except FileNotFoundError:
+        return []
+    if not isinstance(data, list) or not all(isinstance(x, str) and x.strip() for x in data):
+        raise ValueError('A tárgycímkék listája sérült vagy nem olvasható.')
+    return data
+
+def save_labels(labels):
+    if not isinstance(labels, list) or not all(isinstance(x, str) and x.strip() for x in labels):
+        raise ValueError('Érvénytelen címkelista.')
+    store.save_json(LABELS_DATA, labels)
