@@ -144,14 +144,14 @@
       "id": "linkek",
       "name": "Super Link",
       "category": "Eszközök",
-      "description": "Super Link: is.gd linkrövidítés, helyi linklista és feliratos QR-kód készítése.",
+      "description": "ÚJDONSÁG: offline, nyomtatható QR-tárgycímkék mentése, módosítása és törlése. Is.gd linkrövidítés és feliratos QR-kód készítése.",
       "latest": {
-        "version": "0.1.0",
+        "version": "0.2.0",
         "min_core_api": "1.0",
         "min_core_version": "4.6.30",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-linkek-0.1.0/linkek-0.1.0.zip",
-        "sha256": "ef981053859ea76b4519cf4678128d6664eab91822d7f0758a0ae402d3dcb6a8",
-        "size": 44638
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-linkek-0.2.0/linkek-0.2.0.zip",
+        "sha256": "1b714ead22a9a4a0569954e2ff31c2f053f3d9f6a69a633a36d4a82baceef9a4",
+        "size": 46200
       }
     },
     {
