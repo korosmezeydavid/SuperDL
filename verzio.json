@@ -1,7 +1,7 @@
 {
-  "megjegyzes": "A SuperDL mobil legfrissebb verziója. A telefon naponta kétszer ránéz erre a fájlra, és szól, ha újabb van. Kiadáskor EZT a fájlt kell frissíteni.",
-  "verzio": "1.89.0",
-  "letoltes": "https://github.com/korosmezeydavid/SuperDL-Android/releases/latest/download/SuperDL.apk",
-  "kiadva": "2026-10-22",
-  "ujdonsagok": "Az SMS-diktálás jobbra söpréssel lezárható, és a sablon a már beírt szöveghez fűzhető. A mentett GPS-útvonalak és bejegyzéseik szerkeszthetők. A beszélő órában Lilly és Martin is választható egész órára, a köztes időpontokat továbbra is Elena mondja. A GPS-kitekintő a friss sebességet is bemondja; a közeli megállók alatt elérhető megállófigyelő első betöltése lassabb lehet. Android Telegram még nincs a nyilvános APK-ban. Első telepítésre tartalék készülék ajánlott; a mindennapi telefonra telepítés saját felelősségre történik."
+  "megjegyzes": "A SuperDL Android stabil frissítési jelzője.",
+  "verzio": "1.90.1",
+  "letoltes": "https://github.com/korosmezeydavid/SuperDL-Android/releases/download/v1.90.1/SuperDL.apk",
+  "kiadva": "2026-11-20",
+  "ujdonsagok": "Söpréses útvonalszerkesztés, a kártyajátékok utolsó eseményének megismétlése hosszú érintéssel, valamint névnapkeresés a naptárban."
 }
