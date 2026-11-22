@@ -136,6 +136,7 @@ class ReaderFrame(wx.Frame):
         self._title = ""
         self._voices: list[tts.Voice] = []
         self.preview = Player()
+        self._sherpa_offered = False
         self.sleep = None                       # az aktív SleepTimer
         self._sleep_points: list[int] = []      # elalvási pontok (char-pozíciók)
 
@@ -198,7 +199,11 @@ class ReaderFrame(wx.Frame):
         b_hear = wx.Button(p, label="Hang meghallgatása")
         b_hear.SetName("Hang meghallgatása")
         b_hear.Bind(wx.EVT_BUTTON, lambda e: self._on_preview())
-        eng.Add(b_hear, 0, wx.RIGHT, 10)
+        eng.Add(b_hear, 0, wx.RIGHT, 6)
+        self.b_download = wx.Button(p, label="Hangok letöltése")
+        self.b_download.SetName("Hangok letöltése")
+        self.b_download.Bind(wx.EVT_BUTTON, lambda e: self._download_voices())
+        eng.Add(self.b_download, 0, wx.RIGHT, 10)
         eng.Add(wx.StaticText(p, label="&Tempó:"), 0,
                 wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
         self.rate_spin = wx.SpinCtrl(p, min=-10, max=10, initial=0, size=(60, -1))
@@ -338,7 +343,15 @@ class ReaderFrame(wx.Frame):
         forras = ""
         if elso and getattr(elso, "source", ""):
             forras = " " + elso.source
-        self.SetStatusText(f"{len(self._voices)} hang betöltve.{forras}")
+        if key == "sherpa" and not self._voices:
+            self.SetStatusText(
+                "Nincs Sherpa hang a gépen. A Hangok letöltése gomb Anna, "
+                "Berta, Imre és a Supertonic hangot hozza le.")
+            if not self._sherpa_offered:
+                self._sherpa_offered = True
+                wx.CallAfter(self._download_voices)
+        else:
+            self.SetStatusText(f"{len(self._voices)} hang betöltve.{forras}")
 
     def _on_voice_pick(self, _event):
         i = self.voice_ch.GetSelection()
@@ -348,6 +361,16 @@ class ReaderFrame(wx.Frame):
     def _voice_id(self) -> str:
         i = self.voice_ch.GetSelection()
         return self._voices[i].id if 0 <= i < len(self._voices) else ""
+
+    def _download_voices(self):
+        if self._engine_key() != "sherpa":
+            self.SetStatusText(
+                "A Hangok letöltése a Sherpa felolvasóhoz való. "
+                "Válaszd a Sherpa a gépről motort.")
+            return
+        from .sherpa_letolt import offer
+        if offer(self):
+            self._load_voices()
 
     def _on_preview(self):
         i = self.voice_ch.GetSelection()

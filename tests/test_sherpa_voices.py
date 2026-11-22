@@ -88,6 +88,37 @@ def test_a_hangminta_pont_vesszo_felkialto_es_kerdojel():
         open("modules_src/konyvek/konyvek_mod/bookwin.py", encoding="utf-8").read())
 
 
+def test_a_sajat_mappa_es_a_piper_kartya(tmp_path, monkeypatch):
+    monkeypatch.setattr(sherpa_voices, "home_root", lambda: tmp_path)
+    folder = tmp_path / "voices" / "anna"
+    folder.mkdir(parents=True)
+    (folder / "hu.onnx").write_bytes(b"x")
+    (folder / "tokens.txt").write_text("a\n", encoding="utf-8")
+    offer = sherpa_voices.offer_by_id("vits-piper-hu_HU-anna-medium")
+    sherpa_voices._write_voice_config(folder, offer)
+    found = sherpa_voices.discover()
+    assert found and "CC0" in found[0].source
+    assert "NabuCasa" in found[0].source
+    assert "Hangok letöltése" in (
+        open("modules_src/konyvek/konyvek_mod/readerwin.py", encoding="utf-8").read())
+    assert "Hangok letöltése" in (
+        open("modules_src/konyvek/konyvek_mod/bookwin.py", encoding="utf-8").read())
+
+
+def test_a_csomag_nem_loghat_ki(tmp_path):
+    archive = tmp_path / "rossz.tar.bz2"
+    import tarfile
+    with tarfile.open(archive, "w:bz2") as package:
+        info = tarfile.TarInfo("../kint.txt")
+        package.addfile(info, __import__("io").BytesIO(b"x"))
+    try:
+        sherpa_voices._extract(archive, tmp_path / "cel")
+    except RuntimeError as exc:
+        assert "kilóg" in str(exc)
+    else:
+        raise AssertionError("a kilógó csomagot el kell utasítani")
+
+
 def test_a_tinytts_nem_szolal_meg(tmp_path):
     try:
         sherpa_voices.synthesize(

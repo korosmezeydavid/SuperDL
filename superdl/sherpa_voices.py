@@ -13,7 +13,11 @@ from __future__ import annotations
 import ctypes
 import json
 import os
+import shutil
+import tarfile
+import tempfile
 import threading
+import urllib.request
 import wave
 from dataclasses import dataclass
 from pathlib import Path
@@ -37,12 +41,18 @@ class SherpaVoice:
         return "\t".join((self.engine, self.config_path, str(self.speaker), self.lang))
 
 
+def home_root() -> Path:
+    """A SuperDL saját hang- és motormappája. Ide töltjük, ha a gépen még nincs."""
+    return Path.home() / ".superdl" / "sherpa"
+
+
 def voice_roots() -> list[Path]:
     """Mappák, ahol voice.json szerinti hangok vannak."""
     roots: list[Path] = []
     extra = (os.environ.get("SUPERDL_SHERPA_VOICES") or "").strip()
     if extra:
         roots.append(Path(extra))
+    roots.append(home_root() / "voices")
     appdata = os.environ.get("APPDATA")
     if appdata:
         roots.append(Path(appdata) / "nvda" / "sonataSherpaVoices" / "voices")
@@ -61,6 +71,12 @@ def dll_path() -> Path | None:
     env = (os.environ.get("SUPERDL_SHERPA_DLL") or "").strip()
     if env and Path(env).is_file():
         return Path(env)
+    own = home_root() / "engine" / "sherpa-onnx-c-api.dll"
+    if own.is_file():
+        return own
+    bundled = Path(__file__).resolve().parent / "engine" / "sherpa-onnx-c-api.dll"
+    if bundled.is_file():
+        return bundled
     appdata = os.environ.get("APPDATA")
     if not appdata:
         return None
@@ -369,9 +385,8 @@ class _Native:
         path = dll_path()
         if path is None:
             raise RuntimeError(
-                "A sherpa-onnx motor nincs a gépen. A Piper és Supertonic "
-                "hangok az NVDA Sonata Sherpa Voices bővítményével együtt "
-                "érkező sherpa-onnx-c-api.dll-t használják.")
+                "A sherpa-onnx motor nincs a gépen. A Hangok letöltése gomb "
+                "a motort és a magyar hangokat is lehozza.")
         if hasattr(os, "add_dll_directory"):
             self.dir_cookie = os.add_dll_directory(os.fspath(path.parent))
         self.dll = ctypes.CDLL(os.fspath(path))
@@ -529,3 +544,230 @@ def _pitch(pcm: bytes, steps: int) -> bytes:
     pos = np.arange(out_len, dtype="float64") * factor
     out = np.interp(pos, np.arange(src.size, dtype="float64"), src)
     return np.clip(out, -32768, 32767).astype("<i2").tobytes()
+
+
+# ----------------------------------------------------------------------
+# Letöltés. A hangok és a motor nincsenek a modulban: a hivatalos
+# sherpa-onnx kiadásból jönnek, a felhasználó kérésére.
+
+_MODEL_PREFIX = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models"
+_ENGINE_URL = ("https://github.com/k2-fsa/sherpa-onnx/releases/download/v1.13.4/"
+               "sherpa-onnx-v1.13.4-win-x64-shared-MD-Release.tar.bz2")
+_ESPEAK_URL = _MODEL_PREFIX + "/espeak-ng-data.tar.bz2"
+_UA = "SuperDL"
+
+
+@dataclass(frozen=True)
+class VoiceOffer:
+    offer_id: str
+    label: str
+    kind: str
+    checked: bool
+    megabytes: int
+
+
+OFFERS: tuple[VoiceOffer, ...] = (
+    VoiceOffer("vits-piper-hu_HU-anna-medium",
+               "Anna, magyar női hang (Piper, CC0, kb. 61 MB)",
+               "piper", True, 61),
+    VoiceOffer("vits-piper-hu_HU-berta-medium",
+               "Berta, magyar női hang (Piper, CC0, kb. 61 MB)",
+               "piper", False, 61),
+    VoiceOffer("vits-piper-hu_HU-imre-medium",
+               "Imre, magyar férfi hang (Piper, CC0, kb. 61 MB)",
+               "piper", False, 61),
+    VoiceOffer("sherpa-onnx-supertonic-3-tts-int8-2026-05-11",
+               "Supertonic 3, tíz beszélő (MIT, kb. 140 MB)",
+               "supertonic", False, 140),
+)
+
+
+def offer_by_id(offer_id: str) -> VoiceOffer:
+    for offer in OFFERS:
+        if offer.offer_id == offer_id:
+            return offer
+    raise KeyError(offer_id)
+
+
+def install(offer_ids: list[str], progress, cancel: threading.Event) -> None:
+    """A kiválasztott hangokat, és ha kell, a motort és az espeak adatot tölti."""
+    chosen = [offer_by_id(i) for i in offer_ids]
+    steps: list[tuple[str, VoiceOffer | None]] = []
+    if dll_path() is None:
+        steps.append(("engine", None))
+    if any(o.kind == "piper" for o in chosen) and not _espeak_ready():
+        steps.append(("espeak", None))
+    for offer in chosen:
+        steps.append(("voice", offer))
+    if not steps:
+        progress(100, "Már minden megvan.")
+        return
+    for index, (kind, offer) in enumerate(steps):
+        if cancel.is_set():
+            raise RuntimeError("A letöltést megszakítottad.")
+        base = int(index * 100 / len(steps))
+        span = max(1, int(100 / len(steps)))
+
+        def sub(frac: float, message: str, base=base, span=span) -> None:
+            progress(min(99, base + int(frac * span)), message)
+
+        if kind == "engine":
+            _install_engine(sub, cancel)
+        elif kind == "espeak":
+            _install_espeak(sub, cancel)
+        else:
+            _install_voice(offer, sub, cancel)
+    progress(100, "A hangok megvannak.")
+
+
+def _espeak_ready() -> bool:
+    return (home_root() / "shared" / "espeak-ng-data").is_dir()
+
+
+def _install_engine(progress, cancel: threading.Event) -> None:
+    progress(0, "A sherpa-onnx motor letöltése…")
+    with tempfile.TemporaryDirectory(prefix="superdl-sherpa-") as tmp:
+        archive = Path(tmp) / "engine.tar.bz2"
+        _download(_ENGINE_URL, archive, progress, cancel, "A sherpa-onnx motor")
+        extract = Path(tmp) / "extract"
+        _extract(archive, extract)
+        dest = home_root() / "engine"
+        dest.mkdir(parents=True, exist_ok=True)
+        wanted = {"sherpa-onnx-c-api.dll", "onnxruntime.dll",
+                  "onnxruntime_providers_shared.dll"}
+        found = [p for p in extract.rglob("*.dll") if p.name in wanted]
+        if not any(p.name == "sherpa-onnx-c-api.dll" for p in found):
+            raise RuntimeError("A motorcsomagban nincs sherpa-onnx-c-api.dll.")
+        for path in found:
+            shutil.copy2(path, dest / path.name)
+    notice = dest / "NOTICE.txt"
+    notice.write_text(
+        "sherpa-onnx %s, Apache License 2.0.\n"
+        "Forrás: %s\n" % (SHERPA_API_VERSION, _ENGINE_URL),
+        encoding="utf-8")
+    progress(1, "A motor megvan.")
+
+
+def _install_espeak(progress, cancel: threading.Event) -> None:
+    progress(0, "A magyar kiejtés adatainak letöltése…")
+    with tempfile.TemporaryDirectory(prefix="superdl-espeak-") as tmp:
+        archive = Path(tmp) / "espeak.tar.bz2"
+        _download(_ESPEAK_URL, archive, progress, cancel, "Kiejtési adatok")
+        extract = Path(tmp) / "extract"
+        _extract(archive, extract)
+        found = [p for p in extract.rglob("phontab")]
+        if not found:
+            raise RuntimeError("A kiejtési csomagban nincs espeak-ng-data.")
+        source = found[0].parent
+        dest = home_root() / "shared" / "espeak-ng-data"
+        if dest.exists():
+            shutil.rmtree(dest)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, dest)
+    progress(1, "A kiejtési adatok megvannak.")
+
+
+def _install_voice(offer: VoiceOffer, progress, cancel: threading.Event) -> None:
+    folder = home_root() / "voices" / ("catalog-" + offer.offer_id)
+    if (folder / "voice.json").is_file() and any(folder.rglob("*.onnx")):
+        progress(1, offer.label.split(",")[0] + " már a gépen van.")
+        return
+    progress(0, offer.label.split("(")[0].strip() + " letöltése…")
+    url = _MODEL_PREFIX + "/" + offer.offer_id + ".tar.bz2"
+    with tempfile.TemporaryDirectory(prefix="superdl-voice-") as tmp:
+        archive = Path(tmp) / "voice.tar.bz2"
+        _download(url, archive, progress, cancel, offer.label.split(",")[0])
+        extract = Path(tmp) / "extract"
+        _extract(archive, extract)
+        dirs = [p for p in extract.iterdir() if p.is_dir()]
+        source = dirs[0] if len(dirs) == 1 else extract
+        if folder.exists():
+            shutil.rmtree(folder)
+        folder.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, folder)
+    _write_voice_config(folder, offer)
+    progress(1, offer.label.split(",")[0] + " megvan.")
+
+
+def _write_voice_config(folder: Path, offer: VoiceOffer) -> None:
+    if offer.kind == "piper":
+        onnx = next(folder.rglob("*.onnx"), None)
+        tokens = next(folder.rglob("tokens.txt"), None)
+        if onnx is None or tokens is None:
+            raise RuntimeError("A Piper csomagból hiányzik a modell vagy a tokens.txt.")
+        name = offer.offer_id.rsplit("-", 2)[-2]
+        config = {
+            "catalog_id": offer.offer_id,
+            "engine": "vits",
+            "name": name,
+            "language": "hu_HU",
+            "model": Path(os.path.relpath(onnx, folder)).as_posix(),
+            "tokens": Path(os.path.relpath(tokens, folder)).as_posix(),
+            "data_dir": "../../shared/espeak-ng-data",
+            "speakers": {"0": "Default speaker"},
+            "default_speaker": 0,
+        }
+        card = folder / "MODEL_CARD"
+        if not card.is_file():
+            card.write_text(
+                "* URL: https://github.com/NabuCasa/voice-datasets\n"
+                "* License: CC0\n", encoding="utf-8")
+    else:
+        def rel(filename: str) -> str:
+            found = next(folder.rglob(filename), None)
+            if found is None:
+                raise RuntimeError("A Supertonic csomagból hiányzik: " + filename)
+            return Path(os.path.relpath(found, folder)).as_posix()
+        config = {
+            "catalog_id": offer.offer_id,
+            "engine": "supertonic",
+            "name": "Supertonic 3",
+            "language": "hu",
+            "duration_predictor": rel("duration_predictor.int8.onnx"),
+            "text_encoder": rel("text_encoder.int8.onnx"),
+            "vector_estimator": rel("vector_estimator.int8.onnx"),
+            "vocoder": rel("vocoder.int8.onnx"),
+            "tts_json": rel("tts.json"),
+            "unicode_indexer": rel("unicode_indexer.bin"),
+            "voice_style": rel("voice.bin"),
+            "num_steps": 5,
+            "lang": "hu",
+            "speakers": {str(i): "Speaker %d" % (i + 1) for i in range(10)},
+            "default_speaker": 0,
+        }
+    (folder / "voice.json").write_text(
+        json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def _download(url: str, dest: Path, progress, cancel: threading.Event,
+              label: str) -> None:
+    request = urllib.request.Request(url, headers={"User-Agent": _UA})
+    try:
+        src = urllib.request.urlopen(request, timeout=60)
+    except Exception as exc:
+        raise RuntimeError("A letöltés nem indult el (%s): %s" % (label, exc)) from exc
+    with src:
+        total = int(src.headers.get("Content-Length") or 0)
+        got = 0
+        with open(dest, "wb") as out:
+            while True:
+                if cancel.is_set():
+                    raise RuntimeError("A letöltést megszakítottad.")
+                block = src.read(256 * 1024)
+                if not block:
+                    break
+                out.write(block)
+                got += len(block)
+                frac = (got / total) if total else 0.5
+                progress(frac, "%s: %d MB" % (label, got // (1024 * 1024)))
+
+
+def _extract(archive: Path, dest: Path) -> None:
+    dest.mkdir(parents=True, exist_ok=True)
+    with tarfile.open(archive, "r:bz2") as package:
+        root = os.path.normcase(os.path.abspath(dest))
+        for member in package.getmembers():
+            target = os.path.normcase(os.path.abspath(os.path.join(dest, member.name)))
+            if os.path.commonpath([root, target]) != root:
+                raise RuntimeError("A csomag kilóg a mappából: " + member.name)
+        package.extractall(dest)

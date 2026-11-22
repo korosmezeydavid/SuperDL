@@ -105,6 +105,7 @@ class BookFrame(wx.Frame):
         self.voices: list[tts.Voice] = []
         self.keys = store.load_tts_keys()
         self.preview = Player()
+        self._sherpa_offered = False
         self._busy = False
         self._closing = False        # zárás alatt a háttér-callbackek ne nyúljanak hozzánk
 
@@ -199,7 +200,11 @@ class BookFrame(wx.Frame):
         b_pstop = wx.Button(p, label="Előhallgatás &leállítása")
         b_pstop.Bind(wx.EVT_BUTTON, lambda e: self.preview.stop())
         hear.Add(b_hear, 0, wx.RIGHT, 6)
-        hear.Add(b_pstop, 0)
+        hear.Add(b_pstop, 0, wx.RIGHT, 6)
+        self.b_download = wx.Button(p, label="Hangok letöltése")
+        self.b_download.SetName("Hangok letöltése")
+        self.b_download.Bind(wx.EVT_BUTTON, lambda e: self._download_voices())
+        hear.Add(self.b_download, 0)
         v.Add(hear, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
 
         # pitch / rate
@@ -384,7 +389,15 @@ class BookFrame(wx.Frame):
         elso = ""
         if vs and getattr(vs[0], "source", ""):
             elso = " " + vs[0].source
-        self.SetStatusText(f"{len(vs)} hang betöltve.{elso}")
+        if self._engine_key() == "sherpa" and not vs:
+            self.SetStatusText(
+                "Nincs Sherpa hang a gépen. A Hangok letöltése gomb Anna, "
+                "Berta, Imre és a Supertonic hangot hozza le.")
+            if not self._sherpa_offered:
+                self._sherpa_offered = True
+                wx.CallAfter(self._download_voices)
+        else:
+            self.SetStatusText(f"{len(vs)} hang betöltve.{elso}")
 
     def _on_voice_pick(self, _event):
         voice = self._selected_voice()
@@ -565,6 +578,16 @@ class BookFrame(wx.Frame):
         self._mond(szoveg)
 
     # ---- előhallgatás -------------------------------------------------
+
+    def _download_voices(self):
+        if self._engine_key() != "sherpa":
+            self.SetStatusText(
+                "A Hangok letöltése a Sherpa felolvasóhoz való. "
+                "Válaszd a Sherpa a gépről motort.")
+            return
+        from .sherpa_letolt import offer
+        if offer(self):
+            self._load_voices()
 
     def _on_preview(self):
         v = self._selected_voice()
