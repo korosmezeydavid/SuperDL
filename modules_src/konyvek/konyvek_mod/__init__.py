@@ -18,6 +18,8 @@ def _add(core, menu, key, frame_cls, label, help):
 
 
 def register(core):
+    from .sherpa_engine import ensure
+    ensure()
     from .readerwin import ReaderFrame
     from .bookwin import BookFrame
     from .audiobookwin import AudioBookFrame

@@ -28,6 +28,20 @@ OUTRO = ("A hangoskönyv végéhez értünk. Ezt a felvételt a SuperDL program 
          "kizárólag egyéni célú hallgatásra. A felvétel terjesztése vagy "
          "megosztása a szerző engedélye nélkül tilos.")
 
+
+def zaro_szoveg(eng, voice_id: str) -> str:
+    """A fix zárószöveg, és ha a hangnak van közölt forrása, az is elhangzik."""
+    sor = ""
+    fn = getattr(eng, "source_line", None)
+    if callable(fn):
+        try:
+            sor = (fn(voice_id) or "").strip()
+        except Exception:
+            sor = ""
+    if not sor:
+        return OUTRO
+    return OUTRO + " A felolvasó hang forrása: " + sor
+
 DEFAULT_CHUNK = 6000
 
 # Önálló oldalszám-sor (csak számjegy, körülötte legföljebb pont/kötőjel/szóköz),
@@ -298,6 +312,7 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
     # keresés, motor-betöltés) – azonnal, dolgavégezetlenül lépjünk ki.
     _ellenoriz()
     eng = tts.ENGINES[engine_key]
+    zaro = zaro_szoveg(eng, voice_id)
     ff = _ffmpeg_exe()
     flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
@@ -323,14 +338,14 @@ def build(book, engine_key, voice_id, out_path, *, pitch=0, rate=0,
                 _darabok = chunk_text(_szoveg, _limit, by_bytes=bool(_blimit))
                 parts.extend(_darabok)
                 part_fej.extend([_i] * len(_darabok))
-            parts.append(OUTRO)
+            parts.append(zaro)
             part_fej.append(len(fejezetek) - 1)
         else:
             fejezetenkent = False        # nincs mit fejezetenként vágni
     if not fejezetenkent:
         parts = ([INTRO.format(title=book.title)]
                  + chunk_text(book.text, _limit, by_bytes=bool(_blimit))
-                 + [OUTRO])
+                 + [zaro])
 
     # ⚠️ A KIMONDHATATLAN DARABOK KIHAGYÁSA. Egy csupa írásjelből álló darab
     # („* * *", „—————") a beszédmotortól NEM kap hangot, és eddig az EGÉSZ

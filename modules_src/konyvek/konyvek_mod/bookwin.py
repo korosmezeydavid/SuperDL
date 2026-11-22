@@ -47,7 +47,14 @@ def _mondd(main, szoveg):
         except Exception:
             pass
 
-ENGINE_ORDER = ["sapi", "edge", "gemini", "cloud"]
+_HANGMINTA = (
+    "Ma szép idő van. "
+    "A vessző után, ahogy most hallod, a hangsúly megáll egy pillanatra. "
+    "Figyelj ide! "
+    "Így szoktam kérdezni?"
+)
+ENGINE_ORDER = [k for k in ("sherpa", "sapi", "edge", "gemini", "cloud")
+                if k in tts.ENGINES]
 
 HELP = """HANGOSKÖNYV-KÉSZÍTŐ
 
@@ -56,10 +63,12 @@ Könyv (TXT, DOCX, EPUB, PDF) átalakítása MP3 hangoskönyvvé, magyar hanggal
 
 LÉPÉSRŐL LÉPÉSRE (vakon is)
 1. „Tallózás” – válaszd ki a könyvet (vagy illeszd be a szöveget a mezőbe).
-2. „Motor”: SAPI (offline), Edge (ingyenes magyar, kulcs nélkül), Gemini vagy
-   Google Cloud (saját kulccsal).
-3. „Hangok frissítése”, majd válassz „Hang”-ot; állítsd a magasságot és a
-   sebességet; a „Hangteszt” gombbal meghallgathatod.
+2. „Motor”: Sherpa a gépről (a letöltött Piper és Supertonic hangok, offline;
+   minden sorban a készítő és a licenc), SAPI (offline), Edge (ingyenes
+   magyar, kulcs nélkül), Gemini vagy Google Cloud (saját kulccsal).
+3. „Hangok frissítése”, majd válassz „Hang”-ot. A lista után a Tab a
+   „Hang meghallgatása” gombra visz: pont, vessző, felkiáltójel és kérdőjel
+   is elhangzik. Utána állítsd a magasságot és a sebességet.
 4. Válaszd: egyben vagy „Darabolás több MP3-ra” (bekapcsolva megjelenik a
    „Darab hossza percben” mező, és a fókusz rá is ugrik), majd a célmappát.
 5. „Hangoskönyv készítése” – a végén fix bevezető és záró nyilatkozat is
@@ -81,8 +90,10 @@ GYORSBILLENTYŰK
 F1 – súgó.  Tab / Shift+Tab – mozgás.  Enter vagy Szóköz – gomb.
 
 TIPP
-Hosszú könyvnél az Edge magyar hang szép és ingyenes (internet kell); offline a
-SAPI magyar hang megy."""
+Hosszú könyvnél az Edge magyar hang szép és ingyenes (internet kell). Offline
+a gépeden lévő Sherpa-hangok (Piper Anna, Berta, Imre és a Supertonic) és a
+SAPI magyar hang is megy. A Sherpa-sorok nyílt hangok: a licencük a listában
+és a hangoskönyv végén is elhangzik."""
 
 
 class BookFrame(wx.Frame):
@@ -148,7 +159,8 @@ class BookFrame(wx.Frame):
                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
         self.engine_ch = wx.Choice(
             p, choices=[self._engine_label(k) for k in ENGINE_ORDER])
-        self.engine_ch.SetSelection(1)     # alapból Edge (ingyenes, magyar)
+        self.engine_ch.SetSelection(
+            ENGINE_ORDER.index("edge") if "edge" in ENGINE_ORDER else 0)
         self.engine_ch.SetName("TTS-motor")
         self.engine_ch.Bind(wx.EVT_CHOICE, lambda e: self._on_engine())
         r2.Add(self.engine_ch, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
@@ -177,9 +189,20 @@ class BookFrame(wx.Frame):
               wx.LEFT, 8)
         self.voice_list = wx.ListBox(p, style=wx.LB_SINGLE)
         self.voice_list.SetName("Választható hangok")
+        self.voice_list.Bind(wx.EVT_LISTBOX, self._on_voice_pick)
         v.Add(self.voice_list, 1, wx.EXPAND | wx.ALL, 8)
 
-        # pitch / rate / előhallgatás
+        hear = wx.BoxSizer(wx.HORIZONTAL)
+        b_hear = wx.Button(p, label="Hang meghallgatása")
+        b_hear.SetName("Hang meghallgatása")
+        b_hear.Bind(wx.EVT_BUTTON, lambda e: self._on_preview())
+        b_pstop = wx.Button(p, label="Előhallgatás &leállítása")
+        b_pstop.Bind(wx.EVT_BUTTON, lambda e: self.preview.stop())
+        hear.Add(b_hear, 0, wx.RIGHT, 6)
+        hear.Add(b_pstop, 0)
+        v.Add(hear, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
+
+        # pitch / rate
         r3 = wx.BoxSizer(wx.HORIZONTAL)
         r3.Add(wx.StaticText(p, label="Ma&gasság:"), 0,
                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
@@ -190,13 +213,7 @@ class BookFrame(wx.Frame):
                wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
         self.rate_sp = wx.SpinCtrl(p, min=-10, max=10, initial=0, size=(60, -1))
         self.rate_sp.SetName("Sebesség, mínusz tíztől plusz tízig")
-        r3.Add(self.rate_sp, 0, wx.RIGHT, 12)
-        b_test = wx.Button(p, label="Hang&teszt (előhallgatás)")
-        b_test.Bind(wx.EVT_BUTTON, lambda e: self._on_preview())
-        r3.Add(b_test, 0, wx.RIGHT, 6)
-        b_pstop = wx.Button(p, label="Előhallgatás &leállítása")
-        b_pstop.Bind(wx.EVT_BUTTON, lambda e: self.preview.stop())
-        r3.Add(b_pstop, 0)
+        r3.Add(self.rate_sp, 0)
         v.Add(r3, 0, wx.LEFT | wx.BOTTOM, 8)
 
         # szöveg-tisztítás (felesleges üres sorok és sortörések eltávolítása)
@@ -306,8 +323,12 @@ class BookFrame(wx.Frame):
                     "darabolás)")
         self.limit_lbl.SetLabel(f"Karakterkorlát: {lim}.")
         # az állapotsorba is – így a képernyőolvasó felolvassa
-        self.SetStatusText(f"Motor: {eng.name.split(' (')[0]}. "
-                           f"Karakterkorlát: {lim}.")
+        szoveg = (f"Motor: {eng.name.split(' (')[0]}. "
+                  f"Karakterkorlát: {lim}.")
+        if self._engine_key() == "sherpa":
+            szoveg += (" Ezek a gépeden lévő nyílt hangok. Minden sorban ott "
+                       "a készítő és a licenc.")
+        self.SetStatusText(szoveg)
         need = eng.needs_key
         self.key_lbl.Show(need)
         self.key_txt.Show(need)
@@ -360,7 +381,15 @@ class BookFrame(wx.Frame):
         self.voice_list.Set([v.name for v in vs])
         if vs:
             self.voice_list.SetSelection(0)
-        self.SetStatusText(f"{len(vs)} hang betöltve.")
+        elso = ""
+        if vs and getattr(vs[0], "source", ""):
+            elso = " " + vs[0].source
+        self.SetStatusText(f"{len(vs)} hang betöltve.{elso}")
+
+    def _on_voice_pick(self, _event):
+        voice = self._selected_voice()
+        if voice and getattr(voice, "source", ""):
+            self.SetStatusText(voice.source)
 
     def _selected_voice(self) -> tts.Voice | None:
         i = self.voice_list.GetSelection()
@@ -556,9 +585,8 @@ class BookFrame(wx.Frame):
                                     f"sdl_voicetest_{os.getpid()}_"
                                     f"{uuid.uuid4().hex[:8]}")
                 path = eng.synth(
-                    "Sziasztok! Így szól ez a hang. Ezzel készül a "
-                    "hangoskönyved.", v.id, base, pitch=pitch, rate=rate,
-                    api_key=key)
+                    getattr(tts, "PREVIEW_TEXT", _HANGMINTA), v.id, base,
+                    pitch=pitch, rate=rate, api_key=key)
             except Exception as ex:
                 wx.CallAfter(self.SetStatusText, f"Hangteszt hiba: {ex}")
                 return

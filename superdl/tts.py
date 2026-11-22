@@ -1,6 +1,7 @@
 """Szöveg-felolvasó (TTS) motorok közös felülete a hangoskönyv-készítőhöz.
 
-Négy backend:
+Öt backend:
+  sherpa – a gépen lévő Piper és Supertonic hangok (offline, nyílt licenc)
   sapi   – helyi Windows-hangok (offline, ingyenes)
   edge   – Microsoft Edge neural hangok (online, ingyenes, KULCS NÉLKÜL)
   gemini – Google Gemini TTS (saját API-kulcs)
@@ -12,6 +13,15 @@ egész; a motorok a sajátjukra képezik le. A hosszú szöveget a hívó
 darabolja a `char_limit` szerint.
 """
 
+# Rövid minta a „Hang meghallgatása” gombhoz: pont, vessző a mondat közben,
+# felkiáltójel, majd kérdőjel. Így hallani a lezárást, a hangsúlyt és a kérdést.
+PREVIEW_TEXT = (
+    "Ma szép idő van. "
+    "A vessző után, ahogy most hallod, a hangsúly megáll egy pillanatra. "
+    "Figyelj ide! "
+    "Így szoktam kérdezni?"
+)
+
 import base64
 import contextlib
 import json
@@ -21,6 +31,7 @@ import queue
 import re
 import subprocess
 import threading
+import time
 import urllib.request
 from dataclasses import dataclass
 
@@ -205,7 +216,7 @@ class _Sapi32:
             raise _Sapi32Nincs("a 32 bites segéd nem indult el (%r)" % elso)
 
     def _kerdez(self, parancs: dict, varakozas: float) -> str:
-        """Egy parancs, egy válaszsor. A zár alatt: a segéd sorban dolgozik."""
+        """Egy parancs, egy protokollválasz; a hangmotor naplót is írhat."""
         if self._nincs:
             raise _Sapi32Nincs("korábban már nem indult el")
         with self._zar:
@@ -215,7 +226,13 @@ class _Sapi32:
             try:
                 self._proc.stdin.write(sor + b"\n")
                 self._proc.stdin.flush()
-                valasz = self._sorok.get(timeout=varakozas)
+                hatarido = time.monotonic() + varakozas
+                while True:
+                    valasz = self._sorok.get(
+                        timeout=max(0, hatarido - time.monotonic()))
+                    if valasz is None or valasz.startswith(("OK", "HIBA ")):
+                        break
+                    _log.debug("A SAPI segéd protokollon kívüli sort írt.")
             except queue.Empty:
                 self._leallit()
                 raise RuntimeError(
@@ -305,6 +322,8 @@ class Voice:
     name: str
     lang: str = ""
     gender: str = ""
+    source: str = ""
+    playable: bool = True
 
 
 # ======================================================================
@@ -539,7 +558,38 @@ class CloudEngine:
         return path
 
 
-ENGINES = {e.key: e for e in (SapiEngine(), EdgeEngine(),
+class SherpaEngine:
+    """A felhasználó által letöltött Piper és Supertonic hangok.
+
+    A lista minden során feltünteti a készítőt és a licencet. A hangfájlok
+    a gépen maradnak; a motor a sherpa-onnx nyílt C felületét hívja.
+    """
+
+    key = "sherpa"
+    name = "Sherpa a gépről (Piper és Supertonic, offline, nyílt hangok)"
+    char_limit = 600
+    supports_pitch = True
+    supports_rate = True
+    needs_key = False
+
+    def voices(self, api_key: str = "") -> list[Voice]:
+        from . import sherpa_voices
+        return [Voice(id=v.voice_id, name=v.name, lang=v.lang, source=v.source,
+                      playable=v.playable)
+                for v in sherpa_voices.discover()]
+
+    def source_line(self, voice_id: str) -> str:
+        from . import sherpa_voices
+        return sherpa_voices.source_for(voice_id)
+
+    def synth(self, text, voice_id, out_base, pitch=0, rate=0,
+              api_key="") -> str:
+        from . import sherpa_voices
+        return sherpa_voices.synthesize(voice_id, text, out_base,
+                                        pitch=pitch, rate=rate)
+
+
+ENGINES = {e.key: e for e in (SherpaEngine(), SapiEngine(), EdgeEngine(),
                               GeminiEngine(), CloudEngine())}
 
 

@@ -2,23 +2,32 @@
 megjegyzi, hol tartottál (könyvjelző) – onnan folytatható.
 
 Akadálymentes: logikus fókusz-sorrend, minden vezérlő gombbal ÉS billentyűvel
-elérhető. A felolvasás SAPI vagy Edge neurális hanggal, fájlba konvertálás
-nélkül szól.
+elérhető. A felolvasás Sherpa (a gépen lévő nyílt Piper és Supertonic hangok), SAPI
+vagy Edge neurális hanggal, fájlba konvertálás nélkül szól.
 """
 
 import logging
 import os
+import tempfile
 import threading
+import uuid
 
 import wx
 
 from superdl import audiobook, booktext, tts   # megosztott backend a Core-ból
+from superdl.audioengine import Player
 from .readengine import ReadEngine             # a felolvasó-motor a modulban van
 from . import valaszto                         # beépített fájlválasztó
 
 _log = logging.getLogger("superdl.module.konyvek")
 
-READ_ENGINE_KEYS = ["sapi", "edge"]     # csak az élő felolvasáshoz alkalmasak
+_HANGMINTA = (
+    "Ma szép idő van. "
+    "A vessző után, ahogy most hallod, a hangsúly megáll egy pillanatra. "
+    "Figyelj ide! "
+    "Így szoktam kérdezni?"
+)
+READ_ENGINE_KEYS = [k for k in ("sherpa", "sapi", "edge") if k in tts.ENGINES]
 WILDCARD = ("Könyvek|*.txt;*.docx;*.epub;*.pdf|Szöveg (*.txt)|*.txt|"
             "Word (*.docx)|*.docx|EPUB (*.epub)|*.epub|PDF (*.pdf)|*.pdf|"
             "Minden fájl|*.*")
@@ -31,8 +40,9 @@ könyvjelzővel (folytatható), alvás-időzítővel.
 
 LÉPÉSRŐL LÉPÉSRE (vakon is)
 1. „Könyv megnyitása” – válaszd ki a könyvet (vagy a könyvtárból Enterrel).
-2. Válassz „Felolvasó”-t és „Hang”-ot (alapból magyar hangot kínál); állítsd a
-   tempót és a magasságot.
+2. Válassz „Felolvasó”-t és „Hang”-ot (alapból magyar hangot kínál). A hang
+   után a Tab a „Hang meghallgatása” gombra visz: pont, vessző, felkiáltójel
+   és kérdőjel is elhangzik. Utána állítsd a tempót és a magasságot.
 3. Felolvasás/folytatás: F5. Szünet: Ctrl+Szóköz. Leállítás: Esc.
 4. Mondatlépés: Ctrl+bal / Ctrl+jobb nyíl. A program megjegyzi, hol tartottál –
    legközelebb onnan folytatja.
@@ -44,8 +54,9 @@ F1 – súgó.  F5 – felolvasás/folytatás.  Ctrl+Szóköz – szünet.  Esc 
 Ctrl+bal / Ctrl+jobb – előző/következő mondat.
 
 TIPP
-A magyar Edge hang szép és ingyenes (internet kell); offline a SAPI magyar hang
-megy."""
+A magyar Edge hang szép és ingyenes (internet kell). Offline a gépeden lévő
+Sherpa-hangok (Piper Anna, Berta, Imre és a Supertonic) és a SAPI magyar hang
+is megy. A Sherpa-sorokban a készítő és a licenc is benne van."""
 
 
 class _BookmarkDialog(wx.Dialog):
@@ -124,6 +135,7 @@ class ReaderFrame(wx.Frame):
         self._path = ""
         self._title = ""
         self._voices: list[tts.Voice] = []
+        self.preview = Player()
         self.sleep = None                       # az aktív SleepTimer
         self._sleep_points: list[int] = []      # elalvási pontok (char-pozíciók)
 
@@ -172,7 +184,8 @@ class ReaderFrame(wx.Frame):
                 wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
         self.engine_ch = wx.Choice(
             p, choices=[tts.ENGINES[k].name for k in READ_ENGINE_KEYS])
-        self.engine_ch.SetSelection(1)       # alap: Edge (szép magyar hang)
+        self.engine_ch.SetSelection(
+            READ_ENGINE_KEYS.index("edge") if "edge" in READ_ENGINE_KEYS else 0)
         self.engine_ch.SetName("Felolvasó motor")
         self.engine_ch.Bind(wx.EVT_CHOICE, lambda e: self._load_voices())
         eng.Add(self.engine_ch, 0, wx.RIGHT, 10)
@@ -180,7 +193,12 @@ class ReaderFrame(wx.Frame):
                 wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
         self.voice_ch = wx.Choice(p, choices=["(hangok betöltése…)"])
         self.voice_ch.SetName("Hang választása")
-        eng.Add(self.voice_ch, 1, wx.RIGHT, 10)
+        self.voice_ch.Bind(wx.EVT_CHOICE, self._on_voice_pick)
+        eng.Add(self.voice_ch, 1, wx.RIGHT, 6)
+        b_hear = wx.Button(p, label="Hang meghallgatása")
+        b_hear.SetName("Hang meghallgatása")
+        b_hear.Bind(wx.EVT_BUTTON, lambda e: self._on_preview())
+        eng.Add(b_hear, 0, wx.RIGHT, 10)
         eng.Add(wx.StaticText(p, label="&Tempó:"), 0,
                 wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
         self.rate_spin = wx.SpinCtrl(p, min=-10, max=10, initial=0, size=(60, -1))
@@ -307,20 +325,60 @@ class ReaderFrame(wx.Frame):
             return
         if key != self._engine_key():
             return
-        self._voices = vs
-        self.voice_ch.Set([v.name for v in vs] or ["(nincs hang)"])
+        self._voices = [v for v in vs if getattr(v, "playable", True)]
+        self.voice_ch.Set([v.name for v in self._voices] or ["(nincs hang)"])
         # alapból egy magyar hangot választunk
-        idx = next((i for i, v in enumerate(vs)
+        idx = next((i for i, v in enumerate(self._voices)
                     if v.lang.lower().startswith("hu")
                     or "hungar" in v.name.lower()
                     or "magyar" in v.name.lower()), 0)
-        if vs:
+        if self._voices:
             self.voice_ch.SetSelection(idx)
-        self.SetStatusText(f"{len(vs)} hang betöltve.")
+        elso = self._voices[idx] if self._voices else None
+        forras = ""
+        if elso and getattr(elso, "source", ""):
+            forras = " " + elso.source
+        self.SetStatusText(f"{len(self._voices)} hang betöltve.{forras}")
+
+    def _on_voice_pick(self, _event):
+        i = self.voice_ch.GetSelection()
+        if 0 <= i < len(self._voices) and getattr(self._voices[i], "source", ""):
+            self.SetStatusText(self._voices[i].source)
 
     def _voice_id(self) -> str:
         i = self.voice_ch.GetSelection()
         return self._voices[i].id if 0 <= i < len(self._voices) else ""
+
+    def _on_preview(self):
+        i = self.voice_ch.GetSelection()
+        if not (0 <= i < len(self._voices)):
+            self.SetStatusText("Előbb válassz hangot.")
+            return
+        voice = self._voices[i]
+        eng = tts.ENGINES[self._engine_key()]
+        pitch, rate = self.pitch_spin.GetValue(), self.rate_spin.GetValue()
+        self.preview.stop()
+        self.SetStatusText("Hangminta készítése…")
+
+        def work():
+            try:
+                base = os.path.join(tempfile.gettempdir(),
+                                    f"sdl_readtest_{os.getpid()}_"
+                                    f"{uuid.uuid4().hex[:8]}")
+                path = eng.synth(getattr(tts, "PREVIEW_TEXT", _HANGMINTA),
+                                 voice.id, base, pitch=pitch, rate=rate)
+            except Exception as ex:
+                wx.CallAfter(self.SetStatusText, f"Hang meghallgatása hiba: {ex}")
+                return
+            wx.CallAfter(self._play_preview, path, voice.name)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _play_preview(self, path, name):
+        if self._closing:
+            return
+        self.SetStatusText(f"Hang meghallgatása: {name}")
+        self.preview.play(path, title=name)
 
     # ---- könyv megnyitása ---------------------------------------------
 
@@ -687,6 +745,7 @@ class ReaderFrame(wx.Frame):
             self.sleep.cancel()
         self._save_bookmark()
         try:
+            self.preview.stop()
             self.engine.stop()
         except Exception:
             pass
