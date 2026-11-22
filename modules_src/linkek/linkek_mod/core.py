@@ -50,41 +50,119 @@ def load():
 def save(items):
     store.save_json(DATA, items)
 
-def make_qr(url, caption, destination):
-    return _make_qr_payload(normalize_url(url), caption, destination)
+def print_centimeters(value):
+    """Egy cédulaoldal centiméterben. A vesszős magyar számot is elfogadja."""
+    text = str(value).strip().replace(',', '.')
+    if not re.fullmatch(r'\d+(?:\.\d+)?', text):
+        raise ValueError('A méret pozitív szám legyen, például 3 vagy 3,5.')
+    number = float(text)
+    if number < 2 or number > 20:
+        raise ValueError('A cédula oldala 2 és 20 centiméter között legyen.')
+    return number
 
-def make_label(text, destination):
+def size_sentence(width_cm, height_cm):
+    return (f'Nyomtatáskor {_cm_text(width_cm)} centiméter széles és '
+            f'{_cm_text(height_cm)} centiméter magas.')
+
+def _cm_text(number):
+    return f'{number:.2f}'.rstrip('0').rstrip('.').replace('.', ',')
+
+def label_origin_mm(page_w_mm, page_h_mm, width_cm, height_cm, margin_mm=10):
+    """A cédula bal felső sarka a lapon, milliméterben. Ha nem fér el, nem nyomtatunk."""
+    width, height = width_cm * 10, height_cm * 10
+    usable_w = page_w_mm - 2 * margin_mm
+    usable_h = page_h_mm - 2 * margin_mm
+    if width > usable_w or height > usable_h:
+        raise ValueError('A cédula nem fér el a lapon. Kisebb méretet adj meg, vagy nagyobb papírt válassz.')
+    return margin_mm + (usable_w - width) / 2, margin_mm + (usable_h - height) / 2
+
+def make_qr(url, caption, destination, width_cm=3, height_cm=3):
+    image = render_qr(url, caption, width_cm, height_cm)
+    save_png(image, destination, width_cm, height_cm)
+    return image
+
+def make_label(text, destination, width_cm=3, height_cm=3):
+    image = render_label(text, width_cm, height_cm)
+    save_png(image, destination, width_cm, height_cm)
+    return image
+
+def render_qr(url, caption, width_cm=3, height_cm=3):
+    return _render_slip(normalize_url(url), caption, width_cm, height_cm)
+
+def render_label(text, width_cm=3, height_cm=3):
     text = text.strip()
     if not text:
         raise ValueError('Add meg a tárgy nevét vagy a címke szövegét.')
-    return _make_qr_payload(text, text, destination)
+    return _render_slip(text, text, width_cm, height_cm)
 
-def _make_qr_payload(payload, caption, destination):
+def save_png(image, destination, width_cm, height_cm):
+    """A PNG pHYs adata a kért nyomtatási méret. A képpontok nem nyúlnak el."""
+    width_cm = print_centimeters(width_cm)
+    height_cm = print_centimeters(height_cm)
+    dpi = (image.width * 2.54 / width_cm, image.height * 2.54 / height_cm)
+    image.save(destination, format='PNG', dpi=dpi)
+
+def _render_slip(payload, caption, width_cm, height_cm):
     import sys
     vendor = str(Path(__file__).parent / 'vendor')
     if vendor not in sys.path: sys.path.insert(0, vendor)
     import qrcode
     from PIL import Image, ImageDraw, ImageFont
-    image = qrcode.make(payload).convert('RGB')
-    if caption.strip():
-        fontpath = Path('C:/Windows/Fonts/arial.ttf')
-        font = ImageFont.truetype(str(fontpath), 20) if fontpath.exists() else ImageFont.load_default()
-        draw = ImageDraw.Draw(image)
-        words, lines, line = caption.split(), [], ''
-        for word in words:
-            candidate = (line + ' ' + word).strip()
-            if line and draw.textbbox((0, 0), candidate, font=font)[2] > image.width - 24:
-                lines.append(line); line = word
-            else: line = candidate
-        if line: lines.append(line)
-        height = max(25, draw.textbbox((0, 0), 'Árvíz', font=font)[3] + 8)
-        out = Image.new('RGB', (max(image.width, 300), image.height + len(lines) * height + 20), 'white')
-        out.paste(image, ((out.width-image.width)//2, 0))
+    width_cm = print_centimeters(width_cm)
+    height_cm = print_centimeters(height_cm)
+    px_per_cm = 120
+    canvas_w = max(1, round(width_cm * px_per_cm))
+    canvas_h = max(1, round(height_cm * px_per_cm))
+    pad = max(8, round(min(canvas_w, canvas_h) * 0.04))
+    caption = caption.strip()
+    font = _label_font(max(14, min(canvas_w, canvas_h) // 16))
+    probe = ImageDraw.Draw(Image.new('RGB', (1, 1)))
+    lines = _wrap(probe, caption, font, canvas_w - 2 * pad) if caption else []
+    line_h = 0 if not lines else max(1, probe.textbbox((0, 0), 'Árvíz', font=font)[3] + 6)
+    text_h = line_h * len(lines) + (pad if lines else 0)
+    room = min(canvas_w - 2 * pad, canvas_h - 2 * pad - text_h)
+    min_qr = round(1.8 * px_per_cm)
+    if room < min_qr:
+        raise ValueError('Ekkora cédulára a QR-kód és a felirat együtt nem fér ki olvashatóan. Nagyobb méretet adj meg.')
+    image = _qr_square(qrcode, payload, room)
+    out = Image.new('RGB', (canvas_w, canvas_h), 'white')
+    out.paste(image, ((canvas_w - image.width) // 2, pad))
+    if lines:
         draw = ImageDraw.Draw(out)
-        for i, line in enumerate(lines):
-            draw.text((12, image.height + 8 + i*height), line, fill='black', font=font)
-        image = out
-    image.save(destination, format='PNG')
+        top = pad + image.height + pad // 2
+        for index, line in enumerate(lines):
+            draw.text((pad, top + index * line_h), line, fill='black', font=font)
+    return out
+
+def _label_font(size):
+    from PIL import ImageFont
+    fontpath = Path('C:/Windows/Fonts/arial.ttf')
+    if fontpath.exists():
+        return ImageFont.truetype(str(fontpath), size)
+    return ImageFont.load_default()
+
+def _wrap(draw, caption, font, limit):
+    words, lines, line = caption.split(), [], ''
+    for word in words:
+        candidate = (line + ' ' + word).strip()
+        if line and draw.textbbox((0, 0), candidate, font=font)[2] > limit:
+            lines.append(line)
+            line = word
+        else:
+            line = candidate
+    if line:
+        lines.append(line)
+    return lines
+
+def _qr_square(qrcode, payload, side):
+    from PIL import Image
+    code = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M, border=2, box_size=1)
+    code.add_data(payload)
+    code.make(fit=True)
+    image = code.make_image(fill_color='black', back_color='white').convert('RGB')
+    scale = max(1, side // image.width)
+    target = image.width * scale
+    return image.resize((target, target), Image.Resampling.NEAREST)
 
 
 LABELS_DATA = store.CONFIG_DIR / 'targycimkek.json'

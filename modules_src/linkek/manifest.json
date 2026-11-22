@@ -1,10 +1,10 @@
 {
   "id": "linkek",
   "name": "Super Link",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "entry": "linkek_mod",
   "category": "Eszközök",
-  "description": "ÚJDONSÁG: offline, nyomtatható QR-tárgycímkék mentése, módosítása és törlése. Is.gd linkrövidítés és feliratos QR-kód készítése.",
+  "description": "ÚJDONSÁG: a QR-cédula mérete centiméterben megadható, és közvetlenül nyomtatható. Offline tárgycímkék, is.gd linkrövidítés és feliratos QR-kód.",
   "min_core_api": "1.0",
   "min_core_version": "4.6.30",
   "requires_tools": [],

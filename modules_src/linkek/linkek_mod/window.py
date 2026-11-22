@@ -37,8 +37,12 @@ class LinkFrame(wx.Frame):
         box.Add(row)
         self.qrurl = field('&QR-kód tartalma – webcím:', 'QR-kódhoz használt webcím')
         self.caption = field('&Felirat a QR-kód alatt (elhagyható):', 'QR-kód alatti felirat')
+        self.qr_width, self.qr_height = _size_fields(panel, box)
         qr = wx.Button(panel, label='QR-kód &mentése PNG-ként…')
         qr.Bind(wx.EVT_BUTTON, self.on_qr); box.Add(qr, 0, wx.ALL, 5)
+        qr_print = wx.Button(panel, label='QR-cédula &nyomtatása…')
+        qr_print.SetName('A QR-cédula közvetlen nyomtatása a megadott méretben')
+        qr_print.Bind(wx.EVT_BUTTON, self.on_qr_print); box.Add(qr_print, 0, wx.ALL, 5)
         labels = wx.Button(panel, label='&Tárgycímkék…')
         labels.SetName('Tárgycímkék készítése és kezelése')
         labels.Bind(wx.EVT_BUTTON, self.on_labels); box.Add(labels, 0, wx.ALL, 5)
@@ -123,26 +127,38 @@ class LinkFrame(wx.Frame):
         finally: dialog.Destroy()
 
     def on_qr(self, event):
-        try: C.normalize_url(self.qrurl.GetValue())
-        except ValueError as exc: wx.MessageBox(str(exc), 'Hibás cím', wx.OK | wx.ICON_WARNING, self); return
+        try:
+            C.normalize_url(self.qrurl.GetValue())
+            _read_size(self.qr_width, self.qr_height)
+        except ValueError as exc: wx.MessageBox(str(exc), 'Hibás adat', wx.OK | wx.ICON_WARNING, self); return
         dialog = wx.FileDialog(self, 'QR-kód mentése', wildcard='PNG kép (*.png)|*.png', style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         try:
             if dialog.ShowModal() != wx.ID_OK: return
             path = dialog.GetPath()
             if not path.lower().endswith('.png'): path += '.png'
-            C.make_qr(self.qrurl.GetValue(), self.caption.GetValue(), path)
-            self.status.SetLabel('A QR-kód elkészült: ' + path)
-            wx.MessageBox('QR-kód elmentve: ' + path, 'QR-kód', wx.OK | wx.ICON_INFORMATION, self)
+            width, height = _read_size(self.qr_width, self.qr_height)
+            C.make_qr(self.qrurl.GetValue(), self.caption.GetValue(), path, width, height)
+            sentence = C.size_sentence(width, height)
+            self.status.SetLabel('A QR-kód elkészült: ' + path + ' ' + sentence)
+            wx.MessageBox('QR-kód elmentve: ' + path + '\n' + sentence, 'QR-kód', wx.OK | wx.ICON_INFORMATION, self)
         except Exception as exc: wx.MessageBox('A QR-kód mentése nem sikerült: ' + str(exc), 'Hiba', wx.OK | wx.ICON_ERROR, self)
         finally: dialog.Destroy()
 
+    def on_qr_print(self, event):
+        try:
+            C.normalize_url(self.qrurl.GetValue())
+            width, height = _read_size(self.qr_width, self.qr_height)
+            image = C.render_qr(self.qrurl.GetValue(), self.caption.GetValue(), width, height)
+        except ValueError as exc:
+            wx.MessageBox(str(exc), 'Hibás adat', wx.OK | wx.ICON_WARNING, self); return
+        _print_slip(self, image, width, height, self.status)
 
 
 class LabelDialog(wx.Dialog):
     """Offline tárgycímkék: a QR a szöveget tartalmazza."""
 
     def __init__(self, parent):
-        super().__init__(parent, title='Tárgycímkék', size=(600, 500))
+        super().__init__(parent, title='Tárgycímkék', size=(640, 680))
         try:
             self.items = C.load_labels()
         except (OSError, ValueError) as exc:
@@ -150,7 +166,7 @@ class LabelDialog(wx.Dialog):
             wx.MessageBox('A tárgycímkék nem olvashatók, ezért nem írjuk felül őket: ' + str(exc), 'Hiba', wx.OK | wx.ICON_ERROR, self)
         panel = wx.Panel(self)
         layout = wx.BoxSizer(wx.VERTICAL)
-        layout.Add(wx.StaticText(panel, label='A QR-kódba a tárgy szövege kerül; internet nem szükséges.'), 0, wx.ALL, 8)
+        layout.Add(wx.StaticText(panel, label='A QR-kódba a tárgy szövege kerül; internet nem szükséges. A szélesség és a magasság bekerül a PNG-be, és a nyomtatás is ekkora cédulát tesz a lapra.'), 0, wx.ALL, 8)
         layout.Add(wx.StaticText(panel, label='&Tárgy neve vagy címke szövege:'), 0, wx.ALL, 8)
         self.text = wx.TextCtrl(panel)
         self.text.SetName('Tárgy neve vagy címke szövege')
@@ -160,8 +176,16 @@ class LabelDialog(wx.Dialog):
         self.list.SetName('Mentett tárgycímkék listája')
         self.list.Bind(wx.EVT_LISTBOX, self.on_select)
         layout.Add(self.list, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
-        for label, handler in (('Új címke &mentése', self.on_add), ('Kijelölt címke &módosítása', self.on_update), ('Kijelölt címke &törlése', self.on_delete), ('QR-kód &mentése PNG-ként…', self.on_export)):
+        self.width, self.height = _size_fields(panel, layout)
+        for label, handler, name in (
+                ('Új címke &mentése', self.on_add, ''),
+                ('Kijelölt címke &módosítása', self.on_update, ''),
+                ('Kijelölt címke &törlése', self.on_delete, ''),
+                ('QR-kód &mentése PNG-ként…', self.on_export, ''),
+                ('Cédula &nyomtatása…', self.on_print, 'A tárgycédula közvetlen nyomtatása a megadott méretben')):
             button = wx.Button(panel, label=label)
+            if name:
+                button.SetName(name)
             button.Bind(wx.EVT_BUTTON, handler)
             layout.Add(button, 0, wx.ALL, 5)
         close = wx.Button(panel, wx.ID_CLOSE, '&Bezárás')
@@ -229,14 +253,104 @@ class LabelDialog(wx.Dialog):
         if not value:
             wx.MessageBox('Add meg a címke szövegét.', 'Tárgycímke', wx.OK | wx.ICON_WARNING, self)
             return
+        try:
+            _read_size(self.width, self.height)
+        except ValueError as exc:
+            wx.MessageBox(str(exc), 'Hibás adat', wx.OK | wx.ICON_WARNING, self)
+            return
         dialog = wx.FileDialog(self, 'Tárgycímke mentése', wildcard='PNG kép (*.png)|*.png', style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         try:
             if dialog.ShowModal() != wx.ID_OK: return
             path = dialog.GetPath()
             if not path.lower().endswith('.png'): path += '.png'
-            C.make_label(value, path)
-            wx.MessageBox('A tárgycímkét elmentettük: ' + path, 'Tárgycímke', wx.OK | wx.ICON_INFORMATION, self)
+            width, height = _read_size(self.width, self.height)
+            C.make_label(value, path, width, height)
+            wx.MessageBox('A tárgycímkét elmentettük: ' + path + '\n' + C.size_sentence(width, height), 'Tárgycímke', wx.OK | wx.ICON_INFORMATION, self)
         except Exception as exc:
             wx.MessageBox('A címke készítése nem sikerült: ' + str(exc), 'Hiba', wx.OK | wx.ICON_ERROR, self)
         finally:
             dialog.Destroy()
+
+    def on_print(self, event):
+        value = self.text.GetValue().strip()
+        if not value:
+            wx.MessageBox('Add meg a címke szövegét.', 'Tárgycímke', wx.OK | wx.ICON_WARNING, self)
+            return
+        try:
+            width, height = _read_size(self.width, self.height)
+            image = C.render_label(value, width, height)
+        except ValueError as exc:
+            wx.MessageBox(str(exc), 'Hibás adat', wx.OK | wx.ICON_WARNING, self)
+            return
+        _print_slip(self, image, width, height)
+
+
+def _size_fields(panel, layout):
+    layout.Add(wx.StaticText(panel, label='&Szélesség centiméterben:'), 0, wx.ALL, 5)
+    width = wx.TextCtrl(panel, value='3')
+    width.SetName('Cédula szélessége centiméterben')
+    layout.Add(width, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
+    layout.Add(wx.StaticText(panel, label='&Magasság centiméterben:'), 0, wx.ALL, 5)
+    height = wx.TextCtrl(panel, value='3')
+    height.SetName('Cédula magassága centiméterben')
+    layout.Add(height, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
+    return width, height
+
+def _read_size(width, height):
+    return C.print_centimeters(width.GetValue()), C.print_centimeters(height.GetValue())
+
+def _print_slip(parent, image, width, height, status=None):
+    printout = _SlipPrintout(image, width, height)
+    printer = wx.Printer(wx.PrintDialogData())
+    printed = printer.Print(parent, printout, True)
+    if printout.error:
+        wx.MessageBox(printout.error, 'Nyomtatás', wx.OK | wx.ICON_WARNING, parent)
+        return
+    if not printed:
+        if printer.GetLastError() == wx.PRINTER_ERROR:
+            wx.MessageBox('A nyomtató nem érhető el.', 'Nyomtatás', wx.OK | wx.ICON_ERROR, parent)
+        else:
+            message = 'A nyomtatást megszakítottad.'
+            if status is not None:
+                status.SetLabel(message)
+            else:
+                wx.MessageBox(message, 'Nyomtatás', wx.OK | wx.ICON_INFORMATION, parent)
+        return
+    message = 'A cédulát nyomtatásra küldtem. ' + C.size_sentence(width, height)
+    if status is not None:
+        status.SetLabel(message)
+    wx.MessageBox(message, 'Nyomtatás', wx.OK | wx.ICON_INFORMATION, parent)
+
+
+class _SlipPrintout(wx.Printout):
+    def __init__(self, image, width_cm, height_cm):
+        super().__init__('Super Link cédula')
+        self.image = image
+        self.width_cm = width_cm
+        self.height_cm = height_cm
+        self.error = None
+
+    def GetPageInfo(self):
+        return 1, 1, 1, 1
+
+    def HasPage(self, page):
+        return page == 1
+
+    def OnPrintPage(self, page):
+        try:
+            page_w, page_h = self.GetPageSizeMM()
+            x_mm, y_mm = C.label_origin_mm(page_w, page_h, self.width_cm, self.height_cm)
+        except ValueError as exc:
+            self.error = str(exc)
+            return False
+        dc = self.GetDC()
+        pixel_w, pixel_h = dc.GetSize()
+        x = int(x_mm * pixel_w / page_w)
+        y = int(y_mm * pixel_h / page_h)
+        draw_w = max(1, int(self.width_cm * 10 * pixel_w / page_w))
+        draw_h = max(1, int(self.height_cm * 10 * pixel_h / page_h))
+        rgb = self.image.convert('RGB')
+        bitmap = wx.Image(rgb.width, rgb.height)
+        bitmap.SetData(rgb.tobytes())
+        dc.DrawBitmap(bitmap.Scale(draw_w, draw_h, wx.IMAGE_QUALITY_NEAREST).ConvertToBitmap(), x, y)
+        return True
