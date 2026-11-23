@@ -29,7 +29,7 @@ darkdetect==0.8.0
 defusedxml==0.7.1
 easyocr==1.7.2
 EbookLib==0.20
-edge-tts==7.2.8
+edge-tts==7.3.1
 feedparser==6.0.12
 ffmpy==1.0.0
 filelock==3.29.4
