@@ -1,0 +1,12 @@
+{
+  "id": "fajlok",
+  "name": "Super Files",
+  "version": "1.0.0",
+  "entry": "fajlok_mod",
+  "category": "Fájlok",
+  "description": "ÚJDONSÁG: kétágú tallózó. A Tab vált oldalt, a Ctrl+C, a Ctrl+X és a Ctrl+V a másik oldalra másol vagy helyez át, meglévő fájl felülírása nélkül. A Ctrl+A és a Shift+nyíl több elemet jelöl. A Ctrl+F névrészletre vagy fájltípusra keres. Az FTP és az SFTP külön helyként menthető.",
+  "min_core_api": "1.0",
+  "min_core_version": "4.0.0",
+  "requires_tools": [],
+  "author": "Kőrösmezey Dávid"
+}
