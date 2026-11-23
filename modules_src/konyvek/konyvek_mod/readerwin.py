@@ -204,6 +204,10 @@ class ReaderFrame(wx.Frame):
         self.b_download.SetName("Hangok letöltése")
         self.b_download.Bind(wx.EVT_BUTTON, lambda e: self._download_voices())
         eng.Add(self.b_download, 0, wx.RIGHT, 10)
+        b_remove = wx.Button(p, label="Sherpa hang &eltávolítása")
+        b_remove.SetName("Sherpa hang eltávolítása")
+        b_remove.Bind(wx.EVT_BUTTON, self._remove_sherpa_voice)
+        eng.Add(b_remove, 0, wx.RIGHT, 6)
         eng.Add(wx.StaticText(p, label="&Tempó:"), 0,
                 wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
         self.rate_spin = wx.SpinCtrl(p, min=-10, max=10, initial=0, size=(60, -1))
@@ -362,6 +366,11 @@ class ReaderFrame(wx.Frame):
         i = self.voice_ch.GetSelection()
         return self._voices[i].id if 0 <= i < len(self._voices) else ""
 
+    def _remove_sherpa_voice(self, event):
+        from .sherpa_letolt import remove
+        if remove(self):
+            self._load_voices()
+
     def _download_voices(self):
         if self._engine_key() != "sherpa":
             self.SetStatusText(
@@ -411,6 +420,11 @@ class ReaderFrame(wx.Frame):
                                wildcard=WILDCARD)
         if ut:
             self._open_path(ut)
+
+    def open_file(self, path):
+        """Fájltársításból: a könyv azonnal beolvasódik."""
+        if path:
+            self._open_path(path)
 
     def _open_path(self, path):
         self.SetStatusText(f"Könyv beolvasása: {os.path.basename(path)} …")

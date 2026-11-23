@@ -589,6 +589,44 @@ def offer_by_id(offer_id: str) -> VoiceOffer:
     raise KeyError(offer_id)
 
 
+def check_connection(offer_id: str) -> None:
+    """Ellenőrizd rövid időkorláttal a letöltési kiszolgálót."""
+    request = urllib.request.Request(_MODEL_PREFIX + "/" + offer_by_id(offer_id).offer_id + ".tar.bz2",
+                                     method="HEAD",
+                                     headers={"User-Agent": _UA})
+    try:
+        with urllib.request.urlopen(request, timeout=4):
+            pass
+    except Exception as exc:
+        raise RuntimeError("A Sherpa letöltési kiszolgáló nem érhető el. "
+                           "Ellenőrizd az internetkapcsolatot, majd próbáld újra.") from exc
+
+
+def _catalog_folder(offer: VoiceOffer) -> Path:
+    return home_root() / "voices" / ("catalog-" + offer.offer_id)
+
+
+def installed_offers() -> list[VoiceOffer]:
+    return [offer for offer in OFFERS if (_catalog_folder(offer) / "voice.json").is_file()]
+
+
+def remove_voice(offer_id: str) -> None:
+    folder = _catalog_folder(offer_by_id(offer_id))
+    # Kizárólag a SuperDL saját katalógusmappáit kezeljük.
+    for path in (home_root(), folder.parent, folder):
+        if path.is_symlink() or getattr(os.path, "isjunction", lambda p: False)(path):
+            raise RuntimeError("Az átirányított hangmappa nem távolítható el.")
+    with _LOCK:
+        if not (folder / "voice.json").is_file():
+            raise RuntimeError("A kiválasztott hang már nincs telepítve.")
+        key = os.path.normcase(os.path.abspath(folder / "voice.json"))
+        if _NATIVE.tts and _NATIVE.key == key:
+            _NATIVE.dll.SherpaOnnxDestroyOfflineTts(_NATIVE.tts)
+            _NATIVE.tts = None
+            _NATIVE.kept = []
+        shutil.rmtree(folder)
+
+
 def install(offer_ids: list[str], progress, cancel: threading.Event) -> None:
     """A kiválasztott hangokat, és ha kell, a motort és az espeak adatot tölti."""
     chosen = [offer_by_id(i) for i in offer_ids]
@@ -668,7 +706,7 @@ def _install_espeak(progress, cancel: threading.Event) -> None:
 
 
 def _install_voice(offer: VoiceOffer, progress, cancel: threading.Event) -> None:
-    folder = home_root() / "voices" / ("catalog-" + offer.offer_id)
+    folder = _catalog_folder(offer)
     if (folder / "voice.json").is_file() and any(folder.rglob("*.onnx")):
         progress(1, offer.label.split(",")[0] + " már a gépen van.")
         return
@@ -743,7 +781,7 @@ def _download(url: str, dest: Path, progress, cancel: threading.Event,
               label: str) -> None:
     request = urllib.request.Request(url, headers={"User-Agent": _UA})
     try:
-        src = urllib.request.urlopen(request, timeout=60)
+        src = urllib.request.urlopen(request, timeout=15)
     except Exception as exc:
         raise RuntimeError("A letöltés nem indult el (%s): %s" % (label, exc)) from exc
     with src:

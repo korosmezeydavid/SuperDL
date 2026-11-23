@@ -57,54 +57,99 @@ def _choose(parent) -> list[str]:
     return picked
 
 
-def _run(parent, offer_ids: list[str]) -> bool:
-    cancel = threading.Event()
-    outcome = {"error": None}
-    dlg = wx.ProgressDialog(
-        "Hangok letöltése", "Indul a letöltés…", 100, parent,
-        wx.PD_APP_MODAL | wx.PD_CAN_ABORT | wx.PD_ELAPSED_TIME
-        | wx.PD_REMAINING_TIME | wx.PD_AUTO_HIDE)
-
-    def progress(percent: int, message: str) -> None:
-        wx.CallAfter(_tick, dlg, cancel, percent, message)
-
-    def work():
-        try:
-            sherpa_voices.install(offer_ids, progress, cancel)
-        except Exception as exc:
-            outcome["error"] = exc
-        wx.CallAfter(_finish, dlg)
-
-    wx.CallAfter(lambda: threading.Thread(target=work, daemon=True).start())
-    dlg.ShowModal()
-    dlg.Destroy()
-    if outcome["error"] and not cancel.is_set():
-        wx.MessageBox(str(outcome["error"]), "A letöltés megállt",
-                      wx.OK | wx.ICON_WARNING, parent)
+def remove(parent) -> bool:
+    installed = sherpa_voices.installed_offers()
+    if not installed:
+        wx.MessageBox("Nincs eltávolítható, SuperDL-lel letöltött hang.",
+                      "Sherpa hangok", wx.OK | wx.ICON_INFORMATION, parent)
         return False
+    with wx.SingleChoiceDialog(parent, "Melyik hangot távolítod el?",
+                               "Sherpa hang eltávolítása",
+                               [item.label for item in installed]) as dlg:
+        if dlg.ShowModal() != wx.ID_OK:
+            return False
+        item = installed[dlg.GetSelection()]
+    if wx.MessageBox(f"Eltávolítod ezt a hangcsomagot? {item.label}",
+                     "Eltávolítás megerősítése",
+                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION, parent) != wx.YES:
+        return False
+    return _run(parent, [item.offer_id], removing=True)
+
+
+def _run(parent, offer_ids: list[str], *, removing=False) -> bool:
+    cancel = threading.Event()
+    done = threading.Event()
+    outcome = {"error": None, "progress": (0, "Kapcsolat ellenőrzése…")}
+    title = "Hang eltávolítása" if removing else "Hangok letöltése"
+    with wx.Dialog(parent, title=title) as dlg:
+        layout = wx.BoxSizer(wx.VERTICAL)
+        status = wx.TextCtrl(dlg, value="Eltávolítás folyamatban…" if removing else
+                             "Kapcsolat ellenőrzése…", style=wx.TE_READONLY, size=(450, -1))
+        status.SetName("Sherpa művelet állapota")
+        layout.Add(status, 0, wx.EXPAND | wx.ALL, 10)
+        gauge = wx.Gauge(dlg, range=100)
+        gauge.SetName("Sherpa művelet előrehaladása")
+        layout.Add(gauge, 0, wx.EXPAND | wx.ALL, 10)
+        button = wx.Button(dlg, label="&Megszakítás")
+        button.Enable(not removing)
+        layout.Add(button, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
+        dlg.SetSizerAndFit(layout)
+
+        def request_cancel(event):
+            if event.GetEventType() == wx.EVT_CLOSE.typeId:
+                event.Veto()
+            if not removing:
+                cancel.set()
+                button.Disable()
+                status.ChangeValue("Megszakítás folyamatban…")
+
+        button.Bind(wx.EVT_BUTTON, request_cancel)
+        dlg.Bind(wx.EVT_CLOSE, request_cancel)
+        dlg.SetEscapeId(wx.ID_NONE)
+
+        def progress(percent, message):
+            outcome["progress"] = (percent, message)
+
+        def work():
+            try:
+                if removing:
+                    sherpa_voices.remove_voice(offer_ids[0])
+                else:
+                    sherpa_voices.check_connection(offer_ids[0])
+                    if not cancel.is_set():
+                        sherpa_voices.install(offer_ids, progress, cancel)
+            except Exception as exc:
+                outcome["error"] = exc
+            finally:
+                done.set()
+
+        timer = wx.Timer(dlg)
+
+        def tick(event):
+            if done.is_set():
+                dlg.EndModal(wx.ID_OK)
+                return
+            if not cancel.is_set() and not removing:
+                percent, message = outcome["progress"]
+                gauge.SetValue(max(0, min(100, int(percent))))
+                if status.GetValue() != message:
+                    status.ChangeValue(message)
+
+        dlg.Bind(wx.EVT_TIMER, tick, timer)
+        timer.Start(100)
+        try:
+            threading.Thread(target=work, daemon=True).start()
+            dlg.ShowModal()
+        finally:
+            timer.Stop()
+
     if cancel.is_set():
         return True
-    wx.MessageBox(
-        "A hangok a gépeden vannak. A lista most frissül, és a Hang "
-        "meghallgatása gombbal ki lehet próbálni őket.",
-        "Sherpa hangok", wx.OK | wx.ICON_INFORMATION, parent)
+    if outcome["error"]:
+        wx.MessageBox(str(outcome["error"]), title + " – hiba",
+                      wx.OK | wx.ICON_WARNING, parent)
+        return False
+    wx.MessageBox("A hangot eltávolítottuk." if removing else
+                  "A hangok a gépeden vannak. A hanglista frissül.",
+                  "Sherpa hangok", wx.OK | wx.ICON_INFORMATION, parent)
     return True
-
-
-def _tick(dlg, cancel, percent, message):
-    if not dlg:
-        return
-    try:
-        keep = dlg.Update(max(0, min(100, int(percent))), message)
-    except RuntimeError:
-        return
-    if not keep:
-        cancel.set()
-
-
-def _finish(dlg):
-    try:
-        if dlg.IsShown():
-            dlg.EndModal(wx.ID_OK)
-    except RuntimeError:
-        pass

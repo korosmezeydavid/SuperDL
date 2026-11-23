@@ -205,6 +205,10 @@ class BookFrame(wx.Frame):
         self.b_download.SetName("Hangok letöltése")
         self.b_download.Bind(wx.EVT_BUTTON, lambda e: self._download_voices())
         hear.Add(self.b_download, 0)
+        b_remove = wx.Button(p, label="Sherpa hang &eltávolítása")
+        b_remove.SetName("Sherpa hang eltávolítása")
+        b_remove.Bind(wx.EVT_BUTTON, self._remove_sherpa_voice)
+        hear.Add(b_remove, 0, wx.RIGHT, 6)
         v.Add(hear, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
 
         # pitch / rate
@@ -578,6 +582,11 @@ class BookFrame(wx.Frame):
         self._mond(szoveg)
 
     # ---- előhallgatás -------------------------------------------------
+
+    def _remove_sherpa_voice(self, event):
+        from .sherpa_letolt import remove
+        if remove(self):
+            self._load_voices()
 
     def _download_voices(self):
         if self._engine_key() != "sherpa":
