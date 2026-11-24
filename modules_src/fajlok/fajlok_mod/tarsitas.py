@@ -94,7 +94,8 @@ def nyit(main, ut: str) -> str:
     adat = beallitas(kit(ut))
     cel = adat.get("cel") or "rendszer"
     if cel == "program" and adat.get("program"):
-        subprocess.Popen([adat["program"], ut])
+        subprocess.Popen([adat["program"], ut],
+                         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         return "Megnyitja: %s." % os.path.basename(adat["program"])
     if cel == "rendszer" or cel not in _ABLAK:
         os.startfile(ut)

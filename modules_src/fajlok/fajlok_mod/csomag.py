@@ -128,7 +128,8 @@ def _hetzet(parok, cel: str) -> None:
         import subprocess
         kesz = subprocess.run(
             [program, "a", "-y", "-bb0", cel, "@" + lista],
-            capture_output=True, text=True)
+            capture_output=True, text=True,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         if kesz.returncode != 0:
             raise RuntimeError(kesz.stderr.strip() or "A 7-Zip nem csomagolt.")
     finally:
@@ -144,7 +145,8 @@ def _hetzet_ki(arch, cel) -> int:
         raise RuntimeError("A 7z kibontásához a 7-Zip kell.")
     import subprocess
     kesz = subprocess.run(
-        [program, "x", "-y", "-o" + cel, arch], capture_output=True, text=True)
+        [program, "x", "-y", "-o" + cel, arch], capture_output=True, text=True,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
     if kesz.returncode != 0:
         raise RuntimeError(kesz.stderr.strip() or "A 7-Zip nem bontott ki.")
     return len(tartalom_helyi(cel))
@@ -163,7 +165,8 @@ def _hetzet_lista(arch) -> list[str]:
     if not program:
         raise RuntimeError("A 7z listájához a 7-Zip kell.")
     import subprocess
-    kesz = subprocess.run([program, "l", "-ba", arch], capture_output=True, text=True)
+    kesz = subprocess.run([program, "l", "-ba", arch], capture_output=True, text=True,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
     if kesz.returncode != 0:
         raise RuntimeError("A 7z lista nem készült el.")
     return [sor.strip() for sor in kesz.stdout.splitlines() if sor.strip()]
