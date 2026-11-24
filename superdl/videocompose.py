@@ -114,7 +114,8 @@ def _fmt_t(t: float) -> str:
 
 
 def build_filtergraph(
-        elements: list[Element], total: float, width: int, height: int
+        elements: list[Element], total: float, width: int, height: int,
+        slideshow: tuple[str, ...] = (),
 ) -> tuple[str, list[str], list[Element], str]:
     """A filtergraph összeállítása. Visszaad:
       - a teljes filter_complex sztringet,
@@ -130,6 +131,19 @@ def build_filtergraph(
     img_paths: list[str] = []
     text_elems: list[Element] = []
     img_input = 2                 # 0=háttér, 1=zene, innen jönnek a képek
+
+    for i, path in enumerate(slideshow[1:], start=1):
+        start = total * i / len(slideshow)
+        end = total * (i + 1) / len(slideshow)
+        parts.append(
+            f"[{img_input}:v]scale={width}:{height}:force_original_aspect_ratio=decrease,"
+            f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,setsar=1[slide{i}]")
+        parts.append(
+            f"[{cur}][slide{i}]overlay=enable='gte(t,{_fmt_t(start)})"
+            f"*lt(t,{_fmt_t(end)})'[slides{i}]")
+        img_paths.append(path)
+        img_input += 1
+        cur = f"slides{i}"
 
     ordered = sorted(enumerate(elements), key=lambda kv: kv[1].at)
     for n, (_, el) in enumerate(ordered):
@@ -174,8 +188,9 @@ class VideoComposer:
     def __init__(self, background: str, music: str, elements: list[Element],
                  out_path: str, fmt: str = "mp4",
                  resolution: tuple[int, int] = (1920, 1080),
-                 progress=None, ff_progress=None):
-        self.background = background
+                 progress=None, ff_progress=None, *, slideshow: tuple[str, ...] = ()):
+        self.slideshow = tuple(slideshow)
+        self.background = self.slideshow[0] if self.slideshow else background
         self.music = music
         self.elements = list(elements)
         self.out_path = out_path
@@ -207,8 +222,9 @@ class VideoComposer:
                           "Ellenőrizd az internetkapcsolatot.")
             return False
 
-        font = _find_font()
-        if not font:
+        needs_font = any(el.kind == "text" for el in self.elements)
+        font = _find_font() if needs_font else None
+        if needs_font and not font:
             self.error = ("Nem találtam betűkészletet a szöveghez "
                           "(C:\\Windows\\Fonts\\arial.ttf).")
             return False
@@ -220,11 +236,12 @@ class VideoComposer:
             return False
 
         graph, img_paths, text_elems, final_label = build_filtergraph(
-            self.elements, total, self.width, self.height)
+            self.elements, total, self.width, self.height, self.slideshow)
 
         work = Path(tempfile.mkdtemp(prefix="superdl_vid_"))
         try:
-            shutil.copyfile(font, work / "font.ttf")
+            if font:
+                shutil.copyfile(font, work / "font.ttf")
             fs = max(24, int(self.height / 18))
             for i, el in enumerate(text_elems):
                 (work / f"text{i}.txt").write_text(
@@ -235,8 +252,13 @@ class VideoComposer:
                    "-i", self.music]
             for p in img_paths:
                 cmd += ["-loop", "1", "-i", p]
-            cmd += ["-filter_complex", graph,
-                    "-map", f"[{final_label}]", "-map", "1:a",
+            if self.slideshow:
+                (work / "graph.txt").write_text(graph, encoding="utf-8")
+                cmd += ["-filter_complex_threads", "1", "-filter_complex_script", "graph.txt",
+                        "-t", str(total)]
+            else:
+                cmd += ["-filter_complex", graph]
+            cmd += ["-map", f"[{final_label}]", "-map", "1:a",
                     "-c:v", "libx264", "-preset", "veryfast",
                     "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k",
                     "-shortest", "-progress", "pipe:1", "-nostats",

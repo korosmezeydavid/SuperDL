@@ -33,7 +33,9 @@ Videó készítése egy állóképből (háttér) és zenéből, az idővonalra 
 SZÖVEG- és KÉP-overlay-ekkel.
 
 LÉPÉSRŐL LÉPÉSRE (vakon is)
-1. „Háttérkép kiválasztása" – a videó alapképe. „Zene kiválasztása" – a hang.
+1. A „Képek beillesztése a zenébe” egy vagy több képet egyenletesen eloszt
+   a zeneszám teljes hosszán. Feliratot a szerkesztőben adhatsz hozzá.
+   A hagyományos szerkesztéshez: „Háttérkép kiválasztása" – a videó alapképe. „Zene kiválasztása" – a hang.
 2. „Tovább a szerkesztéshez".
 3. SZÓKÖZ: a zene lejátszása/szüneteltetése; a „Pillanatnyi időpont" bemondja,
    hol tartasz.
@@ -57,6 +59,8 @@ class VideoComposeFrame(wx.Frame):
         self.main = main
         self.background = ""
         self.music = ""
+        self.slideshow: tuple[str, ...] = ()
+        self.duration = 0.0
         self.elements: list[VC.Element] = []
         self.player = Player()
         self._closing = False        # zárás alatt a háttér-callbackek kilépnek
@@ -65,8 +69,14 @@ class VideoComposeFrame(wx.Frame):
         self._composer = None
 
         self._build()
+        menu = wx.Menu()
+        self.slides_item = menu.Append(wx.ID_ANY, "Képek &beillesztése a zenébe…")
+        self.Bind(wx.EVT_MENU, lambda e: self._pick_slideshow(), self.slides_item)
+        bar = wx.MenuBar()
+        bar.Append(menu, "&Betöltés")
+        self.SetMenuBar(bar)
         self.CreateStatusBar()
-        self._announce("Válaszd ki a háttérképet és a zenét, majd Tovább.")
+        self._announce("Válassz képeket vagy háttérképet, majd zenét.")
         self.Bind(wx.EVT_CHAR_HOOK, self._on_char_hook)
         self.Bind(wx.EVT_CLOSE, self._on_close)
 
@@ -85,11 +95,15 @@ class VideoComposeFrame(wx.Frame):
         v = wx.BoxSizer(wx.VERTICAL)
         v.Add(wx.StaticText(
             self.setup_panel,
-            label="1. lépés: válaszd ki a HÁTTÉRKÉPET és a ZENÉT."),
+            label="1. lépés: válassz képeket vagy háttérképet, majd zenét."),
             0, wx.ALL, 8)
 
+        slides_btn = wx.Button(self.setup_panel, label="Képek &beillesztése a zenébe…")
+        slides_btn.Bind(wx.EVT_BUTTON, lambda e: self._pick_slideshow())
+        v.Add(slides_btn, 0, wx.ALL, 8)
+
         self.bg_txt = wx.TextCtrl(self.setup_panel, style=wx.TE_READONLY)
-        self.bg_txt.SetName("Kiválasztott háttérkép")
+        self.bg_txt.SetName("Kiválasztott képek vagy háttérkép")
         bg_btn = wx.Button(self.setup_panel, label="&Háttérkép kiválasztása…")
         bg_btn.Bind(wx.EVT_BUTTON, lambda e: self._pick_background())
         r1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -175,11 +189,26 @@ class VideoComposeFrame(wx.Frame):
 
     # ---- 1. lépés: fájlválasztás --------------------------------------
 
+    def _pick_slideshow(self):
+        if not self.setup_panel.IsShown():
+            return
+        with wx.FileDialog(self, "Képek beillesztése a zenébe",
+                           wildcard=IMAGE_WILDCARD,
+                           style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE) as dlg:
+            if dlg.ShowModal() != wx.ID_OK:
+                return
+            self.slideshow = tuple(dlg.GetPaths())
+        self.background = ""
+        self.bg_txt.SetValue("; ".join(Path(p).name for p in self.slideshow))
+        self._announce(f"{len(self.slideshow)} kép kiválasztva. A program időzíti a képeket.")
+        self._update_next()
+
     def _pick_background(self):
         dlg = wx.FileDialog(self, "Háttérkép kiválasztása",
                             wildcard=IMAGE_WILDCARD,
                             style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if dlg.ShowModal() == wx.ID_OK:
+            self.slideshow = ()
             self.background = dlg.GetPath()
             self.bg_txt.SetValue(self.background)
             self._announce(f"Háttérkép: {Path(self.background).name}")
@@ -198,17 +227,18 @@ class VideoComposeFrame(wx.Frame):
         dlg.Destroy()
 
     def _update_next(self):
-        self.next_btn.Enable(bool(self.background and self.music))
+        self.next_btn.Enable(bool((self.background or self.slideshow) and self.music))
 
     def _go_edit(self):
-        if not (self.background and self.music):
+        if not ((self.background or self.slideshow) and self.music):
             return
+        self.slides_item.Enable(False)
         self.setup_panel.Hide()
         self.edit_panel.Show()
         self.outer.Layout()
-        dur = VC.media_duration(self.music)
+        self.duration = VC.media_duration(self.music)
         self._announce(
-            f"Szerkesztés. A zene hossza {VC.human_time(dur)}. "
+            f"Szerkesztés. A zene hossza {VC.human_time(self.duration)}. "
             "Nyomd meg a Szóközt a lejátszáshoz.")
         self.play_btn.SetFocus()
 
@@ -252,6 +282,19 @@ class VideoComposeFrame(wx.Frame):
 
     def _add_text(self):
         pos = self._position()
+        if self.slideshow:
+            with wx.TextEntryDialog(self, "A felirat kezdete másodpercben:",
+                                    "Felirat időpontja", f"{pos:.2f}") as time_dlg:
+                if time_dlg.ShowModal() != wx.ID_OK:
+                    return
+                try:
+                    pos = float(time_dlg.GetValue().replace(",", "."))
+                    if not 0 <= pos < self.duration:
+                        raise ValueError
+                except ValueError:
+                    wx.MessageBox("A kezdőpont a zeneszámon belül legyen.",
+                                  "Érvénytelen időpont", wx.OK | wx.ICON_WARNING, self)
+                    return
         dlg = wx.TextEntryDialog(
             self, f"A megjelenítendő szöveg (időpont: {VC.human_time(pos)}):",
             "Szöveg hozzáadása")
@@ -321,8 +364,8 @@ class VideoComposeFrame(wx.Frame):
         if self._rendering:
             self._announce("A renderelés már folyamatban van.")
             return
-        if not (self.background and self.music):
-            self._announce("Hiányzik a háttérkép vagy a zene.")
+        if not ((self.background or self.slideshow) and self.music):
+            self._announce("Válassz legalább egy képet és egy zeneszámot.")
             return
         fmt_dlg = wx.SingleChoiceDialog(
             self, "Válaszd ki a kimeneti formátumot:", "Videó mentése",
@@ -359,9 +402,10 @@ class VideoComposeFrame(wx.Frame):
         self._sv("video", "start")
         self._announce("Renderelés indul… ez a zene hosszától függően eltarthat "
                        "egy darabig.")
+        options = {"slideshow": self.slideshow} if self.slideshow else {}
         self._composer = VC.VideoComposer(
             self.background, self.music, self.elements, out, fmt=fmt,
-            progress=lambda p: wx.CallAfter(self._render_progress, p))
+            progress=lambda p: wx.CallAfter(self._render_progress, p), **options)
         self._last_pct = -10
 
         def work():
