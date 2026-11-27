@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import os
-import shutil
+import subprocess
+import tempfile
 import tarfile
 import zipfile
 
 
 FORMAK = ("zip", "tar.gz", "tar.bz2", "tar.xz", "7z")
+PROFILOK = {"Gyors": 1, "Alap": None, "Erős": 9}
+_WINDOWS_ARCHIVES = (".7z", ".rar", ".cab", ".iso", ".cpio", ".lha", ".lzh")
 
 
 def fajlok_alatta(utak) -> list[tuple[str, str]]:
@@ -30,23 +33,29 @@ def fajlok_alatta(utak) -> list[tuple[str, str]]:
     return ki
 
 
-def tomorit(utak, cel: str, forma: str) -> str:
+def tomorit(utak, cel: str, forma: str, profil: str = "Alap") -> str:
     forma = forma.lower()
     if forma not in FORMAK:
         raise RuntimeError("Ismeretlen formátum: %s" % forma)
+    fokozat = PROFILOK[profil]
     parok = fajlok_alatta(utak)
     if not parok:
         raise RuntimeError("Nincs mit becsomagolni.")
     os.makedirs(os.path.dirname(os.path.abspath(cel)) or ".", exist_ok=True)
     if forma == "zip":
-        with zipfile.ZipFile(cel, "w", compression=zipfile.ZIP_DEFLATED) as csomag:
+        with zipfile.ZipFile(cel, "w", compression=zipfile.ZIP_DEFLATED,
+                             compresslevel=fokozat) as csomag:
             for teljes, nev in parok:
                 csomag.write(teljes, nev)
     elif forma == "7z":
-        _hetzet(parok, cel)
+        _hetzet(parok, cel, fokozat)
     else:
         mod = {"tar.gz": "w:gz", "tar.bz2": "w:bz2", "tar.xz": "w:xz"}[forma]
-        with tarfile.open(cel, mod) as csomag:
+        beallitas = {}
+        if fokozat is not None:
+            kulcs = "preset" if forma == "tar.xz" else "compresslevel"
+            beallitas[kulcs] = fokozat
+        with tarfile.open(cel, mod, **beallitas) as csomag:
             for teljes, nev in parok:
                 csomag.add(teljes, arcname=nev, recursive=False)
     return cel
@@ -60,8 +69,11 @@ def kibont(arch: str, cel_mappa: str) -> int:
             _biztonsagos_nevek(csomag.namelist())
             csomag.extractall(cel_mappa)
             return len(csomag.namelist())
-    if nev.endswith(".7z"):
-        return _hetzet_ki(arch, cel_mappa)
+    if nev.endswith(_WINDOWS_ARCHIVES):
+        names = tartalom(arch)
+        _biztonsagos_nevek(names)
+        _windows_tar("-xkf", os.path.abspath(arch), "-C", os.path.abspath(cel_mappa))
+        return len(names)
     mod = "r:*"
     with tarfile.open(arch, mod) as csomag:
         tagok = csomag.getmembers()
@@ -75,8 +87,8 @@ def tartalom(arch: str) -> list[str]:
     if nev.endswith(".zip"):
         with zipfile.ZipFile(arch) as csomag:
             return csomag.namelist()
-    if nev.endswith(".7z"):
-        return _hetzet_lista(arch)
+    if nev.endswith(_WINDOWS_ARCHIVES):
+        return _windows_tar("-tf", os.path.abspath(arch)).splitlines()
     with tarfile.open(arch, "r:*") as csomag:
         return [t.name for t in csomag.getmembers() if t.isfile()]
 
@@ -114,42 +126,53 @@ def _biztonsagos_nevek(nevek) -> None:
             raise RuntimeError("A csomag kilógó útvonalat tartalmaz: %s" % nev)
 
 
-def _hetzet(parok, cel: str) -> None:
-    program = shutil.which("7z")
-    if not program:
-        raise RuntimeError(
-            "A 7z formátumhoz a 7-Zip nincs a gépen. A zip, a tar.gz, "
-            "a tar.bz2 és a tar.xz megy nélküle.")
-    lista = cel + ".lista.txt"
-    with open(lista, "w", encoding="utf-8") as ki:
-        for teljes, _nev in parok:
-            ki.write(teljes + "\n")
-    try:
-        import subprocess
-        kesz = subprocess.run(
-            [program, "a", "-y", "-bb0", cel, "@" + lista],
-            capture_output=True, text=True,
-            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
-        if kesz.returncode != 0:
-            raise RuntimeError(kesz.stderr.strip() or "A 7-Zip nem csomagolt.")
-    finally:
-        try:
-            os.remove(lista)
-        except OSError:
-            pass
-
-
-def _hetzet_ki(arch, cel) -> int:
-    program = shutil.which("7z")
-    if not program:
-        raise RuntimeError("A 7z kibontásához a 7-Zip kell.")
-    import subprocess
-    kesz = subprocess.run(
-        [program, "x", "-y", "-o" + cel, arch], capture_output=True, text=True,
+def _windows_tar(*args: str) -> str:
+    program = os.path.join(os.environ.get("SystemRoot", r"C:\Windows"), "System32", "tar.exe")
+    if not os.path.isfile(program):
+        raise RuntimeError("A Windows beépített archívumkezelője (tar.exe) nem érhető el.")
+    result = subprocess.run(
+        [program, *args], stdin=subprocess.DEVNULL, capture_output=True,
+        encoding="utf-8", errors="replace",
         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
-    if kesz.returncode != 0:
-        raise RuntimeError(kesz.stderr.strip() or "A 7-Zip nem bontott ki.")
-    return len(tartalom_helyi(cel))
+    if result.returncode:
+        raise RuntimeError(result.stderr.strip() or "A Windows archívumművelete nem sikerült.")
+    return result.stdout
+
+
+def iso_fajl_kiment(arch, tag, cel):
+    """A kijelölt ISO-tételt a felhasználó által megadott új fájlba írja."""
+    if not str(arch).lower().endswith(".iso"):
+        raise ValueError("ISO-fájlt válassz.")
+    _biztonsagos_nevek([tag])
+    if (not tag or tag.endswith("/") or any(c in tag for c in "*?[]"
+            + chr(92)) or tartalom(str(arch)).count(tag) != 1):
+        raise ValueError("A kijelölt ISO-tétel nem menthető egyértelműen.")
+    program = os.path.join(os.environ.get("SystemRoot", r"C:\Windows"), "System32", "tar.exe")
+    kimenet = open(cel, "xb")
+    try:
+        with kimenet:
+            result = subprocess.run(
+                [program, "-xOf", os.path.abspath(arch), "--", tag],
+                stdin=subprocess.DEVNULL, stdout=kimenet, stderr=subprocess.PIPE,
+                timeout=120, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        if result.returncode:
+            raise OSError("Az ISO-tétel kibontása sikertelen.")
+    except (OSError, subprocess.SubprocessError):
+        os.unlink(cel)
+        raise
+
+
+def _hetzet(parok, cel: str, fokozat: int | None) -> None:
+    target = os.path.abspath(cel)
+    with tempfile.TemporaryDirectory(dir=os.path.dirname(target)) as tmp:
+        stage = os.path.join(tmp, "forras.tar")
+        output = os.path.join(tmp, "csomag.7z")
+        with tarfile.open(stage, "w") as archive:
+            for teljes, nev in parok:
+                archive.add(teljes, arcname=nev, recursive=False)
+        opciok = () if fokozat is None else ("--options", f"7zip:compression-level={fokozat}")
+        _windows_tar("-a", "-cf", output, *opciok, "@" + stage)
+        os.replace(output, target)
 
 
 def tartalom_helyi(mappa) -> list[str]:
@@ -158,15 +181,3 @@ def tartalom_helyi(mappa) -> list[str]:
         for nev in nevek:
             ki.append(os.path.join(gyoker, nev))
     return ki
-
-
-def _hetzet_lista(arch) -> list[str]:
-    program = shutil.which("7z")
-    if not program:
-        raise RuntimeError("A 7z listájához a 7-Zip kell.")
-    import subprocess
-    kesz = subprocess.run([program, "l", "-ba", arch], capture_output=True, text=True,
-        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
-    if kesz.returncode != 0:
-        raise RuntimeError("A 7z lista nem készült el.")
-    return [sor.strip() for sor in kesz.stdout.splitlines() if sor.strip()]

@@ -62,14 +62,14 @@
       "id": "fajlok",
       "name": "Super Files",
       "category": "Fájlok",
-      "description": "Javítás: a 7-Zip műveletei és a fájltársítás külön konzolablak nélkül indulnak. ÚJDONSÁG: kétágú tallózó. A Tab vált oldalt, a Ctrl+C, a Ctrl+X és a Ctrl+V a másik oldalra másol vagy helyez át, meglévő fájl felülírása nélkül. A Ctrl+A és a Shift+nyíl több elemet jelöl. A Ctrl+F névrészletre vagy fájltípusra keres. Az FTP és az SFTP külön helyként menthető.",
+      "description": "Archiválási profilok, ISO, mappaösszevetés, másolatkeresés, Főnix-pajzs és közvetlen fájl- és mappaküldés.",
       "latest": {
-        "version": "1.0.1",
+        "version": "1.1.0",
         "min_core_api": "1.0",
-        "min_core_version": "4.0.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-fajlok-1.0.1/fajlok-1.0.1.zip",
-        "sha256": "ac91445701e76795295567f2e1ca9342aecc18d8c69453f5ee9b03217c84589d",
-        "size": 28422
+        "min_core_version": "4.6.35",
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-fajlok-1.1.0/fajlok-1.1.0.zip",
+        "sha256": "53c74f59ff66615fd78ef60e3f422bebe640245f0bf8199dbf65e510522c5f51",
+        "size": 40961
       }
     },
     {
@@ -200,13 +200,14 @@
       "id": "p2p",
       "name": "Fájl- és mappaküldés, megosztás",
       "category": "Eszközök",
-      "description": "ÚJ BILLENTYŰ: a Mappa küldése és megosztás mostantól Ctrl+Alt+F a főmenüben (eddig Ctrl+Shift+M volt, ami ütközött egy másik menüponttal). Fájl VAGY egész mappa eljuttatása valaki máshoz. Gépről gépre, felhő nélkül, bemondható kóddal és végpontok közötti titkosítással (magic-wormhole) – vagy ha a másik fél nincs a gépénél, feltöltés ideiglenes tárhelyre, lejáratot számon tartó megosztási előzményekkel.",
+      "description": "A Tallózóban kijelölt fájl vagy mappa közvetlen átadása.",
       "latest": {
-        "version": "1.2.1",
+        "version": "1.2.2",
         "min_core_api": "1.0",
-        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-p2p-1.2.1/p2p-1.2.1.zip",
-        "sha256": "cb5eee96cda9a439992462e94b829849c02ed88e3f5cb39c2c052c7d7debb5b4",
-        "size": 32419
+        "url": "https://github.com/korosmezeydavid/SuperDL/releases/download/mod-p2p-1.2.2/p2p-1.2.2.zip",
+        "sha256": "d79123fede86c2d3a3dc50d6ada3236ea636c822d8733eee6d4e521f2a1829a4",
+        "size": 32321,
+        "min_core_version": "4.6.35"
       }
     },
     {

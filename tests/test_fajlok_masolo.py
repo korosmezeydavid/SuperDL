@@ -112,15 +112,26 @@ def test_a_felbemaradt_darab_folytatodik(tmp_path):
     assert not resz.exists()
 
 
-def test_a_kesz_fajlt_folytataskor_kihagyja(tmp_path):
+def test_a_kesz_fajlt_folytataskor_csak_egyezesnel_hagyja_ki(tmp_path):
     forras = tmp_path / "egy.txt"
-    forras.write_text("régi", encoding="utf-8")
+    forras.write_bytes(b"eredeti")
     cel = tmp_path / "cel"
-    jel = masolo.futtat(
-        [str(forras)], str(cel), "masol", "felulir", _jel, lambda: False,
-        keszek=[str(forras)], folytat=True)
-    assert jel.fajlok == 0
-    assert not (cel / "egy.txt").exists()
+    cel.mkdir()
+    kesz = cel / forras.name
+    kesz.write_bytes(b"eredeti")
+
+    def folytat():
+        return masolo.futtat(
+            [str(forras)], str(cel), "masol", "felulir", _jel, lambda: False,
+            keszek=[str(forras)], folytat=True)
+
+    assert folytat().fajlok == 0
+    kesz.write_bytes(b"hibas!!")
+    assert folytat().fajlok == 1
+    assert kesz.read_bytes() == b"eredeti"
+    kesz.unlink()
+    assert folytat().fajlok == 1
+    assert kesz.read_bytes() == b"eredeti"
 
 
 def test_megszakitas_a_szamlalas_utan(tmp_path):
