@@ -91,8 +91,19 @@ def futtat(forrasok, cel, muvelet, utkozes, jelents, cancel,
         tiszta.append(ut)
     jel.fazis = "szamol"
     _szol(jel, jelents)
-    for ut in tiszta:
-        _szamol(ut, jel, cancel, keszek, jelents)
+    try:
+        if folytat and keszek and muvelet == "masol":
+            jel.uzenet = "A korábban késznek jelölt fájlok ellenőrzése."
+            _szol(jel, jelents)
+            keszek = _ellenorzott_keszek(tiszta, cel, keszek, cancel)
+        for ut in tiszta:
+            _szamol(ut, jel, cancel, keszek, jelents)
+    except Megszakitva:
+        jel.kesz = jel.megszakitva = True
+        jel.fazis = "vege"
+        jel.uzenet = "Megszakítva. Az átvitel nem indult el."
+        jelents(jel)
+        return jel
     jel.fazis = "terv"
     jel.uzenet = "A terv: %d fájl, %s." % (jel.fajlok, meret_szoveg(jel.bajtok))
     _szol(jel, jelents)
@@ -273,13 +284,51 @@ def _fajl(forras, cel, muvelet, utkozes, jel, jelents, cancel,
     _szol(jel, jelents)
 
 
+def _ellenorzott_keszek(gyokerek, cel, keszek, cancel):
+    ellenorzott = set()
+    for gyoker in gyokerek:
+        for forras in keszek:
+            if cancel():
+                raise Megszakitva()
+            if forras == _norm(gyoker):
+                rel = os.path.basename(gyoker)
+            elif os.path.isdir(gyoker) and _belul(forras, gyoker):
+                rel = os.path.join(os.path.basename(gyoker), os.path.relpath(forras, gyoker))
+            else:
+                continue
+            target = os.path.join(cel, rel)
+            try:
+                meret = os.path.getsize(forras)
+                if (not _csatolas(target) and os.path.getsize(target) == meret
+                        and _resz_egyezik(forras, target, meret, cancel)):
+                    ellenorzott.add(forras)
+            except OSError:
+                continue
+    return ellenorzott
+
+
+def _resz_egyezik(forras, resz, hossz, cancel) -> bool:
+    """Csak a jelenlegi forrással egyező részfájlt szabad folytatni."""
+    with open(forras, "rb") as be, open(resz, "rb") as ellen:
+        while hossz:
+            if cancel():
+                raise Megszakitva()
+            meret = min(DARAB, hossz)
+            darab = be.read(meret)
+            if len(darab) != meret or darab != ellen.read(meret):
+                return False
+            hossz -= meret
+    return True
+
+
 def _masol_darabonkent(forras, cel, jel, jelents, cancel, folytat) -> None:
     os.makedirs(os.path.dirname(cel), exist_ok=True)
     varhato = _meret(forras)
     megvan = 0
     if os.path.exists(cel):
         megvan = os.path.getsize(cel)
-        if not folytat or megvan > varhato:
+        if (not folytat or megvan > varhato
+                or not _resz_egyezik(forras, cel, megvan, cancel)):
             os.remove(cel)
             megvan = 0
         elif megvan == varhato:

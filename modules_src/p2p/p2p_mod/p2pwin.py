@@ -81,14 +81,26 @@ TIPPEK
 _utolso_ablak = None
 
 
-def mappa_kuldes_inditasa():
+def mappa_kuldes_inditasa(mappa=None):
     """A „Mappa küldése és megosztás" menüpont belépője.
 
     A `wx.CallAfter` azért kell, mert az ablak megnyitása után a felület még
-    nem állt össze; a mappaválasztó egy fél lépéssel később nyílhat csak ki."""
+    nem állt össze; a mappaválasztó egy fél lépéssel később nyílhat csak ki.
+    Ha a mappa útja megvan, a választó nem nyílik meg újra."""
     ablak = _utolso_ablak
-    if ablak is not None:
+    if ablak is None:
+        return
+    if mappa:
+        wx.CallAfter(ablak.mappa_indit, mappa)
+    else:
         wx.CallAfter(ablak._on_send_folder)
+
+
+def fajl_kuldes_inditasa(ut):
+    """A már kiválasztott fájl küldése, új választó nélkül."""
+    ablak = _utolso_ablak
+    if ablak is not None and ut:
+        wx.CallAfter(ablak._kuldes_inditas, ut)
 
 
 class P2PFrame(wx.Frame):
@@ -527,12 +539,11 @@ class P2PFrame(wx.Frame):
     # A felhasználók kérése: „ha Androidon lehet, akkor itt is lehessen."
     # ================================================================
 
-    def _on_send_folder(self):
-        """Mappa küldése: kiválasztás → formátum → csomagolás → út."""
+    def mappa_indit(self, mappa):
+        """A megadott mappa becsomagolása és küldése, választó nélkül."""
         if self.send_session:
             self.SetStatusText("Már folyamatban van egy küldés.")
             return
-        mappa = self._mappat_valaszt("Küldendő mappa kiválasztása")
         if not mappa:
             return
         csomag_ut = self._becsomagol(mappa)
@@ -543,6 +554,16 @@ class P2PFrame(wx.Frame):
             self._kuldes_inditas(str(csomag_ut), takarithato=csomag_ut)
         else:
             self._tarhelyre(csomag_ut, takarithato=csomag_ut)
+
+    def _on_send_folder(self):
+        """Mappa küldése: kiválasztás → formátum → csomagolás → út."""
+        if self.send_session:
+            self.SetStatusText("Már folyamatban van egy küldés.")
+            return
+        mappa = self._mappat_valaszt("Küldendő mappa kiválasztása")
+        if not mappa:
+            return
+        self.mappa_indit(mappa)
 
     def _mappat_valaszt(self, cim):
         dlg = wx.DirDialog(self, cim, style=wx.DD_DIR_MUST_EXIST)

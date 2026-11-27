@@ -80,6 +80,46 @@ def keres(gyoker: str, szoveg: str, mod: str, cancel=None) -> list[str]:
     return talalat
 
 
+# A médiakonvertáló saját listája. Ha a modul be van töltve, az övét használjuk.
+_MEDIA = (
+    ".mp3", ".m4a", ".aac", ".wav", ".flac", ".ogg", ".opus", ".wma",
+    ".mp4", ".mkv", ".avi", ".webm", ".mov", ".wmv", ".flv", ".m4v",
+    ".mpg", ".mpeg", ".ts", ".3gp", ".vob", ".m2v", ".mpe", ".m2ts", ".mts",
+    ".ape", ".wv", ".tta", ".tak", ".mpc", ".shn", ".dsf", ".dff",
+    ".aiff", ".aif", ".aifc", ".au", ".amr", ".caf", ".spx", ".ra",
+    ".ac3", ".dts", ".mka", ".m4b", ".oga", ".w64",
+)
+
+
+def media_fajl(ut: str) -> bool:
+    """Igaz, ha a fájl olyan média, amit a médiakonvertáló be tud venni."""
+    if not ut or os.path.isdir(ut):
+        return False
+    kit = os.path.splitext(ut)[1].lower()
+    try:
+        import sys
+        from pathlib import Path
+        gyoker = Path(__file__).resolve().parents[2] / "mediatools"
+        if gyoker.is_dir() and str(gyoker) not in sys.path:
+            sys.path.insert(0, str(gyoker))
+        from mediatools_mod.convertwin import MEDIA_EXTS
+        return kit in MEDIA_EXTS
+    except Exception:
+        return kit in _MEDIA
+
+
+def helyi_extra(ut: str) -> list[str]:
+    """A helyi menü többletpontjai aszerint, hogy fájlon vagy mappán állunk."""
+    if not ut:
+        return []
+    if os.path.isdir(ut):
+        return ["Mappa küldése és megosztás…"]
+    sorok = ["Fájlküldés gépről gépre"]
+    if media_fajl(ut):
+        sorok.append("Médiakonvertáló")
+    return sorok
+
+
 def _csatolas(ut: str) -> bool:
     try:
         from .masolo import _csatolas as masolo_csatolas
@@ -143,6 +183,7 @@ class TallozoFrame(wx.Frame):
         super().__init__(szulo, title="SuperDL – Tallózó", size=(760, 560))
         self.main = main
         self._ketag = False
+        self._csatolt_isok = {}
         self._vagolap = []
         self._vagolap_muv = ""
         self._vagolap_cel = None
@@ -549,24 +590,456 @@ class TallozoFrame(wx.Frame):
         if talalat:
             self.lista.SetSelection(0)
 
+    def _archivalas(self, _e=None):
+        from . import archivalas
+        if self._dolgozik:
+            self._mond("Még tart az előző művelet.")
+            return
+        if not self._ketag or not self._masik().mappa:
+            self._mond("Nyiss meg egy célmappát a másik panelen.")
+            return
+        if not self._kijelolt_utak():
+            self._mond("Jelölj ki legalább egy fájlt.")
+            return
+        try:
+            alap = "Felvételek archiválása"
+            sablonok = archivalas.mentett_nevek()
+            if sablonok:
+                with wx.SingleChoiceDialog(
+                        self, "Válassz mentett archiválást vagy új nevet.",
+                        "Archiválási művelet", ["Új művelet…", *sablonok]) as valaszto:
+                    valaszto.SetSelection(0)
+                    if valaszto.ShowModal() != wx.ID_OK:
+                        return
+                    index = valaszto.GetSelection()
+                    if index > 0:
+                        alap = sablonok[index - 1]
+            with wx.TextEntryDialog(self, "Menthető művelet neve, egyben a ZIP neve:",
+                                    "Felvételek archiválása", alap) as dlg:
+                if dlg.ShowModal() != wx.ID_OK:
+                    return
+                nev = archivalas.nev_ellenorzes(dlg.GetValue())
+            cel, elemek = archivalas.terv(self._kijelolt_utak(), self._masik().mappa, nev)
+            elonezet = f"{len(elemek)} fájl. Cél: {cel}. Nincs névütközés.\n\n"
+            elonezet += "\n".join(f"{ut.name} → {tag}" for ut, tag in elemek)
+            self._mond(f"{len(elemek)} fájl. Cél: {cel}. Nincs névütközés.")
+            with wx.Dialog(self, title="Archiválás előnézete", size=(580, 380)) as dialog:
+                layout = wx.BoxSizer(wx.VERTICAL)
+                lista = wx.TextCtrl(dialog, value=elonezet,
+                                    style=wx.TE_MULTILINE | wx.TE_READONLY,
+                                    name="Archiválási terv")
+                layout.Add(lista, 1, wx.EXPAND | wx.ALL, 8)
+                ment = wx.CheckBox(dialog, label="Művelet nevének mentése")
+                layout.Add(ment, 0, wx.ALL, 8)
+                layout.Add(dialog.CreateStdDialogButtonSizer(wx.OK | wx.CANCEL),
+                           0, wx.EXPAND | wx.ALL, 8)
+                dialog.SetSizer(layout)
+                lista.SetFocus()
+                if dialog.ShowModal() != wx.ID_OK:
+                    return
+                if ment.GetValue():
+                    archivalas.nev_mentese(nev)
+        except (OSError, ValueError) as exc:
+            self.SetStatusText(str(exc))
+            self._mond(str(exc))
+            return
+
+        self._cancel.clear()
+        self._dolgozik = True
+
+        def kesz(uzenet):
+            self._dolgozik = False
+            if self:
+                self._tolts()
+                self.SetStatusText(uzenet)
+                self._mond(uzenet)
+
+        def munka():
+            try:
+                ok = archivalas.futtat(cel, elemek, self._cancel.is_set)
+                uzenet = f"Elkészült: {cel}" if ok else "Archiválás megszakítva."
+            except (OSError, ValueError, RuntimeError) as exc:
+                uzenet = f"Az archiválás nem sikerült: {exc}"
+            wx.CallAfter(kesz, uzenet)
+
+        self._mond("Archiválás folyamatban.")
+        threading.Thread(target=munka, daemon=True).start()
+
     def _osszevet(self, _e=None):
-        if not self._mappa:
+        if not self._mappa or self._dolgozik:
             return
         from superdl import fajlvalaszto
-        masik = fajlvalaszto.valassz_mappat(self, "A másik mappa", mondd=self._mond)
+        from .osszevet import elteresek, szinkron_tetel
+
+        elso = self._mappa
+        masik = self._masik().mappa if self._ketag else ""
+        if not masik:
+            masik = fajlvalaszto.valassz_mappat(self, "A másik mappa", mondd=self._mond)
         if not masik:
             return
-        from .osszevet import mondat
-        szoveg = mondat(self._mappa, masik)
-        self.SetStatusText(szoveg)
-        self._mond(szoveg)
-        wx.MessageBox(szoveg, "Összevetés", wx.OK | wx.ICON_INFORMATION, self)
+        self._cancel.clear()
+        self._dolgozik = True
+        self.SetStatusText("Mappák összevetése folyamatban.")
+        self._mond("Mappák összevetése folyamatban.")
+
+        def vege(rows, hiba):
+            if not self:
+                return
+            self._dolgozik = False
+            if hiba:
+                self.SetStatusText(hiba)
+                self._mond(hiba)
+                return
+            if not rows:
+                self.SetStatusText("A két mappa fájltartalma egyezik.")
+                self._mond("A két mappa fájltartalma egyezik.")
+                return
+            cim = f"{len(rows)} eltérés. Első: {elso}. Második: {masik}."
+            self._mond(cim)
+            with wx.MultiChoiceDialog(
+                    self, cim + " Jelöld ki az első mappából átmásolandó hiányzó fájlokat.",
+                    "Mappák tartalmának összevetése",
+                    [f"{allapot}: {rel}" for allapot, rel, _ in rows]) as dlg:
+                if dlg.ShowModal() != wx.ID_OK:
+                    return
+                kijelolt = [rows[i] for i in dlg.GetSelections()]
+            if not kijelolt:
+                return
+            if any(path is None for _, _, path in kijelolt):
+                self._mond("Csak az első mappában lévő hiányzó fájlokat jelöld ki.")
+                return
+            if wx.MessageBox(f"{len(kijelolt)} fájl másolása ide: {masik}. Futtatod?",
+                             "Szinkron jóváhagyása",
+                             wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION, self) != wx.YES:
+                return
+            self._cancel.clear()
+            self._dolgozik = True
+            self._mond("Szinkronizálás folyamatban. Megszakítás: Escape.")
+
+            def kesz(szoveg):
+                if not self:
+                    return
+                self._dolgozik = False
+                self.SetStatusText(szoveg)
+                self._mond(szoveg)
+
+            def masol():
+                darab = 0
+                try:
+                    for _, rel, path in kijelolt:
+                        if self._cancel.is_set():
+                            raise InterruptedError("Megszakítva.")
+                        szinkron_tetel(path, masik, rel, self._cancel.is_set)
+                        darab += 1
+                except (OSError, ValueError) as exc:
+                    wx.CallAfter(kesz, f"{darab} fájl átment. {exc}")
+                else:
+                    wx.CallAfter(kesz, f"Szinkron kész. {darab} fájl átmásolva.")
+
+            threading.Thread(target=masol, daemon=True).start()
+
+        def munka():
+            try:
+                rows = elteresek(elso, masik, self._cancel.is_set)
+            except OSError as exc:
+                wx.CallAfter(vege, [], f"Az összevetés megszakadt vagy sikertelen: {exc}")
+            else:
+                wx.CallAfter(vege, rows, "")
+
+        threading.Thread(target=munka, daemon=True).start()
+
+    def _masolatkereses(self, _e=None):
+        if not self._mappa or self._dolgozik:
+            return
+        from .osszevet import masolatok
+
+        gyoker = self._mappa
+        self._cancel.clear()
+        self._dolgozik = True
+        self.SetStatusText("Azonos tartalmú fájlok keresése…")
+        self._mond("Azonos tartalmú fájlok keresése. Megszakítás: Escape.")
+
+        def vege(csoportok, hiba):
+            if not self:
+                return
+            self._dolgozik = False
+            szoveg = hiba or f"{len(csoportok)} másolatcsoport."
+            self.SetStatusText(szoveg)
+            self._mond(szoveg)
+            if not csoportok:
+                return
+            utak = []
+            sorok = []
+            for index, (meret, fajlok) in enumerate(csoportok, 1):
+                for path in fajlok:
+                    utak.append(path)
+                    sorok.append(f"{index}. csoport, {meret_szoveg(meret)}: {path}")
+            with wx.MultiChoiceDialog(
+                    self, szoveg + " Jelöld ki a kezelendő fájlokat.",
+                    "Azonos tartalmú fájlok", sorok) as dialog:
+                if dialog.ShowModal() != wx.ID_OK:
+                    return
+                kijelolt = [utak[i] for i in dialog.GetSelections()]
+            if not kijelolt:
+                return
+            with wx.SingleChoiceDialog(
+                    self, "Mit tegyen a kijelölt találatokkal?", "Másolatok kezelése",
+                    ["Az első kijelölt fájl mappájának megnyitása",
+                     "A kijelölt fájlok áthelyezése a másik panelre"]) as dialog:
+                dialog.SetSelection(0)
+                if dialog.ShowModal() != wx.ID_OK:
+                    return
+                athelyez = dialog.GetSelection() == 1
+            if not athelyez:
+                hely = kijelolt[0].parent
+                if hely.is_dir():
+                    self._mappa = str(hely)
+                    self._tolts()
+                    self._mond(f"Mappa megnyitva: {hely}")
+                return
+
+            cel = self._masik().mappa if self._ketag else ""
+            if not cel or not os.path.isdir(cel):
+                self._mond("Az áthelyezéshez nyiss meg egy helyi mappát a másik panelen.")
+                return
+            utak_szovege = [str(path) for path in kijelolt]
+            terv = (f"{len(kijelolt)} fájl áthelyezése ide: {cel}.\n"
+                    "Névütközéskor új nevet kapnak.\n\n" + "\n".join(utak_szovege))
+            with wx.Dialog(self, title="Másolatok áthelyezésének előnézete", size=(600, 400)) as dialog:
+                layout = wx.BoxSizer(wx.VERTICAL)
+                lista = wx.TextCtrl(dialog, value=terv, name="Áthelyezési terv",
+                                    style=wx.TE_MULTILINE | wx.TE_READONLY)
+                layout.Add(lista, 1, wx.EXPAND | wx.ALL, 8)
+                layout.Add(dialog.CreateStdDialogButtonSizer(wx.OK | wx.CANCEL),
+                           0, wx.EXPAND | wx.ALL, 8)
+                dialog.SetSizer(layout)
+                lista.SetFocus()
+                if dialog.ShowModal() != wx.ID_OK:
+                    return
+            self._indit_atvitel(utak_szovege, cel, "athelyez", "ujnev",
+                                f"Cél: {cel}. Névütközéskor új nevet kapnak.")
+
+        def munka():
+            try:
+                csoportok = masolatok(gyoker, self._cancel.is_set)
+            except InterruptedError:
+                wx.CallAfter(vege, [], "A másolatkeresés megszakadt.")
+            except OSError as exc:
+                wx.CallAfter(vege, [], f"A másolatkeresés nem sikerült: {exc}")
+            else:
+                wx.CallAfter(vege, csoportok, "")
+
+        threading.Thread(target=munka, daemon=True).start()
+
+    def _fonix_kulcs(self, _e=None):
+        from .fonix import kulcsfajl_keszit
+        with wx.FileDialog(self, "Új Főnix-kulcsfájl mentése",
+                           wildcard="Főnix-kulcs (*.fonixkey)|*.fonixkey",
+                           defaultFile="vedett.fonixkey", style=wx.FD_SAVE) as dialog:
+            if dialog.ShowModal() != wx.ID_OK:
+                return
+            try:
+                kulcsfajl_keszit(dialog.GetPath())
+            except OSError as exc:
+                wx.MessageBox(str(exc), "Főnix-pajzs", wx.OK | wx.ICON_ERROR, self)
+                return
+        self._mond("A kulcsfájl elkészült. Tarts róla külön biztonsági másolatot.")
+
+    def _fonix(self, nyitas=False):
+        if self._dolgozik:
+            return
+        utak = self._kijelolt_utak()
+        if not utak or (nyitas and len(utak) != 1):
+            self._mond("Jelöld ki a csomagot." if nyitas else "Jelölj ki fájlokat vagy mappákat.")
+            return
+        from . import fonix
+
+        def jelszo(cim):
+            with wx.TextEntryDialog(self, cim, "Főnix-pajzs",
+                                    style=wx.OK | wx.CANCEL | wx.TE_PASSWORD) as dlg:
+                return dlg.GetValue() if dlg.ShowModal() == wx.ID_OK else None
+
+        titok = jelszo("Jelszó:" if nyitas else "Új jelszó, legalább 12 karakter:")
+        if titok is None or (not nyitas and titok != jelszo("Jelszó megerősítése:")):
+            return
+        try:
+            if nyitas:
+                kell_kulcs = fonix.kulcsfajlos(utak[0])
+            else:
+                valasz = wx.MessageBox(
+                    "A jelszó mellé külön kulcsfájlt is kérjen a feloldás?",
+                    "Főnix-pajzs", wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL, self)
+                if valasz == wx.CANCEL:
+                    return
+                kell_kulcs = valasz == wx.YES
+        except (OSError, ValueError) as exc:
+            wx.MessageBox(str(exc), "Főnix-pajzs", wx.OK | wx.ICON_ERROR, self)
+            return
+        kulcsfajl = None
+        if kell_kulcs:
+            with wx.FileDialog(self, "Főnix-kulcsfájl kiválasztása",
+                               wildcard="Főnix-kulcs (*.fonixkey)|*.fonixkey",
+                               style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as dialog:
+                if dialog.ShowModal() != wx.ID_OK:
+                    return
+                kulcsfajl = dialog.GetPath()
+        cel = None
+        if not nyitas:
+            with wx.FileDialog(self, "Főnix-pajzs mentése", wildcard="Főnix-pajzs (*.fonix)|*.fonix",
+                               defaultFile="vedett.fonix", style=wx.FD_SAVE) as dlg:
+                if dlg.ShowModal() != wx.ID_OK:
+                    return
+                cel = dlg.GetPath()
+        self._dolgozik = True
+        self._mond("Főnix-pajzs művelet folyamatban.")
+
+        def vege(archive, hiba):
+            if not self:
+                if archive:
+                    archive.close()
+                return
+            self._dolgozik = False
+            if hiba:
+                wx.MessageBox(hiba, "Főnix-pajzs", wx.OK | wx.ICON_ERROR, self)
+            elif archive is None:
+                self._tolts()
+                self._mond(f"Főnix-pajzs elkészült: {cel}")
+            else:
+                with archive:
+                    tags = [tag for tag in archive.infolist() if not tag.is_dir()]
+                    with wx.MultiChoiceDialog(
+                            self, "Jelöld ki a kimentendő fájlokat.", "Védett tartalom",
+                            [tag.filename for tag in tags]) as dlg:
+                        if dlg.ShowModal() != wx.ID_OK:
+                            return
+                        kijelolt = [tags[i] for i in dlg.GetSelections()]
+                    if not kijelolt:
+                        return
+                    try:
+                        if len(kijelolt) == 1:
+                            with wx.FileDialog(self, "Védett fájl mentése",
+                                               defaultFile="kimentett-fajl", style=wx.FD_SAVE) as dlg:
+                                if dlg.ShowModal() != wx.ID_OK:
+                                    return
+                                fonix.kiment(archive, kijelolt[0], dlg.GetPath())
+                                darab = 1
+                        else:
+                            from superdl import fajlvalaszto
+                            mappa = fajlvalaszto.valassz_mappat(
+                                self, "Kimentés egy közös mappába", mondd=self._mond)
+                            if not mappa:
+                                return
+                            darab = fonix.kiment_tobb(archive, kijelolt, mappa)
+                    except Exception as exc:
+                        wx.MessageBox(str(exc), "Főnix-pajzs", wx.OK | wx.ICON_ERROR, self)
+                        return
+                    self._mond(f"{darab} fájl kimentve.")
+
+        def munka():
+            try:
+                archive = fonix.felold(utak[0], titok, kulcsfajl) if nyitas else None
+                if not nyitas:
+                    fonix.keszit(utak, cel, titok, kulcsfajl)
+            except Exception as exc:
+                wx.CallAfter(vege, None, str(exc))
+            else:
+                wx.CallAfter(vege, archive, "")
+
+        threading.Thread(target=munka, daemon=True).start()
+
+    def _iso_kiment(self, _e=None):
+        if self._dolgozik:
+            return
+        utak = self._kijelolt_utak()
+        if len(utak) != 1 or not utak[0].lower().endswith(".iso"):
+            self._mond("Jelölj ki egy ISO-fájlt.")
+            return
+        from .csomag import iso_fajl_kiment, tartalom
+
+        try:
+            tagok = [tag for tag in tartalom(utak[0]) if tag not in (".", "./") and not tag.endswith("/")]
+            if not tagok:
+                self._mond("Az ISO nem tartalmaz választható tételt.")
+                return
+            with wx.SingleChoiceDialog(self, "Melyik fájlt mented?",
+                                       "ISO tartalma", tagok) as dlg:
+                if dlg.ShowModal() != wx.ID_OK:
+                    return
+                tag = tagok[dlg.GetSelection()]
+            with wx.FileDialog(self, "ISO-tétel mentése", defaultFile=os.path.basename(tag),
+                               style=wx.FD_SAVE) as dlg:
+                if dlg.ShowModal() != wx.ID_OK:
+                    return
+                iso_fajl_kiment(utak[0], tag, dlg.GetPath())
+        except Exception as exc:
+            wx.MessageBox(str(exc), "ISO-tétel mentése", wx.OK | wx.ICON_ERROR, self)
+            return
+        self._tolts()
+        self.SetStatusText("A kijelölt ISO-tétel elmentve.")
+        self._mond("A kijelölt ISO-tétel elmentve.")
+
+    def _iso(self, levalaszt=False):
+        if self._dolgozik:
+            self._mond("Még tart az előző művelet.")
+            return
+        utak = self._kijelolt_utak()
+        fajl = utak[0] if len(utak) == 1 and utak[0].lower().endswith(".iso") else None
+        if levalaszt and fajl is None:
+            meghajto = os.path.splitdrive(self._mappa)[0].upper()
+            fajl = self._csatolt_isok.get(meghajto)
+        if fajl is None:
+            self._mond("Jelölj ki egy ISO-fájlt.")
+            return
+        from .lemezkep import muvelet
+        ag = self._aktiv
+        nev = os.path.basename(fajl)
+        self._dolgozik = True
+        kezdet = ("ISO leválasztása" if levalaszt else "ISO csatolása") + ": " + nev
+        self.SetStatusText(kezdet)
+        self._mond(kezdet)
+
+        def vege(meghajto, hiba):
+            if not self:
+                return
+            self._dolgozik = False
+            if meghajto:
+                self._csatolt_isok[os.path.splitdrive(meghajto)[0].upper()] = fajl
+                ag.mappa = meghajto
+                self._tolts(ag)
+                status = self.GetStatusBar().GetStatusText()
+                if status.startswith("A mappa nem olvasható:"):
+                    hiba = f"Csatolva: {meghajto}. {status}"
+                ag.lista.SetFocus()
+            elif levalaszt and not hiba:
+                kulcs = os.path.normcase(os.path.abspath(fajl))
+                for betu, eredeti in list(self._csatolt_isok.items()):
+                    if os.path.normcase(os.path.abspath(eredeti)) != kulcs:
+                        continue
+                    del self._csatolt_isok[betu]
+                    for panel in (self._bal, self._jobb):
+                        if os.path.splitdrive(panel.mappa)[0].upper() == betu:
+                            panel.mappa = os.path.dirname(fajl)
+                            self._tolts(panel)
+                ag.lista.SetFocus()
+            szoveg = hiba or (f"Csatolva: {meghajto}" if meghajto else f"Leválasztva: {nev}")
+            self.SetStatusText(szoveg)
+            self._mond(szoveg)
+
+        def munka():
+            try:
+                meghajto = muvelet(fajl, levalaszt)
+            except Exception as exc:
+                wx.CallAfter(vege, "", f"Az ISO-művelet nem sikerült: {exc}")
+            else:
+                wx.CallAfter(vege, meghajto, "")
+
+        threading.Thread(target=munka, daemon=True).start()
 
     def _tomorit(self, _e=None):
         ut = self._kivalasztott()
         if not ut:
             return
-        from .csomag import FORMAK
+        from .csomag import FORMAK, PROFILOK, tomorit
         dlg = wx.SingleChoiceDialog(self, "Milyen formátumba?", "Tömörítés", list(FORMAK))
         if dlg.ShowModal() != wx.ID_OK:
             dlg.Destroy()
@@ -574,9 +1047,14 @@ class TallozoFrame(wx.Frame):
         forma = dlg.GetStringSelection()
         dlg.Destroy()
         cel = ut.rstrip("\\/") + "." + forma
-        from .csomag import tomorit
+        with wx.SingleChoiceDialog(self, "Válassz tömörítési profilt.",
+                                   "Tömörítési profil", list(PROFILOK)) as szint:
+            szint.SetSelection(1)
+            if szint.ShowModal() != wx.ID_OK:
+                return
+            profil = szint.GetStringSelection()
         try:
-            tomorit([ut], cel, forma)
+            tomorit([ut], cel, forma, profil)
         except Exception as exc:
             self.SetStatusText(str(exc))
             self._mond(str(exc))
@@ -688,6 +1166,14 @@ class TallozoFrame(wx.Frame):
         self._mi(eszkoz, "Mit &látok?", self._latok)
         self._mi(eszkoz, "&Gyűjtemény…", self._gyujtemeny)
         self._mi(eszkoz, "Össze&vet…", self._osszevet)
+        self._mi(eszkoz, "ISO &csatolása virtuális meghajtóként…", lambda e: self._iso())
+        self._mi(eszkoz, "ISO &leválasztása…", lambda e: self._iso(True))
+        self._mi(eszkoz, "ISO kijelölt fájljának &kimentése…", self._iso_kiment)
+        self._mi(eszkoz, "Főnix-pajzs létrehozása…", lambda e: self._fonix())
+        self._mi(eszkoz, "Főnix-pajzs feloldása…", lambda e: self._fonix(True))
+        self._mi(eszkoz, "Főnix-kulcsfájl készítése…", self._fonix_kulcs)
+        self._mi(eszkoz, "Azonos tartalmú fájlok &keresése…", self._masolatkereses)
+        self._mi(eszkoz, "Felvételek &archiválása…", self._archivalas)
         eszkoz.AppendSeparator()
         self._mi(eszkoz, "&Tömörít…", self._tomorit)
         self._mi(eszkoz, "&Kibont…", self._kibont)
@@ -712,7 +1198,21 @@ class TallozoFrame(wx.Frame):
         for cimke, fv in (
                 ("Megnyitás", self._nyit),
                 ("Megnyitás mással…", self._massal),
-                ("Társítás…", self._tarsitas),
+                ("Társítás…", self._tarsitas)):
+            it = menu.Append(wx.ID_ANY, cimke)
+            self.Bind(wx.EVT_MENU, lambda e, f=fv: f(), it)
+        extra = helyi_extra(self._kivalasztott())
+        if extra:
+            menu.AppendSeparator()
+            for cimke in extra:
+                fv = {
+                    "Fájlküldés gépről gépre": self._fajl_kuld,
+                    "Médiakonvertáló": self._media_konvert,
+                    "Mappa küldése és megosztás…": self._mappa_kuld,
+                }[cimke]
+                it = menu.Append(wx.ID_ANY, cimke)
+                self.Bind(wx.EVT_MENU, lambda e, f=fv: f(), it)
+        for cimke, fv in (
                 ("Másolás, Ctrl+C", lambda: self._vagolapra("masol")),
                 ("Kivágás, Ctrl+X", lambda: self._vagolapra("athelyez")),
                 ("Beillesztés, Ctrl+V", self._beilleszt),
@@ -734,6 +1234,91 @@ class TallozoFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, lambda e, f=fv: f(), it)
         self.PopupMenu(menu)
         menu.Destroy()
+
+    def _modul_ablak(self, kulcs):
+        """A kész modul ablaka. A SuperDL-ben a gazda nyitja, különben a forrás."""
+        host = getattr(self.main, "_module_host", None)
+        if host is not None:
+            if not getattr(host, "has_window", lambda _k: False)(kulcs):
+                return None
+            return host.open_window(kulcs)
+        tar = getattr(self, "_horgony", None)
+        if tar is None:
+            tar = {}
+            self._horgony = tar
+        meglevo = tar.get(kulcs)
+        if meglevo is not None:
+            try:
+                meglevo.Show()
+                meglevo.Raise()
+                return meglevo
+            except Exception:
+                tar.pop(kulcs, None)
+        import sys
+        from pathlib import Path
+        gyoker = Path(__file__).resolve().parents[2]
+        szulo = self.main if isinstance(self.main, wx.Window) else self
+        try:
+            if kulcs == "p2p_module":
+                ut = gyoker / "p2p"
+                if str(ut) not in sys.path:
+                    sys.path.insert(0, str(ut))
+                from p2p_mod.p2pwin import P2PFrame
+                ablak = P2PFrame(szulo)
+            elif kulcs == "convert_module":
+                ut = gyoker / "mediatools"
+                if str(ut) not in sys.path:
+                    sys.path.insert(0, str(ut))
+                from mediatools_mod.convertwin import BatchConvertFrame
+                ablak = BatchConvertFrame(szulo)
+            else:
+                return None
+        except Exception:
+            return None
+        ablak.Show()
+        tar[kulcs] = ablak
+        return ablak
+
+    def _fajl_kuld(self, _e=None):
+        ut = self._kivalasztott()
+        if not ut or os.path.isdir(ut):
+            self._mond("Fájlküldéshez állj egy fájlra.")
+            return
+        ablak = self._modul_ablak("p2p_module")
+        if ablak is None or not hasattr(ablak, "_kuldes_inditas"):
+            self._mond("A Fájlküldés gépről gépre modul nincs telepítve.")
+            return
+        wx.CallAfter(ablak._kuldes_inditas, ut)
+        self._mond("Fájlküldés gépről gépre. A fájl: %s." % os.path.basename(ut))
+
+    def _mappa_kuld(self, _e=None):
+        ut = self._kivalasztott()
+        if not ut or not os.path.isdir(ut):
+            self._mond("Mappa küldéséhez állj egy mappára.")
+            return
+        ablak = self._modul_ablak("p2p_module")
+        if ablak is None or not hasattr(ablak, "mappa_indit"):
+            self._mond("A Fájlküldés gépről gépre modul nincs telepítve.")
+            return
+        wx.CallAfter(ablak.mappa_indit, ut)
+        nev = os.path.basename(ut.rstrip("\\/")) or ut
+        self._mond("Mappa küldése és megosztás. A mappa: %s." % nev)
+
+    def _media_konvert(self, _e=None):
+        utak = [u for u in self._kijelolt_utak() if media_fajl(u)]
+        if not utak:
+            egy = self._kivalasztott()
+            if media_fajl(egy):
+                utak = [egy]
+        if not utak:
+            self._mond("Médiakonvertáláshoz állj egy médiafájlra.")
+            return
+        ablak = self._modul_ablak("convert_module")
+        if ablak is None or not hasattr(ablak, "add_paths"):
+            self._mond("A Médiakonvertáló modul nincs telepítve.")
+            return
+        wx.CallAfter(ablak.add_paths, utak)
+        self._mond("Médiakonvertáló. %d fájl." % len(utak))
 
     def _uj(self, _e=None):
         if not self._mappa:
