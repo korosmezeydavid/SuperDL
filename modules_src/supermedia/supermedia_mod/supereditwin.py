@@ -4,8 +4,8 @@ A videóvágó SZELLEMÉBEN: a hangot lejátszod, hallás után markert dobsz le
 műveletek a KIJELÖLT marker és a következő közti SZAKASZRA hatnak. Billentyűzetes,
 KIMONDOTT, nincs vizuális hullámforma.
 
-Billentyűk: Szóköz=lejátszás/szünet, Esc=leállítás, bal/jobb nyíl=finomtekerés,
-M=marker itt, Ctrl+Z/Ctrl+Y=visszavonás/újra.
+Billentyűk: bal és jobb nyíl a lépés, Shift+nyíl a kijelölés, Ctrl+nyíl a
+lépésköz. A műveletek az Alt-menüben vannak.
 """
 
 import os
@@ -28,30 +28,22 @@ def _human(sec: float) -> str:
 HELP = """SUPER RECORDER – FÜLRE-SZERKESZTŐ (hangszerkesztő)
 
 MIRE VALÓ
-Akadálymentes hangszerkesztő: markeres navigáció, szakasz törlése/némítása/
-levágása, csend-beszúrás, 22 effekt, vokóder/harmonizer/ének-eltávolítás/2-sáv,
-visszavonás/újra – minden lépés KIMONDVA.
+Akadálymentes hangszerkesztő. A műveletek az Alt-menüben vannak, a Tab
+csak a markerlistát járja.
 
-LÉPÉSRŐL LÉPÉSRE (vakon is)
-1. „Megnyitás” – tölts be egy hangfájlt (vagy a felvevőből jövő felvételt).
-2. Navigálj markerekkel; jelölj ki szakaszt (a menüből a kijelölés/marker
-   funkciók).
-3. Szerkeszd: szakasz törlése, levágás (trim), némítás, csend beszúrása – a
-   program mindegyiket kimondja. Elrontottad? Visszavonás.
-4. Effektek: a listából válaszd (normalizálás, zajszűrés, echo, reverb…); külön
-   a vokóder/harmonizer/ének-eltávolítás/2-sáv keverés.
-5. „Mentés” – WAV vagy MP3. A mentés mellett beállíthatod a MINTAVÉTELT
-   („Eredeti” = a forrásé marad, pl. 48 kHz; vagy 44100/48000 Hz) és MP3 esetén a
-   BITRÁTÁT (128–320 kbps). A megnyitott fájl mostantól a saját mintavételével
-   töltődik be (a 48 kHz nem alakul 44,1-re).
+LÉPÉS ÉS KIJELÖLÉS
+Bal nyíl és jobb nyíl: ennyit lépsz a hangban. Az alap 2 másodperc.
+Ctrl+bal és Ctrl+jobb: a lépésközt állítja, 0,1 másodperctől 10 másodpercig.
+Shift+bal és Shift+jobb: a lenyomott Shift alatt kijelöli az érintett szakaszt.
+A kijelölés megmarad, amíg sima nyíllal tovább nem lépsz.
+Ctrl+C másol, Ctrl+X kivág, Ctrl+V beilleszt a pillanatnyi helyre.
 
-GYORSBILLENTYŰK
-F1 – súgó.  A szerkesztő műveletek F- és Ctrl-billentyűit a MENÜSOR mutatja
-(JAWS-biztos: menüből mennek, nincs sima Szóköz/nyíl/betű, ami a vezérlőktől
-lopná a billentyűt).
+MENÜK
+Alt+F Fájl: megnyitás, mentés, mintavétel, MP3-bitráta.
+Alt+L Lejátszás.  Alt+S Szerkesztés.  Alt+E Effektek.  Alt+V Vokál.
+F1 súgó. F5 lejátszás. F6 leállítás. F7 és F8 egy lépés. F9 marker.
 
-TIPP
-Kezdd kis lépésekkel, és használd a Visszavonást bátran – minden lépést hallasz."""
+A mentésnél az Eredeti mintavétel a forrásé marad. MP3-nál 128–320 kbps."""
 
 
 class SuperEditorFrame(wx.Frame):
@@ -61,6 +53,9 @@ class SuperEditorFrame(wx.Frame):
         self.main = main
         self.clip = supereditor.Clip()
         self._pos = 0.0                 # playhead (mp)
+        self._step = 2.0                # bal/jobb nyíl lépése, 0,1–10 mp
+        self._anchor = None             # Shift-kijelölés kezdete
+        self._sel = None                # (kezdet, vég) másodperc
         self._busy = False
         self._closing = False           # zárás alatt a háttér-callbackek kilépnek
         self._saved = True              # van-e MENTETLEN szerkesztés? [EDIT-P0-06]
@@ -74,28 +69,13 @@ class SuperEditorFrame(wx.Frame):
 
         p = wx.Panel(self)
         v = wx.BoxSizer(wx.VERTICAL)
-
-        # megnyitás + állapot
-        top = wx.BoxSizer(wx.HORIZONTAL)
-        b_open = self._b_open = wx.Button(p, label="Hang meg&nyitása…")
-        b_open.Bind(wx.EVT_BUTTON, lambda e: self._on_open())
         self.title_lbl = wx.StaticText(p, label="Nincs betöltött hang.")
-        top.Add(b_open, 0, wx.RIGHT, 8)
-        top.Add(self.title_lbl, 1, wx.ALIGN_CENTER_VERTICAL)
-        v.Add(top, 0, wx.EXPAND | wx.ALL, 8)
-
-        # lejátszás-vezérlés
-        c = wx.BoxSizer(wx.HORIZONTAL)
-        for label, fn in (
-                ("&Lejátszás/szünet (F5)", lambda e: self._toggle_play()),
-                ("&Elölről", lambda e: self._play_from(0.0)),
-                ("Leállí&tás", lambda e: self._stop()),
-                ("Ma&rker itt (F9)", lambda e: self._add_marker()),
-                ("M&ind töröl (marker)", lambda e: self._clear_markers())):
-            b = wx.Button(p, label=label)
-            b.Bind(wx.EVT_BUTTON, fn)
-            c.Add(b, 0, wx.RIGHT, 5)
-        v.Add(c, 0, wx.LEFT | wx.BOTTOM, 8)
+        self.title_lbl.SetName("A betöltött hang")
+        v.Add(self.title_lbl, 0, wx.EXPAND | wx.ALL, 8)
+        v.Add(wx.StaticText(p, label=(
+            "Alt+F fájl, Alt+L lejátszás, Alt+S szerkesztés, Alt+E effektek, "
+            "Alt+V vokál. Nyíl: lépés. Shift+nyíl: kijelölés. Ctrl+nyíl: lépésköz.")),
+            0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
 
         self.pos_lbl = wx.StaticText(p, label="Pozíció: 00:00,00 / 00:00,00")
         self.pos_lbl.SetName("Lejátszási pozíció és teljes hossz")
@@ -116,103 +96,18 @@ class SuperEditorFrame(wx.Frame):
                                                     if self._sel_section() else 0.0))
         v.Add(self.mk_list, 0, wx.EXPAND | wx.ALL, 8)
 
-        # szerkesztő-műveletek
-        e1 = wx.BoxSizer(wx.HORIZONTAL)
-        for label, fn, name in (
-                ("Szakasz &törlése", self._del_section, "del"),
-                ("Csak a szakasz (&trim)", self._trim_section, "trim"),
-                ("Szakasz né&mítása", self._mute_section, "mute"),
-                ("Szakasz &másolása", self._copy_section, "copy"),
-                ("&Beillesztés itt", self._paste_here, "paste"),
-                ("Csen&d beszúrása itt", self._insert_silence, "sil")):
-            b = wx.Button(p, label=label)
-            b.Bind(wx.EVT_BUTTON, lambda e, f=fn: f())
-            e1.Add(b, 0, wx.RIGHT, 5)
-        v.Add(e1, 0, wx.LEFT | wx.BOTTOM, 8)
-
-        # effekt-rack (It.3)
-        fx = wx.StaticBoxSizer(wx.HORIZONTAL, p, "Effektek")
-        fb = fx.GetStaticBox()
-        fx.Add(wx.StaticText(fb, label="E&ffekt:"), 0,
-               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 6)
-        self.fx_ch = wx.Choice(fb, choices=[n for _k, n, _l, _d, _f
-                                            in supereffects.EFFECTS])
-        self.fx_ch.SetSelection(0)
-        self.fx_ch.SetName("Effekt választása")
-        self.fx_ch.Bind(wx.EVT_CHOICE, lambda e: self._fx_param_update())
-        fx.Add(self.fx_ch, 0, wx.RIGHT, 8)
-        self.fx_param_lbl = wx.StaticText(fb, label="")
-        fx.Add(self.fx_param_lbl, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
-        # CSÚSZKA a paraméterhez (nyílbillentyűkkel állítható, a képernyőolvasó
-        # bemondja az értéket); mellette élő érték-címke a látóknak.
-        self.fx_slider = wx.Slider(fb, minValue=0, maxValue=100, value=0,
-                                   size=(150, -1))
-        self.fx_slider.SetName("Effekt paramétere")
-        self.fx_slider.Bind(wx.EVT_SLIDER, lambda e: self._fx_slider_moved())
-        fx.Add(self.fx_slider, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
-        self.fx_val = wx.StaticText(fb, label="", size=(64, -1))
-        fx.Add(self.fx_val, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
-        self._fx_scale = 1
-        b_fxsec = wx.Button(fb, label="Alkalmaz a sza&kaszra")
-        b_fxsec.Bind(wx.EVT_BUTTON, lambda e: self._apply_effect(False))
-        b_fxall = wx.Button(fb, label="Alkalmaz az e&gészre")
-        b_fxall.Bind(wx.EVT_BUTTON, lambda e: self._apply_effect(True))
-        fx.Add(b_fxsec, 0, wx.RIGHT, 6)
-        fx.Add(b_fxall, 0)
-        v.Add(fx, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
-
-        # vokál-effektek + 2-sáv (It.4)
-        vo = wx.StaticBoxSizer(wx.HORIZONTAL, p, "Vokál és 2-sáv")
-        vb = vo.GetStaticBox()
-        b_voc = wx.Button(vb, label="V&okóder")
-        b_voc.Bind(wx.EVT_BUTTON, lambda e: self._vocoder())
-        vo.Add(b_voc, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
-        vo.Add(wx.StaticText(vb, label="erő %:"), 0,
-               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 2)
-        self.voc_amt = wx.TextCtrl(vb, value="100", size=(50, -1))
-        self.voc_amt.SetName("Vokóder erőssége százalékban")
-        vo.Add(self.voc_amt, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
-        b_harm = wx.Button(vb, label="&Harmonizer (terc+kvint)")
-        b_harm.Bind(wx.EVT_BUTTON, lambda e: self._harmonizer())
-        vo.Add(b_harm, 0, wx.RIGHT, 10)
-        b_kar = wx.Button(vb, label="Ének el&távolítása (karaoke)")
-        b_kar.Bind(wx.EVT_BUTTON, lambda e: self._remove_vocals())
-        vo.Add(b_kar, 0, wx.RIGHT, 14)
-        b_load = wx.Button(vb, label="Ala&p betöltése…")
-        b_load.Bind(wx.EVT_BUTTON, lambda e: self._load_backing())
-        vo.Add(b_load, 0, wx.RIGHT, 4)
-        b_mix = wx.Button(vb, label="Ke&verés")
-        b_mix.Bind(wx.EVT_BUTTON, lambda e: self._mix_backing())
-        vo.Add(b_mix, 0)
-        v.Add(vo, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
         self._backing = b""           # a betöltött 2. sáv (alap) PCM-je
-
-        e2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.btn_undo = wx.Button(p, label="&Visszavonás (Ctrl+Z)")
-        self.btn_undo.Bind(wx.EVT_BUTTON, lambda e: self._undo())
-        self.btn_redo = wx.Button(p, label="Új&ra (Ctrl+Y)")
-        self.btn_redo.Bind(wx.EVT_BUTTON, lambda e: self._redo())
-        self.btn_save = wx.Button(p, label="Men&tés…")
-        self.btn_save.Bind(wx.EVT_BUTTON, lambda e: self._on_save())
-        for b in (self.btn_undo, self.btn_redo, self.btn_save):
-            e2.Add(b, 0, wx.RIGHT, 6)
-        # MENTÉSI beállítások: mintavétel (a forrásé marad, vagy átalakítva) és
-        # MP3-bitráta – a felhasználó jelezte, hogy eddig a 48 kHz-et 44-re
-        # kényszerítette, és nem lehetett a bitrátát állítani
-        e2.Add(wx.StaticText(p, label="&Mintavétel:"), 0,
-               wx.ALIGN_CENTER_VERTICAL | wx.LEFT | wx.RIGHT, 4)
-        self.sr_ch = wx.Choice(p, choices=["Eredeti", "44100 Hz", "48000 Hz"],
+        # A mentési választók a Fájl menü rádióiból töltődnek; a tesztek a
+        # nevükre és a _on_save olvasására épülnek, a Tab sorrendből kikerülnek.
+        self.sr_ch = wx.Choice(self, choices=["Eredeti", "44100 Hz", "48000 Hz"],
                                name="Mentési mintavétel")
         self.sr_ch.SetSelection(0)
-        e2.Add(self.sr_ch, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
-        e2.Add(wx.StaticText(p, label="MP3 &bitráta:"), 0,
-               wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
+        self.sr_ch.Hide()
         self.br_ch = wx.Choice(
-            p, choices=["128 kbps", "192 kbps", "256 kbps", "320 kbps"],
+            self, choices=["128 kbps", "192 kbps", "256 kbps", "320 kbps"],
             name="MP3 bitráta")
         self.br_ch.SetSelection(2)                 # 256 kbps az alap
-        e2.Add(self.br_ch, 0, wx.ALIGN_CENTER_VERTICAL)
-        v.Add(e2, 0, wx.LEFT | wx.BOTTOM, 8)
+        self.br_ch.Hide()
 
         p.SetSizer(v)
         self.CreateStatusBar()
@@ -224,57 +119,89 @@ class SuperEditorFrame(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self._on_close)
         self.Bind(wx.EVT_CHAR_HOOK, self._on_help_key)
         self._update_buttons()
-        self._fx_param_update()
-        self._b_open.SetFocus()        # kezdő fókusz (a JAWS innen indul)
+        self.mk_list.SetFocus()
 
     def _on_help_key(self, e):
-        if e.GetKeyCode() == wx.WXK_F1:
+        code = e.GetKeyCode()
+        if code == wx.WXK_F1:
             try:
                 from superdl.helpdialog import show_help
                 show_help(self, "Super Recorder – fülre-szerkesztő", HELP)
             except Exception:
                 wx.MessageBox(HELP, "Súgó – Fülre-szerkesztő",
                               wx.OK | wx.ICON_INFORMATION, self)
-        else:
-            e.Skip()
+            return
+        if code in (wx.WXK_LEFT, wx.WXK_RIGHT):
+            focus = self.FindFocus()
+            if isinstance(focus, (wx.TextCtrl, wx.Slider, wx.SpinCtrl)):
+                e.Skip()
+                return
+            self._on_arrow(-1 if code == wx.WXK_LEFT else 1,
+                           e.ControlDown(), e.ShiftDown())
+            return
+        e.Skip()
 
-    # ---- menüsor (akadálymentes: a JAWS olvassa; biztonságos gyorsbillentyűk,
-    #      semmi sima Szóköz/nyíl/betű, ami a vezérlőktől lopná a billentyűt) ----
+    # ---- menüsor: a műveletek Alt-tal, a Tab csak a markerlistát járja ----
 
     def _build_menubar(self):
         mb = wx.MenuBar()
 
         def mi(menu, label, fn):
             item = menu.Append(wx.ID_ANY, label)
-            self.Bind(wx.EVT_MENU, lambda e: fn(), item)
+            self.Bind(wx.EVT_MENU, lambda e, f=fn: f(), item)
+            return item
 
         m_file = wx.Menu()
         mi(m_file, "Hang meg&nyitása…\tCtrl+O", self._on_open)
-        mi(m_file, "Men&tés…\tCtrl+S", self._on_save)
+        self.mi_save = mi(m_file, "Men&tés…\tCtrl+S", self._on_save)
+        m_sr = wx.Menu()
+        for i, label in enumerate(("&Eredeti", "44&100 Hz", "4&8000 Hz")):
+            item = m_sr.AppendRadioItem(wx.ID_ANY, label)
+            if i == 0:
+                item.Check(True)
+            self.Bind(wx.EVT_MENU, lambda e, n=i: self._set_sr(n), item)
+        m_file.AppendSubMenu(m_sr, "&Mintavétel")
+        m_br = wx.Menu()
+        for i, label in enumerate(("&128 kbps", "1&92 kbps", "&256 kbps",
+                                   "&320 kbps")):
+            item = m_br.AppendRadioItem(wx.ID_ANY, label)
+            if i == 2:
+                item.Check(True)
+            self.Bind(wx.EVT_MENU, lambda e, n=i: self._set_br(n), item)
+        m_file.AppendSubMenu(m_br, "MP3-&bitráta")
         mb.Append(m_file, "&Fájl")
 
         m_play = wx.Menu()
         mi(m_play, "&Lejátszás / szünet\tF5", self._toggle_play)
         mi(m_play, "&Elölről", lambda: self._play_from(0.0))
         mi(m_play, "Le&állítás\tF6", self._stop)
-        mi(m_play, "&Vissza 2 mp\tF7", lambda: self._nudge(-2.0))
-        mi(m_play, "E&lőre 2 mp\tF8", lambda: self._nudge(2.0))
+        mi(m_play, "&Vissza egy lépés\tF7",
+           lambda: self._on_arrow(-1, False, False))
+        mi(m_play, "Elő&re egy lépés\tF8",
+           lambda: self._on_arrow(1, False, False))
         mb.Append(m_play, "&Lejátszás")
 
         m_edit = wx.Menu()
         mi(m_edit, "&Marker itt\tF9", self._add_marker)
         mi(m_edit, "Minden marker &törlése", self._clear_markers)
+        mi(m_edit, "Kijelölés &eldobása", self._clear_selection)
         m_edit.AppendSeparator()
         mi(m_edit, "Szakasz tör&lése", self._del_section)
         mi(m_edit, "Csak a szakasz (t&rim)", self._trim_section)
-        mi(m_edit, "Szakasz né&mítása", self._mute_section)
-        mi(m_edit, "Szakasz má&solása", self._copy_section)
-        mi(m_edit, "&Beillesztés itt", self._paste_here)
+        mi(m_edit, "Szakasz &némítása", self._mute_section)
+        mi(m_edit, "Má&solás\tCtrl+C", self._copy_section)
+        mi(m_edit, "Ki&vágás\tCtrl+X", self._cut_section)
+        mi(m_edit, "&Beillesztés itt\tCtrl+V", self._paste_here)
         mi(m_edit, "&Csend beszúrása itt", self._insert_silence)
         m_edit.AppendSeparator()
-        mi(m_edit, "&Visszavonás\tCtrl+Z", self._undo)
-        mi(m_edit, "Új&ra\tCtrl+Y", self._redo)
+        self.mi_undo = mi(m_edit, "Visszav&onás\tCtrl+Z", self._undo)
+        self.mi_redo = mi(m_edit, "Ú&jra\tCtrl+Y", self._redo)
         mb.Append(m_edit, "&Szerkesztés")
+
+        m_fx = wx.Menu()
+        mi(m_fx, "Alkalmaz a sza&kaszra", lambda: self._apply_effect(False))
+        mi(m_fx, "Alkalmaz az e&gészre", lambda: self._apply_effect(True))
+        mb.Append(m_fx, "&Effektek")
 
         m_voc = wx.Menu()
         mi(m_voc, "&Vokóder", self._vocoder)
@@ -286,6 +213,14 @@ class SuperEditorFrame(wx.Frame):
         mb.Append(m_voc, "&Vokál")
 
         self.SetMenuBar(mb)
+
+    def _set_sr(self, n):
+        self.sr_ch.SetSelection(n)
+        self._announce(f"Mintavétel: {self.sr_ch.GetString(n)}.")
+
+    def _set_br(self, n):
+        self.br_ch.SetSelection(n)
+        self._announce(f"MP3 bitráta: {self.br_ch.GetString(n)}.")
 
     # ---- segéd -------------------------------------------------------
 
@@ -357,6 +292,8 @@ class SuperEditorFrame(wx.Frame):
         self.clip = clip
         self._saved = True              # frissen betöltve: nincs mentetlen munka
         self._pos = 0.0
+        self._anchor = None
+        self._sel = None
         self._render()
         self.title_lbl.SetLabel(f"Hang: {name}  ({_human(clip.duration())})")
         self._refresh_markers()
@@ -391,12 +328,66 @@ class SuperEditorFrame(wx.Frame):
         self.timer.Stop()
         self._refresh_pos()
 
-    def _nudge(self, delta: float):
-        if self.player.is_active():
-            self.player.relative_seek(delta)
-        else:
-            self._pos = max(0.0, min(self._pos + delta, self.clip.duration()))
+    def _lepes_szoveg(self) -> str:
+        t = f"{self._step:.1f}".replace(".", ",")
+        if t.endswith(",0"):
+            t = t[:-2]
+        return f"{t} másodperc"
+
+    def _on_arrow(self, direction: int, ctrl: bool, shift: bool):
+        """Bal/jobb: lépés. Ctrl: a lépésköz 0,1–10 mp. Shift: kijelölés."""
+        if ctrl:
+            self._adjust_step(direction)
+            return
+        if not self.clip.has_audio():
+            self._announce("Nincs betöltött hang.")
+            return
+        if shift:
+            if self._anchor is None:
+                self._anchor = self._playhead()
+            self._move_by(direction * self._step)
+            new = self._playhead()
+            a, b = sorted((self._anchor, new))
+            self._sel = (a, b) if b - a > 1e-4 else None
             self._refresh_pos()
+            self._announce(
+                f"Kijelölve: {_human(a)}-tól {_human(b)}-ig, "
+                f"hossz {_human(b - a)}.")
+            return
+        self._anchor = None
+        self._sel = None
+        self._move_by(direction * self._step)
+        self._refresh_pos()
+        self._announce(
+            f"Pozíció: {_human(self._playhead())}. "
+            f"Lépés: {self._lepes_szoveg()}.")
+
+    def _move_by(self, delta: float):
+        if self.player.is_active() and not self.player.is_paused():
+            self.player.relative_seek(delta)
+            self._pos = self.player.position()
+            return
+        if self.player.is_active():
+            self._pos = self.player.position()
+            self.player.stop()
+            self.timer.Stop()
+        self._pos = max(0.0, min(self._pos + delta, self.clip.duration()))
+
+    def _adjust_step(self, direction: int):
+        nxt = round(min(10.0, max(0.1, self._step + direction * 0.1)), 1)
+        if abs(nxt - self._step) < 1e-6:
+            szel = "legkisebb" if direction < 0 else "legnagyobb"
+            self._announce(f"A lépés {self._lepes_szoveg()}, ez a {szel}.")
+            return
+        self._step = nxt
+        self._refresh_pos()
+        self._announce(f"Lépés: {self._lepes_szoveg()}.")
+
+    def _clear_selection(self):
+        self._anchor = None
+        self._sel = None
+        self._refresh_pos()
+        self._announce("Kijelölés eldobva.")
 
     def _on_tick(self, e):
         if self.player.is_active():
@@ -406,8 +397,13 @@ class SuperEditorFrame(wx.Frame):
             self.timer.Stop()
 
     def _refresh_pos(self):
+        extra = ""
+        if self._sel and self._sel[1] - self._sel[0] > 1e-4:
+            a, b = self._sel
+            extra = f"  Kijelölés: {_human(a)}–{_human(b)}"
         self.pos_lbl.SetLabel(
-            f"Pozíció: {_human(self._pos)} / {_human(self.clip.duration())}")
+            f"Pozíció: {_human(self._pos)} / {_human(self.clip.duration())}  "
+            f"Lépés: {self._lepes_szoveg()}{extra}")
 
     # ---- markerek ----------------------------------------------------
 
@@ -455,11 +451,19 @@ class SuperEditorFrame(wx.Frame):
 
     # ---- szerkesztő-műveletek ----------------------------------------
 
+    def _active_section(self):
+        """A Shift-kijelölés az elsődleges; különben a markerlistáé."""
+        if self._sel and self._sel[1] - self._sel[0] > 1e-4:
+            a, b = self._sel
+            return (min(a, b), max(a, b))
+        return self._sel_section()
+
     def _need_section(self):
-        sec = self._sel_section()
+        sec = self._active_section()
         if not sec:
-            self._announce("Előbb tegyél le markereket, és jelölj ki egyet "
-                           "a listában – a művelet az ahhoz tartozó szakaszra hat.")
+            self._announce(
+                "Jelölj ki Shift+jobb nyíllal, vagy tegyél le egy markert "
+                "és válaszd ki a listában.")
         return sec
 
     def _after_edit(self, msg):
@@ -498,6 +502,16 @@ class SuperEditorFrame(wx.Frame):
             self.clip.copy_range(*sec)
             self._announce(f"Szakasz vágólapra ({_human(sec[1]-sec[0])}).")
 
+    def _cut_section(self):
+        sec = self._need_section()
+        if not sec:
+            return
+        self.clip.copy_range(*sec)
+        self.clip.delete_range(*sec)
+        self._anchor = None
+        self._sel = None
+        self._after_edit(f"Kivágva ({_human(sec[1]-sec[0])}).")
+
     def _paste_here(self):
         if not self.clip.clipboard:
             self._announce("A vágólap üres – előbb másolj egy szakaszt.")
@@ -518,49 +532,40 @@ class SuperEditorFrame(wx.Frame):
                 self._after_edit(f"{dur:g} mp csend beszúrva.")
         dlg.Destroy()
 
-    # ---- effekt-rack (It.3) ------------------------------------------
+    # ---- effekt-rack: a választás párbeszéd, nem a fő Tab-sorrend --------
 
-    def _fx_value(self) -> float:
-        """A csúszka valós paraméterértéke (egész csúszka / skála)."""
-        return self.fx_slider.GetValue() / self._fx_scale
-
-    def _fx_slider_moved(self):
-        """A csúszka mozgatásakor frissíti az érték-címkét (a képernyőolvasó
-        magát az értéket a nyílbillentyűkkel amúgy is bemondja)."""
-        v = self._fx_value()
-        self.fx_val.SetLabel(f"{v:g}")
-
-    def _fx_param_update(self):
-        """A kiválasztott effekthez tartozó csúszka tartománya/alapja/címkéje."""
-        idx = self.fx_ch.GetSelection()
-        if not (0 <= idx < len(supereffects.EFFECTS)):
-            return
+    def _pick_effect(self):
+        names = [n for _k, n, _l, _d, _f in supereffects.EFFECTS]
+        dlg = wx.SingleChoiceDialog(self, "Melyik effektet alkalmazzam?",
+                                    "Effekt", names)
+        if dlg.ShowModal() != wx.ID_OK:
+            dlg.Destroy()
+            return None
+        idx = dlg.GetSelection()
+        dlg.Destroy()
         key, name, lbl, dflt, _f = supereffects.EFFECTS[idx]
+        param = 0.0
         rng = supereffects.param_range(key)
         if lbl and rng:
-            lo, hi, scale = rng
-            self._fx_scale = scale
-            self.fx_param_lbl.SetLabel(lbl + ":")
-            self.fx_slider.Enable(True)
-            self.fx_slider.SetMin(int(round(lo * scale)))
-            self.fx_slider.SetMax(int(round(hi * scale)))
-            self.fx_slider.SetPageSize(max(1, int((hi - lo) * scale / 20)))
-            self.fx_slider.SetValue(int(round(dflt * scale)))
-            self.fx_slider.SetName(f"{name} paramétere: {lbl}")
-            self._fx_slider_moved()
-        else:
-            self._fx_scale = 1
-            self.fx_param_lbl.SetLabel("(nincs paraméter)")
-            self.fx_slider.Enable(False)
-            self.fx_slider.SetName("Effekt paramétere (ehhez nincs)")
-            self.fx_val.SetLabel("")
+            lo, hi, _scale = rng
+            alap = f"{dflt:g}".replace(".", ",")
+            ask = wx.TextEntryDialog(
+                self, f"{name}: {lbl} ({lo:g} és {hi:g} között).",
+                "Effekt paramétere", alap)
+            if ask.ShowModal() != wx.ID_OK:
+                ask.Destroy()
+                return None
+            try:
+                param = float(ask.GetValue().replace(",", "."))
+            except ValueError:
+                param = dflt
+            param = min(hi, max(lo, param))
+            ask.Destroy()
+        return key, name, param
 
     def _apply_effect(self, whole: bool):
         if self._busy or not self.clip.has_audio():
             return
-        idx = self.fx_ch.GetSelection()
-        key, name, lbl, _dflt, _f = supereffects.EFFECTS[idx]
-        param = self._fx_value() if (lbl and supereffects.param_range(key)) else 0.0
         if whole:
             a, b = 0.0, self.clip.duration()
         else:
@@ -568,6 +573,10 @@ class SuperEditorFrame(wx.Frame):
             if not sec:
                 return
             a, b = sec
+        picked = self._pick_effect()
+        if not picked:
+            return
+        key, name, param = picked
         af = supereffects.build(key, param, b - a, self.clip.freq)
         if not af:
             return
@@ -596,8 +605,8 @@ class SuperEditorFrame(wx.Frame):
     # ---- vokál-effektek + 2-sáv (It.4) -------------------------------
 
     def _range(self):
-        """A kijelölt szakasz, ha van; különben az EGÉSZ klip."""
-        return self._sel_section() or (0.0, self.clip.duration())
+        """A Shift- vagy marker-kijelölés, ha van; különben az egész klip."""
+        return self._active_section() or (0.0, self.clip.duration())
 
     def _run_bg(self, fn, busy_msg, done_msg):
         if self._busy or not self.clip.has_audio():
@@ -616,10 +625,18 @@ class SuperEditorFrame(wx.Frame):
         threading.Thread(target=work, daemon=True).start()
 
     def _vocoder(self):
+        dlg = wx.TextEntryDialog(
+            self, "Vokóder erőssége százalékban, 0 és 100 között:",
+            "Vokóder", "100")
+        if dlg.ShowModal() != wx.ID_OK:
+            dlg.Destroy()
+            return
         try:
-            amt = float(self.voc_amt.GetValue().replace(",", ".")) / 100.0
+            amt = float(dlg.GetValue().replace(",", ".")) / 100.0
         except ValueError:
             amt = 1.0
+        dlg.Destroy()
+        amt = min(1.0, max(0.0, amt))
         a, b = self._range()
         self._run_bg(lambda: self.clip.apply_vocoder(a, b, amt),
                      "Vokóder…", "Vokóder alkalmazva.")
@@ -678,9 +695,10 @@ class SuperEditorFrame(wx.Frame):
             self._announce("Nincs mit újra alkalmazni.")
 
     def _update_buttons(self):
-        self.btn_undo.Enable(self.clip.can_undo())
-        self.btn_redo.Enable(self.clip.can_redo())
-        self.btn_save.Enable(self.clip.has_audio())
+        van = self.clip.has_audio()
+        self.mi_undo.Enable(self.clip.can_undo())
+        self.mi_redo.Enable(self.clip.can_redo())
+        self.mi_save.Enable(van)
 
     # ---- mentés ------------------------------------------------------
 
@@ -706,7 +724,7 @@ class SuperEditorFrame(wx.Frame):
             max(0, self.br_ch.GetSelection())]
         eff = out_freq or self.clip.freq
         self._busy = True
-        self.btn_save.Disable()
+        self.mi_save.Enable(False)
         self._announce(f"Mentés… ({eff} Hz"
                        + (f", MP3 {mp3_bitrate}" if mp3 else "") + ")")
 
@@ -723,7 +741,7 @@ class SuperEditorFrame(wx.Frame):
 
     def _save_done(self, out, err):
         self._busy = False
-        self.btn_save.Enable()
+        self.mi_save.Enable(self.clip.has_audio())
         if err:
             self._announce(f"A mentés nem sikerült: {err}")
         else:

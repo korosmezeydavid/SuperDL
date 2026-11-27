@@ -18,6 +18,7 @@ import random
 import subprocess
 import threading
 import time
+import unicodedata
 from collections import deque
 
 import wx
@@ -28,6 +29,22 @@ from . import hangszin as HSZ
 ALVAS_PERCEK = (5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60)
 TEKERES_MP = 5.0
 ALVAS_HALKULAS_MP = 10.0       # ennyivel a vége előtt kezd elhalkulni
+
+
+def keres_minta(szoveg: str) -> str:
+    """Kisbetű, ékezet nélkül: a „gyoz" megtalálja a „Győzelem" sort is."""
+    bontott = unicodedata.normalize("NFKD", szoveg or "")
+    csupasz = "".join(c for c in bontott if not unicodedata.combining(c))
+    return csupasz.casefold()
+
+
+def szam_illeszik(szam, minta: str) -> bool:
+    """A szám NEVE számít, a mappa neve nem."""
+    if not minta:
+        return True
+    return minta in keres_minta(szam.cim)
+
+
 HANGERO_LEPES = 0.1
 
 SUGO = """ZENE – EGYSZERŰ LEJÁTSZÓ
@@ -114,7 +131,7 @@ folytatódik, ahol tartott – így hallás alapján választhatsz. A csúszka A
 megmarad a következő indításra is.
 
 TÁJÉKOZÓDÁS EGY NAGY LISTÁBAN
-  Ctrl+F ............. keresés a számok közt (a következő találat: F3)
+  Ctrl+F ............. keresés: csak azok a számok maradnak, amelyek nevében benne van a beírt szó. A zene ettől nem indul el. A következő találat: F3, lejátszás nélkül.
   Ctrl+G ............. ugrás mappára – a mappák listájából választasz
   Ctrl+T ............. véletlen szám
   Ctrl+I ............. hol tartunk (szám, idő, kapcsolók, elalvás)
@@ -125,7 +142,7 @@ EGYÉB
   F5 ................. a lista újraolvasása
   Ctrl+O ............. másik zenemappa
   F1 ................. ez a súgó
-  Escape ............. bezárás
+  Escape ............. keresés után vissza az összes számra; ha nincs keresés, bezárás
 
 ÁTTŰNÉS
 A számok között három másodperces áttűnés van: az előző elhalkul, közben a
@@ -281,6 +298,9 @@ class ZeneFrame(wx.Frame):
         self._alvas_vege = 0.0       # időbélyeg; 0 = nincs elalvás
         self._hangero = KT.hangero_betolt()     # megmarad a következő indításra
         self._keresett = ""
+        self._nyitando = ""
+        self._szuro = ""             # a lista szűrője; üres = minden szám
+        self._lista_ne_inditson = False
         self._kedvencek = KT.kedvencek_betolt()      # utak, sorrendben
         self._kedvenc_kulcsok = {u.lower() for u in self._kedvencek}
         self._kedvenc_nezet = False
@@ -517,6 +537,24 @@ class ZeneFrame(wx.Frame):
                           f"A lejátszáshoz nyilazz, vagy nyomj Entert.")
         else:
             self._allapot("Ebben a mappában nincs lejátszható zene.")
+        keres = getattr(self, "_nyitando", "")
+        if keres:
+            cel = os.path.normcase(os.path.abspath(keres))
+            for i, szam in enumerate(self._szamok):
+                if os.path.normcase(os.path.abspath(szam.ut)) == cel:
+                    self._index = i
+                    self.lista.SetSelection(i)
+                    self.lista.SetFocus()
+                    break
+            self._nyitando = ""
+
+    def open_file(self, ut: str):
+        """Fájltársításból: a szám mappája betöltődik, a szám kijelölve."""
+        if not ut:
+            return
+        self._nyitando = os.path.abspath(ut)
+        mappa = ut if os.path.isdir(ut) else os.path.dirname(self._nyitando)
+        self._beolvas(mappa)
 
     # ---- nézet: minden szám, vagy csak a kedvencek ----------------------
 
@@ -556,18 +594,27 @@ class ZeneFrame(wx.Frame):
         else:
             self._szamok = list(self._osszes)
             listanev = "Számok listája"
+        if self._szuro:
+            minta = keres_minta(self._szuro)
+            self._szamok = [s for s in self._szamok if szam_illeszik(s, minta)]
+            listanev = f"Keresés: {self._szuro}. {len(self._szamok)} szám."
         self.lista.SetName(listanev)
         if self._lista_accessible is not None:
             self._lista_accessible._name = listanev
-        self.lista.Set([self._sor(s) for s in self._szamok])
         try:
-            self.cimke.SetLabel(
-                f"&Mentett lista: {nev.replace('&', '&&')} (Ctrl+B: kilépés):"
-                if self._mentett_lista is not None else
-                "&Kedvencek (Ctrl+B: vissza a teljes listára; "
-                "helyi menü: Shift+F10):" if self._kedvenc_nezet
-                else "&Számok (fel-le nyíl: váltás és lejátszás; "
-                     "helyi menü: Shift+F10):")
+            if self._szuro:
+                cimke = (f"&Keresés: {self._szuro.replace('&', '&&')} "
+                         f"({len(self._szamok)} szám, Escape: az összes szám):")
+            elif self._mentett_lista is not None:
+                cimke = (f"&Mentett lista: {nev.replace('&', '&&')} "
+                         "(Ctrl+B: kilépés):")
+            elif self._kedvenc_nezet:
+                cimke = ("&Kedvencek (Ctrl+B: vissza a teljes listára; "
+                         "helyi menü: Shift+F10):")
+            else:
+                cimke = ("&Számok (fel-le nyíl: váltás és lejátszás; "
+                         "helyi menü: Shift+F10):")
+            self.cimke.SetLabel(cimke)
         except Exception:
             pass
         self._zsak = []
@@ -576,10 +623,25 @@ class ZeneFrame(wx.Frame):
             if szolo and s.ut.lower() == szolo.lower():
                 self._index = i
                 break
-        if self._szamok:
-            self.lista.SetSelection(max(0, self._index))
+        self._lista_ne_inditson = True
+        try:
+            self.lista.Set([self._sor(s) for s in self._szamok])
+            if self._szamok:
+                self.lista.SetSelection(0 if self._szuro else max(0, self._index))
+        finally:
+            self._lista_ne_inditson = False
         if mondja:
-            if self._mentett_lista is not None:
+            if self._szuro:
+                if self._szamok:
+                    self._allapot(
+                        f"{len(self._szamok)} szám, aminek a nevében benne van: "
+                        f"{self._szuro}. Még nem indul. A nyilakkal választhatsz. "
+                        "Escape: az összes szám.")
+                else:
+                    self._allapot(
+                        f"Nincs találat erre: {self._szuro}. "
+                        "Escape visszaadja az összes számot.")
+            elif self._mentett_lista is not None:
                 self._allapot(listanev)
             elif not self._szamok:
                 self._allapot("A kedvencek listája üres. Jelölj ki számokat "
@@ -912,6 +974,8 @@ class ZeneFrame(wx.Frame):
                 f"érhető el, a zene a rendszer alapértelmezettjén szól.")
 
     def _kijelolt_indul(self):
+        if self._lista_ne_inditson:
+            return
         i = self.lista.GetSelection()
         if 0 <= i < len(self._szamok) and i != self._index:
             self._indit(i)
@@ -1015,6 +1079,13 @@ class ZeneFrame(wx.Frame):
                 self._sor_kivalaszt()
             return
         if kod == wx.WXK_ESCAPE:
+            if self._szuro:
+                self._szuro = ""
+                self._lista_ne_inditson = True
+                self._nezet_frissit()
+                self._lista_ne_inditson = False
+                self.lista.SetFocus()
+                return
             self.Close()
             return
         if kod == wx.WXK_F1:
@@ -1132,27 +1203,36 @@ class ZeneFrame(wx.Frame):
                       else "A szám végén megáll.")
 
     def _keres(self):
-        d = wx.TextEntryDialog(self, "Mit keresel a számok között?",
-                               "Keresés", self._keresett)
+        d = wx.TextEntryDialog(
+            self, "Mit keresel a számok nevében? Csak ezek maradnak a listában.",
+            "Keresés", self._szuro)
         try:
             if d.ShowModal() != wx.ID_OK:
                 return
-            self._keresett = d.GetValue().strip()
+            szo = d.GetValue().strip()
         finally:
             d.Destroy()
-        if not self._keresett:
+        if not szo:
+            if self._szuro:
+                self._szuro = ""
+                self._nezet_frissit()
+                self.lista.SetFocus()
             return
-        self._talalat_keres(self.lista.GetSelection(), elsotol=True)
+        self._szuro = szo
+        self._nezet_frissit()
+        self.lista.SetFocus()
 
     def _kovetkezo_talalat(self):
-        if not self._keresett:
+        if not self._szuro:
             self._keres()
             return
         self._talalat_keres(self.lista.GetSelection() + 1)
 
     def _talalat_keres(self, tol, elsotol=False):
-        """A keresés KÖRBEFORDUL, és megmondja, hányadik találat."""
-        minta = self._keresett.lower()
+        """A keresés KÖRBEFORDUL, és megmondja, hányadik találat.
+
+        A találat csak kijelölődik. A lejátszás a nyílra vagy az Enterre marad."""
+        minta = keres_minta(self._szuro)
         n = len(self._szamok)
         if not n:
             self._allapot("Nincs betöltve zene.")
@@ -1160,12 +1240,18 @@ class ZeneFrame(wx.Frame):
         kezdet = 0 if elsotol else max(0, tol)
         for eltolas in range(n):
             i = (kezdet + eltolas) % n
-            if minta in self._szamok[i].felirat().lower():
-                self.lista.SetSelection(i)
+            if minta in keres_minta(self._szamok[i].cim):
+                self._lista_ne_inditson = True
+                try:
+                    self.lista.SetSelection(i)
+                finally:
+                    self._lista_ne_inditson = False
                 self.lista.SetFocus()
-                self._indit(i)
+                self._allapot(
+                    f"{i + 1}. a {n} találatból: {self._szamok[i].felirat()}. "
+                    "Nem indul el.")
                 return
-        self._allapot(f"Nincs találat erre: {self._keresett}.")
+        self._allapot(f"Nincs találat erre: {self._szuro}.")
 
     def _ugras_mappara(self):
         mappak = []

@@ -111,6 +111,43 @@ def test_layers_keep_global_time_after_appending_a_silent_clip(media, tmp_path):
         editor.cleanup()
 
 
+def test_a_kivagas_a_projektben_marad_es_a_kozepe_nyilik():
+    editor = VE.VideoEditor()
+    editor.clips.append(VE.Clip(path="a.mp4", duration=10, width=320, height=240))
+    editor.add_marker(2)
+    editor.add_marker(4)
+    editor.add_marker(8)
+    assert editor.apply_cut(2, 4) is None
+    assert editor.total_duration() == pytest.approx(8)
+    assert [clip.duration for clip in editor.clips] == pytest.approx([2, 6])
+    assert editor.clips[1].src_start == pytest.approx(4)
+    assert [marker.at for marker in editor.markers] == pytest.approx([2, 6])
+
+    editor.insert_clip(VE.Clip(path="b.mp4", duration=3, width=320, height=240), 2)
+    assert editor.total_duration() == pytest.approx(11)
+    assert [clip.path for clip in editor.clips] == ["a.mp4", "b.mp4", "a.mp4"]
+    assert editor.clips[2].src_start == pytest.approx(4)
+
+    hang = VE.Clip(path="hang.wav", duration=1.5, kind="audio_insert")
+    editor.insert_clip(hang, 2)
+    assert editor.clips[1].kind == "audio_insert"
+    assert editor.total_duration() == pytest.approx(12.5)
+
+
+def test_a_kep_sarokba_kozepre_vagy_teljes_kepernyore_kerul():
+    sarok = VE.TimelineLayer("image", "a.png", 1, 2)
+    graf = " ".join(VE.image_graph(sarok, 1, "vbase", 320, 240, 3))
+    assert "scale=128:96" in graf
+    assert "main_w-overlay_w-main_w*0.04" in graf
+    kozep = VE.TimelineLayer("image", "a.png", 1, 2, place="center", scale=0.5)
+    graf = " ".join(VE.image_graph(kozep, 1, "vbase", 320, 240, 3))
+    assert "scale=160:120" in graf
+    assert "(main_w-overlay_w)/2" in graf
+    teljes = VE.TimelineLayer("image", "a.png", 1, 2, place="full", scale=1)
+    graf = " ".join(VE.image_graph(teljes, 1, "vbase", 320, 240, 3))
+    assert "crop=320:240" in graf
+
+
 def test_video_editor_layer_controls_and_accessible_summary():
     wx = pytest.importorskip("wx")
     from modules_src.mediatools.mediatools_mod import videoeditwin as window
@@ -118,10 +155,15 @@ def test_video_editor_layer_controls_and_accessible_summary():
     app = wx.App.Get() or wx.App(False)
     frame = window.VideoEditFrame(None)
     try:
-        labels = [child.GetLabel().replace("&", "") for child in frame.GetChildren()[0].GetChildren()
-                  if isinstance(child, wx.Button)]
+        labels = []
+        bar = frame.GetMenuBar()
+        for i in range(bar.GetMenuCount()):
+            for item in bar.GetMenu(i).GetMenuItems():
+                labels.append(item.GetItemLabelText())
         assert "Kép hozzáadása itt…" in labels
-        assert "Hang hozzáadása itt…" in labels
+        assert "Hang rákeverése itt…" in labels
+        assert "Hang beszúrása itt…" in labels
+        assert "Videó beszúrása ide…" in labels
         assert "Hangkeverés meghallgatása" in labels
         assert frame.layer_list.GetName() == "Beszúrt képek és hangok"
         frame.editor.clips.append(VE.Clip("teszt.mp4", duration=4))

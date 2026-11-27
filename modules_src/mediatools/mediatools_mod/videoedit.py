@@ -77,6 +77,36 @@ class TimelineLayer:
     path: str
     at: float
     duration: float
+    place: str = "corner"     # corner | center | full
+    scale: float = 0.4
+
+
+def image_graph(layer, source, video_stream, width, height, end) -> list[str]:
+    """A kép rátétele. A sarok az alap: a videó mellette látszik.
+    A közép fókuszba teszi, a teljes képernyő kitakarja a képkockát."""
+    place = layer.place or "corner"
+    if place == "full":
+        prep = (
+            f"[{source}:v:0]trim=end_frame=1,setpts=PTS-STARTPTS,"
+            f"scale={width}:{height}:force_original_aspect_ratio=increase,"
+            f"crop={width}:{height},setsar=1[image{source}]")
+        x, y = "(main_w-overlay_w)/2", "(main_h-overlay_h)/2"
+    else:
+        ratio = min(1.0, max(0.1, float(layer.scale or 0.4)))
+        sw = max(1, int(width * ratio))
+        sh = max(1, int(height * ratio))
+        prep = (
+            f"[{source}:v:0]trim=end_frame=1,setpts=PTS-STARTPTS,"
+            f"scale={sw}:{sh}:force_original_aspect_ratio=decrease,"
+            f"setsar=1[image{source}]")
+        if place == "center":
+            x, y = "(main_w-overlay_w)/2", "(main_h-overlay_h)/2"
+        else:
+            x, y = "main_w-overlay_w-main_w*0.04", "main_h*0.04"
+    over = (
+        f"[{video_stream}][image{source}]overlay=x={x}:y={y}:"
+        f"enable='gte(t,{layer.at:.6f})*lt(t,{end:.6f})'[layer{source}]")
+    return [prep, over]
 
 
 def _has_audio(path: str) -> bool:
@@ -120,6 +150,8 @@ class Clip:
     duration: float = 0.0
     width: int = 0
     height: int = 0
+    src_start: float = 0.0
+    kind: str = "video"       # video | audio_insert
 
     def label(self) -> str:
         return f"{Path(self.path).name} ({human_time(self.duration)})"
@@ -194,12 +226,173 @@ class VideoEditor:
 
     def target_res(self) -> tuple[int, int]:
         for c in self.clips:
-            if c.width and c.height:
+            if c.kind == "video" and c.width and c.height:
                 return c.width, c.height
         return 1280, 720
 
+    def _slice(self, clip: Clip, offset: float, duration: float) -> Clip:
+        return Clip(
+            path=clip.path, duration=duration, width=clip.width,
+            height=clip.height, src_start=clip.src_start + offset,
+            kind=clip.kind)
 
-    def add_layer(self, kind, path, at, duration=None):
+    def _shift_forward(self, at: float, dur: float):
+        """A beszúrás utáni jelölések és a rajta átnyúló képek ideje nő."""
+        for marker in self.markers:
+            if marker.at >= at - 1e-3:
+                marker.at += dur
+        for note in self.notes:
+            if note.at >= at - 1e-3:
+                note.at += dur
+        for layer in self.layers:
+            if layer.at >= at - 1e-3:
+                layer.at += dur
+            elif layer.at + layer.duration > at:
+                layer.duration += dur
+
+    def insert_clip(self, clip: Clip, at: float):
+        """A klip a megadott időpontra kerül, a régi folytatás utána csúszik."""
+        total = self.total_duration()
+        at = min(max(0.0, at), total)
+        if not self.clips or at >= total - 0.05:
+            self.clips.append(clip)
+        elif at <= 0.05:
+            self.clips.insert(0, clip)
+        else:
+            built = []
+            acc = 0.0
+            done = False
+            for old in self.clips:
+                c0, c1 = acc, acc + old.duration
+                acc = c1
+                if done or c1 <= at + 0.02:
+                    built.append(old)
+                    continue
+                if c0 >= at - 0.02:
+                    built.append(clip)
+                    done = True
+                    built.append(old)
+                    continue
+                head = at - c0
+                if head >= 0.05:
+                    built.append(self._slice(old, 0.0, head))
+                built.append(clip)
+                done = True
+                tail = c1 - at
+                if tail >= 0.05:
+                    built.append(self._slice(old, head, tail))
+            if not done:
+                built.append(clip)
+            self.clips = built
+        self._shift_forward(at, clip.duration)
+        self._base = None
+
+    def insert_video(self, path: str, at: float) -> Clip | None:
+        duration, width, height = probe(path)
+        if duration <= 0:
+            self.error = "Ezt a videót nem sikerült beolvasni."
+            return None
+        clip = Clip(path=str(Path(path).resolve()), duration=duration,
+                    width=width, height=height)
+        self.insert_clip(clip, at)
+        return clip
+
+    def insert_audio(self, path: str, at: float) -> Clip | None:
+        if not _has_audio(path):
+            self.error = "A fájlban nincs lejátszható hang."
+            return None
+        duration = media_duration(path)
+        if duration <= 0:
+            self.error = "A hang hossza nem olvasható."
+            return None
+        width, height = self.target_res()
+        clip = Clip(path=str(Path(path).resolve()), duration=duration,
+                    width=width, height=height, kind="audio_insert")
+        self.insert_clip(clip, at)
+        return clip
+
+    def apply_cut(self, start: float, end: float) -> str | None:
+        """A [start, end) szakasz kiesik a projektből. Nem ment fájlt:
+        a megmaradt részek idővonala rövidül, a szerkesztés folytatható."""
+        total = self.total_duration()
+        start = max(0.0, min(start, total))
+        end = max(start, min(end, total))
+        if end - start < 0.1:
+            return "A kivágandó szakasz túl rövid."
+        if start <= 0.05 and end >= total - 0.05:
+            return "A kivágás az egész videót érintené."
+        kept = []
+        acc = 0.0
+        for clip in self.clips:
+            c0, c1 = acc, acc + clip.duration
+            for lo, hi in ((0.0, start), (end, total)):
+                a, b = max(c0, lo), min(c1, hi)
+                if b - a >= 0.05:
+                    kept.append(self._slice(clip, a - c0, b - a))
+            acc = c1
+        if not kept:
+            return "A kivágás után nem maradna videó."
+        self.clips = kept
+        self._base = None
+        gap = end - start
+        self.markers = self._cut_markers(start, end, gap)
+        self.notes = self._cut_notes(start, end, gap)
+        self.layers = self._cut_layers(start, end, gap)
+        return None
+
+    def _cut_markers(self, start, end, gap):
+        kept = []
+        for marker in self.markers:
+            if start < marker.at < end:
+                continue
+            if marker.at >= end:
+                marker.at -= gap
+            kept.append(marker)
+        kept.sort(key=lambda item: item.at)
+        folded = []
+        for marker in kept:
+            if folded and abs(folded[-1].at - marker.at) < 0.08:
+                continue
+            folded.append(marker)
+        return folded
+
+    def _cut_notes(self, start, end, gap):
+        kept = []
+        for note in self.notes:
+            if start <= note.at < end:
+                continue
+            if note.at >= end:
+                note.at -= gap
+            kept.append(note)
+        kept.sort(key=lambda item: item.at)
+        return kept
+
+    def _cut_layers(self, start, end, gap):
+        kept = []
+        for layer in self.layers:
+            a, b = layer.at, layer.at + layer.duration
+            if b <= start + 1e-3:
+                kept.append(layer)
+            elif a >= end - 1e-3:
+                layer.at -= gap
+                kept.append(layer)
+            elif a < start and b > end:
+                layer.duration -= gap
+                kept.append(layer)
+            elif a < start:
+                layer.duration = start - a
+                if layer.duration >= 0.05:
+                    kept.append(layer)
+            elif b > end:
+                layer.duration = b - end
+                layer.at = start
+                if layer.duration >= 0.05:
+                    kept.append(layer)
+        kept.sort(key=lambda item: item.at)
+        return kept
+
+
+    def add_layer(self, kind, path, at, duration=None, place="corner", scale=0.4):
         path = str(Path(path).resolve())
         if not math.isfinite(at) or not 0 <= at < self.total_duration():
             raise ValueError("Válassz a videón belüli kezdőpontot.")
@@ -215,7 +408,8 @@ class VideoEditor:
             raise ValueError("Ismeretlen beszúrástípus.")
         if duration is None or not math.isfinite(duration) or duration <= 0:
             raise ValueError("Adj meg pozitív, érvényes időtartamot.")
-        layer = TimelineLayer(kind, path, at, duration)
+        layer = TimelineLayer(kind, path, at, duration, place=place or "corner",
+                              scale=scale if scale else 0.4)
         self.layers.append(layer)
         self.layers.sort(key=lambda item: item.at)
         return layer
@@ -245,14 +439,8 @@ class VideoEditor:
             cmd.extend(["-i", layer.path])
             source += 1
             if layer.kind == "image":
-                graph.append(
-                    f"[{source}:v:0]trim=end_frame=1,setpts=PTS-STARTPTS,"
-                    f"scale={max(1, int(width * .4))}:{max(1, int(height * .4))}:"
-                    f"force_original_aspect_ratio=decrease,setsar=1[image{source}]")
-                graph.append(
-                    f"[{video_stream}][image{source}]overlay="
-                    f"x=main_w-overlay_w-main_w*0.04:y=main_h*0.04:"
-                    f"enable='gte(t,{layer.at:.6f})*lt(t,{end:.6f})'[layer{source}]")
+                graph.extend(image_graph(
+                    layer, source, video_stream, width, height, end))
                 video_stream = f"layer{source}"
             else:
                 graph.append(
@@ -389,25 +577,44 @@ class VideoEditor:
         """A klipek egyetlen, normalizált (közös felbontású) videóvá fűzése.
         Egyetlen klipnél maga a klip az alap (nincs felesleges újrakódolás).
         Az alapot egy tartós ideiglenes mappába tesszük (export-cache)."""
-        if len(self.clips) == 1:
+        if (len(self.clips) == 1 and self.clips[0].kind == "video"
+                and self.clips[0].src_start <= 0.02):
             return self.clips[0].path
         if self._base and os.path.isfile(self._base):
             return self._base
         if not self._base_dir:
             self._base_dir = tempfile.mkdtemp(prefix="superdl_editbase_")
         w, h = self.target_res()
+        w -= w % 2
+        h -= h % 2
         base = Path(self._base_dir) / "base.mp4"
+        font = _find_font()
+        if font and any(c.kind == "audio_insert" for c in self.clips):
+            shutil.copyfile(font, Path(self._base_dir) / "font.ttf")
         cmd = [ff, "-y", "-filter_complex_threads", "1"]
         for c in self.clips:
             cmd += ["-i", c.path]
         parts = []
-        for i in range(len(self.clips)):
-            parts.append(
-                f"[{i}:v]scale={w}:{h}:force_original_aspect_ratio=decrease,"
-                f"pad={w}:{h}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=25[v{i}]")
         for i, clip in enumerate(self.clips):
-            source = f"[{i}:a:0]" if _has_audio(clip.path) else "anullsrc=r=48000:cl=stereo,"
-            parts.append(f"{source}{_audio_chain(clip.duration)}[a{i}]")
+            if clip.kind == "audio_insert":
+                parts.append(self._bubble_video(i, clip, w, h, bool(font)))
+                ss = clip.src_start
+                parts.append(
+                    f"[{i}:a:0]atrim=start={ss:.3f}:duration={clip.duration:.3f},"
+                    f"asetpts=PTS-STARTPTS,{_audio_chain(clip.duration)}[a{i}]")
+                continue
+            ss = clip.src_start
+            ee = ss + clip.duration
+            parts.append(
+                f"[{i}:v]trim=start={ss:.3f}:end={ee:.3f},setpts=PTS-STARTPTS,"
+                f"scale={w}:{h}:force_original_aspect_ratio=decrease,"
+                f"pad={w}:{h}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=25[v{i}]")
+            if _has_audio(clip.path):
+                parts.append(
+                    f"[{i}:a:0]atrim=start={ss:.3f}:duration={clip.duration:.3f},"
+                    f"asetpts=PTS-STARTPTS,{_audio_chain(clip.duration)}[a{i}]")
+            else:
+                parts.append(f"anullsrc=r=48000:cl=stereo,{_audio_chain(clip.duration)}[a{i}]")
         streams = "".join(f"[v{i}][a{i}]" for i in range(len(self.clips)))
         graph = ";".join(parts) + ";" + streams + \
             f"concat=n={len(self.clips)}:v=1:a=1[cv][ca]"
@@ -415,10 +622,22 @@ class VideoEditor:
                 "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
                 "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k",
                 str(base)]
-        if not self._run(cmd):
+        if not self._run(cmd, cwd=self._base_dir):
             return None
         self._base = str(base)
         return self._base
+
+    def _bubble_video(self, index: int, clip: Clip, w: int, h: int, font: bool) -> str:
+        """A beszúrt hang alatt egy fehér gondolatbuborék látszik."""
+        x, y = int(w * 0.18), int(h * 0.32)
+        bw, bh = int(w * 0.64), int(h * 0.36)
+        box = (f"drawbox=x={x}:y={y}:w={bw}:h={bh}:color=white@0.94:t=fill")
+        text = ""
+        if font:
+            text = (",drawtext=fontfile=font.ttf:text='...':fontcolor=0x1c2430:"
+                    f"fontsize={max(28, h // 7)}:x=(w-text_w)/2:y=(h-text_h)/2")
+        return (f"color=c=0x1c2430:s={w}x{h}:r=25:d={clip.duration:.3f},"
+                f"format=yuv420p,{box}{text}[v{index}]")
 
     def export(self, start: float, end: float, out: str,
                progress=None) -> bool:

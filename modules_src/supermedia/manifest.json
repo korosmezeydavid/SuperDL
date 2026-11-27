@@ -1,10 +1,10 @@
 {
   "id": "supermedia",
   "name": "Super Media",
-  "version": "1.3.7",
+  "version": "1.3.8",
   "entry": "supermedia_mod",
   "category": "Média",
-  "description": "Super M stúdió, Super Recorder hangszerkesztő és Super Stream. A valós idejű hangváltóban formánsőrző hangmagasság-váltás és állítható, 16 sávos vocoder is van; a meglévő hangkarakterek és effektek továbbra is használhatók. Az echo, kórus, flanger, térhang, torzítás, kompresszor és EQ részletesen állítható. A Super Recorder nem foglalja el a Super Edit szövegszerkesztő helyét. A BASS és bass_fx a Core-ból jön.",
+  "description": "ÚJ a fülre-szerkesztőben: a műveletek Alt-menüben vannak, a Tab csak a markerlistát járja. A nyíl 2 másodpercet lép, a Ctrl+nyíl a lépésközt állítja 0,1 és 10 másodperc között, a Shift+nyíl kijelöl. A Ctrl+C másol, a Ctrl+X kivág, a Ctrl+V a pillanatnyi helyre illeszt. Super M stúdió, Super Recorder hangszerkesztő és Super Stream. A valós idejű hangváltóban formánsőrző hangmagasság-váltás és állítható, 16 sávos vocoder is van; a meglévő hangkarakterek és effektek továbbra is használhatók. Az echo, kórus, flanger, térhang, torzítás, kompresszor és EQ részletesen állítható. A Super Recorder nem foglalja el a Super Edit szövegszerkesztő helyét. A BASS és bass_fx a Core-ból jön.",
   "min_core_api": "1.0",
   "min_core_version": "4.0.0",
   "requires_tools": [],

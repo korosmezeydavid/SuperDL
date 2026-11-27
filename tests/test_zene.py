@@ -259,6 +259,23 @@ def test_a_kereses_korbefordul():
     win = importlib.import_module(BASE + ".zenewin")
     f = inspect.getsource(win.ZeneFrame._talalat_keres)
     assert "% n" in f, "a keresésnek körbe kell fordulnia a lista végén"
+    assert "self._indit(" not in f
+
+
+def test_a_kereses_a_nev_reszletet_szuri():
+    win = importlib.import_module(BASE + ".zenewin")
+    KT = importlib.import_module(BASE + ".konyvtar")
+    szamok = [
+        KT.Szam("a.mp3", "Győzelem induló", "Magyar"),
+        KT.Szam("b.mp3", "Csendes éj", "Karácsony"),
+        KT.Szam("c.mp3", "Másik dal", "A győztes mappa"),
+    ]
+    minta = win.keres_minta("győz")
+    talalat = [s.cim for s in szamok if win.szam_illeszik(s, minta)]
+    assert talalat == ["Győzelem induló"]
+    assert win.szam_illeszik(szamok[0], win.keres_minta("gyoz"))
+    assert not win.szam_illeszik(szamok[1], minta)
+    assert not win.szam_illeszik(szamok[2], minta)
 
 
 def test_a_hangero_megmarad_a_kovetkezo_szamra():
